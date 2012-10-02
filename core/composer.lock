@@ -1,0 +1,49 @@
+{
+    "hash": "49f3143b77fd4fbd695a56746b52042a",
+    "packages": [
+        {
+            "package": "symfony/class-loader",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/config",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/console",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/dependency-injection",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/event-dispatcher",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/http-foundation",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/http-kernel",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/routing",
+            "version": "v2.1.2"
+        },
+        {
+            "package": "symfony/yaml",
+            "version": "v2.1.2"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "stable",
+    "stability-flags": [
+
+    ]
+}
