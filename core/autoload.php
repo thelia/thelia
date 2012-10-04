@@ -22,7 +22,7 @@ foreach ($namespaces as $namespace => $directory) {
     $loader->registerNamespace($namespace, $directory);
 }
 
-$loader->register('Thelia',__DIR__ . '/lib/');
+$loader->registerNamespace('Thelia', __DIR__ . '/lib/');
 
 
 $loader->register();
