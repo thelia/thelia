@@ -3,6 +3,8 @@
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Thelia;
 
+use Symfony\Component\DependencyInjection;
+
 $env = 'debug';
 require __DIR__ . '/core/bootstrap.php';
 
@@ -18,14 +20,13 @@ if( false === in_array($request->getClientIp(), $trustIp)){
 }
 
 
-//$thelia = new Thelia('dev');
-////
+$thelia = new Thelia('dev', true);
+
+var_dump($thelia->getContainer());
+
 //$response = $thelia->handle($request)->prepare($request)->send();
-////
+//
 //$thelia->terminate($request, $reponse);
-
-Thelia::run()->send();
-
 
 
 ?>

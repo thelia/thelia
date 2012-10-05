@@ -17,5 +17,7 @@ use Symfony\Component\DependencyInjection\Reference;
 
 $loader = require __DIR__ . '/autoload.php';
 
+define('THELIA_ROOT', __DIR__ .'/../');
+
 
 ?>
