@@ -3,7 +3,7 @@
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Thelia;
 
-use Symfony\Component\DependencyInjection;
+//use Symfony\Component\DependencyInjection;
 
 $env = 'debug';
 require __DIR__ . '/core/bootstrap.php';

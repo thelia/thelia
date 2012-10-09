@@ -16,10 +16,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 
-class Thelia extends Kernel {
-    
-    const version = '0.0.1';
-    
+class Thelia extends Kernel {    
     
     protected function initializeContainer(){
         if(false === $container = require THELIA_ROOT . '/local/config/container.php'){
