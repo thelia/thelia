@@ -10,46 +10,66 @@ namespace Thelia\Core;
  */
 
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Thelia\Core\TheliaBundle;
 
-class Thelia extends Kernel {    
-    
+class Thelia extends Kernel {   
+    /**
+     * Initializes the service container.
+     *
+     * The cached version of the service container is used when fresh, otherwise the
+     * container is built.
+     */
     protected function initializeContainer(){
-        if(false === $container = require THELIA_ROOT . '/local/config/container.php'){
-            /**
-             * @todo redirect to installation process
-             * 
-             */
-            
-        }
-                
-        $this->container = $container;
+        $this->container = $this->buildContainer();
         $this->container->set('kernel', $this);
+
     }
-    
     
     /**
-     * 
-     * @return \Symfony\Component\DependencyInjection\ContainerBuilder
+     * Builds the service container.
+     *
+     * @return ContainerBuilder The compiled service container
      */
-    public function getContainer(){
-        return $this->container;
+    protected function buildContainer(){
+        
+        $container = $this->getContainerBuilder();
+        
+        foreach($this->bundles as $bundle){
+            $bundle->build($container);
+        }
+        
+        return $container;
     }
+    
+    
     
     /**
      * return available bundle
      * 
      * Part of Symfony\Component\HttpKernel\KernelInterface
      * 
+     * @return array An array of bundle instances.
+     * 
      */
     public function registerBundles() {
         
+        $bundles = array(
+            /* TheliaBundle contain all the dependency injection description */
+            new TheliaBundle()
+        );
+        
+        /**
+         * OTHER CORE BUNDLE CAN BE DECLARE HERE AND INITIALIZE WITH SPECIFIC CONFIGURATION
+         * 
+         * HOW TO DECLARE OTHER BUNDLE ? ETC
+         */
+        
+        return $bundles;
+        
     }
-    
+
     /**
      * Loads the container configuration
      * 
@@ -60,7 +80,8 @@ class Thelia extends Kernel {
      * @api
      */
     public function registerContainerConfiguration(LoaderInterface $loader){
-        
+        //Nothing is load here but it's possible to load container configuration here.
+        //exemple in sf2 : $loader->load(__DIR__.'/config/config_'.$this->getEnvironment().'.yml');
     }
     
     

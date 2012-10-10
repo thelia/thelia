@@ -22,11 +22,11 @@ if( false === in_array($request->getClientIp(), $trustIp)){
 
 $thelia = new Thelia('dev', true);
 
-var_dump($thelia->getContainer());
+//var_dump($thelia->getContainer());
 
-//$response = $thelia->handle($request)->prepare($request)->send();
-//
-//$thelia->terminate($request, $reponse);
+$response = $thelia->handle($request)->prepare($request)->send();
+
+$thelia->terminate($request, $reponse);
 
 
 ?>
