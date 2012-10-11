@@ -2,6 +2,11 @@
 
 namespace Thelia\Controller;
 
+/**
+ * 
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+
 abstract class NullController {
     
     /**

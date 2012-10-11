@@ -3,12 +3,21 @@
 namespace Thelia\Routing\Matcher;
 
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
-//use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\RequestContextAwareInterface;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\Request;
+
+/**
+ * 
+ * Collection of Matcher. 
+ * 
+ * Matcher resolve request into controller::method
+ * exemple of Matcher : UrlMatcher of HttpKernel component (but it implements UrlMatcherInterface and not RequestMatcherInterface.
+ * 
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 
 
 class TheliaMatcherCollection implements RequestMatcherInterface, RequestContextAwareInterface {
@@ -22,7 +31,7 @@ class TheliaMatcherCollection implements RequestMatcherInterface, RequestContext
     /**
      * Constructor
      * 
-     * Check if this constructor id needed (is RequestContext needed ? )
+     * Check if this constructor is needed (is RequestContext needed ? )
      */
     public function __construct() {
         $this->context = new RequestContext();
@@ -31,7 +40,9 @@ class TheliaMatcherCollection implements RequestMatcherInterface, RequestContext
     
     /**
      * allow to add a matcher routing class to the matchers collection
-     * matcher must implement RequestMatcherInterface or UrlMatcherInterface
+     * matcher must implement RequestMatcherInterface
+     * 
+     * priority can be fixed with $priority parameter
      * 
      * @param RequestMatcherInterface $matcher
      * @param int $priority set the priority of the added matcher
@@ -50,6 +61,13 @@ class TheliaMatcherCollection implements RequestMatcherInterface, RequestContext
         $this->sortedMatchers = array();
     }
     
+    
+    /**
+     * 
+     * Sort Matchers by priority
+     * 
+     * @return array Array of matchers sorted by priority.
+     */
     public function getSortedMatchers(){
         if(empty($this->sortedMatchers)){
             $this->sortedMatchers = $this->sortMatchers();
@@ -58,6 +76,13 @@ class TheliaMatcherCollection implements RequestMatcherInterface, RequestContext
         return $this->sortedMatchers;
     }
     
+    
+    /**
+     * 
+     * Sort the matcher by priority
+     * 
+     * @return array Array of matchers sorted by priority.
+     */
     public function sortMatchers(){
         $sortedMatchers = array();
         krsort($this->matchers);

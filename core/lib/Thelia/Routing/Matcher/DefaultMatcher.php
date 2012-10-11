@@ -8,6 +8,8 @@ use Thelia\Controller\NullController;
 
 /**
  * Default matcher when no action is needed and there is no result for urlmatcher
+ * 
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class DefaultMatcher implements RequestMatcherInterface{
     

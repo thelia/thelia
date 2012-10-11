@@ -5,6 +5,8 @@ namespace Thelia\Core;
 /**
  * Root class of Thelia
  * 
+ * It extends Symfony\Component\HttpKernel\Kernel for changing some fonctionnality
+ * 
  * 
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
@@ -17,6 +19,8 @@ use Thelia\Core\TheliaBundle;
 class Thelia extends Kernel {   
     /**
      * Initializes the service container.
+     * 
+     * @TODO cache container initialization
      *
      * The cached version of the service container is used when fresh, otherwise the
      * container is built.

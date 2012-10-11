@@ -2,6 +2,11 @@
 
 namespace Thelia\Autoload;
 
+/**
+ * 
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+
 class TheliaApcUniversalClassLoader extends TheliaUniversalClassLoader {
     
     private $prefix;
@@ -26,7 +31,7 @@ class TheliaApcUniversalClassLoader extends TheliaUniversalClassLoader {
     /**
      * Finds a file by class name while caching lookups to APC.
      * 
-     * Come from Symfony\Component\ClassLoader\ApcUneiversalClassLoader
+     * Come from Symfony\Component\ClassLoader\ApcUniversalClassLoader
      *
      * @param string $class A class name to resolve to file
      *

@@ -7,8 +7,26 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Scope;
 
+/**
+ * First Bundle use in Thelia
+ * It initialize dependency injection container.
+ * 
+ * @TODO load configuration from thelia plugin
+ * @TODO register database configuration.
+ * 
+ * 
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 
 class TheliaBundle extends Bundle {
+    
+    /**
+     * 
+     * Construct the depency injection builder
+     * 
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     */
+    
     public function build(ContainerBuilder $container) {
         
         $container->addScope( new Scope('request'));
@@ -27,13 +45,16 @@ class TheliaBundle extends Bundle {
         
         $container->register('resolver', 'Symfony\Component\HttpKernel\Controller\ControllerResolver');
         
-        $container->register('parser','Thelia\Core\TheliaTemplate');
+        //$container->register('parser','Thelia\Core\TheliaTemplate');
         /**
          * RouterListener implements EventSubscriberInterface and listen for kernel.request event
          */
         $container->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
             ->setArguments(array(new Reference('matcher')));
         
+        /**
+         * @TODO think how to use kernel.view event for templating. In most of case controller doesn't return a Response instance
+         */
         //$container->register('listener.view')
         
         $container->register('http_kernel','Symfony\Component\HttpKernel\HttpKernel')
@@ -45,7 +66,9 @@ class TheliaBundle extends Bundle {
                 ->addMethodCall('addSubscriber', array(new Reference('listener.router')));
         
         
-        
+        /**
+         * @TODO learn about container compilation
+         */
         
     }
 }
