@@ -2,19 +2,19 @@
 
 namespace Thelia\Controller;
 
+use Symfony\Component\HttpFoundation\Request;
+
 /**
  * 
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-abstract class NullController {
+interface NullControllerInterface {
     
     /**
      * Nothing to do
      */
-    public function noAction(){
-        
-    }
+    public function noAction(Request $request);
     
 }
 ?>

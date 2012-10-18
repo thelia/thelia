@@ -4,7 +4,7 @@ namespace Thelia\Routing\Matcher;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
-use Thelia\Controller\NullController;
+use Thelia\Controller\NullControllerInterface;
 
 /**
  * Default matcher when no action is needed and there is no result for urlmatcher
@@ -15,7 +15,7 @@ class DefaultMatcher implements RequestMatcherInterface{
     
     protected $controller;
     
-    public function __construct(NullController $controller) {
+    public function __construct(NullControllerInterface $controller) {
         $this->controller = $controller;
     }
     

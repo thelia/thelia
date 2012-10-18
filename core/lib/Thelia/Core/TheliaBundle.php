@@ -31,7 +31,8 @@ class TheliaBundle extends Bundle {
         
         $container->addScope( new Scope('request'));
         
-        $container->register('request', 'Symfony\Component\HttpFoundation\Request');
+        $container->register('request', 'Symfony\Component\HttpFoundation\Request')
+                ->setSynthetic(true);
         
         $container->register('controller.default','Thelia\Controller\DefaultController');
         $container->register('matcher.default','Thelia\Routing\Matcher\DefaultMatcher')
@@ -45,7 +46,8 @@ class TheliaBundle extends Bundle {
         
         $container->register('resolver', 'Symfony\Component\HttpKernel\Controller\ControllerResolver');
         
-        //$container->register('parser','Thelia\Core\TheliaTemplate');
+        $container->register('parser','Thelia\Core\Template\Parser')
+                ->addArgument(new Reference('service_container'));
         /**
          * RouterListener implements EventSubscriberInterface and listen for kernel.request event
          */
@@ -53,9 +55,10 @@ class TheliaBundle extends Bundle {
             ->setArguments(array(new Reference('matcher')));
         
         /**
-         * @TODO think how to use kernel.view event for templating. In most of case controller doesn't return a Response instance
+         * @TODO think how to use kernel.view event for templating. In most of case (in Thelia) controller doesn't return a Response instance
          */
-        //$container->register('listener.view')
+        $container->register('listener.view','Thelia\Core\EventSubscriber\ViewSubscriber')
+                ->addArgument(new Reference('parser'));
         
         $container->register('http_kernel','Symfony\Component\HttpKernel\HttpKernel')
             ->addArgument(new Reference('dispatcher'))        
@@ -63,7 +66,8 @@ class TheliaBundle extends Bundle {
         
         $container->register('dispatcher','Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher')
                 ->addArgument(new Reference('service_container'))
-                ->addMethodCall('addSubscriber', array(new Reference('listener.router')));
+                ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
+                ->addMethodCall('addSubscriber', array(new Reference('listener.view')));
         
         
         /**
