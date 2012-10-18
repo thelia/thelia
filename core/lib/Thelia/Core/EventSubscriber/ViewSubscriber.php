@@ -21,10 +21,20 @@ class ViewSubscriber implements EventSubscriberInterface{
     
     private $parser;
     
+    /**
+     * 
+     * @param \Thelia\Core\Template\ParserInterface $parser
+     */
     public function __construct(ParserInterface $parser) {
         $this->parser = $parser;
     }
     
+    /**
+     * 
+     * 
+     * 
+     * @param \Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent $event
+     */
     public function onKernelView(GetResponseForControllerResultEvent $event){
         $content = $this->parser->getContent();
         
@@ -32,21 +42,20 @@ class ViewSubscriber implements EventSubscriberInterface{
             $event->setResponse($content);
         }
         else{
-            $event->setResponse(new Response($this->parser->getContent(), $this->parser->getStatus()));
+            $event->setResponse(new Response($content, $this->parser->getStatus()));
         }
-
-
-        //$event->setResponse(($content = $this->parser->getContent() instanceof Response) ?: new Response($this->parser->getContent(), $this->parser->getStatus()) );
     }
     
     
     /**
      * 
+     * Register the method to execute in this class for a specific event (here the kernel.view event)
+     * 
      * @return array The event names to listen to
      */
     public static function getSubscribedEvents(){
         return array(
-            KernelEvents::VIEW => array(array('onKernelView', 32)),
+            KernelEvents::VIEW => array('onKernelView'),
         );
     }
 }

@@ -53,10 +53,7 @@ class TheliaBundle extends Bundle {
          */
         $container->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
             ->setArguments(array(new Reference('matcher')));
-        
-        /**
-         * @TODO think how to use kernel.view event for templating. In most of case (in Thelia) controller doesn't return a Response instance
-         */
+
         $container->register('listener.view','Thelia\Core\EventSubscriber\ViewSubscriber')
                 ->addArgument(new Reference('parser'));
         
