@@ -47,24 +47,43 @@ class TheliaBundle extends Bundle {
         $container->register('resolver', 'Symfony\Component\HttpKernel\Controller\ControllerResolver');
         
         $container->register('parser','Thelia\Core\Template\Parser')
-                ->addArgument(new Reference('service_container'));
+                ->addArgument(new Reference('service_container'))
+        ;
         /**
          * RouterListener implements EventSubscriberInterface and listen for kernel.request event
          */
         $container->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
-            ->setArguments(array(new Reference('matcher')));
+            ->setArguments(array(new Reference('matcher')))
+        ;
+        
+        /**
+         * @TODO add an other listener on kernel.request for checking some params Like check if User is log in, set the language and other.
+         * 
+         * $container->register()
+         * 
+         * 
+         * $container->register('listener.request', 'Thelia\Core\EventListener\RequestListener')
+         *      ->addArgument(new Reference('');
+         * ;
+         */
 
-        $container->register('listener.view','Thelia\Core\EventSubscriber\ViewSubscriber')
-                ->addArgument(new Reference('parser'));
+        $container->register('thelia.listener.view','Thelia\Core\EventListener\ViewListener')
+                ->addArgument(new Reference('parser'))
+        ;
         
         $container->register('http_kernel','Symfony\Component\HttpKernel\HttpKernel')
             ->addArgument(new Reference('dispatcher'))        
-            ->addArgument(new Reference('resolver')); 
+            ->addArgument(new Reference('resolver'))
+        ; 
         
         $container->register('dispatcher','Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher')
                 ->addArgument(new Reference('service_container'))
                 ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
-                ->addMethodCall('addSubscriber', array(new Reference('listener.view')));
+                ->addMethodCall('addSubscriber', array(new Reference('thelia.listener.view')))
+        ;
+        
+        // DEFINE DEFAULT PARAMETER LIKE
+        
         
         
         /**

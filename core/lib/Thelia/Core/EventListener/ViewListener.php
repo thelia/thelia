@@ -1,6 +1,6 @@
 <?php
 
-namespace Thelia\Core\EventSubscriber;
+namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -12,12 +12,14 @@ use Thelia\Core\Template\ParserInterface;
 
 /**
  * 
+ * ViewSubscriber Main class subscribing to view http response.
  * 
+ * @TODO Look if it's possible to block this definition in dependency-injection
  * 
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class ViewSubscriber implements EventSubscriberInterface{
+class ViewListener implements EventSubscriberInterface{
     
     private $parser;
     
@@ -31,18 +33,21 @@ class ViewSubscriber implements EventSubscriberInterface{
     
     /**
      * 
+     * Launch the parser defined on the constructor and get the result.
      * 
+     * The result is transform id needed into a Response object
      * 
      * @param \Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent $event
      */
     public function onKernelView(GetResponseForControllerResultEvent $event){
+        
         $content = $this->parser->getContent();
         
         if($content instanceof Response){
             $event->setResponse($content);
         }
         else{
-            $event->setResponse(new Response($content, $this->parser->getStatus()));
+            $event->setResponse(new Response($content, $this->parser->getStatus() ?: 200));
         }
     }
     

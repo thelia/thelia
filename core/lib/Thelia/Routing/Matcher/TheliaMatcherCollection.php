@@ -150,10 +150,6 @@ class TheliaMatcherCollection implements RequestMatcherInterface, RequestContext
      */
     public function getContext(){
         return $this->context;
-    }
-    
-    
-    
-    
+    } 
 }
 ?>

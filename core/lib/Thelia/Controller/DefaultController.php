@@ -7,6 +7,8 @@ use Symfony\Component\HttpFoundation\Request;
 
 /**
  * 
+ * Must be the last controller call. It fixes default values
+ * 
  * @author Manuel Raynaud <mraynadu@openstudio.fr>
  */
 
