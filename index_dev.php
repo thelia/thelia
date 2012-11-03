@@ -15,16 +15,12 @@ $trustIp = array(
 
 $request = Request::createFromGlobals();
 
-if( false === in_array($request->getClientIp(), $trustIp)){
+if ( false === in_array($request->getClientIp(), $trustIp)) {
     //change request to send to a 404 error page
 }
-
 
 $thelia = new Thelia('dev', true);
 
 $response = $thelia->handle($request)->prepare($request)->send();
 
 $thelia->terminate($request, $response);
-
-
-?>

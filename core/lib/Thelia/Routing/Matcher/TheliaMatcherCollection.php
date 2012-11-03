@@ -10,91 +10,90 @@ use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
- * 
- * Collection of Matcher. 
- * 
+ *
+ * Collection of Matcher.
+ *
  * Matcher resolve request into controller::method
  * exemple of Matcher : UrlMatcher of HttpKernel component (but it implements UrlMatcherInterface and not RequestMatcherInterface.
- * 
+ *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-
-class TheliaMatcherCollection implements RequestMatcherInterface, RequestContextAwareInterface {
-    
+class TheliaMatcherCollection implements RequestMatcherInterface, RequestContextAwareInterface
+{
     protected $context;
     protected $matchers = array();
     protected $defaultMatcher;
-    
+
     protected $sortedMatchers = array();
-    
+
     /**
      * Constructor
-     * 
+     *
      * Check if this constructor is needed (is RequestContext needed ? )
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->context = new RequestContext();
     }
-    
-    
+
     /**
      * allow to add a matcher routing class to the matchers collection
      * matcher must implement RequestMatcherInterface
-     * 
+     *
      * priority can be fixed with $priority parameter
-     * 
+     *
      * @param RequestMatcherInterface $matcher
-     * @param int $priority set the priority of the added matcher
-     * 
+     * @param int                     $priority set the priority of the added matcher
+     *
      */
-    public function add(RequestMatcherInterface $matcher, $priority = 0){
-        if(!is_object($matcher)){
+    public function add(RequestMatcherInterface $matcher, $priority = 0)
+    {
+        if (!is_object($matcher)) {
             $matcher = new $matcher();
         }
-        
-        if(!isset($this->matchers[$priority])){
+
+        if (!isset($this->matchers[$priority])) {
             $this->matchers[$priority] = array();
         }
-        
+
         $this->matchers[$priority][] = $matcher;
         $this->sortedMatchers = array();
     }
-    
-    
+
     /**
-     * 
+     *
      * Sort Matchers by priority
-     * 
+     *
      * @return array Array of matchers sorted by priority.
      */
-    public function getSortedMatchers(){
-        if(empty($this->sortedMatchers)){
+    public function getSortedMatchers()
+    {
+        if (empty($this->sortedMatchers)) {
             $this->sortedMatchers = $this->sortMatchers();
         }
-        
+
         return $this->sortedMatchers;
     }
-    
-    
+
     /**
-     * 
+     *
      * Sort the matcher by priority
-     * 
+     *
      * @return array Array of matchers sorted by priority.
      */
-    public function sortMatchers(){
+    public function sortMatchers()
+    {
         $sortedMatchers = array();
         krsort($this->matchers);
-        
-        foreach($this->matchers as $matcher){
+
+        foreach ($this->matchers as $matcher) {
             $sortedMatchers = array_merge($sortedMatchers,$matcher);
         }
-        
+
         return $sortedMatchers;
     }
-    
-    
+
     /**
      * Tries to match a request with a set of routes.
      *
@@ -108,38 +107,37 @@ class TheliaMatcherCollection implements RequestMatcherInterface, RequestContext
      * @throws ResourceNotFoundException If no matching resource could be found
      * @throws MethodNotAllowedException If a matching resource was found but the request method is not allowed
      */
-    public function matchRequest(Request $request) {
-        if(empty($this->matchers)){
+    public function matchRequest(Request $request)
+    {
+        if (empty($this->matchers)) {
             throw new \InvalidArgumentException('there is no matcher added to the TheliaMatcherCollection');
         }
-        
-        foreach($this->getSortedMatchers() as $matcher){
-            try{
+
+        foreach ($this->getSortedMatchers() as $matcher) {
+            try {
                 return $matcher->matchRequest($request);
-            }
-            catch (ResourceNotFoundException $e){
+            } catch (ResourceNotFoundException $e) {
                 //no action, wait for next matcher
-            }
-            catch(MethodNotAllowedException $e){
+            } catch (MethodNotAllowedException $e) {
                 /**
                  * @todo what todo with a MethodNotAllowedException ?
                  */
             }
         }
 
-        
         throw new ResourceNotFoundException('No one matcher in this collection matched the current request');
     }
-    
+
     /**
      * Sets the request context.
      *
      * @param RequestContext $context The context
      *
      */
-    public function setContext(RequestContext $context){
+    public function setContext(RequestContext $context)
+    {
         $this->context = $context;
-        
+
     }
 
     /**
@@ -148,8 +146,8 @@ class TheliaMatcherCollection implements RequestMatcherInterface, RequestContext
      * @return RequestContext The context
      *
      */
-    public function getContext(){
+    public function getContext()
+    {
         return $this->context;
-    } 
+    }
 }
-?>
