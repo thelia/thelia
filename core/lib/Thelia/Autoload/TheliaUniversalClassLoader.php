@@ -9,7 +9,9 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
  *
  * extends Symfony\Component\ClassLoader\UniversalClassLoader
  *
- * This class respect PSR-0 autoloading standard and allow to load traditionnal Thelia classes
+ * This class respect PSR-0 autoloading standard and allow to load traditionnal Thelia classes.
+ * 
+ * classMap can be used to.
  *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  *
@@ -18,6 +20,7 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 class TheliaUniversalClassLoader extends UniversalClassLoader
 {
     private $directories = array();
+    private $classMap = array();
 
     /**
      *
@@ -53,6 +56,18 @@ class TheliaUniversalClassLoader extends UniversalClassLoader
     {
         return $this->directories;
     }
+    
+    /**
+     * @param array $classMap Class to filename map
+     */
+    public function addClassMap(array $classMap)
+    {
+        if ($this->classMap) {
+            $this->classMap = array_merge($this->classMap, $classMap);
+        } else {
+            $this->classMap = $classMap;
+        }
+    }
 
     /**
      *
@@ -63,6 +78,10 @@ class TheliaUniversalClassLoader extends UniversalClassLoader
      */
     public function findFile($class)
     {
+        if (isset($this->classMap[$class])) {
+            return $this->classMap[$class];
+        }
+        
         foreach ($this->directories as $directory) {
 
             if (is_file($directory.DIRECTORY_SEPARATOR.$class.".class.php")) {

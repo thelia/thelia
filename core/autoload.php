@@ -21,4 +21,11 @@ foreach ($namespaces as $namespace => $directory) {
 
 $loader->registerNamespace('Thelia', __DIR__ . '/lib/');
 
+if(file_exists(__DIR__ . '/vendor/composer/autoload_classmap.php'))
+{
+    $classMap = require __DIR__ . '/vendor/composer/autoload_classmap.php';
+        
+    $loader->addClassMap($classMap);
+}
+
 $loader->register();

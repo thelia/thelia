@@ -7,7 +7,8 @@
         "symfony/yaml" : "2.1.*",
         "symfony/dependency-injection" : "2.1.*",
         "symfony/console" : "2.1.*",
-        "symfony/event-dispatcher" : "2.1.*"
+        "symfony/event-dispatcher" : "2.1.*",
+        "propel/propel1" : "1.6.*"
     },
     "minimum-stability": "stable"
 }

@@ -240,6 +240,11 @@ class Response
             }
         }
 
+        // Fix protocol
+        if ('HTTP/1.0' != $request->server->get('SERVER_PROTOCOL')) {
+            $this->setProtocolVersion('1.1');
+        }
+
         return $this;
     }
 
@@ -574,7 +579,7 @@ class Response
      */
     public function getDate()
     {
-        return $this->headers->getDate('Date');
+        return $this->headers->getDate('Date', new \DateTime());
     }
 
     /**
