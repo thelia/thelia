@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="thelia" defaultIdMethod="native">
+    <table name="category" namespace="Thelia\Model">
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="parent" type="integer" defaultValue="0" />
+        <column name="link" type="varchar" size="255" />
+        <column name="visible" type="tinyint" required="true" />
+        <column name="position" type="integer" required="true" />
+        <column name="created_at" type="timestamp" required="true" />
+        <column name="updated_at" type="timestamp" required="true" /> 
+    </table>
+    
+    <table name="category_desc" namespace="Thelia\Model">
+        <vendor type="mysql">
+            <parameter name="Engine" value="InnoDB"/>
+            <parameter name="Charset" value="utf8"/>
+        </vendor>
+        <column name="id" type="integer" required="true" primaryKey="true" autoIncrement="true" />
+        <column name="category_id" type="integer" required="true" />
+        <column name="lang" type="integer" required="true" />
+        <column name="title" type="varchar" size="255" />
+        <column name="description" type="LONGVARCHAR" />
+        <column name="chapo" type="LONGVARCHAR" />
+        <column name="postscriptum" type="LONGVARCHAR" />
+        <column name="created_at" type="timestamp" required="true" />
+        <column name="updated_at" type="timestamp" required="true" /> 
+        <foreign-key foreignTable="category">
+            <reference local="category_id" foreign="id" />
+        </foreign-key>
+        <index name="category">
+            <index-column name="category_id" />
+        </index>
+    </table>
+</database>
+
