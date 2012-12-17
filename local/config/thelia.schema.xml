@@ -84,7 +84,7 @@
     <table name="admin_log" phpName="AdminLog" namespace="">
         <vendor type="mysql">
             <parameter name="Engine" value="InnoDB" />
-            <parameter name="Charset" value="" />
+            <parameter name="Charset" value="utf8" />
         </vendor>
         <column name="id" type="INTEGER" primaryKey="true" required="true" autoIncrement="true" />
         <column name="admin_login" type="VARCHAR" size="255" />
@@ -98,7 +98,7 @@
     <table name="area" phpName="Area" namespace="">
         <vendor type="mysql">
             <parameter name="Engine" value="InnoDB" />
-            <parameter name="Charset" value="" />
+            <parameter name="Charset" value="utf8" />
         </vendor>
         <column name="id" type="INTEGER" primaryKey="true" required="true" autoIncrement="true" />
         <column name="name" type="VARCHAR" size="100" required="true" />
@@ -237,7 +237,7 @@
         <column name="visible" type="TINYINT" required="true" />
         <column name="position" type="INTEGER" required="true" />
         <column name="created_at" type="TIMESTAMP" required="true" />
-        <column name="update_at" type="TIMESTAMP" required="true" />
+        <column name="updated_at" type="TIMESTAMP" required="true" />
         <foreign-key name="fk_attribute_category_category_id" foreignTable="attribute_category" phpName="AttributeCategory" refPhpName="Category" onDelete="cascade" onUpdate="restrict">
             <reference local="id" foreign="category_id" />
         </foreign-key>
@@ -316,7 +316,7 @@
     <table name="config_desc" phpName="ConfigDesc" namespace="">
         <vendor type="mysql">
             <parameter name="Engine" value="InnoDB" />
-            <parameter name="Charset" value="" />
+            <parameter name="Charset" value="utf8" />
         </vendor>
         <column name="id" type="INTEGER" primaryKey="true" required="true" autoIncrement="true" />
         <column name="config_id" type="INTEGER" required="true" />
@@ -603,7 +603,7 @@
     <table name="delivzone" phpName="Delivzone" namespace="">
         <vendor type="mysql">
             <parameter name="Engine" value="InnoDB" />
-            <parameter name="Charset" value="" />
+            <parameter name="Charset" value="utf8" />
         </vendor>
         <column name="id" type="INTEGER" primaryKey="true" required="true" autoIncrement="true" />
         <column name="area_id" type="INTEGER" />
@@ -949,7 +949,7 @@
     <table name="lang" phpName="Lang" namespace="">
         <vendor type="mysql">
             <parameter name="Engine" value="InnoDB" />
-            <parameter name="Charset" value="" />
+            <parameter name="Charset" value="utf8" />
         </vendor>
         <column name="id" type="INTEGER" primaryKey="true" required="true" autoIncrement="true" />
         <column name="title" type="VARCHAR" size="100" />

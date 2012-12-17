@@ -98,10 +98,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $created_at;
 
     /**
-     * The value for the update_at field.
+     * The value for the updated_at field.
      * @var        string
      */
-    protected $update_at;
+    protected $updated_at;
 
     /**
      * @var        AttributeCategory
@@ -245,7 +245,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [optionally formatted] temporal [update_at] column value.
+     * Get the [optionally formatted] temporal [updated_at] column value.
      *
      *
      * @param string $format The date/time format string (either date()-style or strftime()-style).
@@ -253,21 +253,21 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getUpdateAt($format = 'Y-m-d H:i:s')
+    public function getUpdatedAt($format = 'Y-m-d H:i:s')
     {
-        if ($this->update_at === null) {
+        if ($this->updated_at === null) {
             return null;
         }
 
-        if ($this->update_at === '0000-00-00 00:00:00') {
+        if ($this->updated_at === '0000-00-00 00:00:00') {
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
         } else {
             try {
-                $dt = new DateTime($this->update_at);
+                $dt = new DateTime($this->updated_at);
             } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->update_at, true), $x);
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
             }
         }
 
@@ -442,27 +442,27 @@ abstract class BaseCategory extends BaseObject implements Persistent
     } // setCreatedAt()
 
     /**
-     * Sets the value of [update_at] column to a normalized version of the date/time value specified.
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
      *               Empty strings are treated as null.
      * @return Category The current object (for fluent API support)
      */
-    public function setUpdateAt($v)
+    public function setUpdatedAt($v)
     {
         $dt = PropelDateTime::newInstance($v, null, 'DateTime');
-        if ($this->update_at !== null || $dt !== null) {
-            $currentDateAsString = ($this->update_at !== null && $tmpDt = new DateTime($this->update_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
             $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
             if ($currentDateAsString !== $newDateAsString) {
-                $this->update_at = $newDateAsString;
-                $this->modifiedColumns[] = CategoryPeer::UPDATE_AT;
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = CategoryPeer::UPDATED_AT;
             }
         } // if either are not null
 
 
         return $this;
-    } // setUpdateAt()
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -502,7 +502,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->visible = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->position = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->update_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -834,8 +834,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
         if ($this->isColumnModified(CategoryPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
-        if ($this->isColumnModified(CategoryPeer::UPDATE_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATE_AT`';
+        if ($this->isColumnModified(CategoryPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
@@ -866,8 +866,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATE_AT`':
-                        $stmt->bindValue($identifier, $this->update_at, PDO::PARAM_STR);
+                    case '`UPDATED_AT`':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1076,7 +1076,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 return $this->getCreatedAt();
                 break;
             case 6:
-                return $this->getUpdateAt();
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -1113,7 +1113,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $keys[3] => $this->getVisible(),
             $keys[4] => $this->getPosition(),
             $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdateAt(),
+            $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aAttributeCategory) {
@@ -1193,7 +1193,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 $this->setCreatedAt($value);
                 break;
             case 6:
-                $this->setUpdateAt($value);
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
     }
@@ -1225,7 +1225,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
         if (array_key_exists($keys[3], $arr)) $this->setVisible($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdateAt($arr[$keys[6]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
 
     /**
@@ -1243,7 +1243,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
         if ($this->isColumnModified(CategoryPeer::VISIBLE)) $criteria->add(CategoryPeer::VISIBLE, $this->visible);
         if ($this->isColumnModified(CategoryPeer::POSITION)) $criteria->add(CategoryPeer::POSITION, $this->position);
         if ($this->isColumnModified(CategoryPeer::CREATED_AT)) $criteria->add(CategoryPeer::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(CategoryPeer::UPDATE_AT)) $criteria->add(CategoryPeer::UPDATE_AT, $this->update_at);
+        if ($this->isColumnModified(CategoryPeer::UPDATED_AT)) $criteria->add(CategoryPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1312,7 +1312,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
         $copyObj->setVisible($this->getVisible());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
-        $copyObj->setUpdateAt($this->getUpdateAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1798,7 +1798,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
         $this->visible = null;
         $this->position = null;
         $this->created_at = null;
-        $this->update_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();

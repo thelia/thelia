@@ -35,7 +35,7 @@ use Thelia\Model\Rewriting;
  * @method CategoryQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method CategoryQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method CategoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method CategoryQuery orderByUpdateAt($order = Criteria::ASC) Order by the update_at column
+ * @method CategoryQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method CategoryQuery groupById() Group by the id column
  * @method CategoryQuery groupByParent() Group by the parent column
@@ -43,7 +43,7 @@ use Thelia\Model\Rewriting;
  * @method CategoryQuery groupByVisible() Group by the visible column
  * @method CategoryQuery groupByPosition() Group by the position column
  * @method CategoryQuery groupByCreatedAt() Group by the created_at column
- * @method CategoryQuery groupByUpdateAt() Group by the update_at column
+ * @method CategoryQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method CategoryQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method CategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -90,7 +90,7 @@ use Thelia\Model\Rewriting;
  * @method Category findOneByVisible(int $visible) Return the first Category filtered by the visible column
  * @method Category findOneByPosition(int $position) Return the first Category filtered by the position column
  * @method Category findOneByCreatedAt(string $created_at) Return the first Category filtered by the created_at column
- * @method Category findOneByUpdateAt(string $update_at) Return the first Category filtered by the update_at column
+ * @method Category findOneByUpdatedAt(string $updated_at) Return the first Category filtered by the updated_at column
  *
  * @method array findById(int $id) Return Category objects filtered by the id column
  * @method array findByParent(int $parent) Return Category objects filtered by the parent column
@@ -98,7 +98,7 @@ use Thelia\Model\Rewriting;
  * @method array findByVisible(int $visible) Return Category objects filtered by the visible column
  * @method array findByPosition(int $position) Return Category objects filtered by the position column
  * @method array findByCreatedAt(string $created_at) Return Category objects filtered by the created_at column
- * @method array findByUpdateAt(string $update_at) Return Category objects filtered by the update_at column
+ * @method array findByUpdatedAt(string $updated_at) Return Category objects filtered by the updated_at column
  *
  * @package    propel.generator.Thelia.Model.om
  */
@@ -188,7 +188,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PARENT`, `LINK`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATE_AT` FROM `category` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `PARENT`, `LINK`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `category` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -516,16 +516,16 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the update_at column
+     * Filter the query on the updated_at column
      *
      * Example usage:
      * <code>
-     * $query->filterByUpdateAt('2011-03-14'); // WHERE update_at = '2011-03-14'
-     * $query->filterByUpdateAt('now'); // WHERE update_at = '2011-03-14'
-     * $query->filterByUpdateAt(array('max' => 'yesterday')); // WHERE update_at > '2011-03-13'
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     mixed $updateAt The value to use as filter.
+     * @param     mixed $updatedAt The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
@@ -535,16 +535,16 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function filterByUpdateAt($updateAt = null, $comparison = null)
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
-        if (is_array($updateAt)) {
+        if (is_array($updatedAt)) {
             $useMinMax = false;
-            if (isset($updateAt['min'])) {
-                $this->addUsingAlias(CategoryPeer::UPDATE_AT, $updateAt['min'], Criteria::GREATER_EQUAL);
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(CategoryPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($updateAt['max'])) {
-                $this->addUsingAlias(CategoryPeer::UPDATE_AT, $updateAt['max'], Criteria::LESS_EQUAL);
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(CategoryPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -555,7 +555,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CategoryPeer::UPDATE_AT, $updateAt, $comparison);
+        return $this->addUsingAlias(CategoryPeer::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**

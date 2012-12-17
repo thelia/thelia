@@ -70,8 +70,8 @@ abstract class BaseCategoryPeer
     /** the column name for the CREATED_AT field */
     const CREATED_AT = 'category.CREATED_AT';
 
-    /** the column name for the UPDATE_AT field */
-    const UPDATE_AT = 'category.UPDATE_AT';
+    /** the column name for the UPDATED_AT field */
+    const UPDATED_AT = 'category.UPDATED_AT';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -92,11 +92,11 @@ abstract class BaseCategoryPeer
      * e.g. CategoryPeer::$fieldNames[CategoryPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Parent', 'Link', 'Visible', 'Position', 'CreatedAt', 'UpdateAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parent', 'link', 'visible', 'position', 'createdAt', 'updateAt', ),
-        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID, CategoryPeer::PARENT, CategoryPeer::LINK, CategoryPeer::VISIBLE, CategoryPeer::POSITION, CategoryPeer::CREATED_AT, CategoryPeer::UPDATE_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PARENT', 'LINK', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATE_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'parent', 'link', 'visible', 'position', 'created_at', 'update_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Parent', 'Link', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parent', 'link', 'visible', 'position', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID, CategoryPeer::PARENT, CategoryPeer::LINK, CategoryPeer::VISIBLE, CategoryPeer::POSITION, CategoryPeer::CREATED_AT, CategoryPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PARENT', 'LINK', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'parent', 'link', 'visible', 'position', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -107,11 +107,11 @@ abstract class BaseCategoryPeer
      * e.g. CategoryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Parent' => 1, 'Link' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdateAt' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updateAt' => 6, ),
-        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID => 0, CategoryPeer::PARENT => 1, CategoryPeer::LINK => 2, CategoryPeer::VISIBLE => 3, CategoryPeer::POSITION => 4, CategoryPeer::CREATED_AT => 5, CategoryPeer::UPDATE_AT => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PARENT' => 1, 'LINK' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATE_AT' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'update_at' => 6, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Parent' => 1, 'Link' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID => 0, CategoryPeer::PARENT => 1, CategoryPeer::LINK => 2, CategoryPeer::VISIBLE => 3, CategoryPeer::POSITION => 4, CategoryPeer::CREATED_AT => 5, CategoryPeer::UPDATED_AT => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PARENT' => 1, 'LINK' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -192,7 +192,7 @@ abstract class BaseCategoryPeer
             $criteria->addSelectColumn(CategoryPeer::VISIBLE);
             $criteria->addSelectColumn(CategoryPeer::POSITION);
             $criteria->addSelectColumn(CategoryPeer::CREATED_AT);
-            $criteria->addSelectColumn(CategoryPeer::UPDATE_AT);
+            $criteria->addSelectColumn(CategoryPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PARENT');
@@ -200,7 +200,7 @@ abstract class BaseCategoryPeer
             $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATE_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 
