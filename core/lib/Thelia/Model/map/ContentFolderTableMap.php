@@ -1,0 +1,59 @@
+<?php
+
+namespace Thelia\Model\map;
+
+use \RelationMap;
+use \TableMap;
+
+
+/**
+ * This class defines the structure of the 'content_folder' table.
+ *
+ *
+ *
+ * This map class is used by Propel to do runtime db structure discovery.
+ * For example, the createSelectSql() method checks the type of a given column used in an
+ * ORDER BY clause to know whether it needs to apply SQL to make the ORDER BY case-insensitive
+ * (i.e. if it's a text column type).
+ *
+ * @package    propel.generator.Thelia.Model.map
+ */
+class ContentFolderTableMap extends TableMap
+{
+
+    /**
+     * The (dot-path) name of this class
+     */
+    const CLASS_NAME = 'Thelia.Model.map.ContentFolderTableMap';
+
+    /**
+     * Initialize the table attributes, columns and validators
+     * Relations are not initialized by this method since they are lazy loaded
+     *
+     * @return void
+     * @throws PropelException
+     */
+    public function initialize()
+    {
+        // attributes
+        $this->setName('content_folder');
+        $this->setPhpName('ContentFolder');
+        $this->setClassname('Thelia\\Model\\ContentFolder');
+        $this->setPackage('Thelia.Model');
+        $this->setUseIdGenerator(false);
+        // columns
+        $this->addPrimaryKey('CONTENT_ID', 'ContentId', 'INTEGER', true, null, null);
+        $this->addPrimaryKey('FOLDER_ID', 'FolderId', 'INTEGER', true, null, null);
+        // validators
+    } // initialize()
+
+    /**
+     * Build the RelationMap objects for this table relationships
+     */
+    public function buildRelations()
+    {
+        $this->addRelation('Content', 'Thelia\\Model\\Content', RelationMap::ONE_TO_ONE, array('content_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Folder', 'Thelia\\Model\\Folder', RelationMap::ONE_TO_ONE, array('folder_id' => 'id', ), 'CASCADE', 'RESTRICT');
+    } // buildRelations()
+
+} // ContentFolderTableMap
