@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Message;
 use Thelia\Model\MessageDesc;
@@ -78,9 +80,10 @@ abstract class BaseMessage extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        MessageDesc
+     * @var        PropelObjectCollection|MessageDesc[] Collection to store aggregation of MessageDesc objects.
      */
-    protected $aMessageDesc;
+    protected $collMessageDescs;
+    protected $collMessageDescsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -95,6 +98,12 @@ abstract class BaseMessage extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $messageDescsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -215,10 +224,6 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = MessagePeer::ID;
-        }
-
-        if ($this->aMessageDesc !== null && $this->aMessageDesc->getMessageId() !== $v) {
-            $this->aMessageDesc = null;
         }
 
 
@@ -381,9 +386,6 @@ abstract class BaseMessage extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aMessageDesc !== null && $this->id !== $this->aMessageDesc->getMessageId()) {
-            $this->aMessageDesc = null;
-        }
     } // ensureConsistency
 
     /**
@@ -423,7 +425,8 @@ abstract class BaseMessage extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aMessageDesc = null;
+            $this->collMessageDescs = null;
+
         } // if (deep)
     }
 
@@ -537,18 +540,6 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aMessageDesc !== null) {
-                if ($this->aMessageDesc->isModified() || $this->aMessageDesc->isNew()) {
-                    $affectedRows += $this->aMessageDesc->save($con);
-                }
-                $this->setMessageDesc($this->aMessageDesc);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -558,6 +549,23 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->messageDescsScheduledForDeletion !== null) {
+                if (!$this->messageDescsScheduledForDeletion->isEmpty()) {
+                    MessageDescQuery::create()
+                        ->filterByPrimaryKeys($this->messageDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->messageDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMessageDescs !== null) {
+                foreach ($this->collMessageDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -721,22 +729,18 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aMessageDesc !== null) {
-                if (!$this->aMessageDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aMessageDesc->getValidationFailures());
-                }
-            }
-
-
             if (($retval = MessagePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collMessageDescs !== null) {
+                    foreach ($this->collMessageDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -824,8 +828,8 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aMessageDesc) {
-                $result['MessageDesc'] = $this->aMessageDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collMessageDescs) {
+                $result['MessageDescs'] = $this->collMessageDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -996,9 +1000,10 @@ abstract class BaseMessage extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getMessageDesc();
-            if ($relObj) {
-                $copyObj->setMessageDesc($relObj->copy($deepCopy));
+            foreach ($this->getMessageDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMessageDesc($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1051,51 +1056,227 @@ abstract class BaseMessage extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a MessageDesc object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             MessageDesc $v
-     * @return Message The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('MessageDesc' == $relationName) {
+            $this->initMessageDescs();
+        }
+    }
+
+    /**
+     * Clears out the collMessageDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addMessageDescs()
+     */
+    public function clearMessageDescs()
+    {
+        $this->collMessageDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collMessageDescsPartial = null;
+    }
+
+    /**
+     * reset is the collMessageDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialMessageDescs($v = true)
+    {
+        $this->collMessageDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collMessageDescs collection.
+     *
+     * By default this just sets the collMessageDescs collection to an empty array (like clearcollMessageDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMessageDescs($overrideExisting = true)
+    {
+        if (null !== $this->collMessageDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collMessageDescs = new PropelObjectCollection();
+        $this->collMessageDescs->setModel('MessageDesc');
+    }
+
+    /**
+     * Gets an array of MessageDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Message is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|MessageDesc[] List of MessageDesc objects
      * @throws PropelException
      */
-    public function setMessageDesc(MessageDesc $v = null)
+    public function getMessageDescs($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collMessageDescsPartial && !$this->isNew();
+        if (null === $this->collMessageDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMessageDescs) {
+                // return empty collection
+                $this->initMessageDescs();
+            } else {
+                $collMessageDescs = MessageDescQuery::create(null, $criteria)
+                    ->filterByMessage($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collMessageDescsPartial && count($collMessageDescs)) {
+                      $this->initMessageDescs(false);
+
+                      foreach($collMessageDescs as $obj) {
+                        if (false == $this->collMessageDescs->contains($obj)) {
+                          $this->collMessageDescs->append($obj);
+                        }
+                      }
+
+                      $this->collMessageDescsPartial = true;
+                    }
+
+                    return $collMessageDescs;
+                }
+
+                if($partial && $this->collMessageDescs) {
+                    foreach($this->collMessageDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collMessageDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMessageDescs = $collMessageDescs;
+                $this->collMessageDescsPartial = false;
+            }
+        }
+
+        return $this->collMessageDescs;
+    }
+
+    /**
+     * Sets a collection of MessageDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $messageDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setMessageDescs(PropelCollection $messageDescs, PropelPDO $con = null)
+    {
+        $this->messageDescsScheduledForDeletion = $this->getMessageDescs(new Criteria(), $con)->diff($messageDescs);
+
+        foreach ($this->messageDescsScheduledForDeletion as $messageDescRemoved) {
+            $messageDescRemoved->setMessage(null);
+        }
+
+        $this->collMessageDescs = null;
+        foreach ($messageDescs as $messageDesc) {
+            $this->addMessageDesc($messageDesc);
+        }
+
+        $this->collMessageDescs = $messageDescs;
+        $this->collMessageDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related MessageDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related MessageDesc objects.
+     * @throws PropelException
+     */
+    public function countMessageDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collMessageDescsPartial && !$this->isNew();
+        if (null === $this->collMessageDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMessageDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getMessageDescs());
+                }
+                $query = MessageDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByMessage($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getMessageId());
+            return count($this->collMessageDescs);
         }
+    }
 
-        $this->aMessageDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setMessage($this);
+    /**
+     * Method called to associate a MessageDesc object to this object
+     * through the MessageDesc foreign key attribute.
+     *
+     * @param    MessageDesc $l MessageDesc
+     * @return Message The current object (for fluent API support)
+     */
+    public function addMessageDesc(MessageDesc $l)
+    {
+        if ($this->collMessageDescs === null) {
+            $this->initMessageDescs();
+            $this->collMessageDescsPartial = true;
         }
-
+        if (!$this->collMessageDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddMessageDesc($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	MessageDesc $messageDesc The messageDesc object to add.
+     */
+    protected function doAddMessageDesc($messageDesc)
+    {
+        $this->collMessageDescs[]= $messageDesc;
+        $messageDesc->setMessage($this);
+    }
 
     /**
-     * Get the associated MessageDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return MessageDesc The associated MessageDesc object.
-     * @throws PropelException
+     * @param	MessageDesc $messageDesc The messageDesc object to remove.
      */
-    public function getMessageDesc(PropelPDO $con = null)
+    public function removeMessageDesc($messageDesc)
     {
-        if ($this->aMessageDesc === null && ($this->id !== null)) {
-            $this->aMessageDesc = MessageDescQuery::create()
-                ->filterByMessage($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aMessageDesc->setMessage($this);
+        if ($this->getMessageDescs()->contains($messageDesc)) {
+            $this->collMessageDescs->remove($this->collMessageDescs->search($messageDesc));
+            if (null === $this->messageDescsScheduledForDeletion) {
+                $this->messageDescsScheduledForDeletion = clone $this->collMessageDescs;
+                $this->messageDescsScheduledForDeletion->clear();
+            }
+            $this->messageDescsScheduledForDeletion[]= $messageDesc;
+            $messageDesc->setMessage(null);
         }
-
-        return $this->aMessageDesc;
     }
 
     /**
@@ -1128,9 +1309,17 @@ abstract class BaseMessage extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collMessageDescs) {
+                foreach ($this->collMessageDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aMessageDesc = null;
+        if ($this->collMessageDescs instanceof PropelCollection) {
+            $this->collMessageDescs->clearIterator();
+        }
+        $this->collMessageDescs = null;
     }
 
     /**

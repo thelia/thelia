@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\OrderStatus;
 use Thelia\Model\OrderStatusDesc;
@@ -98,9 +96,9 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        OrderStatus one-to-one related OrderStatus object
+     * @var        OrderStatus
      */
-    protected $singleOrderStatus;
+    protected $aOrderStatus;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,12 +113,6 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $orderStatussScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -292,6 +284,10 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
         if ($this->status_id !== $v) {
             $this->status_id = $v;
             $this->modifiedColumns[] = OrderStatusDescPeer::STATUS_ID;
+        }
+
+        if ($this->aOrderStatus !== null && $this->aOrderStatus->getId() !== $v) {
+            $this->aOrderStatus = null;
         }
 
 
@@ -499,6 +495,9 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aOrderStatus !== null && $this->status_id !== $this->aOrderStatus->getId()) {
+            $this->aOrderStatus = null;
+        }
     } // ensureConsistency
 
     /**
@@ -538,8 +537,7 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleOrderStatus = null;
-
+            $this->aOrderStatus = null;
         } // if (deep)
     }
 
@@ -653,6 +651,18 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aOrderStatus !== null) {
+                if ($this->aOrderStatus->isModified() || $this->aOrderStatus->isNew()) {
+                    $affectedRows += $this->aOrderStatus->save($con);
+                }
+                $this->setOrderStatus($this->aOrderStatus);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -662,21 +672,6 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->orderStatussScheduledForDeletion !== null) {
-                if (!$this->orderStatussScheduledForDeletion->isEmpty()) {
-                    OrderStatusQuery::create()
-                        ->filterByPrimaryKeys($this->orderStatussScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->orderStatussScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleOrderStatus !== null) {
-                if (!$this->singleOrderStatus->isDeleted()) {
-                        $affectedRows += $this->singleOrderStatus->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -858,16 +853,22 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aOrderStatus !== null) {
+                if (!$this->aOrderStatus->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aOrderStatus->getValidationFailures());
+                }
+            }
+
+
             if (($retval = OrderStatusDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleOrderStatus !== null) {
-                    if (!$this->singleOrderStatus->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleOrderStatus->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -967,8 +968,8 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleOrderStatus) {
-                $result['OrderStatus'] = $this->singleOrderStatus->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aOrderStatus) {
+                $result['OrderStatus'] = $this->aOrderStatus->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1157,11 +1158,6 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getOrderStatus();
-            if ($relObj) {
-                $copyObj->setOrderStatus($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1212,53 +1208,55 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a OrderStatus object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single OrderStatus object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return OrderStatus
-     * @throws PropelException
-     */
-    public function getOrderStatus(PropelPDO $con = null)
-    {
-
-        if ($this->singleOrderStatus === null && !$this->isNew()) {
-            $this->singleOrderStatus = OrderStatusQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleOrderStatus;
-    }
-
-    /**
-     * Sets a single OrderStatus object as related to this object by a one-to-one relationship.
-     *
-     * @param             OrderStatus $v OrderStatus
+     * @param             OrderStatus $v
      * @return OrderStatusDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setOrderStatus(OrderStatus $v = null)
     {
-        $this->singleOrderStatus = $v;
-
-        // Make sure that that the passed-in OrderStatus isn't already associated with this object
-        if ($v !== null && $v->getOrderStatusDesc() === null) {
-            $v->setOrderStatusDesc($this);
+        if ($v === null) {
+            $this->setStatusId(NULL);
+        } else {
+            $this->setStatusId($v->getId());
         }
 
+        $this->aOrderStatus = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the OrderStatus object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderStatusDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated OrderStatus object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return OrderStatus The associated OrderStatus object.
+     * @throws PropelException
+     */
+    public function getOrderStatus(PropelPDO $con = null)
+    {
+        if ($this->aOrderStatus === null && ($this->status_id !== null)) {
+            $this->aOrderStatus = OrderStatusQuery::create()->findPk($this->status_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aOrderStatus->addOrderStatusDescs($this);
+             */
+        }
+
+        return $this->aOrderStatus;
     }
 
     /**
@@ -1294,15 +1292,9 @@ abstract class BaseOrderStatusDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleOrderStatus) {
-                $this->singleOrderStatus->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleOrderStatus instanceof PropelCollection) {
-            $this->singleOrderStatus->clearIterator();
-        }
-        $this->singleOrderStatus = null;
+        $this->aOrderStatus = null;
     }
 
     /**

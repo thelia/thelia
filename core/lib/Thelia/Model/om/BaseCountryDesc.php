@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Country;
 use Thelia\Model\CountryDesc;
@@ -98,9 +96,9 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Country one-to-one related Country object
+     * @var        Country
      */
-    protected $singleCountry;
+    protected $aCountry;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,12 +113,6 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $countrysScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -292,6 +284,10 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
         if ($this->country_id !== $v) {
             $this->country_id = $v;
             $this->modifiedColumns[] = CountryDescPeer::COUNTRY_ID;
+        }
+
+        if ($this->aCountry !== null && $this->aCountry->getId() !== $v) {
+            $this->aCountry = null;
         }
 
 
@@ -499,6 +495,9 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
+            $this->aCountry = null;
+        }
     } // ensureConsistency
 
     /**
@@ -538,8 +537,7 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCountry = null;
-
+            $this->aCountry = null;
         } // if (deep)
     }
 
@@ -653,6 +651,18 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCountry !== null) {
+                if ($this->aCountry->isModified() || $this->aCountry->isNew()) {
+                    $affectedRows += $this->aCountry->save($con);
+                }
+                $this->setCountry($this->aCountry);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -662,21 +672,6 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->countrysScheduledForDeletion !== null) {
-                if (!$this->countrysScheduledForDeletion->isEmpty()) {
-                    CountryQuery::create()
-                        ->filterByPrimaryKeys($this->countrysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->countrysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCountry !== null) {
-                if (!$this->singleCountry->isDeleted()) {
-                        $affectedRows += $this->singleCountry->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -858,16 +853,22 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCountry !== null) {
+                if (!$this->aCountry->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCountry->getValidationFailures());
+                }
+            }
+
+
             if (($retval = CountryDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCountry !== null) {
-                    if (!$this->singleCountry->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCountry->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -967,8 +968,8 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCountry) {
-                $result['Country'] = $this->singleCountry->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCountry) {
+                $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1157,11 +1158,6 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCountry();
-            if ($relObj) {
-                $copyObj->setCountry($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1212,53 +1208,55 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Country object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Country object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Country
-     * @throws PropelException
-     */
-    public function getCountry(PropelPDO $con = null)
-    {
-
-        if ($this->singleCountry === null && !$this->isNew()) {
-            $this->singleCountry = CountryQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCountry;
-    }
-
-    /**
-     * Sets a single Country object as related to this object by a one-to-one relationship.
-     *
-     * @param             Country $v Country
+     * @param             Country $v
      * @return CountryDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCountry(Country $v = null)
     {
-        $this->singleCountry = $v;
-
-        // Make sure that that the passed-in Country isn't already associated with this object
-        if ($v !== null && $v->getCountryDesc() === null) {
-            $v->setCountryDesc($this);
+        if ($v === null) {
+            $this->setCountryId(NULL);
+        } else {
+            $this->setCountryId($v->getId());
         }
 
+        $this->aCountry = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Country object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCountryDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Country object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Country The associated Country object.
+     * @throws PropelException
+     */
+    public function getCountry(PropelPDO $con = null)
+    {
+        if ($this->aCountry === null && ($this->country_id !== null)) {
+            $this->aCountry = CountryQuery::create()->findPk($this->country_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCountry->addCountryDescs($this);
+             */
+        }
+
+        return $this->aCountry;
     }
 
     /**
@@ -1294,15 +1292,9 @@ abstract class BaseCountryDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCountry) {
-                $this->singleCountry->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCountry instanceof PropelCollection) {
-            $this->singleCountry->clearIterator();
-        }
-        $this->singleCountry = null;
+        $this->aCountry = null;
     }
 
     /**

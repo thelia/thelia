@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Area;
 use Thelia\Model\AreaPeer;
@@ -80,14 +82,16 @@ abstract class BaseArea extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Country
+     * @var        PropelObjectCollection|Country[] Collection to store aggregation of Country objects.
      */
-    protected $aCountry;
+    protected $collCountrys;
+    protected $collCountrysPartial;
 
     /**
-     * @var        Delivzone
+     * @var        PropelObjectCollection|Delivzone[] Collection to store aggregation of Delivzone objects.
      */
-    protected $aDelivzone;
+    protected $collDelivzones;
+    protected $collDelivzonesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -102,6 +106,18 @@ abstract class BaseArea extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $countrysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $delivzonesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -222,14 +238,6 @@ abstract class BaseArea extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = AreaPeer::ID;
-        }
-
-        if ($this->aCountry !== null && $this->aCountry->getAreaId() !== $v) {
-            $this->aCountry = null;
-        }
-
-        if ($this->aDelivzone !== null && $this->aDelivzone->getAreaId() !== $v) {
-            $this->aDelivzone = null;
         }
 
 
@@ -392,12 +400,6 @@ abstract class BaseArea extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aCountry !== null && $this->id !== $this->aCountry->getAreaId()) {
-            $this->aCountry = null;
-        }
-        if ($this->aDelivzone !== null && $this->id !== $this->aDelivzone->getAreaId()) {
-            $this->aDelivzone = null;
-        }
     } // ensureConsistency
 
     /**
@@ -437,8 +439,10 @@ abstract class BaseArea extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aCountry = null;
-            $this->aDelivzone = null;
+            $this->collCountrys = null;
+
+            $this->collDelivzones = null;
+
         } // if (deep)
     }
 
@@ -552,25 +556,6 @@ abstract class BaseArea extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aCountry !== null) {
-                if ($this->aCountry->isModified() || $this->aCountry->isNew()) {
-                    $affectedRows += $this->aCountry->save($con);
-                }
-                $this->setCountry($this->aCountry);
-            }
-
-            if ($this->aDelivzone !== null) {
-                if ($this->aDelivzone->isModified() || $this->aDelivzone->isNew()) {
-                    $affectedRows += $this->aDelivzone->save($con);
-                }
-                $this->setDelivzone($this->aDelivzone);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -580,6 +565,42 @@ abstract class BaseArea extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->countrysScheduledForDeletion !== null) {
+                if (!$this->countrysScheduledForDeletion->isEmpty()) {
+                    foreach ($this->countrysScheduledForDeletion as $country) {
+                        // need to save related object because we set the relation to null
+                        $country->save($con);
+                    }
+                    $this->countrysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCountrys !== null) {
+                foreach ($this->collCountrys as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->delivzonesScheduledForDeletion !== null) {
+                if (!$this->delivzonesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->delivzonesScheduledForDeletion as $delivzone) {
+                        // need to save related object because we set the relation to null
+                        $delivzone->save($con);
+                    }
+                    $this->delivzonesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collDelivzones !== null) {
+                foreach ($this->collDelivzones as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -743,28 +764,26 @@ abstract class BaseArea extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aCountry !== null) {
-                if (!$this->aCountry->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aCountry->getValidationFailures());
-                }
-            }
-
-            if ($this->aDelivzone !== null) {
-                if (!$this->aDelivzone->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aDelivzone->getValidationFailures());
-                }
-            }
-
-
             if (($retval = AreaPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collCountrys !== null) {
+                    foreach ($this->collCountrys as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collDelivzones !== null) {
+                    foreach ($this->collDelivzones as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -852,11 +871,11 @@ abstract class BaseArea extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aCountry) {
-                $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collCountrys) {
+                $result['Countrys'] = $this->collCountrys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aDelivzone) {
-                $result['Delivzone'] = $this->aDelivzone->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collDelivzones) {
+                $result['Delivzones'] = $this->collDelivzones->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1027,14 +1046,16 @@ abstract class BaseArea extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCountry();
-            if ($relObj) {
-                $copyObj->setCountry($relObj->copy($deepCopy));
+            foreach ($this->getCountrys() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCountry($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getDelivzone();
-            if ($relObj) {
-                $copyObj->setDelivzone($relObj->copy($deepCopy));
+            foreach ($this->getDelivzones() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addDelivzone($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1087,98 +1108,437 @@ abstract class BaseArea extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a Country object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             Country $v
-     * @return Area The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Country' == $relationName) {
+            $this->initCountrys();
+        }
+        if ('Delivzone' == $relationName) {
+            $this->initDelivzones();
+        }
+    }
+
+    /**
+     * Clears out the collCountrys collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCountrys()
+     */
+    public function clearCountrys()
+    {
+        $this->collCountrys = null; // important to set this to null since that means it is uninitialized
+        $this->collCountrysPartial = null;
+    }
+
+    /**
+     * reset is the collCountrys collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCountrys($v = true)
+    {
+        $this->collCountrysPartial = $v;
+    }
+
+    /**
+     * Initializes the collCountrys collection.
+     *
+     * By default this just sets the collCountrys collection to an empty array (like clearcollCountrys());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCountrys($overrideExisting = true)
+    {
+        if (null !== $this->collCountrys && !$overrideExisting) {
+            return;
+        }
+        $this->collCountrys = new PropelObjectCollection();
+        $this->collCountrys->setModel('Country');
+    }
+
+    /**
+     * Gets an array of Country objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Area is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Country[] List of Country objects
      * @throws PropelException
      */
-    public function setCountry(Country $v = null)
+    public function getCountrys($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collCountrysPartial && !$this->isNew();
+        if (null === $this->collCountrys || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCountrys) {
+                // return empty collection
+                $this->initCountrys();
+            } else {
+                $collCountrys = CountryQuery::create(null, $criteria)
+                    ->filterByArea($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCountrysPartial && count($collCountrys)) {
+                      $this->initCountrys(false);
+
+                      foreach($collCountrys as $obj) {
+                        if (false == $this->collCountrys->contains($obj)) {
+                          $this->collCountrys->append($obj);
+                        }
+                      }
+
+                      $this->collCountrysPartial = true;
+                    }
+
+                    return $collCountrys;
+                }
+
+                if($partial && $this->collCountrys) {
+                    foreach($this->collCountrys as $obj) {
+                        if($obj->isNew()) {
+                            $collCountrys[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCountrys = $collCountrys;
+                $this->collCountrysPartial = false;
+            }
+        }
+
+        return $this->collCountrys;
+    }
+
+    /**
+     * Sets a collection of Country objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $countrys A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCountrys(PropelCollection $countrys, PropelPDO $con = null)
+    {
+        $this->countrysScheduledForDeletion = $this->getCountrys(new Criteria(), $con)->diff($countrys);
+
+        foreach ($this->countrysScheduledForDeletion as $countryRemoved) {
+            $countryRemoved->setArea(null);
+        }
+
+        $this->collCountrys = null;
+        foreach ($countrys as $country) {
+            $this->addCountry($country);
+        }
+
+        $this->collCountrys = $countrys;
+        $this->collCountrysPartial = false;
+    }
+
+    /**
+     * Returns the number of related Country objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Country objects.
+     * @throws PropelException
+     */
+    public function countCountrys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCountrysPartial && !$this->isNew();
+        if (null === $this->collCountrys || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCountrys) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCountrys());
+                }
+                $query = CountryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByArea($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getAreaId());
+            return count($this->collCountrys);
         }
+    }
 
-        $this->aCountry = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setArea($this);
+    /**
+     * Method called to associate a Country object to this object
+     * through the Country foreign key attribute.
+     *
+     * @param    Country $l Country
+     * @return Area The current object (for fluent API support)
+     */
+    public function addCountry(Country $l)
+    {
+        if ($this->collCountrys === null) {
+            $this->initCountrys();
+            $this->collCountrysPartial = true;
         }
-
+        if (!$this->collCountrys->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCountry($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated Country object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Country The associated Country object.
-     * @throws PropelException
+     * @param	Country $country The country object to add.
      */
-    public function getCountry(PropelPDO $con = null)
+    protected function doAddCountry($country)
     {
-        if ($this->aCountry === null && ($this->id !== null)) {
-            $this->aCountry = CountryQuery::create()
-                ->filterByArea($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aCountry->setArea($this);
-        }
-
-        return $this->aCountry;
+        $this->collCountrys[]= $country;
+        $country->setArea($this);
     }
 
     /**
-     * Declares an association between this object and a Delivzone object.
+     * @param	Country $country The country object to remove.
+     */
+    public function removeCountry($country)
+    {
+        if ($this->getCountrys()->contains($country)) {
+            $this->collCountrys->remove($this->collCountrys->search($country));
+            if (null === $this->countrysScheduledForDeletion) {
+                $this->countrysScheduledForDeletion = clone $this->collCountrys;
+                $this->countrysScheduledForDeletion->clear();
+            }
+            $this->countrysScheduledForDeletion[]= $country;
+            $country->setArea(null);
+        }
+    }
+
+    /**
+     * Clears out the collDelivzones collection
      *
-     * @param             Delivzone $v
-     * @return Area The current object (for fluent API support)
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addDelivzones()
+     */
+    public function clearDelivzones()
+    {
+        $this->collDelivzones = null; // important to set this to null since that means it is uninitialized
+        $this->collDelivzonesPartial = null;
+    }
+
+    /**
+     * reset is the collDelivzones collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialDelivzones($v = true)
+    {
+        $this->collDelivzonesPartial = $v;
+    }
+
+    /**
+     * Initializes the collDelivzones collection.
+     *
+     * By default this just sets the collDelivzones collection to an empty array (like clearcollDelivzones());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initDelivzones($overrideExisting = true)
+    {
+        if (null !== $this->collDelivzones && !$overrideExisting) {
+            return;
+        }
+        $this->collDelivzones = new PropelObjectCollection();
+        $this->collDelivzones->setModel('Delivzone');
+    }
+
+    /**
+     * Gets an array of Delivzone objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Area is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Delivzone[] List of Delivzone objects
      * @throws PropelException
      */
-    public function setDelivzone(Delivzone $v = null)
+    public function getDelivzones($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collDelivzonesPartial && !$this->isNew();
+        if (null === $this->collDelivzones || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDelivzones) {
+                // return empty collection
+                $this->initDelivzones();
+            } else {
+                $collDelivzones = DelivzoneQuery::create(null, $criteria)
+                    ->filterByArea($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collDelivzonesPartial && count($collDelivzones)) {
+                      $this->initDelivzones(false);
+
+                      foreach($collDelivzones as $obj) {
+                        if (false == $this->collDelivzones->contains($obj)) {
+                          $this->collDelivzones->append($obj);
+                        }
+                      }
+
+                      $this->collDelivzonesPartial = true;
+                    }
+
+                    return $collDelivzones;
+                }
+
+                if($partial && $this->collDelivzones) {
+                    foreach($this->collDelivzones as $obj) {
+                        if($obj->isNew()) {
+                            $collDelivzones[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collDelivzones = $collDelivzones;
+                $this->collDelivzonesPartial = false;
+            }
+        }
+
+        return $this->collDelivzones;
+    }
+
+    /**
+     * Sets a collection of Delivzone objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $delivzones A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setDelivzones(PropelCollection $delivzones, PropelPDO $con = null)
+    {
+        $this->delivzonesScheduledForDeletion = $this->getDelivzones(new Criteria(), $con)->diff($delivzones);
+
+        foreach ($this->delivzonesScheduledForDeletion as $delivzoneRemoved) {
+            $delivzoneRemoved->setArea(null);
+        }
+
+        $this->collDelivzones = null;
+        foreach ($delivzones as $delivzone) {
+            $this->addDelivzone($delivzone);
+        }
+
+        $this->collDelivzones = $delivzones;
+        $this->collDelivzonesPartial = false;
+    }
+
+    /**
+     * Returns the number of related Delivzone objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Delivzone objects.
+     * @throws PropelException
+     */
+    public function countDelivzones(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collDelivzonesPartial && !$this->isNew();
+        if (null === $this->collDelivzones || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDelivzones) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getDelivzones());
+                }
+                $query = DelivzoneQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByArea($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getAreaId());
+            return count($this->collDelivzones);
         }
+    }
 
-        $this->aDelivzone = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setArea($this);
+    /**
+     * Method called to associate a Delivzone object to this object
+     * through the Delivzone foreign key attribute.
+     *
+     * @param    Delivzone $l Delivzone
+     * @return Area The current object (for fluent API support)
+     */
+    public function addDelivzone(Delivzone $l)
+    {
+        if ($this->collDelivzones === null) {
+            $this->initDelivzones();
+            $this->collDelivzonesPartial = true;
         }
-
+        if (!$this->collDelivzones->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddDelivzone($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	Delivzone $delivzone The delivzone object to add.
+     */
+    protected function doAddDelivzone($delivzone)
+    {
+        $this->collDelivzones[]= $delivzone;
+        $delivzone->setArea($this);
+    }
 
     /**
-     * Get the associated Delivzone object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Delivzone The associated Delivzone object.
-     * @throws PropelException
+     * @param	Delivzone $delivzone The delivzone object to remove.
      */
-    public function getDelivzone(PropelPDO $con = null)
+    public function removeDelivzone($delivzone)
     {
-        if ($this->aDelivzone === null && ($this->id !== null)) {
-            $this->aDelivzone = DelivzoneQuery::create()
-                ->filterByArea($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aDelivzone->setArea($this);
+        if ($this->getDelivzones()->contains($delivzone)) {
+            $this->collDelivzones->remove($this->collDelivzones->search($delivzone));
+            if (null === $this->delivzonesScheduledForDeletion) {
+                $this->delivzonesScheduledForDeletion = clone $this->collDelivzones;
+                $this->delivzonesScheduledForDeletion->clear();
+            }
+            $this->delivzonesScheduledForDeletion[]= $delivzone;
+            $delivzone->setArea(null);
         }
-
-        return $this->aDelivzone;
     }
 
     /**
@@ -1211,10 +1571,26 @@ abstract class BaseArea extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collCountrys) {
+                foreach ($this->collCountrys as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collDelivzones) {
+                foreach ($this->collDelivzones as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aCountry = null;
-        $this->aDelivzone = null;
+        if ($this->collCountrys instanceof PropelCollection) {
+            $this->collCountrys->clearIterator();
+        }
+        $this->collCountrys = null;
+        if ($this->collDelivzones instanceof PropelCollection) {
+            $this->collDelivzones->clearIterator();
+        }
+        $this->collDelivzones = null;
     }
 
     /**

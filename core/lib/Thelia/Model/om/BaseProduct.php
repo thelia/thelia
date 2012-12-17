@@ -156,59 +156,69 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Accessory
+     * @var        TaxRule
      */
-    protected $aAccessory;
+    protected $aTaxRule;
 
     /**
-     * @var        Accessory
+     * @var        PropelObjectCollection|Accessory[] Collection to store aggregation of Accessory objects.
      */
-    protected $aAccessory;
+    protected $collAccessorysRelatedByProductId;
+    protected $collAccessorysRelatedByProductIdPartial;
 
     /**
-     * @var        ContentAssoc
+     * @var        PropelObjectCollection|Accessory[] Collection to store aggregation of Accessory objects.
      */
-    protected $aContentAssoc;
+    protected $collAccessorysRelatedByAccessory;
+    protected $collAccessorysRelatedByAccessoryPartial;
 
     /**
-     * @var        Document
+     * @var        PropelObjectCollection|ContentAssoc[] Collection to store aggregation of ContentAssoc objects.
      */
-    protected $aDocument;
+    protected $collContentAssocs;
+    protected $collContentAssocsPartial;
 
     /**
-     * @var        FeatureProd
+     * @var        PropelObjectCollection|Document[] Collection to store aggregation of Document objects.
      */
-    protected $aFeatureProd;
+    protected $collDocuments;
+    protected $collDocumentsPartial;
 
     /**
-     * @var        Image
+     * @var        PropelObjectCollection|FeatureProd[] Collection to store aggregation of FeatureProd objects.
      */
-    protected $aImage;
+    protected $collFeatureProds;
+    protected $collFeatureProdsPartial;
 
     /**
-     * @var        ProductCategory
+     * @var        PropelObjectCollection|Image[] Collection to store aggregation of Image objects.
      */
-    protected $aProductCategory;
+    protected $collImages;
+    protected $collImagesPartial;
 
     /**
-     * @var        ProductDesc
+     * @var        PropelObjectCollection|ProductCategory[] Collection to store aggregation of ProductCategory objects.
      */
-    protected $aProductDesc;
+    protected $collProductCategorys;
+    protected $collProductCategorysPartial;
 
     /**
-     * @var        Rewriting
+     * @var        PropelObjectCollection|ProductDesc[] Collection to store aggregation of ProductDesc objects.
      */
-    protected $aRewriting;
+    protected $collProductDescs;
+    protected $collProductDescsPartial;
 
     /**
-     * @var        Stock
+     * @var        PropelObjectCollection|Rewriting[] Collection to store aggregation of Rewriting objects.
      */
-    protected $aStock;
+    protected $collRewritings;
+    protected $collRewritingsPartial;
 
     /**
-     * @var        TaxRule one-to-one related TaxRule object
+     * @var        PropelObjectCollection|Stock[] Collection to store aggregation of Stock objects.
      */
-    protected $singleTaxRule;
+    protected $collStocks;
+    protected $collStocksPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -228,7 +238,61 @@ abstract class BaseProduct extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $taxRulesScheduledForDeletion = null;
+    protected $accessorysRelatedByProductIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $accessorysRelatedByAccessoryScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $contentAssocsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $documentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $featureProdsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $imagesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productCategorysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productDescsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $rewritingsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $stocksScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -465,46 +529,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $this->modifiedColumns[] = ProductPeer::ID;
         }
 
-        if ($this->aAccessory !== null && $this->aAccessory->getProductId() !== $v) {
-            $this->aAccessory = null;
-        }
-
-        if ($this->aAccessory !== null && $this->aAccessory->getAccessory() !== $v) {
-            $this->aAccessory = null;
-        }
-
-        if ($this->aContentAssoc !== null && $this->aContentAssoc->getProductId() !== $v) {
-            $this->aContentAssoc = null;
-        }
-
-        if ($this->aDocument !== null && $this->aDocument->getProductId() !== $v) {
-            $this->aDocument = null;
-        }
-
-        if ($this->aFeatureProd !== null && $this->aFeatureProd->getProductId() !== $v) {
-            $this->aFeatureProd = null;
-        }
-
-        if ($this->aImage !== null && $this->aImage->getProductId() !== $v) {
-            $this->aImage = null;
-        }
-
-        if ($this->aProductCategory !== null && $this->aProductCategory->getProductId() !== $v) {
-            $this->aProductCategory = null;
-        }
-
-        if ($this->aProductDesc !== null && $this->aProductDesc->getProductId() !== $v) {
-            $this->aProductDesc = null;
-        }
-
-        if ($this->aRewriting !== null && $this->aRewriting->getProductId() !== $v) {
-            $this->aRewriting = null;
-        }
-
-        if ($this->aStock !== null && $this->aStock->getProductId() !== $v) {
-            $this->aStock = null;
-        }
-
 
         return $this;
     } // setId()
@@ -524,6 +548,10 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if ($this->tax_rule_id !== $v) {
             $this->tax_rule_id = $v;
             $this->modifiedColumns[] = ProductPeer::TAX_RULE_ID;
+        }
+
+        if ($this->aTaxRule !== null && $this->aTaxRule->getId() !== $v) {
+            $this->aTaxRule = null;
         }
 
 
@@ -879,35 +907,8 @@ abstract class BaseProduct extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aAccessory !== null && $this->id !== $this->aAccessory->getProductId()) {
-            $this->aAccessory = null;
-        }
-        if ($this->aAccessory !== null && $this->id !== $this->aAccessory->getAccessory()) {
-            $this->aAccessory = null;
-        }
-        if ($this->aContentAssoc !== null && $this->id !== $this->aContentAssoc->getProductId()) {
-            $this->aContentAssoc = null;
-        }
-        if ($this->aDocument !== null && $this->id !== $this->aDocument->getProductId()) {
-            $this->aDocument = null;
-        }
-        if ($this->aFeatureProd !== null && $this->id !== $this->aFeatureProd->getProductId()) {
-            $this->aFeatureProd = null;
-        }
-        if ($this->aImage !== null && $this->id !== $this->aImage->getProductId()) {
-            $this->aImage = null;
-        }
-        if ($this->aProductCategory !== null && $this->id !== $this->aProductCategory->getProductId()) {
-            $this->aProductCategory = null;
-        }
-        if ($this->aProductDesc !== null && $this->id !== $this->aProductDesc->getProductId()) {
-            $this->aProductDesc = null;
-        }
-        if ($this->aRewriting !== null && $this->id !== $this->aRewriting->getProductId()) {
-            $this->aRewriting = null;
-        }
-        if ($this->aStock !== null && $this->id !== $this->aStock->getProductId()) {
-            $this->aStock = null;
+        if ($this->aTaxRule !== null && $this->tax_rule_id !== $this->aTaxRule->getId()) {
+            $this->aTaxRule = null;
         }
     } // ensureConsistency
 
@@ -948,17 +949,26 @@ abstract class BaseProduct extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aAccessory = null;
-            $this->aAccessory = null;
-            $this->aContentAssoc = null;
-            $this->aDocument = null;
-            $this->aFeatureProd = null;
-            $this->aImage = null;
-            $this->aProductCategory = null;
-            $this->aProductDesc = null;
-            $this->aRewriting = null;
-            $this->aStock = null;
-            $this->singleTaxRule = null;
+            $this->aTaxRule = null;
+            $this->collAccessorysRelatedByProductId = null;
+
+            $this->collAccessorysRelatedByAccessory = null;
+
+            $this->collContentAssocs = null;
+
+            $this->collDocuments = null;
+
+            $this->collFeatureProds = null;
+
+            $this->collImages = null;
+
+            $this->collProductCategorys = null;
+
+            $this->collProductDescs = null;
+
+            $this->collRewritings = null;
+
+            $this->collStocks = null;
 
         } // if (deep)
     }
@@ -1078,74 +1088,11 @@ abstract class BaseProduct extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aAccessory !== null) {
-                if ($this->aAccessory->isModified() || $this->aAccessory->isNew()) {
-                    $affectedRows += $this->aAccessory->save($con);
+            if ($this->aTaxRule !== null) {
+                if ($this->aTaxRule->isModified() || $this->aTaxRule->isNew()) {
+                    $affectedRows += $this->aTaxRule->save($con);
                 }
-                $this->setAccessory($this->aAccessory);
-            }
-
-            if ($this->aAccessory !== null) {
-                if ($this->aAccessory->isModified() || $this->aAccessory->isNew()) {
-                    $affectedRows += $this->aAccessory->save($con);
-                }
-                $this->setAccessory($this->aAccessory);
-            }
-
-            if ($this->aContentAssoc !== null) {
-                if ($this->aContentAssoc->isModified() || $this->aContentAssoc->isNew()) {
-                    $affectedRows += $this->aContentAssoc->save($con);
-                }
-                $this->setContentAssoc($this->aContentAssoc);
-            }
-
-            if ($this->aDocument !== null) {
-                if ($this->aDocument->isModified() || $this->aDocument->isNew()) {
-                    $affectedRows += $this->aDocument->save($con);
-                }
-                $this->setDocument($this->aDocument);
-            }
-
-            if ($this->aFeatureProd !== null) {
-                if ($this->aFeatureProd->isModified() || $this->aFeatureProd->isNew()) {
-                    $affectedRows += $this->aFeatureProd->save($con);
-                }
-                $this->setFeatureProd($this->aFeatureProd);
-            }
-
-            if ($this->aImage !== null) {
-                if ($this->aImage->isModified() || $this->aImage->isNew()) {
-                    $affectedRows += $this->aImage->save($con);
-                }
-                $this->setImage($this->aImage);
-            }
-
-            if ($this->aProductCategory !== null) {
-                if ($this->aProductCategory->isModified() || $this->aProductCategory->isNew()) {
-                    $affectedRows += $this->aProductCategory->save($con);
-                }
-                $this->setProductCategory($this->aProductCategory);
-            }
-
-            if ($this->aProductDesc !== null) {
-                if ($this->aProductDesc->isModified() || $this->aProductDesc->isNew()) {
-                    $affectedRows += $this->aProductDesc->save($con);
-                }
-                $this->setProductDesc($this->aProductDesc);
-            }
-
-            if ($this->aRewriting !== null) {
-                if ($this->aRewriting->isModified() || $this->aRewriting->isNew()) {
-                    $affectedRows += $this->aRewriting->save($con);
-                }
-                $this->setRewriting($this->aRewriting);
-            }
-
-            if ($this->aStock !== null) {
-                if ($this->aStock->isModified() || $this->aStock->isNew()) {
-                    $affectedRows += $this->aStock->save($con);
-                }
-                $this->setStock($this->aStock);
+                $this->setTaxRule($this->aTaxRule);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1159,18 +1106,177 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->taxRulesScheduledForDeletion !== null) {
-                if (!$this->taxRulesScheduledForDeletion->isEmpty()) {
-                    TaxRuleQuery::create()
-                        ->filterByPrimaryKeys($this->taxRulesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->accessorysRelatedByProductIdScheduledForDeletion !== null) {
+                if (!$this->accessorysRelatedByProductIdScheduledForDeletion->isEmpty()) {
+                    AccessoryQuery::create()
+                        ->filterByPrimaryKeys($this->accessorysRelatedByProductIdScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->taxRulesScheduledForDeletion = null;
+                    $this->accessorysRelatedByProductIdScheduledForDeletion = null;
                 }
             }
 
-            if ($this->singleTaxRule !== null) {
-                if (!$this->singleTaxRule->isDeleted()) {
-                        $affectedRows += $this->singleTaxRule->save($con);
+            if ($this->collAccessorysRelatedByProductId !== null) {
+                foreach ($this->collAccessorysRelatedByProductId as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->accessorysRelatedByAccessoryScheduledForDeletion !== null) {
+                if (!$this->accessorysRelatedByAccessoryScheduledForDeletion->isEmpty()) {
+                    AccessoryQuery::create()
+                        ->filterByPrimaryKeys($this->accessorysRelatedByAccessoryScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->accessorysRelatedByAccessoryScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAccessorysRelatedByAccessory !== null) {
+                foreach ($this->collAccessorysRelatedByAccessory as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->contentAssocsScheduledForDeletion !== null) {
+                if (!$this->contentAssocsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->contentAssocsScheduledForDeletion as $contentAssoc) {
+                        // need to save related object because we set the relation to null
+                        $contentAssoc->save($con);
+                    }
+                    $this->contentAssocsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collContentAssocs !== null) {
+                foreach ($this->collContentAssocs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->documentsScheduledForDeletion !== null) {
+                if (!$this->documentsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->documentsScheduledForDeletion as $document) {
+                        // need to save related object because we set the relation to null
+                        $document->save($con);
+                    }
+                    $this->documentsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collDocuments !== null) {
+                foreach ($this->collDocuments as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->featureProdsScheduledForDeletion !== null) {
+                if (!$this->featureProdsScheduledForDeletion->isEmpty()) {
+                    FeatureProdQuery::create()
+                        ->filterByPrimaryKeys($this->featureProdsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->featureProdsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFeatureProds !== null) {
+                foreach ($this->collFeatureProds as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->imagesScheduledForDeletion !== null) {
+                if (!$this->imagesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->imagesScheduledForDeletion as $image) {
+                        // need to save related object because we set the relation to null
+                        $image->save($con);
+                    }
+                    $this->imagesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collImages !== null) {
+                foreach ($this->collImages as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productCategorysScheduledForDeletion !== null) {
+                if (!$this->productCategorysScheduledForDeletion->isEmpty()) {
+                    ProductCategoryQuery::create()
+                        ->filterByPrimaryKeys($this->productCategorysScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productCategorysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collProductCategorys !== null) {
+                foreach ($this->collProductCategorys as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productDescsScheduledForDeletion !== null) {
+                if (!$this->productDescsScheduledForDeletion->isEmpty()) {
+                    ProductDescQuery::create()
+                        ->filterByPrimaryKeys($this->productDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collProductDescs !== null) {
+                foreach ($this->collProductDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->rewritingsScheduledForDeletion !== null) {
+                if (!$this->rewritingsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->rewritingsScheduledForDeletion as $rewriting) {
+                        // need to save related object because we set the relation to null
+                        $rewriting->save($con);
+                    }
+                    $this->rewritingsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collRewritings !== null) {
+                foreach ($this->collRewritings as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->stocksScheduledForDeletion !== null) {
+                if (!$this->stocksScheduledForDeletion->isEmpty()) {
+                    StockQuery::create()
+                        ->filterByPrimaryKeys($this->stocksScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->stocksScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collStocks !== null) {
+                foreach ($this->collStocks as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
                 }
             }
 
@@ -1394,63 +1500,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aAccessory !== null) {
-                if (!$this->aAccessory->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAccessory->getValidationFailures());
-                }
-            }
-
-            if ($this->aAccessory !== null) {
-                if (!$this->aAccessory->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAccessory->getValidationFailures());
-                }
-            }
-
-            if ($this->aContentAssoc !== null) {
-                if (!$this->aContentAssoc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aContentAssoc->getValidationFailures());
-                }
-            }
-
-            if ($this->aDocument !== null) {
-                if (!$this->aDocument->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aDocument->getValidationFailures());
-                }
-            }
-
-            if ($this->aFeatureProd !== null) {
-                if (!$this->aFeatureProd->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aFeatureProd->getValidationFailures());
-                }
-            }
-
-            if ($this->aImage !== null) {
-                if (!$this->aImage->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aImage->getValidationFailures());
-                }
-            }
-
-            if ($this->aProductCategory !== null) {
-                if (!$this->aProductCategory->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aProductCategory->getValidationFailures());
-                }
-            }
-
-            if ($this->aProductDesc !== null) {
-                if (!$this->aProductDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aProductDesc->getValidationFailures());
-                }
-            }
-
-            if ($this->aRewriting !== null) {
-                if (!$this->aRewriting->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aRewriting->getValidationFailures());
-                }
-            }
-
-            if ($this->aStock !== null) {
-                if (!$this->aStock->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aStock->getValidationFailures());
+            if ($this->aTaxRule !== null) {
+                if (!$this->aTaxRule->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTaxRule->getValidationFailures());
                 }
             }
 
@@ -1460,9 +1512,83 @@ abstract class BaseProduct extends BaseObject implements Persistent
             }
 
 
-                if ($this->singleTaxRule !== null) {
-                    if (!$this->singleTaxRule->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleTaxRule->getValidationFailures());
+                if ($this->collAccessorysRelatedByProductId !== null) {
+                    foreach ($this->collAccessorysRelatedByProductId as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collAccessorysRelatedByAccessory !== null) {
+                    foreach ($this->collAccessorysRelatedByAccessory as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collContentAssocs !== null) {
+                    foreach ($this->collContentAssocs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collDocuments !== null) {
+                    foreach ($this->collDocuments as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collFeatureProds !== null) {
+                    foreach ($this->collFeatureProds as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collImages !== null) {
+                    foreach ($this->collImages as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collProductCategorys !== null) {
+                    foreach ($this->collProductCategorys as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collProductDescs !== null) {
+                    foreach ($this->collProductDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collRewritings !== null) {
+                    foreach ($this->collRewritings as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collStocks !== null) {
+                    foreach ($this->collStocks as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
                     }
                 }
 
@@ -1588,38 +1714,38 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $keys[13] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aAccessory) {
-                $result['Accessory'] = $this->aAccessory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aTaxRule) {
+                $result['TaxRule'] = $this->aTaxRule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aAccessory) {
-                $result['Accessory'] = $this->aAccessory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collAccessorysRelatedByProductId) {
+                $result['AccessorysRelatedByProductId'] = $this->collAccessorysRelatedByProductId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aContentAssoc) {
-                $result['ContentAssoc'] = $this->aContentAssoc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collAccessorysRelatedByAccessory) {
+                $result['AccessorysRelatedByAccessory'] = $this->collAccessorysRelatedByAccessory->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aDocument) {
-                $result['Document'] = $this->aDocument->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collContentAssocs) {
+                $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aFeatureProd) {
-                $result['FeatureProd'] = $this->aFeatureProd->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collDocuments) {
+                $result['Documents'] = $this->collDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aImage) {
-                $result['Image'] = $this->aImage->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collFeatureProds) {
+                $result['FeatureProds'] = $this->collFeatureProds->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aProductCategory) {
-                $result['ProductCategory'] = $this->aProductCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collImages) {
+                $result['Images'] = $this->collImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aProductDesc) {
-                $result['ProductDesc'] = $this->aProductDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collProductCategorys) {
+                $result['ProductCategorys'] = $this->collProductCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aRewriting) {
-                $result['Rewriting'] = $this->aRewriting->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collProductDescs) {
+                $result['ProductDescs'] = $this->collProductDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aStock) {
-                $result['Stock'] = $this->aStock->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collRewritings) {
+                $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->singleTaxRule) {
-                $result['TaxRule'] = $this->singleTaxRule->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->collStocks) {
+                $result['Stocks'] = $this->collStocks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1844,59 +1970,64 @@ abstract class BaseProduct extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getTaxRule();
-            if ($relObj) {
-                $copyObj->setTaxRule($relObj->copy($deepCopy));
+            foreach ($this->getAccessorysRelatedByProductId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAccessoryRelatedByProductId($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getAccessory();
-            if ($relObj) {
-                $copyObj->setAccessory($relObj->copy($deepCopy));
+            foreach ($this->getAccessorysRelatedByAccessory() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAccessoryRelatedByAccessory($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getAccessory();
-            if ($relObj) {
-                $copyObj->setAccessory($relObj->copy($deepCopy));
+            foreach ($this->getContentAssocs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addContentAssoc($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getContentAssoc();
-            if ($relObj) {
-                $copyObj->setContentAssoc($relObj->copy($deepCopy));
+            foreach ($this->getDocuments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addDocument($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getDocument();
-            if ($relObj) {
-                $copyObj->setDocument($relObj->copy($deepCopy));
+            foreach ($this->getFeatureProds() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFeatureProd($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getFeatureProd();
-            if ($relObj) {
-                $copyObj->setFeatureProd($relObj->copy($deepCopy));
+            foreach ($this->getImages() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addImage($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getImage();
-            if ($relObj) {
-                $copyObj->setImage($relObj->copy($deepCopy));
+            foreach ($this->getProductCategorys() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductCategory($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getProductCategory();
-            if ($relObj) {
-                $copyObj->setProductCategory($relObj->copy($deepCopy));
+            foreach ($this->getProductDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductDesc($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getProductDesc();
-            if ($relObj) {
-                $copyObj->setProductDesc($relObj->copy($deepCopy));
+            foreach ($this->getRewritings() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addRewriting($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getRewriting();
-            if ($relObj) {
-                $copyObj->setRewriting($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getStock();
-            if ($relObj) {
-                $copyObj->setStock($relObj->copy($deepCopy));
+            foreach ($this->getStocks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addStock($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1950,25 +2081,26 @@ abstract class BaseProduct extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a Accessory object.
+     * Declares an association between this object and a TaxRule object.
      *
-     * @param             Accessory $v
+     * @param             TaxRule $v
      * @return Product The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setAccessory(Accessory $v = null)
+    public function setTaxRule(TaxRule $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setTaxRuleId(NULL);
         } else {
-            $this->setId($v->getProductId());
+            $this->setTaxRuleId($v->getId());
         }
 
-        $this->aAccessory = $v;
+        $this->aTaxRule = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the TaxRule object, it will not be re-added.
         if ($v !== null) {
-            $v->setProduct($this);
+            $v->addProduct($this);
         }
 
 
@@ -1977,446 +2109,26 @@ abstract class BaseProduct extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated Accessory object
+     * Get the associated TaxRule object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return Accessory The associated Accessory object.
+     * @return TaxRule The associated TaxRule object.
      * @throws PropelException
      */
-    public function getAccessory(PropelPDO $con = null)
+    public function getTaxRule(PropelPDO $con = null)
     {
-        if ($this->aAccessory === null && ($this->id !== null)) {
-            $this->aAccessory = AccessoryQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aAccessory->setProduct($this);
+        if ($this->aTaxRule === null && ($this->tax_rule_id !== null)) {
+            $this->aTaxRule = TaxRuleQuery::create()->findPk($this->tax_rule_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTaxRule->addProducts($this);
+             */
         }
 
-        return $this->aAccessory;
-    }
-
-    /**
-     * Declares an association between this object and a Accessory object.
-     *
-     * @param             Accessory $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setAccessory(Accessory $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getAccessory());
-        }
-
-        $this->aAccessory = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Accessory object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Accessory The associated Accessory object.
-     * @throws PropelException
-     */
-    public function getAccessory(PropelPDO $con = null)
-    {
-        if ($this->aAccessory === null && ($this->id !== null)) {
-            $this->aAccessory = AccessoryQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aAccessory->setProduct($this);
-        }
-
-        return $this->aAccessory;
-    }
-
-    /**
-     * Declares an association between this object and a ContentAssoc object.
-     *
-     * @param             ContentAssoc $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setContentAssoc(ContentAssoc $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aContentAssoc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ContentAssoc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return ContentAssoc The associated ContentAssoc object.
-     * @throws PropelException
-     */
-    public function getContentAssoc(PropelPDO $con = null)
-    {
-        if ($this->aContentAssoc === null && ($this->id !== null)) {
-            $this->aContentAssoc = ContentAssocQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aContentAssoc->setProduct($this);
-        }
-
-        return $this->aContentAssoc;
-    }
-
-    /**
-     * Declares an association between this object and a Document object.
-     *
-     * @param             Document $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setDocument(Document $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aDocument = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Document object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Document The associated Document object.
-     * @throws PropelException
-     */
-    public function getDocument(PropelPDO $con = null)
-    {
-        if ($this->aDocument === null && ($this->id !== null)) {
-            $this->aDocument = DocumentQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aDocument->setProduct($this);
-        }
-
-        return $this->aDocument;
-    }
-
-    /**
-     * Declares an association between this object and a FeatureProd object.
-     *
-     * @param             FeatureProd $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFeatureProd(FeatureProd $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aFeatureProd = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated FeatureProd object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return FeatureProd The associated FeatureProd object.
-     * @throws PropelException
-     */
-    public function getFeatureProd(PropelPDO $con = null)
-    {
-        if ($this->aFeatureProd === null && ($this->id !== null)) {
-            $this->aFeatureProd = FeatureProdQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aFeatureProd->setProduct($this);
-        }
-
-        return $this->aFeatureProd;
-    }
-
-    /**
-     * Declares an association between this object and a Image object.
-     *
-     * @param             Image $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setImage(Image $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aImage = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Image object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Image The associated Image object.
-     * @throws PropelException
-     */
-    public function getImage(PropelPDO $con = null)
-    {
-        if ($this->aImage === null && ($this->id !== null)) {
-            $this->aImage = ImageQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aImage->setProduct($this);
-        }
-
-        return $this->aImage;
-    }
-
-    /**
-     * Declares an association between this object and a ProductCategory object.
-     *
-     * @param             ProductCategory $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProductCategory(ProductCategory $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aProductCategory = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ProductCategory object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return ProductCategory The associated ProductCategory object.
-     * @throws PropelException
-     */
-    public function getProductCategory(PropelPDO $con = null)
-    {
-        if ($this->aProductCategory === null && ($this->id !== null)) {
-            $this->aProductCategory = ProductCategoryQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aProductCategory->setProduct($this);
-        }
-
-        return $this->aProductCategory;
-    }
-
-    /**
-     * Declares an association between this object and a ProductDesc object.
-     *
-     * @param             ProductDesc $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProductDesc(ProductDesc $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aProductDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ProductDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return ProductDesc The associated ProductDesc object.
-     * @throws PropelException
-     */
-    public function getProductDesc(PropelPDO $con = null)
-    {
-        if ($this->aProductDesc === null && ($this->id !== null)) {
-            $this->aProductDesc = ProductDescQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aProductDesc->setProduct($this);
-        }
-
-        return $this->aProductDesc;
-    }
-
-    /**
-     * Declares an association between this object and a Rewriting object.
-     *
-     * @param             Rewriting $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setRewriting(Rewriting $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aRewriting = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Rewriting object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Rewriting The associated Rewriting object.
-     * @throws PropelException
-     */
-    public function getRewriting(PropelPDO $con = null)
-    {
-        if ($this->aRewriting === null && ($this->id !== null)) {
-            $this->aRewriting = RewritingQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aRewriting->setProduct($this);
-        }
-
-        return $this->aRewriting;
-    }
-
-    /**
-     * Declares an association between this object and a Stock object.
-     *
-     * @param             Stock $v
-     * @return Product The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setStock(Stock $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getProductId());
-        }
-
-        $this->aStock = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setProduct($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated Stock object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Stock The associated Stock object.
-     * @throws PropelException
-     */
-    public function getStock(PropelPDO $con = null)
-    {
-        if ($this->aStock === null && ($this->id !== null)) {
-            $this->aStock = StockQuery::create()
-                ->filterByProduct($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aStock->setProduct($this);
-        }
-
-        return $this->aStock;
+        return $this->aTaxRule;
     }
 
 
@@ -2430,42 +2142,2481 @@ abstract class BaseProduct extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('AccessoryRelatedByProductId' == $relationName) {
+            $this->initAccessorysRelatedByProductId();
+        }
+        if ('AccessoryRelatedByAccessory' == $relationName) {
+            $this->initAccessorysRelatedByAccessory();
+        }
+        if ('ContentAssoc' == $relationName) {
+            $this->initContentAssocs();
+        }
+        if ('Document' == $relationName) {
+            $this->initDocuments();
+        }
+        if ('FeatureProd' == $relationName) {
+            $this->initFeatureProds();
+        }
+        if ('Image' == $relationName) {
+            $this->initImages();
+        }
+        if ('ProductCategory' == $relationName) {
+            $this->initProductCategorys();
+        }
+        if ('ProductDesc' == $relationName) {
+            $this->initProductDescs();
+        }
+        if ('Rewriting' == $relationName) {
+            $this->initRewritings();
+        }
+        if ('Stock' == $relationName) {
+            $this->initStocks();
+        }
     }
 
     /**
-     * Gets a single TaxRule object, which is related to this object by a one-to-one relationship.
+     * Clears out the collAccessorysRelatedByProductId collection
      *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAccessorysRelatedByProductId()
+     */
+    public function clearAccessorysRelatedByProductId()
+    {
+        $this->collAccessorysRelatedByProductId = null; // important to set this to null since that means it is uninitialized
+        $this->collAccessorysRelatedByProductIdPartial = null;
+    }
+
+    /**
+     * reset is the collAccessorysRelatedByProductId collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAccessorysRelatedByProductId($v = true)
+    {
+        $this->collAccessorysRelatedByProductIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collAccessorysRelatedByProductId collection.
+     *
+     * By default this just sets the collAccessorysRelatedByProductId collection to an empty array (like clearcollAccessorysRelatedByProductId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAccessorysRelatedByProductId($overrideExisting = true)
+    {
+        if (null !== $this->collAccessorysRelatedByProductId && !$overrideExisting) {
+            return;
+        }
+        $this->collAccessorysRelatedByProductId = new PropelObjectCollection();
+        $this->collAccessorysRelatedByProductId->setModel('Accessory');
+    }
+
+    /**
+     * Gets an array of Accessory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return TaxRule
+     * @return PropelObjectCollection|Accessory[] List of Accessory objects
      * @throws PropelException
      */
-    public function getTaxRule(PropelPDO $con = null)
+    public function getAccessorysRelatedByProductId($criteria = null, PropelPDO $con = null)
     {
+        $partial = $this->collAccessorysRelatedByProductIdPartial && !$this->isNew();
+        if (null === $this->collAccessorysRelatedByProductId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAccessorysRelatedByProductId) {
+                // return empty collection
+                $this->initAccessorysRelatedByProductId();
+            } else {
+                $collAccessorysRelatedByProductId = AccessoryQuery::create(null, $criteria)
+                    ->filterByProductRelatedByProductId($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAccessorysRelatedByProductIdPartial && count($collAccessorysRelatedByProductId)) {
+                      $this->initAccessorysRelatedByProductId(false);
 
-        if ($this->singleTaxRule === null && !$this->isNew()) {
-            $this->singleTaxRule = TaxRuleQuery::create()->findPk($this->getPrimaryKey(), $con);
+                      foreach($collAccessorysRelatedByProductId as $obj) {
+                        if (false == $this->collAccessorysRelatedByProductId->contains($obj)) {
+                          $this->collAccessorysRelatedByProductId->append($obj);
+                        }
+                      }
+
+                      $this->collAccessorysRelatedByProductIdPartial = true;
+                    }
+
+                    return $collAccessorysRelatedByProductId;
+                }
+
+                if($partial && $this->collAccessorysRelatedByProductId) {
+                    foreach($this->collAccessorysRelatedByProductId as $obj) {
+                        if($obj->isNew()) {
+                            $collAccessorysRelatedByProductId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAccessorysRelatedByProductId = $collAccessorysRelatedByProductId;
+                $this->collAccessorysRelatedByProductIdPartial = false;
+            }
         }
 
-        return $this->singleTaxRule;
+        return $this->collAccessorysRelatedByProductId;
     }
 
     /**
-     * Sets a single TaxRule object as related to this object by a one-to-one relationship.
+     * Sets a collection of AccessoryRelatedByProductId objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
      *
-     * @param             TaxRule $v TaxRule
-     * @return Product The current object (for fluent API support)
+     * @param PropelCollection $accessorysRelatedByProductId A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAccessorysRelatedByProductId(PropelCollection $accessorysRelatedByProductId, PropelPDO $con = null)
+    {
+        $this->accessorysRelatedByProductIdScheduledForDeletion = $this->getAccessorysRelatedByProductId(new Criteria(), $con)->diff($accessorysRelatedByProductId);
+
+        foreach ($this->accessorysRelatedByProductIdScheduledForDeletion as $accessoryRelatedByProductIdRemoved) {
+            $accessoryRelatedByProductIdRemoved->setProductRelatedByProductId(null);
+        }
+
+        $this->collAccessorysRelatedByProductId = null;
+        foreach ($accessorysRelatedByProductId as $accessoryRelatedByProductId) {
+            $this->addAccessoryRelatedByProductId($accessoryRelatedByProductId);
+        }
+
+        $this->collAccessorysRelatedByProductId = $accessorysRelatedByProductId;
+        $this->collAccessorysRelatedByProductIdPartial = false;
+    }
+
+    /**
+     * Returns the number of related Accessory objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Accessory objects.
      * @throws PropelException
      */
-    public function setTaxRule(TaxRule $v = null)
+    public function countAccessorysRelatedByProductId(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $this->singleTaxRule = $v;
+        $partial = $this->collAccessorysRelatedByProductIdPartial && !$this->isNew();
+        if (null === $this->collAccessorysRelatedByProductId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAccessorysRelatedByProductId) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAccessorysRelatedByProductId());
+                }
+                $query = AccessoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
 
-        // Make sure that that the passed-in TaxRule isn't already associated with this object
-        if ($v !== null && $v->getProduct() === null) {
-            $v->setProduct($this);
+                return $query
+                    ->filterByProductRelatedByProductId($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAccessorysRelatedByProductId);
+        }
+    }
+
+    /**
+     * Method called to associate a Accessory object to this object
+     * through the Accessory foreign key attribute.
+     *
+     * @param    Accessory $l Accessory
+     * @return Product The current object (for fluent API support)
+     */
+    public function addAccessoryRelatedByProductId(Accessory $l)
+    {
+        if ($this->collAccessorysRelatedByProductId === null) {
+            $this->initAccessorysRelatedByProductId();
+            $this->collAccessorysRelatedByProductIdPartial = true;
+        }
+        if (!$this->collAccessorysRelatedByProductId->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAccessoryRelatedByProductId($l);
         }
 
         return $this;
+    }
+
+    /**
+     * @param	AccessoryRelatedByProductId $accessoryRelatedByProductId The accessoryRelatedByProductId object to add.
+     */
+    protected function doAddAccessoryRelatedByProductId($accessoryRelatedByProductId)
+    {
+        $this->collAccessorysRelatedByProductId[]= $accessoryRelatedByProductId;
+        $accessoryRelatedByProductId->setProductRelatedByProductId($this);
+    }
+
+    /**
+     * @param	AccessoryRelatedByProductId $accessoryRelatedByProductId The accessoryRelatedByProductId object to remove.
+     */
+    public function removeAccessoryRelatedByProductId($accessoryRelatedByProductId)
+    {
+        if ($this->getAccessorysRelatedByProductId()->contains($accessoryRelatedByProductId)) {
+            $this->collAccessorysRelatedByProductId->remove($this->collAccessorysRelatedByProductId->search($accessoryRelatedByProductId));
+            if (null === $this->accessorysRelatedByProductIdScheduledForDeletion) {
+                $this->accessorysRelatedByProductIdScheduledForDeletion = clone $this->collAccessorysRelatedByProductId;
+                $this->accessorysRelatedByProductIdScheduledForDeletion->clear();
+            }
+            $this->accessorysRelatedByProductIdScheduledForDeletion[]= $accessoryRelatedByProductId;
+            $accessoryRelatedByProductId->setProductRelatedByProductId(null);
+        }
+    }
+
+    /**
+     * Clears out the collAccessorysRelatedByAccessory collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAccessorysRelatedByAccessory()
+     */
+    public function clearAccessorysRelatedByAccessory()
+    {
+        $this->collAccessorysRelatedByAccessory = null; // important to set this to null since that means it is uninitialized
+        $this->collAccessorysRelatedByAccessoryPartial = null;
+    }
+
+    /**
+     * reset is the collAccessorysRelatedByAccessory collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAccessorysRelatedByAccessory($v = true)
+    {
+        $this->collAccessorysRelatedByAccessoryPartial = $v;
+    }
+
+    /**
+     * Initializes the collAccessorysRelatedByAccessory collection.
+     *
+     * By default this just sets the collAccessorysRelatedByAccessory collection to an empty array (like clearcollAccessorysRelatedByAccessory());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAccessorysRelatedByAccessory($overrideExisting = true)
+    {
+        if (null !== $this->collAccessorysRelatedByAccessory && !$overrideExisting) {
+            return;
+        }
+        $this->collAccessorysRelatedByAccessory = new PropelObjectCollection();
+        $this->collAccessorysRelatedByAccessory->setModel('Accessory');
+    }
+
+    /**
+     * Gets an array of Accessory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Accessory[] List of Accessory objects
+     * @throws PropelException
+     */
+    public function getAccessorysRelatedByAccessory($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collAccessorysRelatedByAccessoryPartial && !$this->isNew();
+        if (null === $this->collAccessorysRelatedByAccessory || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAccessorysRelatedByAccessory) {
+                // return empty collection
+                $this->initAccessorysRelatedByAccessory();
+            } else {
+                $collAccessorysRelatedByAccessory = AccessoryQuery::create(null, $criteria)
+                    ->filterByProductRelatedByAccessory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAccessorysRelatedByAccessoryPartial && count($collAccessorysRelatedByAccessory)) {
+                      $this->initAccessorysRelatedByAccessory(false);
+
+                      foreach($collAccessorysRelatedByAccessory as $obj) {
+                        if (false == $this->collAccessorysRelatedByAccessory->contains($obj)) {
+                          $this->collAccessorysRelatedByAccessory->append($obj);
+                        }
+                      }
+
+                      $this->collAccessorysRelatedByAccessoryPartial = true;
+                    }
+
+                    return $collAccessorysRelatedByAccessory;
+                }
+
+                if($partial && $this->collAccessorysRelatedByAccessory) {
+                    foreach($this->collAccessorysRelatedByAccessory as $obj) {
+                        if($obj->isNew()) {
+                            $collAccessorysRelatedByAccessory[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAccessorysRelatedByAccessory = $collAccessorysRelatedByAccessory;
+                $this->collAccessorysRelatedByAccessoryPartial = false;
+            }
+        }
+
+        return $this->collAccessorysRelatedByAccessory;
+    }
+
+    /**
+     * Sets a collection of AccessoryRelatedByAccessory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $accessorysRelatedByAccessory A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAccessorysRelatedByAccessory(PropelCollection $accessorysRelatedByAccessory, PropelPDO $con = null)
+    {
+        $this->accessorysRelatedByAccessoryScheduledForDeletion = $this->getAccessorysRelatedByAccessory(new Criteria(), $con)->diff($accessorysRelatedByAccessory);
+
+        foreach ($this->accessorysRelatedByAccessoryScheduledForDeletion as $accessoryRelatedByAccessoryRemoved) {
+            $accessoryRelatedByAccessoryRemoved->setProductRelatedByAccessory(null);
+        }
+
+        $this->collAccessorysRelatedByAccessory = null;
+        foreach ($accessorysRelatedByAccessory as $accessoryRelatedByAccessory) {
+            $this->addAccessoryRelatedByAccessory($accessoryRelatedByAccessory);
+        }
+
+        $this->collAccessorysRelatedByAccessory = $accessorysRelatedByAccessory;
+        $this->collAccessorysRelatedByAccessoryPartial = false;
+    }
+
+    /**
+     * Returns the number of related Accessory objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Accessory objects.
+     * @throws PropelException
+     */
+    public function countAccessorysRelatedByAccessory(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAccessorysRelatedByAccessoryPartial && !$this->isNew();
+        if (null === $this->collAccessorysRelatedByAccessory || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAccessorysRelatedByAccessory) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAccessorysRelatedByAccessory());
+                }
+                $query = AccessoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProductRelatedByAccessory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAccessorysRelatedByAccessory);
+        }
+    }
+
+    /**
+     * Method called to associate a Accessory object to this object
+     * through the Accessory foreign key attribute.
+     *
+     * @param    Accessory $l Accessory
+     * @return Product The current object (for fluent API support)
+     */
+    public function addAccessoryRelatedByAccessory(Accessory $l)
+    {
+        if ($this->collAccessorysRelatedByAccessory === null) {
+            $this->initAccessorysRelatedByAccessory();
+            $this->collAccessorysRelatedByAccessoryPartial = true;
+        }
+        if (!$this->collAccessorysRelatedByAccessory->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAccessoryRelatedByAccessory($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	AccessoryRelatedByAccessory $accessoryRelatedByAccessory The accessoryRelatedByAccessory object to add.
+     */
+    protected function doAddAccessoryRelatedByAccessory($accessoryRelatedByAccessory)
+    {
+        $this->collAccessorysRelatedByAccessory[]= $accessoryRelatedByAccessory;
+        $accessoryRelatedByAccessory->setProductRelatedByAccessory($this);
+    }
+
+    /**
+     * @param	AccessoryRelatedByAccessory $accessoryRelatedByAccessory The accessoryRelatedByAccessory object to remove.
+     */
+    public function removeAccessoryRelatedByAccessory($accessoryRelatedByAccessory)
+    {
+        if ($this->getAccessorysRelatedByAccessory()->contains($accessoryRelatedByAccessory)) {
+            $this->collAccessorysRelatedByAccessory->remove($this->collAccessorysRelatedByAccessory->search($accessoryRelatedByAccessory));
+            if (null === $this->accessorysRelatedByAccessoryScheduledForDeletion) {
+                $this->accessorysRelatedByAccessoryScheduledForDeletion = clone $this->collAccessorysRelatedByAccessory;
+                $this->accessorysRelatedByAccessoryScheduledForDeletion->clear();
+            }
+            $this->accessorysRelatedByAccessoryScheduledForDeletion[]= $accessoryRelatedByAccessory;
+            $accessoryRelatedByAccessory->setProductRelatedByAccessory(null);
+        }
+    }
+
+    /**
+     * Clears out the collContentAssocs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addContentAssocs()
+     */
+    public function clearContentAssocs()
+    {
+        $this->collContentAssocs = null; // important to set this to null since that means it is uninitialized
+        $this->collContentAssocsPartial = null;
+    }
+
+    /**
+     * reset is the collContentAssocs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialContentAssocs($v = true)
+    {
+        $this->collContentAssocsPartial = $v;
+    }
+
+    /**
+     * Initializes the collContentAssocs collection.
+     *
+     * By default this just sets the collContentAssocs collection to an empty array (like clearcollContentAssocs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initContentAssocs($overrideExisting = true)
+    {
+        if (null !== $this->collContentAssocs && !$overrideExisting) {
+            return;
+        }
+        $this->collContentAssocs = new PropelObjectCollection();
+        $this->collContentAssocs->setModel('ContentAssoc');
+    }
+
+    /**
+     * Gets an array of ContentAssoc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ContentAssoc[] List of ContentAssoc objects
+     * @throws PropelException
+     */
+    public function getContentAssocs($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collContentAssocsPartial && !$this->isNew();
+        if (null === $this->collContentAssocs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collContentAssocs) {
+                // return empty collection
+                $this->initContentAssocs();
+            } else {
+                $collContentAssocs = ContentAssocQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collContentAssocsPartial && count($collContentAssocs)) {
+                      $this->initContentAssocs(false);
+
+                      foreach($collContentAssocs as $obj) {
+                        if (false == $this->collContentAssocs->contains($obj)) {
+                          $this->collContentAssocs->append($obj);
+                        }
+                      }
+
+                      $this->collContentAssocsPartial = true;
+                    }
+
+                    return $collContentAssocs;
+                }
+
+                if($partial && $this->collContentAssocs) {
+                    foreach($this->collContentAssocs as $obj) {
+                        if($obj->isNew()) {
+                            $collContentAssocs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collContentAssocs = $collContentAssocs;
+                $this->collContentAssocsPartial = false;
+            }
+        }
+
+        return $this->collContentAssocs;
+    }
+
+    /**
+     * Sets a collection of ContentAssoc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $contentAssocs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setContentAssocs(PropelCollection $contentAssocs, PropelPDO $con = null)
+    {
+        $this->contentAssocsScheduledForDeletion = $this->getContentAssocs(new Criteria(), $con)->diff($contentAssocs);
+
+        foreach ($this->contentAssocsScheduledForDeletion as $contentAssocRemoved) {
+            $contentAssocRemoved->setProduct(null);
+        }
+
+        $this->collContentAssocs = null;
+        foreach ($contentAssocs as $contentAssoc) {
+            $this->addContentAssoc($contentAssoc);
+        }
+
+        $this->collContentAssocs = $contentAssocs;
+        $this->collContentAssocsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ContentAssoc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ContentAssoc objects.
+     * @throws PropelException
+     */
+    public function countContentAssocs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collContentAssocsPartial && !$this->isNew();
+        if (null === $this->collContentAssocs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collContentAssocs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getContentAssocs());
+                }
+                $query = ContentAssocQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collContentAssocs);
+        }
+    }
+
+    /**
+     * Method called to associate a ContentAssoc object to this object
+     * through the ContentAssoc foreign key attribute.
+     *
+     * @param    ContentAssoc $l ContentAssoc
+     * @return Product The current object (for fluent API support)
+     */
+    public function addContentAssoc(ContentAssoc $l)
+    {
+        if ($this->collContentAssocs === null) {
+            $this->initContentAssocs();
+            $this->collContentAssocsPartial = true;
+        }
+        if (!$this->collContentAssocs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddContentAssoc($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ContentAssoc $contentAssoc The contentAssoc object to add.
+     */
+    protected function doAddContentAssoc($contentAssoc)
+    {
+        $this->collContentAssocs[]= $contentAssoc;
+        $contentAssoc->setProduct($this);
+    }
+
+    /**
+     * @param	ContentAssoc $contentAssoc The contentAssoc object to remove.
+     */
+    public function removeContentAssoc($contentAssoc)
+    {
+        if ($this->getContentAssocs()->contains($contentAssoc)) {
+            $this->collContentAssocs->remove($this->collContentAssocs->search($contentAssoc));
+            if (null === $this->contentAssocsScheduledForDeletion) {
+                $this->contentAssocsScheduledForDeletion = clone $this->collContentAssocs;
+                $this->contentAssocsScheduledForDeletion->clear();
+            }
+            $this->contentAssocsScheduledForDeletion[]= $contentAssoc;
+            $contentAssoc->setProduct(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related ContentAssocs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|ContentAssoc[] List of ContentAssoc objects
+     */
+    public function getContentAssocsJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ContentAssocQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getContentAssocs($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related ContentAssocs from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|ContentAssoc[] List of ContentAssoc objects
+     */
+    public function getContentAssocsJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ContentAssocQuery::create(null, $criteria);
+        $query->joinWith('Content', $join_behavior);
+
+        return $this->getContentAssocs($query, $con);
+    }
+
+    /**
+     * Clears out the collDocuments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addDocuments()
+     */
+    public function clearDocuments()
+    {
+        $this->collDocuments = null; // important to set this to null since that means it is uninitialized
+        $this->collDocumentsPartial = null;
+    }
+
+    /**
+     * reset is the collDocuments collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialDocuments($v = true)
+    {
+        $this->collDocumentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collDocuments collection.
+     *
+     * By default this just sets the collDocuments collection to an empty array (like clearcollDocuments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initDocuments($overrideExisting = true)
+    {
+        if (null !== $this->collDocuments && !$overrideExisting) {
+            return;
+        }
+        $this->collDocuments = new PropelObjectCollection();
+        $this->collDocuments->setModel('Document');
+    }
+
+    /**
+     * Gets an array of Document objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Document[] List of Document objects
+     * @throws PropelException
+     */
+    public function getDocuments($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collDocumentsPartial && !$this->isNew();
+        if (null === $this->collDocuments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDocuments) {
+                // return empty collection
+                $this->initDocuments();
+            } else {
+                $collDocuments = DocumentQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collDocumentsPartial && count($collDocuments)) {
+                      $this->initDocuments(false);
+
+                      foreach($collDocuments as $obj) {
+                        if (false == $this->collDocuments->contains($obj)) {
+                          $this->collDocuments->append($obj);
+                        }
+                      }
+
+                      $this->collDocumentsPartial = true;
+                    }
+
+                    return $collDocuments;
+                }
+
+                if($partial && $this->collDocuments) {
+                    foreach($this->collDocuments as $obj) {
+                        if($obj->isNew()) {
+                            $collDocuments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collDocuments = $collDocuments;
+                $this->collDocumentsPartial = false;
+            }
+        }
+
+        return $this->collDocuments;
+    }
+
+    /**
+     * Sets a collection of Document objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $documents A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setDocuments(PropelCollection $documents, PropelPDO $con = null)
+    {
+        $this->documentsScheduledForDeletion = $this->getDocuments(new Criteria(), $con)->diff($documents);
+
+        foreach ($this->documentsScheduledForDeletion as $documentRemoved) {
+            $documentRemoved->setProduct(null);
+        }
+
+        $this->collDocuments = null;
+        foreach ($documents as $document) {
+            $this->addDocument($document);
+        }
+
+        $this->collDocuments = $documents;
+        $this->collDocumentsPartial = false;
+    }
+
+    /**
+     * Returns the number of related Document objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Document objects.
+     * @throws PropelException
+     */
+    public function countDocuments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collDocumentsPartial && !$this->isNew();
+        if (null === $this->collDocuments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDocuments) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getDocuments());
+                }
+                $query = DocumentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collDocuments);
+        }
+    }
+
+    /**
+     * Method called to associate a Document object to this object
+     * through the Document foreign key attribute.
+     *
+     * @param    Document $l Document
+     * @return Product The current object (for fluent API support)
+     */
+    public function addDocument(Document $l)
+    {
+        if ($this->collDocuments === null) {
+            $this->initDocuments();
+            $this->collDocumentsPartial = true;
+        }
+        if (!$this->collDocuments->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddDocument($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Document $document The document object to add.
+     */
+    protected function doAddDocument($document)
+    {
+        $this->collDocuments[]= $document;
+        $document->setProduct($this);
+    }
+
+    /**
+     * @param	Document $document The document object to remove.
+     */
+    public function removeDocument($document)
+    {
+        if ($this->getDocuments()->contains($document)) {
+            $this->collDocuments->remove($this->collDocuments->search($document));
+            if (null === $this->documentsScheduledForDeletion) {
+                $this->documentsScheduledForDeletion = clone $this->collDocuments;
+                $this->documentsScheduledForDeletion->clear();
+            }
+            $this->documentsScheduledForDeletion[]= $document;
+            $document->setProduct(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getDocuments($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Content', $join_behavior);
+
+        return $this->getDocuments($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinFolder($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Folder', $join_behavior);
+
+        return $this->getDocuments($query, $con);
+    }
+
+    /**
+     * Clears out the collFeatureProds collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFeatureProds()
+     */
+    public function clearFeatureProds()
+    {
+        $this->collFeatureProds = null; // important to set this to null since that means it is uninitialized
+        $this->collFeatureProdsPartial = null;
+    }
+
+    /**
+     * reset is the collFeatureProds collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeatureProds($v = true)
+    {
+        $this->collFeatureProdsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeatureProds collection.
+     *
+     * By default this just sets the collFeatureProds collection to an empty array (like clearcollFeatureProds());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeatureProds($overrideExisting = true)
+    {
+        if (null !== $this->collFeatureProds && !$overrideExisting) {
+            return;
+        }
+        $this->collFeatureProds = new PropelObjectCollection();
+        $this->collFeatureProds->setModel('FeatureProd');
+    }
+
+    /**
+     * Gets an array of FeatureProd objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
+     * @throws PropelException
+     */
+    public function getFeatureProds($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFeatureProdsPartial && !$this->isNew();
+        if (null === $this->collFeatureProds || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProds) {
+                // return empty collection
+                $this->initFeatureProds();
+            } else {
+                $collFeatureProds = FeatureProdQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeatureProdsPartial && count($collFeatureProds)) {
+                      $this->initFeatureProds(false);
+
+                      foreach($collFeatureProds as $obj) {
+                        if (false == $this->collFeatureProds->contains($obj)) {
+                          $this->collFeatureProds->append($obj);
+                        }
+                      }
+
+                      $this->collFeatureProdsPartial = true;
+                    }
+
+                    return $collFeatureProds;
+                }
+
+                if($partial && $this->collFeatureProds) {
+                    foreach($this->collFeatureProds as $obj) {
+                        if($obj->isNew()) {
+                            $collFeatureProds[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeatureProds = $collFeatureProds;
+                $this->collFeatureProdsPartial = false;
+            }
+        }
+
+        return $this->collFeatureProds;
+    }
+
+    /**
+     * Sets a collection of FeatureProd objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $featureProds A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setFeatureProds(PropelCollection $featureProds, PropelPDO $con = null)
+    {
+        $this->featureProdsScheduledForDeletion = $this->getFeatureProds(new Criteria(), $con)->diff($featureProds);
+
+        foreach ($this->featureProdsScheduledForDeletion as $featureProdRemoved) {
+            $featureProdRemoved->setProduct(null);
+        }
+
+        $this->collFeatureProds = null;
+        foreach ($featureProds as $featureProd) {
+            $this->addFeatureProd($featureProd);
+        }
+
+        $this->collFeatureProds = $featureProds;
+        $this->collFeatureProdsPartial = false;
+    }
+
+    /**
+     * Returns the number of related FeatureProd objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeatureProd objects.
+     * @throws PropelException
+     */
+    public function countFeatureProds(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFeatureProdsPartial && !$this->isNew();
+        if (null === $this->collFeatureProds || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProds) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getFeatureProds());
+                }
+                $query = FeatureProdQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFeatureProds);
+        }
+    }
+
+    /**
+     * Method called to associate a FeatureProd object to this object
+     * through the FeatureProd foreign key attribute.
+     *
+     * @param    FeatureProd $l FeatureProd
+     * @return Product The current object (for fluent API support)
+     */
+    public function addFeatureProd(FeatureProd $l)
+    {
+        if ($this->collFeatureProds === null) {
+            $this->initFeatureProds();
+            $this->collFeatureProdsPartial = true;
+        }
+        if (!$this->collFeatureProds->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddFeatureProd($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FeatureProd $featureProd The featureProd object to add.
+     */
+    protected function doAddFeatureProd($featureProd)
+    {
+        $this->collFeatureProds[]= $featureProd;
+        $featureProd->setProduct($this);
+    }
+
+    /**
+     * @param	FeatureProd $featureProd The featureProd object to remove.
+     */
+    public function removeFeatureProd($featureProd)
+    {
+        if ($this->getFeatureProds()->contains($featureProd)) {
+            $this->collFeatureProds->remove($this->collFeatureProds->search($featureProd));
+            if (null === $this->featureProdsScheduledForDeletion) {
+                $this->featureProdsScheduledForDeletion = clone $this->collFeatureProds;
+                $this->featureProdsScheduledForDeletion->clear();
+            }
+            $this->featureProdsScheduledForDeletion[]= $featureProd;
+            $featureProd->setProduct(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related FeatureProds from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
+     */
+    public function getFeatureProdsJoinFeatureAv($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeatureProdQuery::create(null, $criteria);
+        $query->joinWith('FeatureAv', $join_behavior);
+
+        return $this->getFeatureProds($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related FeatureProds from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
+     */
+    public function getFeatureProdsJoinFeature($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeatureProdQuery::create(null, $criteria);
+        $query->joinWith('Feature', $join_behavior);
+
+        return $this->getFeatureProds($query, $con);
+    }
+
+    /**
+     * Clears out the collImages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addImages()
+     */
+    public function clearImages()
+    {
+        $this->collImages = null; // important to set this to null since that means it is uninitialized
+        $this->collImagesPartial = null;
+    }
+
+    /**
+     * reset is the collImages collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialImages($v = true)
+    {
+        $this->collImagesPartial = $v;
+    }
+
+    /**
+     * Initializes the collImages collection.
+     *
+     * By default this just sets the collImages collection to an empty array (like clearcollImages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initImages($overrideExisting = true)
+    {
+        if (null !== $this->collImages && !$overrideExisting) {
+            return;
+        }
+        $this->collImages = new PropelObjectCollection();
+        $this->collImages->setModel('Image');
+    }
+
+    /**
+     * Gets an array of Image objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Image[] List of Image objects
+     * @throws PropelException
+     */
+    public function getImages($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collImagesPartial && !$this->isNew();
+        if (null === $this->collImages || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collImages) {
+                // return empty collection
+                $this->initImages();
+            } else {
+                $collImages = ImageQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collImagesPartial && count($collImages)) {
+                      $this->initImages(false);
+
+                      foreach($collImages as $obj) {
+                        if (false == $this->collImages->contains($obj)) {
+                          $this->collImages->append($obj);
+                        }
+                      }
+
+                      $this->collImagesPartial = true;
+                    }
+
+                    return $collImages;
+                }
+
+                if($partial && $this->collImages) {
+                    foreach($this->collImages as $obj) {
+                        if($obj->isNew()) {
+                            $collImages[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collImages = $collImages;
+                $this->collImagesPartial = false;
+            }
+        }
+
+        return $this->collImages;
+    }
+
+    /**
+     * Sets a collection of Image objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $images A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setImages(PropelCollection $images, PropelPDO $con = null)
+    {
+        $this->imagesScheduledForDeletion = $this->getImages(new Criteria(), $con)->diff($images);
+
+        foreach ($this->imagesScheduledForDeletion as $imageRemoved) {
+            $imageRemoved->setProduct(null);
+        }
+
+        $this->collImages = null;
+        foreach ($images as $image) {
+            $this->addImage($image);
+        }
+
+        $this->collImages = $images;
+        $this->collImagesPartial = false;
+    }
+
+    /**
+     * Returns the number of related Image objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Image objects.
+     * @throws PropelException
+     */
+    public function countImages(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collImagesPartial && !$this->isNew();
+        if (null === $this->collImages || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collImages) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getImages());
+                }
+                $query = ImageQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collImages);
+        }
+    }
+
+    /**
+     * Method called to associate a Image object to this object
+     * through the Image foreign key attribute.
+     *
+     * @param    Image $l Image
+     * @return Product The current object (for fluent API support)
+     */
+    public function addImage(Image $l)
+    {
+        if ($this->collImages === null) {
+            $this->initImages();
+            $this->collImagesPartial = true;
+        }
+        if (!$this->collImages->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddImage($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Image $image The image object to add.
+     */
+    protected function doAddImage($image)
+    {
+        $this->collImages[]= $image;
+        $image->setProduct($this);
+    }
+
+    /**
+     * @param	Image $image The image object to remove.
+     */
+    public function removeImage($image)
+    {
+        if ($this->getImages()->contains($image)) {
+            $this->collImages->remove($this->collImages->search($image));
+            if (null === $this->imagesScheduledForDeletion) {
+                $this->imagesScheduledForDeletion = clone $this->collImages;
+                $this->imagesScheduledForDeletion->clear();
+            }
+            $this->imagesScheduledForDeletion[]= $image;
+            $image->setProduct(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Images from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Image[] List of Image objects
+     */
+    public function getImagesJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ImageQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getImages($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Images from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Image[] List of Image objects
+     */
+    public function getImagesJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ImageQuery::create(null, $criteria);
+        $query->joinWith('Content', $join_behavior);
+
+        return $this->getImages($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Images from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Image[] List of Image objects
+     */
+    public function getImagesJoinFolder($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ImageQuery::create(null, $criteria);
+        $query->joinWith('Folder', $join_behavior);
+
+        return $this->getImages($query, $con);
+    }
+
+    /**
+     * Clears out the collProductCategorys collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductCategorys()
+     */
+    public function clearProductCategorys()
+    {
+        $this->collProductCategorys = null; // important to set this to null since that means it is uninitialized
+        $this->collProductCategorysPartial = null;
+    }
+
+    /**
+     * reset is the collProductCategorys collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialProductCategorys($v = true)
+    {
+        $this->collProductCategorysPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductCategorys collection.
+     *
+     * By default this just sets the collProductCategorys collection to an empty array (like clearcollProductCategorys());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductCategorys($overrideExisting = true)
+    {
+        if (null !== $this->collProductCategorys && !$overrideExisting) {
+            return;
+        }
+        $this->collProductCategorys = new PropelObjectCollection();
+        $this->collProductCategorys->setModel('ProductCategory');
+    }
+
+    /**
+     * Gets an array of ProductCategory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ProductCategory[] List of ProductCategory objects
+     * @throws PropelException
+     */
+    public function getProductCategorys($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collProductCategorysPartial && !$this->isNew();
+        if (null === $this->collProductCategorys || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductCategorys) {
+                // return empty collection
+                $this->initProductCategorys();
+            } else {
+                $collProductCategorys = ProductCategoryQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collProductCategorysPartial && count($collProductCategorys)) {
+                      $this->initProductCategorys(false);
+
+                      foreach($collProductCategorys as $obj) {
+                        if (false == $this->collProductCategorys->contains($obj)) {
+                          $this->collProductCategorys->append($obj);
+                        }
+                      }
+
+                      $this->collProductCategorysPartial = true;
+                    }
+
+                    return $collProductCategorys;
+                }
+
+                if($partial && $this->collProductCategorys) {
+                    foreach($this->collProductCategorys as $obj) {
+                        if($obj->isNew()) {
+                            $collProductCategorys[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductCategorys = $collProductCategorys;
+                $this->collProductCategorysPartial = false;
+            }
+        }
+
+        return $this->collProductCategorys;
+    }
+
+    /**
+     * Sets a collection of ProductCategory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productCategorys A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setProductCategorys(PropelCollection $productCategorys, PropelPDO $con = null)
+    {
+        $this->productCategorysScheduledForDeletion = $this->getProductCategorys(new Criteria(), $con)->diff($productCategorys);
+
+        foreach ($this->productCategorysScheduledForDeletion as $productCategoryRemoved) {
+            $productCategoryRemoved->setProduct(null);
+        }
+
+        $this->collProductCategorys = null;
+        foreach ($productCategorys as $productCategory) {
+            $this->addProductCategory($productCategory);
+        }
+
+        $this->collProductCategorys = $productCategorys;
+        $this->collProductCategorysPartial = false;
+    }
+
+    /**
+     * Returns the number of related ProductCategory objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ProductCategory objects.
+     * @throws PropelException
+     */
+    public function countProductCategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collProductCategorysPartial && !$this->isNew();
+        if (null === $this->collProductCategorys || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductCategorys) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getProductCategorys());
+                }
+                $query = ProductCategoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductCategorys);
+        }
+    }
+
+    /**
+     * Method called to associate a ProductCategory object to this object
+     * through the ProductCategory foreign key attribute.
+     *
+     * @param    ProductCategory $l ProductCategory
+     * @return Product The current object (for fluent API support)
+     */
+    public function addProductCategory(ProductCategory $l)
+    {
+        if ($this->collProductCategorys === null) {
+            $this->initProductCategorys();
+            $this->collProductCategorysPartial = true;
+        }
+        if (!$this->collProductCategorys->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddProductCategory($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductCategory $productCategory The productCategory object to add.
+     */
+    protected function doAddProductCategory($productCategory)
+    {
+        $this->collProductCategorys[]= $productCategory;
+        $productCategory->setProduct($this);
+    }
+
+    /**
+     * @param	ProductCategory $productCategory The productCategory object to remove.
+     */
+    public function removeProductCategory($productCategory)
+    {
+        if ($this->getProductCategorys()->contains($productCategory)) {
+            $this->collProductCategorys->remove($this->collProductCategorys->search($productCategory));
+            if (null === $this->productCategorysScheduledForDeletion) {
+                $this->productCategorysScheduledForDeletion = clone $this->collProductCategorys;
+                $this->productCategorysScheduledForDeletion->clear();
+            }
+            $this->productCategorysScheduledForDeletion[]= $productCategory;
+            $productCategory->setProduct(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related ProductCategorys from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|ProductCategory[] List of ProductCategory objects
+     */
+    public function getProductCategorysJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ProductCategoryQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getProductCategorys($query, $con);
+    }
+
+    /**
+     * Clears out the collProductDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductDescs()
+     */
+    public function clearProductDescs()
+    {
+        $this->collProductDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collProductDescsPartial = null;
+    }
+
+    /**
+     * reset is the collProductDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialProductDescs($v = true)
+    {
+        $this->collProductDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductDescs collection.
+     *
+     * By default this just sets the collProductDescs collection to an empty array (like clearcollProductDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductDescs($overrideExisting = true)
+    {
+        if (null !== $this->collProductDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collProductDescs = new PropelObjectCollection();
+        $this->collProductDescs->setModel('ProductDesc');
+    }
+
+    /**
+     * Gets an array of ProductDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ProductDesc[] List of ProductDesc objects
+     * @throws PropelException
+     */
+    public function getProductDescs($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collProductDescsPartial && !$this->isNew();
+        if (null === $this->collProductDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductDescs) {
+                // return empty collection
+                $this->initProductDescs();
+            } else {
+                $collProductDescs = ProductDescQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collProductDescsPartial && count($collProductDescs)) {
+                      $this->initProductDescs(false);
+
+                      foreach($collProductDescs as $obj) {
+                        if (false == $this->collProductDescs->contains($obj)) {
+                          $this->collProductDescs->append($obj);
+                        }
+                      }
+
+                      $this->collProductDescsPartial = true;
+                    }
+
+                    return $collProductDescs;
+                }
+
+                if($partial && $this->collProductDescs) {
+                    foreach($this->collProductDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collProductDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductDescs = $collProductDescs;
+                $this->collProductDescsPartial = false;
+            }
+        }
+
+        return $this->collProductDescs;
+    }
+
+    /**
+     * Sets a collection of ProductDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setProductDescs(PropelCollection $productDescs, PropelPDO $con = null)
+    {
+        $this->productDescsScheduledForDeletion = $this->getProductDescs(new Criteria(), $con)->diff($productDescs);
+
+        foreach ($this->productDescsScheduledForDeletion as $productDescRemoved) {
+            $productDescRemoved->setProduct(null);
+        }
+
+        $this->collProductDescs = null;
+        foreach ($productDescs as $productDesc) {
+            $this->addProductDesc($productDesc);
+        }
+
+        $this->collProductDescs = $productDescs;
+        $this->collProductDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ProductDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ProductDesc objects.
+     * @throws PropelException
+     */
+    public function countProductDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collProductDescsPartial && !$this->isNew();
+        if (null === $this->collProductDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getProductDescs());
+                }
+                $query = ProductDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductDescs);
+        }
+    }
+
+    /**
+     * Method called to associate a ProductDesc object to this object
+     * through the ProductDesc foreign key attribute.
+     *
+     * @param    ProductDesc $l ProductDesc
+     * @return Product The current object (for fluent API support)
+     */
+    public function addProductDesc(ProductDesc $l)
+    {
+        if ($this->collProductDescs === null) {
+            $this->initProductDescs();
+            $this->collProductDescsPartial = true;
+        }
+        if (!$this->collProductDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddProductDesc($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductDesc $productDesc The productDesc object to add.
+     */
+    protected function doAddProductDesc($productDesc)
+    {
+        $this->collProductDescs[]= $productDesc;
+        $productDesc->setProduct($this);
+    }
+
+    /**
+     * @param	ProductDesc $productDesc The productDesc object to remove.
+     */
+    public function removeProductDesc($productDesc)
+    {
+        if ($this->getProductDescs()->contains($productDesc)) {
+            $this->collProductDescs->remove($this->collProductDescs->search($productDesc));
+            if (null === $this->productDescsScheduledForDeletion) {
+                $this->productDescsScheduledForDeletion = clone $this->collProductDescs;
+                $this->productDescsScheduledForDeletion->clear();
+            }
+            $this->productDescsScheduledForDeletion[]= $productDesc;
+            $productDesc->setProduct(null);
+        }
+    }
+
+    /**
+     * Clears out the collRewritings collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addRewritings()
+     */
+    public function clearRewritings()
+    {
+        $this->collRewritings = null; // important to set this to null since that means it is uninitialized
+        $this->collRewritingsPartial = null;
+    }
+
+    /**
+     * reset is the collRewritings collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialRewritings($v = true)
+    {
+        $this->collRewritingsPartial = $v;
+    }
+
+    /**
+     * Initializes the collRewritings collection.
+     *
+     * By default this just sets the collRewritings collection to an empty array (like clearcollRewritings());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initRewritings($overrideExisting = true)
+    {
+        if (null !== $this->collRewritings && !$overrideExisting) {
+            return;
+        }
+        $this->collRewritings = new PropelObjectCollection();
+        $this->collRewritings->setModel('Rewriting');
+    }
+
+    /**
+     * Gets an array of Rewriting objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Rewriting[] List of Rewriting objects
+     * @throws PropelException
+     */
+    public function getRewritings($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collRewritingsPartial && !$this->isNew();
+        if (null === $this->collRewritings || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collRewritings) {
+                // return empty collection
+                $this->initRewritings();
+            } else {
+                $collRewritings = RewritingQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collRewritingsPartial && count($collRewritings)) {
+                      $this->initRewritings(false);
+
+                      foreach($collRewritings as $obj) {
+                        if (false == $this->collRewritings->contains($obj)) {
+                          $this->collRewritings->append($obj);
+                        }
+                      }
+
+                      $this->collRewritingsPartial = true;
+                    }
+
+                    return $collRewritings;
+                }
+
+                if($partial && $this->collRewritings) {
+                    foreach($this->collRewritings as $obj) {
+                        if($obj->isNew()) {
+                            $collRewritings[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collRewritings = $collRewritings;
+                $this->collRewritingsPartial = false;
+            }
+        }
+
+        return $this->collRewritings;
+    }
+
+    /**
+     * Sets a collection of Rewriting objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $rewritings A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setRewritings(PropelCollection $rewritings, PropelPDO $con = null)
+    {
+        $this->rewritingsScheduledForDeletion = $this->getRewritings(new Criteria(), $con)->diff($rewritings);
+
+        foreach ($this->rewritingsScheduledForDeletion as $rewritingRemoved) {
+            $rewritingRemoved->setProduct(null);
+        }
+
+        $this->collRewritings = null;
+        foreach ($rewritings as $rewriting) {
+            $this->addRewriting($rewriting);
+        }
+
+        $this->collRewritings = $rewritings;
+        $this->collRewritingsPartial = false;
+    }
+
+    /**
+     * Returns the number of related Rewriting objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Rewriting objects.
+     * @throws PropelException
+     */
+    public function countRewritings(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collRewritingsPartial && !$this->isNew();
+        if (null === $this->collRewritings || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collRewritings) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getRewritings());
+                }
+                $query = RewritingQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collRewritings);
+        }
+    }
+
+    /**
+     * Method called to associate a Rewriting object to this object
+     * through the Rewriting foreign key attribute.
+     *
+     * @param    Rewriting $l Rewriting
+     * @return Product The current object (for fluent API support)
+     */
+    public function addRewriting(Rewriting $l)
+    {
+        if ($this->collRewritings === null) {
+            $this->initRewritings();
+            $this->collRewritingsPartial = true;
+        }
+        if (!$this->collRewritings->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddRewriting($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Rewriting $rewriting The rewriting object to add.
+     */
+    protected function doAddRewriting($rewriting)
+    {
+        $this->collRewritings[]= $rewriting;
+        $rewriting->setProduct($this);
+    }
+
+    /**
+     * @param	Rewriting $rewriting The rewriting object to remove.
+     */
+    public function removeRewriting($rewriting)
+    {
+        if ($this->getRewritings()->contains($rewriting)) {
+            $this->collRewritings->remove($this->collRewritings->search($rewriting));
+            if (null === $this->rewritingsScheduledForDeletion) {
+                $this->rewritingsScheduledForDeletion = clone $this->collRewritings;
+                $this->rewritingsScheduledForDeletion->clear();
+            }
+            $this->rewritingsScheduledForDeletion[]= $rewriting;
+            $rewriting->setProduct(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Rewritings from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Rewriting[] List of Rewriting objects
+     */
+    public function getRewritingsJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = RewritingQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getRewritings($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Rewritings from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Rewriting[] List of Rewriting objects
+     */
+    public function getRewritingsJoinFolder($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = RewritingQuery::create(null, $criteria);
+        $query->joinWith('Folder', $join_behavior);
+
+        return $this->getRewritings($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Rewritings from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Rewriting[] List of Rewriting objects
+     */
+    public function getRewritingsJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = RewritingQuery::create(null, $criteria);
+        $query->joinWith('Content', $join_behavior);
+
+        return $this->getRewritings($query, $con);
+    }
+
+    /**
+     * Clears out the collStocks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addStocks()
+     */
+    public function clearStocks()
+    {
+        $this->collStocks = null; // important to set this to null since that means it is uninitialized
+        $this->collStocksPartial = null;
+    }
+
+    /**
+     * reset is the collStocks collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialStocks($v = true)
+    {
+        $this->collStocksPartial = $v;
+    }
+
+    /**
+     * Initializes the collStocks collection.
+     *
+     * By default this just sets the collStocks collection to an empty array (like clearcollStocks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initStocks($overrideExisting = true)
+    {
+        if (null !== $this->collStocks && !$overrideExisting) {
+            return;
+        }
+        $this->collStocks = new PropelObjectCollection();
+        $this->collStocks->setModel('Stock');
+    }
+
+    /**
+     * Gets an array of Stock objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Stock[] List of Stock objects
+     * @throws PropelException
+     */
+    public function getStocks($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collStocksPartial && !$this->isNew();
+        if (null === $this->collStocks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collStocks) {
+                // return empty collection
+                $this->initStocks();
+            } else {
+                $collStocks = StockQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collStocksPartial && count($collStocks)) {
+                      $this->initStocks(false);
+
+                      foreach($collStocks as $obj) {
+                        if (false == $this->collStocks->contains($obj)) {
+                          $this->collStocks->append($obj);
+                        }
+                      }
+
+                      $this->collStocksPartial = true;
+                    }
+
+                    return $collStocks;
+                }
+
+                if($partial && $this->collStocks) {
+                    foreach($this->collStocks as $obj) {
+                        if($obj->isNew()) {
+                            $collStocks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collStocks = $collStocks;
+                $this->collStocksPartial = false;
+            }
+        }
+
+        return $this->collStocks;
+    }
+
+    /**
+     * Sets a collection of Stock objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $stocks A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setStocks(PropelCollection $stocks, PropelPDO $con = null)
+    {
+        $this->stocksScheduledForDeletion = $this->getStocks(new Criteria(), $con)->diff($stocks);
+
+        foreach ($this->stocksScheduledForDeletion as $stockRemoved) {
+            $stockRemoved->setProduct(null);
+        }
+
+        $this->collStocks = null;
+        foreach ($stocks as $stock) {
+            $this->addStock($stock);
+        }
+
+        $this->collStocks = $stocks;
+        $this->collStocksPartial = false;
+    }
+
+    /**
+     * Returns the number of related Stock objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Stock objects.
+     * @throws PropelException
+     */
+    public function countStocks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collStocksPartial && !$this->isNew();
+        if (null === $this->collStocks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collStocks) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getStocks());
+                }
+                $query = StockQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collStocks);
+        }
+    }
+
+    /**
+     * Method called to associate a Stock object to this object
+     * through the Stock foreign key attribute.
+     *
+     * @param    Stock $l Stock
+     * @return Product The current object (for fluent API support)
+     */
+    public function addStock(Stock $l)
+    {
+        if ($this->collStocks === null) {
+            $this->initStocks();
+            $this->collStocksPartial = true;
+        }
+        if (!$this->collStocks->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddStock($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Stock $stock The stock object to add.
+     */
+    protected function doAddStock($stock)
+    {
+        $this->collStocks[]= $stock;
+        $stock->setProduct($this);
+    }
+
+    /**
+     * @param	Stock $stock The stock object to remove.
+     */
+    public function removeStock($stock)
+    {
+        if ($this->getStocks()->contains($stock)) {
+            $this->collStocks->remove($this->collStocks->search($stock));
+            if (null === $this->stocksScheduledForDeletion) {
+                $this->stocksScheduledForDeletion = clone $this->collStocks;
+                $this->stocksScheduledForDeletion->clear();
+            }
+            $this->stocksScheduledForDeletion[]= $stock;
+            $stock->setProduct(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Product is new, it will return
+     * an empty collection; or if this Product has previously
+     * been saved, it will retrieve related Stocks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Product.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Stock[] List of Stock objects
+     */
+    public function getStocksJoinCombination($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = StockQuery::create(null, $criteria);
+        $query->joinWith('Combination', $join_behavior);
+
+        return $this->getStocks($query, $con);
     }
 
     /**
@@ -2508,25 +4659,99 @@ abstract class BaseProduct extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleTaxRule) {
-                $this->singleTaxRule->clearAllReferences($deep);
+            if ($this->collAccessorysRelatedByProductId) {
+                foreach ($this->collAccessorysRelatedByProductId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collAccessorysRelatedByAccessory) {
+                foreach ($this->collAccessorysRelatedByAccessory as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collContentAssocs) {
+                foreach ($this->collContentAssocs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collDocuments) {
+                foreach ($this->collDocuments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFeatureProds) {
+                foreach ($this->collFeatureProds as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collImages) {
+                foreach ($this->collImages as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductCategorys) {
+                foreach ($this->collProductCategorys as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductDescs) {
+                foreach ($this->collProductDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collRewritings) {
+                foreach ($this->collRewritings as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collStocks) {
+                foreach ($this->collStocks as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
         } // if ($deep)
 
-        if ($this->singleTaxRule instanceof PropelCollection) {
-            $this->singleTaxRule->clearIterator();
+        if ($this->collAccessorysRelatedByProductId instanceof PropelCollection) {
+            $this->collAccessorysRelatedByProductId->clearIterator();
         }
-        $this->singleTaxRule = null;
-        $this->aAccessory = null;
-        $this->aAccessory = null;
-        $this->aContentAssoc = null;
-        $this->aDocument = null;
-        $this->aFeatureProd = null;
-        $this->aImage = null;
-        $this->aProductCategory = null;
-        $this->aProductDesc = null;
-        $this->aRewriting = null;
-        $this->aStock = null;
+        $this->collAccessorysRelatedByProductId = null;
+        if ($this->collAccessorysRelatedByAccessory instanceof PropelCollection) {
+            $this->collAccessorysRelatedByAccessory->clearIterator();
+        }
+        $this->collAccessorysRelatedByAccessory = null;
+        if ($this->collContentAssocs instanceof PropelCollection) {
+            $this->collContentAssocs->clearIterator();
+        }
+        $this->collContentAssocs = null;
+        if ($this->collDocuments instanceof PropelCollection) {
+            $this->collDocuments->clearIterator();
+        }
+        $this->collDocuments = null;
+        if ($this->collFeatureProds instanceof PropelCollection) {
+            $this->collFeatureProds->clearIterator();
+        }
+        $this->collFeatureProds = null;
+        if ($this->collImages instanceof PropelCollection) {
+            $this->collImages->clearIterator();
+        }
+        $this->collImages = null;
+        if ($this->collProductCategorys instanceof PropelCollection) {
+            $this->collProductCategorys->clearIterator();
+        }
+        $this->collProductCategorys = null;
+        if ($this->collProductDescs instanceof PropelCollection) {
+            $this->collProductDescs->clearIterator();
+        }
+        $this->collProductDescs = null;
+        if ($this->collRewritings instanceof PropelCollection) {
+            $this->collRewritings->clearIterator();
+        }
+        $this->collRewritings = null;
+        if ($this->collStocks instanceof PropelCollection) {
+            $this->collStocks->clearIterator();
+        }
+        $this->collStocks = null;
+        $this->aTaxRule = null;
     }
 
     /**

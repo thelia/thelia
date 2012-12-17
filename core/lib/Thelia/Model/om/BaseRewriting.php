@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
@@ -104,24 +102,24 @@ abstract class BaseRewriting extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Category one-to-one related Category object
+     * @var        Product
      */
-    protected $singleCategory;
+    protected $aProduct;
 
     /**
-     * @var        Content one-to-one related Content object
+     * @var        Category
      */
-    protected $singleContent;
+    protected $aCategory;
 
     /**
-     * @var        Folder one-to-one related Folder object
+     * @var        Folder
      */
-    protected $singleFolder;
+    protected $aFolder;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        Content
      */
-    protected $singleProduct;
+    protected $aContent;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -136,30 +134,6 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $categorysScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $contentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $foldersScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -354,6 +328,10 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             $this->modifiedColumns[] = RewritingPeer::PRODUCT_ID;
         }
 
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
+        }
+
 
         return $this;
     } // setProductId()
@@ -373,6 +351,10 @@ abstract class BaseRewriting extends BaseObject implements Persistent
         if ($this->category_id !== $v) {
             $this->category_id = $v;
             $this->modifiedColumns[] = RewritingPeer::CATEGORY_ID;
+        }
+
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
         }
 
 
@@ -396,6 +378,10 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             $this->modifiedColumns[] = RewritingPeer::FOLDER_ID;
         }
 
+        if ($this->aFolder !== null && $this->aFolder->getId() !== $v) {
+            $this->aFolder = null;
+        }
+
 
         return $this;
     } // setFolderId()
@@ -415,6 +401,10 @@ abstract class BaseRewriting extends BaseObject implements Persistent
         if ($this->content_id !== $v) {
             $this->content_id = $v;
             $this->modifiedColumns[] = RewritingPeer::CONTENT_ID;
+        }
+
+        if ($this->aContent !== null && $this->aContent->getId() !== $v) {
+            $this->aContent = null;
         }
 
 
@@ -538,6 +528,18 @@ abstract class BaseRewriting extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
+        }
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
+        }
+        if ($this->aFolder !== null && $this->folder_id !== $this->aFolder->getId()) {
+            $this->aFolder = null;
+        }
+        if ($this->aContent !== null && $this->content_id !== $this->aContent->getId()) {
+            $this->aContent = null;
+        }
     } // ensureConsistency
 
     /**
@@ -577,14 +579,10 @@ abstract class BaseRewriting extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCategory = null;
-
-            $this->singleContent = null;
-
-            $this->singleFolder = null;
-
-            $this->singleProduct = null;
-
+            $this->aProduct = null;
+            $this->aCategory = null;
+            $this->aFolder = null;
+            $this->aContent = null;
         } // if (deep)
     }
 
@@ -698,6 +696,39 @@ abstract class BaseRewriting extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
+                }
+                $this->setProduct($this->aProduct);
+            }
+
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
+                }
+                $this->setCategory($this->aCategory);
+            }
+
+            if ($this->aFolder !== null) {
+                if ($this->aFolder->isModified() || $this->aFolder->isNew()) {
+                    $affectedRows += $this->aFolder->save($con);
+                }
+                $this->setFolder($this->aFolder);
+            }
+
+            if ($this->aContent !== null) {
+                if ($this->aContent->isModified() || $this->aContent->isNew()) {
+                    $affectedRows += $this->aContent->save($con);
+                }
+                $this->setContent($this->aContent);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -707,66 +738,6 @@ abstract class BaseRewriting extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->categorysScheduledForDeletion !== null) {
-                if (!$this->categorysScheduledForDeletion->isEmpty()) {
-                    CategoryQuery::create()
-                        ->filterByPrimaryKeys($this->categorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->categorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCategory !== null) {
-                if (!$this->singleCategory->isDeleted()) {
-                        $affectedRows += $this->singleCategory->save($con);
-                }
-            }
-
-            if ($this->contentsScheduledForDeletion !== null) {
-                if (!$this->contentsScheduledForDeletion->isEmpty()) {
-                    ContentQuery::create()
-                        ->filterByPrimaryKeys($this->contentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleContent !== null) {
-                if (!$this->singleContent->isDeleted()) {
-                        $affectedRows += $this->singleContent->save($con);
-                }
-            }
-
-            if ($this->foldersScheduledForDeletion !== null) {
-                if (!$this->foldersScheduledForDeletion->isEmpty()) {
-                    FolderQuery::create()
-                        ->filterByPrimaryKeys($this->foldersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->foldersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFolder !== null) {
-                if (!$this->singleFolder->isDeleted()) {
-                        $affectedRows += $this->singleFolder->save($con);
-                }
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -937,34 +908,40 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProduct !== null) {
+                if (!$this->aProduct->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
+                }
+            }
+
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
+                }
+            }
+
+            if ($this->aFolder !== null) {
+                if (!$this->aFolder->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFolder->getValidationFailures());
+                }
+            }
+
+            if ($this->aContent !== null) {
+                if (!$this->aContent->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aContent->getValidationFailures());
+                }
+            }
+
+
             if (($retval = RewritingPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCategory !== null) {
-                    if (!$this->singleCategory->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCategory->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleContent !== null) {
-                    if (!$this->singleContent->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleContent->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleFolder !== null) {
-                    if (!$this->singleFolder->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFolder->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -1064,17 +1041,17 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCategory) {
-                $result['Category'] = $this->singleCategory->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleContent) {
-                $result['Content'] = $this->singleContent->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleFolder) {
-                $result['Folder'] = $this->singleFolder->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFolder) {
+                $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aContent) {
+                $result['Content'] = $this->aContent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1263,26 +1240,6 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCategory();
-            if ($relObj) {
-                $copyObj->setCategory($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getContent();
-            if ($relObj) {
-                $copyObj->setContent($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getFolder();
-            if ($relObj) {
-                $copyObj->setFolder($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1333,161 +1290,208 @@ abstract class BaseRewriting extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Product object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Category object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Category
-     * @throws PropelException
-     */
-    public function getCategory(PropelPDO $con = null)
-    {
-
-        if ($this->singleCategory === null && !$this->isNew()) {
-            $this->singleCategory = CategoryQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCategory;
-    }
-
-    /**
-     * Sets a single Category object as related to this object by a one-to-one relationship.
-     *
-     * @param             Category $v Category
-     * @return Rewriting The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCategory(Category $v = null)
-    {
-        $this->singleCategory = $v;
-
-        // Make sure that that the passed-in Category isn't already associated with this object
-        if ($v !== null && $v->getRewriting() === null) {
-            $v->setRewriting($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Content object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Content
-     * @throws PropelException
-     */
-    public function getContent(PropelPDO $con = null)
-    {
-
-        if ($this->singleContent === null && !$this->isNew()) {
-            $this->singleContent = ContentQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleContent;
-    }
-
-    /**
-     * Sets a single Content object as related to this object by a one-to-one relationship.
-     *
-     * @param             Content $v Content
-     * @return Rewriting The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setContent(Content $v = null)
-    {
-        $this->singleContent = $v;
-
-        // Make sure that that the passed-in Content isn't already associated with this object
-        if ($v !== null && $v->getRewriting() === null) {
-            $v->setRewriting($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Folder object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Folder
-     * @throws PropelException
-     */
-    public function getFolder(PropelPDO $con = null)
-    {
-
-        if ($this->singleFolder === null && !$this->isNew()) {
-            $this->singleFolder = FolderQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleFolder;
-    }
-
-    /**
-     * Sets a single Folder object as related to this object by a one-to-one relationship.
-     *
-     * @param             Folder $v Folder
-     * @return Rewriting The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFolder(Folder $v = null)
-    {
-        $this->singleFolder = $v;
-
-        // Make sure that that the passed-in Folder isn't already associated with this object
-        if ($v !== null && $v->getRewriting() === null) {
-            $v->setRewriting($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Product
-     * @throws PropelException
-     */
-    public function getProduct(PropelPDO $con = null)
-    {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleProduct;
-    }
-
-    /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
-     *
-     * @param             Product $v Product
+     * @param             Product $v
      * @return Rewriting The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(Product $v = null)
     {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getRewriting() === null) {
-            $v->setRewriting($this);
+        if ($v === null) {
+            $this->setProductId(NULL);
+        } else {
+            $this->setProductId($v->getId());
         }
 
+        $this->aProduct = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
+        if ($v !== null) {
+            $v->addRewriting($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Product object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Product The associated Product object.
+     * @throws PropelException
+     */
+    public function getProduct(PropelPDO $con = null)
+    {
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProduct->addRewritings($this);
+             */
+        }
+
+        return $this->aProduct;
+    }
+
+    /**
+     * Declares an association between this object and a Category object.
+     *
+     * @param             Category $v
+     * @return Rewriting The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCategory(Category $v = null)
+    {
+        if ($v === null) {
+            $this->setCategoryId(NULL);
+        } else {
+            $this->setCategoryId($v->getId());
+        }
+
+        $this->aCategory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Category object, it will not be re-added.
+        if ($v !== null) {
+            $v->addRewriting($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Category object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Category The associated Category object.
+     * @throws PropelException
+     */
+    public function getCategory(PropelPDO $con = null)
+    {
+        if ($this->aCategory === null && ($this->category_id !== null)) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategory->addRewritings($this);
+             */
+        }
+
+        return $this->aCategory;
+    }
+
+    /**
+     * Declares an association between this object and a Folder object.
+     *
+     * @param             Folder $v
+     * @return Rewriting The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setFolder(Folder $v = null)
+    {
+        if ($v === null) {
+            $this->setFolderId(NULL);
+        } else {
+            $this->setFolderId($v->getId());
+        }
+
+        $this->aFolder = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Folder object, it will not be re-added.
+        if ($v !== null) {
+            $v->addRewriting($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Folder object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Folder The associated Folder object.
+     * @throws PropelException
+     */
+    public function getFolder(PropelPDO $con = null)
+    {
+        if ($this->aFolder === null && ($this->folder_id !== null)) {
+            $this->aFolder = FolderQuery::create()->findPk($this->folder_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFolder->addRewritings($this);
+             */
+        }
+
+        return $this->aFolder;
+    }
+
+    /**
+     * Declares an association between this object and a Content object.
+     *
+     * @param             Content $v
+     * @return Rewriting The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setContent(Content $v = null)
+    {
+        if ($v === null) {
+            $this->setContentId(NULL);
+        } else {
+            $this->setContentId($v->getId());
+        }
+
+        $this->aContent = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Content object, it will not be re-added.
+        if ($v !== null) {
+            $v->addRewriting($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Content object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Content The associated Content object.
+     * @throws PropelException
+     */
+    public function getContent(PropelPDO $con = null)
+    {
+        if ($this->aContent === null && ($this->content_id !== null)) {
+            $this->aContent = ContentQuery::create()->findPk($this->content_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aContent->addRewritings($this);
+             */
+        }
+
+        return $this->aContent;
     }
 
     /**
@@ -1523,36 +1527,12 @@ abstract class BaseRewriting extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCategory) {
-                $this->singleCategory->clearAllReferences($deep);
-            }
-            if ($this->singleContent) {
-                $this->singleContent->clearAllReferences($deep);
-            }
-            if ($this->singleFolder) {
-                $this->singleFolder->clearAllReferences($deep);
-            }
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCategory instanceof PropelCollection) {
-            $this->singleCategory->clearIterator();
-        }
-        $this->singleCategory = null;
-        if ($this->singleContent instanceof PropelCollection) {
-            $this->singleContent->clearIterator();
-        }
-        $this->singleContent = null;
-        if ($this->singleFolder instanceof PropelCollection) {
-            $this->singleFolder->clearIterator();
-        }
-        $this->singleFolder = null;
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
+        $this->aProduct = null;
+        $this->aCategory = null;
+        $this->aFolder = null;
+        $this->aContent = null;
     }
 
     /**

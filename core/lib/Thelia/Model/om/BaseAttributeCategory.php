@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeCategory;
@@ -82,14 +80,14 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Attribute one-to-one related Attribute object
+     * @var        Category
      */
-    protected $singleAttribute;
+    protected $aCategory;
 
     /**
-     * @var        Category one-to-one related Category object
+     * @var        Attribute
      */
-    protected $singleCategory;
+    protected $aAttribute;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -104,18 +102,6 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $attributesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $categorysScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -259,6 +245,10 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
             $this->modifiedColumns[] = AttributeCategoryPeer::CATEGORY_ID;
         }
 
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
+        }
+
 
         return $this;
     } // setCategoryId()
@@ -278,6 +268,10 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
         if ($this->attribute_id !== $v) {
             $this->attribute_id = $v;
             $this->modifiedColumns[] = AttributeCategoryPeer::ATTRIBUTE_ID;
+        }
+
+        if ($this->aAttribute !== null && $this->aAttribute->getId() !== $v) {
+            $this->aAttribute = null;
         }
 
 
@@ -398,6 +392,12 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
+        }
+        if ($this->aAttribute !== null && $this->attribute_id !== $this->aAttribute->getId()) {
+            $this->aAttribute = null;
+        }
     } // ensureConsistency
 
     /**
@@ -437,10 +437,8 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleAttribute = null;
-
-            $this->singleCategory = null;
-
+            $this->aCategory = null;
+            $this->aAttribute = null;
         } // if (deep)
     }
 
@@ -554,6 +552,25 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
+                }
+                $this->setCategory($this->aCategory);
+            }
+
+            if ($this->aAttribute !== null) {
+                if ($this->aAttribute->isModified() || $this->aAttribute->isNew()) {
+                    $affectedRows += $this->aAttribute->save($con);
+                }
+                $this->setAttribute($this->aAttribute);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -563,36 +580,6 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->attributesScheduledForDeletion !== null) {
-                if (!$this->attributesScheduledForDeletion->isEmpty()) {
-                    AttributeQuery::create()
-                        ->filterByPrimaryKeys($this->attributesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleAttribute !== null) {
-                if (!$this->singleAttribute->isDeleted()) {
-                        $affectedRows += $this->singleAttribute->save($con);
-                }
-            }
-
-            if ($this->categorysScheduledForDeletion !== null) {
-                if (!$this->categorysScheduledForDeletion->isEmpty()) {
-                    CategoryQuery::create()
-                        ->filterByPrimaryKeys($this->categorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->categorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCategory !== null) {
-                if (!$this->singleCategory->isDeleted()) {
-                        $affectedRows += $this->singleCategory->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -756,22 +743,28 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
+                }
+            }
+
+            if ($this->aAttribute !== null) {
+                if (!$this->aAttribute->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aAttribute->getValidationFailures());
+                }
+            }
+
+
             if (($retval = AttributeCategoryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleAttribute !== null) {
-                    if (!$this->singleAttribute->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleAttribute->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleCategory !== null) {
-                    if (!$this->singleCategory->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCategory->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -859,11 +852,11 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleAttribute) {
-                $result['Attribute'] = $this->singleAttribute->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCategory) {
-                $result['Category'] = $this->singleCategory->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aAttribute) {
+                $result['Attribute'] = $this->aAttribute->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1034,16 +1027,6 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAttribute();
-            if ($relObj) {
-                $copyObj->setAttribute($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getCategory();
-            if ($relObj) {
-                $copyObj->setCategory($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1094,89 +1077,106 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Category object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Attribute object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Attribute
-     * @throws PropelException
-     */
-    public function getAttribute(PropelPDO $con = null)
-    {
-
-        if ($this->singleAttribute === null && !$this->isNew()) {
-            $this->singleAttribute = AttributeQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleAttribute;
-    }
-
-    /**
-     * Sets a single Attribute object as related to this object by a one-to-one relationship.
-     *
-     * @param             Attribute $v Attribute
-     * @return AttributeCategory The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setAttribute(Attribute $v = null)
-    {
-        $this->singleAttribute = $v;
-
-        // Make sure that that the passed-in Attribute isn't already associated with this object
-        if ($v !== null && $v->getAttributeCategory() === null) {
-            $v->setAttributeCategory($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Category object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Category
-     * @throws PropelException
-     */
-    public function getCategory(PropelPDO $con = null)
-    {
-
-        if ($this->singleCategory === null && !$this->isNew()) {
-            $this->singleCategory = CategoryQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCategory;
-    }
-
-    /**
-     * Sets a single Category object as related to this object by a one-to-one relationship.
-     *
-     * @param             Category $v Category
+     * @param             Category $v
      * @return AttributeCategory The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCategory(Category $v = null)
     {
-        $this->singleCategory = $v;
-
-        // Make sure that that the passed-in Category isn't already associated with this object
-        if ($v !== null && $v->getAttributeCategory() === null) {
-            $v->setAttributeCategory($this);
+        if ($v === null) {
+            $this->setCategoryId(NULL);
+        } else {
+            $this->setCategoryId($v->getId());
         }
 
+        $this->aCategory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Category object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAttributeCategory($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Category object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Category The associated Category object.
+     * @throws PropelException
+     */
+    public function getCategory(PropelPDO $con = null)
+    {
+        if ($this->aCategory === null && ($this->category_id !== null)) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategory->addAttributeCategorys($this);
+             */
+        }
+
+        return $this->aCategory;
+    }
+
+    /**
+     * Declares an association between this object and a Attribute object.
+     *
+     * @param             Attribute $v
+     * @return AttributeCategory The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setAttribute(Attribute $v = null)
+    {
+        if ($v === null) {
+            $this->setAttributeId(NULL);
+        } else {
+            $this->setAttributeId($v->getId());
+        }
+
+        $this->aAttribute = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Attribute object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAttributeCategory($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Attribute object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Attribute The associated Attribute object.
+     * @throws PropelException
+     */
+    public function getAttribute(PropelPDO $con = null)
+    {
+        if ($this->aAttribute === null && ($this->attribute_id !== null)) {
+            $this->aAttribute = AttributeQuery::create()->findPk($this->attribute_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAttribute->addAttributeCategorys($this);
+             */
+        }
+
+        return $this->aAttribute;
     }
 
     /**
@@ -1209,22 +1209,10 @@ abstract class BaseAttributeCategory extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleAttribute) {
-                $this->singleAttribute->clearAllReferences($deep);
-            }
-            if ($this->singleCategory) {
-                $this->singleCategory->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleAttribute instanceof PropelCollection) {
-            $this->singleAttribute->clearIterator();
-        }
-        $this->singleAttribute = null;
-        if ($this->singleCategory instanceof PropelCollection) {
-            $this->singleCategory->clearIterator();
-        }
-        $this->singleCategory = null;
+        $this->aCategory = null;
+        $this->aAttribute = null;
     }
 
     /**

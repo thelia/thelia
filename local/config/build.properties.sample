@@ -1,0 +1,31 @@
+# Database driver
+propel.database = mysql
+
+# Project name
+propel.project = thelia
+
+propel.schema.validate = false
+
+propel.namespace.autoPackage = true
+
+# The directory where Propel should output generated object model classes.
+propel.php.dir = ${propel.project.dir}/../../core/lib
+
+# The database PDO connection settings at builtime.
+# This setting is required for the sql, reverse, and datasql tasks.
+# Note that some drivers (e.g. mysql, oracle) require that you specify the
+# username and password separately from the DSN, which is why they are
+# available as options.
+# Example PDO connection strings:
+#   mysql:host=localhost;port=3307;dbname=testdb
+#   sqlite:/opt/databases/mydb.sq3
+#   sqlite::memory:
+#   pgsql:host=localhost;port=5432;dbname=testdb;user=bruce;password=mypass
+#   oci:dbname=//localhost:1521/mydb
+# SEE http://propelorm.org/reference/buildtime-configuration
+propel.database.url = {empty}|string
+propel.database.user = {empty}|string
+propel.database.password = {empty}|string
+
+
+propel.mysql.tableType = InnoDB

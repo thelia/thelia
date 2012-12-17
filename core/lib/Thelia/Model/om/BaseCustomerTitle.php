@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Address;
 use Thelia\Model\AddressQuery;
@@ -83,19 +85,22 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Address
+     * @var        PropelObjectCollection|Address[] Collection to store aggregation of Address objects.
      */
-    protected $aAddress;
+    protected $collAddresss;
+    protected $collAddresssPartial;
 
     /**
-     * @var        Customer
+     * @var        PropelObjectCollection|Customer[] Collection to store aggregation of Customer objects.
      */
-    protected $aCustomer;
+    protected $collCustomers;
+    protected $collCustomersPartial;
 
     /**
-     * @var        CustomerTitleDesc
+     * @var        PropelObjectCollection|CustomerTitleDesc[] Collection to store aggregation of CustomerTitleDesc objects.
      */
-    protected $aCustomerTitleDesc;
+    protected $collCustomerTitleDescs;
+    protected $collCustomerTitleDescsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -110,6 +115,24 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $addresssScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $customersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $customerTitleDescsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -251,18 +274,6 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = CustomerTitlePeer::ID;
-        }
-
-        if ($this->aAddress !== null && $this->aAddress->getCustomerTitleId() !== $v) {
-            $this->aAddress = null;
-        }
-
-        if ($this->aCustomer !== null && $this->aCustomer->getCustomerTitleId() !== $v) {
-            $this->aCustomer = null;
-        }
-
-        if ($this->aCustomerTitleDesc !== null && $this->aCustomerTitleDesc->getCustomerTitleId() !== $v) {
-            $this->aCustomerTitleDesc = null;
         }
 
 
@@ -429,15 +440,6 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aAddress !== null && $this->id !== $this->aAddress->getCustomerTitleId()) {
-            $this->aAddress = null;
-        }
-        if ($this->aCustomer !== null && $this->id !== $this->aCustomer->getCustomerTitleId()) {
-            $this->aCustomer = null;
-        }
-        if ($this->aCustomerTitleDesc !== null && $this->id !== $this->aCustomerTitleDesc->getCustomerTitleId()) {
-            $this->aCustomerTitleDesc = null;
-        }
     } // ensureConsistency
 
     /**
@@ -477,9 +479,12 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aAddress = null;
-            $this->aCustomer = null;
-            $this->aCustomerTitleDesc = null;
+            $this->collAddresss = null;
+
+            $this->collCustomers = null;
+
+            $this->collCustomerTitleDescs = null;
+
         } // if (deep)
     }
 
@@ -593,32 +598,6 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAddress !== null) {
-                if ($this->aAddress->isModified() || $this->aAddress->isNew()) {
-                    $affectedRows += $this->aAddress->save($con);
-                }
-                $this->setAddress($this->aAddress);
-            }
-
-            if ($this->aCustomer !== null) {
-                if ($this->aCustomer->isModified() || $this->aCustomer->isNew()) {
-                    $affectedRows += $this->aCustomer->save($con);
-                }
-                $this->setCustomer($this->aCustomer);
-            }
-
-            if ($this->aCustomerTitleDesc !== null) {
-                if ($this->aCustomerTitleDesc->isModified() || $this->aCustomerTitleDesc->isNew()) {
-                    $affectedRows += $this->aCustomerTitleDesc->save($con);
-                }
-                $this->setCustomerTitleDesc($this->aCustomerTitleDesc);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -628,6 +607,59 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->addresssScheduledForDeletion !== null) {
+                if (!$this->addresssScheduledForDeletion->isEmpty()) {
+                    foreach ($this->addresssScheduledForDeletion as $address) {
+                        // need to save related object because we set the relation to null
+                        $address->save($con);
+                    }
+                    $this->addresssScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAddresss !== null) {
+                foreach ($this->collAddresss as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->customersScheduledForDeletion !== null) {
+                if (!$this->customersScheduledForDeletion->isEmpty()) {
+                    foreach ($this->customersScheduledForDeletion as $customer) {
+                        // need to save related object because we set the relation to null
+                        $customer->save($con);
+                    }
+                    $this->customersScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCustomers !== null) {
+                foreach ($this->collCustomers as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->customerTitleDescsScheduledForDeletion !== null) {
+                if (!$this->customerTitleDescsScheduledForDeletion->isEmpty()) {
+                    CustomerTitleDescQuery::create()
+                        ->filterByPrimaryKeys($this->customerTitleDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->customerTitleDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCustomerTitleDescs !== null) {
+                foreach ($this->collCustomerTitleDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -791,34 +823,34 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAddress !== null) {
-                if (!$this->aAddress->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAddress->getValidationFailures());
-                }
-            }
-
-            if ($this->aCustomer !== null) {
-                if (!$this->aCustomer->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aCustomer->getValidationFailures());
-                }
-            }
-
-            if ($this->aCustomerTitleDesc !== null) {
-                if (!$this->aCustomerTitleDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aCustomerTitleDesc->getValidationFailures());
-                }
-            }
-
-
             if (($retval = CustomerTitlePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collAddresss !== null) {
+                    foreach ($this->collAddresss as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collCustomers !== null) {
+                    foreach ($this->collCustomers as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collCustomerTitleDescs !== null) {
+                    foreach ($this->collCustomerTitleDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -906,14 +938,14 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aAddress) {
-                $result['Address'] = $this->aAddress->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collAddresss) {
+                $result['Addresss'] = $this->collAddresss->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aCustomer) {
-                $result['Customer'] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collCustomers) {
+                $result['Customers'] = $this->collCustomers->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aCustomerTitleDesc) {
-                $result['CustomerTitleDesc'] = $this->aCustomerTitleDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collCustomerTitleDescs) {
+                $result['CustomerTitleDescs'] = $this->collCustomerTitleDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1084,19 +1116,22 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAddress();
-            if ($relObj) {
-                $copyObj->setAddress($relObj->copy($deepCopy));
+            foreach ($this->getAddresss() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAddress($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getCustomer();
-            if ($relObj) {
-                $copyObj->setCustomer($relObj->copy($deepCopy));
+            foreach ($this->getCustomers() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomer($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getCustomerTitleDesc();
-            if ($relObj) {
-                $copyObj->setCustomerTitleDesc($relObj->copy($deepCopy));
+            foreach ($this->getCustomerTitleDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCustomerTitleDesc($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1149,145 +1184,672 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a Address object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             Address $v
-     * @return CustomerTitle The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Address' == $relationName) {
+            $this->initAddresss();
+        }
+        if ('Customer' == $relationName) {
+            $this->initCustomers();
+        }
+        if ('CustomerTitleDesc' == $relationName) {
+            $this->initCustomerTitleDescs();
+        }
+    }
+
+    /**
+     * Clears out the collAddresss collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAddresss()
+     */
+    public function clearAddresss()
+    {
+        $this->collAddresss = null; // important to set this to null since that means it is uninitialized
+        $this->collAddresssPartial = null;
+    }
+
+    /**
+     * reset is the collAddresss collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAddresss($v = true)
+    {
+        $this->collAddresssPartial = $v;
+    }
+
+    /**
+     * Initializes the collAddresss collection.
+     *
+     * By default this just sets the collAddresss collection to an empty array (like clearcollAddresss());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAddresss($overrideExisting = true)
+    {
+        if (null !== $this->collAddresss && !$overrideExisting) {
+            return;
+        }
+        $this->collAddresss = new PropelObjectCollection();
+        $this->collAddresss->setModel('Address');
+    }
+
+    /**
+     * Gets an array of Address objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this CustomerTitle is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Address[] List of Address objects
      * @throws PropelException
      */
-    public function setAddress(Address $v = null)
+    public function getAddresss($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collAddresssPartial && !$this->isNew();
+        if (null === $this->collAddresss || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAddresss) {
+                // return empty collection
+                $this->initAddresss();
+            } else {
+                $collAddresss = AddressQuery::create(null, $criteria)
+                    ->filterByCustomerTitle($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAddresssPartial && count($collAddresss)) {
+                      $this->initAddresss(false);
+
+                      foreach($collAddresss as $obj) {
+                        if (false == $this->collAddresss->contains($obj)) {
+                          $this->collAddresss->append($obj);
+                        }
+                      }
+
+                      $this->collAddresssPartial = true;
+                    }
+
+                    return $collAddresss;
+                }
+
+                if($partial && $this->collAddresss) {
+                    foreach($this->collAddresss as $obj) {
+                        if($obj->isNew()) {
+                            $collAddresss[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAddresss = $collAddresss;
+                $this->collAddresssPartial = false;
+            }
+        }
+
+        return $this->collAddresss;
+    }
+
+    /**
+     * Sets a collection of Address objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $addresss A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAddresss(PropelCollection $addresss, PropelPDO $con = null)
+    {
+        $this->addresssScheduledForDeletion = $this->getAddresss(new Criteria(), $con)->diff($addresss);
+
+        foreach ($this->addresssScheduledForDeletion as $addressRemoved) {
+            $addressRemoved->setCustomerTitle(null);
+        }
+
+        $this->collAddresss = null;
+        foreach ($addresss as $address) {
+            $this->addAddress($address);
+        }
+
+        $this->collAddresss = $addresss;
+        $this->collAddresssPartial = false;
+    }
+
+    /**
+     * Returns the number of related Address objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Address objects.
+     * @throws PropelException
+     */
+    public function countAddresss(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAddresssPartial && !$this->isNew();
+        if (null === $this->collAddresss || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAddresss) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAddresss());
+                }
+                $query = AddressQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCustomerTitle($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getCustomerTitleId());
+            return count($this->collAddresss);
         }
+    }
 
-        $this->aAddress = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setCustomerTitle($this);
+    /**
+     * Method called to associate a Address object to this object
+     * through the Address foreign key attribute.
+     *
+     * @param    Address $l Address
+     * @return CustomerTitle The current object (for fluent API support)
+     */
+    public function addAddress(Address $l)
+    {
+        if ($this->collAddresss === null) {
+            $this->initAddresss();
+            $this->collAddresssPartial = true;
         }
-
+        if (!$this->collAddresss->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAddress($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated Address object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Address The associated Address object.
-     * @throws PropelException
+     * @param	Address $address The address object to add.
      */
-    public function getAddress(PropelPDO $con = null)
+    protected function doAddAddress($address)
     {
-        if ($this->aAddress === null && ($this->id !== null)) {
-            $this->aAddress = AddressQuery::create()
-                ->filterByCustomerTitle($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aAddress->setCustomerTitle($this);
-        }
-
-        return $this->aAddress;
+        $this->collAddresss[]= $address;
+        $address->setCustomerTitle($this);
     }
 
     /**
-     * Declares an association between this object and a Customer object.
+     * @param	Address $address The address object to remove.
+     */
+    public function removeAddress($address)
+    {
+        if ($this->getAddresss()->contains($address)) {
+            $this->collAddresss->remove($this->collAddresss->search($address));
+            if (null === $this->addresssScheduledForDeletion) {
+                $this->addresssScheduledForDeletion = clone $this->collAddresss;
+                $this->addresssScheduledForDeletion->clear();
+            }
+            $this->addresssScheduledForDeletion[]= $address;
+            $address->setCustomerTitle(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this CustomerTitle is new, it will return
+     * an empty collection; or if this CustomerTitle has previously
+     * been saved, it will retrieve related Addresss from storage.
      *
-     * @param             Customer $v
-     * @return CustomerTitle The current object (for fluent API support)
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in CustomerTitle.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Address[] List of Address objects
+     */
+    public function getAddresssJoinCustomer($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AddressQuery::create(null, $criteria);
+        $query->joinWith('Customer', $join_behavior);
+
+        return $this->getAddresss($query, $con);
+    }
+
+    /**
+     * Clears out the collCustomers collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomers()
+     */
+    public function clearCustomers()
+    {
+        $this->collCustomers = null; // important to set this to null since that means it is uninitialized
+        $this->collCustomersPartial = null;
+    }
+
+    /**
+     * reset is the collCustomers collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCustomers($v = true)
+    {
+        $this->collCustomersPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomers collection.
+     *
+     * By default this just sets the collCustomers collection to an empty array (like clearcollCustomers());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomers($overrideExisting = true)
+    {
+        if (null !== $this->collCustomers && !$overrideExisting) {
+            return;
+        }
+        $this->collCustomers = new PropelObjectCollection();
+        $this->collCustomers->setModel('Customer');
+    }
+
+    /**
+     * Gets an array of Customer objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this CustomerTitle is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Customer[] List of Customer objects
      * @throws PropelException
      */
-    public function setCustomer(Customer $v = null)
+    public function getCustomers($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collCustomersPartial && !$this->isNew();
+        if (null === $this->collCustomers || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomers) {
+                // return empty collection
+                $this->initCustomers();
+            } else {
+                $collCustomers = CustomerQuery::create(null, $criteria)
+                    ->filterByCustomerTitle($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomersPartial && count($collCustomers)) {
+                      $this->initCustomers(false);
+
+                      foreach($collCustomers as $obj) {
+                        if (false == $this->collCustomers->contains($obj)) {
+                          $this->collCustomers->append($obj);
+                        }
+                      }
+
+                      $this->collCustomersPartial = true;
+                    }
+
+                    return $collCustomers;
+                }
+
+                if($partial && $this->collCustomers) {
+                    foreach($this->collCustomers as $obj) {
+                        if($obj->isNew()) {
+                            $collCustomers[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomers = $collCustomers;
+                $this->collCustomersPartial = false;
+            }
+        }
+
+        return $this->collCustomers;
+    }
+
+    /**
+     * Sets a collection of Customer objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $customers A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCustomers(PropelCollection $customers, PropelPDO $con = null)
+    {
+        $this->customersScheduledForDeletion = $this->getCustomers(new Criteria(), $con)->diff($customers);
+
+        foreach ($this->customersScheduledForDeletion as $customerRemoved) {
+            $customerRemoved->setCustomerTitle(null);
+        }
+
+        $this->collCustomers = null;
+        foreach ($customers as $customer) {
+            $this->addCustomer($customer);
+        }
+
+        $this->collCustomers = $customers;
+        $this->collCustomersPartial = false;
+    }
+
+    /**
+     * Returns the number of related Customer objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Customer objects.
+     * @throws PropelException
+     */
+    public function countCustomers(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCustomersPartial && !$this->isNew();
+        if (null === $this->collCustomers || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomers) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCustomers());
+                }
+                $query = CustomerQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCustomerTitle($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getCustomerTitleId());
+            return count($this->collCustomers);
         }
+    }
 
-        $this->aCustomer = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setCustomerTitle($this);
+    /**
+     * Method called to associate a Customer object to this object
+     * through the Customer foreign key attribute.
+     *
+     * @param    Customer $l Customer
+     * @return CustomerTitle The current object (for fluent API support)
+     */
+    public function addCustomer(Customer $l)
+    {
+        if ($this->collCustomers === null) {
+            $this->initCustomers();
+            $this->collCustomersPartial = true;
         }
-
+        if (!$this->collCustomers->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomer($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated Customer object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Customer The associated Customer object.
-     * @throws PropelException
+     * @param	Customer $customer The customer object to add.
      */
-    public function getCustomer(PropelPDO $con = null)
+    protected function doAddCustomer($customer)
     {
-        if ($this->aCustomer === null && ($this->id !== null)) {
-            $this->aCustomer = CustomerQuery::create()
-                ->filterByCustomerTitle($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aCustomer->setCustomerTitle($this);
-        }
-
-        return $this->aCustomer;
+        $this->collCustomers[]= $customer;
+        $customer->setCustomerTitle($this);
     }
 
     /**
-     * Declares an association between this object and a CustomerTitleDesc object.
+     * @param	Customer $customer The customer object to remove.
+     */
+    public function removeCustomer($customer)
+    {
+        if ($this->getCustomers()->contains($customer)) {
+            $this->collCustomers->remove($this->collCustomers->search($customer));
+            if (null === $this->customersScheduledForDeletion) {
+                $this->customersScheduledForDeletion = clone $this->collCustomers;
+                $this->customersScheduledForDeletion->clear();
+            }
+            $this->customersScheduledForDeletion[]= $customer;
+            $customer->setCustomerTitle(null);
+        }
+    }
+
+    /**
+     * Clears out the collCustomerTitleDescs collection
      *
-     * @param             CustomerTitleDesc $v
-     * @return CustomerTitle The current object (for fluent API support)
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCustomerTitleDescs()
+     */
+    public function clearCustomerTitleDescs()
+    {
+        $this->collCustomerTitleDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collCustomerTitleDescsPartial = null;
+    }
+
+    /**
+     * reset is the collCustomerTitleDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCustomerTitleDescs($v = true)
+    {
+        $this->collCustomerTitleDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCustomerTitleDescs collection.
+     *
+     * By default this just sets the collCustomerTitleDescs collection to an empty array (like clearcollCustomerTitleDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCustomerTitleDescs($overrideExisting = true)
+    {
+        if (null !== $this->collCustomerTitleDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collCustomerTitleDescs = new PropelObjectCollection();
+        $this->collCustomerTitleDescs->setModel('CustomerTitleDesc');
+    }
+
+    /**
+     * Gets an array of CustomerTitleDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this CustomerTitle is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CustomerTitleDesc[] List of CustomerTitleDesc objects
      * @throws PropelException
      */
-    public function setCustomerTitleDesc(CustomerTitleDesc $v = null)
+    public function getCustomerTitleDescs($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collCustomerTitleDescsPartial && !$this->isNew();
+        if (null === $this->collCustomerTitleDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerTitleDescs) {
+                // return empty collection
+                $this->initCustomerTitleDescs();
+            } else {
+                $collCustomerTitleDescs = CustomerTitleDescQuery::create(null, $criteria)
+                    ->filterByCustomerTitle($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCustomerTitleDescsPartial && count($collCustomerTitleDescs)) {
+                      $this->initCustomerTitleDescs(false);
+
+                      foreach($collCustomerTitleDescs as $obj) {
+                        if (false == $this->collCustomerTitleDescs->contains($obj)) {
+                          $this->collCustomerTitleDescs->append($obj);
+                        }
+                      }
+
+                      $this->collCustomerTitleDescsPartial = true;
+                    }
+
+                    return $collCustomerTitleDescs;
+                }
+
+                if($partial && $this->collCustomerTitleDescs) {
+                    foreach($this->collCustomerTitleDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collCustomerTitleDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCustomerTitleDescs = $collCustomerTitleDescs;
+                $this->collCustomerTitleDescsPartial = false;
+            }
+        }
+
+        return $this->collCustomerTitleDescs;
+    }
+
+    /**
+     * Sets a collection of CustomerTitleDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $customerTitleDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCustomerTitleDescs(PropelCollection $customerTitleDescs, PropelPDO $con = null)
+    {
+        $this->customerTitleDescsScheduledForDeletion = $this->getCustomerTitleDescs(new Criteria(), $con)->diff($customerTitleDescs);
+
+        foreach ($this->customerTitleDescsScheduledForDeletion as $customerTitleDescRemoved) {
+            $customerTitleDescRemoved->setCustomerTitle(null);
+        }
+
+        $this->collCustomerTitleDescs = null;
+        foreach ($customerTitleDescs as $customerTitleDesc) {
+            $this->addCustomerTitleDesc($customerTitleDesc);
+        }
+
+        $this->collCustomerTitleDescs = $customerTitleDescs;
+        $this->collCustomerTitleDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related CustomerTitleDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CustomerTitleDesc objects.
+     * @throws PropelException
+     */
+    public function countCustomerTitleDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCustomerTitleDescsPartial && !$this->isNew();
+        if (null === $this->collCustomerTitleDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerTitleDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCustomerTitleDescs());
+                }
+                $query = CustomerTitleDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCustomerTitle($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getCustomerTitleId());
+            return count($this->collCustomerTitleDescs);
         }
+    }
 
-        $this->aCustomerTitleDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setCustomerTitle($this);
+    /**
+     * Method called to associate a CustomerTitleDesc object to this object
+     * through the CustomerTitleDesc foreign key attribute.
+     *
+     * @param    CustomerTitleDesc $l CustomerTitleDesc
+     * @return CustomerTitle The current object (for fluent API support)
+     */
+    public function addCustomerTitleDesc(CustomerTitleDesc $l)
+    {
+        if ($this->collCustomerTitleDescs === null) {
+            $this->initCustomerTitleDescs();
+            $this->collCustomerTitleDescsPartial = true;
         }
-
+        if (!$this->collCustomerTitleDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomerTitleDesc($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	CustomerTitleDesc $customerTitleDesc The customerTitleDesc object to add.
+     */
+    protected function doAddCustomerTitleDesc($customerTitleDesc)
+    {
+        $this->collCustomerTitleDescs[]= $customerTitleDesc;
+        $customerTitleDesc->setCustomerTitle($this);
+    }
 
     /**
-     * Get the associated CustomerTitleDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return CustomerTitleDesc The associated CustomerTitleDesc object.
-     * @throws PropelException
+     * @param	CustomerTitleDesc $customerTitleDesc The customerTitleDesc object to remove.
      */
-    public function getCustomerTitleDesc(PropelPDO $con = null)
+    public function removeCustomerTitleDesc($customerTitleDesc)
     {
-        if ($this->aCustomerTitleDesc === null && ($this->id !== null)) {
-            $this->aCustomerTitleDesc = CustomerTitleDescQuery::create()
-                ->filterByCustomerTitle($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aCustomerTitleDesc->setCustomerTitle($this);
+        if ($this->getCustomerTitleDescs()->contains($customerTitleDesc)) {
+            $this->collCustomerTitleDescs->remove($this->collCustomerTitleDescs->search($customerTitleDesc));
+            if (null === $this->customerTitleDescsScheduledForDeletion) {
+                $this->customerTitleDescsScheduledForDeletion = clone $this->collCustomerTitleDescs;
+                $this->customerTitleDescsScheduledForDeletion->clear();
+            }
+            $this->customerTitleDescsScheduledForDeletion[]= $customerTitleDesc;
+            $customerTitleDesc->setCustomerTitle(null);
         }
-
-        return $this->aCustomerTitleDesc;
     }
 
     /**
@@ -1321,11 +1883,35 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collAddresss) {
+                foreach ($this->collAddresss as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCustomers) {
+                foreach ($this->collCustomers as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCustomerTitleDescs) {
+                foreach ($this->collCustomerTitleDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aAddress = null;
-        $this->aCustomer = null;
-        $this->aCustomerTitleDesc = null;
+        if ($this->collAddresss instanceof PropelCollection) {
+            $this->collAddresss->clearIterator();
+        }
+        $this->collAddresss = null;
+        if ($this->collCustomers instanceof PropelCollection) {
+            $this->collCustomers->clearIterator();
+        }
+        $this->collCustomers = null;
+        if ($this->collCustomerTitleDescs instanceof PropelCollection) {
+            $this->collCustomerTitleDescs->clearIterator();
+        }
+        $this->collCustomerTitleDescs = null;
     }
 
     /**

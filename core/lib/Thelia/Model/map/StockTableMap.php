@@ -43,8 +43,8 @@ class StockTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('COMBINATION_ID', 'CombinationId', 'INTEGER', false, null, null);
-        $this->addColumn('PRODUCT_ID', 'ProductId', 'INTEGER', true, null, null);
+        $this->addForeignKey('COMBINATION_ID', 'CombinationId', 'INTEGER', 'combination', 'ID', false, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('INCREASE', 'Increase', 'FLOAT', false, null, null);
         $this->addColumn('VALUE', 'Value', 'FLOAT', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -57,8 +57,8 @@ class StockTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Combination', 'Thelia\\Model\\Combination', RelationMap::ONE_TO_ONE, array('combination_id' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Combination', 'Thelia\\Model\\Combination', RelationMap::MANY_TO_ONE, array('combination_id' => 'id', ), 'SET NULL', null);
+        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // StockTableMap

@@ -43,9 +43,9 @@ class FeatureProdTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('PRODUCT_ID', 'ProductId', 'INTEGER', true, null, null);
-        $this->addColumn('FEATURE_ID', 'FeatureId', 'INTEGER', true, null, null);
-        $this->addColumn('FEATURE_AV_ID', 'FeatureAvId', 'INTEGER', false, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
+        $this->addForeignKey('FEATURE_ID', 'FeatureId', 'INTEGER', 'feature', 'ID', true, null, null);
+        $this->addForeignKey('FEATURE_AV_ID', 'FeatureAvId', 'INTEGER', 'feature_av', 'ID', false, null, null);
         $this->addColumn('DEFAULT_UTILITY', 'DefaultUtility', 'VARCHAR', false, 255, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -58,9 +58,9 @@ class FeatureProdTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::ONE_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FeatureAv', 'Thelia\\Model\\FeatureAv', RelationMap::ONE_TO_ONE, array('feature_av_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('FeatureAv', 'Thelia\\Model\\FeatureAv', RelationMap::MANY_TO_ONE, array('feature_av_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::MANY_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // FeatureProdTableMap

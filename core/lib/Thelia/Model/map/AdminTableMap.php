@@ -42,7 +42,7 @@ class AdminTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'admin_group', 'ADMIN_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 100, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 100, null);
         $this->addColumn('LOGIN', 'Login', 'VARCHAR', true, 100, null);
@@ -59,7 +59,7 @@ class AdminTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::MANY_TO_ONE, array('id' => 'admin_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::ONE_TO_MANY, array('id' => 'admin_id', ), 'CASCADE', null, 'AdminGroups');
     } // buildRelations()
 
 } // AdminTableMap

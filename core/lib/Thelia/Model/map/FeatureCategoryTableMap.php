@@ -43,8 +43,8 @@ class FeatureCategoryTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('FEATURE_ID', 'FeatureId', 'INTEGER', true, null, null);
-        $this->addColumn('CATEGORY_ID', 'CategoryId', 'INTEGER', true, null, null);
+        $this->addForeignKey('FEATURE_ID', 'FeatureId', 'INTEGER', 'feature', 'ID', true, null, null);
+        $this->addForeignKey('CATEGORY_ID', 'CategoryId', 'INTEGER', 'category', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
         // validators
@@ -55,8 +55,8 @@ class FeatureCategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Category', 'Thelia\\Model\\Category', RelationMap::ONE_TO_ONE, array('category_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::ONE_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Category', 'Thelia\\Model\\Category', RelationMap::MANY_TO_ONE, array('category_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::MANY_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // FeatureCategoryTableMap

@@ -42,9 +42,7 @@ class CustomerTitleTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'address', 'CUSTOMER_TITLE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'customer', 'CUSTOMER_TITLE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'customer_title_desc', 'CUSTOMER_TITLE_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('DEFAULT_UTILITY', 'DefaultUtility', 'INTEGER', true, null, 0);
         $this->addColumn('POSITION', 'Position', 'VARCHAR', true, 45, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -57,9 +55,9 @@ class CustomerTitleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Address', 'Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('id' => 'customer_title_id', ), 'RESTRICT', 'RESTRICT');
-        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('id' => 'customer_title_id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('CustomerTitleDesc', 'Thelia\\Model\\CustomerTitleDesc', RelationMap::MANY_TO_ONE, array('id' => 'customer_title_id', ), 'CASCADE', null);
+        $this->addRelation('Address', 'Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), null, null, 'Addresss');
+        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'SET NULL', null, 'Customers');
+        $this->addRelation('CustomerTitleDesc', 'Thelia\\Model\\CustomerTitleDesc', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'CASCADE', null, 'CustomerTitleDescs');
     } // buildRelations()
 
 } // CustomerTitleTableMap

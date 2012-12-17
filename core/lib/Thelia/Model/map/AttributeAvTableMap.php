@@ -42,9 +42,8 @@ class AttributeAvTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_av_desc', 'ATTRIBUTE_AV_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_combination', 'ATTRIBUTE_AV_ID', true, null, null);
-        $this->addColumn('ATTRIBUTE_ID', 'AttributeId', 'INTEGER', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER', 'attribute', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -56,9 +55,9 @@ class AttributeAvTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeAvDesc', 'Thelia\\Model\\AttributeAvDesc', RelationMap::MANY_TO_ONE, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::MANY_TO_ONE, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::ONE_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('AttributeAvDesc', 'Thelia\\Model\\AttributeAvDesc', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', null, 'AttributeAvDescs');
+        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', null, 'AttributeCombinations');
     } // buildRelations()
 
 } // AttributeAvTableMap

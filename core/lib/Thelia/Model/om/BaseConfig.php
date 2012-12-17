@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Config;
 use Thelia\Model\ConfigDesc;
@@ -92,9 +94,10 @@ abstract class BaseConfig extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        ConfigDesc
+     * @var        PropelObjectCollection|ConfigDesc[] Collection to store aggregation of ConfigDesc objects.
      */
-    protected $aConfigDesc;
+    protected $collConfigDescs;
+    protected $collConfigDescsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -109,6 +112,12 @@ abstract class BaseConfig extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $configDescsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -271,10 +280,6 @@ abstract class BaseConfig extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = ConfigPeer::ID;
-        }
-
-        if ($this->aConfigDesc !== null && $this->aConfigDesc->getConfigId() !== $v) {
-            $this->aConfigDesc = null;
         }
 
 
@@ -489,9 +494,6 @@ abstract class BaseConfig extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aConfigDesc !== null && $this->id !== $this->aConfigDesc->getConfigId()) {
-            $this->aConfigDesc = null;
-        }
     } // ensureConsistency
 
     /**
@@ -531,7 +533,8 @@ abstract class BaseConfig extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aConfigDesc = null;
+            $this->collConfigDescs = null;
+
         } // if (deep)
     }
 
@@ -645,18 +648,6 @@ abstract class BaseConfig extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aConfigDesc !== null) {
-                if ($this->aConfigDesc->isModified() || $this->aConfigDesc->isNew()) {
-                    $affectedRows += $this->aConfigDesc->save($con);
-                }
-                $this->setConfigDesc($this->aConfigDesc);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -666,6 +657,23 @@ abstract class BaseConfig extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->configDescsScheduledForDeletion !== null) {
+                if (!$this->configDescsScheduledForDeletion->isEmpty()) {
+                    ConfigDescQuery::create()
+                        ->filterByPrimaryKeys($this->configDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->configDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collConfigDescs !== null) {
+                foreach ($this->collConfigDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -841,22 +849,18 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aConfigDesc !== null) {
-                if (!$this->aConfigDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aConfigDesc->getValidationFailures());
-                }
-            }
-
-
             if (($retval = ConfigPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collConfigDescs !== null) {
+                    foreach ($this->collConfigDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -952,8 +956,8 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aConfigDesc) {
-                $result['ConfigDesc'] = $this->aConfigDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collConfigDescs) {
+                $result['ConfigDescs'] = $this->collConfigDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1136,9 +1140,10 @@ abstract class BaseConfig extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getConfigDesc();
-            if ($relObj) {
-                $copyObj->setConfigDesc($relObj->copy($deepCopy));
+            foreach ($this->getConfigDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addConfigDesc($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1191,51 +1196,227 @@ abstract class BaseConfig extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a ConfigDesc object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             ConfigDesc $v
-     * @return Config The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('ConfigDesc' == $relationName) {
+            $this->initConfigDescs();
+        }
+    }
+
+    /**
+     * Clears out the collConfigDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addConfigDescs()
+     */
+    public function clearConfigDescs()
+    {
+        $this->collConfigDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collConfigDescsPartial = null;
+    }
+
+    /**
+     * reset is the collConfigDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialConfigDescs($v = true)
+    {
+        $this->collConfigDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collConfigDescs collection.
+     *
+     * By default this just sets the collConfigDescs collection to an empty array (like clearcollConfigDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initConfigDescs($overrideExisting = true)
+    {
+        if (null !== $this->collConfigDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collConfigDescs = new PropelObjectCollection();
+        $this->collConfigDescs->setModel('ConfigDesc');
+    }
+
+    /**
+     * Gets an array of ConfigDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Config is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ConfigDesc[] List of ConfigDesc objects
      * @throws PropelException
      */
-    public function setConfigDesc(ConfigDesc $v = null)
+    public function getConfigDescs($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collConfigDescsPartial && !$this->isNew();
+        if (null === $this->collConfigDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collConfigDescs) {
+                // return empty collection
+                $this->initConfigDescs();
+            } else {
+                $collConfigDescs = ConfigDescQuery::create(null, $criteria)
+                    ->filterByConfig($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collConfigDescsPartial && count($collConfigDescs)) {
+                      $this->initConfigDescs(false);
+
+                      foreach($collConfigDescs as $obj) {
+                        if (false == $this->collConfigDescs->contains($obj)) {
+                          $this->collConfigDescs->append($obj);
+                        }
+                      }
+
+                      $this->collConfigDescsPartial = true;
+                    }
+
+                    return $collConfigDescs;
+                }
+
+                if($partial && $this->collConfigDescs) {
+                    foreach($this->collConfigDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collConfigDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collConfigDescs = $collConfigDescs;
+                $this->collConfigDescsPartial = false;
+            }
+        }
+
+        return $this->collConfigDescs;
+    }
+
+    /**
+     * Sets a collection of ConfigDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $configDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setConfigDescs(PropelCollection $configDescs, PropelPDO $con = null)
+    {
+        $this->configDescsScheduledForDeletion = $this->getConfigDescs(new Criteria(), $con)->diff($configDescs);
+
+        foreach ($this->configDescsScheduledForDeletion as $configDescRemoved) {
+            $configDescRemoved->setConfig(null);
+        }
+
+        $this->collConfigDescs = null;
+        foreach ($configDescs as $configDesc) {
+            $this->addConfigDesc($configDesc);
+        }
+
+        $this->collConfigDescs = $configDescs;
+        $this->collConfigDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ConfigDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ConfigDesc objects.
+     * @throws PropelException
+     */
+    public function countConfigDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collConfigDescsPartial && !$this->isNew();
+        if (null === $this->collConfigDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collConfigDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getConfigDescs());
+                }
+                $query = ConfigDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByConfig($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getConfigId());
+            return count($this->collConfigDescs);
         }
+    }
 
-        $this->aConfigDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setConfig($this);
+    /**
+     * Method called to associate a ConfigDesc object to this object
+     * through the ConfigDesc foreign key attribute.
+     *
+     * @param    ConfigDesc $l ConfigDesc
+     * @return Config The current object (for fluent API support)
+     */
+    public function addConfigDesc(ConfigDesc $l)
+    {
+        if ($this->collConfigDescs === null) {
+            $this->initConfigDescs();
+            $this->collConfigDescsPartial = true;
         }
-
+        if (!$this->collConfigDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddConfigDesc($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	ConfigDesc $configDesc The configDesc object to add.
+     */
+    protected function doAddConfigDesc($configDesc)
+    {
+        $this->collConfigDescs[]= $configDesc;
+        $configDesc->setConfig($this);
+    }
 
     /**
-     * Get the associated ConfigDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return ConfigDesc The associated ConfigDesc object.
-     * @throws PropelException
+     * @param	ConfigDesc $configDesc The configDesc object to remove.
      */
-    public function getConfigDesc(PropelPDO $con = null)
+    public function removeConfigDesc($configDesc)
     {
-        if ($this->aConfigDesc === null && ($this->id !== null)) {
-            $this->aConfigDesc = ConfigDescQuery::create()
-                ->filterByConfig($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aConfigDesc->setConfig($this);
+        if ($this->getConfigDescs()->contains($configDesc)) {
+            $this->collConfigDescs->remove($this->collConfigDescs->search($configDesc));
+            if (null === $this->configDescsScheduledForDeletion) {
+                $this->configDescsScheduledForDeletion = clone $this->collConfigDescs;
+                $this->configDescsScheduledForDeletion->clear();
+            }
+            $this->configDescsScheduledForDeletion[]= $configDesc;
+            $configDesc->setConfig(null);
         }
-
-        return $this->aConfigDesc;
     }
 
     /**
@@ -1271,9 +1452,17 @@ abstract class BaseConfig extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collConfigDescs) {
+                foreach ($this->collConfigDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aConfigDesc = null;
+        if ($this->collConfigDescs instanceof PropelCollection) {
+            $this->collConfigDescs->clearIterator();
+        }
+        $this->collConfigDescs = null;
     }
 
     /**

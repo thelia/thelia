@@ -27,7 +27,7 @@ abstract class BaseAttributeAvPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'attribute_av';
@@ -385,9 +385,12 @@ abstract class BaseAttributeAvPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AttributePeer instance pool,
+        // Invalidate objects in AttributeAvDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AttributePeer::clearInstancePool();
+        AttributeAvDescPeer::clearInstancePool();
+        // Invalidate objects in AttributeCombinationPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttributeCombinationPeer::clearInstancePool();
     }
 
     /**
@@ -486,7 +489,7 @@ abstract class BaseAttributeAvPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related AttributeAvDesc table
+     * Returns the number of rows matching criteria, joining the related Attribute table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -494,7 +497,7 @@ abstract class BaseAttributeAvPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAttributeAvDesc(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAttribute(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -521,7 +524,7 @@ abstract class BaseAttributeAvPeer
             $con = Propel::getConnection(AttributeAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeAvDescPeer::ATTRIBUTE_AV_ID, $join_behavior);
+        $criteria->addJoin(AttributeAvPeer::ATTRIBUTE_ID, AttributePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -537,58 +540,7 @@ abstract class BaseAttributeAvPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related AttributeCombination table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAttributeCombination(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(AttributeAvPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            AttributeAvPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(AttributeAvPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(AttributeAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeCombinationPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of AttributeAv objects pre-filled with their AttributeAvDesc objects.
+     * Selects a collection of AttributeAv objects pre-filled with their Attribute objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -596,7 +548,7 @@ abstract class BaseAttributeAvPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAttributeAvDesc(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAttribute(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -607,9 +559,9 @@ abstract class BaseAttributeAvPeer
 
         AttributeAvPeer::addSelectColumns($criteria);
         $startcol = AttributeAvPeer::NUM_HYDRATE_COLUMNS;
-        AttributeAvDescPeer::addSelectColumns($criteria);
+        AttributePeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeAvDescPeer::ATTRIBUTE_AV_ID, $join_behavior);
+        $criteria->addJoin(AttributeAvPeer::ATTRIBUTE_ID, AttributePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -629,89 +581,20 @@ abstract class BaseAttributeAvPeer
                 AttributeAvPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = AttributeAvDescPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = AttributePeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = AttributeAvDescPeer::getInstanceFromPool($key2);
+                $obj2 = AttributePeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = AttributeAvDescPeer::getOMClass();
+                    $cls = AttributePeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    AttributeAvDescPeer::addInstanceToPool($obj2, $key2);
+                    AttributePeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (AttributeAv) to $obj2 (AttributeAvDesc)
-                // one to one relationship
-                $obj1->setAttributeAvDesc($obj2);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of AttributeAv objects pre-filled with their AttributeCombination objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of AttributeAv objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAttributeCombination(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(AttributeAvPeer::DATABASE_NAME);
-        }
-
-        AttributeAvPeer::addSelectColumns($criteria);
-        $startcol = AttributeAvPeer::NUM_HYDRATE_COLUMNS;
-        AttributeCombinationPeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeCombinationPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = AttributeAvPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = AttributeAvPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = AttributeAvPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                AttributeAvPeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = AttributeCombinationPeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = AttributeCombinationPeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = AttributeCombinationPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    AttributeCombinationPeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (AttributeAv) to $obj2 (AttributeCombination)
-                // one to one relationship
-                $obj1->setAttributeCombination($obj2);
+                // Add the $obj1 (AttributeAv) to $obj2 (Attribute)
+                $obj2->addAttributeAv($obj1);
 
             } // if joined row was not null
 
@@ -759,9 +642,7 @@ abstract class BaseAttributeAvPeer
             $con = Propel::getConnection(AttributeAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeAvDescPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeCombinationPeer::ATTRIBUTE_AV_ID, $join_behavior);
+        $criteria->addJoin(AttributeAvPeer::ATTRIBUTE_ID, AttributePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -797,15 +678,10 @@ abstract class BaseAttributeAvPeer
         AttributeAvPeer::addSelectColumns($criteria);
         $startcol2 = AttributeAvPeer::NUM_HYDRATE_COLUMNS;
 
-        AttributeAvDescPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + AttributeAvDescPeer::NUM_HYDRATE_COLUMNS;
+        AttributePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + AttributePeer::NUM_HYDRATE_COLUMNS;
 
-        AttributeCombinationPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + AttributeCombinationPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeAvDescPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeCombinationPeer::ATTRIBUTE_AV_ID, $join_behavior);
+        $criteria->addJoin(AttributeAvPeer::ATTRIBUTE_ID, AttributePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -824,291 +700,23 @@ abstract class BaseAttributeAvPeer
                 AttributeAvPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined AttributeAvDesc rows
+            // Add objects for joined Attribute rows
 
-            $key2 = AttributeAvDescPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = AttributePeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = AttributeAvDescPeer::getInstanceFromPool($key2);
+                $obj2 = AttributePeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = AttributeAvDescPeer::getOMClass();
+                    $cls = AttributePeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    AttributeAvDescPeer::addInstanceToPool($obj2, $key2);
+                    AttributePeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (AttributeAv) to the collection in $obj2 (AttributeAvDesc)
-                $obj1->setAttributeAvDesc($obj2);
+                // Add the $obj1 (AttributeAv) to the collection in $obj2 (Attribute)
+                $obj2->addAttributeAv($obj1);
             } // if joined row not null
-
-            // Add objects for joined AttributeCombination rows
-
-            $key3 = AttributeCombinationPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = AttributeCombinationPeer::getInstanceFromPool($key3);
-                if (!$obj3) {
-
-                    $cls = AttributeCombinationPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    AttributeCombinationPeer::addInstanceToPool($obj3, $key3);
-                } // if obj3 loaded
-
-                // Add the $obj1 (AttributeAv) to the collection in $obj3 (AttributeCombination)
-                $obj1->setAttributeCombination($obj3);
-            } // if joined row not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related AttributeAvDesc table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptAttributeAvDesc(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(AttributeAvPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            AttributeAvPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(AttributeAvPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(AttributeAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeCombinationPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related AttributeCombination table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptAttributeCombination(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(AttributeAvPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            AttributeAvPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(AttributeAvPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(AttributeAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeAvDescPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of AttributeAv objects pre-filled with all related objects except AttributeAvDesc.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of AttributeAv objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptAttributeAvDesc(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(AttributeAvPeer::DATABASE_NAME);
-        }
-
-        AttributeAvPeer::addSelectColumns($criteria);
-        $startcol2 = AttributeAvPeer::NUM_HYDRATE_COLUMNS;
-
-        AttributeCombinationPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + AttributeCombinationPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeCombinationPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = AttributeAvPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = AttributeAvPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = AttributeAvPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                AttributeAvPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined AttributeCombination rows
-
-                $key2 = AttributeCombinationPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = AttributeCombinationPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = AttributeCombinationPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    AttributeCombinationPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (AttributeAv) to the collection in $obj2 (AttributeCombination)
-                $obj1->setAttributeCombination($obj2);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of AttributeAv objects pre-filled with all related objects except AttributeCombination.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of AttributeAv objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptAttributeCombination(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(AttributeAvPeer::DATABASE_NAME);
-        }
-
-        AttributeAvPeer::addSelectColumns($criteria);
-        $startcol2 = AttributeAvPeer::NUM_HYDRATE_COLUMNS;
-
-        AttributeAvDescPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + AttributeAvDescPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(AttributeAvPeer::ID, AttributeAvDescPeer::ATTRIBUTE_AV_ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = AttributeAvPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = AttributeAvPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = AttributeAvPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                AttributeAvPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined AttributeAvDesc rows
-
-                $key2 = AttributeAvDescPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = AttributeAvDescPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = AttributeAvDescPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    AttributeAvDescPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (AttributeAv) to the collection in $obj2 (AttributeAvDesc)
-                $obj1->setAttributeAvDesc($obj2);
-
-            } // if joined row is not null
 
             $results[] = $obj1;
         }
@@ -1250,7 +858,6 @@ abstract class BaseAttributeAvPeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += AttributeAvPeer::doOnDeleteCascade(new Criteria(AttributeAvPeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(AttributeAvPeer::TABLE_NAME, $con, AttributeAvPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -1284,14 +891,24 @@ abstract class BaseAttributeAvPeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            AttributeAvPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof AttributeAv) { // it's a model object
+            // invalidate the cache for this single object
+            AttributeAvPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(AttributeAvPeer::DATABASE_NAME);
             $criteria->add(AttributeAvPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                AttributeAvPeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -1304,23 +921,6 @@ abstract class BaseAttributeAvPeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            $affectedRows += AttributeAvPeer::doOnDeleteCascade($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                AttributeAvPeer::clearInstancePool();
-            } elseif ($values instanceof AttributeAv) { // it's a model object
-                AttributeAvPeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    AttributeAvPeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             AttributeAvPeer::clearRelatedInstancePool();
             $con->commit();
@@ -1330,39 +930,6 @@ abstract class BaseAttributeAvPeer
             $con->rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return int The number of affected rows (if supported by underlying database driver).
-     */
-    protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-    {
-        // initialize var to track total num of affected rows
-        $affectedRows = 0;
-
-        // first find the objects that are implicated by the $criteria
-        $objects = AttributeAvPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-
-            // delete related Attribute objects
-            $criteria = new Criteria(AttributePeer::DATABASE_NAME);
-
-            $criteria->add(AttributePeer::ID, $obj->getAttributeId());
-            $affectedRows += AttributePeer::doDelete($criteria, $con);
-        }
-
-        return $affectedRows;
     }
 
     /**

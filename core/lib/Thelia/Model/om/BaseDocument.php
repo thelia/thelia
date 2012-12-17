@@ -112,29 +112,30 @@ abstract class BaseDocument extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        DocumentDesc
+     * @var        Product
      */
-    protected $aDocumentDesc;
+    protected $aProduct;
 
     /**
-     * @var        Category one-to-one related Category object
+     * @var        Category
      */
-    protected $singleCategory;
+    protected $aCategory;
 
     /**
-     * @var        Content one-to-one related Content object
+     * @var        Content
      */
-    protected $singleContent;
+    protected $aContent;
 
     /**
-     * @var        Folder one-to-one related Folder object
+     * @var        Folder
      */
-    protected $singleFolder;
+    protected $aFolder;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        PropelObjectCollection|DocumentDesc[] Collection to store aggregation of DocumentDesc objects.
      */
-    protected $singleProduct;
+    protected $collDocumentDescs;
+    protected $collDocumentDescsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -154,25 +155,7 @@ abstract class BaseDocument extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $categorysScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $contentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $foldersScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
+    protected $documentDescsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -335,10 +318,6 @@ abstract class BaseDocument extends BaseObject implements Persistent
             $this->modifiedColumns[] = DocumentPeer::ID;
         }
 
-        if ($this->aDocumentDesc !== null && $this->aDocumentDesc->getDocumentId() !== $v) {
-            $this->aDocumentDesc = null;
-        }
-
 
         return $this;
     } // setId()
@@ -358,6 +337,10 @@ abstract class BaseDocument extends BaseObject implements Persistent
         if ($this->product_id !== $v) {
             $this->product_id = $v;
             $this->modifiedColumns[] = DocumentPeer::PRODUCT_ID;
+        }
+
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
         }
 
 
@@ -381,6 +364,10 @@ abstract class BaseDocument extends BaseObject implements Persistent
             $this->modifiedColumns[] = DocumentPeer::CATEGORY_ID;
         }
 
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
+        }
+
 
         return $this;
     } // setCategoryId()
@@ -402,6 +389,10 @@ abstract class BaseDocument extends BaseObject implements Persistent
             $this->modifiedColumns[] = DocumentPeer::FOLDER_ID;
         }
 
+        if ($this->aFolder !== null && $this->aFolder->getId() !== $v) {
+            $this->aFolder = null;
+        }
+
 
         return $this;
     } // setFolderId()
@@ -421,6 +412,10 @@ abstract class BaseDocument extends BaseObject implements Persistent
         if ($this->content_id !== $v) {
             $this->content_id = $v;
             $this->modifiedColumns[] = DocumentPeer::CONTENT_ID;
+        }
+
+        if ($this->aContent !== null && $this->aContent->getId() !== $v) {
+            $this->aContent = null;
         }
 
 
@@ -587,8 +582,17 @@ abstract class BaseDocument extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aDocumentDesc !== null && $this->id !== $this->aDocumentDesc->getDocumentId()) {
-            $this->aDocumentDesc = null;
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
+        }
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
+        }
+        if ($this->aFolder !== null && $this->folder_id !== $this->aFolder->getId()) {
+            $this->aFolder = null;
+        }
+        if ($this->aContent !== null && $this->content_id !== $this->aContent->getId()) {
+            $this->aContent = null;
         }
     } // ensureConsistency
 
@@ -629,14 +633,11 @@ abstract class BaseDocument extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aDocumentDesc = null;
-            $this->singleCategory = null;
-
-            $this->singleContent = null;
-
-            $this->singleFolder = null;
-
-            $this->singleProduct = null;
+            $this->aProduct = null;
+            $this->aCategory = null;
+            $this->aContent = null;
+            $this->aFolder = null;
+            $this->collDocumentDescs = null;
 
         } // if (deep)
     }
@@ -756,11 +757,32 @@ abstract class BaseDocument extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aDocumentDesc !== null) {
-                if ($this->aDocumentDesc->isModified() || $this->aDocumentDesc->isNew()) {
-                    $affectedRows += $this->aDocumentDesc->save($con);
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
                 }
-                $this->setDocumentDesc($this->aDocumentDesc);
+                $this->setProduct($this->aProduct);
+            }
+
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
+                }
+                $this->setCategory($this->aCategory);
+            }
+
+            if ($this->aContent !== null) {
+                if ($this->aContent->isModified() || $this->aContent->isNew()) {
+                    $affectedRows += $this->aContent->save($con);
+                }
+                $this->setContent($this->aContent);
+            }
+
+            if ($this->aFolder !== null) {
+                if ($this->aFolder->isModified() || $this->aFolder->isNew()) {
+                    $affectedRows += $this->aFolder->save($con);
+                }
+                $this->setFolder($this->aFolder);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -774,63 +796,20 @@ abstract class BaseDocument extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->categorysScheduledForDeletion !== null) {
-                if (!$this->categorysScheduledForDeletion->isEmpty()) {
-                    CategoryQuery::create()
-                        ->filterByPrimaryKeys($this->categorysScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->documentDescsScheduledForDeletion !== null) {
+                if (!$this->documentDescsScheduledForDeletion->isEmpty()) {
+                    DocumentDescQuery::create()
+                        ->filterByPrimaryKeys($this->documentDescsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->categorysScheduledForDeletion = null;
+                    $this->documentDescsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->singleCategory !== null) {
-                if (!$this->singleCategory->isDeleted()) {
-                        $affectedRows += $this->singleCategory->save($con);
-                }
-            }
-
-            if ($this->contentsScheduledForDeletion !== null) {
-                if (!$this->contentsScheduledForDeletion->isEmpty()) {
-                    ContentQuery::create()
-                        ->filterByPrimaryKeys($this->contentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleContent !== null) {
-                if (!$this->singleContent->isDeleted()) {
-                        $affectedRows += $this->singleContent->save($con);
-                }
-            }
-
-            if ($this->foldersScheduledForDeletion !== null) {
-                if (!$this->foldersScheduledForDeletion->isEmpty()) {
-                    FolderQuery::create()
-                        ->filterByPrimaryKeys($this->foldersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->foldersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFolder !== null) {
-                if (!$this->singleFolder->isDeleted()) {
-                        $affectedRows += $this->singleFolder->save($con);
-                }
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
+            if ($this->collDocumentDescs !== null) {
+                foreach ($this->collDocumentDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
                 }
             }
 
@@ -1024,9 +1003,27 @@ abstract class BaseDocument extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aDocumentDesc !== null) {
-                if (!$this->aDocumentDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aDocumentDesc->getValidationFailures());
+            if ($this->aProduct !== null) {
+                if (!$this->aProduct->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
+                }
+            }
+
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
+                }
+            }
+
+            if ($this->aContent !== null) {
+                if (!$this->aContent->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aContent->getValidationFailures());
+                }
+            }
+
+            if ($this->aFolder !== null) {
+                if (!$this->aFolder->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFolder->getValidationFailures());
                 }
             }
 
@@ -1036,27 +1033,11 @@ abstract class BaseDocument extends BaseObject implements Persistent
             }
 
 
-                if ($this->singleCategory !== null) {
-                    if (!$this->singleCategory->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCategory->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleContent !== null) {
-                    if (!$this->singleContent->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleContent->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleFolder !== null) {
-                    if (!$this->singleFolder->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFolder->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
+                if ($this->collDocumentDescs !== null) {
+                    foreach ($this->collDocumentDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
                     }
                 }
 
@@ -1162,20 +1143,20 @@ abstract class BaseDocument extends BaseObject implements Persistent
             $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aDocumentDesc) {
-                $result['DocumentDesc'] = $this->aDocumentDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCategory) {
-                $result['Category'] = $this->singleCategory->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleContent) {
-                $result['Content'] = $this->singleContent->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aContent) {
+                $result['Content'] = $this->aContent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleFolder) {
-                $result['Folder'] = $this->singleFolder->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFolder) {
+                $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->collDocumentDescs) {
+                $result['DocumentDescs'] = $this->collDocumentDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1370,29 +1351,10 @@ abstract class BaseDocument extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCategory();
-            if ($relObj) {
-                $copyObj->setCategory($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getContent();
-            if ($relObj) {
-                $copyObj->setContent($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getFolder();
-            if ($relObj) {
-                $copyObj->setFolder($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getDocumentDesc();
-            if ($relObj) {
-                $copyObj->setDocumentDesc($relObj->copy($deepCopy));
+            foreach ($this->getDocumentDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addDocumentDesc($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1446,25 +1408,26 @@ abstract class BaseDocument extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a DocumentDesc object.
+     * Declares an association between this object and a Product object.
      *
-     * @param             DocumentDesc $v
+     * @param             Product $v
      * @return Document The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setDocumentDesc(DocumentDesc $v = null)
+    public function setProduct(Product $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setProductId(NULL);
         } else {
-            $this->setId($v->getDocumentId());
+            $this->setProductId($v->getId());
         }
 
-        $this->aDocumentDesc = $v;
+        $this->aProduct = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
         if ($v !== null) {
-            $v->setDocument($this);
+            $v->addDocument($this);
         }
 
 
@@ -1473,23 +1436,179 @@ abstract class BaseDocument extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated DocumentDesc object
+     * Get the associated Product object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return DocumentDesc The associated DocumentDesc object.
+     * @return Product The associated Product object.
      * @throws PropelException
      */
-    public function getDocumentDesc(PropelPDO $con = null)
+    public function getProduct(PropelPDO $con = null)
     {
-        if ($this->aDocumentDesc === null && ($this->id !== null)) {
-            $this->aDocumentDesc = DocumentDescQuery::create()
-                ->filterByDocument($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aDocumentDesc->setDocument($this);
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProduct->addDocuments($this);
+             */
         }
 
-        return $this->aDocumentDesc;
+        return $this->aProduct;
+    }
+
+    /**
+     * Declares an association between this object and a Category object.
+     *
+     * @param             Category $v
+     * @return Document The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCategory(Category $v = null)
+    {
+        if ($v === null) {
+            $this->setCategoryId(NULL);
+        } else {
+            $this->setCategoryId($v->getId());
+        }
+
+        $this->aCategory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Category object, it will not be re-added.
+        if ($v !== null) {
+            $v->addDocument($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Category object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Category The associated Category object.
+     * @throws PropelException
+     */
+    public function getCategory(PropelPDO $con = null)
+    {
+        if ($this->aCategory === null && ($this->category_id !== null)) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategory->addDocuments($this);
+             */
+        }
+
+        return $this->aCategory;
+    }
+
+    /**
+     * Declares an association between this object and a Content object.
+     *
+     * @param             Content $v
+     * @return Document The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setContent(Content $v = null)
+    {
+        if ($v === null) {
+            $this->setContentId(NULL);
+        } else {
+            $this->setContentId($v->getId());
+        }
+
+        $this->aContent = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Content object, it will not be re-added.
+        if ($v !== null) {
+            $v->addDocument($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Content object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Content The associated Content object.
+     * @throws PropelException
+     */
+    public function getContent(PropelPDO $con = null)
+    {
+        if ($this->aContent === null && ($this->content_id !== null)) {
+            $this->aContent = ContentQuery::create()->findPk($this->content_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aContent->addDocuments($this);
+             */
+        }
+
+        return $this->aContent;
+    }
+
+    /**
+     * Declares an association between this object and a Folder object.
+     *
+     * @param             Folder $v
+     * @return Document The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setFolder(Folder $v = null)
+    {
+        if ($v === null) {
+            $this->setFolderId(NULL);
+        } else {
+            $this->setFolderId($v->getId());
+        }
+
+        $this->aFolder = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Folder object, it will not be re-added.
+        if ($v !== null) {
+            $v->addDocument($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Folder object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Folder The associated Folder object.
+     * @throws PropelException
+     */
+    public function getFolder(PropelPDO $con = null)
+    {
+        if ($this->aFolder === null && ($this->folder_id !== null)) {
+            $this->aFolder = FolderQuery::create()->findPk($this->folder_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFolder->addDocuments($this);
+             */
+        }
+
+        return $this->aFolder;
     }
 
 
@@ -1503,150 +1622,216 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('DocumentDesc' == $relationName) {
+            $this->initDocumentDescs();
+        }
     }
 
     /**
-     * Gets a single Category object, which is related to this object by a one-to-one relationship.
+     * Clears out the collDocumentDescs collection
      *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addDocumentDescs()
+     */
+    public function clearDocumentDescs()
+    {
+        $this->collDocumentDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collDocumentDescsPartial = null;
+    }
+
+    /**
+     * reset is the collDocumentDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialDocumentDescs($v = true)
+    {
+        $this->collDocumentDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collDocumentDescs collection.
+     *
+     * By default this just sets the collDocumentDescs collection to an empty array (like clearcollDocumentDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initDocumentDescs($overrideExisting = true)
+    {
+        if (null !== $this->collDocumentDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collDocumentDescs = new PropelObjectCollection();
+        $this->collDocumentDescs->setModel('DocumentDesc');
+    }
+
+    /**
+     * Gets an array of DocumentDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Document is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return Category
+     * @return PropelObjectCollection|DocumentDesc[] List of DocumentDesc objects
      * @throws PropelException
      */
-    public function getCategory(PropelPDO $con = null)
+    public function getDocumentDescs($criteria = null, PropelPDO $con = null)
     {
+        $partial = $this->collDocumentDescsPartial && !$this->isNew();
+        if (null === $this->collDocumentDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDocumentDescs) {
+                // return empty collection
+                $this->initDocumentDescs();
+            } else {
+                $collDocumentDescs = DocumentDescQuery::create(null, $criteria)
+                    ->filterByDocument($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collDocumentDescsPartial && count($collDocumentDescs)) {
+                      $this->initDocumentDescs(false);
 
-        if ($this->singleCategory === null && !$this->isNew()) {
-            $this->singleCategory = CategoryQuery::create()->findPk($this->getPrimaryKey(), $con);
+                      foreach($collDocumentDescs as $obj) {
+                        if (false == $this->collDocumentDescs->contains($obj)) {
+                          $this->collDocumentDescs->append($obj);
+                        }
+                      }
+
+                      $this->collDocumentDescsPartial = true;
+                    }
+
+                    return $collDocumentDescs;
+                }
+
+                if($partial && $this->collDocumentDescs) {
+                    foreach($this->collDocumentDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collDocumentDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collDocumentDescs = $collDocumentDescs;
+                $this->collDocumentDescsPartial = false;
+            }
         }
 
-        return $this->singleCategory;
+        return $this->collDocumentDescs;
     }
 
     /**
-     * Sets a single Category object as related to this object by a one-to-one relationship.
+     * Sets a collection of DocumentDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
      *
-     * @param             Category $v Category
-     * @return Document The current object (for fluent API support)
+     * @param PropelCollection $documentDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setDocumentDescs(PropelCollection $documentDescs, PropelPDO $con = null)
+    {
+        $this->documentDescsScheduledForDeletion = $this->getDocumentDescs(new Criteria(), $con)->diff($documentDescs);
+
+        foreach ($this->documentDescsScheduledForDeletion as $documentDescRemoved) {
+            $documentDescRemoved->setDocument(null);
+        }
+
+        $this->collDocumentDescs = null;
+        foreach ($documentDescs as $documentDesc) {
+            $this->addDocumentDesc($documentDesc);
+        }
+
+        $this->collDocumentDescs = $documentDescs;
+        $this->collDocumentDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related DocumentDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related DocumentDesc objects.
      * @throws PropelException
      */
-    public function setCategory(Category $v = null)
+    public function countDocumentDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $this->singleCategory = $v;
+        $partial = $this->collDocumentDescsPartial && !$this->isNew();
+        if (null === $this->collDocumentDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDocumentDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getDocumentDescs());
+                }
+                $query = DocumentDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
 
-        // Make sure that that the passed-in Category isn't already associated with this object
-        if ($v !== null && $v->getDocument() === null) {
-            $v->setDocument($this);
+                return $query
+                    ->filterByDocument($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collDocumentDescs);
+        }
+    }
+
+    /**
+     * Method called to associate a DocumentDesc object to this object
+     * through the DocumentDesc foreign key attribute.
+     *
+     * @param    DocumentDesc $l DocumentDesc
+     * @return Document The current object (for fluent API support)
+     */
+    public function addDocumentDesc(DocumentDesc $l)
+    {
+        if ($this->collDocumentDescs === null) {
+            $this->initDocumentDescs();
+            $this->collDocumentDescsPartial = true;
+        }
+        if (!$this->collDocumentDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddDocumentDesc($l);
         }
 
         return $this;
     }
 
     /**
-     * Gets a single Content object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Content
-     * @throws PropelException
+     * @param	DocumentDesc $documentDesc The documentDesc object to add.
      */
-    public function getContent(PropelPDO $con = null)
+    protected function doAddDocumentDesc($documentDesc)
     {
-
-        if ($this->singleContent === null && !$this->isNew()) {
-            $this->singleContent = ContentQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleContent;
+        $this->collDocumentDescs[]= $documentDesc;
+        $documentDesc->setDocument($this);
     }
 
     /**
-     * Sets a single Content object as related to this object by a one-to-one relationship.
-     *
-     * @param             Content $v Content
-     * @return Document The current object (for fluent API support)
-     * @throws PropelException
+     * @param	DocumentDesc $documentDesc The documentDesc object to remove.
      */
-    public function setContent(Content $v = null)
+    public function removeDocumentDesc($documentDesc)
     {
-        $this->singleContent = $v;
-
-        // Make sure that that the passed-in Content isn't already associated with this object
-        if ($v !== null && $v->getDocument() === null) {
-            $v->setDocument($this);
+        if ($this->getDocumentDescs()->contains($documentDesc)) {
+            $this->collDocumentDescs->remove($this->collDocumentDescs->search($documentDesc));
+            if (null === $this->documentDescsScheduledForDeletion) {
+                $this->documentDescsScheduledForDeletion = clone $this->collDocumentDescs;
+                $this->documentDescsScheduledForDeletion->clear();
+            }
+            $this->documentDescsScheduledForDeletion[]= $documentDesc;
+            $documentDesc->setDocument(null);
         }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Folder object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Folder
-     * @throws PropelException
-     */
-    public function getFolder(PropelPDO $con = null)
-    {
-
-        if ($this->singleFolder === null && !$this->isNew()) {
-            $this->singleFolder = FolderQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleFolder;
-    }
-
-    /**
-     * Sets a single Folder object as related to this object by a one-to-one relationship.
-     *
-     * @param             Folder $v Folder
-     * @return Document The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFolder(Folder $v = null)
-    {
-        $this->singleFolder = $v;
-
-        // Make sure that that the passed-in Folder isn't already associated with this object
-        if ($v !== null && $v->getDocument() === null) {
-            $v->setDocument($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Product
-     * @throws PropelException
-     */
-    public function getProduct(PropelPDO $con = null)
-    {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleProduct;
-    }
-
-    /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
-     *
-     * @param             Product $v Product
-     * @return Document The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProduct(Product $v = null)
-    {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getDocument() === null) {
-            $v->setDocument($this);
-        }
-
-        return $this;
     }
 
     /**
@@ -1683,37 +1868,21 @@ abstract class BaseDocument extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCategory) {
-                $this->singleCategory->clearAllReferences($deep);
-            }
-            if ($this->singleContent) {
-                $this->singleContent->clearAllReferences($deep);
-            }
-            if ($this->singleFolder) {
-                $this->singleFolder->clearAllReferences($deep);
-            }
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
+            if ($this->collDocumentDescs) {
+                foreach ($this->collDocumentDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
         } // if ($deep)
 
-        if ($this->singleCategory instanceof PropelCollection) {
-            $this->singleCategory->clearIterator();
+        if ($this->collDocumentDescs instanceof PropelCollection) {
+            $this->collDocumentDescs->clearIterator();
         }
-        $this->singleCategory = null;
-        if ($this->singleContent instanceof PropelCollection) {
-            $this->singleContent->clearIterator();
-        }
-        $this->singleContent = null;
-        if ($this->singleFolder instanceof PropelCollection) {
-            $this->singleFolder->clearIterator();
-        }
-        $this->singleFolder = null;
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
-        $this->aDocumentDesc = null;
+        $this->collDocumentDescs = null;
+        $this->aProduct = null;
+        $this->aCategory = null;
+        $this->aContent = null;
+        $this->aFolder = null;
     }
 
     /**

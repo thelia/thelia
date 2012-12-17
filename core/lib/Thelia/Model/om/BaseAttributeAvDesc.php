@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\AttributeAv;
 use Thelia\Model\AttributeAvDesc;
@@ -98,9 +96,9 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        AttributeAv one-to-one related AttributeAv object
+     * @var        AttributeAv
      */
-    protected $singleAttributeAv;
+    protected $aAttributeAv;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,12 +113,6 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $attributeAvsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -292,6 +284,10 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
         if ($this->attribute_av_id !== $v) {
             $this->attribute_av_id = $v;
             $this->modifiedColumns[] = AttributeAvDescPeer::ATTRIBUTE_AV_ID;
+        }
+
+        if ($this->aAttributeAv !== null && $this->aAttributeAv->getId() !== $v) {
+            $this->aAttributeAv = null;
         }
 
 
@@ -499,6 +495,9 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aAttributeAv !== null && $this->attribute_av_id !== $this->aAttributeAv->getId()) {
+            $this->aAttributeAv = null;
+        }
     } // ensureConsistency
 
     /**
@@ -538,8 +537,7 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleAttributeAv = null;
-
+            $this->aAttributeAv = null;
         } // if (deep)
     }
 
@@ -653,6 +651,18 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAttributeAv !== null) {
+                if ($this->aAttributeAv->isModified() || $this->aAttributeAv->isNew()) {
+                    $affectedRows += $this->aAttributeAv->save($con);
+                }
+                $this->setAttributeAv($this->aAttributeAv);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -662,21 +672,6 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->attributeAvsScheduledForDeletion !== null) {
-                if (!$this->attributeAvsScheduledForDeletion->isEmpty()) {
-                    AttributeAvQuery::create()
-                        ->filterByPrimaryKeys($this->attributeAvsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributeAvsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleAttributeAv !== null) {
-                if (!$this->singleAttributeAv->isDeleted()) {
-                        $affectedRows += $this->singleAttributeAv->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -858,16 +853,22 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAttributeAv !== null) {
+                if (!$this->aAttributeAv->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aAttributeAv->getValidationFailures());
+                }
+            }
+
+
             if (($retval = AttributeAvDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleAttributeAv !== null) {
-                    if (!$this->singleAttributeAv->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleAttributeAv->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -967,8 +968,8 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleAttributeAv) {
-                $result['AttributeAv'] = $this->singleAttributeAv->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aAttributeAv) {
+                $result['AttributeAv'] = $this->aAttributeAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1157,11 +1158,6 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAttributeAv();
-            if ($relObj) {
-                $copyObj->setAttributeAv($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1212,53 +1208,55 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a AttributeAv object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single AttributeAv object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return AttributeAv
-     * @throws PropelException
-     */
-    public function getAttributeAv(PropelPDO $con = null)
-    {
-
-        if ($this->singleAttributeAv === null && !$this->isNew()) {
-            $this->singleAttributeAv = AttributeAvQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleAttributeAv;
-    }
-
-    /**
-     * Sets a single AttributeAv object as related to this object by a one-to-one relationship.
-     *
-     * @param             AttributeAv $v AttributeAv
+     * @param             AttributeAv $v
      * @return AttributeAvDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setAttributeAv(AttributeAv $v = null)
     {
-        $this->singleAttributeAv = $v;
-
-        // Make sure that that the passed-in AttributeAv isn't already associated with this object
-        if ($v !== null && $v->getAttributeAvDesc() === null) {
-            $v->setAttributeAvDesc($this);
+        if ($v === null) {
+            $this->setAttributeAvId(NULL);
+        } else {
+            $this->setAttributeAvId($v->getId());
         }
 
+        $this->aAttributeAv = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the AttributeAv object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAttributeAvDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated AttributeAv object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return AttributeAv The associated AttributeAv object.
+     * @throws PropelException
+     */
+    public function getAttributeAv(PropelPDO $con = null)
+    {
+        if ($this->aAttributeAv === null && ($this->attribute_av_id !== null)) {
+            $this->aAttributeAv = AttributeAvQuery::create()->findPk($this->attribute_av_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAttributeAv->addAttributeAvDescs($this);
+             */
+        }
+
+        return $this->aAttributeAv;
     }
 
     /**
@@ -1294,15 +1292,9 @@ abstract class BaseAttributeAvDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleAttributeAv) {
-                $this->singleAttributeAv->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleAttributeAv instanceof PropelCollection) {
-            $this->singleAttributeAv->clearIterator();
-        }
-        $this->singleAttributeAv = null;
+        $this->aAttributeAv = null;
     }
 
     /**

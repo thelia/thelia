@@ -42,17 +42,8 @@ class ProductTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'accessory', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'accessory', 'ACCESSORY', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'content_assoc', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'document', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_prod', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'image', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product_category', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product_desc', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'rewriting', 'PRODUCT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'stock', 'PRODUCT_ID', true, null, null);
-        $this->addColumn('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', 'tax_rule', 'ID', false, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
         $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
         $this->addColumn('PRICE2', 'Price2', 'FLOAT', false, null, null);
@@ -73,17 +64,17 @@ class ProductTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Accessory', 'Thelia\\Model\\Accessory', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Accessory', 'Thelia\\Model\\Accessory', RelationMap::MANY_TO_ONE, array('id' => 'accessory', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ContentAssoc', 'Thelia\\Model\\ContentAssoc', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ProductCategory', 'Thelia\\Model\\ProductCategory', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ProductDesc', 'Thelia\\Model\\ProductDesc', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Stock', 'Thelia\\Model\\Stock', RelationMap::MANY_TO_ONE, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('TaxRule', 'Thelia\\Model\\TaxRule', RelationMap::ONE_TO_ONE, array('tax_rule_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('TaxRule', 'Thelia\\Model\\TaxRule', RelationMap::MANY_TO_ONE, array('tax_rule_id' => 'id', ), 'SET NULL', null);
+        $this->addRelation('AccessoryRelatedByProductId', 'Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'AccessorysRelatedByProductId');
+        $this->addRelation('AccessoryRelatedByAccessory', 'Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'accessory', ), 'CASCADE', null, 'AccessorysRelatedByAccessory');
+        $this->addRelation('ContentAssoc', 'Thelia\\Model\\ContentAssoc', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'ContentAssocs');
+        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'Documents');
+        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'FeatureProds');
+        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'Images');
+        $this->addRelation('ProductCategory', 'Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'ProductCategorys');
+        $this->addRelation('ProductDesc', 'Thelia\\Model\\ProductDesc', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'ProductDescs');
+        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'Rewritings');
+        $this->addRelation('Stock', 'Thelia\\Model\\Stock', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', null, 'Stocks');
     } // buildRelations()
 
 } // ProductTableMap

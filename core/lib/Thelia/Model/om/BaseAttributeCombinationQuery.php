@@ -82,7 +82,7 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\AttributeCombination', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\AttributeCombination', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -306,6 +306,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * $query->filterByAttributeId(array('min' => 12)); // WHERE attribute_id > 12
      * </code>
      *
+     * @see       filterByAttribute()
+     *
      * @param     mixed $attributeId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -333,6 +335,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
      * </code>
      *
+     * @see       filterByCombination()
+     *
      * @param     mixed $combinationId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -359,6 +363,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * $query->filterByAttributeAvId(array(12, 34)); // WHERE attribute_av_id IN (12, 34)
      * $query->filterByAttributeAvId(array('min' => 12)); // WHERE attribute_av_id > 12
      * </code>
+     *
+     * @see       filterByAttributeAv()
      *
      * @param     mixed $attributeAvId The value to use as filter.
      *              Use scalar values for equality.
@@ -466,7 +472,7 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
     /**
      * Filter the query by a related Attribute object
      *
-     * @param   Attribute|PropelObjectCollection $attribute  the related object to use as filter
+     * @param   Attribute|PropelObjectCollection $attribute The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeCombinationQuery The current query, for fluid interface
@@ -478,10 +484,12 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_ID, $attribute->getId(), $comparison);
         } elseif ($attribute instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useAttributeQuery()
-                ->filterByPrimaryKeys($attribute->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_ID, $attribute->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByAttribute() only accepts arguments of type Attribute or PropelCollection');
         }
@@ -540,7 +548,7 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
     /**
      * Filter the query by a related AttributeAv object
      *
-     * @param   AttributeAv|PropelObjectCollection $attributeAv  the related object to use as filter
+     * @param   AttributeAv|PropelObjectCollection $attributeAv The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeCombinationQuery The current query, for fluid interface
@@ -552,10 +560,12 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_AV_ID, $attributeAv->getId(), $comparison);
         } elseif ($attributeAv instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useAttributeAvQuery()
-                ->filterByPrimaryKeys($attributeAv->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_AV_ID, $attributeAv->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByAttributeAv() only accepts arguments of type AttributeAv or PropelCollection');
         }
@@ -614,7 +624,7 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
     /**
      * Filter the query by a related Combination object
      *
-     * @param   Combination|PropelObjectCollection $combination  the related object to use as filter
+     * @param   Combination|PropelObjectCollection $combination The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeCombinationQuery The current query, for fluid interface
@@ -626,10 +636,12 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributeCombinationPeer::COMBINATION_ID, $combination->getId(), $comparison);
         } elseif ($combination instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCombinationQuery()
-                ->filterByPrimaryKeys($combination->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(AttributeCombinationPeer::COMBINATION_ID, $combination->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCombination() only accepts arguments of type Combination or PropelCollection');
         }

@@ -84,7 +84,7 @@ abstract class BaseCategoryDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\CategoryDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\CategoryDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -286,6 +286,8 @@ abstract class BaseCategoryDescQuery extends ModelCriteria
      * $query->filterByCategoryId(array(12, 34)); // WHERE category_id IN (12, 34)
      * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
      * </code>
+     *
+     * @see       filterByCategory()
      *
      * @param     mixed $categoryId The value to use as filter.
      *              Use scalar values for equality.
@@ -552,7 +554,7 @@ abstract class BaseCategoryDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Category object
      *
-     * @param   Category|PropelObjectCollection $category  the related object to use as filter
+     * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryDescQuery The current query, for fluid interface
@@ -564,10 +566,12 @@ abstract class BaseCategoryDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryDescPeer::CATEGORY_ID, $category->getId(), $comparison);
         } elseif ($category instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCategoryQuery()
-                ->filterByPrimaryKeys($category->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(CategoryDescPeer::CATEGORY_ID, $category->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCategory() only accepts arguments of type Category or PropelCollection');
         }

@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Content;
 use Thelia\Model\ContentDesc;
@@ -104,9 +102,9 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Content one-to-one related Content object
+     * @var        Content
      */
-    protected $singleContent;
+    protected $aContent;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,12 +119,6 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $contentsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -308,6 +300,10 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
         if ($this->content_id !== $v) {
             $this->content_id = $v;
             $this->modifiedColumns[] = ContentDescPeer::CONTENT_ID;
+        }
+
+        if ($this->aContent !== null && $this->aContent->getId() !== $v) {
+            $this->aContent = null;
         }
 
 
@@ -537,6 +533,9 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aContent !== null && $this->content_id !== $this->aContent->getId()) {
+            $this->aContent = null;
+        }
     } // ensureConsistency
 
     /**
@@ -576,8 +575,7 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleContent = null;
-
+            $this->aContent = null;
         } // if (deep)
     }
 
@@ -691,6 +689,18 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aContent !== null) {
+                if ($this->aContent->isModified() || $this->aContent->isNew()) {
+                    $affectedRows += $this->aContent->save($con);
+                }
+                $this->setContent($this->aContent);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -700,21 +710,6 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->contentsScheduledForDeletion !== null) {
-                if (!$this->contentsScheduledForDeletion->isEmpty()) {
-                    ContentQuery::create()
-                        ->filterByPrimaryKeys($this->contentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleContent !== null) {
-                if (!$this->singleContent->isDeleted()) {
-                        $affectedRows += $this->singleContent->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -902,16 +897,22 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aContent !== null) {
+                if (!$this->aContent->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aContent->getValidationFailures());
+                }
+            }
+
+
             if (($retval = ContentDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleContent !== null) {
-                    if (!$this->singleContent->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleContent->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -1015,8 +1016,8 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
             $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleContent) {
-                $result['Content'] = $this->singleContent->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aContent) {
+                $result['Content'] = $this->aContent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1211,11 +1212,6 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getContent();
-            if ($relObj) {
-                $copyObj->setContent($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1266,53 +1262,55 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Content object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Content object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Content
-     * @throws PropelException
-     */
-    public function getContent(PropelPDO $con = null)
-    {
-
-        if ($this->singleContent === null && !$this->isNew()) {
-            $this->singleContent = ContentQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleContent;
-    }
-
-    /**
-     * Sets a single Content object as related to this object by a one-to-one relationship.
-     *
-     * @param             Content $v Content
+     * @param             Content $v
      * @return ContentDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setContent(Content $v = null)
     {
-        $this->singleContent = $v;
-
-        // Make sure that that the passed-in Content isn't already associated with this object
-        if ($v !== null && $v->getContentDesc() === null) {
-            $v->setContentDesc($this);
+        if ($v === null) {
+            $this->setContentId(NULL);
+        } else {
+            $this->setContentId($v->getId());
         }
 
+        $this->aContent = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Content object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContentDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Content object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Content The associated Content object.
+     * @throws PropelException
+     */
+    public function getContent(PropelPDO $con = null)
+    {
+        if ($this->aContent === null && ($this->content_id !== null)) {
+            $this->aContent = ContentQuery::create()->findPk($this->content_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aContent->addContentDescs($this);
+             */
+        }
+
+        return $this->aContent;
     }
 
     /**
@@ -1349,15 +1347,9 @@ abstract class BaseContentDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleContent) {
-                $this->singleContent->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleContent instanceof PropelCollection) {
-            $this->singleContent->clearIterator();
-        }
-        $this->singleContent = null;
+        $this->aContent = null;
     }
 
     /**

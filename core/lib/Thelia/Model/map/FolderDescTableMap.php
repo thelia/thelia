@@ -43,7 +43,7 @@ class FolderDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('FOLDER_ID', 'FolderId', 'INTEGER', true, null, null);
+        $this->addForeignKey('FOLDER_ID', 'FolderId', 'INTEGER', 'folder', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -59,7 +59,7 @@ class FolderDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Folder', 'Thelia\\Model\\Folder', RelationMap::ONE_TO_ONE, array('folder_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Folder', 'Thelia\\Model\\Folder', RelationMap::MANY_TO_ONE, array('folder_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // FolderDescTableMap

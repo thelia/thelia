@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Module;
 use Thelia\Model\ModuleDesc;
@@ -104,9 +102,9 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Module one-to-one related Module object
+     * @var        Module
      */
-    protected $singleModule;
+    protected $aModule;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,12 +119,6 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $modulesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -308,6 +300,10 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
         if ($this->module_id !== $v) {
             $this->module_id = $v;
             $this->modifiedColumns[] = ModuleDescPeer::MODULE_ID;
+        }
+
+        if ($this->aModule !== null && $this->aModule->getId() !== $v) {
+            $this->aModule = null;
         }
 
 
@@ -537,6 +533,9 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aModule !== null && $this->module_id !== $this->aModule->getId()) {
+            $this->aModule = null;
+        }
     } // ensureConsistency
 
     /**
@@ -576,8 +575,7 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleModule = null;
-
+            $this->aModule = null;
         } // if (deep)
     }
 
@@ -691,6 +689,18 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aModule !== null) {
+                if ($this->aModule->isModified() || $this->aModule->isNew()) {
+                    $affectedRows += $this->aModule->save($con);
+                }
+                $this->setModule($this->aModule);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -700,21 +710,6 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->modulesScheduledForDeletion !== null) {
-                if (!$this->modulesScheduledForDeletion->isEmpty()) {
-                    ModuleQuery::create()
-                        ->filterByPrimaryKeys($this->modulesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->modulesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleModule !== null) {
-                if (!$this->singleModule->isDeleted()) {
-                        $affectedRows += $this->singleModule->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -902,16 +897,22 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aModule !== null) {
+                if (!$this->aModule->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aModule->getValidationFailures());
+                }
+            }
+
+
             if (($retval = ModuleDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleModule !== null) {
-                    if (!$this->singleModule->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleModule->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -1015,8 +1016,8 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
             $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleModule) {
-                $result['Module'] = $this->singleModule->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aModule) {
+                $result['Module'] = $this->aModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1211,11 +1212,6 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getModule();
-            if ($relObj) {
-                $copyObj->setModule($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1266,53 +1262,55 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Module object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Module object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Module
-     * @throws PropelException
-     */
-    public function getModule(PropelPDO $con = null)
-    {
-
-        if ($this->singleModule === null && !$this->isNew()) {
-            $this->singleModule = ModuleQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleModule;
-    }
-
-    /**
-     * Sets a single Module object as related to this object by a one-to-one relationship.
-     *
-     * @param             Module $v Module
+     * @param             Module $v
      * @return ModuleDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setModule(Module $v = null)
     {
-        $this->singleModule = $v;
-
-        // Make sure that that the passed-in Module isn't already associated with this object
-        if ($v !== null && $v->getModuleDesc() === null) {
-            $v->setModuleDesc($this);
+        if ($v === null) {
+            $this->setModuleId(NULL);
+        } else {
+            $this->setModuleId($v->getId());
         }
 
+        $this->aModule = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Module object, it will not be re-added.
+        if ($v !== null) {
+            $v->addModuleDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Module object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Module The associated Module object.
+     * @throws PropelException
+     */
+    public function getModule(PropelPDO $con = null)
+    {
+        if ($this->aModule === null && ($this->module_id !== null)) {
+            $this->aModule = ModuleQuery::create()->findPk($this->module_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aModule->addModuleDescs($this);
+             */
+        }
+
+        return $this->aModule;
     }
 
     /**
@@ -1349,15 +1347,9 @@ abstract class BaseModuleDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleModule) {
-                $this->singleModule->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleModule instanceof PropelCollection) {
-            $this->singleModule->clearIterator();
-        }
-        $this->singleModule = null;
+        $this->aModule = null;
     }
 
     /**

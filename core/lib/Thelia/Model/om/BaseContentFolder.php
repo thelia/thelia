@@ -9,9 +9,7 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Content;
 use Thelia\Model\ContentFolder;
@@ -62,14 +60,14 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     protected $folder_id;
 
     /**
-     * @var        Content one-to-one related Content object
+     * @var        Content
      */
-    protected $singleContent;
+    protected $aContent;
 
     /**
-     * @var        Folder one-to-one related Folder object
+     * @var        Folder
      */
-    protected $singleFolder;
+    protected $aFolder;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -84,18 +82,6 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $contentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $foldersScheduledForDeletion = null;
 
     /**
      * Get the [content_id] column value.
@@ -134,6 +120,10 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
             $this->modifiedColumns[] = ContentFolderPeer::CONTENT_ID;
         }
 
+        if ($this->aContent !== null && $this->aContent->getId() !== $v) {
+            $this->aContent = null;
+        }
+
 
         return $this;
     } // setContentId()
@@ -153,6 +143,10 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
         if ($this->folder_id !== $v) {
             $this->folder_id = $v;
             $this->modifiedColumns[] = ContentFolderPeer::FOLDER_ID;
+        }
+
+        if ($this->aFolder !== null && $this->aFolder->getId() !== $v) {
+            $this->aFolder = null;
         }
 
 
@@ -224,6 +218,12 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aContent !== null && $this->content_id !== $this->aContent->getId()) {
+            $this->aContent = null;
+        }
+        if ($this->aFolder !== null && $this->folder_id !== $this->aFolder->getId()) {
+            $this->aFolder = null;
+        }
     } // ensureConsistency
 
     /**
@@ -263,10 +263,8 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleContent = null;
-
-            $this->singleFolder = null;
-
+            $this->aContent = null;
+            $this->aFolder = null;
         } // if (deep)
     }
 
@@ -380,6 +378,25 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aContent !== null) {
+                if ($this->aContent->isModified() || $this->aContent->isNew()) {
+                    $affectedRows += $this->aContent->save($con);
+                }
+                $this->setContent($this->aContent);
+            }
+
+            if ($this->aFolder !== null) {
+                if ($this->aFolder->isModified() || $this->aFolder->isNew()) {
+                    $affectedRows += $this->aFolder->save($con);
+                }
+                $this->setFolder($this->aFolder);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -389,36 +406,6 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->contentsScheduledForDeletion !== null) {
-                if (!$this->contentsScheduledForDeletion->isEmpty()) {
-                    ContentQuery::create()
-                        ->filterByPrimaryKeys($this->contentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleContent !== null) {
-                if (!$this->singleContent->isDeleted()) {
-                        $affectedRows += $this->singleContent->save($con);
-                }
-            }
-
-            if ($this->foldersScheduledForDeletion !== null) {
-                if (!$this->foldersScheduledForDeletion->isEmpty()) {
-                    FolderQuery::create()
-                        ->filterByPrimaryKeys($this->foldersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->foldersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFolder !== null) {
-                if (!$this->singleFolder->isDeleted()) {
-                        $affectedRows += $this->singleFolder->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -553,22 +540,28 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aContent !== null) {
+                if (!$this->aContent->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aContent->getValidationFailures());
+                }
+            }
+
+            if ($this->aFolder !== null) {
+                if (!$this->aFolder->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFolder->getValidationFailures());
+                }
+            }
+
+
             if (($retval = ContentFolderPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleContent !== null) {
-                    if (!$this->singleContent->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleContent->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleFolder !== null) {
-                    if (!$this->singleFolder->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFolder->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -644,11 +637,11 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
             $keys[1] => $this->getFolderId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleContent) {
-                $result['Content'] = $this->singleContent->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aContent) {
+                $result['Content'] = $this->aContent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleFolder) {
-                $result['Folder'] = $this->singleFolder->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFolder) {
+                $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -809,16 +802,6 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getContent();
-            if ($relObj) {
-                $copyObj->setContent($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getFolder();
-            if ($relObj) {
-                $copyObj->setFolder($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -868,89 +851,106 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Content object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Content object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Content
-     * @throws PropelException
-     */
-    public function getContent(PropelPDO $con = null)
-    {
-
-        if ($this->singleContent === null && !$this->isNew()) {
-            $this->singleContent = ContentQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleContent;
-    }
-
-    /**
-     * Sets a single Content object as related to this object by a one-to-one relationship.
-     *
-     * @param             Content $v Content
+     * @param             Content $v
      * @return ContentFolder The current object (for fluent API support)
      * @throws PropelException
      */
     public function setContent(Content $v = null)
     {
-        $this->singleContent = $v;
-
-        // Make sure that that the passed-in Content isn't already associated with this object
-        if ($v !== null && $v->getContentFolder() === null) {
-            $v->setContentFolder($this);
+        if ($v === null) {
+            $this->setContentId(NULL);
+        } else {
+            $this->setContentId($v->getId());
         }
+
+        $this->aContent = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Content object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContentFolder($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single Folder object, which is related to this object by a one-to-one relationship.
+     * Get the associated Content object
      *
-     * @param PropelPDO $con optional connection object
-     * @return Folder
+     * @param PropelPDO $con Optional Connection object.
+     * @return Content The associated Content object.
      * @throws PropelException
      */
-    public function getFolder(PropelPDO $con = null)
+    public function getContent(PropelPDO $con = null)
     {
-
-        if ($this->singleFolder === null && !$this->isNew()) {
-            $this->singleFolder = FolderQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aContent === null && ($this->content_id !== null)) {
+            $this->aContent = ContentQuery::create()->findPk($this->content_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aContent->addContentFolders($this);
+             */
         }
 
-        return $this->singleFolder;
+        return $this->aContent;
     }
 
     /**
-     * Sets a single Folder object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a Folder object.
      *
-     * @param             Folder $v Folder
+     * @param             Folder $v
      * @return ContentFolder The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFolder(Folder $v = null)
     {
-        $this->singleFolder = $v;
-
-        // Make sure that that the passed-in Folder isn't already associated with this object
-        if ($v !== null && $v->getContentFolder() === null) {
-            $v->setContentFolder($this);
+        if ($v === null) {
+            $this->setFolderId(NULL);
+        } else {
+            $this->setFolderId($v->getId());
         }
 
+        $this->aFolder = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Folder object, it will not be re-added.
+        if ($v !== null) {
+            $v->addContentFolder($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Folder object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Folder The associated Folder object.
+     * @throws PropelException
+     */
+    public function getFolder(PropelPDO $con = null)
+    {
+        if ($this->aFolder === null && ($this->folder_id !== null)) {
+            $this->aFolder = FolderQuery::create()->findPk($this->folder_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFolder->addContentFolders($this);
+             */
+        }
+
+        return $this->aFolder;
     }
 
     /**
@@ -980,22 +980,10 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleContent) {
-                $this->singleContent->clearAllReferences($deep);
-            }
-            if ($this->singleFolder) {
-                $this->singleFolder->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleContent instanceof PropelCollection) {
-            $this->singleContent->clearIterator();
-        }
-        $this->singleContent = null;
-        if ($this->singleFolder instanceof PropelCollection) {
-            $this->singleFolder->clearIterator();
-        }
-        $this->singleFolder = null;
+        $this->aContent = null;
+        $this->aFolder = null;
     }
 
     /**

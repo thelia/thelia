@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Currency;
 use Thelia\Model\CurrencyPeer;
@@ -96,9 +98,10 @@ abstract class BaseCurrency extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Order
+     * @var        PropelObjectCollection|Order[] Collection to store aggregation of Order objects.
      */
-    protected $aOrder;
+    protected $collOrders;
+    protected $collOrdersPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -113,6 +116,12 @@ abstract class BaseCurrency extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $ordersScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -263,10 +272,6 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = CurrencyPeer::ID;
-        }
-
-        if ($this->aOrder !== null && $this->aOrder->getCurrencyId() !== $v) {
-            $this->aOrder = null;
         }
 
 
@@ -495,9 +500,6 @@ abstract class BaseCurrency extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aOrder !== null && $this->id !== $this->aOrder->getCurrencyId()) {
-            $this->aOrder = null;
-        }
     } // ensureConsistency
 
     /**
@@ -537,7 +539,8 @@ abstract class BaseCurrency extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aOrder = null;
+            $this->collOrders = null;
+
         } // if (deep)
     }
 
@@ -651,18 +654,6 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aOrder !== null) {
-                if ($this->aOrder->isModified() || $this->aOrder->isNew()) {
-                    $affectedRows += $this->aOrder->save($con);
-                }
-                $this->setOrder($this->aOrder);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -672,6 +663,24 @@ abstract class BaseCurrency extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->ordersScheduledForDeletion !== null) {
+                if (!$this->ordersScheduledForDeletion->isEmpty()) {
+                    foreach ($this->ordersScheduledForDeletion as $order) {
+                        // need to save related object because we set the relation to null
+                        $order->save($con);
+                    }
+                    $this->ordersScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collOrders !== null) {
+                foreach ($this->collOrders as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -853,22 +862,18 @@ abstract class BaseCurrency extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aOrder !== null) {
-                if (!$this->aOrder->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aOrder->getValidationFailures());
-                }
-            }
-
-
             if (($retval = CurrencyPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collOrders !== null) {
+                    foreach ($this->collOrders as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -968,8 +973,8 @@ abstract class BaseCurrency extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aOrder) {
-                $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collOrders) {
+                $result['Orders'] = $this->collOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1158,9 +1163,10 @@ abstract class BaseCurrency extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getOrder();
-            if ($relObj) {
-                $copyObj->setOrder($relObj->copy($deepCopy));
+            foreach ($this->getOrders() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrder($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1213,51 +1219,327 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a Order object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             Order $v
-     * @return Currency The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Order' == $relationName) {
+            $this->initOrders();
+        }
+    }
+
+    /**
+     * Clears out the collOrders collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrders()
+     */
+    public function clearOrders()
+    {
+        $this->collOrders = null; // important to set this to null since that means it is uninitialized
+        $this->collOrdersPartial = null;
+    }
+
+    /**
+     * reset is the collOrders collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialOrders($v = true)
+    {
+        $this->collOrdersPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrders collection.
+     *
+     * By default this just sets the collOrders collection to an empty array (like clearcollOrders());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrders($overrideExisting = true)
+    {
+        if (null !== $this->collOrders && !$overrideExisting) {
+            return;
+        }
+        $this->collOrders = new PropelObjectCollection();
+        $this->collOrders->setModel('Order');
+    }
+
+    /**
+     * Gets an array of Order objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Currency is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Order[] List of Order objects
      * @throws PropelException
      */
-    public function setOrder(Order $v = null)
+    public function getOrders($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collOrdersPartial && !$this->isNew();
+        if (null === $this->collOrders || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrders) {
+                // return empty collection
+                $this->initOrders();
+            } else {
+                $collOrders = OrderQuery::create(null, $criteria)
+                    ->filterByCurrency($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collOrdersPartial && count($collOrders)) {
+                      $this->initOrders(false);
+
+                      foreach($collOrders as $obj) {
+                        if (false == $this->collOrders->contains($obj)) {
+                          $this->collOrders->append($obj);
+                        }
+                      }
+
+                      $this->collOrdersPartial = true;
+                    }
+
+                    return $collOrders;
+                }
+
+                if($partial && $this->collOrders) {
+                    foreach($this->collOrders as $obj) {
+                        if($obj->isNew()) {
+                            $collOrders[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrders = $collOrders;
+                $this->collOrdersPartial = false;
+            }
+        }
+
+        return $this->collOrders;
+    }
+
+    /**
+     * Sets a collection of Order objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $orders A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setOrders(PropelCollection $orders, PropelPDO $con = null)
+    {
+        $this->ordersScheduledForDeletion = $this->getOrders(new Criteria(), $con)->diff($orders);
+
+        foreach ($this->ordersScheduledForDeletion as $orderRemoved) {
+            $orderRemoved->setCurrency(null);
+        }
+
+        $this->collOrders = null;
+        foreach ($orders as $order) {
+            $this->addOrder($order);
+        }
+
+        $this->collOrders = $orders;
+        $this->collOrdersPartial = false;
+    }
+
+    /**
+     * Returns the number of related Order objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Order objects.
+     * @throws PropelException
+     */
+    public function countOrders(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collOrdersPartial && !$this->isNew();
+        if (null === $this->collOrders || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrders) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getOrders());
+                }
+                $query = OrderQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCurrency($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getCurrencyId());
+            return count($this->collOrders);
         }
+    }
 
-        $this->aOrder = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setCurrency($this);
+    /**
+     * Method called to associate a Order object to this object
+     * through the Order foreign key attribute.
+     *
+     * @param    Order $l Order
+     * @return Currency The current object (for fluent API support)
+     */
+    public function addOrder(Order $l)
+    {
+        if ($this->collOrders === null) {
+            $this->initOrders();
+            $this->collOrdersPartial = true;
         }
-
+        if (!$this->collOrders->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddOrder($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	Order $order The order object to add.
+     */
+    protected function doAddOrder($order)
+    {
+        $this->collOrders[]= $order;
+        $order->setCurrency($this);
+    }
 
     /**
-     * Get the associated Order object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Order The associated Order object.
-     * @throws PropelException
+     * @param	Order $order The order object to remove.
      */
-    public function getOrder(PropelPDO $con = null)
+    public function removeOrder($order)
     {
-        if ($this->aOrder === null && ($this->id !== null)) {
-            $this->aOrder = OrderQuery::create()
-                ->filterByCurrency($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aOrder->setCurrency($this);
+        if ($this->getOrders()->contains($order)) {
+            $this->collOrders->remove($this->collOrders->search($order));
+            if (null === $this->ordersScheduledForDeletion) {
+                $this->ordersScheduledForDeletion = clone $this->collOrders;
+                $this->ordersScheduledForDeletion->clear();
+            }
+            $this->ordersScheduledForDeletion[]= $order;
+            $order->setCurrency(null);
         }
+    }
 
-        return $this->aOrder;
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinCustomer($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('Customer', $join_behavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinOrderAddressRelatedByAddressInvoice($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByAddressInvoice', $join_behavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinOrderAddressRelatedByAddressDelivery($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByAddressDelivery', $join_behavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinOrderStatus($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('OrderStatus', $join_behavior);
+
+        return $this->getOrders($query, $con);
     }
 
     /**
@@ -1293,9 +1575,17 @@ abstract class BaseCurrency extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collOrders) {
+                foreach ($this->collOrders as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aOrder = null;
+        if ($this->collOrders instanceof PropelCollection) {
+            $this->collOrders->clearIterator();
+        }
+        $this->collOrders = null;
     }
 
     /**

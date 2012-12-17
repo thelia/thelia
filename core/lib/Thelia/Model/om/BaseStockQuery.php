@@ -81,7 +81,7 @@ abstract class BaseStockQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Stock', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Stock', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -284,6 +284,8 @@ abstract class BaseStockQuery extends ModelCriteria
      * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
      * </code>
      *
+     * @see       filterByCombination()
+     *
      * @param     mixed $combinationId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -324,6 +326,8 @@ abstract class BaseStockQuery extends ModelCriteria
      * $query->filterByProductId(array(12, 34)); // WHERE product_id IN (12, 34)
      * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
      * </code>
+     *
+     * @see       filterByProduct()
      *
      * @param     mixed $productId The value to use as filter.
      *              Use scalar values for equality.
@@ -527,7 +531,7 @@ abstract class BaseStockQuery extends ModelCriteria
     /**
      * Filter the query by a related Combination object
      *
-     * @param   Combination|PropelObjectCollection $combination  the related object to use as filter
+     * @param   Combination|PropelObjectCollection $combination The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   StockQuery The current query, for fluid interface
@@ -539,10 +543,12 @@ abstract class BaseStockQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(StockPeer::COMBINATION_ID, $combination->getId(), $comparison);
         } elseif ($combination instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCombinationQuery()
-                ->filterByPrimaryKeys($combination->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(StockPeer::COMBINATION_ID, $combination->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCombination() only accepts arguments of type Combination or PropelCollection');
         }
@@ -556,7 +562,7 @@ abstract class BaseStockQuery extends ModelCriteria
      *
      * @return StockQuery The current query, for fluid interface
      */
-    public function joinCombination($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCombination($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Combination');
@@ -591,7 +597,7 @@ abstract class BaseStockQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\CombinationQuery A secondary query class using the current class as primary query
      */
-    public function useCombinationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCombinationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinCombination($relationAlias, $joinType)
@@ -601,7 +607,7 @@ abstract class BaseStockQuery extends ModelCriteria
     /**
      * Filter the query by a related Product object
      *
-     * @param   Product|PropelObjectCollection $product  the related object to use as filter
+     * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   StockQuery The current query, for fluid interface
@@ -613,10 +619,12 @@ abstract class BaseStockQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(StockPeer::PRODUCT_ID, $product->getId(), $comparison);
         } elseif ($product instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useProductQuery()
-                ->filterByPrimaryKeys($product->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(StockPeer::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByProduct() only accepts arguments of type Product or PropelCollection');
         }

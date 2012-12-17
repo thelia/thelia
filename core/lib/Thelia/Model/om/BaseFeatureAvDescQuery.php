@@ -72,7 +72,7 @@ abstract class BaseFeatureAvDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\FeatureAvDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\FeatureAvDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -275,6 +275,8 @@ abstract class BaseFeatureAvDescQuery extends ModelCriteria
      * $query->filterByFeatureAvId(array('min' => 12)); // WHERE feature_av_id > 12
      * </code>
      *
+     * @see       filterByFeatureAv()
+     *
      * @param     mixed $featureAvId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -425,7 +427,7 @@ abstract class BaseFeatureAvDescQuery extends ModelCriteria
     /**
      * Filter the query by a related FeatureAv object
      *
-     * @param   FeatureAv|PropelObjectCollection $featureAv  the related object to use as filter
+     * @param   FeatureAv|PropelObjectCollection $featureAv The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureAvDescQuery The current query, for fluid interface
@@ -437,10 +439,12 @@ abstract class BaseFeatureAvDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(FeatureAvDescPeer::FEATURE_AV_ID, $featureAv->getId(), $comparison);
         } elseif ($featureAv instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useFeatureAvQuery()
-                ->filterByPrimaryKeys($featureAv->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(FeatureAvDescPeer::FEATURE_AV_ID, $featureAv->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByFeatureAv() only accepts arguments of type FeatureAv or PropelCollection');
         }

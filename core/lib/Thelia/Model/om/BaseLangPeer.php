@@ -24,7 +24,7 @@ abstract class BaseLangPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'lang';

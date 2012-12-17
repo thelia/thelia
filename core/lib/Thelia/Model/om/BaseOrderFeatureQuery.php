@@ -72,7 +72,7 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\OrderFeature', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\OrderFeature', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -275,6 +275,8 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
      * $query->filterByOrderProductId(array('min' => 12)); // WHERE order_product_id > 12
      * </code>
      *
+     * @see       filterByOrderProduct()
+     *
      * @param     mixed $orderProductId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -453,7 +455,7 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
     /**
      * Filter the query by a related OrderProduct object
      *
-     * @param   OrderProduct|PropelObjectCollection $orderProduct  the related object to use as filter
+     * @param   OrderProduct|PropelObjectCollection $orderProduct The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderFeatureQuery The current query, for fluid interface
@@ -465,10 +467,12 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderFeaturePeer::ORDER_PRODUCT_ID, $orderProduct->getId(), $comparison);
         } elseif ($orderProduct instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useOrderProductQuery()
-                ->filterByPrimaryKeys($orderProduct->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderFeaturePeer::ORDER_PRODUCT_ID, $orderProduct->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByOrderProduct() only accepts arguments of type OrderProduct or PropelCollection');
         }

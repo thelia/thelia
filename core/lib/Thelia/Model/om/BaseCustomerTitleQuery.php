@@ -78,7 +78,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\CustomerTitle', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\CustomerTitle', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -253,12 +253,6 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByAddress()
-     *
-     * @see       filterByCustomer()
-     *
-     * @see       filterByCustomerTitleDesc()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -436,7 +430,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     /**
      * Filter the query by a related Address object
      *
-     * @param   Address|PropelObjectCollection $address The related object(s) to use as filter
+     * @param   Address|PropelObjectCollection $address  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CustomerTitleQuery The current query, for fluid interface
@@ -448,12 +442,10 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CustomerTitlePeer::ID, $address->getCustomerTitleId(), $comparison);
         } elseif ($address instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CustomerTitlePeer::ID, $address->toKeyValue('PrimaryKey', 'CustomerTitleId'), $comparison);
+                ->useAddressQuery()
+                ->filterByPrimaryKeys($address->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAddress() only accepts arguments of type Address or PropelCollection');
         }
@@ -467,7 +459,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return CustomerTitleQuery The current query, for fluid interface
      */
-    public function joinAddress($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAddress($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Address');
@@ -502,7 +494,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
      */
-    public function useAddressQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAddressQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinAddress($relationAlias, $joinType)
@@ -512,7 +504,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     /**
      * Filter the query by a related Customer object
      *
-     * @param   Customer|PropelObjectCollection $customer The related object(s) to use as filter
+     * @param   Customer|PropelObjectCollection $customer  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CustomerTitleQuery The current query, for fluid interface
@@ -524,12 +516,10 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CustomerTitlePeer::ID, $customer->getCustomerTitleId(), $comparison);
         } elseif ($customer instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CustomerTitlePeer::ID, $customer->toKeyValue('PrimaryKey', 'CustomerTitleId'), $comparison);
+                ->useCustomerQuery()
+                ->filterByPrimaryKeys($customer->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByCustomer() only accepts arguments of type Customer or PropelCollection');
         }
@@ -543,7 +533,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return CustomerTitleQuery The current query, for fluid interface
      */
-    public function joinCustomer($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCustomer($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Customer');
@@ -578,7 +568,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\CustomerQuery A secondary query class using the current class as primary query
      */
-    public function useCustomerQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCustomerQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinCustomer($relationAlias, $joinType)
@@ -588,7 +578,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     /**
      * Filter the query by a related CustomerTitleDesc object
      *
-     * @param   CustomerTitleDesc|PropelObjectCollection $customerTitleDesc The related object(s) to use as filter
+     * @param   CustomerTitleDesc|PropelObjectCollection $customerTitleDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CustomerTitleQuery The current query, for fluid interface
@@ -600,12 +590,10 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CustomerTitlePeer::ID, $customerTitleDesc->getCustomerTitleId(), $comparison);
         } elseif ($customerTitleDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CustomerTitlePeer::ID, $customerTitleDesc->toKeyValue('PrimaryKey', 'CustomerTitleId'), $comparison);
+                ->useCustomerTitleDescQuery()
+                ->filterByPrimaryKeys($customerTitleDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByCustomerTitleDesc() only accepts arguments of type CustomerTitleDesc or PropelCollection');
         }

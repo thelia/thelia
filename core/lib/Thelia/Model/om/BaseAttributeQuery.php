@@ -79,7 +79,7 @@ abstract class BaseAttributeQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Attribute', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Attribute', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -255,14 +255,6 @@ abstract class BaseAttributeQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByAttributeAv()
-     *
-     * @see       filterByAttributeCategory()
-     *
-     * @see       filterByAttributeCombination()
-     *
-     * @see       filterByAttributeDesc()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -410,7 +402,7 @@ abstract class BaseAttributeQuery extends ModelCriteria
     /**
      * Filter the query by a related AttributeAv object
      *
-     * @param   AttributeAv|PropelObjectCollection $attributeAv The related object(s) to use as filter
+     * @param   AttributeAv|PropelObjectCollection $attributeAv  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeQuery The current query, for fluid interface
@@ -422,12 +414,10 @@ abstract class BaseAttributeQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributePeer::ID, $attributeAv->getAttributeId(), $comparison);
         } elseif ($attributeAv instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(AttributePeer::ID, $attributeAv->toKeyValue('PrimaryKey', 'AttributeId'), $comparison);
+                ->useAttributeAvQuery()
+                ->filterByPrimaryKeys($attributeAv->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAttributeAv() only accepts arguments of type AttributeAv or PropelCollection');
         }
@@ -486,7 +476,7 @@ abstract class BaseAttributeQuery extends ModelCriteria
     /**
      * Filter the query by a related AttributeCategory object
      *
-     * @param   AttributeCategory|PropelObjectCollection $attributeCategory The related object(s) to use as filter
+     * @param   AttributeCategory|PropelObjectCollection $attributeCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeQuery The current query, for fluid interface
@@ -498,12 +488,10 @@ abstract class BaseAttributeQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributePeer::ID, $attributeCategory->getAttributeId(), $comparison);
         } elseif ($attributeCategory instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(AttributePeer::ID, $attributeCategory->toKeyValue('PrimaryKey', 'AttributeId'), $comparison);
+                ->useAttributeCategoryQuery()
+                ->filterByPrimaryKeys($attributeCategory->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAttributeCategory() only accepts arguments of type AttributeCategory or PropelCollection');
         }
@@ -562,7 +550,7 @@ abstract class BaseAttributeQuery extends ModelCriteria
     /**
      * Filter the query by a related AttributeCombination object
      *
-     * @param   AttributeCombination|PropelObjectCollection $attributeCombination The related object(s) to use as filter
+     * @param   AttributeCombination|PropelObjectCollection $attributeCombination  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeQuery The current query, for fluid interface
@@ -574,12 +562,10 @@ abstract class BaseAttributeQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributePeer::ID, $attributeCombination->getAttributeId(), $comparison);
         } elseif ($attributeCombination instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(AttributePeer::ID, $attributeCombination->toKeyValue('AttributeId', 'AttributeId'), $comparison);
+                ->useAttributeCombinationQuery()
+                ->filterByPrimaryKeys($attributeCombination->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAttributeCombination() only accepts arguments of type AttributeCombination or PropelCollection');
         }
@@ -638,7 +624,7 @@ abstract class BaseAttributeQuery extends ModelCriteria
     /**
      * Filter the query by a related AttributeDesc object
      *
-     * @param   AttributeDesc|PropelObjectCollection $attributeDesc The related object(s) to use as filter
+     * @param   AttributeDesc|PropelObjectCollection $attributeDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeQuery The current query, for fluid interface
@@ -650,12 +636,10 @@ abstract class BaseAttributeQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributePeer::ID, $attributeDesc->getAttributeId(), $comparison);
         } elseif ($attributeDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(AttributePeer::ID, $attributeDesc->toKeyValue('PrimaryKey', 'AttributeId'), $comparison);
+                ->useAttributeDescQuery()
+                ->filterByPrimaryKeys($attributeDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAttributeDesc() only accepts arguments of type AttributeDesc or PropelCollection');
         }

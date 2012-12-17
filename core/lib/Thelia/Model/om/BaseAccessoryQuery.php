@@ -40,13 +40,13 @@ use Thelia\Model\Product;
  * @method AccessoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method AccessoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method AccessoryQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method AccessoryQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method AccessoryQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method AccessoryQuery leftJoinProductRelatedByProductId($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductRelatedByProductId relation
+ * @method AccessoryQuery rightJoinProductRelatedByProductId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductRelatedByProductId relation
+ * @method AccessoryQuery innerJoinProductRelatedByProductId($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductRelatedByProductId relation
  *
- * @method AccessoryQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method AccessoryQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method AccessoryQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method AccessoryQuery leftJoinProductRelatedByAccessory($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductRelatedByAccessory relation
+ * @method AccessoryQuery rightJoinProductRelatedByAccessory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductRelatedByAccessory relation
+ * @method AccessoryQuery innerJoinProductRelatedByAccessory($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductRelatedByAccessory relation
  *
  * @method Accessory findOne(PropelPDO $con = null) Return the first Accessory matching the query
  * @method Accessory findOneOrCreate(PropelPDO $con = null) Return the first Accessory matching the query, or a new Accessory object populated from the query conditions when no match is found
@@ -76,7 +76,7 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Accessory', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Accessory', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -279,6 +279,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
      * </code>
      *
+     * @see       filterByProductRelatedByProductId()
+     *
      * @param     mixed $productId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -319,6 +321,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * $query->filterByAccessory(array(12, 34)); // WHERE accessory IN (12, 34)
      * $query->filterByAccessory(array('min' => 12)); // WHERE accessory > 12
      * </code>
+     *
+     * @see       filterByProductRelatedByAccessory()
      *
      * @param     mixed $accessory The value to use as filter.
      *              Use scalar values for equality.
@@ -481,39 +485,41 @@ abstract class BaseAccessoryQuery extends ModelCriteria
     /**
      * Filter the query by a related Product object
      *
-     * @param   Product|PropelObjectCollection $product  the related object to use as filter
+     * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AccessoryQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByProduct($product, $comparison = null)
+    public function filterByProductRelatedByProductId($product, $comparison = null)
     {
         if ($product instanceof Product) {
             return $this
                 ->addUsingAlias(AccessoryPeer::PRODUCT_ID, $product->getId(), $comparison);
         } elseif ($product instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useProductQuery()
-                ->filterByPrimaryKeys($product->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(AccessoryPeer::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByProduct() only accepts arguments of type Product or PropelCollection');
+            throw new PropelException('filterByProductRelatedByProductId() only accepts arguments of type Product or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Product relation
+     * Adds a JOIN clause to the query using the ProductRelatedByProductId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return AccessoryQuery The current query, for fluid interface
      */
-    public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProductRelatedByProductId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Product');
+        $relationMap = $tableMap->getRelation('ProductRelatedByProductId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -528,14 +534,14 @@ abstract class BaseAccessoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Product');
+            $this->addJoinObject($join, 'ProductRelatedByProductId');
         }
 
         return $this;
     }
 
     /**
-     * Use the Product relation Product object
+     * Use the ProductRelatedByProductId relation Product object
      *
      * @see       useQuery()
      *
@@ -545,49 +551,51 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
      */
-    public function useProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProductRelatedByProductIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinProduct($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Product', '\Thelia\Model\ProductQuery');
+            ->joinProductRelatedByProductId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductRelatedByProductId', '\Thelia\Model\ProductQuery');
     }
 
     /**
      * Filter the query by a related Product object
      *
-     * @param   Product|PropelObjectCollection $product  the related object to use as filter
+     * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AccessoryQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByProduct($product, $comparison = null)
+    public function filterByProductRelatedByAccessory($product, $comparison = null)
     {
         if ($product instanceof Product) {
             return $this
                 ->addUsingAlias(AccessoryPeer::ACCESSORY, $product->getId(), $comparison);
         } elseif ($product instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useProductQuery()
-                ->filterByPrimaryKeys($product->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(AccessoryPeer::ACCESSORY, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByProduct() only accepts arguments of type Product or PropelCollection');
+            throw new PropelException('filterByProductRelatedByAccessory() only accepts arguments of type Product or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Product relation
+     * Adds a JOIN clause to the query using the ProductRelatedByAccessory relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return AccessoryQuery The current query, for fluid interface
      */
-    public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProductRelatedByAccessory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Product');
+        $relationMap = $tableMap->getRelation('ProductRelatedByAccessory');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -602,14 +610,14 @@ abstract class BaseAccessoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Product');
+            $this->addJoinObject($join, 'ProductRelatedByAccessory');
         }
 
         return $this;
     }
 
     /**
-     * Use the Product relation Product object
+     * Use the ProductRelatedByAccessory relation Product object
      *
      * @see       useQuery()
      *
@@ -619,11 +627,11 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
      */
-    public function useProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProductRelatedByAccessoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinProduct($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Product', '\Thelia\Model\ProductQuery');
+            ->joinProductRelatedByAccessory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductRelatedByAccessory', '\Thelia\Model\ProductQuery');
     }
 
     /**

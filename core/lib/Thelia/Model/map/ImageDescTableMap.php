@@ -43,7 +43,7 @@ class ImageDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('IMAGE_ID', 'ImageId', 'INTEGER', false, null, null);
+        $this->addForeignKey('IMAGE_ID', 'ImageId', 'INTEGER', 'image', 'ID', false, null, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
         $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
@@ -57,7 +57,7 @@ class ImageDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_ONE, array('image_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::MANY_TO_ONE, array('image_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ImageDescTableMap

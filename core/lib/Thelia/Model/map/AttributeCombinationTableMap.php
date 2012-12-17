@@ -43,9 +43,9 @@ class AttributeCombinationTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addPrimaryKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER', true, null, null);
-        $this->addPrimaryKey('COMBINATION_ID', 'CombinationId', 'INTEGER', true, null, null);
-        $this->addPrimaryKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER' , 'attribute', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('COMBINATION_ID', 'CombinationId', 'INTEGER' , 'combination', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER' , 'attribute_av', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
         // validators
@@ -56,9 +56,9 @@ class AttributeCombinationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::ONE_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('AttributeAv', 'Thelia\\Model\\AttributeAv', RelationMap::ONE_TO_ONE, array('attribute_av_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Combination', 'Thelia\\Model\\Combination', RelationMap::ONE_TO_ONE, array('combination_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('AttributeAv', 'Thelia\\Model\\AttributeAv', RelationMap::MANY_TO_ONE, array('attribute_av_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Combination', 'Thelia\\Model\\Combination', RelationMap::MANY_TO_ONE, array('combination_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // AttributeCombinationTableMap

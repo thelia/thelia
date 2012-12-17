@@ -43,8 +43,8 @@ class AccessoryTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('PRODUCT_ID', 'ProductId', 'INTEGER', true, null, null);
-        $this->addColumn('ACCESSORY', 'Accessory', 'INTEGER', true, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
+        $this->addForeignKey('ACCESSORY', 'Accessory', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -56,8 +56,8 @@ class AccessoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_ONE, array('accessory' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ProductRelatedByProductId', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('ProductRelatedByAccessory', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('accessory' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // AccessoryTableMap

@@ -43,7 +43,7 @@ class OrderStatusDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('STATUS_ID', 'StatusId', 'INTEGER', true, null, null);
+        $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -58,7 +58,7 @@ class OrderStatusDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('OrderStatus', 'Thelia\\Model\\OrderStatus', RelationMap::ONE_TO_ONE, array('status_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('OrderStatus', 'Thelia\\Model\\OrderStatus', RelationMap::MANY_TO_ONE, array('status_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // OrderStatusDescTableMap

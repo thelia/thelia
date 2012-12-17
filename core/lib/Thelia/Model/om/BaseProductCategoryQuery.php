@@ -33,13 +33,13 @@ use Thelia\Model\ProductCategoryQuery;
  * @method ProductCategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ProductCategoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ProductCategoryQuery leftJoinCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Category relation
- * @method ProductCategoryQuery rightJoinCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Category relation
- * @method ProductCategoryQuery innerJoinCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Category relation
- *
  * @method ProductCategoryQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
  * @method ProductCategoryQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
  * @method ProductCategoryQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ *
+ * @method ProductCategoryQuery leftJoinCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Category relation
+ * @method ProductCategoryQuery rightJoinCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Category relation
+ * @method ProductCategoryQuery innerJoinCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Category relation
  *
  * @method ProductCategory findOne(PropelPDO $con = null) Return the first ProductCategory matching the query
  * @method ProductCategory findOneOrCreate(PropelPDO $con = null) Return the first ProductCategory matching the query, or a new ProductCategory object populated from the query conditions when no match is found
@@ -61,7 +61,7 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\ProductCategory', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\ProductCategory', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -250,6 +250,8 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
      * </code>
      *
+     * @see       filterByProduct()
+     *
      * @param     mixed $productId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -277,6 +279,8 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
      * </code>
      *
+     * @see       filterByCategory()
+     *
      * @param     mixed $categoryId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -295,83 +299,9 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Category object
-     *
-     * @param   Category|PropelObjectCollection $category  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   ProductCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByCategory($category, $comparison = null)
-    {
-        if ($category instanceof Category) {
-            return $this
-                ->addUsingAlias(ProductCategoryPeer::CATEGORY_ID, $category->getId(), $comparison);
-        } elseif ($category instanceof PropelObjectCollection) {
-            return $this
-                ->useCategoryQuery()
-                ->filterByPrimaryKeys($category->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCategory() only accepts arguments of type Category or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Category relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ProductCategoryQuery The current query, for fluid interface
-     */
-    public function joinCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Category');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Category');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Category relation Category object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CategoryQuery A secondary query class using the current class as primary query
-     */
-    public function useCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Category', '\Thelia\Model\CategoryQuery');
-    }
-
-    /**
      * Filter the query by a related Product object
      *
-     * @param   Product|PropelObjectCollection $product  the related object to use as filter
+     * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductCategoryQuery The current query, for fluid interface
@@ -383,10 +313,12 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductCategoryPeer::PRODUCT_ID, $product->getId(), $comparison);
         } elseif ($product instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useProductQuery()
-                ->filterByPrimaryKeys($product->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ProductCategoryPeer::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByProduct() only accepts arguments of type Product or PropelCollection');
         }
@@ -440,6 +372,82 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
         return $this
             ->joinProduct($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Product', '\Thelia\Model\ProductQuery');
+    }
+
+    /**
+     * Filter the query by a related Category object
+     *
+     * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ProductCategoryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCategory($category, $comparison = null)
+    {
+        if ($category instanceof Category) {
+            return $this
+                ->addUsingAlias(ProductCategoryPeer::CATEGORY_ID, $category->getId(), $comparison);
+        } elseif ($category instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(ProductCategoryPeer::CATEGORY_ID, $category->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCategory() only accepts arguments of type Category or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Category relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ProductCategoryQuery The current query, for fluid interface
+     */
+    public function joinCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Category');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Category');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Category relation Category object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CategoryQuery A secondary query class using the current class as primary query
+     */
+    public function useCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCategory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Category', '\Thelia\Model\CategoryQuery');
     }
 
     /**

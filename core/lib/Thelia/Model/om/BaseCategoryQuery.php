@@ -111,7 +111,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Category', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Category', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -286,22 +286,6 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByAttributeCategory()
-     *
-     * @see       filterByCategoryDesc()
-     *
-     * @see       filterByContentAssoc()
-     *
-     * @see       filterByDocument()
-     *
-     * @see       filterByFeatureCategory()
-     *
-     * @see       filterByImage()
-     *
-     * @see       filterByProductCategory()
-     *
-     * @see       filterByRewriting()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -561,7 +545,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related AttributeCategory object
      *
-     * @param   AttributeCategory|PropelObjectCollection $attributeCategory The related object(s) to use as filter
+     * @param   AttributeCategory|PropelObjectCollection $attributeCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -573,12 +557,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $attributeCategory->getCategoryId(), $comparison);
         } elseif ($attributeCategory instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $attributeCategory->toKeyValue('PrimaryKey', 'CategoryId'), $comparison);
+                ->useAttributeCategoryQuery()
+                ->filterByPrimaryKeys($attributeCategory->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAttributeCategory() only accepts arguments of type AttributeCategory or PropelCollection');
         }
@@ -637,7 +619,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related CategoryDesc object
      *
-     * @param   CategoryDesc|PropelObjectCollection $categoryDesc The related object(s) to use as filter
+     * @param   CategoryDesc|PropelObjectCollection $categoryDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -649,12 +631,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $categoryDesc->getCategoryId(), $comparison);
         } elseif ($categoryDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $categoryDesc->toKeyValue('PrimaryKey', 'CategoryId'), $comparison);
+                ->useCategoryDescQuery()
+                ->filterByPrimaryKeys($categoryDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByCategoryDesc() only accepts arguments of type CategoryDesc or PropelCollection');
         }
@@ -713,7 +693,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related ContentAssoc object
      *
-     * @param   ContentAssoc|PropelObjectCollection $contentAssoc The related object(s) to use as filter
+     * @param   ContentAssoc|PropelObjectCollection $contentAssoc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -725,12 +705,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $contentAssoc->getCategoryId(), $comparison);
         } elseif ($contentAssoc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $contentAssoc->toKeyValue('PrimaryKey', 'CategoryId'), $comparison);
+                ->useContentAssocQuery()
+                ->filterByPrimaryKeys($contentAssoc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByContentAssoc() only accepts arguments of type ContentAssoc or PropelCollection');
         }
@@ -744,7 +722,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('ContentAssoc');
@@ -779,7 +757,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ContentAssocQuery A secondary query class using the current class as primary query
      */
-    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinContentAssoc($relationAlias, $joinType)
@@ -789,7 +767,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related Document object
      *
-     * @param   Document|PropelObjectCollection $document The related object(s) to use as filter
+     * @param   Document|PropelObjectCollection $document  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -801,12 +779,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $document->getCategoryId(), $comparison);
         } elseif ($document instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $document->toKeyValue('PrimaryKey', 'CategoryId'), $comparison);
+                ->useDocumentQuery()
+                ->filterByPrimaryKeys($document->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
         }
@@ -820,7 +796,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinDocument($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Document');
@@ -855,7 +831,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
      */
-    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinDocument($relationAlias, $joinType)
@@ -865,7 +841,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related FeatureCategory object
      *
-     * @param   FeatureCategory|PropelObjectCollection $featureCategory The related object(s) to use as filter
+     * @param   FeatureCategory|PropelObjectCollection $featureCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -877,12 +853,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $featureCategory->getCategoryId(), $comparison);
         } elseif ($featureCategory instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $featureCategory->toKeyValue('PrimaryKey', 'CategoryId'), $comparison);
+                ->useFeatureCategoryQuery()
+                ->filterByPrimaryKeys($featureCategory->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByFeatureCategory() only accepts arguments of type FeatureCategory or PropelCollection');
         }
@@ -941,7 +915,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related Image object
      *
-     * @param   Image|PropelObjectCollection $image The related object(s) to use as filter
+     * @param   Image|PropelObjectCollection $image  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -953,12 +927,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $image->getCategoryId(), $comparison);
         } elseif ($image instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $image->toKeyValue('PrimaryKey', 'CategoryId'), $comparison);
+                ->useImageQuery()
+                ->filterByPrimaryKeys($image->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByImage() only accepts arguments of type Image or PropelCollection');
         }
@@ -972,7 +944,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinImage($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Image');
@@ -1007,7 +979,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ImageQuery A secondary query class using the current class as primary query
      */
-    public function useImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useImageQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinImage($relationAlias, $joinType)
@@ -1017,7 +989,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related ProductCategory object
      *
-     * @param   ProductCategory|PropelObjectCollection $productCategory The related object(s) to use as filter
+     * @param   ProductCategory|PropelObjectCollection $productCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -1029,12 +1001,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $productCategory->getCategoryId(), $comparison);
         } elseif ($productCategory instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $productCategory->toKeyValue('CategoryId', 'CategoryId'), $comparison);
+                ->useProductCategoryQuery()
+                ->filterByPrimaryKeys($productCategory->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByProductCategory() only accepts arguments of type ProductCategory or PropelCollection');
         }
@@ -1093,7 +1063,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related Rewriting object
      *
-     * @param   Rewriting|PropelObjectCollection $rewriting The related object(s) to use as filter
+     * @param   Rewriting|PropelObjectCollection $rewriting  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
@@ -1105,12 +1075,10 @@ abstract class BaseCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CategoryPeer::ID, $rewriting->getCategoryId(), $comparison);
         } elseif ($rewriting instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $rewriting->toKeyValue('PrimaryKey', 'CategoryId'), $comparison);
+                ->useRewritingQuery()
+                ->filterByPrimaryKeys($rewriting->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByRewriting() only accepts arguments of type Rewriting or PropelCollection');
         }
@@ -1124,7 +1092,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinRewriting($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinRewriting($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Rewriting');
@@ -1159,7 +1127,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\RewritingQuery A secondary query class using the current class as primary query
      */
-    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinRewriting($relationAlias, $joinType)

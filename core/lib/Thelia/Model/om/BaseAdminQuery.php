@@ -84,7 +84,7 @@ abstract class BaseAdminQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Admin', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Admin', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -259,8 +259,6 @@ abstract class BaseAdminQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByAdminGroup()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -542,7 +540,7 @@ abstract class BaseAdminQuery extends ModelCriteria
     /**
      * Filter the query by a related AdminGroup object
      *
-     * @param   AdminGroup|PropelObjectCollection $adminGroup The related object(s) to use as filter
+     * @param   AdminGroup|PropelObjectCollection $adminGroup  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AdminQuery The current query, for fluid interface
@@ -554,12 +552,10 @@ abstract class BaseAdminQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AdminPeer::ID, $adminGroup->getAdminId(), $comparison);
         } elseif ($adminGroup instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(AdminPeer::ID, $adminGroup->toKeyValue('PrimaryKey', 'AdminId'), $comparison);
+                ->useAdminGroupQuery()
+                ->filterByPrimaryKeys($adminGroup->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAdminGroup() only accepts arguments of type AdminGroup or PropelCollection');
         }
@@ -573,7 +569,7 @@ abstract class BaseAdminQuery extends ModelCriteria
      *
      * @return AdminQuery The current query, for fluid interface
      */
-    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('AdminGroup');
@@ -608,7 +604,7 @@ abstract class BaseAdminQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AdminGroupQuery A secondary query class using the current class as primary query
      */
-    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinAdminGroup($relationAlias, $joinType)

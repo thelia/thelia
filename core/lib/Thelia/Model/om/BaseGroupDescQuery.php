@@ -80,7 +80,7 @@ abstract class BaseGroupDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\GroupDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\GroupDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -282,6 +282,8 @@ abstract class BaseGroupDescQuery extends ModelCriteria
      * $query->filterByGroupId(array(12, 34)); // WHERE group_id IN (12, 34)
      * $query->filterByGroupId(array('min' => 12)); // WHERE group_id > 12
      * </code>
+     *
+     * @see       filterByGroup()
      *
      * @param     mixed $groupId The value to use as filter.
      *              Use scalar values for equality.
@@ -519,7 +521,7 @@ abstract class BaseGroupDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Group object
      *
-     * @param   Group|PropelObjectCollection $group  the related object to use as filter
+     * @param   Group|PropelObjectCollection $group The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   GroupDescQuery The current query, for fluid interface
@@ -531,10 +533,12 @@ abstract class BaseGroupDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(GroupDescPeer::GROUP_ID, $group->getId(), $comparison);
         } elseif ($group instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useGroupQuery()
-                ->filterByPrimaryKeys($group->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(GroupDescPeer::GROUP_ID, $group->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByGroup() only accepts arguments of type Group or PropelCollection');
         }

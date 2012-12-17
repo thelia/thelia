@@ -42,8 +42,7 @@ class OrderAddressTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order', 'ADDRESS_INVOICE', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order', 'ADDRESS_DELIVERY', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', false, null, null);
         $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
@@ -65,8 +64,8 @@ class OrderAddressTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('id' => 'address_invoice', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('id' => 'address_delivery', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('OrderRelatedByAddressInvoice', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_invoice', ), 'SET NULL', null, 'OrdersRelatedByAddressInvoice');
+        $this->addRelation('OrderRelatedByAddressDelivery', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_delivery', ), 'SET NULL', null, 'OrdersRelatedByAddressDelivery');
     } // buildRelations()
 
 } // OrderAddressTableMap

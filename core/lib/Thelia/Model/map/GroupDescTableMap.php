@@ -43,7 +43,7 @@ class GroupDescTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('GROUP_ID', 'GroupId', 'INTEGER', true, null, null);
+        $this->addForeignKey('GROUP_ID', 'GroupId', 'INTEGER', 'group', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -58,7 +58,7 @@ class GroupDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::ONE_TO_ONE, array('group_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::MANY_TO_ONE, array('group_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // GroupDescTableMap

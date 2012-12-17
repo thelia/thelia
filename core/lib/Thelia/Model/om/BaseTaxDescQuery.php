@@ -76,7 +76,7 @@ abstract class BaseTaxDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\TaxDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\TaxDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -278,6 +278,8 @@ abstract class BaseTaxDescQuery extends ModelCriteria
      * $query->filterByTaxId(array(12, 34)); // WHERE tax_id IN (12, 34)
      * $query->filterByTaxId(array('min' => 12)); // WHERE tax_id > 12
      * </code>
+     *
+     * @see       filterByTax()
      *
      * @param     mixed $taxId The value to use as filter.
      *              Use scalar values for equality.
@@ -486,7 +488,7 @@ abstract class BaseTaxDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Tax object
      *
-     * @param   Tax|PropelObjectCollection $tax  the related object to use as filter
+     * @param   Tax|PropelObjectCollection $tax The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TaxDescQuery The current query, for fluid interface
@@ -498,10 +500,12 @@ abstract class BaseTaxDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(TaxDescPeer::TAX_ID, $tax->getId(), $comparison);
         } elseif ($tax instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useTaxQuery()
-                ->filterByPrimaryKeys($tax->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(TaxDescPeer::TAX_ID, $tax->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByTax() only accepts arguments of type Tax or PropelCollection');
         }

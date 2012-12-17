@@ -80,7 +80,7 @@ abstract class BaseCountryDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\CountryDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\CountryDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -282,6 +282,8 @@ abstract class BaseCountryDescQuery extends ModelCriteria
      * $query->filterByCountryId(array(12, 34)); // WHERE country_id IN (12, 34)
      * $query->filterByCountryId(array('min' => 12)); // WHERE country_id > 12
      * </code>
+     *
+     * @see       filterByCountry()
      *
      * @param     mixed $countryId The value to use as filter.
      *              Use scalar values for equality.
@@ -519,7 +521,7 @@ abstract class BaseCountryDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Country object
      *
-     * @param   Country|PropelObjectCollection $country  the related object to use as filter
+     * @param   Country|PropelObjectCollection $country The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CountryDescQuery The current query, for fluid interface
@@ -531,10 +533,12 @@ abstract class BaseCountryDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CountryDescPeer::COUNTRY_ID, $country->getId(), $comparison);
         } elseif ($country instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCountryQuery()
-                ->filterByPrimaryKeys($country->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(CountryDescPeer::COUNTRY_ID, $country->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCountry() only accepts arguments of type Country or PropelCollection');
         }

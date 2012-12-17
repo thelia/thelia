@@ -42,8 +42,7 @@ class TaxTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'tax_desc', 'TAX_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'tax_rule_country', 'TAX_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('RATE', 'Rate', 'FLOAT', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -55,8 +54,8 @@ class TaxTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('TaxDesc', 'Thelia\\Model\\TaxDesc', RelationMap::MANY_TO_ONE, array('id' => 'tax_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::MANY_TO_ONE, array('id' => 'tax_id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('TaxDesc', 'Thelia\\Model\\TaxDesc', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'CASCADE', null, 'TaxDescs');
+        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'SET NULL', null, 'TaxRuleCountrys');
     } // buildRelations()
 
 } // TaxTableMap

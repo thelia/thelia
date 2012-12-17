@@ -43,7 +43,7 @@ class ProductDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('PRODUCT_ID', 'ProductId', 'INTEGER', true, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
@@ -59,7 +59,7 @@ class ProductDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ProductDescTableMap

@@ -43,7 +43,7 @@ class DocumentDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('DOCUMENT_ID', 'DocumentId', 'INTEGER', true, null, null);
+        $this->addForeignKey('DOCUMENT_ID', 'DocumentId', 'INTEGER', 'document', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -58,7 +58,7 @@ class DocumentDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_ONE, array('document_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::MANY_TO_ONE, array('document_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // DocumentDescTableMap

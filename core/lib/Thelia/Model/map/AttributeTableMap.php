@@ -42,10 +42,7 @@ class AttributeTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_av', 'ATTRIBUTE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_category', 'ATTRIBUTE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_combination', 'ATTRIBUTE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_desc', 'ATTRIBUTE_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -57,10 +54,10 @@ class AttributeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeAv', 'Thelia\\Model\\AttributeAv', RelationMap::MANY_TO_ONE, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('AttributeCategory', 'Thelia\\Model\\AttributeCategory', RelationMap::MANY_TO_ONE, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::MANY_TO_ONE, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('AttributeDesc', 'Thelia\\Model\\AttributeDesc', RelationMap::MANY_TO_ONE, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('AttributeAv', 'Thelia\\Model\\AttributeAv', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeAvs');
+        $this->addRelation('AttributeCategory', 'Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeCategorys');
+        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeCombinations');
+        $this->addRelation('AttributeDesc', 'Thelia\\Model\\AttributeDesc', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeDescs');
     } // buildRelations()
 
 } // AttributeTableMap

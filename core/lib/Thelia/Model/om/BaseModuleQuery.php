@@ -81,7 +81,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Module', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Module', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -256,10 +256,6 @@ abstract class BaseModuleQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByGroupModule()
-     *
-     * @see       filterByModuleDesc()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -519,7 +515,7 @@ abstract class BaseModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related GroupModule object
      *
-     * @param   GroupModule|PropelObjectCollection $groupModule The related object(s) to use as filter
+     * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ModuleQuery The current query, for fluid interface
@@ -531,12 +527,10 @@ abstract class BaseModuleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ModulePeer::ID, $groupModule->getModuleId(), $comparison);
         } elseif ($groupModule instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ModulePeer::ID, $groupModule->toKeyValue('PrimaryKey', 'ModuleId'), $comparison);
+                ->useGroupModuleQuery()
+                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByGroupModule() only accepts arguments of type GroupModule or PropelCollection');
         }
@@ -550,7 +544,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      *
      * @return ModuleQuery The current query, for fluid interface
      */
-    public function joinGroupModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinGroupModule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('GroupModule');
@@ -585,7 +579,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\GroupModuleQuery A secondary query class using the current class as primary query
      */
-    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinGroupModule($relationAlias, $joinType)
@@ -595,7 +589,7 @@ abstract class BaseModuleQuery extends ModelCriteria
     /**
      * Filter the query by a related ModuleDesc object
      *
-     * @param   ModuleDesc|PropelObjectCollection $moduleDesc The related object(s) to use as filter
+     * @param   ModuleDesc|PropelObjectCollection $moduleDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ModuleQuery The current query, for fluid interface
@@ -607,12 +601,10 @@ abstract class BaseModuleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ModulePeer::ID, $moduleDesc->getModuleId(), $comparison);
         } elseif ($moduleDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ModulePeer::ID, $moduleDesc->toKeyValue('PrimaryKey', 'ModuleId'), $comparison);
+                ->useModuleDescQuery()
+                ->filterByPrimaryKeys($moduleDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByModuleDesc() only accepts arguments of type ModuleDesc or PropelCollection');
         }

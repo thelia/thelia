@@ -27,7 +27,7 @@ abstract class BaseTaxRuleCountryPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'tax_rule_country';
@@ -395,15 +395,6 @@ abstract class BaseTaxRuleCountryPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in CountryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CountryPeer::clearInstancePool();
-        // Invalidate objects in TaxPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        TaxPeer::clearInstancePool();
-        // Invalidate objects in TaxRulePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        TaxRulePeer::clearInstancePool();
     }
 
     /**
@@ -498,6 +489,983 @@ abstract class BaseTaxRuleCountryPeer
         }
 
         return array($obj, $col);
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Tax table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinTax(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaxRuleCountryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaxRuleCountryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaxRuleCountryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related TaxRule table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinTaxRule(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaxRuleCountryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaxRuleCountryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaxRuleCountryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Country table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinCountry(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaxRuleCountryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaxRuleCountryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaxRuleCountryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of TaxRuleCountry objects pre-filled with their Tax objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of TaxRuleCountry objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinTax(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+        }
+
+        TaxRuleCountryPeer::addSelectColumns($criteria);
+        $startcol = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS;
+        TaxPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaxRuleCountryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaxRuleCountryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = TaxRuleCountryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaxRuleCountryPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = TaxPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = TaxPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TaxPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    TaxPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to $obj2 (Tax)
+                $obj2->addTaxRuleCountry($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of TaxRuleCountry objects pre-filled with their TaxRule objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of TaxRuleCountry objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinTaxRule(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+        }
+
+        TaxRuleCountryPeer::addSelectColumns($criteria);
+        $startcol = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS;
+        TaxRulePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaxRuleCountryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaxRuleCountryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = TaxRuleCountryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaxRuleCountryPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = TaxRulePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = TaxRulePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TaxRulePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    TaxRulePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to $obj2 (TaxRule)
+                $obj2->addTaxRuleCountry($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of TaxRuleCountry objects pre-filled with their Country objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of TaxRuleCountry objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinCountry(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+        }
+
+        TaxRuleCountryPeer::addSelectColumns($criteria);
+        $startcol = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS;
+        CountryPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaxRuleCountryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaxRuleCountryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = TaxRuleCountryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaxRuleCountryPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = CountryPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = CountryPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CountryPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    CountryPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to $obj2 (Country)
+                $obj2->addTaxRuleCountry($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaxRuleCountryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaxRuleCountryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaxRuleCountryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of TaxRuleCountry objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of TaxRuleCountry objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+        }
+
+        TaxRuleCountryPeer::addSelectColumns($criteria);
+        $startcol2 = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS;
+
+        TaxPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TaxPeer::NUM_HYDRATE_COLUMNS;
+
+        TaxRulePeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + TaxRulePeer::NUM_HYDRATE_COLUMNS;
+
+        CountryPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + CountryPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaxRuleCountryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaxRuleCountryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = TaxRuleCountryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaxRuleCountryPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined Tax rows
+
+            $key2 = TaxPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = TaxPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = TaxPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TaxPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj2 (Tax)
+                $obj2->addTaxRuleCountry($obj1);
+            } // if joined row not null
+
+            // Add objects for joined TaxRule rows
+
+            $key3 = TaxRulePeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = TaxRulePeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = TaxRulePeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    TaxRulePeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj3 (TaxRule)
+                $obj3->addTaxRuleCountry($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Country rows
+
+            $key4 = CountryPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+            if ($key4 !== null) {
+                $obj4 = CountryPeer::getInstanceFromPool($key4);
+                if (!$obj4) {
+
+                    $cls = CountryPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    CountryPeer::addInstanceToPool($obj4, $key4);
+                } // if obj4 loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj4 (Country)
+                $obj4->addTaxRuleCountry($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Tax table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptTax(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaxRuleCountryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaxRuleCountryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaxRuleCountryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related TaxRule table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptTaxRule(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaxRuleCountryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaxRuleCountryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaxRuleCountryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Country table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptCountry(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(TaxRuleCountryPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            TaxRuleCountryPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(TaxRuleCountryPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of TaxRuleCountry objects pre-filled with all related objects except Tax.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of TaxRuleCountry objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptTax(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+        }
+
+        TaxRuleCountryPeer::addSelectColumns($criteria);
+        $startcol2 = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS;
+
+        TaxRulePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TaxRulePeer::NUM_HYDRATE_COLUMNS;
+
+        CountryPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + CountryPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaxRuleCountryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaxRuleCountryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = TaxRuleCountryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaxRuleCountryPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined TaxRule rows
+
+                $key2 = TaxRulePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TaxRulePeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TaxRulePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TaxRulePeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj2 (TaxRule)
+                $obj2->addTaxRuleCountry($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Country rows
+
+                $key3 = CountryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = CountryPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = CountryPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    CountryPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj3 (Country)
+                $obj3->addTaxRuleCountry($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of TaxRuleCountry objects pre-filled with all related objects except TaxRule.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of TaxRuleCountry objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptTaxRule(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+        }
+
+        TaxRuleCountryPeer::addSelectColumns($criteria);
+        $startcol2 = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS;
+
+        TaxPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TaxPeer::NUM_HYDRATE_COLUMNS;
+
+        CountryPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + CountryPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::COUNTRY_ID, CountryPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaxRuleCountryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaxRuleCountryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = TaxRuleCountryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaxRuleCountryPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Tax rows
+
+                $key2 = TaxPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TaxPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TaxPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TaxPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj2 (Tax)
+                $obj2->addTaxRuleCountry($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Country rows
+
+                $key3 = CountryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = CountryPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = CountryPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    CountryPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj3 (Country)
+                $obj3->addTaxRuleCountry($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of TaxRuleCountry objects pre-filled with all related objects except Country.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of TaxRuleCountry objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptCountry(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(TaxRuleCountryPeer::DATABASE_NAME);
+        }
+
+        TaxRuleCountryPeer::addSelectColumns($criteria);
+        $startcol2 = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS;
+
+        TaxPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + TaxPeer::NUM_HYDRATE_COLUMNS;
+
+        TaxRulePeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + TaxRulePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_ID, TaxPeer::ID, $join_behavior);
+
+        $criteria->addJoin(TaxRuleCountryPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = TaxRuleCountryPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = TaxRuleCountryPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = TaxRuleCountryPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                TaxRuleCountryPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Tax rows
+
+                $key2 = TaxPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = TaxPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = TaxPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    TaxPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj2 (Tax)
+                $obj2->addTaxRuleCountry($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined TaxRule rows
+
+                $key3 = TaxRulePeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = TaxRulePeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = TaxRulePeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    TaxRulePeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (TaxRuleCountry) to the collection in $obj3 (TaxRule)
+                $obj3->addTaxRuleCountry($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
     /**
@@ -629,8 +1597,6 @@ abstract class BaseTaxRuleCountryPeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += TaxRuleCountryPeer::doOnDeleteCascade(new Criteria(TaxRuleCountryPeer::DATABASE_NAME), $con);
-            TaxRuleCountryPeer::doOnDeleteSetNull(new Criteria(TaxRuleCountryPeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(TaxRuleCountryPeer::TABLE_NAME, $con, TaxRuleCountryPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -664,14 +1630,24 @@ abstract class BaseTaxRuleCountryPeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            TaxRuleCountryPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof TaxRuleCountry) { // it's a model object
+            // invalidate the cache for this single object
+            TaxRuleCountryPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(TaxRuleCountryPeer::DATABASE_NAME);
             $criteria->add(TaxRuleCountryPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                TaxRuleCountryPeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -684,27 +1660,6 @@ abstract class BaseTaxRuleCountryPeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            $affectedRows += TaxRuleCountryPeer::doOnDeleteCascade($c, $con);
-
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            TaxRuleCountryPeer::doOnDeleteSetNull($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                TaxRuleCountryPeer::clearInstancePool();
-            } elseif ($values instanceof TaxRuleCountry) { // it's a model object
-                TaxRuleCountryPeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    TaxRuleCountryPeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             TaxRuleCountryPeer::clearRelatedInstancePool();
             $con->commit();
@@ -713,76 +1668,6 @@ abstract class BaseTaxRuleCountryPeer
         } catch (PropelException $e) {
             $con->rollBack();
             throw $e;
-        }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return int The number of affected rows (if supported by underlying database driver).
-     */
-    protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-    {
-        // initialize var to track total num of affected rows
-        $affectedRows = 0;
-
-        // first find the objects that are implicated by the $criteria
-        $objects = TaxRuleCountryPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-
-            // delete related Country objects
-            $criteria = new Criteria(CountryPeer::DATABASE_NAME);
-
-            $criteria->add(CountryPeer::ID, $obj->getCountryId());
-            $affectedRows += CountryPeer::doDelete($criteria, $con);
-
-            // delete related TaxRule objects
-            $criteria = new Criteria(TaxRulePeer::DATABASE_NAME);
-
-            $criteria->add(TaxRulePeer::ID, $obj->getTaxRuleId());
-            $affectedRows += TaxRulePeer::doDelete($criteria, $con);
-        }
-
-        return $affectedRows;
-    }
-
-    /**
-     * This is a method for emulating ON DELETE SET NULL DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return void
-     */
-    protected static function doOnDeleteSetNull(Criteria $criteria, PropelPDO $con)
-    {
-
-        // first find the objects that are implicated by the $criteria
-        $objects = TaxRuleCountryPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-            // set fkey col in related Tax rows to null
-            $selectCriteria = new Criteria(TaxRuleCountryPeer::DATABASE_NAME);
-            $updateValues = new Criteria(TaxRuleCountryPeer::DATABASE_NAME);
-            $selectCriteria->add(TaxPeer::ID, $obj->getTaxId());
-            $updateValues->add(TaxPeer::ID, null);
-
-            BasePeer::doUpdate($selectCriteria, $updateValues, $con); // use BasePeer because generated Peer doUpdate() methods only update using pkey
-
         }
     }
 

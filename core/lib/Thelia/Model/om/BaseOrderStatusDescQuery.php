@@ -80,7 +80,7 @@ abstract class BaseOrderStatusDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\OrderStatusDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\OrderStatusDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -282,6 +282,8 @@ abstract class BaseOrderStatusDescQuery extends ModelCriteria
      * $query->filterByStatusId(array(12, 34)); // WHERE status_id IN (12, 34)
      * $query->filterByStatusId(array('min' => 12)); // WHERE status_id > 12
      * </code>
+     *
+     * @see       filterByOrderStatus()
      *
      * @param     mixed $statusId The value to use as filter.
      *              Use scalar values for equality.
@@ -519,7 +521,7 @@ abstract class BaseOrderStatusDescQuery extends ModelCriteria
     /**
      * Filter the query by a related OrderStatus object
      *
-     * @param   OrderStatus|PropelObjectCollection $orderStatus  the related object to use as filter
+     * @param   OrderStatus|PropelObjectCollection $orderStatus The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderStatusDescQuery The current query, for fluid interface
@@ -531,10 +533,12 @@ abstract class BaseOrderStatusDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderStatusDescPeer::STATUS_ID, $orderStatus->getId(), $comparison);
         } elseif ($orderStatus instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useOrderStatusQuery()
-                ->filterByPrimaryKeys($orderStatus->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderStatusDescPeer::STATUS_ID, $orderStatus->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByOrderStatus() only accepts arguments of type OrderStatus or PropelCollection');
         }

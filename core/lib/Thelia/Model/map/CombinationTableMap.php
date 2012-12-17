@@ -42,8 +42,7 @@ class CombinationTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_combination', 'COMBINATION_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'stock', 'COMBINATION_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -55,8 +54,8 @@ class CombinationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::MANY_TO_ONE, array('id' => 'combination_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Stock', 'Thelia\\Model\\Stock', RelationMap::MANY_TO_ONE, array('id' => 'combination_id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'CASCADE', null, 'AttributeCombinations');
+        $this->addRelation('Stock', 'Thelia\\Model\\Stock', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'SET NULL', null, 'Stocks');
     } // buildRelations()
 
 } // CombinationTableMap

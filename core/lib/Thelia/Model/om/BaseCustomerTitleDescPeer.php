@@ -25,7 +25,7 @@ abstract class BaseCustomerTitleDescPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'customer_title_desc';
@@ -393,9 +393,6 @@ abstract class BaseCustomerTitleDescPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in CustomerTitlePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CustomerTitlePeer::clearInstancePool();
     }
 
     /**
@@ -490,6 +487,244 @@ abstract class BaseCustomerTitleDescPeer
         }
 
         return array($obj, $col);
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related CustomerTitle table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinCustomerTitle(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(CustomerTitleDescPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            CustomerTitleDescPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(CustomerTitleDescPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(CustomerTitleDescPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(CustomerTitleDescPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of CustomerTitleDesc objects pre-filled with their CustomerTitle objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of CustomerTitleDesc objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinCustomerTitle(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(CustomerTitleDescPeer::DATABASE_NAME);
+        }
+
+        CustomerTitleDescPeer::addSelectColumns($criteria);
+        $startcol = CustomerTitleDescPeer::NUM_HYDRATE_COLUMNS;
+        CustomerTitlePeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(CustomerTitleDescPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = CustomerTitleDescPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = CustomerTitleDescPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = CustomerTitleDescPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                CustomerTitleDescPeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = CustomerTitlePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = CustomerTitlePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CustomerTitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    CustomerTitlePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (CustomerTitleDesc) to $obj2 (CustomerTitle)
+                $obj2->addCustomerTitleDesc($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(CustomerTitleDescPeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            CustomerTitleDescPeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(CustomerTitleDescPeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(CustomerTitleDescPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(CustomerTitleDescPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of CustomerTitleDesc objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of CustomerTitleDesc objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(CustomerTitleDescPeer::DATABASE_NAME);
+        }
+
+        CustomerTitleDescPeer::addSelectColumns($criteria);
+        $startcol2 = CustomerTitleDescPeer::NUM_HYDRATE_COLUMNS;
+
+        CustomerTitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + CustomerTitlePeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(CustomerTitleDescPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = CustomerTitleDescPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = CustomerTitleDescPeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = CustomerTitleDescPeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                CustomerTitleDescPeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined CustomerTitle rows
+
+            $key2 = CustomerTitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = CustomerTitlePeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CustomerTitlePeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    CustomerTitlePeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (CustomerTitleDesc) to the collection in $obj2 (CustomerTitle)
+                $obj2->addCustomerTitleDesc($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
     /**
@@ -625,7 +860,6 @@ abstract class BaseCustomerTitleDescPeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += CustomerTitleDescPeer::doOnDeleteCascade(new Criteria(CustomerTitleDescPeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(CustomerTitleDescPeer::TABLE_NAME, $con, CustomerTitleDescPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -659,14 +893,24 @@ abstract class BaseCustomerTitleDescPeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            CustomerTitleDescPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof CustomerTitleDesc) { // it's a model object
+            // invalidate the cache for this single object
+            CustomerTitleDescPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CustomerTitleDescPeer::DATABASE_NAME);
             $criteria->add(CustomerTitleDescPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                CustomerTitleDescPeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -679,23 +923,6 @@ abstract class BaseCustomerTitleDescPeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            $affectedRows += CustomerTitleDescPeer::doOnDeleteCascade($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                CustomerTitleDescPeer::clearInstancePool();
-            } elseif ($values instanceof CustomerTitleDesc) { // it's a model object
-                CustomerTitleDescPeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    CustomerTitleDescPeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             CustomerTitleDescPeer::clearRelatedInstancePool();
             $con->commit();
@@ -705,39 +932,6 @@ abstract class BaseCustomerTitleDescPeer
             $con->rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return int The number of affected rows (if supported by underlying database driver).
-     */
-    protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-    {
-        // initialize var to track total num of affected rows
-        $affectedRows = 0;
-
-        // first find the objects that are implicated by the $criteria
-        $objects = CustomerTitleDescPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-
-            // delete related CustomerTitle objects
-            $criteria = new Criteria(CustomerTitlePeer::DATABASE_NAME);
-
-            $criteria->add(CustomerTitlePeer::ID, $obj->getCustomerTitleId());
-            $affectedRows += CustomerTitlePeer::doDelete($criteria, $con);
-        }
-
-        return $affectedRows;
     }
 
     /**

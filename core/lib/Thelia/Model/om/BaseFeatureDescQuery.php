@@ -80,7 +80,7 @@ abstract class BaseFeatureDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\FeatureDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\FeatureDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -282,6 +282,8 @@ abstract class BaseFeatureDescQuery extends ModelCriteria
      * $query->filterByFeatureId(array(12, 34)); // WHERE feature_id IN (12, 34)
      * $query->filterByFeatureId(array('min' => 12)); // WHERE feature_id > 12
      * </code>
+     *
+     * @see       filterByFeature()
      *
      * @param     mixed $featureId The value to use as filter.
      *              Use scalar values for equality.
@@ -519,7 +521,7 @@ abstract class BaseFeatureDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Feature object
      *
-     * @param   Feature|PropelObjectCollection $feature  the related object to use as filter
+     * @param   Feature|PropelObjectCollection $feature The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureDescQuery The current query, for fluid interface
@@ -531,10 +533,12 @@ abstract class BaseFeatureDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(FeatureDescPeer::FEATURE_ID, $feature->getId(), $comparison);
         } elseif ($feature instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useFeatureQuery()
-                ->filterByPrimaryKeys($feature->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(FeatureDescPeer::FEATURE_ID, $feature->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByFeature() only accepts arguments of type Feature or PropelCollection');
         }

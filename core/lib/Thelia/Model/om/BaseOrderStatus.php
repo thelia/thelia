@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
@@ -74,14 +76,16 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Order
+     * @var        PropelObjectCollection|Order[] Collection to store aggregation of Order objects.
      */
-    protected $aOrder;
+    protected $collOrders;
+    protected $collOrdersPartial;
 
     /**
-     * @var        OrderStatusDesc
+     * @var        PropelObjectCollection|OrderStatusDesc[] Collection to store aggregation of OrderStatusDesc objects.
      */
-    protected $aOrderStatusDesc;
+    protected $collOrderStatusDescs;
+    protected $collOrderStatusDescsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -96,6 +100,18 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $ordersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $orderStatusDescsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -206,14 +222,6 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = OrderStatusPeer::ID;
-        }
-
-        if ($this->aOrder !== null && $this->aOrder->getStatusId() !== $v) {
-            $this->aOrder = null;
-        }
-
-        if ($this->aOrderStatusDesc !== null && $this->aOrderStatusDesc->getStatusId() !== $v) {
-            $this->aOrderStatusDesc = null;
         }
 
 
@@ -354,12 +362,6 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aOrder !== null && $this->id !== $this->aOrder->getStatusId()) {
-            $this->aOrder = null;
-        }
-        if ($this->aOrderStatusDesc !== null && $this->id !== $this->aOrderStatusDesc->getStatusId()) {
-            $this->aOrderStatusDesc = null;
-        }
     } // ensureConsistency
 
     /**
@@ -399,8 +401,10 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aOrder = null;
-            $this->aOrderStatusDesc = null;
+            $this->collOrders = null;
+
+            $this->collOrderStatusDescs = null;
+
         } // if (deep)
     }
 
@@ -514,25 +518,6 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aOrder !== null) {
-                if ($this->aOrder->isModified() || $this->aOrder->isNew()) {
-                    $affectedRows += $this->aOrder->save($con);
-                }
-                $this->setOrder($this->aOrder);
-            }
-
-            if ($this->aOrderStatusDesc !== null) {
-                if ($this->aOrderStatusDesc->isModified() || $this->aOrderStatusDesc->isNew()) {
-                    $affectedRows += $this->aOrderStatusDesc->save($con);
-                }
-                $this->setOrderStatusDesc($this->aOrderStatusDesc);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -542,6 +527,41 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->ordersScheduledForDeletion !== null) {
+                if (!$this->ordersScheduledForDeletion->isEmpty()) {
+                    foreach ($this->ordersScheduledForDeletion as $order) {
+                        // need to save related object because we set the relation to null
+                        $order->save($con);
+                    }
+                    $this->ordersScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collOrders !== null) {
+                foreach ($this->collOrders as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->orderStatusDescsScheduledForDeletion !== null) {
+                if (!$this->orderStatusDescsScheduledForDeletion->isEmpty()) {
+                    OrderStatusDescQuery::create()
+                        ->filterByPrimaryKeys($this->orderStatusDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->orderStatusDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collOrderStatusDescs !== null) {
+                foreach ($this->collOrderStatusDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -699,28 +719,26 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aOrder !== null) {
-                if (!$this->aOrder->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aOrder->getValidationFailures());
-                }
-            }
-
-            if ($this->aOrderStatusDesc !== null) {
-                if (!$this->aOrderStatusDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aOrderStatusDesc->getValidationFailures());
-                }
-            }
-
-
             if (($retval = OrderStatusPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collOrders !== null) {
+                    foreach ($this->collOrders as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collOrderStatusDescs !== null) {
+                    foreach ($this->collOrderStatusDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -804,11 +822,11 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aOrder) {
-                $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collOrders) {
+                $result['Orders'] = $this->collOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aOrderStatusDesc) {
-                $result['OrderStatusDesc'] = $this->aOrderStatusDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collOrderStatusDescs) {
+                $result['OrderStatusDescs'] = $this->collOrderStatusDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -973,14 +991,16 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getOrder();
-            if ($relObj) {
-                $copyObj->setOrder($relObj->copy($deepCopy));
+            foreach ($this->getOrders() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrder($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getOrderStatusDesc();
-            if ($relObj) {
-                $copyObj->setOrderStatusDesc($relObj->copy($deepCopy));
+            foreach ($this->getOrderStatusDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrderStatusDesc($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1033,98 +1053,537 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a Order object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             Order $v
-     * @return OrderStatus The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('Order' == $relationName) {
+            $this->initOrders();
+        }
+        if ('OrderStatusDesc' == $relationName) {
+            $this->initOrderStatusDescs();
+        }
+    }
+
+    /**
+     * Clears out the collOrders collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrders()
+     */
+    public function clearOrders()
+    {
+        $this->collOrders = null; // important to set this to null since that means it is uninitialized
+        $this->collOrdersPartial = null;
+    }
+
+    /**
+     * reset is the collOrders collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialOrders($v = true)
+    {
+        $this->collOrdersPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrders collection.
+     *
+     * By default this just sets the collOrders collection to an empty array (like clearcollOrders());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrders($overrideExisting = true)
+    {
+        if (null !== $this->collOrders && !$overrideExisting) {
+            return;
+        }
+        $this->collOrders = new PropelObjectCollection();
+        $this->collOrders->setModel('Order');
+    }
+
+    /**
+     * Gets an array of Order objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this OrderStatus is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Order[] List of Order objects
      * @throws PropelException
      */
-    public function setOrder(Order $v = null)
+    public function getOrders($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collOrdersPartial && !$this->isNew();
+        if (null === $this->collOrders || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrders) {
+                // return empty collection
+                $this->initOrders();
+            } else {
+                $collOrders = OrderQuery::create(null, $criteria)
+                    ->filterByOrderStatus($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collOrdersPartial && count($collOrders)) {
+                      $this->initOrders(false);
+
+                      foreach($collOrders as $obj) {
+                        if (false == $this->collOrders->contains($obj)) {
+                          $this->collOrders->append($obj);
+                        }
+                      }
+
+                      $this->collOrdersPartial = true;
+                    }
+
+                    return $collOrders;
+                }
+
+                if($partial && $this->collOrders) {
+                    foreach($this->collOrders as $obj) {
+                        if($obj->isNew()) {
+                            $collOrders[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrders = $collOrders;
+                $this->collOrdersPartial = false;
+            }
+        }
+
+        return $this->collOrders;
+    }
+
+    /**
+     * Sets a collection of Order objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $orders A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setOrders(PropelCollection $orders, PropelPDO $con = null)
+    {
+        $this->ordersScheduledForDeletion = $this->getOrders(new Criteria(), $con)->diff($orders);
+
+        foreach ($this->ordersScheduledForDeletion as $orderRemoved) {
+            $orderRemoved->setOrderStatus(null);
+        }
+
+        $this->collOrders = null;
+        foreach ($orders as $order) {
+            $this->addOrder($order);
+        }
+
+        $this->collOrders = $orders;
+        $this->collOrdersPartial = false;
+    }
+
+    /**
+     * Returns the number of related Order objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Order objects.
+     * @throws PropelException
+     */
+    public function countOrders(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collOrdersPartial && !$this->isNew();
+        if (null === $this->collOrders || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrders) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getOrders());
+                }
+                $query = OrderQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByOrderStatus($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getStatusId());
+            return count($this->collOrders);
         }
+    }
 
-        $this->aOrder = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setOrderStatus($this);
+    /**
+     * Method called to associate a Order object to this object
+     * through the Order foreign key attribute.
+     *
+     * @param    Order $l Order
+     * @return OrderStatus The current object (for fluent API support)
+     */
+    public function addOrder(Order $l)
+    {
+        if ($this->collOrders === null) {
+            $this->initOrders();
+            $this->collOrdersPartial = true;
         }
-
+        if (!$this->collOrders->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddOrder($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated Order object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Order The associated Order object.
-     * @throws PropelException
+     * @param	Order $order The order object to add.
      */
-    public function getOrder(PropelPDO $con = null)
+    protected function doAddOrder($order)
     {
-        if ($this->aOrder === null && ($this->id !== null)) {
-            $this->aOrder = OrderQuery::create()
-                ->filterByOrderStatus($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aOrder->setOrderStatus($this);
-        }
-
-        return $this->aOrder;
+        $this->collOrders[]= $order;
+        $order->setOrderStatus($this);
     }
 
     /**
-     * Declares an association between this object and a OrderStatusDesc object.
+     * @param	Order $order The order object to remove.
+     */
+    public function removeOrder($order)
+    {
+        if ($this->getOrders()->contains($order)) {
+            $this->collOrders->remove($this->collOrders->search($order));
+            if (null === $this->ordersScheduledForDeletion) {
+                $this->ordersScheduledForDeletion = clone $this->collOrders;
+                $this->ordersScheduledForDeletion->clear();
+            }
+            $this->ordersScheduledForDeletion[]= $order;
+            $order->setOrderStatus(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this OrderStatus is new, it will return
+     * an empty collection; or if this OrderStatus has previously
+     * been saved, it will retrieve related Orders from storage.
      *
-     * @param             OrderStatusDesc $v
-     * @return OrderStatus The current object (for fluent API support)
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in OrderStatus.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinCurrency($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('Currency', $join_behavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this OrderStatus is new, it will return
+     * an empty collection; or if this OrderStatus has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in OrderStatus.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinCustomer($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('Customer', $join_behavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this OrderStatus is new, it will return
+     * an empty collection; or if this OrderStatus has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in OrderStatus.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinOrderAddressRelatedByAddressInvoice($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByAddressInvoice', $join_behavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this OrderStatus is new, it will return
+     * an empty collection; or if this OrderStatus has previously
+     * been saved, it will retrieve related Orders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in OrderStatus.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Order[] List of Order objects
+     */
+    public function getOrdersJoinOrderAddressRelatedByAddressDelivery($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = OrderQuery::create(null, $criteria);
+        $query->joinWith('OrderAddressRelatedByAddressDelivery', $join_behavior);
+
+        return $this->getOrders($query, $con);
+    }
+
+    /**
+     * Clears out the collOrderStatusDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrderStatusDescs()
+     */
+    public function clearOrderStatusDescs()
+    {
+        $this->collOrderStatusDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collOrderStatusDescsPartial = null;
+    }
+
+    /**
+     * reset is the collOrderStatusDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialOrderStatusDescs($v = true)
+    {
+        $this->collOrderStatusDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrderStatusDescs collection.
+     *
+     * By default this just sets the collOrderStatusDescs collection to an empty array (like clearcollOrderStatusDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrderStatusDescs($overrideExisting = true)
+    {
+        if (null !== $this->collOrderStatusDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collOrderStatusDescs = new PropelObjectCollection();
+        $this->collOrderStatusDescs->setModel('OrderStatusDesc');
+    }
+
+    /**
+     * Gets an array of OrderStatusDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this OrderStatus is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|OrderStatusDesc[] List of OrderStatusDesc objects
      * @throws PropelException
      */
-    public function setOrderStatusDesc(OrderStatusDesc $v = null)
+    public function getOrderStatusDescs($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collOrderStatusDescsPartial && !$this->isNew();
+        if (null === $this->collOrderStatusDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderStatusDescs) {
+                // return empty collection
+                $this->initOrderStatusDescs();
+            } else {
+                $collOrderStatusDescs = OrderStatusDescQuery::create(null, $criteria)
+                    ->filterByOrderStatus($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collOrderStatusDescsPartial && count($collOrderStatusDescs)) {
+                      $this->initOrderStatusDescs(false);
+
+                      foreach($collOrderStatusDescs as $obj) {
+                        if (false == $this->collOrderStatusDescs->contains($obj)) {
+                          $this->collOrderStatusDescs->append($obj);
+                        }
+                      }
+
+                      $this->collOrderStatusDescsPartial = true;
+                    }
+
+                    return $collOrderStatusDescs;
+                }
+
+                if($partial && $this->collOrderStatusDescs) {
+                    foreach($this->collOrderStatusDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collOrderStatusDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrderStatusDescs = $collOrderStatusDescs;
+                $this->collOrderStatusDescsPartial = false;
+            }
+        }
+
+        return $this->collOrderStatusDescs;
+    }
+
+    /**
+     * Sets a collection of OrderStatusDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $orderStatusDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setOrderStatusDescs(PropelCollection $orderStatusDescs, PropelPDO $con = null)
+    {
+        $this->orderStatusDescsScheduledForDeletion = $this->getOrderStatusDescs(new Criteria(), $con)->diff($orderStatusDescs);
+
+        foreach ($this->orderStatusDescsScheduledForDeletion as $orderStatusDescRemoved) {
+            $orderStatusDescRemoved->setOrderStatus(null);
+        }
+
+        $this->collOrderStatusDescs = null;
+        foreach ($orderStatusDescs as $orderStatusDesc) {
+            $this->addOrderStatusDesc($orderStatusDesc);
+        }
+
+        $this->collOrderStatusDescs = $orderStatusDescs;
+        $this->collOrderStatusDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related OrderStatusDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related OrderStatusDesc objects.
+     * @throws PropelException
+     */
+    public function countOrderStatusDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collOrderStatusDescsPartial && !$this->isNew();
+        if (null === $this->collOrderStatusDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderStatusDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getOrderStatusDescs());
+                }
+                $query = OrderStatusDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByOrderStatus($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getStatusId());
+            return count($this->collOrderStatusDescs);
         }
+    }
 
-        $this->aOrderStatusDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setOrderStatus($this);
+    /**
+     * Method called to associate a OrderStatusDesc object to this object
+     * through the OrderStatusDesc foreign key attribute.
+     *
+     * @param    OrderStatusDesc $l OrderStatusDesc
+     * @return OrderStatus The current object (for fluent API support)
+     */
+    public function addOrderStatusDesc(OrderStatusDesc $l)
+    {
+        if ($this->collOrderStatusDescs === null) {
+            $this->initOrderStatusDescs();
+            $this->collOrderStatusDescsPartial = true;
         }
-
+        if (!$this->collOrderStatusDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderStatusDesc($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	OrderStatusDesc $orderStatusDesc The orderStatusDesc object to add.
+     */
+    protected function doAddOrderStatusDesc($orderStatusDesc)
+    {
+        $this->collOrderStatusDescs[]= $orderStatusDesc;
+        $orderStatusDesc->setOrderStatus($this);
+    }
 
     /**
-     * Get the associated OrderStatusDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return OrderStatusDesc The associated OrderStatusDesc object.
-     * @throws PropelException
+     * @param	OrderStatusDesc $orderStatusDesc The orderStatusDesc object to remove.
      */
-    public function getOrderStatusDesc(PropelPDO $con = null)
+    public function removeOrderStatusDesc($orderStatusDesc)
     {
-        if ($this->aOrderStatusDesc === null && ($this->id !== null)) {
-            $this->aOrderStatusDesc = OrderStatusDescQuery::create()
-                ->filterByOrderStatus($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aOrderStatusDesc->setOrderStatus($this);
+        if ($this->getOrderStatusDescs()->contains($orderStatusDesc)) {
+            $this->collOrderStatusDescs->remove($this->collOrderStatusDescs->search($orderStatusDesc));
+            if (null === $this->orderStatusDescsScheduledForDeletion) {
+                $this->orderStatusDescsScheduledForDeletion = clone $this->collOrderStatusDescs;
+                $this->orderStatusDescsScheduledForDeletion->clear();
+            }
+            $this->orderStatusDescsScheduledForDeletion[]= $orderStatusDesc;
+            $orderStatusDesc->setOrderStatus(null);
         }
-
-        return $this->aOrderStatusDesc;
     }
 
     /**
@@ -1156,10 +1615,26 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collOrders) {
+                foreach ($this->collOrders as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collOrderStatusDescs) {
+                foreach ($this->collOrderStatusDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aOrder = null;
-        $this->aOrderStatusDesc = null;
+        if ($this->collOrders instanceof PropelCollection) {
+            $this->collOrders->clearIterator();
+        }
+        $this->collOrders = null;
+        if ($this->collOrderStatusDescs instanceof PropelCollection) {
+            $this->collOrderStatusDescs->clearIterator();
+        }
+        $this->collOrderStatusDescs = null;
     }
 
     /**

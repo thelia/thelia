@@ -43,7 +43,7 @@ class CouponOrderTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('ORDER_ID', 'OrderId', 'INTEGER', true, null, null);
+        $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
         $this->addColumn('VALUE', 'Value', 'FLOAT', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -56,7 +56,7 @@ class CouponOrderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_ONE, array('order_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // CouponOrderTableMap

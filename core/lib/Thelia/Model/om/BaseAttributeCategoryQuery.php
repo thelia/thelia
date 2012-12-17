@@ -39,13 +39,13 @@ use Thelia\Model\Category;
  * @method AttributeCategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method AttributeCategoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method AttributeCategoryQuery leftJoinAttribute($relationAlias = null) Adds a LEFT JOIN clause to the query using the Attribute relation
- * @method AttributeCategoryQuery rightJoinAttribute($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Attribute relation
- * @method AttributeCategoryQuery innerJoinAttribute($relationAlias = null) Adds a INNER JOIN clause to the query using the Attribute relation
- *
  * @method AttributeCategoryQuery leftJoinCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Category relation
  * @method AttributeCategoryQuery rightJoinCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Category relation
  * @method AttributeCategoryQuery innerJoinCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Category relation
+ *
+ * @method AttributeCategoryQuery leftJoinAttribute($relationAlias = null) Adds a LEFT JOIN clause to the query using the Attribute relation
+ * @method AttributeCategoryQuery rightJoinAttribute($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Attribute relation
+ * @method AttributeCategoryQuery innerJoinAttribute($relationAlias = null) Adds a INNER JOIN clause to the query using the Attribute relation
  *
  * @method AttributeCategory findOne(PropelPDO $con = null) Return the first AttributeCategory matching the query
  * @method AttributeCategory findOneOrCreate(PropelPDO $con = null) Return the first AttributeCategory matching the query, or a new AttributeCategory object populated from the query conditions when no match is found
@@ -73,7 +73,7 @@ abstract class BaseAttributeCategoryQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\AttributeCategory', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\AttributeCategory', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -276,6 +276,8 @@ abstract class BaseAttributeCategoryQuery extends ModelCriteria
      * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
      * </code>
      *
+     * @see       filterByCategory()
+     *
      * @param     mixed $categoryId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -316,6 +318,8 @@ abstract class BaseAttributeCategoryQuery extends ModelCriteria
      * $query->filterByAttributeId(array(12, 34)); // WHERE attribute_id IN (12, 34)
      * $query->filterByAttributeId(array('min' => 12)); // WHERE attribute_id > 12
      * </code>
+     *
+     * @see       filterByAttribute()
      *
      * @param     mixed $attributeId The value to use as filter.
      *              Use scalar values for equality.
@@ -435,83 +439,9 @@ abstract class BaseAttributeCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Attribute object
-     *
-     * @param   Attribute|PropelObjectCollection $attribute  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   AttributeCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByAttribute($attribute, $comparison = null)
-    {
-        if ($attribute instanceof Attribute) {
-            return $this
-                ->addUsingAlias(AttributeCategoryPeer::ATTRIBUTE_ID, $attribute->getId(), $comparison);
-        } elseif ($attribute instanceof PropelObjectCollection) {
-            return $this
-                ->useAttributeQuery()
-                ->filterByPrimaryKeys($attribute->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByAttribute() only accepts arguments of type Attribute or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Attribute relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return AttributeCategoryQuery The current query, for fluid interface
-     */
-    public function joinAttribute($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Attribute');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Attribute');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Attribute relation Attribute object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\AttributeQuery A secondary query class using the current class as primary query
-     */
-    public function useAttributeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinAttribute($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Attribute', '\Thelia\Model\AttributeQuery');
-    }
-
-    /**
      * Filter the query by a related Category object
      *
-     * @param   Category|PropelObjectCollection $category  the related object to use as filter
+     * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeCategoryQuery The current query, for fluid interface
@@ -523,10 +453,12 @@ abstract class BaseAttributeCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributeCategoryPeer::CATEGORY_ID, $category->getId(), $comparison);
         } elseif ($category instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCategoryQuery()
-                ->filterByPrimaryKeys($category->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(AttributeCategoryPeer::CATEGORY_ID, $category->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCategory() only accepts arguments of type Category or PropelCollection');
         }
@@ -580,6 +512,82 @@ abstract class BaseAttributeCategoryQuery extends ModelCriteria
         return $this
             ->joinCategory($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Category', '\Thelia\Model\CategoryQuery');
+    }
+
+    /**
+     * Filter the query by a related Attribute object
+     *
+     * @param   Attribute|PropelObjectCollection $attribute The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   AttributeCategoryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByAttribute($attribute, $comparison = null)
+    {
+        if ($attribute instanceof Attribute) {
+            return $this
+                ->addUsingAlias(AttributeCategoryPeer::ATTRIBUTE_ID, $attribute->getId(), $comparison);
+        } elseif ($attribute instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(AttributeCategoryPeer::ATTRIBUTE_ID, $attribute->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByAttribute() only accepts arguments of type Attribute or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Attribute relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return AttributeCategoryQuery The current query, for fluid interface
+     */
+    public function joinAttribute($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Attribute');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Attribute');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Attribute relation Attribute object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\AttributeQuery A secondary query class using the current class as primary query
+     */
+    public function useAttributeQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinAttribute($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Attribute', '\Thelia\Model\AttributeQuery');
     }
 
     /**

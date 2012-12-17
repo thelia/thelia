@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
@@ -82,14 +80,14 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Category one-to-one related Category object
+     * @var        Category
      */
-    protected $singleCategory;
+    protected $aCategory;
 
     /**
-     * @var        Feature one-to-one related Feature object
+     * @var        Feature
      */
-    protected $singleFeature;
+    protected $aFeature;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -104,18 +102,6 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $categorysScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $featuresScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -259,6 +245,10 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
             $this->modifiedColumns[] = FeatureCategoryPeer::FEATURE_ID;
         }
 
+        if ($this->aFeature !== null && $this->aFeature->getId() !== $v) {
+            $this->aFeature = null;
+        }
+
 
         return $this;
     } // setFeatureId()
@@ -278,6 +268,10 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
         if ($this->category_id !== $v) {
             $this->category_id = $v;
             $this->modifiedColumns[] = FeatureCategoryPeer::CATEGORY_ID;
+        }
+
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
         }
 
 
@@ -398,6 +392,12 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aFeature !== null && $this->feature_id !== $this->aFeature->getId()) {
+            $this->aFeature = null;
+        }
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
+        }
     } // ensureConsistency
 
     /**
@@ -437,10 +437,8 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCategory = null;
-
-            $this->singleFeature = null;
-
+            $this->aCategory = null;
+            $this->aFeature = null;
         } // if (deep)
     }
 
@@ -554,6 +552,25 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
+                }
+                $this->setCategory($this->aCategory);
+            }
+
+            if ($this->aFeature !== null) {
+                if ($this->aFeature->isModified() || $this->aFeature->isNew()) {
+                    $affectedRows += $this->aFeature->save($con);
+                }
+                $this->setFeature($this->aFeature);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -563,36 +580,6 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->categorysScheduledForDeletion !== null) {
-                if (!$this->categorysScheduledForDeletion->isEmpty()) {
-                    CategoryQuery::create()
-                        ->filterByPrimaryKeys($this->categorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->categorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCategory !== null) {
-                if (!$this->singleCategory->isDeleted()) {
-                        $affectedRows += $this->singleCategory->save($con);
-                }
-            }
-
-            if ($this->featuresScheduledForDeletion !== null) {
-                if (!$this->featuresScheduledForDeletion->isEmpty()) {
-                    FeatureQuery::create()
-                        ->filterByPrimaryKeys($this->featuresScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->featuresScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFeature !== null) {
-                if (!$this->singleFeature->isDeleted()) {
-                        $affectedRows += $this->singleFeature->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -756,22 +743,28 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
+                }
+            }
+
+            if ($this->aFeature !== null) {
+                if (!$this->aFeature->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFeature->getValidationFailures());
+                }
+            }
+
+
             if (($retval = FeatureCategoryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCategory !== null) {
-                    if (!$this->singleCategory->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCategory->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleFeature !== null) {
-                    if (!$this->singleFeature->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFeature->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -859,11 +852,11 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCategory) {
-                $result['Category'] = $this->singleCategory->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleFeature) {
-                $result['Feature'] = $this->singleFeature->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFeature) {
+                $result['Feature'] = $this->aFeature->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1034,16 +1027,6 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCategory();
-            if ($relObj) {
-                $copyObj->setCategory($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getFeature();
-            if ($relObj) {
-                $copyObj->setFeature($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1094,89 +1077,106 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Category object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Category object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Category
-     * @throws PropelException
-     */
-    public function getCategory(PropelPDO $con = null)
-    {
-
-        if ($this->singleCategory === null && !$this->isNew()) {
-            $this->singleCategory = CategoryQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCategory;
-    }
-
-    /**
-     * Sets a single Category object as related to this object by a one-to-one relationship.
-     *
-     * @param             Category $v Category
+     * @param             Category $v
      * @return FeatureCategory The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCategory(Category $v = null)
     {
-        $this->singleCategory = $v;
-
-        // Make sure that that the passed-in Category isn't already associated with this object
-        if ($v !== null && $v->getFeatureCategory() === null) {
-            $v->setFeatureCategory($this);
+        if ($v === null) {
+            $this->setCategoryId(NULL);
+        } else {
+            $this->setCategoryId($v->getId());
         }
+
+        $this->aCategory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Category object, it will not be re-added.
+        if ($v !== null) {
+            $v->addFeatureCategory($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single Feature object, which is related to this object by a one-to-one relationship.
+     * Get the associated Category object
      *
-     * @param PropelPDO $con optional connection object
-     * @return Feature
+     * @param PropelPDO $con Optional Connection object.
+     * @return Category The associated Category object.
      * @throws PropelException
      */
-    public function getFeature(PropelPDO $con = null)
+    public function getCategory(PropelPDO $con = null)
     {
-
-        if ($this->singleFeature === null && !$this->isNew()) {
-            $this->singleFeature = FeatureQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aCategory === null && ($this->category_id !== null)) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategory->addFeatureCategorys($this);
+             */
         }
 
-        return $this->singleFeature;
+        return $this->aCategory;
     }
 
     /**
-     * Sets a single Feature object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a Feature object.
      *
-     * @param             Feature $v Feature
+     * @param             Feature $v
      * @return FeatureCategory The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFeature(Feature $v = null)
     {
-        $this->singleFeature = $v;
-
-        // Make sure that that the passed-in Feature isn't already associated with this object
-        if ($v !== null && $v->getFeatureCategory() === null) {
-            $v->setFeatureCategory($this);
+        if ($v === null) {
+            $this->setFeatureId(NULL);
+        } else {
+            $this->setFeatureId($v->getId());
         }
 
+        $this->aFeature = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Feature object, it will not be re-added.
+        if ($v !== null) {
+            $v->addFeatureCategory($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Feature object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Feature The associated Feature object.
+     * @throws PropelException
+     */
+    public function getFeature(PropelPDO $con = null)
+    {
+        if ($this->aFeature === null && ($this->feature_id !== null)) {
+            $this->aFeature = FeatureQuery::create()->findPk($this->feature_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFeature->addFeatureCategorys($this);
+             */
+        }
+
+        return $this->aFeature;
     }
 
     /**
@@ -1209,22 +1209,10 @@ abstract class BaseFeatureCategory extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCategory) {
-                $this->singleCategory->clearAllReferences($deep);
-            }
-            if ($this->singleFeature) {
-                $this->singleFeature->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCategory instanceof PropelCollection) {
-            $this->singleCategory->clearIterator();
-        }
-        $this->singleCategory = null;
-        if ($this->singleFeature instanceof PropelCollection) {
-            $this->singleFeature->clearIterator();
-        }
-        $this->singleFeature = null;
+        $this->aCategory = null;
+        $this->aFeature = null;
     }
 
     /**

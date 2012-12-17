@@ -112,29 +112,30 @@ abstract class BaseImage extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        ImageDesc
+     * @var        Product
      */
-    protected $aImageDesc;
+    protected $aProduct;
 
     /**
-     * @var        Category one-to-one related Category object
+     * @var        Category
      */
-    protected $singleCategory;
+    protected $aCategory;
 
     /**
-     * @var        Content one-to-one related Content object
+     * @var        Content
      */
-    protected $singleContent;
+    protected $aContent;
 
     /**
-     * @var        Folder one-to-one related Folder object
+     * @var        Folder
      */
-    protected $singleFolder;
+    protected $aFolder;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        PropelObjectCollection|ImageDesc[] Collection to store aggregation of ImageDesc objects.
      */
-    protected $singleProduct;
+    protected $collImageDescs;
+    protected $collImageDescsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -154,25 +155,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $categorysScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $contentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $foldersScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
+    protected $imageDescsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -335,10 +318,6 @@ abstract class BaseImage extends BaseObject implements Persistent
             $this->modifiedColumns[] = ImagePeer::ID;
         }
 
-        if ($this->aImageDesc !== null && $this->aImageDesc->getImageId() !== $v) {
-            $this->aImageDesc = null;
-        }
-
 
         return $this;
     } // setId()
@@ -358,6 +337,10 @@ abstract class BaseImage extends BaseObject implements Persistent
         if ($this->product_id !== $v) {
             $this->product_id = $v;
             $this->modifiedColumns[] = ImagePeer::PRODUCT_ID;
+        }
+
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
         }
 
 
@@ -381,6 +364,10 @@ abstract class BaseImage extends BaseObject implements Persistent
             $this->modifiedColumns[] = ImagePeer::CATEGORY_ID;
         }
 
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
+        }
+
 
         return $this;
     } // setCategoryId()
@@ -402,6 +389,10 @@ abstract class BaseImage extends BaseObject implements Persistent
             $this->modifiedColumns[] = ImagePeer::FOLDER_ID;
         }
 
+        if ($this->aFolder !== null && $this->aFolder->getId() !== $v) {
+            $this->aFolder = null;
+        }
+
 
         return $this;
     } // setFolderId()
@@ -421,6 +412,10 @@ abstract class BaseImage extends BaseObject implements Persistent
         if ($this->content_id !== $v) {
             $this->content_id = $v;
             $this->modifiedColumns[] = ImagePeer::CONTENT_ID;
+        }
+
+        if ($this->aContent !== null && $this->aContent->getId() !== $v) {
+            $this->aContent = null;
         }
 
 
@@ -587,8 +582,17 @@ abstract class BaseImage extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aImageDesc !== null && $this->id !== $this->aImageDesc->getImageId()) {
-            $this->aImageDesc = null;
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
+        }
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
+        }
+        if ($this->aFolder !== null && $this->folder_id !== $this->aFolder->getId()) {
+            $this->aFolder = null;
+        }
+        if ($this->aContent !== null && $this->content_id !== $this->aContent->getId()) {
+            $this->aContent = null;
         }
     } // ensureConsistency
 
@@ -629,14 +633,11 @@ abstract class BaseImage extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aImageDesc = null;
-            $this->singleCategory = null;
-
-            $this->singleContent = null;
-
-            $this->singleFolder = null;
-
-            $this->singleProduct = null;
+            $this->aProduct = null;
+            $this->aCategory = null;
+            $this->aContent = null;
+            $this->aFolder = null;
+            $this->collImageDescs = null;
 
         } // if (deep)
     }
@@ -756,11 +757,32 @@ abstract class BaseImage extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aImageDesc !== null) {
-                if ($this->aImageDesc->isModified() || $this->aImageDesc->isNew()) {
-                    $affectedRows += $this->aImageDesc->save($con);
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
                 }
-                $this->setImageDesc($this->aImageDesc);
+                $this->setProduct($this->aProduct);
+            }
+
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
+                }
+                $this->setCategory($this->aCategory);
+            }
+
+            if ($this->aContent !== null) {
+                if ($this->aContent->isModified() || $this->aContent->isNew()) {
+                    $affectedRows += $this->aContent->save($con);
+                }
+                $this->setContent($this->aContent);
+            }
+
+            if ($this->aFolder !== null) {
+                if ($this->aFolder->isModified() || $this->aFolder->isNew()) {
+                    $affectedRows += $this->aFolder->save($con);
+                }
+                $this->setFolder($this->aFolder);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -774,63 +796,21 @@ abstract class BaseImage extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->categorysScheduledForDeletion !== null) {
-                if (!$this->categorysScheduledForDeletion->isEmpty()) {
-                    CategoryQuery::create()
-                        ->filterByPrimaryKeys($this->categorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->categorysScheduledForDeletion = null;
+            if ($this->imageDescsScheduledForDeletion !== null) {
+                if (!$this->imageDescsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->imageDescsScheduledForDeletion as $imageDesc) {
+                        // need to save related object because we set the relation to null
+                        $imageDesc->save($con);
+                    }
+                    $this->imageDescsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->singleCategory !== null) {
-                if (!$this->singleCategory->isDeleted()) {
-                        $affectedRows += $this->singleCategory->save($con);
-                }
-            }
-
-            if ($this->contentsScheduledForDeletion !== null) {
-                if (!$this->contentsScheduledForDeletion->isEmpty()) {
-                    ContentQuery::create()
-                        ->filterByPrimaryKeys($this->contentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleContent !== null) {
-                if (!$this->singleContent->isDeleted()) {
-                        $affectedRows += $this->singleContent->save($con);
-                }
-            }
-
-            if ($this->foldersScheduledForDeletion !== null) {
-                if (!$this->foldersScheduledForDeletion->isEmpty()) {
-                    FolderQuery::create()
-                        ->filterByPrimaryKeys($this->foldersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->foldersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFolder !== null) {
-                if (!$this->singleFolder->isDeleted()) {
-                        $affectedRows += $this->singleFolder->save($con);
-                }
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
+            if ($this->collImageDescs !== null) {
+                foreach ($this->collImageDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
                 }
             }
 
@@ -1024,9 +1004,27 @@ abstract class BaseImage extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aImageDesc !== null) {
-                if (!$this->aImageDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aImageDesc->getValidationFailures());
+            if ($this->aProduct !== null) {
+                if (!$this->aProduct->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
+                }
+            }
+
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
+                }
+            }
+
+            if ($this->aContent !== null) {
+                if (!$this->aContent->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aContent->getValidationFailures());
+                }
+            }
+
+            if ($this->aFolder !== null) {
+                if (!$this->aFolder->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFolder->getValidationFailures());
                 }
             }
 
@@ -1036,27 +1034,11 @@ abstract class BaseImage extends BaseObject implements Persistent
             }
 
 
-                if ($this->singleCategory !== null) {
-                    if (!$this->singleCategory->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCategory->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleContent !== null) {
-                    if (!$this->singleContent->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleContent->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleFolder !== null) {
-                    if (!$this->singleFolder->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFolder->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
+                if ($this->collImageDescs !== null) {
+                    foreach ($this->collImageDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
                     }
                 }
 
@@ -1162,20 +1144,20 @@ abstract class BaseImage extends BaseObject implements Persistent
             $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aImageDesc) {
-                $result['ImageDesc'] = $this->aImageDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCategory) {
-                $result['Category'] = $this->singleCategory->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleContent) {
-                $result['Content'] = $this->singleContent->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aContent) {
+                $result['Content'] = $this->aContent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleFolder) {
-                $result['Folder'] = $this->singleFolder->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFolder) {
+                $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->collImageDescs) {
+                $result['ImageDescs'] = $this->collImageDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1370,29 +1352,10 @@ abstract class BaseImage extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCategory();
-            if ($relObj) {
-                $copyObj->setCategory($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getContent();
-            if ($relObj) {
-                $copyObj->setContent($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getFolder();
-            if ($relObj) {
-                $copyObj->setFolder($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getImageDesc();
-            if ($relObj) {
-                $copyObj->setImageDesc($relObj->copy($deepCopy));
+            foreach ($this->getImageDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addImageDesc($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1446,25 +1409,26 @@ abstract class BaseImage extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a ImageDesc object.
+     * Declares an association between this object and a Product object.
      *
-     * @param             ImageDesc $v
+     * @param             Product $v
      * @return Image The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setImageDesc(ImageDesc $v = null)
+    public function setProduct(Product $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setProductId(NULL);
         } else {
-            $this->setId($v->getImageId());
+            $this->setProductId($v->getId());
         }
 
-        $this->aImageDesc = $v;
+        $this->aProduct = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
         if ($v !== null) {
-            $v->setImage($this);
+            $v->addImage($this);
         }
 
 
@@ -1473,23 +1437,179 @@ abstract class BaseImage extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated ImageDesc object
+     * Get the associated Product object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return ImageDesc The associated ImageDesc object.
+     * @return Product The associated Product object.
      * @throws PropelException
      */
-    public function getImageDesc(PropelPDO $con = null)
+    public function getProduct(PropelPDO $con = null)
     {
-        if ($this->aImageDesc === null && ($this->id !== null)) {
-            $this->aImageDesc = ImageDescQuery::create()
-                ->filterByImage($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aImageDesc->setImage($this);
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProduct->addImages($this);
+             */
         }
 
-        return $this->aImageDesc;
+        return $this->aProduct;
+    }
+
+    /**
+     * Declares an association between this object and a Category object.
+     *
+     * @param             Category $v
+     * @return Image The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCategory(Category $v = null)
+    {
+        if ($v === null) {
+            $this->setCategoryId(NULL);
+        } else {
+            $this->setCategoryId($v->getId());
+        }
+
+        $this->aCategory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Category object, it will not be re-added.
+        if ($v !== null) {
+            $v->addImage($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Category object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Category The associated Category object.
+     * @throws PropelException
+     */
+    public function getCategory(PropelPDO $con = null)
+    {
+        if ($this->aCategory === null && ($this->category_id !== null)) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategory->addImages($this);
+             */
+        }
+
+        return $this->aCategory;
+    }
+
+    /**
+     * Declares an association between this object and a Content object.
+     *
+     * @param             Content $v
+     * @return Image The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setContent(Content $v = null)
+    {
+        if ($v === null) {
+            $this->setContentId(NULL);
+        } else {
+            $this->setContentId($v->getId());
+        }
+
+        $this->aContent = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Content object, it will not be re-added.
+        if ($v !== null) {
+            $v->addImage($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Content object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Content The associated Content object.
+     * @throws PropelException
+     */
+    public function getContent(PropelPDO $con = null)
+    {
+        if ($this->aContent === null && ($this->content_id !== null)) {
+            $this->aContent = ContentQuery::create()->findPk($this->content_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aContent->addImages($this);
+             */
+        }
+
+        return $this->aContent;
+    }
+
+    /**
+     * Declares an association between this object and a Folder object.
+     *
+     * @param             Folder $v
+     * @return Image The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setFolder(Folder $v = null)
+    {
+        if ($v === null) {
+            $this->setFolderId(NULL);
+        } else {
+            $this->setFolderId($v->getId());
+        }
+
+        $this->aFolder = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Folder object, it will not be re-added.
+        if ($v !== null) {
+            $v->addImage($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Folder object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Folder The associated Folder object.
+     * @throws PropelException
+     */
+    public function getFolder(PropelPDO $con = null)
+    {
+        if ($this->aFolder === null && ($this->folder_id !== null)) {
+            $this->aFolder = FolderQuery::create()->findPk($this->folder_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFolder->addImages($this);
+             */
+        }
+
+        return $this->aFolder;
     }
 
 
@@ -1503,150 +1623,216 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('ImageDesc' == $relationName) {
+            $this->initImageDescs();
+        }
     }
 
     /**
-     * Gets a single Category object, which is related to this object by a one-to-one relationship.
+     * Clears out the collImageDescs collection
      *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addImageDescs()
+     */
+    public function clearImageDescs()
+    {
+        $this->collImageDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collImageDescsPartial = null;
+    }
+
+    /**
+     * reset is the collImageDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialImageDescs($v = true)
+    {
+        $this->collImageDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collImageDescs collection.
+     *
+     * By default this just sets the collImageDescs collection to an empty array (like clearcollImageDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initImageDescs($overrideExisting = true)
+    {
+        if (null !== $this->collImageDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collImageDescs = new PropelObjectCollection();
+        $this->collImageDescs->setModel('ImageDesc');
+    }
+
+    /**
+     * Gets an array of ImageDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Image is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return Category
+     * @return PropelObjectCollection|ImageDesc[] List of ImageDesc objects
      * @throws PropelException
      */
-    public function getCategory(PropelPDO $con = null)
+    public function getImageDescs($criteria = null, PropelPDO $con = null)
     {
+        $partial = $this->collImageDescsPartial && !$this->isNew();
+        if (null === $this->collImageDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collImageDescs) {
+                // return empty collection
+                $this->initImageDescs();
+            } else {
+                $collImageDescs = ImageDescQuery::create(null, $criteria)
+                    ->filterByImage($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collImageDescsPartial && count($collImageDescs)) {
+                      $this->initImageDescs(false);
 
-        if ($this->singleCategory === null && !$this->isNew()) {
-            $this->singleCategory = CategoryQuery::create()->findPk($this->getPrimaryKey(), $con);
+                      foreach($collImageDescs as $obj) {
+                        if (false == $this->collImageDescs->contains($obj)) {
+                          $this->collImageDescs->append($obj);
+                        }
+                      }
+
+                      $this->collImageDescsPartial = true;
+                    }
+
+                    return $collImageDescs;
+                }
+
+                if($partial && $this->collImageDescs) {
+                    foreach($this->collImageDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collImageDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collImageDescs = $collImageDescs;
+                $this->collImageDescsPartial = false;
+            }
         }
 
-        return $this->singleCategory;
+        return $this->collImageDescs;
     }
 
     /**
-     * Sets a single Category object as related to this object by a one-to-one relationship.
+     * Sets a collection of ImageDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
      *
-     * @param             Category $v Category
-     * @return Image The current object (for fluent API support)
+     * @param PropelCollection $imageDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setImageDescs(PropelCollection $imageDescs, PropelPDO $con = null)
+    {
+        $this->imageDescsScheduledForDeletion = $this->getImageDescs(new Criteria(), $con)->diff($imageDescs);
+
+        foreach ($this->imageDescsScheduledForDeletion as $imageDescRemoved) {
+            $imageDescRemoved->setImage(null);
+        }
+
+        $this->collImageDescs = null;
+        foreach ($imageDescs as $imageDesc) {
+            $this->addImageDesc($imageDesc);
+        }
+
+        $this->collImageDescs = $imageDescs;
+        $this->collImageDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ImageDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ImageDesc objects.
      * @throws PropelException
      */
-    public function setCategory(Category $v = null)
+    public function countImageDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $this->singleCategory = $v;
+        $partial = $this->collImageDescsPartial && !$this->isNew();
+        if (null === $this->collImageDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collImageDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getImageDescs());
+                }
+                $query = ImageDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
 
-        // Make sure that that the passed-in Category isn't already associated with this object
-        if ($v !== null && $v->getImage() === null) {
-            $v->setImage($this);
+                return $query
+                    ->filterByImage($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collImageDescs);
+        }
+    }
+
+    /**
+     * Method called to associate a ImageDesc object to this object
+     * through the ImageDesc foreign key attribute.
+     *
+     * @param    ImageDesc $l ImageDesc
+     * @return Image The current object (for fluent API support)
+     */
+    public function addImageDesc(ImageDesc $l)
+    {
+        if ($this->collImageDescs === null) {
+            $this->initImageDescs();
+            $this->collImageDescsPartial = true;
+        }
+        if (!$this->collImageDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddImageDesc($l);
         }
 
         return $this;
     }
 
     /**
-     * Gets a single Content object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Content
-     * @throws PropelException
+     * @param	ImageDesc $imageDesc The imageDesc object to add.
      */
-    public function getContent(PropelPDO $con = null)
+    protected function doAddImageDesc($imageDesc)
     {
-
-        if ($this->singleContent === null && !$this->isNew()) {
-            $this->singleContent = ContentQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleContent;
+        $this->collImageDescs[]= $imageDesc;
+        $imageDesc->setImage($this);
     }
 
     /**
-     * Sets a single Content object as related to this object by a one-to-one relationship.
-     *
-     * @param             Content $v Content
-     * @return Image The current object (for fluent API support)
-     * @throws PropelException
+     * @param	ImageDesc $imageDesc The imageDesc object to remove.
      */
-    public function setContent(Content $v = null)
+    public function removeImageDesc($imageDesc)
     {
-        $this->singleContent = $v;
-
-        // Make sure that that the passed-in Content isn't already associated with this object
-        if ($v !== null && $v->getImage() === null) {
-            $v->setImage($this);
+        if ($this->getImageDescs()->contains($imageDesc)) {
+            $this->collImageDescs->remove($this->collImageDescs->search($imageDesc));
+            if (null === $this->imageDescsScheduledForDeletion) {
+                $this->imageDescsScheduledForDeletion = clone $this->collImageDescs;
+                $this->imageDescsScheduledForDeletion->clear();
+            }
+            $this->imageDescsScheduledForDeletion[]= $imageDesc;
+            $imageDesc->setImage(null);
         }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Folder object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Folder
-     * @throws PropelException
-     */
-    public function getFolder(PropelPDO $con = null)
-    {
-
-        if ($this->singleFolder === null && !$this->isNew()) {
-            $this->singleFolder = FolderQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleFolder;
-    }
-
-    /**
-     * Sets a single Folder object as related to this object by a one-to-one relationship.
-     *
-     * @param             Folder $v Folder
-     * @return Image The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFolder(Folder $v = null)
-    {
-        $this->singleFolder = $v;
-
-        // Make sure that that the passed-in Folder isn't already associated with this object
-        if ($v !== null && $v->getImage() === null) {
-            $v->setImage($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Product
-     * @throws PropelException
-     */
-    public function getProduct(PropelPDO $con = null)
-    {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleProduct;
-    }
-
-    /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
-     *
-     * @param             Product $v Product
-     * @return Image The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProduct(Product $v = null)
-    {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getImage() === null) {
-            $v->setImage($this);
-        }
-
-        return $this;
     }
 
     /**
@@ -1683,37 +1869,21 @@ abstract class BaseImage extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCategory) {
-                $this->singleCategory->clearAllReferences($deep);
-            }
-            if ($this->singleContent) {
-                $this->singleContent->clearAllReferences($deep);
-            }
-            if ($this->singleFolder) {
-                $this->singleFolder->clearAllReferences($deep);
-            }
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
+            if ($this->collImageDescs) {
+                foreach ($this->collImageDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
         } // if ($deep)
 
-        if ($this->singleCategory instanceof PropelCollection) {
-            $this->singleCategory->clearIterator();
+        if ($this->collImageDescs instanceof PropelCollection) {
+            $this->collImageDescs->clearIterator();
         }
-        $this->singleCategory = null;
-        if ($this->singleContent instanceof PropelCollection) {
-            $this->singleContent->clearIterator();
-        }
-        $this->singleContent = null;
-        if ($this->singleFolder instanceof PropelCollection) {
-            $this->singleFolder->clearIterator();
-        }
-        $this->singleFolder = null;
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
-        $this->aImageDesc = null;
+        $this->collImageDescs = null;
+        $this->aProduct = null;
+        $this->aCategory = null;
+        $this->aContent = null;
+        $this->aFolder = null;
     }
 
     /**

@@ -43,7 +43,7 @@ class ResourceDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('RESOURCE_ID', 'ResourceId', 'INTEGER', true, null, null);
+        $this->addForeignKey('RESOURCE_ID', 'ResourceId', 'INTEGER', 'resource', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -56,7 +56,7 @@ class ResourceDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Resource', 'Thelia\\Model\\Resource', RelationMap::ONE_TO_ONE, array('resource_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Resource', 'Thelia\\Model\\Resource', RelationMap::MANY_TO_ONE, array('resource_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ResourceDescTableMap

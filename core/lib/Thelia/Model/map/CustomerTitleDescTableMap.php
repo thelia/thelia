@@ -43,7 +43,7 @@ class CustomerTitleDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', true, null, null);
+        $this->addForeignKey('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', 'customer_title', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('SHORT', 'Short', 'VARCHAR', false, 10, null);
         $this->addColumn('LONG', 'Long', 'VARCHAR', false, 45, null);
@@ -57,7 +57,7 @@ class CustomerTitleDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CustomerTitle', 'Thelia\\Model\\CustomerTitle', RelationMap::ONE_TO_ONE, array('customer_title_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('CustomerTitle', 'Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // CustomerTitleDescTableMap

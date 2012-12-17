@@ -42,8 +42,8 @@ class OrderProductTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order_feature', 'ORDER_PRODUCT_ID', true, null, null);
-        $this->addColumn('ORDER_ID', 'OrderId', 'INTEGER', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
         $this->addColumn('PRODUCT_REF', 'ProductRef', 'VARCHAR', false, 255, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -62,8 +62,8 @@ class OrderProductTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('OrderFeature', 'Thelia\\Model\\OrderFeature', RelationMap::MANY_TO_ONE, array('id' => 'order_product_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_ONE, array('order_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('OrderFeature', 'Thelia\\Model\\OrderFeature', RelationMap::ONE_TO_MANY, array('id' => 'order_product_id', ), 'CASCADE', null, 'OrderFeatures');
     } // buildRelations()
 
 } // OrderProductTableMap

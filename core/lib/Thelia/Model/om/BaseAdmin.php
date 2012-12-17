@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminGroup;
@@ -102,9 +104,10 @@ abstract class BaseAdmin extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        AdminGroup
+     * @var        PropelObjectCollection|AdminGroup[] Collection to store aggregation of AdminGroup objects.
      */
-    protected $aAdminGroup;
+    protected $collAdminGroups;
+    protected $collAdminGroupsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -119,6 +122,12 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $adminGroupsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -279,10 +288,6 @@ abstract class BaseAdmin extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = AdminPeer::ID;
-        }
-
-        if ($this->aAdminGroup !== null && $this->aAdminGroup->getAdminId() !== $v) {
-            $this->aAdminGroup = null;
         }
 
 
@@ -533,9 +538,6 @@ abstract class BaseAdmin extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aAdminGroup !== null && $this->id !== $this->aAdminGroup->getAdminId()) {
-            $this->aAdminGroup = null;
-        }
     } // ensureConsistency
 
     /**
@@ -575,7 +577,8 @@ abstract class BaseAdmin extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aAdminGroup = null;
+            $this->collAdminGroups = null;
+
         } // if (deep)
     }
 
@@ -689,18 +692,6 @@ abstract class BaseAdmin extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAdminGroup !== null) {
-                if ($this->aAdminGroup->isModified() || $this->aAdminGroup->isNew()) {
-                    $affectedRows += $this->aAdminGroup->save($con);
-                }
-                $this->setAdminGroup($this->aAdminGroup);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -710,6 +701,24 @@ abstract class BaseAdmin extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->adminGroupsScheduledForDeletion !== null) {
+                if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->adminGroupsScheduledForDeletion as $adminGroup) {
+                        // need to save related object because we set the relation to null
+                        $adminGroup->save($con);
+                    }
+                    $this->adminGroupsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAdminGroups !== null) {
+                foreach ($this->collAdminGroups as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -897,22 +906,18 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAdminGroup !== null) {
-                if (!$this->aAdminGroup->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAdminGroup->getValidationFailures());
-                }
-            }
-
-
             if (($retval = AdminPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collAdminGroups !== null) {
+                    foreach ($this->collAdminGroups as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -1016,8 +1021,8 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aAdminGroup) {
-                $result['AdminGroup'] = $this->aAdminGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collAdminGroups) {
+                $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1212,9 +1217,10 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAdminGroup();
-            if ($relObj) {
-                $copyObj->setAdminGroup($relObj->copy($deepCopy));
+            foreach ($this->getAdminGroups() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAdminGroup($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1267,51 +1273,252 @@ abstract class BaseAdmin extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a AdminGroup object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             AdminGroup $v
-     * @return Admin The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('AdminGroup' == $relationName) {
+            $this->initAdminGroups();
+        }
+    }
+
+    /**
+     * Clears out the collAdminGroups collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAdminGroups()
+     */
+    public function clearAdminGroups()
+    {
+        $this->collAdminGroups = null; // important to set this to null since that means it is uninitialized
+        $this->collAdminGroupsPartial = null;
+    }
+
+    /**
+     * reset is the collAdminGroups collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAdminGroups($v = true)
+    {
+        $this->collAdminGroupsPartial = $v;
+    }
+
+    /**
+     * Initializes the collAdminGroups collection.
+     *
+     * By default this just sets the collAdminGroups collection to an empty array (like clearcollAdminGroups());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAdminGroups($overrideExisting = true)
+    {
+        if (null !== $this->collAdminGroups && !$overrideExisting) {
+            return;
+        }
+        $this->collAdminGroups = new PropelObjectCollection();
+        $this->collAdminGroups->setModel('AdminGroup');
+    }
+
+    /**
+     * Gets an array of AdminGroup objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Admin is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|AdminGroup[] List of AdminGroup objects
      * @throws PropelException
      */
-    public function setAdminGroup(AdminGroup $v = null)
+    public function getAdminGroups($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collAdminGroupsPartial && !$this->isNew();
+        if (null === $this->collAdminGroups || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAdminGroups) {
+                // return empty collection
+                $this->initAdminGroups();
+            } else {
+                $collAdminGroups = AdminGroupQuery::create(null, $criteria)
+                    ->filterByAdmin($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAdminGroupsPartial && count($collAdminGroups)) {
+                      $this->initAdminGroups(false);
+
+                      foreach($collAdminGroups as $obj) {
+                        if (false == $this->collAdminGroups->contains($obj)) {
+                          $this->collAdminGroups->append($obj);
+                        }
+                      }
+
+                      $this->collAdminGroupsPartial = true;
+                    }
+
+                    return $collAdminGroups;
+                }
+
+                if($partial && $this->collAdminGroups) {
+                    foreach($this->collAdminGroups as $obj) {
+                        if($obj->isNew()) {
+                            $collAdminGroups[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAdminGroups = $collAdminGroups;
+                $this->collAdminGroupsPartial = false;
+            }
+        }
+
+        return $this->collAdminGroups;
+    }
+
+    /**
+     * Sets a collection of AdminGroup objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $adminGroups A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAdminGroups(PropelCollection $adminGroups, PropelPDO $con = null)
+    {
+        $this->adminGroupsScheduledForDeletion = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
+
+        foreach ($this->adminGroupsScheduledForDeletion as $adminGroupRemoved) {
+            $adminGroupRemoved->setAdmin(null);
+        }
+
+        $this->collAdminGroups = null;
+        foreach ($adminGroups as $adminGroup) {
+            $this->addAdminGroup($adminGroup);
+        }
+
+        $this->collAdminGroups = $adminGroups;
+        $this->collAdminGroupsPartial = false;
+    }
+
+    /**
+     * Returns the number of related AdminGroup objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related AdminGroup objects.
+     * @throws PropelException
+     */
+    public function countAdminGroups(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAdminGroupsPartial && !$this->isNew();
+        if (null === $this->collAdminGroups || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAdminGroups) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAdminGroups());
+                }
+                $query = AdminGroupQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByAdmin($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getAdminId());
+            return count($this->collAdminGroups);
         }
+    }
 
-        $this->aAdminGroup = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setAdmin($this);
+    /**
+     * Method called to associate a AdminGroup object to this object
+     * through the AdminGroup foreign key attribute.
+     *
+     * @param    AdminGroup $l AdminGroup
+     * @return Admin The current object (for fluent API support)
+     */
+    public function addAdminGroup(AdminGroup $l)
+    {
+        if ($this->collAdminGroups === null) {
+            $this->initAdminGroups();
+            $this->collAdminGroupsPartial = true;
         }
-
+        if (!$this->collAdminGroups->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAdminGroup($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	AdminGroup $adminGroup The adminGroup object to add.
+     */
+    protected function doAddAdminGroup($adminGroup)
+    {
+        $this->collAdminGroups[]= $adminGroup;
+        $adminGroup->setAdmin($this);
+    }
 
     /**
-     * Get the associated AdminGroup object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return AdminGroup The associated AdminGroup object.
-     * @throws PropelException
+     * @param	AdminGroup $adminGroup The adminGroup object to remove.
      */
-    public function getAdminGroup(PropelPDO $con = null)
+    public function removeAdminGroup($adminGroup)
     {
-        if ($this->aAdminGroup === null && ($this->id !== null)) {
-            $this->aAdminGroup = AdminGroupQuery::create()
-                ->filterByAdmin($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aAdminGroup->setAdmin($this);
+        if ($this->getAdminGroups()->contains($adminGroup)) {
+            $this->collAdminGroups->remove($this->collAdminGroups->search($adminGroup));
+            if (null === $this->adminGroupsScheduledForDeletion) {
+                $this->adminGroupsScheduledForDeletion = clone $this->collAdminGroups;
+                $this->adminGroupsScheduledForDeletion->clear();
+            }
+            $this->adminGroupsScheduledForDeletion[]= $adminGroup;
+            $adminGroup->setAdmin(null);
         }
+    }
 
-        return $this->aAdminGroup;
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Admin is new, it will return
+     * an empty collection; or if this Admin has previously
+     * been saved, it will retrieve related AdminGroups from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Admin.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AdminGroup[] List of AdminGroup objects
+     */
+    public function getAdminGroupsJoinGroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AdminGroupQuery::create(null, $criteria);
+        $query->joinWith('Group', $join_behavior);
+
+        return $this->getAdminGroups($query, $con);
     }
 
     /**
@@ -1348,9 +1555,17 @@ abstract class BaseAdmin extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collAdminGroups) {
+                foreach ($this->collAdminGroups as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aAdminGroup = null;
+        if ($this->collAdminGroups instanceof PropelCollection) {
+            $this->collAdminGroups->clearIterator();
+        }
+        $this->collAdminGroups = null;
     }
 
     /**

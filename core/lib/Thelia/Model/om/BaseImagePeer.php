@@ -29,7 +29,7 @@ abstract class BaseImagePeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'image';
@@ -407,18 +407,9 @@ abstract class BaseImagePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in CategoryPeer instance pool,
+        // Invalidate objects in ImageDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CategoryPeer::clearInstancePool();
-        // Invalidate objects in ContentPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ContentPeer::clearInstancePool();
-        // Invalidate objects in FolderPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FolderPeer::clearInstancePool();
-        // Invalidate objects in ProductPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ProductPeer::clearInstancePool();
+        ImageDescPeer::clearInstancePool();
     }
 
     /**
@@ -517,7 +508,7 @@ abstract class BaseImagePeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related ImageDesc table
+     * Returns the number of rows matching criteria, joining the related Product table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -525,7 +516,7 @@ abstract class BaseImagePeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinImageDesc(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinProduct(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -552,7 +543,7 @@ abstract class BaseImagePeer
             $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(ImagePeer::ID, ImageDescPeer::IMAGE_ID, $join_behavior);
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -568,7 +559,160 @@ abstract class BaseImagePeer
 
 
     /**
-     * Selects a collection of Image objects pre-filled with their ImageDesc objects.
+     * Returns the number of rows matching criteria, joining the related Category table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinCategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ImagePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ImagePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(ImagePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Content table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinContent(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ImagePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ImagePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(ImagePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Folder table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinFolder(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ImagePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ImagePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(ImagePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with their Product objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -576,7 +720,7 @@ abstract class BaseImagePeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinImageDesc(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinProduct(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -587,9 +731,9 @@ abstract class BaseImagePeer
 
         ImagePeer::addSelectColumns($criteria);
         $startcol = ImagePeer::NUM_HYDRATE_COLUMNS;
-        ImageDescPeer::addSelectColumns($criteria);
+        ProductPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(ImagePeer::ID, ImageDescPeer::IMAGE_ID, $join_behavior);
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -609,21 +753,221 @@ abstract class BaseImagePeer
                 ImagePeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = ImageDescPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = ImageDescPeer::getInstanceFromPool($key2);
+                $obj2 = ProductPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = ImageDescPeer::getOMClass();
+                    $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    ImageDescPeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Image) to $obj2 (ImageDesc)
-                // one to one relationship
-                $obj1->setImageDesc($obj2);
+                // Add the $obj1 (Image) to $obj2 (Product)
+                $obj2->addImage($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with their Category objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Image objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinCategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ImagePeer::DATABASE_NAME);
+        }
+
+        ImagePeer::addSelectColumns($criteria);
+        $startcol = ImagePeer::NUM_HYDRATE_COLUMNS;
+        CategoryPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ImagePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ImagePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = ImagePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ImagePeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = CategoryPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = CategoryPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    CategoryPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Image) to $obj2 (Category)
+                $obj2->addImage($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with their Content objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Image objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinContent(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ImagePeer::DATABASE_NAME);
+        }
+
+        ImagePeer::addSelectColumns($criteria);
+        $startcol = ImagePeer::NUM_HYDRATE_COLUMNS;
+        ContentPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ImagePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ImagePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = ImagePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ImagePeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = ContentPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = ContentPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = ContentPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    ContentPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Image) to $obj2 (Content)
+                $obj2->addImage($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with their Folder objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Image objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinFolder(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ImagePeer::DATABASE_NAME);
+        }
+
+        ImagePeer::addSelectColumns($criteria);
+        $startcol = ImagePeer::NUM_HYDRATE_COLUMNS;
+        FolderPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ImagePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ImagePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = ImagePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ImagePeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = FolderPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = FolderPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = FolderPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    FolderPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Image) to $obj2 (Folder)
+                $obj2->addImage($obj1);
 
             } // if joined row was not null
 
@@ -671,7 +1015,13 @@ abstract class BaseImagePeer
             $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(ImagePeer::ID, ImageDescPeer::IMAGE_ID, $join_behavior);
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -707,10 +1057,25 @@ abstract class BaseImagePeer
         ImagePeer::addSelectColumns($criteria);
         $startcol2 = ImagePeer::NUM_HYDRATE_COLUMNS;
 
-        ImageDescPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + ImageDescPeer::NUM_HYDRATE_COLUMNS;
+        ProductPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(ImagePeer::ID, ImageDescPeer::IMAGE_ID, $join_behavior);
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + CategoryPeer::NUM_HYDRATE_COLUMNS;
+
+        ContentPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + ContentPeer::NUM_HYDRATE_COLUMNS;
+
+        FolderPeer::addSelectColumns($criteria);
+        $startcol6 = $startcol5 + FolderPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -729,23 +1094,785 @@ abstract class BaseImagePeer
                 ImagePeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined ImageDesc rows
+            // Add objects for joined Product rows
 
-            $key2 = ImageDescPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = ImageDescPeer::getInstanceFromPool($key2);
+                $obj2 = ProductPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = ImageDescPeer::getOMClass();
+                    $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    ImageDescPeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (Image) to the collection in $obj2 (ImageDesc)
-                $obj1->setImageDesc($obj2);
+                // Add the $obj1 (Image) to the collection in $obj2 (Product)
+                $obj2->addImage($obj1);
             } // if joined row not null
+
+            // Add objects for joined Category rows
+
+            $key3 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+            if ($key3 !== null) {
+                $obj3 = CategoryPeer::getInstanceFromPool($key3);
+                if (!$obj3) {
+
+                    $cls = CategoryPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    CategoryPeer::addInstanceToPool($obj3, $key3);
+                } // if obj3 loaded
+
+                // Add the $obj1 (Image) to the collection in $obj3 (Category)
+                $obj3->addImage($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Content rows
+
+            $key4 = ContentPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+            if ($key4 !== null) {
+                $obj4 = ContentPeer::getInstanceFromPool($key4);
+                if (!$obj4) {
+
+                    $cls = ContentPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    ContentPeer::addInstanceToPool($obj4, $key4);
+                } // if obj4 loaded
+
+                // Add the $obj1 (Image) to the collection in $obj4 (Content)
+                $obj4->addImage($obj1);
+            } // if joined row not null
+
+            // Add objects for joined Folder rows
+
+            $key5 = FolderPeer::getPrimaryKeyHashFromRow($row, $startcol5);
+            if ($key5 !== null) {
+                $obj5 = FolderPeer::getInstanceFromPool($key5);
+                if (!$obj5) {
+
+                    $cls = FolderPeer::getOMClass();
+
+                    $obj5 = new $cls();
+                    $obj5->hydrate($row, $startcol5);
+                    FolderPeer::addInstanceToPool($obj5, $key5);
+                } // if obj5 loaded
+
+                // Add the $obj1 (Image) to the collection in $obj5 (Folder)
+                $obj5->addImage($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Product table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptProduct(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ImagePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ImagePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(ImagePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Category table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptCategory(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ImagePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ImagePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(ImagePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Content table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptContent(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ImagePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ImagePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(ImagePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Folder table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAllExceptFolder(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(ImagePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            ImagePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
+
+        // Set the correct dbName
+        $criteria->setDbName(ImagePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(ImagePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with all related objects except Product.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Image objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptProduct(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ImagePeer::DATABASE_NAME);
+        }
+
+        ImagePeer::addSelectColumns($criteria);
+        $startcol2 = ImagePeer::NUM_HYDRATE_COLUMNS;
+
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + CategoryPeer::NUM_HYDRATE_COLUMNS;
+
+        ContentPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + ContentPeer::NUM_HYDRATE_COLUMNS;
+
+        FolderPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + FolderPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ImagePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ImagePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = ImagePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ImagePeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Category rows
+
+                $key2 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = CategoryPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = CategoryPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    CategoryPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj2 (Category)
+                $obj2->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Content rows
+
+                $key3 = ContentPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = ContentPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = ContentPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    ContentPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj3 (Content)
+                $obj3->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Folder rows
+
+                $key4 = FolderPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = FolderPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = FolderPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    FolderPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj4 (Folder)
+                $obj4->addImage($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with all related objects except Category.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Image objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptCategory(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ImagePeer::DATABASE_NAME);
+        }
+
+        ImagePeer::addSelectColumns($criteria);
+        $startcol2 = ImagePeer::NUM_HYDRATE_COLUMNS;
+
+        ProductPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
+
+        ContentPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + ContentPeer::NUM_HYDRATE_COLUMNS;
+
+        FolderPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + FolderPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ImagePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ImagePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = ImagePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ImagePeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Product rows
+
+                $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = ProductPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = ProductPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj2 (Product)
+                $obj2->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Content rows
+
+                $key3 = ContentPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = ContentPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = ContentPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    ContentPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj3 (Content)
+                $obj3->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Folder rows
+
+                $key4 = FolderPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = FolderPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = FolderPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    FolderPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj4 (Folder)
+                $obj4->addImage($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with all related objects except Content.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Image objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptContent(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ImagePeer::DATABASE_NAME);
+        }
+
+        ImagePeer::addSelectColumns($criteria);
+        $startcol2 = ImagePeer::NUM_HYDRATE_COLUMNS;
+
+        ProductPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
+
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + CategoryPeer::NUM_HYDRATE_COLUMNS;
+
+        FolderPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + FolderPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::FOLDER_ID, FolderPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ImagePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ImagePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = ImagePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ImagePeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Product rows
+
+                $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = ProductPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = ProductPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj2 (Product)
+                $obj2->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Category rows
+
+                $key3 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = CategoryPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = CategoryPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    CategoryPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj3 (Category)
+                $obj3->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Folder rows
+
+                $key4 = FolderPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = FolderPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = FolderPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    FolderPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj4 (Folder)
+                $obj4->addImage($obj1);
+
+            } // if joined row is not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Selects a collection of Image objects pre-filled with all related objects except Folder.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Image objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAllExceptFolder(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        // $criteria->getDbName() will return the same object if not set to another value
+        // so == check is okay and faster
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(ImagePeer::DATABASE_NAME);
+        }
+
+        ImagePeer::addSelectColumns($criteria);
+        $startcol2 = ImagePeer::NUM_HYDRATE_COLUMNS;
+
+        ProductPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
+
+        CategoryPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + CategoryPeer::NUM_HYDRATE_COLUMNS;
+
+        ContentPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + ContentPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(ImagePeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CATEGORY_ID, CategoryPeer::ID, $join_behavior);
+
+        $criteria->addJoin(ImagePeer::CONTENT_ID, ContentPeer::ID, $join_behavior);
+
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = ImagePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ImagePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = ImagePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                ImagePeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+                // Add objects for joined Product rows
+
+                $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                if ($key2 !== null) {
+                    $obj2 = ProductPeer::getInstanceFromPool($key2);
+                    if (!$obj2) {
+
+                        $cls = ProductPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
+                } // if $obj2 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj2 (Product)
+                $obj2->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Category rows
+
+                $key3 = CategoryPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                if ($key3 !== null) {
+                    $obj3 = CategoryPeer::getInstanceFromPool($key3);
+                    if (!$obj3) {
+
+                        $cls = CategoryPeer::getOMClass();
+
+                    $obj3 = new $cls();
+                    $obj3->hydrate($row, $startcol3);
+                    CategoryPeer::addInstanceToPool($obj3, $key3);
+                } // if $obj3 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj3 (Category)
+                $obj3->addImage($obj1);
+
+            } // if joined row is not null
+
+                // Add objects for joined Content rows
+
+                $key4 = ContentPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+                if ($key4 !== null) {
+                    $obj4 = ContentPeer::getInstanceFromPool($key4);
+                    if (!$obj4) {
+
+                        $cls = ContentPeer::getOMClass();
+
+                    $obj4 = new $cls();
+                    $obj4->hydrate($row, $startcol4);
+                    ContentPeer::addInstanceToPool($obj4, $key4);
+                } // if $obj4 already loaded
+
+                // Add the $obj1 (Image) to the collection in $obj4 (Content)
+                $obj4->addImage($obj1);
+
+            } // if joined row is not null
 
             $results[] = $obj1;
         }
@@ -887,7 +2014,6 @@ abstract class BaseImagePeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += ImagePeer::doOnDeleteCascade(new Criteria(ImagePeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(ImagePeer::TABLE_NAME, $con, ImagePeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -921,14 +2047,24 @@ abstract class BaseImagePeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            ImagePeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof Image) { // it's a model object
+            // invalidate the cache for this single object
+            ImagePeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(ImagePeer::DATABASE_NAME);
             $criteria->add(ImagePeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                ImagePeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -941,23 +2077,6 @@ abstract class BaseImagePeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            $affectedRows += ImagePeer::doOnDeleteCascade($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                ImagePeer::clearInstancePool();
-            } elseif ($values instanceof Image) { // it's a model object
-                ImagePeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    ImagePeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             ImagePeer::clearRelatedInstancePool();
             $con->commit();
@@ -967,57 +2086,6 @@ abstract class BaseImagePeer
             $con->rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return int The number of affected rows (if supported by underlying database driver).
-     */
-    protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-    {
-        // initialize var to track total num of affected rows
-        $affectedRows = 0;
-
-        // first find the objects that are implicated by the $criteria
-        $objects = ImagePeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-
-            // delete related Category objects
-            $criteria = new Criteria(CategoryPeer::DATABASE_NAME);
-
-            $criteria->add(CategoryPeer::ID, $obj->getCategoryId());
-            $affectedRows += CategoryPeer::doDelete($criteria, $con);
-
-            // delete related Content objects
-            $criteria = new Criteria(ContentPeer::DATABASE_NAME);
-
-            $criteria->add(ContentPeer::ID, $obj->getContentId());
-            $affectedRows += ContentPeer::doDelete($criteria, $con);
-
-            // delete related Folder objects
-            $criteria = new Criteria(FolderPeer::DATABASE_NAME);
-
-            $criteria->add(FolderPeer::ID, $obj->getFolderId());
-            $affectedRows += FolderPeer::doDelete($criteria, $con);
-
-            // delete related Product objects
-            $criteria = new Criteria(ProductPeer::DATABASE_NAME);
-
-            $criteria->add(ProductPeer::ID, $obj->getProductId());
-            $affectedRows += ProductPeer::doDelete($criteria, $con);
-        }
-
-        return $affectedRows;
     }
 
     /**

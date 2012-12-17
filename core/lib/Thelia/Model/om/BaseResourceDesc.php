@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Resource;
 use Thelia\Model\ResourceDesc;
@@ -86,9 +84,9 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Resource one-to-one related Resource object
+     * @var        Resource
      */
-    protected $singleResource;
+    protected $aResource;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -103,12 +101,6 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $resourcesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -260,6 +252,10 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
         if ($this->resource_id !== $v) {
             $this->resource_id = $v;
             $this->modifiedColumns[] = ResourceDescPeer::RESOURCE_ID;
+        }
+
+        if ($this->aResource !== null && $this->aResource->getId() !== $v) {
+            $this->aResource = null;
         }
 
 
@@ -423,6 +419,9 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aResource !== null && $this->resource_id !== $this->aResource->getId()) {
+            $this->aResource = null;
+        }
     } // ensureConsistency
 
     /**
@@ -462,8 +461,7 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleResource = null;
-
+            $this->aResource = null;
         } // if (deep)
     }
 
@@ -577,6 +575,18 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aResource !== null) {
+                if ($this->aResource->isModified() || $this->aResource->isNew()) {
+                    $affectedRows += $this->aResource->save($con);
+                }
+                $this->setResource($this->aResource);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -586,21 +596,6 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->resourcesScheduledForDeletion !== null) {
-                if (!$this->resourcesScheduledForDeletion->isEmpty()) {
-                    ResourceQuery::create()
-                        ->filterByPrimaryKeys($this->resourcesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->resourcesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleResource !== null) {
-                if (!$this->singleResource->isDeleted()) {
-                        $affectedRows += $this->singleResource->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -770,16 +765,22 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aResource !== null) {
+                if (!$this->aResource->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aResource->getValidationFailures());
+                }
+            }
+
+
             if (($retval = ResourceDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleResource !== null) {
-                    if (!$this->singleResource->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleResource->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -871,8 +872,8 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
             $keys[5] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleResource) {
-                $result['Resource'] = $this->singleResource->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aResource) {
+                $result['Resource'] = $this->aResource->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1049,11 +1050,6 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getResource();
-            if ($relObj) {
-                $copyObj->setResource($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1104,53 +1100,55 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Resource object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Resource object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Resource
-     * @throws PropelException
-     */
-    public function getResource(PropelPDO $con = null)
-    {
-
-        if ($this->singleResource === null && !$this->isNew()) {
-            $this->singleResource = ResourceQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleResource;
-    }
-
-    /**
-     * Sets a single Resource object as related to this object by a one-to-one relationship.
-     *
-     * @param             Resource $v Resource
+     * @param             Resource $v
      * @return ResourceDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setResource(Resource $v = null)
     {
-        $this->singleResource = $v;
-
-        // Make sure that that the passed-in Resource isn't already associated with this object
-        if ($v !== null && $v->getResourceDesc() === null) {
-            $v->setResourceDesc($this);
+        if ($v === null) {
+            $this->setResourceId(NULL);
+        } else {
+            $this->setResourceId($v->getId());
         }
 
+        $this->aResource = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Resource object, it will not be re-added.
+        if ($v !== null) {
+            $v->addResourceDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Resource object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Resource The associated Resource object.
+     * @throws PropelException
+     */
+    public function getResource(PropelPDO $con = null)
+    {
+        if ($this->aResource === null && ($this->resource_id !== null)) {
+            $this->aResource = ResourceQuery::create()->findPk($this->resource_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aResource->addResourceDescs($this);
+             */
+        }
+
+        return $this->aResource;
     }
 
     /**
@@ -1184,15 +1182,9 @@ abstract class BaseResourceDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleResource) {
-                $this->singleResource->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleResource instanceof PropelCollection) {
-            $this->singleResource->clearIterator();
-        }
-        $this->singleResource = null;
+        $this->aResource = null;
     }
 
     /**

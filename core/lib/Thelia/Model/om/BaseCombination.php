@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeCombinationQuery;
@@ -74,14 +76,16 @@ abstract class BaseCombination extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        AttributeCombination
+     * @var        PropelObjectCollection|AttributeCombination[] Collection to store aggregation of AttributeCombination objects.
      */
-    protected $aAttributeCombination;
+    protected $collAttributeCombinations;
+    protected $collAttributeCombinationsPartial;
 
     /**
-     * @var        Stock
+     * @var        PropelObjectCollection|Stock[] Collection to store aggregation of Stock objects.
      */
-    protected $aStock;
+    protected $collStocks;
+    protected $collStocksPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -96,6 +100,18 @@ abstract class BaseCombination extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $attributeCombinationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $stocksScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -206,14 +222,6 @@ abstract class BaseCombination extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = CombinationPeer::ID;
-        }
-
-        if ($this->aAttributeCombination !== null && $this->aAttributeCombination->getCombinationId() !== $v) {
-            $this->aAttributeCombination = null;
-        }
-
-        if ($this->aStock !== null && $this->aStock->getCombinationId() !== $v) {
-            $this->aStock = null;
         }
 
 
@@ -354,12 +362,6 @@ abstract class BaseCombination extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aAttributeCombination !== null && $this->id !== $this->aAttributeCombination->getCombinationId()) {
-            $this->aAttributeCombination = null;
-        }
-        if ($this->aStock !== null && $this->id !== $this->aStock->getCombinationId()) {
-            $this->aStock = null;
-        }
     } // ensureConsistency
 
     /**
@@ -399,8 +401,10 @@ abstract class BaseCombination extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aAttributeCombination = null;
-            $this->aStock = null;
+            $this->collAttributeCombinations = null;
+
+            $this->collStocks = null;
+
         } // if (deep)
     }
 
@@ -514,25 +518,6 @@ abstract class BaseCombination extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAttributeCombination !== null) {
-                if ($this->aAttributeCombination->isModified() || $this->aAttributeCombination->isNew()) {
-                    $affectedRows += $this->aAttributeCombination->save($con);
-                }
-                $this->setAttributeCombination($this->aAttributeCombination);
-            }
-
-            if ($this->aStock !== null) {
-                if ($this->aStock->isModified() || $this->aStock->isNew()) {
-                    $affectedRows += $this->aStock->save($con);
-                }
-                $this->setStock($this->aStock);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -542,6 +527,41 @@ abstract class BaseCombination extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->attributeCombinationsScheduledForDeletion !== null) {
+                if (!$this->attributeCombinationsScheduledForDeletion->isEmpty()) {
+                    AttributeCombinationQuery::create()
+                        ->filterByPrimaryKeys($this->attributeCombinationsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->attributeCombinationsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAttributeCombinations !== null) {
+                foreach ($this->collAttributeCombinations as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->stocksScheduledForDeletion !== null) {
+                if (!$this->stocksScheduledForDeletion->isEmpty()) {
+                    foreach ($this->stocksScheduledForDeletion as $stock) {
+                        // need to save related object because we set the relation to null
+                        $stock->save($con);
+                    }
+                    $this->stocksScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collStocks !== null) {
+                foreach ($this->collStocks as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -699,28 +719,26 @@ abstract class BaseCombination extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAttributeCombination !== null) {
-                if (!$this->aAttributeCombination->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAttributeCombination->getValidationFailures());
-                }
-            }
-
-            if ($this->aStock !== null) {
-                if (!$this->aStock->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aStock->getValidationFailures());
-                }
-            }
-
-
             if (($retval = CombinationPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collAttributeCombinations !== null) {
+                    foreach ($this->collAttributeCombinations as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collStocks !== null) {
+                    foreach ($this->collStocks as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -804,11 +822,11 @@ abstract class BaseCombination extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aAttributeCombination) {
-                $result['AttributeCombination'] = $this->aAttributeCombination->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collAttributeCombinations) {
+                $result['AttributeCombinations'] = $this->collAttributeCombinations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aStock) {
-                $result['Stock'] = $this->aStock->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collStocks) {
+                $result['Stocks'] = $this->collStocks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -973,14 +991,16 @@ abstract class BaseCombination extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAttributeCombination();
-            if ($relObj) {
-                $copyObj->setAttributeCombination($relObj->copy($deepCopy));
+            foreach ($this->getAttributeCombinations() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAttributeCombination($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getStock();
-            if ($relObj) {
-                $copyObj->setStock($relObj->copy($deepCopy));
+            foreach ($this->getStocks() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addStock($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1033,98 +1053,512 @@ abstract class BaseCombination extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a AttributeCombination object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             AttributeCombination $v
-     * @return Combination The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('AttributeCombination' == $relationName) {
+            $this->initAttributeCombinations();
+        }
+        if ('Stock' == $relationName) {
+            $this->initStocks();
+        }
+    }
+
+    /**
+     * Clears out the collAttributeCombinations collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAttributeCombinations()
+     */
+    public function clearAttributeCombinations()
+    {
+        $this->collAttributeCombinations = null; // important to set this to null since that means it is uninitialized
+        $this->collAttributeCombinationsPartial = null;
+    }
+
+    /**
+     * reset is the collAttributeCombinations collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAttributeCombinations($v = true)
+    {
+        $this->collAttributeCombinationsPartial = $v;
+    }
+
+    /**
+     * Initializes the collAttributeCombinations collection.
+     *
+     * By default this just sets the collAttributeCombinations collection to an empty array (like clearcollAttributeCombinations());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAttributeCombinations($overrideExisting = true)
+    {
+        if (null !== $this->collAttributeCombinations && !$overrideExisting) {
+            return;
+        }
+        $this->collAttributeCombinations = new PropelObjectCollection();
+        $this->collAttributeCombinations->setModel('AttributeCombination');
+    }
+
+    /**
+     * Gets an array of AttributeCombination objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Combination is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|AttributeCombination[] List of AttributeCombination objects
      * @throws PropelException
      */
-    public function setAttributeCombination(AttributeCombination $v = null)
+    public function getAttributeCombinations($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collAttributeCombinationsPartial && !$this->isNew();
+        if (null === $this->collAttributeCombinations || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAttributeCombinations) {
+                // return empty collection
+                $this->initAttributeCombinations();
+            } else {
+                $collAttributeCombinations = AttributeCombinationQuery::create(null, $criteria)
+                    ->filterByCombination($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAttributeCombinationsPartial && count($collAttributeCombinations)) {
+                      $this->initAttributeCombinations(false);
+
+                      foreach($collAttributeCombinations as $obj) {
+                        if (false == $this->collAttributeCombinations->contains($obj)) {
+                          $this->collAttributeCombinations->append($obj);
+                        }
+                      }
+
+                      $this->collAttributeCombinationsPartial = true;
+                    }
+
+                    return $collAttributeCombinations;
+                }
+
+                if($partial && $this->collAttributeCombinations) {
+                    foreach($this->collAttributeCombinations as $obj) {
+                        if($obj->isNew()) {
+                            $collAttributeCombinations[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAttributeCombinations = $collAttributeCombinations;
+                $this->collAttributeCombinationsPartial = false;
+            }
+        }
+
+        return $this->collAttributeCombinations;
+    }
+
+    /**
+     * Sets a collection of AttributeCombination objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $attributeCombinations A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAttributeCombinations(PropelCollection $attributeCombinations, PropelPDO $con = null)
+    {
+        $this->attributeCombinationsScheduledForDeletion = $this->getAttributeCombinations(new Criteria(), $con)->diff($attributeCombinations);
+
+        foreach ($this->attributeCombinationsScheduledForDeletion as $attributeCombinationRemoved) {
+            $attributeCombinationRemoved->setCombination(null);
+        }
+
+        $this->collAttributeCombinations = null;
+        foreach ($attributeCombinations as $attributeCombination) {
+            $this->addAttributeCombination($attributeCombination);
+        }
+
+        $this->collAttributeCombinations = $attributeCombinations;
+        $this->collAttributeCombinationsPartial = false;
+    }
+
+    /**
+     * Returns the number of related AttributeCombination objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related AttributeCombination objects.
+     * @throws PropelException
+     */
+    public function countAttributeCombinations(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAttributeCombinationsPartial && !$this->isNew();
+        if (null === $this->collAttributeCombinations || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAttributeCombinations) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAttributeCombinations());
+                }
+                $query = AttributeCombinationQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCombination($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getCombinationId());
+            return count($this->collAttributeCombinations);
         }
+    }
 
-        $this->aAttributeCombination = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setCombination($this);
+    /**
+     * Method called to associate a AttributeCombination object to this object
+     * through the AttributeCombination foreign key attribute.
+     *
+     * @param    AttributeCombination $l AttributeCombination
+     * @return Combination The current object (for fluent API support)
+     */
+    public function addAttributeCombination(AttributeCombination $l)
+    {
+        if ($this->collAttributeCombinations === null) {
+            $this->initAttributeCombinations();
+            $this->collAttributeCombinationsPartial = true;
         }
-
+        if (!$this->collAttributeCombinations->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAttributeCombination($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated AttributeCombination object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return AttributeCombination The associated AttributeCombination object.
-     * @throws PropelException
+     * @param	AttributeCombination $attributeCombination The attributeCombination object to add.
      */
-    public function getAttributeCombination(PropelPDO $con = null)
+    protected function doAddAttributeCombination($attributeCombination)
     {
-        if ($this->aAttributeCombination === null && ($this->id !== null)) {
-            $this->aAttributeCombination = AttributeCombinationQuery::create()
-                ->filterByCombination($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aAttributeCombination->setCombination($this);
-        }
-
-        return $this->aAttributeCombination;
+        $this->collAttributeCombinations[]= $attributeCombination;
+        $attributeCombination->setCombination($this);
     }
 
     /**
-     * Declares an association between this object and a Stock object.
+     * @param	AttributeCombination $attributeCombination The attributeCombination object to remove.
+     */
+    public function removeAttributeCombination($attributeCombination)
+    {
+        if ($this->getAttributeCombinations()->contains($attributeCombination)) {
+            $this->collAttributeCombinations->remove($this->collAttributeCombinations->search($attributeCombination));
+            if (null === $this->attributeCombinationsScheduledForDeletion) {
+                $this->attributeCombinationsScheduledForDeletion = clone $this->collAttributeCombinations;
+                $this->attributeCombinationsScheduledForDeletion->clear();
+            }
+            $this->attributeCombinationsScheduledForDeletion[]= $attributeCombination;
+            $attributeCombination->setCombination(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Combination is new, it will return
+     * an empty collection; or if this Combination has previously
+     * been saved, it will retrieve related AttributeCombinations from storage.
      *
-     * @param             Stock $v
-     * @return Combination The current object (for fluent API support)
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Combination.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AttributeCombination[] List of AttributeCombination objects
+     */
+    public function getAttributeCombinationsJoinAttribute($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AttributeCombinationQuery::create(null, $criteria);
+        $query->joinWith('Attribute', $join_behavior);
+
+        return $this->getAttributeCombinations($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Combination is new, it will return
+     * an empty collection; or if this Combination has previously
+     * been saved, it will retrieve related AttributeCombinations from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Combination.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AttributeCombination[] List of AttributeCombination objects
+     */
+    public function getAttributeCombinationsJoinAttributeAv($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AttributeCombinationQuery::create(null, $criteria);
+        $query->joinWith('AttributeAv', $join_behavior);
+
+        return $this->getAttributeCombinations($query, $con);
+    }
+
+    /**
+     * Clears out the collStocks collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addStocks()
+     */
+    public function clearStocks()
+    {
+        $this->collStocks = null; // important to set this to null since that means it is uninitialized
+        $this->collStocksPartial = null;
+    }
+
+    /**
+     * reset is the collStocks collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialStocks($v = true)
+    {
+        $this->collStocksPartial = $v;
+    }
+
+    /**
+     * Initializes the collStocks collection.
+     *
+     * By default this just sets the collStocks collection to an empty array (like clearcollStocks());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initStocks($overrideExisting = true)
+    {
+        if (null !== $this->collStocks && !$overrideExisting) {
+            return;
+        }
+        $this->collStocks = new PropelObjectCollection();
+        $this->collStocks->setModel('Stock');
+    }
+
+    /**
+     * Gets an array of Stock objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Combination is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Stock[] List of Stock objects
      * @throws PropelException
      */
-    public function setStock(Stock $v = null)
+    public function getStocks($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collStocksPartial && !$this->isNew();
+        if (null === $this->collStocks || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collStocks) {
+                // return empty collection
+                $this->initStocks();
+            } else {
+                $collStocks = StockQuery::create(null, $criteria)
+                    ->filterByCombination($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collStocksPartial && count($collStocks)) {
+                      $this->initStocks(false);
+
+                      foreach($collStocks as $obj) {
+                        if (false == $this->collStocks->contains($obj)) {
+                          $this->collStocks->append($obj);
+                        }
+                      }
+
+                      $this->collStocksPartial = true;
+                    }
+
+                    return $collStocks;
+                }
+
+                if($partial && $this->collStocks) {
+                    foreach($this->collStocks as $obj) {
+                        if($obj->isNew()) {
+                            $collStocks[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collStocks = $collStocks;
+                $this->collStocksPartial = false;
+            }
+        }
+
+        return $this->collStocks;
+    }
+
+    /**
+     * Sets a collection of Stock objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $stocks A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setStocks(PropelCollection $stocks, PropelPDO $con = null)
+    {
+        $this->stocksScheduledForDeletion = $this->getStocks(new Criteria(), $con)->diff($stocks);
+
+        foreach ($this->stocksScheduledForDeletion as $stockRemoved) {
+            $stockRemoved->setCombination(null);
+        }
+
+        $this->collStocks = null;
+        foreach ($stocks as $stock) {
+            $this->addStock($stock);
+        }
+
+        $this->collStocks = $stocks;
+        $this->collStocksPartial = false;
+    }
+
+    /**
+     * Returns the number of related Stock objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Stock objects.
+     * @throws PropelException
+     */
+    public function countStocks(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collStocksPartial && !$this->isNew();
+        if (null === $this->collStocks || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collStocks) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getStocks());
+                }
+                $query = StockQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCombination($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getCombinationId());
+            return count($this->collStocks);
         }
+    }
 
-        $this->aStock = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setCombination($this);
+    /**
+     * Method called to associate a Stock object to this object
+     * through the Stock foreign key attribute.
+     *
+     * @param    Stock $l Stock
+     * @return Combination The current object (for fluent API support)
+     */
+    public function addStock(Stock $l)
+    {
+        if ($this->collStocks === null) {
+            $this->initStocks();
+            $this->collStocksPartial = true;
         }
-
+        if (!$this->collStocks->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddStock($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	Stock $stock The stock object to add.
+     */
+    protected function doAddStock($stock)
+    {
+        $this->collStocks[]= $stock;
+        $stock->setCombination($this);
+    }
 
     /**
-     * Get the associated Stock object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return Stock The associated Stock object.
-     * @throws PropelException
+     * @param	Stock $stock The stock object to remove.
      */
-    public function getStock(PropelPDO $con = null)
+    public function removeStock($stock)
     {
-        if ($this->aStock === null && ($this->id !== null)) {
-            $this->aStock = StockQuery::create()
-                ->filterByCombination($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aStock->setCombination($this);
+        if ($this->getStocks()->contains($stock)) {
+            $this->collStocks->remove($this->collStocks->search($stock));
+            if (null === $this->stocksScheduledForDeletion) {
+                $this->stocksScheduledForDeletion = clone $this->collStocks;
+                $this->stocksScheduledForDeletion->clear();
+            }
+            $this->stocksScheduledForDeletion[]= $stock;
+            $stock->setCombination(null);
         }
+    }
 
-        return $this->aStock;
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Combination is new, it will return
+     * an empty collection; or if this Combination has previously
+     * been saved, it will retrieve related Stocks from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Combination.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Stock[] List of Stock objects
+     */
+    public function getStocksJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = StockQuery::create(null, $criteria);
+        $query->joinWith('Product', $join_behavior);
+
+        return $this->getStocks($query, $con);
     }
 
     /**
@@ -1156,10 +1590,26 @@ abstract class BaseCombination extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collAttributeCombinations) {
+                foreach ($this->collAttributeCombinations as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collStocks) {
+                foreach ($this->collStocks as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aAttributeCombination = null;
-        $this->aStock = null;
+        if ($this->collAttributeCombinations instanceof PropelCollection) {
+            $this->collAttributeCombinations->clearIterator();
+        }
+        $this->collAttributeCombinations = null;
+        if ($this->collStocks instanceof PropelCollection) {
+            $this->collStocks->clearIterator();
+        }
+        $this->collStocks = null;
     }
 
     /**

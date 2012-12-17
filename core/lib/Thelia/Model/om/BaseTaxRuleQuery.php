@@ -74,7 +74,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\TaxRule', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\TaxRule', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -250,12 +250,6 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByProduct()
-     *
-     * @see       filterByTaxRuleCountry()
-     *
-     * @see       filterByTaxRuleDesc()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -391,7 +385,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
     /**
      * Filter the query by a related Product object
      *
-     * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
+     * @param   Product|PropelObjectCollection $product  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TaxRuleQuery The current query, for fluid interface
@@ -403,12 +397,10 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(TaxRulePeer::ID, $product->getTaxRuleId(), $comparison);
         } elseif ($product instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(TaxRulePeer::ID, $product->toKeyValue('PrimaryKey', 'TaxRuleId'), $comparison);
+                ->useProductQuery()
+                ->filterByPrimaryKeys($product->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByProduct() only accepts arguments of type Product or PropelCollection');
         }
@@ -422,7 +414,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      *
      * @return TaxRuleQuery The current query, for fluid interface
      */
-    public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProduct($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Product');
@@ -457,7 +449,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
      */
-    public function useProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProductQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinProduct($relationAlias, $joinType)
@@ -467,7 +459,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
     /**
      * Filter the query by a related TaxRuleCountry object
      *
-     * @param   TaxRuleCountry|PropelObjectCollection $taxRuleCountry The related object(s) to use as filter
+     * @param   TaxRuleCountry|PropelObjectCollection $taxRuleCountry  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TaxRuleQuery The current query, for fluid interface
@@ -479,12 +471,10 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(TaxRulePeer::ID, $taxRuleCountry->getTaxRuleId(), $comparison);
         } elseif ($taxRuleCountry instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(TaxRulePeer::ID, $taxRuleCountry->toKeyValue('PrimaryKey', 'TaxRuleId'), $comparison);
+                ->useTaxRuleCountryQuery()
+                ->filterByPrimaryKeys($taxRuleCountry->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByTaxRuleCountry() only accepts arguments of type TaxRuleCountry or PropelCollection');
         }
@@ -498,7 +488,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      *
      * @return TaxRuleQuery The current query, for fluid interface
      */
-    public function joinTaxRuleCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTaxRuleCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('TaxRuleCountry');
@@ -533,7 +523,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TaxRuleCountryQuery A secondary query class using the current class as primary query
      */
-    public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTaxRuleCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinTaxRuleCountry($relationAlias, $joinType)
@@ -543,7 +533,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
     /**
      * Filter the query by a related TaxRuleDesc object
      *
-     * @param   TaxRuleDesc|PropelObjectCollection $taxRuleDesc The related object(s) to use as filter
+     * @param   TaxRuleDesc|PropelObjectCollection $taxRuleDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TaxRuleQuery The current query, for fluid interface
@@ -555,12 +545,10 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(TaxRulePeer::ID, $taxRuleDesc->getTaxRuleId(), $comparison);
         } elseif ($taxRuleDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(TaxRulePeer::ID, $taxRuleDesc->toKeyValue('PrimaryKey', 'TaxRuleId'), $comparison);
+                ->useTaxRuleDescQuery()
+                ->filterByPrimaryKeys($taxRuleDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByTaxRuleDesc() only accepts arguments of type TaxRuleDesc or PropelCollection');
         }
@@ -574,7 +562,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      *
      * @return TaxRuleQuery The current query, for fluid interface
      */
-    public function joinTaxRuleDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTaxRuleDesc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('TaxRuleDesc');
@@ -609,7 +597,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TaxRuleDescQuery A secondary query class using the current class as primary query
      */
-    public function useTaxRuleDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTaxRuleDescQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinTaxRuleDesc($relationAlias, $joinType)

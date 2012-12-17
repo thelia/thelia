@@ -43,7 +43,7 @@ class ModuleDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('MODULE_ID', 'ModuleId', 'INTEGER', true, null, null);
+        $this->addForeignKey('MODULE_ID', 'ModuleId', 'INTEGER', 'module', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -59,7 +59,7 @@ class ModuleDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Module', 'Thelia\\Model\\Module', RelationMap::ONE_TO_ONE, array('module_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Module', 'Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('module_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ModuleDescTableMap

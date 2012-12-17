@@ -27,7 +27,7 @@ abstract class BaseFeatureAvPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'feature_av';
@@ -380,9 +380,12 @@ abstract class BaseFeatureAvPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FeaturePeer instance pool,
+        // Invalidate objects in FeatureAvDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FeaturePeer::clearInstancePool();
+        FeatureAvDescPeer::clearInstancePool();
+        // Invalidate objects in FeatureProdPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeatureProdPeer::clearInstancePool();
     }
 
     /**
@@ -481,7 +484,7 @@ abstract class BaseFeatureAvPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related FeatureAvDesc table
+     * Returns the number of rows matching criteria, joining the related Feature table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -489,7 +492,7 @@ abstract class BaseFeatureAvPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinFeatureAvDesc(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinFeature(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -516,7 +519,7 @@ abstract class BaseFeatureAvPeer
             $con = Propel::getConnection(FeatureAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, $join_behavior);
+        $criteria->addJoin(FeatureAvPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -532,58 +535,7 @@ abstract class BaseFeatureAvPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related FeatureProd table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinFeatureProd(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(FeatureAvPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            FeatureAvPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(FeatureAvPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(FeatureAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureProdPeer::FEATURE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of FeatureAv objects pre-filled with their FeatureAvDesc objects.
+     * Selects a collection of FeatureAv objects pre-filled with their Feature objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -591,7 +543,7 @@ abstract class BaseFeatureAvPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinFeatureAvDesc(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinFeature(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -602,9 +554,9 @@ abstract class BaseFeatureAvPeer
 
         FeatureAvPeer::addSelectColumns($criteria);
         $startcol = FeatureAvPeer::NUM_HYDRATE_COLUMNS;
-        FeatureAvDescPeer::addSelectColumns($criteria);
+        FeaturePeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, $join_behavior);
+        $criteria->addJoin(FeatureAvPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -624,89 +576,20 @@ abstract class BaseFeatureAvPeer
                 FeatureAvPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = FeatureAvDescPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = FeaturePeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = FeatureAvDescPeer::getInstanceFromPool($key2);
+                $obj2 = FeaturePeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = FeatureAvDescPeer::getOMClass();
+                    $cls = FeaturePeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    FeatureAvDescPeer::addInstanceToPool($obj2, $key2);
+                    FeaturePeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (FeatureAv) to $obj2 (FeatureAvDesc)
-                // one to one relationship
-                $obj1->setFeatureAvDesc($obj2);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of FeatureAv objects pre-filled with their FeatureProd objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of FeatureAv objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinFeatureProd(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(FeatureAvPeer::DATABASE_NAME);
-        }
-
-        FeatureAvPeer::addSelectColumns($criteria);
-        $startcol = FeatureAvPeer::NUM_HYDRATE_COLUMNS;
-        FeatureProdPeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureProdPeer::FEATURE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = FeatureAvPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = FeatureAvPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                FeatureAvPeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = FeatureProdPeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = FeatureProdPeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = FeatureProdPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    FeatureProdPeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (FeatureAv) to $obj2 (FeatureProd)
-                // one to one relationship
-                $obj1->setFeatureProd($obj2);
+                // Add the $obj1 (FeatureAv) to $obj2 (Feature)
+                $obj2->addFeatureAv($obj1);
 
             } // if joined row was not null
 
@@ -754,9 +637,7 @@ abstract class BaseFeatureAvPeer
             $con = Propel::getConnection(FeatureAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, $join_behavior);
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureProdPeer::FEATURE_AV_ID, $join_behavior);
+        $criteria->addJoin(FeatureAvPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -792,15 +673,10 @@ abstract class BaseFeatureAvPeer
         FeatureAvPeer::addSelectColumns($criteria);
         $startcol2 = FeatureAvPeer::NUM_HYDRATE_COLUMNS;
 
-        FeatureAvDescPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + FeatureAvDescPeer::NUM_HYDRATE_COLUMNS;
+        FeaturePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + FeaturePeer::NUM_HYDRATE_COLUMNS;
 
-        FeatureProdPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + FeatureProdPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, $join_behavior);
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureProdPeer::FEATURE_AV_ID, $join_behavior);
+        $criteria->addJoin(FeatureAvPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -819,291 +695,23 @@ abstract class BaseFeatureAvPeer
                 FeatureAvPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined FeatureAvDesc rows
+            // Add objects for joined Feature rows
 
-            $key2 = FeatureAvDescPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = FeaturePeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = FeatureAvDescPeer::getInstanceFromPool($key2);
+                $obj2 = FeaturePeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = FeatureAvDescPeer::getOMClass();
+                    $cls = FeaturePeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    FeatureAvDescPeer::addInstanceToPool($obj2, $key2);
+                    FeaturePeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (FeatureAv) to the collection in $obj2 (FeatureAvDesc)
-                $obj1->setFeatureAvDesc($obj2);
+                // Add the $obj1 (FeatureAv) to the collection in $obj2 (Feature)
+                $obj2->addFeatureAv($obj1);
             } // if joined row not null
-
-            // Add objects for joined FeatureProd rows
-
-            $key3 = FeatureProdPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = FeatureProdPeer::getInstanceFromPool($key3);
-                if (!$obj3) {
-
-                    $cls = FeatureProdPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    FeatureProdPeer::addInstanceToPool($obj3, $key3);
-                } // if obj3 loaded
-
-                // Add the $obj1 (FeatureAv) to the collection in $obj3 (FeatureProd)
-                $obj1->setFeatureProd($obj3);
-            } // if joined row not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related FeatureAvDesc table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptFeatureAvDesc(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(FeatureAvPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            FeatureAvPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(FeatureAvPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(FeatureAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureProdPeer::FEATURE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related FeatureProd table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptFeatureProd(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(FeatureAvPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            FeatureAvPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(FeatureAvPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(FeatureAvPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of FeatureAv objects pre-filled with all related objects except FeatureAvDesc.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of FeatureAv objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptFeatureAvDesc(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(FeatureAvPeer::DATABASE_NAME);
-        }
-
-        FeatureAvPeer::addSelectColumns($criteria);
-        $startcol2 = FeatureAvPeer::NUM_HYDRATE_COLUMNS;
-
-        FeatureProdPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + FeatureProdPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureProdPeer::FEATURE_AV_ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = FeatureAvPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = FeatureAvPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                FeatureAvPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined FeatureProd rows
-
-                $key2 = FeatureProdPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = FeatureProdPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = FeatureProdPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    FeatureProdPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (FeatureAv) to the collection in $obj2 (FeatureProd)
-                $obj1->setFeatureProd($obj2);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of FeatureAv objects pre-filled with all related objects except FeatureProd.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of FeatureAv objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptFeatureProd(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(FeatureAvPeer::DATABASE_NAME);
-        }
-
-        FeatureAvPeer::addSelectColumns($criteria);
-        $startcol2 = FeatureAvPeer::NUM_HYDRATE_COLUMNS;
-
-        FeatureAvDescPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + FeatureAvDescPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(FeatureAvPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = FeatureAvPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = FeatureAvPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                FeatureAvPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined FeatureAvDesc rows
-
-                $key2 = FeatureAvDescPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = FeatureAvDescPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = FeatureAvDescPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    FeatureAvDescPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (FeatureAv) to the collection in $obj2 (FeatureAvDesc)
-                $obj1->setFeatureAvDesc($obj2);
-
-            } // if joined row is not null
 
             $results[] = $obj1;
         }
@@ -1245,7 +853,6 @@ abstract class BaseFeatureAvPeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += FeatureAvPeer::doOnDeleteCascade(new Criteria(FeatureAvPeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(FeatureAvPeer::TABLE_NAME, $con, FeatureAvPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -1279,14 +886,24 @@ abstract class BaseFeatureAvPeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            FeatureAvPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof FeatureAv) { // it's a model object
+            // invalidate the cache for this single object
+            FeatureAvPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(FeatureAvPeer::DATABASE_NAME);
             $criteria->add(FeatureAvPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                FeatureAvPeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -1299,23 +916,6 @@ abstract class BaseFeatureAvPeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            $affectedRows += FeatureAvPeer::doOnDeleteCascade($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                FeatureAvPeer::clearInstancePool();
-            } elseif ($values instanceof FeatureAv) { // it's a model object
-                FeatureAvPeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    FeatureAvPeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             FeatureAvPeer::clearRelatedInstancePool();
             $con->commit();
@@ -1325,39 +925,6 @@ abstract class BaseFeatureAvPeer
             $con->rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return int The number of affected rows (if supported by underlying database driver).
-     */
-    protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-    {
-        // initialize var to track total num of affected rows
-        $affectedRows = 0;
-
-        // first find the objects that are implicated by the $criteria
-        $objects = FeatureAvPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-
-            // delete related Feature objects
-            $criteria = new Criteria(FeaturePeer::DATABASE_NAME);
-
-            $criteria->add(FeaturePeer::ID, $obj->getFeatureId());
-            $affectedRows += FeaturePeer::doDelete($criteria, $con);
-        }
-
-        return $affectedRows;
     }
 
     /**

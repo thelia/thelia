@@ -88,7 +88,7 @@ abstract class BaseCouponQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Coupon', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Coupon', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -263,8 +263,6 @@ abstract class BaseCouponQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByCouponRule()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -639,7 +637,7 @@ abstract class BaseCouponQuery extends ModelCriteria
     /**
      * Filter the query by a related CouponRule object
      *
-     * @param   CouponRule|PropelObjectCollection $couponRule The related object(s) to use as filter
+     * @param   CouponRule|PropelObjectCollection $couponRule  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CouponQuery The current query, for fluid interface
@@ -651,12 +649,10 @@ abstract class BaseCouponQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CouponPeer::ID, $couponRule->getCouponId(), $comparison);
         } elseif ($couponRule instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CouponPeer::ID, $couponRule->toKeyValue('PrimaryKey', 'CouponId'), $comparison);
+                ->useCouponRuleQuery()
+                ->filterByPrimaryKeys($couponRule->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByCouponRule() only accepts arguments of type CouponRule or PropelCollection');
         }

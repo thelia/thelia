@@ -72,7 +72,7 @@ abstract class BaseResourceDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\ResourceDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\ResourceDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -275,6 +275,8 @@ abstract class BaseResourceDescQuery extends ModelCriteria
      * $query->filterByResourceId(array('min' => 12)); // WHERE resource_id > 12
      * </code>
      *
+     * @see       filterByResource()
+     *
      * @param     mixed $resourceId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -453,7 +455,7 @@ abstract class BaseResourceDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Resource object
      *
-     * @param   Resource|PropelObjectCollection $resource  the related object to use as filter
+     * @param   Resource|PropelObjectCollection $resource The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ResourceDescQuery The current query, for fluid interface
@@ -465,10 +467,12 @@ abstract class BaseResourceDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ResourceDescPeer::RESOURCE_ID, $resource->getId(), $comparison);
         } elseif ($resource instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useResourceQuery()
-                ->filterByPrimaryKeys($resource->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ResourceDescPeer::RESOURCE_ID, $resource->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByResource() only accepts arguments of type Resource or PropelCollection');
         }

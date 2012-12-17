@@ -42,11 +42,7 @@ class FolderTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'content_folder', 'FOLDER_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'document', 'FOLDER_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'folder_desc', 'FOLDER_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'image', 'FOLDER_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'rewriting', 'FOLDER_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('PARENT', 'Parent', 'INTEGER', true, null, null);
         $this->addColumn('LINK', 'Link', 'VARCHAR', false, 255, null);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', false, null, null);
@@ -61,11 +57,11 @@ class FolderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::MANY_TO_ONE, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::MANY_TO_ONE, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FolderDesc', 'Thelia\\Model\\FolderDesc', RelationMap::MANY_TO_ONE, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::MANY_TO_ONE, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::MANY_TO_ONE, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'ContentFolders');
+        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'Documents');
+        $this->addRelation('FolderDesc', 'Thelia\\Model\\FolderDesc', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'FolderDescs');
+        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'Images');
+        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'Rewritings');
     } // buildRelations()
 
 } // FolderTableMap

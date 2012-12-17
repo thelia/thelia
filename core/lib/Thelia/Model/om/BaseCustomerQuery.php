@@ -78,6 +78,10 @@ use Thelia\Model\Order;
  * @method CustomerQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method CustomerQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method CustomerQuery leftJoinCustomerTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitle relation
+ * @method CustomerQuery rightJoinCustomerTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitle relation
+ * @method CustomerQuery innerJoinCustomerTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitle relation
+ *
  * @method CustomerQuery leftJoinAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the Address relation
  * @method CustomerQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
  * @method CustomerQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
@@ -85,10 +89,6 @@ use Thelia\Model\Order;
  * @method CustomerQuery leftJoinOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the Order relation
  * @method CustomerQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method CustomerQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
- *
- * @method CustomerQuery leftJoinCustomerTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitle relation
- * @method CustomerQuery rightJoinCustomerTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitle relation
- * @method CustomerQuery innerJoinCustomerTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitle relation
  *
  * @method Customer findOne(PropelPDO $con = null) Return the first Customer matching the query
  * @method Customer findOneOrCreate(PropelPDO $con = null) Return the first Customer matching the query, or a new Customer object populated from the query conditions when no match is found
@@ -154,7 +154,7 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Customer', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Customer', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -330,10 +330,6 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByAddress()
-     *
-     * @see       filterByOrder()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -389,6 +385,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * $query->filterByCustomerTitleId(array(12, 34)); // WHERE customer_title_id IN (12, 34)
      * $query->filterByCustomerTitleId(array('min' => 12)); // WHERE customer_title_id > 12
      * </code>
+     *
+     * @see       filterByCustomerTitle()
      *
      * @param     mixed $customerTitleId The value to use as filter.
      *              Use scalar values for equality.
@@ -1095,9 +1093,85 @@ abstract class BaseCustomerQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related CustomerTitle object
+     *
+     * @param   CustomerTitle|PropelObjectCollection $customerTitle The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CustomerQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCustomerTitle($customerTitle, $comparison = null)
+    {
+        if ($customerTitle instanceof CustomerTitle) {
+            return $this
+                ->addUsingAlias(CustomerPeer::CUSTOMER_TITLE_ID, $customerTitle->getId(), $comparison);
+        } elseif ($customerTitle instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(CustomerPeer::CUSTOMER_TITLE_ID, $customerTitle->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCustomerTitle() only accepts arguments of type CustomerTitle or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CustomerTitle relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CustomerQuery The current query, for fluid interface
+     */
+    public function joinCustomerTitle($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CustomerTitle');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CustomerTitle');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CustomerTitle relation CustomerTitle object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CustomerTitleQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerTitleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCustomerTitle($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerTitle', '\Thelia\Model\CustomerTitleQuery');
+    }
+
+    /**
      * Filter the query by a related Address object
      *
-     * @param   Address|PropelObjectCollection $address The related object(s) to use as filter
+     * @param   Address|PropelObjectCollection $address  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CustomerQuery The current query, for fluid interface
@@ -1109,12 +1183,10 @@ abstract class BaseCustomerQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CustomerPeer::ID, $address->getCustomerId(), $comparison);
         } elseif ($address instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CustomerPeer::ID, $address->toKeyValue('PrimaryKey', 'CustomerId'), $comparison);
+                ->useAddressQuery()
+                ->filterByPrimaryKeys($address->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAddress() only accepts arguments of type Address or PropelCollection');
         }
@@ -1173,7 +1245,7 @@ abstract class BaseCustomerQuery extends ModelCriteria
     /**
      * Filter the query by a related Order object
      *
-     * @param   Order|PropelObjectCollection $order The related object(s) to use as filter
+     * @param   Order|PropelObjectCollection $order  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CustomerQuery The current query, for fluid interface
@@ -1185,12 +1257,10 @@ abstract class BaseCustomerQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CustomerPeer::ID, $order->getCustomerId(), $comparison);
         } elseif ($order instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CustomerPeer::ID, $order->toKeyValue('PrimaryKey', 'CustomerId'), $comparison);
+                ->useOrderQuery()
+                ->filterByPrimaryKeys($order->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByOrder() only accepts arguments of type Order or PropelCollection');
         }
@@ -1244,80 +1314,6 @@ abstract class BaseCustomerQuery extends ModelCriteria
         return $this
             ->joinOrder($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Order', '\Thelia\Model\OrderQuery');
-    }
-
-    /**
-     * Filter the query by a related CustomerTitle object
-     *
-     * @param   CustomerTitle|PropelObjectCollection $customerTitle  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   CustomerQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByCustomerTitle($customerTitle, $comparison = null)
-    {
-        if ($customerTitle instanceof CustomerTitle) {
-            return $this
-                ->addUsingAlias(CustomerPeer::CUSTOMER_TITLE_ID, $customerTitle->getId(), $comparison);
-        } elseif ($customerTitle instanceof PropelObjectCollection) {
-            return $this
-                ->useCustomerTitleQuery()
-                ->filterByPrimaryKeys($customerTitle->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCustomerTitle() only accepts arguments of type CustomerTitle or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the CustomerTitle relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return CustomerQuery The current query, for fluid interface
-     */
-    public function joinCustomerTitle($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CustomerTitle');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'CustomerTitle');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the CustomerTitle relation CustomerTitle object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CustomerTitleQuery A secondary query class using the current class as primary query
-     */
-    public function useCustomerTitleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCustomerTitle($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CustomerTitle', '\Thelia\Model\CustomerTitleQuery');
     }
 
     /**

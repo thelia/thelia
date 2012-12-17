@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Area;
 use Thelia\Model\AreaQuery;
@@ -80,9 +78,9 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Area one-to-one related Area object
+     * @var        Area
      */
-    protected $singleArea;
+    protected $aArea;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -97,12 +95,6 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $areasScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -246,6 +238,10 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
             $this->modifiedColumns[] = DelivzonePeer::AREA_ID;
         }
 
+        if ($this->aArea !== null && $this->aArea->getId() !== $v) {
+            $this->aArea = null;
+        }
+
 
         return $this;
     } // setAreaId()
@@ -385,6 +381,9 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aArea !== null && $this->area_id !== $this->aArea->getId()) {
+            $this->aArea = null;
+        }
     } // ensureConsistency
 
     /**
@@ -424,8 +423,7 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleArea = null;
-
+            $this->aArea = null;
         } // if (deep)
     }
 
@@ -539,6 +537,18 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aArea !== null) {
+                if ($this->aArea->isModified() || $this->aArea->isNew()) {
+                    $affectedRows += $this->aArea->save($con);
+                }
+                $this->setArea($this->aArea);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -548,21 +558,6 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->areasScheduledForDeletion !== null) {
-                if (!$this->areasScheduledForDeletion->isEmpty()) {
-                    AreaQuery::create()
-                        ->filterByPrimaryKeys($this->areasScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->areasScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleArea !== null) {
-                if (!$this->singleArea->isDeleted()) {
-                        $affectedRows += $this->singleArea->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -726,16 +721,22 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aArea !== null) {
+                if (!$this->aArea->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aArea->getValidationFailures());
+                }
+            }
+
+
             if (($retval = DelivzonePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleArea !== null) {
-                    if (!$this->singleArea->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleArea->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -823,8 +824,8 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleArea) {
-                $result['Area'] = $this->singleArea->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aArea) {
+                $result['Area'] = $this->aArea->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -995,11 +996,6 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getArea();
-            if ($relObj) {
-                $copyObj->setArea($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1050,53 +1046,55 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Area object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Area object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Area
-     * @throws PropelException
-     */
-    public function getArea(PropelPDO $con = null)
-    {
-
-        if ($this->singleArea === null && !$this->isNew()) {
-            $this->singleArea = AreaQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleArea;
-    }
-
-    /**
-     * Sets a single Area object as related to this object by a one-to-one relationship.
-     *
-     * @param             Area $v Area
+     * @param             Area $v
      * @return Delivzone The current object (for fluent API support)
      * @throws PropelException
      */
     public function setArea(Area $v = null)
     {
-        $this->singleArea = $v;
-
-        // Make sure that that the passed-in Area isn't already associated with this object
-        if ($v !== null && $v->getDelivzone() === null) {
-            $v->setDelivzone($this);
+        if ($v === null) {
+            $this->setAreaId(NULL);
+        } else {
+            $this->setAreaId($v->getId());
         }
 
+        $this->aArea = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Area object, it will not be re-added.
+        if ($v !== null) {
+            $v->addDelivzone($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Area object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Area The associated Area object.
+     * @throws PropelException
+     */
+    public function getArea(PropelPDO $con = null)
+    {
+        if ($this->aArea === null && ($this->area_id !== null)) {
+            $this->aArea = AreaQuery::create()->findPk($this->area_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aArea->addDelivzones($this);
+             */
+        }
+
+        return $this->aArea;
     }
 
     /**
@@ -1129,15 +1127,9 @@ abstract class BaseDelivzone extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleArea) {
-                $this->singleArea->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleArea instanceof PropelCollection) {
-            $this->singleArea->clearIterator();
-        }
-        $this->singleArea = null;
+        $this->aArea = null;
     }
 
     /**

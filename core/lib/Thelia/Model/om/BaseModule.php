@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\GroupModule;
 use Thelia\Model\GroupModuleQuery;
@@ -92,14 +94,16 @@ abstract class BaseModule extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        GroupModule
+     * @var        PropelObjectCollection|GroupModule[] Collection to store aggregation of GroupModule objects.
      */
-    protected $aGroupModule;
+    protected $collGroupModules;
+    protected $collGroupModulesPartial;
 
     /**
-     * @var        ModuleDesc
+     * @var        PropelObjectCollection|ModuleDesc[] Collection to store aggregation of ModuleDesc objects.
      */
-    protected $aModuleDesc;
+    protected $collModuleDescs;
+    protected $collModuleDescsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -114,6 +118,18 @@ abstract class BaseModule extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $moduleDescsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -254,14 +270,6 @@ abstract class BaseModule extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = ModulePeer::ID;
-        }
-
-        if ($this->aGroupModule !== null && $this->aGroupModule->getModuleId() !== $v) {
-            $this->aGroupModule = null;
-        }
-
-        if ($this->aModuleDesc !== null && $this->aModuleDesc->getModuleId() !== $v) {
-            $this->aModuleDesc = null;
         }
 
 
@@ -468,12 +476,6 @@ abstract class BaseModule extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aGroupModule !== null && $this->id !== $this->aGroupModule->getModuleId()) {
-            $this->aGroupModule = null;
-        }
-        if ($this->aModuleDesc !== null && $this->id !== $this->aModuleDesc->getModuleId()) {
-            $this->aModuleDesc = null;
-        }
     } // ensureConsistency
 
     /**
@@ -513,8 +515,10 @@ abstract class BaseModule extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aGroupModule = null;
-            $this->aModuleDesc = null;
+            $this->collGroupModules = null;
+
+            $this->collModuleDescs = null;
+
         } // if (deep)
     }
 
@@ -628,25 +632,6 @@ abstract class BaseModule extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aGroupModule !== null) {
-                if ($this->aGroupModule->isModified() || $this->aGroupModule->isNew()) {
-                    $affectedRows += $this->aGroupModule->save($con);
-                }
-                $this->setGroupModule($this->aGroupModule);
-            }
-
-            if ($this->aModuleDesc !== null) {
-                if ($this->aModuleDesc->isModified() || $this->aModuleDesc->isNew()) {
-                    $affectedRows += $this->aModuleDesc->save($con);
-                }
-                $this->setModuleDesc($this->aModuleDesc);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -656,6 +641,41 @@ abstract class BaseModule extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->groupModulesScheduledForDeletion !== null) {
+                if (!$this->groupModulesScheduledForDeletion->isEmpty()) {
+                    foreach ($this->groupModulesScheduledForDeletion as $groupModule) {
+                        // need to save related object because we set the relation to null
+                        $groupModule->save($con);
+                    }
+                    $this->groupModulesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGroupModules !== null) {
+                foreach ($this->collGroupModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->moduleDescsScheduledForDeletion !== null) {
+                if (!$this->moduleDescsScheduledForDeletion->isEmpty()) {
+                    ModuleDescQuery::create()
+                        ->filterByPrimaryKeys($this->moduleDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collModuleDescs !== null) {
+                foreach ($this->collModuleDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -820,28 +840,26 @@ abstract class BaseModule extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aGroupModule !== null) {
-                if (!$this->aGroupModule->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aGroupModule->getValidationFailures());
-                }
-            }
-
-            if ($this->aModuleDesc !== null) {
-                if (!$this->aModuleDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aModuleDesc->getValidationFailures());
-                }
-            }
-
-
             if (($retval = ModulePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collGroupModules !== null) {
+                    foreach ($this->collGroupModules as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collModuleDescs !== null) {
+                    foreach ($this->collModuleDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -937,11 +955,11 @@ abstract class BaseModule extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aGroupModule) {
-                $result['GroupModule'] = $this->aGroupModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collGroupModules) {
+                $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aModuleDesc) {
-                $result['ModuleDesc'] = $this->aModuleDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collModuleDescs) {
+                $result['ModuleDescs'] = $this->collModuleDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1124,14 +1142,16 @@ abstract class BaseModule extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getGroupModule();
-            if ($relObj) {
-                $copyObj->setGroupModule($relObj->copy($deepCopy));
+            foreach ($this->getGroupModules() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGroupModule($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getModuleDesc();
-            if ($relObj) {
-                $copyObj->setModuleDesc($relObj->copy($deepCopy));
+            foreach ($this->getModuleDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleDesc($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1184,98 +1204,462 @@ abstract class BaseModule extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a GroupModule object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             GroupModule $v
-     * @return Module The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('GroupModule' == $relationName) {
+            $this->initGroupModules();
+        }
+        if ('ModuleDesc' == $relationName) {
+            $this->initModuleDescs();
+        }
+    }
+
+    /**
+     * Clears out the collGroupModules collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addGroupModules()
+     */
+    public function clearGroupModules()
+    {
+        $this->collGroupModules = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupModulesPartial = null;
+    }
+
+    /**
+     * reset is the collGroupModules collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGroupModules($v = true)
+    {
+        $this->collGroupModulesPartial = $v;
+    }
+
+    /**
+     * Initializes the collGroupModules collection.
+     *
+     * By default this just sets the collGroupModules collection to an empty array (like clearcollGroupModules());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGroupModules($overrideExisting = true)
+    {
+        if (null !== $this->collGroupModules && !$overrideExisting) {
+            return;
+        }
+        $this->collGroupModules = new PropelObjectCollection();
+        $this->collGroupModules->setModel('GroupModule');
+    }
+
+    /**
+     * Gets an array of GroupModule objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Module is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GroupModule[] List of GroupModule objects
      * @throws PropelException
      */
-    public function setGroupModule(GroupModule $v = null)
+    public function getGroupModules($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collGroupModulesPartial && !$this->isNew();
+        if (null === $this->collGroupModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGroupModules) {
+                // return empty collection
+                $this->initGroupModules();
+            } else {
+                $collGroupModules = GroupModuleQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGroupModulesPartial && count($collGroupModules)) {
+                      $this->initGroupModules(false);
+
+                      foreach($collGroupModules as $obj) {
+                        if (false == $this->collGroupModules->contains($obj)) {
+                          $this->collGroupModules->append($obj);
+                        }
+                      }
+
+                      $this->collGroupModulesPartial = true;
+                    }
+
+                    return $collGroupModules;
+                }
+
+                if($partial && $this->collGroupModules) {
+                    foreach($this->collGroupModules as $obj) {
+                        if($obj->isNew()) {
+                            $collGroupModules[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGroupModules = $collGroupModules;
+                $this->collGroupModulesPartial = false;
+            }
+        }
+
+        return $this->collGroupModules;
+    }
+
+    /**
+     * Sets a collection of GroupModule objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groupModules A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setGroupModules(PropelCollection $groupModules, PropelPDO $con = null)
+    {
+        $this->groupModulesScheduledForDeletion = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
+
+        foreach ($this->groupModulesScheduledForDeletion as $groupModuleRemoved) {
+            $groupModuleRemoved->setModule(null);
+        }
+
+        $this->collGroupModules = null;
+        foreach ($groupModules as $groupModule) {
+            $this->addGroupModule($groupModule);
+        }
+
+        $this->collGroupModules = $groupModules;
+        $this->collGroupModulesPartial = false;
+    }
+
+    /**
+     * Returns the number of related GroupModule objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GroupModule objects.
+     * @throws PropelException
+     */
+    public function countGroupModules(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupModulesPartial && !$this->isNew();
+        if (null === $this->collGroupModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGroupModules) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getGroupModules());
+                }
+                $query = GroupModuleQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByModule($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getModuleId());
+            return count($this->collGroupModules);
         }
+    }
 
-        $this->aGroupModule = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setModule($this);
+    /**
+     * Method called to associate a GroupModule object to this object
+     * through the GroupModule foreign key attribute.
+     *
+     * @param    GroupModule $l GroupModule
+     * @return Module The current object (for fluent API support)
+     */
+    public function addGroupModule(GroupModule $l)
+    {
+        if ($this->collGroupModules === null) {
+            $this->initGroupModules();
+            $this->collGroupModulesPartial = true;
         }
-
+        if (!$this->collGroupModules->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddGroupModule($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated GroupModule object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return GroupModule The associated GroupModule object.
-     * @throws PropelException
+     * @param	GroupModule $groupModule The groupModule object to add.
      */
-    public function getGroupModule(PropelPDO $con = null)
+    protected function doAddGroupModule($groupModule)
     {
-        if ($this->aGroupModule === null && ($this->id !== null)) {
-            $this->aGroupModule = GroupModuleQuery::create()
-                ->filterByModule($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aGroupModule->setModule($this);
-        }
-
-        return $this->aGroupModule;
+        $this->collGroupModules[]= $groupModule;
+        $groupModule->setModule($this);
     }
 
     /**
-     * Declares an association between this object and a ModuleDesc object.
+     * @param	GroupModule $groupModule The groupModule object to remove.
+     */
+    public function removeGroupModule($groupModule)
+    {
+        if ($this->getGroupModules()->contains($groupModule)) {
+            $this->collGroupModules->remove($this->collGroupModules->search($groupModule));
+            if (null === $this->groupModulesScheduledForDeletion) {
+                $this->groupModulesScheduledForDeletion = clone $this->collGroupModules;
+                $this->groupModulesScheduledForDeletion->clear();
+            }
+            $this->groupModulesScheduledForDeletion[]= $groupModule;
+            $groupModule->setModule(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Module is new, it will return
+     * an empty collection; or if this Module has previously
+     * been saved, it will retrieve related GroupModules from storage.
      *
-     * @param             ModuleDesc $v
-     * @return Module The current object (for fluent API support)
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Module.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|GroupModule[] List of GroupModule objects
+     */
+    public function getGroupModulesJoinGroup($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = GroupModuleQuery::create(null, $criteria);
+        $query->joinWith('Group', $join_behavior);
+
+        return $this->getGroupModules($query, $con);
+    }
+
+    /**
+     * Clears out the collModuleDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleDescs()
+     */
+    public function clearModuleDescs()
+    {
+        $this->collModuleDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collModuleDescsPartial = null;
+    }
+
+    /**
+     * reset is the collModuleDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialModuleDescs($v = true)
+    {
+        $this->collModuleDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleDescs collection.
+     *
+     * By default this just sets the collModuleDescs collection to an empty array (like clearcollModuleDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleDescs($overrideExisting = true)
+    {
+        if (null !== $this->collModuleDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleDescs = new PropelObjectCollection();
+        $this->collModuleDescs->setModel('ModuleDesc');
+    }
+
+    /**
+     * Gets an array of ModuleDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Module is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ModuleDesc[] List of ModuleDesc objects
      * @throws PropelException
      */
-    public function setModuleDesc(ModuleDesc $v = null)
+    public function getModuleDescs($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collModuleDescsPartial && !$this->isNew();
+        if (null === $this->collModuleDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleDescs) {
+                // return empty collection
+                $this->initModuleDescs();
+            } else {
+                $collModuleDescs = ModuleDescQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleDescsPartial && count($collModuleDescs)) {
+                      $this->initModuleDescs(false);
+
+                      foreach($collModuleDescs as $obj) {
+                        if (false == $this->collModuleDescs->contains($obj)) {
+                          $this->collModuleDescs->append($obj);
+                        }
+                      }
+
+                      $this->collModuleDescsPartial = true;
+                    }
+
+                    return $collModuleDescs;
+                }
+
+                if($partial && $this->collModuleDescs) {
+                    foreach($this->collModuleDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collModuleDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleDescs = $collModuleDescs;
+                $this->collModuleDescsPartial = false;
+            }
+        }
+
+        return $this->collModuleDescs;
+    }
+
+    /**
+     * Sets a collection of ModuleDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $moduleDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setModuleDescs(PropelCollection $moduleDescs, PropelPDO $con = null)
+    {
+        $this->moduleDescsScheduledForDeletion = $this->getModuleDescs(new Criteria(), $con)->diff($moduleDescs);
+
+        foreach ($this->moduleDescsScheduledForDeletion as $moduleDescRemoved) {
+            $moduleDescRemoved->setModule(null);
+        }
+
+        $this->collModuleDescs = null;
+        foreach ($moduleDescs as $moduleDesc) {
+            $this->addModuleDesc($moduleDesc);
+        }
+
+        $this->collModuleDescs = $moduleDescs;
+        $this->collModuleDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ModuleDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ModuleDesc objects.
+     * @throws PropelException
+     */
+    public function countModuleDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collModuleDescsPartial && !$this->isNew();
+        if (null === $this->collModuleDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getModuleDescs());
+                }
+                $query = ModuleDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByModule($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getModuleId());
+            return count($this->collModuleDescs);
         }
+    }
 
-        $this->aModuleDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setModule($this);
+    /**
+     * Method called to associate a ModuleDesc object to this object
+     * through the ModuleDesc foreign key attribute.
+     *
+     * @param    ModuleDesc $l ModuleDesc
+     * @return Module The current object (for fluent API support)
+     */
+    public function addModuleDesc(ModuleDesc $l)
+    {
+        if ($this->collModuleDescs === null) {
+            $this->initModuleDescs();
+            $this->collModuleDescsPartial = true;
         }
-
+        if (!$this->collModuleDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleDesc($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	ModuleDesc $moduleDesc The moduleDesc object to add.
+     */
+    protected function doAddModuleDesc($moduleDesc)
+    {
+        $this->collModuleDescs[]= $moduleDesc;
+        $moduleDesc->setModule($this);
+    }
 
     /**
-     * Get the associated ModuleDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return ModuleDesc The associated ModuleDesc object.
-     * @throws PropelException
+     * @param	ModuleDesc $moduleDesc The moduleDesc object to remove.
      */
-    public function getModuleDesc(PropelPDO $con = null)
+    public function removeModuleDesc($moduleDesc)
     {
-        if ($this->aModuleDesc === null && ($this->id !== null)) {
-            $this->aModuleDesc = ModuleDescQuery::create()
-                ->filterByModule($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aModuleDesc->setModule($this);
+        if ($this->getModuleDescs()->contains($moduleDesc)) {
+            $this->collModuleDescs->remove($this->collModuleDescs->search($moduleDesc));
+            if (null === $this->moduleDescsScheduledForDeletion) {
+                $this->moduleDescsScheduledForDeletion = clone $this->collModuleDescs;
+                $this->moduleDescsScheduledForDeletion->clear();
+            }
+            $this->moduleDescsScheduledForDeletion[]= $moduleDesc;
+            $moduleDesc->setModule(null);
         }
-
-        return $this->aModuleDesc;
     }
 
     /**
@@ -1310,10 +1694,26 @@ abstract class BaseModule extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collGroupModules) {
+                foreach ($this->collGroupModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collModuleDescs) {
+                foreach ($this->collModuleDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aGroupModule = null;
-        $this->aModuleDesc = null;
+        if ($this->collGroupModules instanceof PropelCollection) {
+            $this->collGroupModules->clearIterator();
+        }
+        $this->collGroupModules = null;
+        if ($this->collModuleDescs instanceof PropelCollection) {
+            $this->collModuleDescs->clearIterator();
+        }
+        $this->collModuleDescs = null;
     }
 
     /**

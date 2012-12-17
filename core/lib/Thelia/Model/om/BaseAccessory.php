@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryPeer;
@@ -86,14 +84,14 @@ abstract class BaseAccessory extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        Product
      */
-    protected $singleProduct;
+    protected $aProductRelatedByProductId;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        Product
      */
-    protected $singleProduct;
+    protected $aProductRelatedByAccessory;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -108,18 +106,6 @@ abstract class BaseAccessory extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -273,6 +259,10 @@ abstract class BaseAccessory extends BaseObject implements Persistent
             $this->modifiedColumns[] = AccessoryPeer::PRODUCT_ID;
         }
 
+        if ($this->aProductRelatedByProductId !== null && $this->aProductRelatedByProductId->getId() !== $v) {
+            $this->aProductRelatedByProductId = null;
+        }
+
 
         return $this;
     } // setProductId()
@@ -292,6 +282,10 @@ abstract class BaseAccessory extends BaseObject implements Persistent
         if ($this->accessory !== $v) {
             $this->accessory = $v;
             $this->modifiedColumns[] = AccessoryPeer::ACCESSORY;
+        }
+
+        if ($this->aProductRelatedByAccessory !== null && $this->aProductRelatedByAccessory->getId() !== $v) {
+            $this->aProductRelatedByAccessory = null;
         }
 
 
@@ -434,6 +428,12 @@ abstract class BaseAccessory extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aProductRelatedByProductId !== null && $this->product_id !== $this->aProductRelatedByProductId->getId()) {
+            $this->aProductRelatedByProductId = null;
+        }
+        if ($this->aProductRelatedByAccessory !== null && $this->accessory !== $this->aProductRelatedByAccessory->getId()) {
+            $this->aProductRelatedByAccessory = null;
+        }
     } // ensureConsistency
 
     /**
@@ -473,10 +473,8 @@ abstract class BaseAccessory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleProduct = null;
-
-            $this->singleProduct = null;
-
+            $this->aProductRelatedByProductId = null;
+            $this->aProductRelatedByAccessory = null;
         } // if (deep)
     }
 
@@ -590,6 +588,25 @@ abstract class BaseAccessory extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProductRelatedByProductId !== null) {
+                if ($this->aProductRelatedByProductId->isModified() || $this->aProductRelatedByProductId->isNew()) {
+                    $affectedRows += $this->aProductRelatedByProductId->save($con);
+                }
+                $this->setProductRelatedByProductId($this->aProductRelatedByProductId);
+            }
+
+            if ($this->aProductRelatedByAccessory !== null) {
+                if ($this->aProductRelatedByAccessory->isModified() || $this->aProductRelatedByAccessory->isNew()) {
+                    $affectedRows += $this->aProductRelatedByAccessory->save($con);
+                }
+                $this->setProductRelatedByAccessory($this->aProductRelatedByAccessory);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -599,36 +616,6 @@ abstract class BaseAccessory extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
-                }
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -787,22 +774,28 @@ abstract class BaseAccessory extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProductRelatedByProductId !== null) {
+                if (!$this->aProductRelatedByProductId->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProductRelatedByProductId->getValidationFailures());
+                }
+            }
+
+            if ($this->aProductRelatedByAccessory !== null) {
+                if (!$this->aProductRelatedByAccessory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProductRelatedByAccessory->getValidationFailures());
+                }
+            }
+
+
             if (($retval = AccessoryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -894,11 +887,11 @@ abstract class BaseAccessory extends BaseObject implements Persistent
             $keys[5] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aProductRelatedByProductId) {
+                $result['ProductRelatedByProductId'] = $this->aProductRelatedByProductId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aProductRelatedByAccessory) {
+                $result['ProductRelatedByAccessory'] = $this->aProductRelatedByAccessory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1075,16 +1068,6 @@ abstract class BaseAccessory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1135,89 +1118,106 @@ abstract class BaseAccessory extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Product object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Product
-     * @throws PropelException
-     */
-    public function getProduct(PropelPDO $con = null)
-    {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleProduct;
-    }
-
-    /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
-     *
-     * @param             Product $v Product
+     * @param             Product $v
      * @return Accessory The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setProduct(Product $v = null)
+    public function setProductRelatedByProductId(Product $v = null)
     {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getAccessory() === null) {
-            $v->setAccessory($this);
+        if ($v === null) {
+            $this->setProductId(NULL);
+        } else {
+            $this->setProductId($v->getId());
         }
+
+        $this->aProductRelatedByProductId = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAccessoryRelatedByProductId($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
+     * Get the associated Product object
      *
-     * @param PropelPDO $con optional connection object
-     * @return Product
+     * @param PropelPDO $con Optional Connection object.
+     * @return Product The associated Product object.
      * @throws PropelException
      */
-    public function getProduct(PropelPDO $con = null)
+    public function getProductRelatedByProductId(PropelPDO $con = null)
     {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aProductRelatedByProductId === null && ($this->product_id !== null)) {
+            $this->aProductRelatedByProductId = ProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProductRelatedByProductId->addAccessorysRelatedByProductId($this);
+             */
         }
 
-        return $this->singleProduct;
+        return $this->aProductRelatedByProductId;
     }
 
     /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a Product object.
      *
-     * @param             Product $v Product
+     * @param             Product $v
      * @return Accessory The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setProduct(Product $v = null)
+    public function setProductRelatedByAccessory(Product $v = null)
     {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getAccessory() === null) {
-            $v->setAccessory($this);
+        if ($v === null) {
+            $this->setAccessory(NULL);
+        } else {
+            $this->setAccessory($v->getId());
         }
 
+        $this->aProductRelatedByAccessory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAccessoryRelatedByAccessory($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Product object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Product The associated Product object.
+     * @throws PropelException
+     */
+    public function getProductRelatedByAccessory(PropelPDO $con = null)
+    {
+        if ($this->aProductRelatedByAccessory === null && ($this->accessory !== null)) {
+            $this->aProductRelatedByAccessory = ProductQuery::create()->findPk($this->accessory, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProductRelatedByAccessory->addAccessorysRelatedByAccessory($this);
+             */
+        }
+
+        return $this->aProductRelatedByAccessory;
     }
 
     /**
@@ -1251,22 +1251,10 @@ abstract class BaseAccessory extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
-            }
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
+        $this->aProductRelatedByProductId = null;
+        $this->aProductRelatedByAccessory = null;
     }
 
     /**

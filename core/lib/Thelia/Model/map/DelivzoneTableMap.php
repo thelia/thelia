@@ -43,7 +43,7 @@ class DelivzoneTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('AREA_ID', 'AreaId', 'INTEGER', false, null, null);
+        $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', false, null, null);
         $this->addColumn('DELIVERY', 'Delivery', 'VARCHAR', true, 45, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -55,7 +55,7 @@ class DelivzoneTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Area', 'Thelia\\Model\\Area', RelationMap::ONE_TO_ONE, array('area_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Area', 'Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'SET NULL', null);
     } // buildRelations()
 
 } // DelivzoneTableMap

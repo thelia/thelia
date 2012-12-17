@@ -84,7 +84,7 @@ abstract class BaseContentDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\ContentDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\ContentDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -286,6 +286,8 @@ abstract class BaseContentDescQuery extends ModelCriteria
      * $query->filterByContentId(array(12, 34)); // WHERE content_id IN (12, 34)
      * $query->filterByContentId(array('min' => 12)); // WHERE content_id > 12
      * </code>
+     *
+     * @see       filterByContent()
      *
      * @param     mixed $contentId The value to use as filter.
      *              Use scalar values for equality.
@@ -552,7 +554,7 @@ abstract class BaseContentDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Content object
      *
-     * @param   Content|PropelObjectCollection $content  the related object to use as filter
+     * @param   Content|PropelObjectCollection $content The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentDescQuery The current query, for fluid interface
@@ -564,10 +566,12 @@ abstract class BaseContentDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentDescPeer::CONTENT_ID, $content->getId(), $comparison);
         } elseif ($content instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useContentQuery()
-                ->filterByPrimaryKeys($content->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ContentDescPeer::CONTENT_ID, $content->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByContent() only accepts arguments of type Content or PropelCollection');
         }

@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleDesc;
@@ -92,9 +90,9 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        TaxRule one-to-one related TaxRule object
+     * @var        TaxRule
      */
-    protected $singleTaxRule;
+    protected $aTaxRule;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -109,12 +107,6 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $taxRulesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -276,6 +268,10 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
         if ($this->tax_rule_id !== $v) {
             $this->tax_rule_id = $v;
             $this->modifiedColumns[] = TaxRuleDescPeer::TAX_RULE_ID;
+        }
+
+        if ($this->aTaxRule !== null && $this->aTaxRule->getId() !== $v) {
+            $this->aTaxRule = null;
         }
 
 
@@ -461,6 +457,9 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aTaxRule !== null && $this->tax_rule_id !== $this->aTaxRule->getId()) {
+            $this->aTaxRule = null;
+        }
     } // ensureConsistency
 
     /**
@@ -500,8 +499,7 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleTaxRule = null;
-
+            $this->aTaxRule = null;
         } // if (deep)
     }
 
@@ -615,6 +613,18 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTaxRule !== null) {
+                if ($this->aTaxRule->isModified() || $this->aTaxRule->isNew()) {
+                    $affectedRows += $this->aTaxRule->save($con);
+                }
+                $this->setTaxRule($this->aTaxRule);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -624,21 +634,6 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->taxRulesScheduledForDeletion !== null) {
-                if (!$this->taxRulesScheduledForDeletion->isEmpty()) {
-                    TaxRuleQuery::create()
-                        ->filterByPrimaryKeys($this->taxRulesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->taxRulesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleTaxRule !== null) {
-                if (!$this->singleTaxRule->isDeleted()) {
-                        $affectedRows += $this->singleTaxRule->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -814,16 +809,22 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTaxRule !== null) {
+                if (!$this->aTaxRule->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTaxRule->getValidationFailures());
+                }
+            }
+
+
             if (($retval = TaxRuleDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleTaxRule !== null) {
-                    if (!$this->singleTaxRule->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleTaxRule->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -919,8 +920,8 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleTaxRule) {
-                $result['TaxRule'] = $this->singleTaxRule->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aTaxRule) {
+                $result['TaxRule'] = $this->aTaxRule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1103,11 +1104,6 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getTaxRule();
-            if ($relObj) {
-                $copyObj->setTaxRule($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1158,53 +1154,55 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a TaxRule object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single TaxRule object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return TaxRule
-     * @throws PropelException
-     */
-    public function getTaxRule(PropelPDO $con = null)
-    {
-
-        if ($this->singleTaxRule === null && !$this->isNew()) {
-            $this->singleTaxRule = TaxRuleQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleTaxRule;
-    }
-
-    /**
-     * Sets a single TaxRule object as related to this object by a one-to-one relationship.
-     *
-     * @param             TaxRule $v TaxRule
+     * @param             TaxRule $v
      * @return TaxRuleDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTaxRule(TaxRule $v = null)
     {
-        $this->singleTaxRule = $v;
-
-        // Make sure that that the passed-in TaxRule isn't already associated with this object
-        if ($v !== null && $v->getTaxRuleDesc() === null) {
-            $v->setTaxRuleDesc($this);
+        if ($v === null) {
+            $this->setTaxRuleId(NULL);
+        } else {
+            $this->setTaxRuleId($v->getId());
         }
 
+        $this->aTaxRule = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the TaxRule object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTaxRuleDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated TaxRule object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return TaxRule The associated TaxRule object.
+     * @throws PropelException
+     */
+    public function getTaxRule(PropelPDO $con = null)
+    {
+        if ($this->aTaxRule === null && ($this->tax_rule_id !== null)) {
+            $this->aTaxRule = TaxRuleQuery::create()->findPk($this->tax_rule_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTaxRule->addTaxRuleDescs($this);
+             */
+        }
+
+        return $this->aTaxRule;
     }
 
     /**
@@ -1239,15 +1237,9 @@ abstract class BaseTaxRuleDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleTaxRule) {
-                $this->singleTaxRule->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleTaxRule instanceof PropelCollection) {
-            $this->singleTaxRule->clearIterator();
-        }
-        $this->singleTaxRule = null;
+        $this->aTaxRule = null;
     }
 
     /**

@@ -43,7 +43,7 @@ class CountryDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('COUNTRY_ID', 'CountryId', 'INTEGER', true, null, null);
+        $this->addForeignKey('COUNTRY_ID', 'CountryId', 'INTEGER', 'country', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -58,7 +58,7 @@ class CountryDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Country', 'Thelia\\Model\\Country', RelationMap::ONE_TO_ONE, array('country_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Country', 'Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('country_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // CountryDescTableMap

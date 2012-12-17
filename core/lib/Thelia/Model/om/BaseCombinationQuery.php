@@ -69,7 +69,7 @@ abstract class BaseCombinationQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Combination', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Combination', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -245,10 +245,6 @@ abstract class BaseCombinationQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByAttributeCombination()
-     *
-     * @see       filterByStock()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -384,7 +380,7 @@ abstract class BaseCombinationQuery extends ModelCriteria
     /**
      * Filter the query by a related AttributeCombination object
      *
-     * @param   AttributeCombination|PropelObjectCollection $attributeCombination The related object(s) to use as filter
+     * @param   AttributeCombination|PropelObjectCollection $attributeCombination  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CombinationQuery The current query, for fluid interface
@@ -396,12 +392,10 @@ abstract class BaseCombinationQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CombinationPeer::ID, $attributeCombination->getCombinationId(), $comparison);
         } elseif ($attributeCombination instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CombinationPeer::ID, $attributeCombination->toKeyValue('CombinationId', 'CombinationId'), $comparison);
+                ->useAttributeCombinationQuery()
+                ->filterByPrimaryKeys($attributeCombination->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAttributeCombination() only accepts arguments of type AttributeCombination or PropelCollection');
         }
@@ -460,7 +454,7 @@ abstract class BaseCombinationQuery extends ModelCriteria
     /**
      * Filter the query by a related Stock object
      *
-     * @param   Stock|PropelObjectCollection $stock The related object(s) to use as filter
+     * @param   Stock|PropelObjectCollection $stock  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CombinationQuery The current query, for fluid interface
@@ -472,12 +466,10 @@ abstract class BaseCombinationQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CombinationPeer::ID, $stock->getCombinationId(), $comparison);
         } elseif ($stock instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CombinationPeer::ID, $stock->toKeyValue('PrimaryKey', 'CombinationId'), $comparison);
+                ->useStockQuery()
+                ->filterByPrimaryKeys($stock->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByStock() only accepts arguments of type Stock or PropelCollection');
         }
@@ -491,7 +483,7 @@ abstract class BaseCombinationQuery extends ModelCriteria
      *
      * @return CombinationQuery The current query, for fluid interface
      */
-    public function joinStock($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinStock($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Stock');
@@ -526,7 +518,7 @@ abstract class BaseCombinationQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\StockQuery A secondary query class using the current class as primary query
      */
-    public function useStockQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useStockQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinStock($relationAlias, $joinType)

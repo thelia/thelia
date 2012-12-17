@@ -76,7 +76,7 @@ abstract class BaseConfigQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Config', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Config', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -251,8 +251,6 @@ abstract class BaseConfigQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByConfigDesc()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -500,7 +498,7 @@ abstract class BaseConfigQuery extends ModelCriteria
     /**
      * Filter the query by a related ConfigDesc object
      *
-     * @param   ConfigDesc|PropelObjectCollection $configDesc The related object(s) to use as filter
+     * @param   ConfigDesc|PropelObjectCollection $configDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ConfigQuery The current query, for fluid interface
@@ -512,12 +510,10 @@ abstract class BaseConfigQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ConfigPeer::ID, $configDesc->getConfigId(), $comparison);
         } elseif ($configDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ConfigPeer::ID, $configDesc->toKeyValue('PrimaryKey', 'ConfigId'), $comparison);
+                ->useConfigDescQuery()
+                ->filterByPrimaryKeys($configDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByConfigDesc() only accepts arguments of type ConfigDesc or PropelCollection');
         }

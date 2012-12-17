@@ -42,8 +42,7 @@ class OrderStatusTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order', 'STATUS_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order_status_desc', 'STATUS_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -55,8 +54,8 @@ class OrderStatusTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('id' => 'status_id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('OrderStatusDesc', 'Thelia\\Model\\OrderStatusDesc', RelationMap::MANY_TO_ONE, array('id' => 'status_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'status_id', ), 'SET NULL', null, 'Orders');
+        $this->addRelation('OrderStatusDesc', 'Thelia\\Model\\OrderStatusDesc', RelationMap::ONE_TO_MANY, array('id' => 'status_id', ), 'CASCADE', null, 'OrderStatusDescs');
     } // buildRelations()
 
 } // OrderStatusTableMap

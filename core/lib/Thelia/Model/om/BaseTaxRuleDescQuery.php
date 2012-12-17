@@ -76,7 +76,7 @@ abstract class BaseTaxRuleDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\TaxRuleDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\TaxRuleDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -278,6 +278,8 @@ abstract class BaseTaxRuleDescQuery extends ModelCriteria
      * $query->filterByTaxRuleId(array(12, 34)); // WHERE tax_rule_id IN (12, 34)
      * $query->filterByTaxRuleId(array('min' => 12)); // WHERE tax_rule_id > 12
      * </code>
+     *
+     * @see       filterByTaxRule()
      *
      * @param     mixed $taxRuleId The value to use as filter.
      *              Use scalar values for equality.
@@ -486,7 +488,7 @@ abstract class BaseTaxRuleDescQuery extends ModelCriteria
     /**
      * Filter the query by a related TaxRule object
      *
-     * @param   TaxRule|PropelObjectCollection $taxRule  the related object to use as filter
+     * @param   TaxRule|PropelObjectCollection $taxRule The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TaxRuleDescQuery The current query, for fluid interface
@@ -498,10 +500,12 @@ abstract class BaseTaxRuleDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(TaxRuleDescPeer::TAX_RULE_ID, $taxRule->getId(), $comparison);
         } elseif ($taxRule instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useTaxRuleQuery()
-                ->filterByPrimaryKeys($taxRule->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(TaxRuleDescPeer::TAX_RULE_ID, $taxRule->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByTaxRule() only accepts arguments of type TaxRule or PropelCollection');
         }
@@ -515,7 +519,7 @@ abstract class BaseTaxRuleDescQuery extends ModelCriteria
      *
      * @return TaxRuleDescQuery The current query, for fluid interface
      */
-    public function joinTaxRule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTaxRule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('TaxRule');
@@ -550,7 +554,7 @@ abstract class BaseTaxRuleDescQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
      */
-    public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinTaxRule($relationAlias, $joinType)

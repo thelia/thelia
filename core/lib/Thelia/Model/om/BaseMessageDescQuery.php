@@ -80,7 +80,7 @@ abstract class BaseMessageDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\MessageDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\MessageDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -282,6 +282,8 @@ abstract class BaseMessageDescQuery extends ModelCriteria
      * $query->filterByMessageId(array(12, 34)); // WHERE message_id IN (12, 34)
      * $query->filterByMessageId(array('min' => 12)); // WHERE message_id > 12
      * </code>
+     *
+     * @see       filterByMessage()
      *
      * @param     mixed $messageId The value to use as filter.
      *              Use scalar values for equality.
@@ -505,7 +507,7 @@ abstract class BaseMessageDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Message object
      *
-     * @param   Message|PropelObjectCollection $message  the related object to use as filter
+     * @param   Message|PropelObjectCollection $message The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   MessageDescQuery The current query, for fluid interface
@@ -517,10 +519,12 @@ abstract class BaseMessageDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(MessageDescPeer::MESSAGE_ID, $message->getId(), $comparison);
         } elseif ($message instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useMessageQuery()
-                ->filterByPrimaryKeys($message->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(MessageDescPeer::MESSAGE_ID, $message->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByMessage() only accepts arguments of type Message or PropelCollection');
         }

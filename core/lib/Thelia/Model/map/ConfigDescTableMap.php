@@ -43,7 +43,7 @@ class ConfigDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CONFIG_ID', 'ConfigId', 'INTEGER', true, null, null);
+        $this->addForeignKey('CONFIG_ID', 'ConfigId', 'INTEGER', 'config', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -58,7 +58,7 @@ class ConfigDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Config', 'Thelia\\Model\\Config', RelationMap::ONE_TO_ONE, array('config_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Config', 'Thelia\\Model\\Config', RelationMap::MANY_TO_ONE, array('config_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ConfigDescTableMap

@@ -80,7 +80,7 @@ abstract class BaseAttributeDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\AttributeDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\AttributeDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -312,6 +312,8 @@ abstract class BaseAttributeDescQuery extends ModelCriteria
      * $query->filterByAttributeId(array('min' => 12)); // WHERE attribute_id > 12
      * </code>
      *
+     * @see       filterByAttribute()
+     *
      * @param     mixed $attributeId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -519,7 +521,7 @@ abstract class BaseAttributeDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Attribute object
      *
-     * @param   Attribute|PropelObjectCollection $attribute  the related object to use as filter
+     * @param   Attribute|PropelObjectCollection $attribute The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AttributeDescQuery The current query, for fluid interface
@@ -531,10 +533,12 @@ abstract class BaseAttributeDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AttributeDescPeer::ATTRIBUTE_ID, $attribute->getId(), $comparison);
         } elseif ($attribute instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useAttributeQuery()
-                ->filterByPrimaryKeys($attribute->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(AttributeDescPeer::ATTRIBUTE_ID, $attribute->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByAttribute() only accepts arguments of type Attribute or PropelCollection');
         }

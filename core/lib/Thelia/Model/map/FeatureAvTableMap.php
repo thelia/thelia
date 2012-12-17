@@ -42,9 +42,8 @@ class FeatureAvTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_av_desc', 'FEATURE_AV_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_prod', 'FEATURE_AV_ID', true, null, null);
-        $this->addColumn('FEATURE_ID', 'FeatureId', 'INTEGER', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('FEATURE_ID', 'FeatureId', 'INTEGER', 'feature', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
         // validators
@@ -55,9 +54,9 @@ class FeatureAvTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FeatureAvDesc', 'Thelia\\Model\\FeatureAvDesc', RelationMap::MANY_TO_ONE, array('id' => 'feature_av_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::MANY_TO_ONE, array('id' => 'feature_av_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::ONE_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::MANY_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('FeatureAvDesc', 'Thelia\\Model\\FeatureAvDesc', RelationMap::ONE_TO_MANY, array('id' => 'feature_av_id', ), 'CASCADE', null, 'FeatureAvDescs');
+        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::ONE_TO_MANY, array('id' => 'feature_av_id', ), 'CASCADE', null, 'FeatureProds');
     } // buildRelations()
 
 } // FeatureAvTableMap

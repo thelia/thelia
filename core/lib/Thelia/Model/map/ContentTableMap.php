@@ -42,12 +42,7 @@ class ContentTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'content_assoc', 'CONTENT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'content_desc', 'CONTENT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'content_folder', 'CONTENT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'document', 'CONTENT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'image', 'CONTENT_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'rewriting', 'CONTENT_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', false, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -60,12 +55,12 @@ class ContentTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ContentAssoc', 'Thelia\\Model\\ContentAssoc', RelationMap::MANY_TO_ONE, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ContentDesc', 'Thelia\\Model\\ContentDesc', RelationMap::MANY_TO_ONE, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::MANY_TO_ONE, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::MANY_TO_ONE, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::MANY_TO_ONE, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::MANY_TO_ONE, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ContentAssoc', 'Thelia\\Model\\ContentAssoc', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', null, 'ContentAssocs');
+        $this->addRelation('ContentDesc', 'Thelia\\Model\\ContentDesc', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', null, 'ContentDescs');
+        $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', null, 'ContentFolders');
+        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', null, 'Documents');
+        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', null, 'Images');
+        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', null, 'Rewritings');
     } // buildRelations()
 
 } // ContentTableMap

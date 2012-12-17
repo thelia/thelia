@@ -80,7 +80,7 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Currency', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Currency', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -255,8 +255,6 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByOrder()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -533,7 +531,7 @@ abstract class BaseCurrencyQuery extends ModelCriteria
     /**
      * Filter the query by a related Order object
      *
-     * @param   Order|PropelObjectCollection $order The related object(s) to use as filter
+     * @param   Order|PropelObjectCollection $order  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CurrencyQuery The current query, for fluid interface
@@ -545,12 +543,10 @@ abstract class BaseCurrencyQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(CurrencyPeer::ID, $order->getCurrencyId(), $comparison);
         } elseif ($order instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(CurrencyPeer::ID, $order->toKeyValue('PrimaryKey', 'CurrencyId'), $comparison);
+                ->useOrderQuery()
+                ->filterByPrimaryKeys($order->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByOrder() only accepts arguments of type Order or PropelCollection');
         }
@@ -564,7 +560,7 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      *
      * @return CurrencyQuery The current query, for fluid interface
      */
-    public function joinOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinOrder($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Order');
@@ -599,7 +595,7 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
-    public function useOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useOrderQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinOrder($relationAlias, $joinType)

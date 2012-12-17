@@ -69,7 +69,7 @@ abstract class BaseResourceQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Resource', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Resource', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -245,10 +245,6 @@ abstract class BaseResourceQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByGroupResource()
-     *
-     * @see       filterByResourceDesc()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -384,7 +380,7 @@ abstract class BaseResourceQuery extends ModelCriteria
     /**
      * Filter the query by a related GroupResource object
      *
-     * @param   GroupResource|PropelObjectCollection $groupResource The related object(s) to use as filter
+     * @param   GroupResource|PropelObjectCollection $groupResource  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ResourceQuery The current query, for fluid interface
@@ -396,12 +392,10 @@ abstract class BaseResourceQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ResourcePeer::ID, $groupResource->getResourceId(), $comparison);
         } elseif ($groupResource instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ResourcePeer::ID, $groupResource->toKeyValue('PrimaryKey', 'ResourceId'), $comparison);
+                ->useGroupResourceQuery()
+                ->filterByPrimaryKeys($groupResource->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByGroupResource() only accepts arguments of type GroupResource or PropelCollection');
         }
@@ -460,7 +454,7 @@ abstract class BaseResourceQuery extends ModelCriteria
     /**
      * Filter the query by a related ResourceDesc object
      *
-     * @param   ResourceDesc|PropelObjectCollection $resourceDesc The related object(s) to use as filter
+     * @param   ResourceDesc|PropelObjectCollection $resourceDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ResourceQuery The current query, for fluid interface
@@ -472,12 +466,10 @@ abstract class BaseResourceQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ResourcePeer::ID, $resourceDesc->getResourceId(), $comparison);
         } elseif ($resourceDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ResourcePeer::ID, $resourceDesc->toKeyValue('PrimaryKey', 'ResourceId'), $comparison);
+                ->useResourceDescQuery()
+                ->filterByPrimaryKeys($resourceDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByResourceDesc() only accepts arguments of type ResourceDesc or PropelCollection');
         }

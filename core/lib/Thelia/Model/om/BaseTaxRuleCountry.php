@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Country;
 use Thelia\Model\CountryQuery;
@@ -96,19 +94,19 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Country one-to-one related Country object
+     * @var        Tax
      */
-    protected $singleCountry;
+    protected $aTax;
 
     /**
-     * @var        Tax one-to-one related Tax object
+     * @var        TaxRule
      */
-    protected $singleTax;
+    protected $aTaxRule;
 
     /**
-     * @var        TaxRule one-to-one related TaxRule object
+     * @var        Country
      */
-    protected $singleTaxRule;
+    protected $aCountry;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -123,24 +121,6 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $countrysScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $taxsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $taxRulesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -304,6 +284,10 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             $this->modifiedColumns[] = TaxRuleCountryPeer::TAX_RULE_ID;
         }
 
+        if ($this->aTaxRule !== null && $this->aTaxRule->getId() !== $v) {
+            $this->aTaxRule = null;
+        }
+
 
         return $this;
     } // setTaxRuleId()
@@ -325,6 +309,10 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             $this->modifiedColumns[] = TaxRuleCountryPeer::COUNTRY_ID;
         }
 
+        if ($this->aCountry !== null && $this->aCountry->getId() !== $v) {
+            $this->aCountry = null;
+        }
+
 
         return $this;
     } // setCountryId()
@@ -344,6 +332,10 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
         if ($this->tax_id !== $v) {
             $this->tax_id = $v;
             $this->modifiedColumns[] = TaxRuleCountryPeer::TAX_ID;
+        }
+
+        if ($this->aTax !== null && $this->aTax->getId() !== $v) {
+            $this->aTax = null;
         }
 
 
@@ -487,6 +479,15 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aTaxRule !== null && $this->tax_rule_id !== $this->aTaxRule->getId()) {
+            $this->aTaxRule = null;
+        }
+        if ($this->aCountry !== null && $this->country_id !== $this->aCountry->getId()) {
+            $this->aCountry = null;
+        }
+        if ($this->aTax !== null && $this->tax_id !== $this->aTax->getId()) {
+            $this->aTax = null;
+        }
     } // ensureConsistency
 
     /**
@@ -526,12 +527,9 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCountry = null;
-
-            $this->singleTax = null;
-
-            $this->singleTaxRule = null;
-
+            $this->aTax = null;
+            $this->aTaxRule = null;
+            $this->aCountry = null;
         } // if (deep)
     }
 
@@ -645,6 +643,32 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTax !== null) {
+                if ($this->aTax->isModified() || $this->aTax->isNew()) {
+                    $affectedRows += $this->aTax->save($con);
+                }
+                $this->setTax($this->aTax);
+            }
+
+            if ($this->aTaxRule !== null) {
+                if ($this->aTaxRule->isModified() || $this->aTaxRule->isNew()) {
+                    $affectedRows += $this->aTaxRule->save($con);
+                }
+                $this->setTaxRule($this->aTaxRule);
+            }
+
+            if ($this->aCountry !== null) {
+                if ($this->aCountry->isModified() || $this->aCountry->isNew()) {
+                    $affectedRows += $this->aCountry->save($con);
+                }
+                $this->setCountry($this->aCountry);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -654,51 +678,6 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->countrysScheduledForDeletion !== null) {
-                if (!$this->countrysScheduledForDeletion->isEmpty()) {
-                    CountryQuery::create()
-                        ->filterByPrimaryKeys($this->countrysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->countrysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCountry !== null) {
-                if (!$this->singleCountry->isDeleted()) {
-                        $affectedRows += $this->singleCountry->save($con);
-                }
-            }
-
-            if ($this->taxsScheduledForDeletion !== null) {
-                if (!$this->taxsScheduledForDeletion->isEmpty()) {
-                    TaxQuery::create()
-                        ->filterByPrimaryKeys($this->taxsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->taxsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleTax !== null) {
-                if (!$this->singleTax->isDeleted()) {
-                        $affectedRows += $this->singleTax->save($con);
-                }
-            }
-
-            if ($this->taxRulesScheduledForDeletion !== null) {
-                if (!$this->taxRulesScheduledForDeletion->isEmpty()) {
-                    TaxRuleQuery::create()
-                        ->filterByPrimaryKeys($this->taxRulesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->taxRulesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleTaxRule !== null) {
-                if (!$this->singleTaxRule->isDeleted()) {
-                        $affectedRows += $this->singleTaxRule->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -863,28 +842,34 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aTax !== null) {
+                if (!$this->aTax->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTax->getValidationFailures());
+                }
+            }
+
+            if ($this->aTaxRule !== null) {
+                if (!$this->aTaxRule->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aTaxRule->getValidationFailures());
+                }
+            }
+
+            if ($this->aCountry !== null) {
+                if (!$this->aCountry->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCountry->getValidationFailures());
+                }
+            }
+
+
             if (($retval = TaxRuleCountryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCountry !== null) {
-                    if (!$this->singleCountry->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCountry->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleTax !== null) {
-                    if (!$this->singleTax->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleTax->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleTaxRule !== null) {
-                    if (!$this->singleTaxRule->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleTaxRule->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -980,14 +965,14 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCountry) {
-                $result['Country'] = $this->singleCountry->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aTax) {
+                $result['Tax'] = $this->aTax->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleTax) {
-                $result['Tax'] = $this->singleTax->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aTaxRule) {
+                $result['TaxRule'] = $this->aTaxRule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleTaxRule) {
-                $result['TaxRule'] = $this->singleTaxRule->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCountry) {
+                $result['Country'] = $this->aCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1170,21 +1155,6 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCountry();
-            if ($relObj) {
-                $copyObj->setCountry($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getTax();
-            if ($relObj) {
-                $copyObj->setTax($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getTaxRule();
-            if ($relObj) {
-                $copyObj->setTaxRule($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1235,125 +1205,157 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Tax object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Country object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Country
-     * @throws PropelException
-     */
-    public function getCountry(PropelPDO $con = null)
-    {
-
-        if ($this->singleCountry === null && !$this->isNew()) {
-            $this->singleCountry = CountryQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCountry;
-    }
-
-    /**
-     * Sets a single Country object as related to this object by a one-to-one relationship.
-     *
-     * @param             Country $v Country
-     * @return TaxRuleCountry The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCountry(Country $v = null)
-    {
-        $this->singleCountry = $v;
-
-        // Make sure that that the passed-in Country isn't already associated with this object
-        if ($v !== null && $v->getTaxRuleCountry() === null) {
-            $v->setTaxRuleCountry($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Tax object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Tax
-     * @throws PropelException
-     */
-    public function getTax(PropelPDO $con = null)
-    {
-
-        if ($this->singleTax === null && !$this->isNew()) {
-            $this->singleTax = TaxQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleTax;
-    }
-
-    /**
-     * Sets a single Tax object as related to this object by a one-to-one relationship.
-     *
-     * @param             Tax $v Tax
+     * @param             Tax $v
      * @return TaxRuleCountry The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTax(Tax $v = null)
     {
-        $this->singleTax = $v;
-
-        // Make sure that that the passed-in Tax isn't already associated with this object
-        if ($v !== null && $v->getTaxRuleCountry() === null) {
-            $v->setTaxRuleCountry($this);
+        if ($v === null) {
+            $this->setTaxId(NULL);
+        } else {
+            $this->setTaxId($v->getId());
         }
+
+        $this->aTax = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Tax object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTaxRuleCountry($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single TaxRule object, which is related to this object by a one-to-one relationship.
+     * Get the associated Tax object
      *
-     * @param PropelPDO $con optional connection object
-     * @return TaxRule
+     * @param PropelPDO $con Optional Connection object.
+     * @return Tax The associated Tax object.
      * @throws PropelException
      */
-    public function getTaxRule(PropelPDO $con = null)
+    public function getTax(PropelPDO $con = null)
     {
-
-        if ($this->singleTaxRule === null && !$this->isNew()) {
-            $this->singleTaxRule = TaxRuleQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aTax === null && ($this->tax_id !== null)) {
+            $this->aTax = TaxQuery::create()->findPk($this->tax_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTax->addTaxRuleCountrys($this);
+             */
         }
 
-        return $this->singleTaxRule;
+        return $this->aTax;
     }
 
     /**
-     * Sets a single TaxRule object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a TaxRule object.
      *
-     * @param             TaxRule $v TaxRule
+     * @param             TaxRule $v
      * @return TaxRuleCountry The current object (for fluent API support)
      * @throws PropelException
      */
     public function setTaxRule(TaxRule $v = null)
     {
-        $this->singleTaxRule = $v;
-
-        // Make sure that that the passed-in TaxRule isn't already associated with this object
-        if ($v !== null && $v->getTaxRuleCountry() === null) {
-            $v->setTaxRuleCountry($this);
+        if ($v === null) {
+            $this->setTaxRuleId(NULL);
+        } else {
+            $this->setTaxRuleId($v->getId());
         }
 
+        $this->aTaxRule = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the TaxRule object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTaxRuleCountry($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated TaxRule object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return TaxRule The associated TaxRule object.
+     * @throws PropelException
+     */
+    public function getTaxRule(PropelPDO $con = null)
+    {
+        if ($this->aTaxRule === null && ($this->tax_rule_id !== null)) {
+            $this->aTaxRule = TaxRuleQuery::create()->findPk($this->tax_rule_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aTaxRule->addTaxRuleCountrys($this);
+             */
+        }
+
+        return $this->aTaxRule;
+    }
+
+    /**
+     * Declares an association between this object and a Country object.
+     *
+     * @param             Country $v
+     * @return TaxRuleCountry The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCountry(Country $v = null)
+    {
+        if ($v === null) {
+            $this->setCountryId(NULL);
+        } else {
+            $this->setCountryId($v->getId());
+        }
+
+        $this->aCountry = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Country object, it will not be re-added.
+        if ($v !== null) {
+            $v->addTaxRuleCountry($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Country object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Country The associated Country object.
+     * @throws PropelException
+     */
+    public function getCountry(PropelPDO $con = null)
+    {
+        if ($this->aCountry === null && ($this->country_id !== null)) {
+            $this->aCountry = CountryQuery::create()->findPk($this->country_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCountry->addTaxRuleCountrys($this);
+             */
+        }
+
+        return $this->aCountry;
     }
 
     /**
@@ -1388,29 +1390,11 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCountry) {
-                $this->singleCountry->clearAllReferences($deep);
-            }
-            if ($this->singleTax) {
-                $this->singleTax->clearAllReferences($deep);
-            }
-            if ($this->singleTaxRule) {
-                $this->singleTaxRule->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCountry instanceof PropelCollection) {
-            $this->singleCountry->clearIterator();
-        }
-        $this->singleCountry = null;
-        if ($this->singleTax instanceof PropelCollection) {
-            $this->singleTax->clearIterator();
-        }
-        $this->singleTax = null;
-        if ($this->singleTaxRule instanceof PropelCollection) {
-            $this->singleTaxRule->clearIterator();
-        }
-        $this->singleTaxRule = null;
+        $this->aTax = null;
+        $this->aTaxRule = null;
+        $this->aCountry = null;
     }
 
     /**

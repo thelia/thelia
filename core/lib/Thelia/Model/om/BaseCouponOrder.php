@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\CouponOrder;
 use Thelia\Model\CouponOrderPeer;
@@ -86,9 +84,9 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Order one-to-one related Order object
+     * @var        Order
      */
-    protected $singleOrder;
+    protected $aOrder;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -103,12 +101,6 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $ordersScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -260,6 +252,10 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
         if ($this->order_id !== $v) {
             $this->order_id = $v;
             $this->modifiedColumns[] = CouponOrderPeer::ORDER_ID;
+        }
+
+        if ($this->aOrder !== null && $this->aOrder->getId() !== $v) {
+            $this->aOrder = null;
         }
 
 
@@ -423,6 +419,9 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aOrder !== null && $this->order_id !== $this->aOrder->getId()) {
+            $this->aOrder = null;
+        }
     } // ensureConsistency
 
     /**
@@ -462,8 +461,7 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleOrder = null;
-
+            $this->aOrder = null;
         } // if (deep)
     }
 
@@ -577,6 +575,18 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aOrder !== null) {
+                if ($this->aOrder->isModified() || $this->aOrder->isNew()) {
+                    $affectedRows += $this->aOrder->save($con);
+                }
+                $this->setOrder($this->aOrder);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -586,21 +596,6 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->ordersScheduledForDeletion !== null) {
-                if (!$this->ordersScheduledForDeletion->isEmpty()) {
-                    OrderQuery::create()
-                        ->filterByPrimaryKeys($this->ordersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->ordersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleOrder !== null) {
-                if (!$this->singleOrder->isDeleted()) {
-                        $affectedRows += $this->singleOrder->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -770,16 +765,22 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aOrder !== null) {
+                if (!$this->aOrder->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aOrder->getValidationFailures());
+                }
+            }
+
+
             if (($retval = CouponOrderPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleOrder !== null) {
-                    if (!$this->singleOrder->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleOrder->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -871,8 +872,8 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
             $keys[5] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleOrder) {
-                $result['Order'] = $this->singleOrder->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aOrder) {
+                $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1049,11 +1050,6 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getOrder();
-            if ($relObj) {
-                $copyObj->setOrder($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1104,53 +1100,55 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Order object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Order object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Order
-     * @throws PropelException
-     */
-    public function getOrder(PropelPDO $con = null)
-    {
-
-        if ($this->singleOrder === null && !$this->isNew()) {
-            $this->singleOrder = OrderQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleOrder;
-    }
-
-    /**
-     * Sets a single Order object as related to this object by a one-to-one relationship.
-     *
-     * @param             Order $v Order
+     * @param             Order $v
      * @return CouponOrder The current object (for fluent API support)
      * @throws PropelException
      */
     public function setOrder(Order $v = null)
     {
-        $this->singleOrder = $v;
-
-        // Make sure that that the passed-in Order isn't already associated with this object
-        if ($v !== null && $v->getCouponOrder() === null) {
-            $v->setCouponOrder($this);
+        if ($v === null) {
+            $this->setOrderId(NULL);
+        } else {
+            $this->setOrderId($v->getId());
         }
 
+        $this->aOrder = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Order object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCouponOrder($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Order object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Order The associated Order object.
+     * @throws PropelException
+     */
+    public function getOrder(PropelPDO $con = null)
+    {
+        if ($this->aOrder === null && ($this->order_id !== null)) {
+            $this->aOrder = OrderQuery::create()->findPk($this->order_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aOrder->addCouponOrders($this);
+             */
+        }
+
+        return $this->aOrder;
     }
 
     /**
@@ -1184,15 +1182,9 @@ abstract class BaseCouponOrder extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleOrder) {
-                $this->singleOrder->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleOrder instanceof PropelCollection) {
-            $this->singleOrder->clearIterator();
-        }
-        $this->singleOrder = null;
+        $this->aOrder = null;
     }
 
     /**

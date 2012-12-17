@@ -43,7 +43,7 @@ class ContentDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CONTENT_ID', 'ContentId', 'INTEGER', true, null, null);
+        $this->addForeignKey('CONTENT_ID', 'ContentId', 'INTEGER', 'content', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -59,7 +59,7 @@ class ContentDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Content', 'Thelia\\Model\\Content', RelationMap::ONE_TO_ONE, array('content_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Content', 'Thelia\\Model\\Content', RelationMap::MANY_TO_ONE, array('content_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ContentDescTableMap

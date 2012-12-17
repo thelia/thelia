@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Group;
 use Thelia\Model\GroupQuery;
@@ -96,14 +94,14 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Group one-to-one related Group object
+     * @var        Group
      */
-    protected $singleGroup;
+    protected $aGroup;
 
     /**
-     * @var        Resource one-to-one related Resource object
+     * @var        Resource
      */
-    protected $singleResource;
+    protected $aResource;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -118,18 +116,6 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $groupsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $resourcesScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -315,6 +301,10 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             $this->modifiedColumns[] = GroupResourcePeer::GROUP_ID;
         }
 
+        if ($this->aGroup !== null && $this->aGroup->getId() !== $v) {
+            $this->aGroup = null;
+        }
+
 
         return $this;
     } // setGroupId()
@@ -334,6 +324,10 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
         if ($this->resource_id !== $v) {
             $this->resource_id = $v;
             $this->modifiedColumns[] = GroupResourcePeer::RESOURCE_ID;
+        }
+
+        if ($this->aResource !== null && $this->aResource->getId() !== $v) {
+            $this->aResource = null;
         }
 
 
@@ -506,6 +500,12 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aGroup !== null && $this->group_id !== $this->aGroup->getId()) {
+            $this->aGroup = null;
+        }
+        if ($this->aResource !== null && $this->resource_id !== $this->aResource->getId()) {
+            $this->aResource = null;
+        }
     } // ensureConsistency
 
     /**
@@ -545,10 +545,8 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleGroup = null;
-
-            $this->singleResource = null;
-
+            $this->aGroup = null;
+            $this->aResource = null;
         } // if (deep)
     }
 
@@ -662,6 +660,25 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aGroup !== null) {
+                if ($this->aGroup->isModified() || $this->aGroup->isNew()) {
+                    $affectedRows += $this->aGroup->save($con);
+                }
+                $this->setGroup($this->aGroup);
+            }
+
+            if ($this->aResource !== null) {
+                if ($this->aResource->isModified() || $this->aResource->isNew()) {
+                    $affectedRows += $this->aResource->save($con);
+                }
+                $this->setResource($this->aResource);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -671,36 +688,6 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->groupsScheduledForDeletion !== null) {
-                if (!$this->groupsScheduledForDeletion->isEmpty()) {
-                    GroupQuery::create()
-                        ->filterByPrimaryKeys($this->groupsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->groupsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleGroup !== null) {
-                if (!$this->singleGroup->isDeleted()) {
-                        $affectedRows += $this->singleGroup->save($con);
-                }
-            }
-
-            if ($this->resourcesScheduledForDeletion !== null) {
-                if (!$this->resourcesScheduledForDeletion->isEmpty()) {
-                    ResourceQuery::create()
-                        ->filterByPrimaryKeys($this->resourcesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->resourcesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleResource !== null) {
-                if (!$this->singleResource->isDeleted()) {
-                        $affectedRows += $this->singleResource->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -876,22 +863,28 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aGroup !== null) {
+                if (!$this->aGroup->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aGroup->getValidationFailures());
+                }
+            }
+
+            if ($this->aResource !== null) {
+                if (!$this->aResource->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aResource->getValidationFailures());
+                }
+            }
+
+
             if (($retval = GroupResourcePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleGroup !== null) {
-                    if (!$this->singleGroup->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleGroup->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleResource !== null) {
-                    if (!$this->singleResource->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleResource->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -987,11 +980,11 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleGroup) {
-                $result['Group'] = $this->singleGroup->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aGroup) {
+                $result['Group'] = $this->aGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleResource) {
-                $result['Resource'] = $this->singleResource->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aResource) {
+                $result['Resource'] = $this->aResource->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1174,16 +1167,6 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getGroup();
-            if ($relObj) {
-                $copyObj->setGroup($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getResource();
-            if ($relObj) {
-                $copyObj->setResource($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1234,89 +1217,106 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Group object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Group object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Group
-     * @throws PropelException
-     */
-    public function getGroup(PropelPDO $con = null)
-    {
-
-        if ($this->singleGroup === null && !$this->isNew()) {
-            $this->singleGroup = GroupQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleGroup;
-    }
-
-    /**
-     * Sets a single Group object as related to this object by a one-to-one relationship.
-     *
-     * @param             Group $v Group
+     * @param             Group $v
      * @return GroupResource The current object (for fluent API support)
      * @throws PropelException
      */
     public function setGroup(Group $v = null)
     {
-        $this->singleGroup = $v;
-
-        // Make sure that that the passed-in Group isn't already associated with this object
-        if ($v !== null && $v->getGroupResource() === null) {
-            $v->setGroupResource($this);
+        if ($v === null) {
+            $this->setGroupId(NULL);
+        } else {
+            $this->setGroupId($v->getId());
         }
+
+        $this->aGroup = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Group object, it will not be re-added.
+        if ($v !== null) {
+            $v->addGroupResource($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single Resource object, which is related to this object by a one-to-one relationship.
+     * Get the associated Group object
      *
-     * @param PropelPDO $con optional connection object
-     * @return Resource
+     * @param PropelPDO $con Optional Connection object.
+     * @return Group The associated Group object.
      * @throws PropelException
      */
-    public function getResource(PropelPDO $con = null)
+    public function getGroup(PropelPDO $con = null)
     {
-
-        if ($this->singleResource === null && !$this->isNew()) {
-            $this->singleResource = ResourceQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aGroup === null && ($this->group_id !== null)) {
+            $this->aGroup = GroupQuery::create()->findPk($this->group_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aGroup->addGroupResources($this);
+             */
         }
 
-        return $this->singleResource;
+        return $this->aGroup;
     }
 
     /**
-     * Sets a single Resource object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a Resource object.
      *
-     * @param             Resource $v Resource
+     * @param             Resource $v
      * @return GroupResource The current object (for fluent API support)
      * @throws PropelException
      */
     public function setResource(Resource $v = null)
     {
-        $this->singleResource = $v;
-
-        // Make sure that that the passed-in Resource isn't already associated with this object
-        if ($v !== null && $v->getGroupResource() === null) {
-            $v->setGroupResource($this);
+        if ($v === null) {
+            $this->setResourceId(NULL);
+        } else {
+            $this->setResourceId($v->getId());
         }
 
+        $this->aResource = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Resource object, it will not be re-added.
+        if ($v !== null) {
+            $v->addGroupResource($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Resource object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Resource The associated Resource object.
+     * @throws PropelException
+     */
+    public function getResource(PropelPDO $con = null)
+    {
+        if ($this->aResource === null && ($this->resource_id !== null)) {
+            $this->aResource = ResourceQuery::create()->findPk($this->resource_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aResource->addGroupResources($this);
+             */
+        }
+
+        return $this->aResource;
     }
 
     /**
@@ -1352,22 +1352,10 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleGroup) {
-                $this->singleGroup->clearAllReferences($deep);
-            }
-            if ($this->singleResource) {
-                $this->singleResource->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleGroup instanceof PropelCollection) {
-            $this->singleGroup->clearIterator();
-        }
-        $this->singleGroup = null;
-        if ($this->singleResource instanceof PropelCollection) {
-            $this->singleResource->clearIterator();
-        }
-        $this->singleResource = null;
+        $this->aGroup = null;
+        $this->aResource = null;
     }
 
     /**

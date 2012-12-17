@@ -27,7 +27,7 @@ abstract class BaseCustomerPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'customer';
@@ -480,9 +480,12 @@ abstract class BaseCustomerPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in CustomerTitlePeer instance pool,
+        // Invalidate objects in AddressPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CustomerTitlePeer::clearInstancePool();
+        AddressPeer::clearInstancePool();
+        // Invalidate objects in OrderPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        OrderPeer::clearInstancePool();
     }
 
     /**
@@ -581,7 +584,7 @@ abstract class BaseCustomerPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Address table
+     * Returns the number of rows matching criteria, joining the related CustomerTitle table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -589,7 +592,7 @@ abstract class BaseCustomerPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAddress(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinCustomerTitle(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -616,7 +619,7 @@ abstract class BaseCustomerPeer
             $con = Propel::getConnection(CustomerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(CustomerPeer::ID, AddressPeer::CUSTOMER_ID, $join_behavior);
+        $criteria->addJoin(CustomerPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -632,58 +635,7 @@ abstract class BaseCustomerPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Order table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinOrder(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(CustomerPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            CustomerPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-
-        // Set the correct dbName
-        $criteria->setDbName(CustomerPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(CustomerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(CustomerPeer::ID, OrderPeer::CUSTOMER_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of Customer objects pre-filled with their Address objects.
+     * Selects a collection of Customer objects pre-filled with their CustomerTitle objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -691,7 +643,7 @@ abstract class BaseCustomerPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAddress(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinCustomerTitle(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -702,9 +654,9 @@ abstract class BaseCustomerPeer
 
         CustomerPeer::addSelectColumns($criteria);
         $startcol = CustomerPeer::NUM_HYDRATE_COLUMNS;
-        AddressPeer::addSelectColumns($criteria);
+        CustomerTitlePeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(CustomerPeer::ID, AddressPeer::CUSTOMER_ID, $join_behavior);
+        $criteria->addJoin(CustomerPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -724,89 +676,20 @@ abstract class BaseCustomerPeer
                 CustomerPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = AddressPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = CustomerTitlePeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = AddressPeer::getInstanceFromPool($key2);
+                $obj2 = CustomerTitlePeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = AddressPeer::getOMClass();
+                    $cls = CustomerTitlePeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    AddressPeer::addInstanceToPool($obj2, $key2);
+                    CustomerTitlePeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Customer) to $obj2 (Address)
-                // one to one relationship
-                $obj1->setAddress($obj2);
-
-            } // if joined row was not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of Customer objects pre-filled with their Order objects.
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Customer objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinOrder(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(CustomerPeer::DATABASE_NAME);
-        }
-
-        CustomerPeer::addSelectColumns($criteria);
-        $startcol = CustomerPeer::NUM_HYDRATE_COLUMNS;
-        OrderPeer::addSelectColumns($criteria);
-
-        $criteria->addJoin(CustomerPeer::ID, OrderPeer::CUSTOMER_ID, $join_behavior);
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = CustomerPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = CustomerPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-
-                $cls = CustomerPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                CustomerPeer::addInstanceToPool($obj1, $key1);
-            } // if $obj1 already loaded
-
-            $key2 = OrderPeer::getPrimaryKeyHashFromRow($row, $startcol);
-            if ($key2 !== null) {
-                $obj2 = OrderPeer::getInstanceFromPool($key2);
-                if (!$obj2) {
-
-                    $cls = OrderPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol);
-                    OrderPeer::addInstanceToPool($obj2, $key2);
-                } // if obj2 already loaded
-
-                // Add the $obj1 (Customer) to $obj2 (Order)
-                // one to one relationship
-                $obj1->setOrder($obj2);
+                // Add the $obj1 (Customer) to $obj2 (CustomerTitle)
+                $obj2->addCustomer($obj1);
 
             } // if joined row was not null
 
@@ -854,9 +737,7 @@ abstract class BaseCustomerPeer
             $con = Propel::getConnection(CustomerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(CustomerPeer::ID, AddressPeer::CUSTOMER_ID, $join_behavior);
-
-        $criteria->addJoin(CustomerPeer::ID, OrderPeer::CUSTOMER_ID, $join_behavior);
+        $criteria->addJoin(CustomerPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -892,15 +773,10 @@ abstract class BaseCustomerPeer
         CustomerPeer::addSelectColumns($criteria);
         $startcol2 = CustomerPeer::NUM_HYDRATE_COLUMNS;
 
-        AddressPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + AddressPeer::NUM_HYDRATE_COLUMNS;
+        CustomerTitlePeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + CustomerTitlePeer::NUM_HYDRATE_COLUMNS;
 
-        OrderPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + OrderPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(CustomerPeer::ID, AddressPeer::CUSTOMER_ID, $join_behavior);
-
-        $criteria->addJoin(CustomerPeer::ID, OrderPeer::CUSTOMER_ID, $join_behavior);
+        $criteria->addJoin(CustomerPeer::CUSTOMER_TITLE_ID, CustomerTitlePeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -919,291 +795,23 @@ abstract class BaseCustomerPeer
                 CustomerPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined Address rows
+            // Add objects for joined CustomerTitle rows
 
-            $key2 = AddressPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = CustomerTitlePeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = AddressPeer::getInstanceFromPool($key2);
+                $obj2 = CustomerTitlePeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = AddressPeer::getOMClass();
+                    $cls = CustomerTitlePeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    AddressPeer::addInstanceToPool($obj2, $key2);
+                    CustomerTitlePeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (Customer) to the collection in $obj2 (Address)
-                $obj1->setAddress($obj2);
+                // Add the $obj1 (Customer) to the collection in $obj2 (CustomerTitle)
+                $obj2->addCustomer($obj1);
             } // if joined row not null
-
-            // Add objects for joined Order rows
-
-            $key3 = OrderPeer::getPrimaryKeyHashFromRow($row, $startcol3);
-            if ($key3 !== null) {
-                $obj3 = OrderPeer::getInstanceFromPool($key3);
-                if (!$obj3) {
-
-                    $cls = OrderPeer::getOMClass();
-
-                    $obj3 = new $cls();
-                    $obj3->hydrate($row, $startcol3);
-                    OrderPeer::addInstanceToPool($obj3, $key3);
-                } // if obj3 loaded
-
-                // Add the $obj1 (Customer) to the collection in $obj3 (Order)
-                $obj1->setOrder($obj3);
-            } // if joined row not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Address table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptAddress(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(CustomerPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            CustomerPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(CustomerPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(CustomerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(CustomerPeer::ID, OrderPeer::CUSTOMER_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Returns the number of rows matching criteria, joining the related Order table
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return int Number of matching rows.
-     */
-    public static function doCountJoinAllExceptOrder(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        // we're going to modify criteria, so copy it first
-        $criteria = clone $criteria;
-
-        // We need to set the primary table name, since in the case that there are no WHERE columns
-        // it will be impossible for the BasePeer::createSelectSql() method to determine which
-        // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(CustomerPeer::TABLE_NAME);
-
-        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
-            $criteria->setDistinct();
-        }
-
-        if (!$criteria->hasSelectClause()) {
-            CustomerPeer::addSelectColumns($criteria);
-        }
-
-        $criteria->clearOrderByColumns(); // ORDER BY should not affect count
-
-        // Set the correct dbName
-        $criteria->setDbName(CustomerPeer::DATABASE_NAME);
-
-        if ($con === null) {
-            $con = Propel::getConnection(CustomerPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $criteria->addJoin(CustomerPeer::ID, AddressPeer::CUSTOMER_ID, $join_behavior);
-
-        $stmt = BasePeer::doCount($criteria, $con);
-
-        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $count = (int) $row[0];
-        } else {
-            $count = 0; // no rows returned; we infer that means 0 matches.
-        }
-        $stmt->closeCursor();
-
-        return $count;
-    }
-
-
-    /**
-     * Selects a collection of Customer objects pre-filled with all related objects except Address.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Customer objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptAddress(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(CustomerPeer::DATABASE_NAME);
-        }
-
-        CustomerPeer::addSelectColumns($criteria);
-        $startcol2 = CustomerPeer::NUM_HYDRATE_COLUMNS;
-
-        OrderPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + OrderPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(CustomerPeer::ID, OrderPeer::CUSTOMER_ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = CustomerPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = CustomerPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = CustomerPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                CustomerPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Order rows
-
-                $key2 = OrderPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = OrderPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = OrderPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    OrderPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (Customer) to the collection in $obj2 (Order)
-                $obj1->setOrder($obj2);
-
-            } // if joined row is not null
-
-            $results[] = $obj1;
-        }
-        $stmt->closeCursor();
-
-        return $results;
-    }
-
-
-    /**
-     * Selects a collection of Customer objects pre-filled with all related objects except Order.
-     *
-     * @param      Criteria  $criteria
-     * @param      PropelPDO $con
-     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Customer objects.
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function doSelectJoinAllExceptOrder(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $criteria = clone $criteria;
-
-        // Set the correct dbName if it has not been overridden
-        // $criteria->getDbName() will return the same object if not set to another value
-        // so == check is okay and faster
-        if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(CustomerPeer::DATABASE_NAME);
-        }
-
-        CustomerPeer::addSelectColumns($criteria);
-        $startcol2 = CustomerPeer::NUM_HYDRATE_COLUMNS;
-
-        AddressPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + AddressPeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(CustomerPeer::ID, AddressPeer::CUSTOMER_ID, $join_behavior);
-
-
-        $stmt = BasePeer::doSelect($criteria, $con);
-        $results = array();
-
-        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = CustomerPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = CustomerPeer::getInstanceFromPool($key1))) {
-                // We no longer rehydrate the object, since this can cause data loss.
-                // See http://www.propelorm.org/ticket/509
-                // $obj1->hydrate($row, 0, true); // rehydrate
-            } else {
-                $cls = CustomerPeer::getOMClass();
-
-                $obj1 = new $cls();
-                $obj1->hydrate($row);
-                CustomerPeer::addInstanceToPool($obj1, $key1);
-            } // if obj1 already loaded
-
-                // Add objects for joined Address rows
-
-                $key2 = AddressPeer::getPrimaryKeyHashFromRow($row, $startcol2);
-                if ($key2 !== null) {
-                    $obj2 = AddressPeer::getInstanceFromPool($key2);
-                    if (!$obj2) {
-
-                        $cls = AddressPeer::getOMClass();
-
-                    $obj2 = new $cls();
-                    $obj2->hydrate($row, $startcol2);
-                    AddressPeer::addInstanceToPool($obj2, $key2);
-                } // if $obj2 already loaded
-
-                // Add the $obj1 (Customer) to the collection in $obj2 (Address)
-                $obj1->setAddress($obj2);
-
-            } // if joined row is not null
 
             $results[] = $obj1;
         }
@@ -1345,7 +953,6 @@ abstract class BaseCustomerPeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            CustomerPeer::doOnDeleteSetNull(new Criteria(CustomerPeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(CustomerPeer::TABLE_NAME, $con, CustomerPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -1379,14 +986,24 @@ abstract class BaseCustomerPeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            CustomerPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof Customer) { // it's a model object
+            // invalidate the cache for this single object
+            CustomerPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(CustomerPeer::DATABASE_NAME);
             $criteria->add(CustomerPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                CustomerPeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -1399,23 +1016,6 @@ abstract class BaseCustomerPeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            CustomerPeer::doOnDeleteSetNull($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                CustomerPeer::clearInstancePool();
-            } elseif ($values instanceof Customer) { // it's a model object
-                CustomerPeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    CustomerPeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             CustomerPeer::clearRelatedInstancePool();
             $con->commit();
@@ -1424,37 +1024,6 @@ abstract class BaseCustomerPeer
         } catch (PropelException $e) {
             $con->rollBack();
             throw $e;
-        }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE SET NULL DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return void
-     */
-    protected static function doOnDeleteSetNull(Criteria $criteria, PropelPDO $con)
-    {
-
-        // first find the objects that are implicated by the $criteria
-        $objects = CustomerPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-            // set fkey col in related CustomerTitle rows to null
-            $selectCriteria = new Criteria(CustomerPeer::DATABASE_NAME);
-            $updateValues = new Criteria(CustomerPeer::DATABASE_NAME);
-            $selectCriteria->add(CustomerTitlePeer::ID, $obj->getCustomerTitleId());
-            $updateValues->add(CustomerTitlePeer::ID, null);
-
-            BasePeer::doUpdate($selectCriteria, $updateValues, $con); // use BasePeer because generated Peer doUpdate() methods only update using pkey
-
         }
     }
 

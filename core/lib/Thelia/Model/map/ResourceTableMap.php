@@ -42,8 +42,7 @@ class ResourceTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'group_resource', 'RESOURCE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'resource_desc', 'RESOURCE_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 30, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -55,8 +54,8 @@ class ResourceTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::MANY_TO_ONE, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ResourceDesc', 'Thelia\\Model\\ResourceDesc', RelationMap::MANY_TO_ONE, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', null, 'GroupResources');
+        $this->addRelation('ResourceDesc', 'Thelia\\Model\\ResourceDesc', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', null, 'ResourceDescs');
     } // buildRelations()
 
 } // ResourceTableMap

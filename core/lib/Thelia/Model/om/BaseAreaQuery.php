@@ -73,7 +73,7 @@ abstract class BaseAreaQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Area', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Area', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -248,10 +248,6 @@ abstract class BaseAreaQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByCountry()
-     *
-     * @see       filterByDelivzone()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -429,7 +425,7 @@ abstract class BaseAreaQuery extends ModelCriteria
     /**
      * Filter the query by a related Country object
      *
-     * @param   Country|PropelObjectCollection $country The related object(s) to use as filter
+     * @param   Country|PropelObjectCollection $country  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AreaQuery The current query, for fluid interface
@@ -441,12 +437,10 @@ abstract class BaseAreaQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AreaPeer::ID, $country->getAreaId(), $comparison);
         } elseif ($country instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(AreaPeer::ID, $country->toKeyValue('PrimaryKey', 'AreaId'), $comparison);
+                ->useCountryQuery()
+                ->filterByPrimaryKeys($country->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByCountry() only accepts arguments of type Country or PropelCollection');
         }
@@ -460,7 +454,7 @@ abstract class BaseAreaQuery extends ModelCriteria
      *
      * @return AreaQuery The current query, for fluid interface
      */
-    public function joinCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Country');
@@ -495,7 +489,7 @@ abstract class BaseAreaQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
      */
-    public function useCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinCountry($relationAlias, $joinType)
@@ -505,7 +499,7 @@ abstract class BaseAreaQuery extends ModelCriteria
     /**
      * Filter the query by a related Delivzone object
      *
-     * @param   Delivzone|PropelObjectCollection $delivzone The related object(s) to use as filter
+     * @param   Delivzone|PropelObjectCollection $delivzone  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   AreaQuery The current query, for fluid interface
@@ -517,12 +511,10 @@ abstract class BaseAreaQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(AreaPeer::ID, $delivzone->getAreaId(), $comparison);
         } elseif ($delivzone instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(AreaPeer::ID, $delivzone->toKeyValue('PrimaryKey', 'AreaId'), $comparison);
+                ->useDelivzoneQuery()
+                ->filterByPrimaryKeys($delivzone->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByDelivzone() only accepts arguments of type Delivzone or PropelCollection');
         }
@@ -536,7 +528,7 @@ abstract class BaseAreaQuery extends ModelCriteria
      *
      * @return AreaQuery The current query, for fluid interface
      */
-    public function joinDelivzone($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinDelivzone($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Delivzone');
@@ -571,7 +563,7 @@ abstract class BaseAreaQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\DelivzoneQuery A secondary query class using the current class as primary query
      */
-    public function useDelivzoneQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useDelivzoneQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinDelivzone($relationAlias, $joinType)

@@ -80,7 +80,7 @@ abstract class BaseConfigDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\ConfigDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\ConfigDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -282,6 +282,8 @@ abstract class BaseConfigDescQuery extends ModelCriteria
      * $query->filterByConfigId(array(12, 34)); // WHERE config_id IN (12, 34)
      * $query->filterByConfigId(array('min' => 12)); // WHERE config_id > 12
      * </code>
+     *
+     * @see       filterByConfig()
      *
      * @param     mixed $configId The value to use as filter.
      *              Use scalar values for equality.
@@ -519,7 +521,7 @@ abstract class BaseConfigDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Config object
      *
-     * @param   Config|PropelObjectCollection $config  the related object to use as filter
+     * @param   Config|PropelObjectCollection $config The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ConfigDescQuery The current query, for fluid interface
@@ -531,10 +533,12 @@ abstract class BaseConfigDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ConfigDescPeer::CONFIG_ID, $config->getId(), $comparison);
         } elseif ($config instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useConfigQuery()
-                ->filterByPrimaryKeys($config->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ConfigDescPeer::CONFIG_ID, $config->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByConfig() only accepts arguments of type Config or PropelCollection');
         }

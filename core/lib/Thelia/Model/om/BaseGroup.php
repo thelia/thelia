@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\AdminGroup;
 use Thelia\Model\AdminGroupQuery;
@@ -78,24 +80,28 @@ abstract class BaseGroup extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        AdminGroup
+     * @var        PropelObjectCollection|AdminGroup[] Collection to store aggregation of AdminGroup objects.
      */
-    protected $aAdminGroup;
+    protected $collAdminGroups;
+    protected $collAdminGroupsPartial;
 
     /**
-     * @var        GroupDesc
+     * @var        PropelObjectCollection|GroupDesc[] Collection to store aggregation of GroupDesc objects.
      */
-    protected $aGroupDesc;
+    protected $collGroupDescs;
+    protected $collGroupDescsPartial;
 
     /**
-     * @var        GroupModule
+     * @var        PropelObjectCollection|GroupModule[] Collection to store aggregation of GroupModule objects.
      */
-    protected $aGroupModule;
+    protected $collGroupModules;
+    protected $collGroupModulesPartial;
 
     /**
-     * @var        GroupResource
+     * @var        PropelObjectCollection|GroupResource[] Collection to store aggregation of GroupResource objects.
      */
-    protected $aGroupResource;
+    protected $collGroupResources;
+    protected $collGroupResourcesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -110,6 +116,30 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $adminGroupsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupDescsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupResourcesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -220,22 +250,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = GroupPeer::ID;
-        }
-
-        if ($this->aAdminGroup !== null && $this->aAdminGroup->getGroupId() !== $v) {
-            $this->aAdminGroup = null;
-        }
-
-        if ($this->aGroupDesc !== null && $this->aGroupDesc->getGroupId() !== $v) {
-            $this->aGroupDesc = null;
-        }
-
-        if ($this->aGroupModule !== null && $this->aGroupModule->getGroupId() !== $v) {
-            $this->aGroupModule = null;
-        }
-
-        if ($this->aGroupResource !== null && $this->aGroupResource->getGroupId() !== $v) {
-            $this->aGroupResource = null;
         }
 
 
@@ -376,18 +390,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aAdminGroup !== null && $this->id !== $this->aAdminGroup->getGroupId()) {
-            $this->aAdminGroup = null;
-        }
-        if ($this->aGroupDesc !== null && $this->id !== $this->aGroupDesc->getGroupId()) {
-            $this->aGroupDesc = null;
-        }
-        if ($this->aGroupModule !== null && $this->id !== $this->aGroupModule->getGroupId()) {
-            $this->aGroupModule = null;
-        }
-        if ($this->aGroupResource !== null && $this->id !== $this->aGroupResource->getGroupId()) {
-            $this->aGroupResource = null;
-        }
     } // ensureConsistency
 
     /**
@@ -427,10 +429,14 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aAdminGroup = null;
-            $this->aGroupDesc = null;
-            $this->aGroupModule = null;
-            $this->aGroupResource = null;
+            $this->collAdminGroups = null;
+
+            $this->collGroupDescs = null;
+
+            $this->collGroupModules = null;
+
+            $this->collGroupResources = null;
+
         } // if (deep)
     }
 
@@ -544,39 +550,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAdminGroup !== null) {
-                if ($this->aAdminGroup->isModified() || $this->aAdminGroup->isNew()) {
-                    $affectedRows += $this->aAdminGroup->save($con);
-                }
-                $this->setAdminGroup($this->aAdminGroup);
-            }
-
-            if ($this->aGroupDesc !== null) {
-                if ($this->aGroupDesc->isModified() || $this->aGroupDesc->isNew()) {
-                    $affectedRows += $this->aGroupDesc->save($con);
-                }
-                $this->setGroupDesc($this->aGroupDesc);
-            }
-
-            if ($this->aGroupModule !== null) {
-                if ($this->aGroupModule->isModified() || $this->aGroupModule->isNew()) {
-                    $affectedRows += $this->aGroupModule->save($con);
-                }
-                $this->setGroupModule($this->aGroupModule);
-            }
-
-            if ($this->aGroupResource !== null) {
-                if ($this->aGroupResource->isModified() || $this->aGroupResource->isNew()) {
-                    $affectedRows += $this->aGroupResource->save($con);
-                }
-                $this->setGroupResource($this->aGroupResource);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -586,6 +559,75 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->adminGroupsScheduledForDeletion !== null) {
+                if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->adminGroupsScheduledForDeletion as $adminGroup) {
+                        // need to save related object because we set the relation to null
+                        $adminGroup->save($con);
+                    }
+                    $this->adminGroupsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAdminGroups !== null) {
+                foreach ($this->collAdminGroups as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->groupDescsScheduledForDeletion !== null) {
+                if (!$this->groupDescsScheduledForDeletion->isEmpty()) {
+                    GroupDescQuery::create()
+                        ->filterByPrimaryKeys($this->groupDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->groupDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGroupDescs !== null) {
+                foreach ($this->collGroupDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->groupModulesScheduledForDeletion !== null) {
+                if (!$this->groupModulesScheduledForDeletion->isEmpty()) {
+                    GroupModuleQuery::create()
+                        ->filterByPrimaryKeys($this->groupModulesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->groupModulesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGroupModules !== null) {
+                foreach ($this->collGroupModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->groupResourcesScheduledForDeletion !== null) {
+                if (!$this->groupResourcesScheduledForDeletion->isEmpty()) {
+                    GroupResourceQuery::create()
+                        ->filterByPrimaryKeys($this->groupResourcesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->groupResourcesScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGroupResources !== null) {
+                foreach ($this->collGroupResources as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -743,40 +785,42 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aAdminGroup !== null) {
-                if (!$this->aAdminGroup->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aAdminGroup->getValidationFailures());
-                }
-            }
-
-            if ($this->aGroupDesc !== null) {
-                if (!$this->aGroupDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aGroupDesc->getValidationFailures());
-                }
-            }
-
-            if ($this->aGroupModule !== null) {
-                if (!$this->aGroupModule->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aGroupModule->getValidationFailures());
-                }
-            }
-
-            if ($this->aGroupResource !== null) {
-                if (!$this->aGroupResource->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aGroupResource->getValidationFailures());
-                }
-            }
-
-
             if (($retval = GroupPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collAdminGroups !== null) {
+                    foreach ($this->collAdminGroups as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collGroupDescs !== null) {
+                    foreach ($this->collGroupDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collGroupModules !== null) {
+                    foreach ($this->collGroupModules as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collGroupResources !== null) {
+                    foreach ($this->collGroupResources as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -860,17 +904,17 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aAdminGroup) {
-                $result['AdminGroup'] = $this->aAdminGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collAdminGroups) {
+                $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aGroupDesc) {
-                $result['GroupDesc'] = $this->aGroupDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collGroupDescs) {
+                $result['GroupDescs'] = $this->collGroupDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aGroupModule) {
-                $result['GroupModule'] = $this->aGroupModule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collGroupModules) {
+                $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aGroupResource) {
-                $result['GroupResource'] = $this->aGroupResource->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collGroupResources) {
+                $result['GroupResources'] = $this->collGroupResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1035,24 +1079,28 @@ abstract class BaseGroup extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAdminGroup();
-            if ($relObj) {
-                $copyObj->setAdminGroup($relObj->copy($deepCopy));
+            foreach ($this->getAdminGroups() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAdminGroup($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getGroupDesc();
-            if ($relObj) {
-                $copyObj->setGroupDesc($relObj->copy($deepCopy));
+            foreach ($this->getGroupDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGroupDesc($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getGroupModule();
-            if ($relObj) {
-                $copyObj->setGroupModule($relObj->copy($deepCopy));
+            foreach ($this->getGroupModules() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGroupModule($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getGroupResource();
-            if ($relObj) {
-                $copyObj->setGroupResource($relObj->copy($deepCopy));
+            foreach ($this->getGroupResources() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGroupResource($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1105,192 +1153,932 @@ abstract class BaseGroup extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a AdminGroup object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             AdminGroup $v
-     * @return Group The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('AdminGroup' == $relationName) {
+            $this->initAdminGroups();
+        }
+        if ('GroupDesc' == $relationName) {
+            $this->initGroupDescs();
+        }
+        if ('GroupModule' == $relationName) {
+            $this->initGroupModules();
+        }
+        if ('GroupResource' == $relationName) {
+            $this->initGroupResources();
+        }
+    }
+
+    /**
+     * Clears out the collAdminGroups collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAdminGroups()
+     */
+    public function clearAdminGroups()
+    {
+        $this->collAdminGroups = null; // important to set this to null since that means it is uninitialized
+        $this->collAdminGroupsPartial = null;
+    }
+
+    /**
+     * reset is the collAdminGroups collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAdminGroups($v = true)
+    {
+        $this->collAdminGroupsPartial = $v;
+    }
+
+    /**
+     * Initializes the collAdminGroups collection.
+     *
+     * By default this just sets the collAdminGroups collection to an empty array (like clearcollAdminGroups());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAdminGroups($overrideExisting = true)
+    {
+        if (null !== $this->collAdminGroups && !$overrideExisting) {
+            return;
+        }
+        $this->collAdminGroups = new PropelObjectCollection();
+        $this->collAdminGroups->setModel('AdminGroup');
+    }
+
+    /**
+     * Gets an array of AdminGroup objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|AdminGroup[] List of AdminGroup objects
      * @throws PropelException
      */
-    public function setAdminGroup(AdminGroup $v = null)
+    public function getAdminGroups($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collAdminGroupsPartial && !$this->isNew();
+        if (null === $this->collAdminGroups || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAdminGroups) {
+                // return empty collection
+                $this->initAdminGroups();
+            } else {
+                $collAdminGroups = AdminGroupQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAdminGroupsPartial && count($collAdminGroups)) {
+                      $this->initAdminGroups(false);
+
+                      foreach($collAdminGroups as $obj) {
+                        if (false == $this->collAdminGroups->contains($obj)) {
+                          $this->collAdminGroups->append($obj);
+                        }
+                      }
+
+                      $this->collAdminGroupsPartial = true;
+                    }
+
+                    return $collAdminGroups;
+                }
+
+                if($partial && $this->collAdminGroups) {
+                    foreach($this->collAdminGroups as $obj) {
+                        if($obj->isNew()) {
+                            $collAdminGroups[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAdminGroups = $collAdminGroups;
+                $this->collAdminGroupsPartial = false;
+            }
+        }
+
+        return $this->collAdminGroups;
+    }
+
+    /**
+     * Sets a collection of AdminGroup objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $adminGroups A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAdminGroups(PropelCollection $adminGroups, PropelPDO $con = null)
+    {
+        $this->adminGroupsScheduledForDeletion = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
+
+        foreach ($this->adminGroupsScheduledForDeletion as $adminGroupRemoved) {
+            $adminGroupRemoved->setGroup(null);
+        }
+
+        $this->collAdminGroups = null;
+        foreach ($adminGroups as $adminGroup) {
+            $this->addAdminGroup($adminGroup);
+        }
+
+        $this->collAdminGroups = $adminGroups;
+        $this->collAdminGroupsPartial = false;
+    }
+
+    /**
+     * Returns the number of related AdminGroup objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related AdminGroup objects.
+     * @throws PropelException
+     */
+    public function countAdminGroups(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAdminGroupsPartial && !$this->isNew();
+        if (null === $this->collAdminGroups || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAdminGroups) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAdminGroups());
+                }
+                $query = AdminGroupQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getGroupId());
+            return count($this->collAdminGroups);
         }
+    }
 
-        $this->aAdminGroup = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setGroup($this);
+    /**
+     * Method called to associate a AdminGroup object to this object
+     * through the AdminGroup foreign key attribute.
+     *
+     * @param    AdminGroup $l AdminGroup
+     * @return Group The current object (for fluent API support)
+     */
+    public function addAdminGroup(AdminGroup $l)
+    {
+        if ($this->collAdminGroups === null) {
+            $this->initAdminGroups();
+            $this->collAdminGroupsPartial = true;
         }
-
+        if (!$this->collAdminGroups->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAdminGroup($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated AdminGroup object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return AdminGroup The associated AdminGroup object.
-     * @throws PropelException
+     * @param	AdminGroup $adminGroup The adminGroup object to add.
      */
-    public function getAdminGroup(PropelPDO $con = null)
+    protected function doAddAdminGroup($adminGroup)
     {
-        if ($this->aAdminGroup === null && ($this->id !== null)) {
-            $this->aAdminGroup = AdminGroupQuery::create()
-                ->filterByGroup($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aAdminGroup->setGroup($this);
-        }
-
-        return $this->aAdminGroup;
+        $this->collAdminGroups[]= $adminGroup;
+        $adminGroup->setGroup($this);
     }
 
     /**
-     * Declares an association between this object and a GroupDesc object.
+     * @param	AdminGroup $adminGroup The adminGroup object to remove.
+     */
+    public function removeAdminGroup($adminGroup)
+    {
+        if ($this->getAdminGroups()->contains($adminGroup)) {
+            $this->collAdminGroups->remove($this->collAdminGroups->search($adminGroup));
+            if (null === $this->adminGroupsScheduledForDeletion) {
+                $this->adminGroupsScheduledForDeletion = clone $this->collAdminGroups;
+                $this->adminGroupsScheduledForDeletion->clear();
+            }
+            $this->adminGroupsScheduledForDeletion[]= $adminGroup;
+            $adminGroup->setGroup(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Group is new, it will return
+     * an empty collection; or if this Group has previously
+     * been saved, it will retrieve related AdminGroups from storage.
      *
-     * @param             GroupDesc $v
-     * @return Group The current object (for fluent API support)
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Group.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AdminGroup[] List of AdminGroup objects
+     */
+    public function getAdminGroupsJoinAdmin($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AdminGroupQuery::create(null, $criteria);
+        $query->joinWith('Admin', $join_behavior);
+
+        return $this->getAdminGroups($query, $con);
+    }
+
+    /**
+     * Clears out the collGroupDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addGroupDescs()
+     */
+    public function clearGroupDescs()
+    {
+        $this->collGroupDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupDescsPartial = null;
+    }
+
+    /**
+     * reset is the collGroupDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGroupDescs($v = true)
+    {
+        $this->collGroupDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collGroupDescs collection.
+     *
+     * By default this just sets the collGroupDescs collection to an empty array (like clearcollGroupDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGroupDescs($overrideExisting = true)
+    {
+        if (null !== $this->collGroupDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collGroupDescs = new PropelObjectCollection();
+        $this->collGroupDescs->setModel('GroupDesc');
+    }
+
+    /**
+     * Gets an array of GroupDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GroupDesc[] List of GroupDesc objects
      * @throws PropelException
      */
-    public function setGroupDesc(GroupDesc $v = null)
+    public function getGroupDescs($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collGroupDescsPartial && !$this->isNew();
+        if (null === $this->collGroupDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGroupDescs) {
+                // return empty collection
+                $this->initGroupDescs();
+            } else {
+                $collGroupDescs = GroupDescQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGroupDescsPartial && count($collGroupDescs)) {
+                      $this->initGroupDescs(false);
+
+                      foreach($collGroupDescs as $obj) {
+                        if (false == $this->collGroupDescs->contains($obj)) {
+                          $this->collGroupDescs->append($obj);
+                        }
+                      }
+
+                      $this->collGroupDescsPartial = true;
+                    }
+
+                    return $collGroupDescs;
+                }
+
+                if($partial && $this->collGroupDescs) {
+                    foreach($this->collGroupDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collGroupDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGroupDescs = $collGroupDescs;
+                $this->collGroupDescsPartial = false;
+            }
+        }
+
+        return $this->collGroupDescs;
+    }
+
+    /**
+     * Sets a collection of GroupDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groupDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setGroupDescs(PropelCollection $groupDescs, PropelPDO $con = null)
+    {
+        $this->groupDescsScheduledForDeletion = $this->getGroupDescs(new Criteria(), $con)->diff($groupDescs);
+
+        foreach ($this->groupDescsScheduledForDeletion as $groupDescRemoved) {
+            $groupDescRemoved->setGroup(null);
+        }
+
+        $this->collGroupDescs = null;
+        foreach ($groupDescs as $groupDesc) {
+            $this->addGroupDesc($groupDesc);
+        }
+
+        $this->collGroupDescs = $groupDescs;
+        $this->collGroupDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related GroupDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GroupDesc objects.
+     * @throws PropelException
+     */
+    public function countGroupDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupDescsPartial && !$this->isNew();
+        if (null === $this->collGroupDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGroupDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getGroupDescs());
+                }
+                $query = GroupDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getGroupId());
+            return count($this->collGroupDescs);
         }
+    }
 
-        $this->aGroupDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setGroup($this);
+    /**
+     * Method called to associate a GroupDesc object to this object
+     * through the GroupDesc foreign key attribute.
+     *
+     * @param    GroupDesc $l GroupDesc
+     * @return Group The current object (for fluent API support)
+     */
+    public function addGroupDesc(GroupDesc $l)
+    {
+        if ($this->collGroupDescs === null) {
+            $this->initGroupDescs();
+            $this->collGroupDescsPartial = true;
         }
-
+        if (!$this->collGroupDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddGroupDesc($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated GroupDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return GroupDesc The associated GroupDesc object.
-     * @throws PropelException
+     * @param	GroupDesc $groupDesc The groupDesc object to add.
      */
-    public function getGroupDesc(PropelPDO $con = null)
+    protected function doAddGroupDesc($groupDesc)
     {
-        if ($this->aGroupDesc === null && ($this->id !== null)) {
-            $this->aGroupDesc = GroupDescQuery::create()
-                ->filterByGroup($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aGroupDesc->setGroup($this);
-        }
-
-        return $this->aGroupDesc;
+        $this->collGroupDescs[]= $groupDesc;
+        $groupDesc->setGroup($this);
     }
 
     /**
-     * Declares an association between this object and a GroupModule object.
+     * @param	GroupDesc $groupDesc The groupDesc object to remove.
+     */
+    public function removeGroupDesc($groupDesc)
+    {
+        if ($this->getGroupDescs()->contains($groupDesc)) {
+            $this->collGroupDescs->remove($this->collGroupDescs->search($groupDesc));
+            if (null === $this->groupDescsScheduledForDeletion) {
+                $this->groupDescsScheduledForDeletion = clone $this->collGroupDescs;
+                $this->groupDescsScheduledForDeletion->clear();
+            }
+            $this->groupDescsScheduledForDeletion[]= $groupDesc;
+            $groupDesc->setGroup(null);
+        }
+    }
+
+    /**
+     * Clears out the collGroupModules collection
      *
-     * @param             GroupModule $v
-     * @return Group The current object (for fluent API support)
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addGroupModules()
+     */
+    public function clearGroupModules()
+    {
+        $this->collGroupModules = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupModulesPartial = null;
+    }
+
+    /**
+     * reset is the collGroupModules collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGroupModules($v = true)
+    {
+        $this->collGroupModulesPartial = $v;
+    }
+
+    /**
+     * Initializes the collGroupModules collection.
+     *
+     * By default this just sets the collGroupModules collection to an empty array (like clearcollGroupModules());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGroupModules($overrideExisting = true)
+    {
+        if (null !== $this->collGroupModules && !$overrideExisting) {
+            return;
+        }
+        $this->collGroupModules = new PropelObjectCollection();
+        $this->collGroupModules->setModel('GroupModule');
+    }
+
+    /**
+     * Gets an array of GroupModule objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GroupModule[] List of GroupModule objects
      * @throws PropelException
      */
-    public function setGroupModule(GroupModule $v = null)
+    public function getGroupModules($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collGroupModulesPartial && !$this->isNew();
+        if (null === $this->collGroupModules || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGroupModules) {
+                // return empty collection
+                $this->initGroupModules();
+            } else {
+                $collGroupModules = GroupModuleQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGroupModulesPartial && count($collGroupModules)) {
+                      $this->initGroupModules(false);
+
+                      foreach($collGroupModules as $obj) {
+                        if (false == $this->collGroupModules->contains($obj)) {
+                          $this->collGroupModules->append($obj);
+                        }
+                      }
+
+                      $this->collGroupModulesPartial = true;
+                    }
+
+                    return $collGroupModules;
+                }
+
+                if($partial && $this->collGroupModules) {
+                    foreach($this->collGroupModules as $obj) {
+                        if($obj->isNew()) {
+                            $collGroupModules[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGroupModules = $collGroupModules;
+                $this->collGroupModulesPartial = false;
+            }
+        }
+
+        return $this->collGroupModules;
+    }
+
+    /**
+     * Sets a collection of GroupModule objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groupModules A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setGroupModules(PropelCollection $groupModules, PropelPDO $con = null)
+    {
+        $this->groupModulesScheduledForDeletion = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
+
+        foreach ($this->groupModulesScheduledForDeletion as $groupModuleRemoved) {
+            $groupModuleRemoved->setGroup(null);
+        }
+
+        $this->collGroupModules = null;
+        foreach ($groupModules as $groupModule) {
+            $this->addGroupModule($groupModule);
+        }
+
+        $this->collGroupModules = $groupModules;
+        $this->collGroupModulesPartial = false;
+    }
+
+    /**
+     * Returns the number of related GroupModule objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GroupModule objects.
+     * @throws PropelException
+     */
+    public function countGroupModules(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupModulesPartial && !$this->isNew();
+        if (null === $this->collGroupModules || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGroupModules) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getGroupModules());
+                }
+                $query = GroupModuleQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getGroupId());
+            return count($this->collGroupModules);
         }
+    }
 
-        $this->aGroupModule = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setGroup($this);
+    /**
+     * Method called to associate a GroupModule object to this object
+     * through the GroupModule foreign key attribute.
+     *
+     * @param    GroupModule $l GroupModule
+     * @return Group The current object (for fluent API support)
+     */
+    public function addGroupModule(GroupModule $l)
+    {
+        if ($this->collGroupModules === null) {
+            $this->initGroupModules();
+            $this->collGroupModulesPartial = true;
         }
-
+        if (!$this->collGroupModules->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddGroupModule($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated GroupModule object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return GroupModule The associated GroupModule object.
-     * @throws PropelException
+     * @param	GroupModule $groupModule The groupModule object to add.
      */
-    public function getGroupModule(PropelPDO $con = null)
+    protected function doAddGroupModule($groupModule)
     {
-        if ($this->aGroupModule === null && ($this->id !== null)) {
-            $this->aGroupModule = GroupModuleQuery::create()
-                ->filterByGroup($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aGroupModule->setGroup($this);
-        }
-
-        return $this->aGroupModule;
+        $this->collGroupModules[]= $groupModule;
+        $groupModule->setGroup($this);
     }
 
     /**
-     * Declares an association between this object and a GroupResource object.
+     * @param	GroupModule $groupModule The groupModule object to remove.
+     */
+    public function removeGroupModule($groupModule)
+    {
+        if ($this->getGroupModules()->contains($groupModule)) {
+            $this->collGroupModules->remove($this->collGroupModules->search($groupModule));
+            if (null === $this->groupModulesScheduledForDeletion) {
+                $this->groupModulesScheduledForDeletion = clone $this->collGroupModules;
+                $this->groupModulesScheduledForDeletion->clear();
+            }
+            $this->groupModulesScheduledForDeletion[]= $groupModule;
+            $groupModule->setGroup(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Group is new, it will return
+     * an empty collection; or if this Group has previously
+     * been saved, it will retrieve related GroupModules from storage.
      *
-     * @param             GroupResource $v
-     * @return Group The current object (for fluent API support)
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Group.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|GroupModule[] List of GroupModule objects
+     */
+    public function getGroupModulesJoinModule($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = GroupModuleQuery::create(null, $criteria);
+        $query->joinWith('Module', $join_behavior);
+
+        return $this->getGroupModules($query, $con);
+    }
+
+    /**
+     * Clears out the collGroupResources collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addGroupResources()
+     */
+    public function clearGroupResources()
+    {
+        $this->collGroupResources = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupResourcesPartial = null;
+    }
+
+    /**
+     * reset is the collGroupResources collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGroupResources($v = true)
+    {
+        $this->collGroupResourcesPartial = $v;
+    }
+
+    /**
+     * Initializes the collGroupResources collection.
+     *
+     * By default this just sets the collGroupResources collection to an empty array (like clearcollGroupResources());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGroupResources($overrideExisting = true)
+    {
+        if (null !== $this->collGroupResources && !$overrideExisting) {
+            return;
+        }
+        $this->collGroupResources = new PropelObjectCollection();
+        $this->collGroupResources->setModel('GroupResource');
+    }
+
+    /**
+     * Gets an array of GroupResource objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GroupResource[] List of GroupResource objects
      * @throws PropelException
      */
-    public function setGroupResource(GroupResource $v = null)
+    public function getGroupResources($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collGroupResourcesPartial && !$this->isNew();
+        if (null === $this->collGroupResources || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGroupResources) {
+                // return empty collection
+                $this->initGroupResources();
+            } else {
+                $collGroupResources = GroupResourceQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGroupResourcesPartial && count($collGroupResources)) {
+                      $this->initGroupResources(false);
+
+                      foreach($collGroupResources as $obj) {
+                        if (false == $this->collGroupResources->contains($obj)) {
+                          $this->collGroupResources->append($obj);
+                        }
+                      }
+
+                      $this->collGroupResourcesPartial = true;
+                    }
+
+                    return $collGroupResources;
+                }
+
+                if($partial && $this->collGroupResources) {
+                    foreach($this->collGroupResources as $obj) {
+                        if($obj->isNew()) {
+                            $collGroupResources[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGroupResources = $collGroupResources;
+                $this->collGroupResourcesPartial = false;
+            }
+        }
+
+        return $this->collGroupResources;
+    }
+
+    /**
+     * Sets a collection of GroupResource objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groupResources A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setGroupResources(PropelCollection $groupResources, PropelPDO $con = null)
+    {
+        $this->groupResourcesScheduledForDeletion = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
+
+        foreach ($this->groupResourcesScheduledForDeletion as $groupResourceRemoved) {
+            $groupResourceRemoved->setGroup(null);
+        }
+
+        $this->collGroupResources = null;
+        foreach ($groupResources as $groupResource) {
+            $this->addGroupResource($groupResource);
+        }
+
+        $this->collGroupResources = $groupResources;
+        $this->collGroupResourcesPartial = false;
+    }
+
+    /**
+     * Returns the number of related GroupResource objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GroupResource objects.
+     * @throws PropelException
+     */
+    public function countGroupResources(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupResourcesPartial && !$this->isNew();
+        if (null === $this->collGroupResources || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGroupResources) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getGroupResources());
+                }
+                $query = GroupResourceQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getGroupId());
+            return count($this->collGroupResources);
         }
+    }
 
-        $this->aGroupResource = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setGroup($this);
+    /**
+     * Method called to associate a GroupResource object to this object
+     * through the GroupResource foreign key attribute.
+     *
+     * @param    GroupResource $l GroupResource
+     * @return Group The current object (for fluent API support)
+     */
+    public function addGroupResource(GroupResource $l)
+    {
+        if ($this->collGroupResources === null) {
+            $this->initGroupResources();
+            $this->collGroupResourcesPartial = true;
         }
-
+        if (!$this->collGroupResources->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddGroupResource($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	GroupResource $groupResource The groupResource object to add.
+     */
+    protected function doAddGroupResource($groupResource)
+    {
+        $this->collGroupResources[]= $groupResource;
+        $groupResource->setGroup($this);
+    }
 
     /**
-     * Get the associated GroupResource object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return GroupResource The associated GroupResource object.
-     * @throws PropelException
+     * @param	GroupResource $groupResource The groupResource object to remove.
      */
-    public function getGroupResource(PropelPDO $con = null)
+    public function removeGroupResource($groupResource)
     {
-        if ($this->aGroupResource === null && ($this->id !== null)) {
-            $this->aGroupResource = GroupResourceQuery::create()
-                ->filterByGroup($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aGroupResource->setGroup($this);
+        if ($this->getGroupResources()->contains($groupResource)) {
+            $this->collGroupResources->remove($this->collGroupResources->search($groupResource));
+            if (null === $this->groupResourcesScheduledForDeletion) {
+                $this->groupResourcesScheduledForDeletion = clone $this->collGroupResources;
+                $this->groupResourcesScheduledForDeletion->clear();
+            }
+            $this->groupResourcesScheduledForDeletion[]= $groupResource;
+            $groupResource->setGroup(null);
         }
+    }
 
-        return $this->aGroupResource;
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Group is new, it will return
+     * an empty collection; or if this Group has previously
+     * been saved, it will retrieve related GroupResources from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Group.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|GroupResource[] List of GroupResource objects
+     */
+    public function getGroupResourcesJoinResource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = GroupResourceQuery::create(null, $criteria);
+        $query->joinWith('Resource', $join_behavior);
+
+        return $this->getGroupResources($query, $con);
     }
 
     /**
@@ -1322,12 +2110,44 @@ abstract class BaseGroup extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collAdminGroups) {
+                foreach ($this->collAdminGroups as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collGroupDescs) {
+                foreach ($this->collGroupDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collGroupModules) {
+                foreach ($this->collGroupModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collGroupResources) {
+                foreach ($this->collGroupResources as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aAdminGroup = null;
-        $this->aGroupDesc = null;
-        $this->aGroupModule = null;
-        $this->aGroupResource = null;
+        if ($this->collAdminGroups instanceof PropelCollection) {
+            $this->collAdminGroups->clearIterator();
+        }
+        $this->collAdminGroups = null;
+        if ($this->collGroupDescs instanceof PropelCollection) {
+            $this->collGroupDescs->clearIterator();
+        }
+        $this->collGroupDescs = null;
+        if ($this->collGroupModules instanceof PropelCollection) {
+            $this->collGroupModules->clearIterator();
+        }
+        $this->collGroupModules = null;
+        if ($this->collGroupResources instanceof PropelCollection) {
+            $this->collGroupResources->clearIterator();
+        }
+        $this->collGroupResources = null;
     }
 
     /**

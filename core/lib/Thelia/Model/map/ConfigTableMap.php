@@ -42,7 +42,7 @@ class ConfigTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'config_desc', 'CONFIG_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('NAME', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('VALUE', 'Value', 'VARCHAR', true, 255, null);
         $this->addColumn('SECURE', 'Secure', 'TINYINT', true, null, 1);
@@ -57,7 +57,7 @@ class ConfigTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ConfigDesc', 'Thelia\\Model\\ConfigDesc', RelationMap::MANY_TO_ONE, array('id' => 'config_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ConfigDesc', 'Thelia\\Model\\ConfigDesc', RelationMap::ONE_TO_MANY, array('id' => 'config_id', ), 'CASCADE', null, 'ConfigDescs');
     } // buildRelations()
 
 } // ConfigTableMap

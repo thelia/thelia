@@ -42,7 +42,7 @@ class CouponTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'coupon_rule', 'COUPON_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
         $this->addColumn('ACTION', 'Action', 'VARCHAR', true, 255, null);
         $this->addColumn('VALUE', 'Value', 'FLOAT', true, null, null);
@@ -60,7 +60,7 @@ class CouponTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CouponRule', 'Thelia\\Model\\CouponRule', RelationMap::MANY_TO_ONE, array('id' => 'coupon_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('CouponRule', 'Thelia\\Model\\CouponRule', RelationMap::ONE_TO_MANY, array('id' => 'coupon_id', ), 'CASCADE', null, 'CouponRules');
     } // buildRelations()
 
 } // CouponTableMap

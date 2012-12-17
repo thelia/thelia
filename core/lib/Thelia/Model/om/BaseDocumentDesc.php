@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Document;
 use Thelia\Model\DocumentDesc;
@@ -98,9 +96,9 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Document one-to-one related Document object
+     * @var        Document
      */
-    protected $singleDocument;
+    protected $aDocument;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,12 +113,6 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $documentsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -292,6 +284,10 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
         if ($this->document_id !== $v) {
             $this->document_id = $v;
             $this->modifiedColumns[] = DocumentDescPeer::DOCUMENT_ID;
+        }
+
+        if ($this->aDocument !== null && $this->aDocument->getId() !== $v) {
+            $this->aDocument = null;
         }
 
 
@@ -499,6 +495,9 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aDocument !== null && $this->document_id !== $this->aDocument->getId()) {
+            $this->aDocument = null;
+        }
     } // ensureConsistency
 
     /**
@@ -538,8 +537,7 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleDocument = null;
-
+            $this->aDocument = null;
         } // if (deep)
     }
 
@@ -653,6 +651,18 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aDocument !== null) {
+                if ($this->aDocument->isModified() || $this->aDocument->isNew()) {
+                    $affectedRows += $this->aDocument->save($con);
+                }
+                $this->setDocument($this->aDocument);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -662,21 +672,6 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->documentsScheduledForDeletion !== null) {
-                if (!$this->documentsScheduledForDeletion->isEmpty()) {
-                    DocumentQuery::create()
-                        ->filterByPrimaryKeys($this->documentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->documentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleDocument !== null) {
-                if (!$this->singleDocument->isDeleted()) {
-                        $affectedRows += $this->singleDocument->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -858,16 +853,22 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aDocument !== null) {
+                if (!$this->aDocument->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aDocument->getValidationFailures());
+                }
+            }
+
+
             if (($retval = DocumentDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleDocument !== null) {
-                    if (!$this->singleDocument->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleDocument->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -967,8 +968,8 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleDocument) {
-                $result['Document'] = $this->singleDocument->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aDocument) {
+                $result['Document'] = $this->aDocument->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1157,11 +1158,6 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getDocument();
-            if ($relObj) {
-                $copyObj->setDocument($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1212,53 +1208,55 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Document object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Document object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Document
-     * @throws PropelException
-     */
-    public function getDocument(PropelPDO $con = null)
-    {
-
-        if ($this->singleDocument === null && !$this->isNew()) {
-            $this->singleDocument = DocumentQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleDocument;
-    }
-
-    /**
-     * Sets a single Document object as related to this object by a one-to-one relationship.
-     *
-     * @param             Document $v Document
+     * @param             Document $v
      * @return DocumentDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setDocument(Document $v = null)
     {
-        $this->singleDocument = $v;
-
-        // Make sure that that the passed-in Document isn't already associated with this object
-        if ($v !== null && $v->getDocumentDesc() === null) {
-            $v->setDocumentDesc($this);
+        if ($v === null) {
+            $this->setDocumentId(NULL);
+        } else {
+            $this->setDocumentId($v->getId());
         }
 
+        $this->aDocument = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Document object, it will not be re-added.
+        if ($v !== null) {
+            $v->addDocumentDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Document object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Document The associated Document object.
+     * @throws PropelException
+     */
+    public function getDocument(PropelPDO $con = null)
+    {
+        if ($this->aDocument === null && ($this->document_id !== null)) {
+            $this->aDocument = DocumentQuery::create()->findPk($this->document_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aDocument->addDocumentDescs($this);
+             */
+        }
+
+        return $this->aDocument;
     }
 
     /**
@@ -1294,15 +1292,9 @@ abstract class BaseDocumentDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleDocument) {
-                $this->singleDocument->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleDocument instanceof PropelCollection) {
-            $this->singleDocument->clearIterator();
-        }
-        $this->singleDocument = null;
+        $this->aDocument = null;
     }
 
     /**

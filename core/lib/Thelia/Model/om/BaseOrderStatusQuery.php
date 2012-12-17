@@ -69,7 +69,7 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\OrderStatus', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\OrderStatus', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -245,10 +245,6 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByOrder()
-     *
-     * @see       filterByOrderStatusDesc()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -384,7 +380,7 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
     /**
      * Filter the query by a related Order object
      *
-     * @param   Order|PropelObjectCollection $order The related object(s) to use as filter
+     * @param   Order|PropelObjectCollection $order  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderStatusQuery The current query, for fluid interface
@@ -396,12 +392,10 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderStatusPeer::ID, $order->getStatusId(), $comparison);
         } elseif ($order instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(OrderStatusPeer::ID, $order->toKeyValue('PrimaryKey', 'StatusId'), $comparison);
+                ->useOrderQuery()
+                ->filterByPrimaryKeys($order->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByOrder() only accepts arguments of type Order or PropelCollection');
         }
@@ -415,7 +409,7 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
      *
      * @return OrderStatusQuery The current query, for fluid interface
      */
-    public function joinOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinOrder($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Order');
@@ -450,7 +444,7 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderQuery A secondary query class using the current class as primary query
      */
-    public function useOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useOrderQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinOrder($relationAlias, $joinType)
@@ -460,7 +454,7 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
     /**
      * Filter the query by a related OrderStatusDesc object
      *
-     * @param   OrderStatusDesc|PropelObjectCollection $orderStatusDesc The related object(s) to use as filter
+     * @param   OrderStatusDesc|PropelObjectCollection $orderStatusDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderStatusQuery The current query, for fluid interface
@@ -472,12 +466,10 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderStatusPeer::ID, $orderStatusDesc->getStatusId(), $comparison);
         } elseif ($orderStatusDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(OrderStatusPeer::ID, $orderStatusDesc->toKeyValue('PrimaryKey', 'StatusId'), $comparison);
+                ->useOrderStatusDescQuery()
+                ->filterByPrimaryKeys($orderStatusDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByOrderStatusDesc() only accepts arguments of type OrderStatusDesc or PropelCollection');
         }

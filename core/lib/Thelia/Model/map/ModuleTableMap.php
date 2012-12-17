@@ -42,8 +42,7 @@ class ModuleTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'group_module', 'MODULE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'module_desc', 'MODULE_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 55, null);
         $this->addColumn('TYPE', 'Type', 'TINYINT', true, null, null);
         $this->addColumn('ACTIVATE', 'Activate', 'TINYINT', false, null, null);
@@ -58,8 +57,8 @@ class ModuleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('GroupModule', 'Thelia\\Model\\GroupModule', RelationMap::MANY_TO_ONE, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ModuleDesc', 'Thelia\\Model\\ModuleDesc', RelationMap::MANY_TO_ONE, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('GroupModule', 'Thelia\\Model\\GroupModule', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', null, 'GroupModules');
+        $this->addRelation('ModuleDesc', 'Thelia\\Model\\ModuleDesc', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', null, 'ModuleDescs');
     } // buildRelations()
 
 } // ModuleTableMap

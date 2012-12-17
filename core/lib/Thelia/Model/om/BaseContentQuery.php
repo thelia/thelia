@@ -93,7 +93,7 @@ abstract class BaseContentQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Content', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Content', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -268,18 +268,6 @@ abstract class BaseContentQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByContentAssoc()
-     *
-     * @see       filterByContentDesc()
-     *
-     * @see       filterByContentFolder()
-     *
-     * @see       filterByDocument()
-     *
-     * @see       filterByImage()
-     *
-     * @see       filterByRewriting()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -469,7 +457,7 @@ abstract class BaseContentQuery extends ModelCriteria
     /**
      * Filter the query by a related ContentAssoc object
      *
-     * @param   ContentAssoc|PropelObjectCollection $contentAssoc The related object(s) to use as filter
+     * @param   ContentAssoc|PropelObjectCollection $contentAssoc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentQuery The current query, for fluid interface
@@ -481,12 +469,10 @@ abstract class BaseContentQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentPeer::ID, $contentAssoc->getContentId(), $comparison);
         } elseif ($contentAssoc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ContentPeer::ID, $contentAssoc->toKeyValue('PrimaryKey', 'ContentId'), $comparison);
+                ->useContentAssocQuery()
+                ->filterByPrimaryKeys($contentAssoc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByContentAssoc() only accepts arguments of type ContentAssoc or PropelCollection');
         }
@@ -500,7 +486,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return ContentQuery The current query, for fluid interface
      */
-    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('ContentAssoc');
@@ -535,7 +521,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ContentAssocQuery A secondary query class using the current class as primary query
      */
-    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinContentAssoc($relationAlias, $joinType)
@@ -545,7 +531,7 @@ abstract class BaseContentQuery extends ModelCriteria
     /**
      * Filter the query by a related ContentDesc object
      *
-     * @param   ContentDesc|PropelObjectCollection $contentDesc The related object(s) to use as filter
+     * @param   ContentDesc|PropelObjectCollection $contentDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentQuery The current query, for fluid interface
@@ -557,12 +543,10 @@ abstract class BaseContentQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentPeer::ID, $contentDesc->getContentId(), $comparison);
         } elseif ($contentDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ContentPeer::ID, $contentDesc->toKeyValue('PrimaryKey', 'ContentId'), $comparison);
+                ->useContentDescQuery()
+                ->filterByPrimaryKeys($contentDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByContentDesc() only accepts arguments of type ContentDesc or PropelCollection');
         }
@@ -621,7 +605,7 @@ abstract class BaseContentQuery extends ModelCriteria
     /**
      * Filter the query by a related ContentFolder object
      *
-     * @param   ContentFolder|PropelObjectCollection $contentFolder The related object(s) to use as filter
+     * @param   ContentFolder|PropelObjectCollection $contentFolder  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentQuery The current query, for fluid interface
@@ -633,12 +617,10 @@ abstract class BaseContentQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentPeer::ID, $contentFolder->getContentId(), $comparison);
         } elseif ($contentFolder instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ContentPeer::ID, $contentFolder->toKeyValue('ContentId', 'ContentId'), $comparison);
+                ->useContentFolderQuery()
+                ->filterByPrimaryKeys($contentFolder->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByContentFolder() only accepts arguments of type ContentFolder or PropelCollection');
         }
@@ -697,7 +679,7 @@ abstract class BaseContentQuery extends ModelCriteria
     /**
      * Filter the query by a related Document object
      *
-     * @param   Document|PropelObjectCollection $document The related object(s) to use as filter
+     * @param   Document|PropelObjectCollection $document  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentQuery The current query, for fluid interface
@@ -709,12 +691,10 @@ abstract class BaseContentQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentPeer::ID, $document->getContentId(), $comparison);
         } elseif ($document instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ContentPeer::ID, $document->toKeyValue('PrimaryKey', 'ContentId'), $comparison);
+                ->useDocumentQuery()
+                ->filterByPrimaryKeys($document->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
         }
@@ -728,7 +708,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return ContentQuery The current query, for fluid interface
      */
-    public function joinDocument($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Document');
@@ -763,7 +743,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
      */
-    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinDocument($relationAlias, $joinType)
@@ -773,7 +753,7 @@ abstract class BaseContentQuery extends ModelCriteria
     /**
      * Filter the query by a related Image object
      *
-     * @param   Image|PropelObjectCollection $image The related object(s) to use as filter
+     * @param   Image|PropelObjectCollection $image  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentQuery The current query, for fluid interface
@@ -785,12 +765,10 @@ abstract class BaseContentQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentPeer::ID, $image->getContentId(), $comparison);
         } elseif ($image instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ContentPeer::ID, $image->toKeyValue('PrimaryKey', 'ContentId'), $comparison);
+                ->useImageQuery()
+                ->filterByPrimaryKeys($image->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByImage() only accepts arguments of type Image or PropelCollection');
         }
@@ -804,7 +782,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return ContentQuery The current query, for fluid interface
      */
-    public function joinImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinImage($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Image');
@@ -839,7 +817,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ImageQuery A secondary query class using the current class as primary query
      */
-    public function useImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useImageQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinImage($relationAlias, $joinType)
@@ -849,7 +827,7 @@ abstract class BaseContentQuery extends ModelCriteria
     /**
      * Filter the query by a related Rewriting object
      *
-     * @param   Rewriting|PropelObjectCollection $rewriting The related object(s) to use as filter
+     * @param   Rewriting|PropelObjectCollection $rewriting  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentQuery The current query, for fluid interface
@@ -861,12 +839,10 @@ abstract class BaseContentQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentPeer::ID, $rewriting->getContentId(), $comparison);
         } elseif ($rewriting instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ContentPeer::ID, $rewriting->toKeyValue('PrimaryKey', 'ContentId'), $comparison);
+                ->useRewritingQuery()
+                ->filterByPrimaryKeys($rewriting->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByRewriting() only accepts arguments of type Rewriting or PropelCollection');
         }
@@ -880,7 +856,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return ContentQuery The current query, for fluid interface
      */
-    public function joinRewriting($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinRewriting($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Rewriting');
@@ -915,7 +891,7 @@ abstract class BaseContentQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\RewritingQuery A secondary query class using the current class as primary query
      */
-    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinRewriting($relationAlias, $joinType)

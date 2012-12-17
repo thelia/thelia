@@ -42,14 +42,7 @@ class CategoryTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'attribute_category', 'CATEGORY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'category_desc', 'CATEGORY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'content_assoc', 'CATEGORY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'document', 'CATEGORY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_category', 'CATEGORY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'image', 'CATEGORY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product_category', 'CATEGORY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'rewriting', 'CATEGORY_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('PARENT', 'Parent', 'INTEGER', false, null, null);
         $this->addColumn('LINK', 'Link', 'VARCHAR', false, 255, null);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, null);
@@ -64,14 +57,14 @@ class CategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeCategory', 'Thelia\\Model\\AttributeCategory', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('CategoryDesc', 'Thelia\\Model\\CategoryDesc', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ContentAssoc', 'Thelia\\Model\\ContentAssoc', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FeatureCategory', 'Thelia\\Model\\FeatureCategory', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ProductCategory', 'Thelia\\Model\\ProductCategory', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::MANY_TO_ONE, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('AttributeCategory', 'Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'AttributeCategorys');
+        $this->addRelation('CategoryDesc', 'Thelia\\Model\\CategoryDesc', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'CategoryDescs');
+        $this->addRelation('ContentAssoc', 'Thelia\\Model\\ContentAssoc', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'ContentAssocs');
+        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'Documents');
+        $this->addRelation('FeatureCategory', 'Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'FeatureCategorys');
+        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'Images');
+        $this->addRelation('ProductCategory', 'Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'ProductCategorys');
+        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', null, 'Rewritings');
     } // buildRelations()
 
 } // CategoryTableMap

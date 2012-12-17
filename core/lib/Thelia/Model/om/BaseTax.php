@@ -10,8 +10,10 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
+use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Tax;
 use Thelia\Model\TaxDesc;
@@ -74,14 +76,16 @@ abstract class BaseTax extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        TaxDesc
+     * @var        PropelObjectCollection|TaxDesc[] Collection to store aggregation of TaxDesc objects.
      */
-    protected $aTaxDesc;
+    protected $collTaxDescs;
+    protected $collTaxDescsPartial;
 
     /**
-     * @var        TaxRuleCountry
+     * @var        PropelObjectCollection|TaxRuleCountry[] Collection to store aggregation of TaxRuleCountry objects.
      */
-    protected $aTaxRuleCountry;
+    protected $collTaxRuleCountrys;
+    protected $collTaxRuleCountrysPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -96,6 +100,18 @@ abstract class BaseTax extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $taxDescsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $taxRuleCountrysScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -206,14 +222,6 @@ abstract class BaseTax extends BaseObject implements Persistent
         if ($this->id !== $v) {
             $this->id = $v;
             $this->modifiedColumns[] = TaxPeer::ID;
-        }
-
-        if ($this->aTaxDesc !== null && $this->aTaxDesc->getTaxId() !== $v) {
-            $this->aTaxDesc = null;
-        }
-
-        if ($this->aTaxRuleCountry !== null && $this->aTaxRuleCountry->getTaxId() !== $v) {
-            $this->aTaxRuleCountry = null;
         }
 
 
@@ -354,12 +362,6 @@ abstract class BaseTax extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aTaxDesc !== null && $this->id !== $this->aTaxDesc->getTaxId()) {
-            $this->aTaxDesc = null;
-        }
-        if ($this->aTaxRuleCountry !== null && $this->id !== $this->aTaxRuleCountry->getTaxId()) {
-            $this->aTaxRuleCountry = null;
-        }
     } // ensureConsistency
 
     /**
@@ -399,8 +401,10 @@ abstract class BaseTax extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aTaxDesc = null;
-            $this->aTaxRuleCountry = null;
+            $this->collTaxDescs = null;
+
+            $this->collTaxRuleCountrys = null;
+
         } // if (deep)
     }
 
@@ -514,25 +518,6 @@ abstract class BaseTax extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
-            // We call the save method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aTaxDesc !== null) {
-                if ($this->aTaxDesc->isModified() || $this->aTaxDesc->isNew()) {
-                    $affectedRows += $this->aTaxDesc->save($con);
-                }
-                $this->setTaxDesc($this->aTaxDesc);
-            }
-
-            if ($this->aTaxRuleCountry !== null) {
-                if ($this->aTaxRuleCountry->isModified() || $this->aTaxRuleCountry->isNew()) {
-                    $affectedRows += $this->aTaxRuleCountry->save($con);
-                }
-                $this->setTaxRuleCountry($this->aTaxRuleCountry);
-            }
-
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -542,6 +527,41 @@ abstract class BaseTax extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->taxDescsScheduledForDeletion !== null) {
+                if (!$this->taxDescsScheduledForDeletion->isEmpty()) {
+                    TaxDescQuery::create()
+                        ->filterByPrimaryKeys($this->taxDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->taxDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTaxDescs !== null) {
+                foreach ($this->collTaxDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->taxRuleCountrysScheduledForDeletion !== null) {
+                if (!$this->taxRuleCountrysScheduledForDeletion->isEmpty()) {
+                    foreach ($this->taxRuleCountrysScheduledForDeletion as $taxRuleCountry) {
+                        // need to save related object because we set the relation to null
+                        $taxRuleCountry->save($con);
+                    }
+                    $this->taxRuleCountrysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTaxRuleCountrys !== null) {
+                foreach ($this->collTaxRuleCountrys as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
             }
 
             $this->alreadyInSave = false;
@@ -699,28 +719,26 @@ abstract class BaseTax extends BaseObject implements Persistent
             $failureMap = array();
 
 
-            // We call the validate method on the following object(s) if they
-            // were passed to this object by their coresponding set
-            // method.  This object relates to these object(s) by a
-            // foreign key reference.
-
-            if ($this->aTaxDesc !== null) {
-                if (!$this->aTaxDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aTaxDesc->getValidationFailures());
-                }
-            }
-
-            if ($this->aTaxRuleCountry !== null) {
-                if (!$this->aTaxRuleCountry->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aTaxRuleCountry->getValidationFailures());
-                }
-            }
-
-
             if (($retval = TaxPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
+
+                if ($this->collTaxDescs !== null) {
+                    foreach ($this->collTaxDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collTaxRuleCountrys !== null) {
+                    foreach ($this->collTaxRuleCountrys as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
 
 
             $this->alreadyInValidation = false;
@@ -804,11 +822,11 @@ abstract class BaseTax extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aTaxDesc) {
-                $result['TaxDesc'] = $this->aTaxDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collTaxDescs) {
+                $result['TaxDescs'] = $this->collTaxDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->aTaxRuleCountry) {
-                $result['TaxRuleCountry'] = $this->aTaxRuleCountry->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collTaxRuleCountrys) {
+                $result['TaxRuleCountrys'] = $this->collTaxRuleCountrys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -973,14 +991,16 @@ abstract class BaseTax extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getTaxDesc();
-            if ($relObj) {
-                $copyObj->setTaxDesc($relObj->copy($deepCopy));
+            foreach ($this->getTaxDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTaxDesc($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getTaxRuleCountry();
-            if ($relObj) {
-                $copyObj->setTaxRuleCountry($relObj->copy($deepCopy));
+            foreach ($this->getTaxRuleCountrys() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTaxRuleCountry($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1033,98 +1053,487 @@ abstract class BaseTax extends BaseObject implements Persistent
         return self::$peer;
     }
 
+
     /**
-     * Declares an association between this object and a TaxDesc object.
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
      *
-     * @param             TaxDesc $v
-     * @return Tax The current object (for fluent API support)
+     * @param string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('TaxDesc' == $relationName) {
+            $this->initTaxDescs();
+        }
+        if ('TaxRuleCountry' == $relationName) {
+            $this->initTaxRuleCountrys();
+        }
+    }
+
+    /**
+     * Clears out the collTaxDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTaxDescs()
+     */
+    public function clearTaxDescs()
+    {
+        $this->collTaxDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collTaxDescsPartial = null;
+    }
+
+    /**
+     * reset is the collTaxDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTaxDescs($v = true)
+    {
+        $this->collTaxDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTaxDescs collection.
+     *
+     * By default this just sets the collTaxDescs collection to an empty array (like clearcollTaxDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTaxDescs($overrideExisting = true)
+    {
+        if (null !== $this->collTaxDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collTaxDescs = new PropelObjectCollection();
+        $this->collTaxDescs->setModel('TaxDesc');
+    }
+
+    /**
+     * Gets an array of TaxDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Tax is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|TaxDesc[] List of TaxDesc objects
      * @throws PropelException
      */
-    public function setTaxDesc(TaxDesc $v = null)
+    public function getTaxDescs($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collTaxDescsPartial && !$this->isNew();
+        if (null === $this->collTaxDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTaxDescs) {
+                // return empty collection
+                $this->initTaxDescs();
+            } else {
+                $collTaxDescs = TaxDescQuery::create(null, $criteria)
+                    ->filterByTax($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTaxDescsPartial && count($collTaxDescs)) {
+                      $this->initTaxDescs(false);
+
+                      foreach($collTaxDescs as $obj) {
+                        if (false == $this->collTaxDescs->contains($obj)) {
+                          $this->collTaxDescs->append($obj);
+                        }
+                      }
+
+                      $this->collTaxDescsPartial = true;
+                    }
+
+                    return $collTaxDescs;
+                }
+
+                if($partial && $this->collTaxDescs) {
+                    foreach($this->collTaxDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collTaxDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTaxDescs = $collTaxDescs;
+                $this->collTaxDescsPartial = false;
+            }
+        }
+
+        return $this->collTaxDescs;
+    }
+
+    /**
+     * Sets a collection of TaxDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $taxDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setTaxDescs(PropelCollection $taxDescs, PropelPDO $con = null)
+    {
+        $this->taxDescsScheduledForDeletion = $this->getTaxDescs(new Criteria(), $con)->diff($taxDescs);
+
+        foreach ($this->taxDescsScheduledForDeletion as $taxDescRemoved) {
+            $taxDescRemoved->setTax(null);
+        }
+
+        $this->collTaxDescs = null;
+        foreach ($taxDescs as $taxDesc) {
+            $this->addTaxDesc($taxDesc);
+        }
+
+        $this->collTaxDescs = $taxDescs;
+        $this->collTaxDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related TaxDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related TaxDesc objects.
+     * @throws PropelException
+     */
+    public function countTaxDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTaxDescsPartial && !$this->isNew();
+        if (null === $this->collTaxDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTaxDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getTaxDescs());
+                }
+                $query = TaxDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByTax($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getTaxId());
+            return count($this->collTaxDescs);
         }
+    }
 
-        $this->aTaxDesc = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setTax($this);
+    /**
+     * Method called to associate a TaxDesc object to this object
+     * through the TaxDesc foreign key attribute.
+     *
+     * @param    TaxDesc $l TaxDesc
+     * @return Tax The current object (for fluent API support)
+     */
+    public function addTaxDesc(TaxDesc $l)
+    {
+        if ($this->collTaxDescs === null) {
+            $this->initTaxDescs();
+            $this->collTaxDescsPartial = true;
         }
-
+        if (!$this->collTaxDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddTaxDesc($l);
+        }
 
         return $this;
     }
 
-
     /**
-     * Get the associated TaxDesc object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return TaxDesc The associated TaxDesc object.
-     * @throws PropelException
+     * @param	TaxDesc $taxDesc The taxDesc object to add.
      */
-    public function getTaxDesc(PropelPDO $con = null)
+    protected function doAddTaxDesc($taxDesc)
     {
-        if ($this->aTaxDesc === null && ($this->id !== null)) {
-            $this->aTaxDesc = TaxDescQuery::create()
-                ->filterByTax($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aTaxDesc->setTax($this);
-        }
-
-        return $this->aTaxDesc;
+        $this->collTaxDescs[]= $taxDesc;
+        $taxDesc->setTax($this);
     }
 
     /**
-     * Declares an association between this object and a TaxRuleCountry object.
+     * @param	TaxDesc $taxDesc The taxDesc object to remove.
+     */
+    public function removeTaxDesc($taxDesc)
+    {
+        if ($this->getTaxDescs()->contains($taxDesc)) {
+            $this->collTaxDescs->remove($this->collTaxDescs->search($taxDesc));
+            if (null === $this->taxDescsScheduledForDeletion) {
+                $this->taxDescsScheduledForDeletion = clone $this->collTaxDescs;
+                $this->taxDescsScheduledForDeletion->clear();
+            }
+            $this->taxDescsScheduledForDeletion[]= $taxDesc;
+            $taxDesc->setTax(null);
+        }
+    }
+
+    /**
+     * Clears out the collTaxRuleCountrys collection
      *
-     * @param             TaxRuleCountry $v
-     * @return Tax The current object (for fluent API support)
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTaxRuleCountrys()
+     */
+    public function clearTaxRuleCountrys()
+    {
+        $this->collTaxRuleCountrys = null; // important to set this to null since that means it is uninitialized
+        $this->collTaxRuleCountrysPartial = null;
+    }
+
+    /**
+     * reset is the collTaxRuleCountrys collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTaxRuleCountrys($v = true)
+    {
+        $this->collTaxRuleCountrysPartial = $v;
+    }
+
+    /**
+     * Initializes the collTaxRuleCountrys collection.
+     *
+     * By default this just sets the collTaxRuleCountrys collection to an empty array (like clearcollTaxRuleCountrys());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTaxRuleCountrys($overrideExisting = true)
+    {
+        if (null !== $this->collTaxRuleCountrys && !$overrideExisting) {
+            return;
+        }
+        $this->collTaxRuleCountrys = new PropelObjectCollection();
+        $this->collTaxRuleCountrys->setModel('TaxRuleCountry');
+    }
+
+    /**
+     * Gets an array of TaxRuleCountry objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Tax is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|TaxRuleCountry[] List of TaxRuleCountry objects
      * @throws PropelException
      */
-    public function setTaxRuleCountry(TaxRuleCountry $v = null)
+    public function getTaxRuleCountrys($criteria = null, PropelPDO $con = null)
     {
-        if ($v === null) {
-            $this->setId(NULL);
+        $partial = $this->collTaxRuleCountrysPartial && !$this->isNew();
+        if (null === $this->collTaxRuleCountrys || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTaxRuleCountrys) {
+                // return empty collection
+                $this->initTaxRuleCountrys();
+            } else {
+                $collTaxRuleCountrys = TaxRuleCountryQuery::create(null, $criteria)
+                    ->filterByTax($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTaxRuleCountrysPartial && count($collTaxRuleCountrys)) {
+                      $this->initTaxRuleCountrys(false);
+
+                      foreach($collTaxRuleCountrys as $obj) {
+                        if (false == $this->collTaxRuleCountrys->contains($obj)) {
+                          $this->collTaxRuleCountrys->append($obj);
+                        }
+                      }
+
+                      $this->collTaxRuleCountrysPartial = true;
+                    }
+
+                    return $collTaxRuleCountrys;
+                }
+
+                if($partial && $this->collTaxRuleCountrys) {
+                    foreach($this->collTaxRuleCountrys as $obj) {
+                        if($obj->isNew()) {
+                            $collTaxRuleCountrys[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTaxRuleCountrys = $collTaxRuleCountrys;
+                $this->collTaxRuleCountrysPartial = false;
+            }
+        }
+
+        return $this->collTaxRuleCountrys;
+    }
+
+    /**
+     * Sets a collection of TaxRuleCountry objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $taxRuleCountrys A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setTaxRuleCountrys(PropelCollection $taxRuleCountrys, PropelPDO $con = null)
+    {
+        $this->taxRuleCountrysScheduledForDeletion = $this->getTaxRuleCountrys(new Criteria(), $con)->diff($taxRuleCountrys);
+
+        foreach ($this->taxRuleCountrysScheduledForDeletion as $taxRuleCountryRemoved) {
+            $taxRuleCountryRemoved->setTax(null);
+        }
+
+        $this->collTaxRuleCountrys = null;
+        foreach ($taxRuleCountrys as $taxRuleCountry) {
+            $this->addTaxRuleCountry($taxRuleCountry);
+        }
+
+        $this->collTaxRuleCountrys = $taxRuleCountrys;
+        $this->collTaxRuleCountrysPartial = false;
+    }
+
+    /**
+     * Returns the number of related TaxRuleCountry objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related TaxRuleCountry objects.
+     * @throws PropelException
+     */
+    public function countTaxRuleCountrys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTaxRuleCountrysPartial && !$this->isNew();
+        if (null === $this->collTaxRuleCountrys || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTaxRuleCountrys) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getTaxRuleCountrys());
+                }
+                $query = TaxRuleCountryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByTax($this)
+                    ->count($con);
+            }
         } else {
-            $this->setId($v->getTaxId());
+            return count($this->collTaxRuleCountrys);
         }
+    }
 
-        $this->aTaxRuleCountry = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setTax($this);
+    /**
+     * Method called to associate a TaxRuleCountry object to this object
+     * through the TaxRuleCountry foreign key attribute.
+     *
+     * @param    TaxRuleCountry $l TaxRuleCountry
+     * @return Tax The current object (for fluent API support)
+     */
+    public function addTaxRuleCountry(TaxRuleCountry $l)
+    {
+        if ($this->collTaxRuleCountrys === null) {
+            $this->initTaxRuleCountrys();
+            $this->collTaxRuleCountrysPartial = true;
         }
-
+        if (!$this->collTaxRuleCountrys->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddTaxRuleCountry($l);
+        }
 
         return $this;
     }
 
+    /**
+     * @param	TaxRuleCountry $taxRuleCountry The taxRuleCountry object to add.
+     */
+    protected function doAddTaxRuleCountry($taxRuleCountry)
+    {
+        $this->collTaxRuleCountrys[]= $taxRuleCountry;
+        $taxRuleCountry->setTax($this);
+    }
 
     /**
-     * Get the associated TaxRuleCountry object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return TaxRuleCountry The associated TaxRuleCountry object.
-     * @throws PropelException
+     * @param	TaxRuleCountry $taxRuleCountry The taxRuleCountry object to remove.
      */
-    public function getTaxRuleCountry(PropelPDO $con = null)
+    public function removeTaxRuleCountry($taxRuleCountry)
     {
-        if ($this->aTaxRuleCountry === null && ($this->id !== null)) {
-            $this->aTaxRuleCountry = TaxRuleCountryQuery::create()
-                ->filterByTax($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aTaxRuleCountry->setTax($this);
+        if ($this->getTaxRuleCountrys()->contains($taxRuleCountry)) {
+            $this->collTaxRuleCountrys->remove($this->collTaxRuleCountrys->search($taxRuleCountry));
+            if (null === $this->taxRuleCountrysScheduledForDeletion) {
+                $this->taxRuleCountrysScheduledForDeletion = clone $this->collTaxRuleCountrys;
+                $this->taxRuleCountrysScheduledForDeletion->clear();
+            }
+            $this->taxRuleCountrysScheduledForDeletion[]= $taxRuleCountry;
+            $taxRuleCountry->setTax(null);
         }
+    }
 
-        return $this->aTaxRuleCountry;
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Tax is new, it will return
+     * an empty collection; or if this Tax has previously
+     * been saved, it will retrieve related TaxRuleCountrys from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Tax.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|TaxRuleCountry[] List of TaxRuleCountry objects
+     */
+    public function getTaxRuleCountrysJoinTaxRule($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaxRuleCountryQuery::create(null, $criteria);
+        $query->joinWith('TaxRule', $join_behavior);
+
+        return $this->getTaxRuleCountrys($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Tax is new, it will return
+     * an empty collection; or if this Tax has previously
+     * been saved, it will retrieve related TaxRuleCountrys from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Tax.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|TaxRuleCountry[] List of TaxRuleCountry objects
+     */
+    public function getTaxRuleCountrysJoinCountry($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = TaxRuleCountryQuery::create(null, $criteria);
+        $query->joinWith('Country', $join_behavior);
+
+        return $this->getTaxRuleCountrys($query, $con);
     }
 
     /**
@@ -1156,10 +1565,26 @@ abstract class BaseTax extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collTaxDescs) {
+                foreach ($this->collTaxDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collTaxRuleCountrys) {
+                foreach ($this->collTaxRuleCountrys as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        $this->aTaxDesc = null;
-        $this->aTaxRuleCountry = null;
+        if ($this->collTaxDescs instanceof PropelCollection) {
+            $this->collTaxDescs->clearIterator();
+        }
+        $this->collTaxDescs = null;
+        if ($this->collTaxRuleCountrys instanceof PropelCollection) {
+            $this->collTaxRuleCountrys->clearIterator();
+        }
+        $this->collTaxRuleCountrys = null;
     }
 
     /**

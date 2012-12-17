@@ -61,7 +61,7 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\ContentFolder', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\ContentFolder', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -250,6 +250,8 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * $query->filterByContentId(array('min' => 12)); // WHERE content_id > 12
      * </code>
      *
+     * @see       filterByContent()
+     *
      * @param     mixed $contentId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -277,6 +279,8 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * $query->filterByFolderId(array('min' => 12)); // WHERE folder_id > 12
      * </code>
      *
+     * @see       filterByFolder()
+     *
      * @param     mixed $folderId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -297,7 +301,7 @@ abstract class BaseContentFolderQuery extends ModelCriteria
     /**
      * Filter the query by a related Content object
      *
-     * @param   Content|PropelObjectCollection $content  the related object to use as filter
+     * @param   Content|PropelObjectCollection $content The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentFolderQuery The current query, for fluid interface
@@ -309,10 +313,12 @@ abstract class BaseContentFolderQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentFolderPeer::CONTENT_ID, $content->getId(), $comparison);
         } elseif ($content instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useContentQuery()
-                ->filterByPrimaryKeys($content->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ContentFolderPeer::CONTENT_ID, $content->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByContent() only accepts arguments of type Content or PropelCollection');
         }
@@ -371,7 +377,7 @@ abstract class BaseContentFolderQuery extends ModelCriteria
     /**
      * Filter the query by a related Folder object
      *
-     * @param   Folder|PropelObjectCollection $folder  the related object to use as filter
+     * @param   Folder|PropelObjectCollection $folder The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ContentFolderQuery The current query, for fluid interface
@@ -383,10 +389,12 @@ abstract class BaseContentFolderQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ContentFolderPeer::FOLDER_ID, $folder->getId(), $comparison);
         } elseif ($folder instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useFolderQuery()
-                ->filterByPrimaryKeys($folder->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ContentFolderPeer::FOLDER_ID, $folder->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByFolder() only accepts arguments of type Folder or PropelCollection');
         }

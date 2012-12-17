@@ -73,7 +73,7 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\FeatureCategory', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\FeatureCategory', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -276,6 +276,8 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * $query->filterByFeatureId(array('min' => 12)); // WHERE feature_id > 12
      * </code>
      *
+     * @see       filterByFeature()
+     *
      * @param     mixed $featureId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -316,6 +318,8 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * $query->filterByCategoryId(array(12, 34)); // WHERE category_id IN (12, 34)
      * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
      * </code>
+     *
+     * @see       filterByCategory()
      *
      * @param     mixed $categoryId The value to use as filter.
      *              Use scalar values for equality.
@@ -437,7 +441,7 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related Category object
      *
-     * @param   Category|PropelObjectCollection $category  the related object to use as filter
+     * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureCategoryQuery The current query, for fluid interface
@@ -449,10 +453,12 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(FeatureCategoryPeer::CATEGORY_ID, $category->getId(), $comparison);
         } elseif ($category instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCategoryQuery()
-                ->filterByPrimaryKeys($category->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(FeatureCategoryPeer::CATEGORY_ID, $category->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCategory() only accepts arguments of type Category or PropelCollection');
         }
@@ -511,7 +517,7 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
     /**
      * Filter the query by a related Feature object
      *
-     * @param   Feature|PropelObjectCollection $feature  the related object to use as filter
+     * @param   Feature|PropelObjectCollection $feature The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureCategoryQuery The current query, for fluid interface
@@ -523,10 +529,12 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(FeatureCategoryPeer::FEATURE_ID, $feature->getId(), $comparison);
         } elseif ($feature instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useFeatureQuery()
-                ->filterByPrimaryKeys($feature->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(FeatureCategoryPeer::FEATURE_ID, $feature->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByFeature() only accepts arguments of type Feature or PropelCollection');
         }

@@ -42,8 +42,8 @@ class ContentFolderTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('CONTENT_ID', 'ContentId', 'INTEGER', true, null, null);
-        $this->addPrimaryKey('FOLDER_ID', 'FolderId', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('CONTENT_ID', 'ContentId', 'INTEGER' , 'content', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('FOLDER_ID', 'FolderId', 'INTEGER' , 'folder', 'ID', true, null, null);
         // validators
     } // initialize()
 
@@ -52,8 +52,8 @@ class ContentFolderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Content', 'Thelia\\Model\\Content', RelationMap::ONE_TO_ONE, array('content_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Folder', 'Thelia\\Model\\Folder', RelationMap::ONE_TO_ONE, array('folder_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Content', 'Thelia\\Model\\Content', RelationMap::MANY_TO_ONE, array('content_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Folder', 'Thelia\\Model\\Folder', RelationMap::MANY_TO_ONE, array('folder_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ContentFolderTableMap

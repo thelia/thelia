@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAv;
@@ -90,19 +88,19 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Attribute one-to-one related Attribute object
+     * @var        Attribute
      */
-    protected $singleAttribute;
+    protected $aAttribute;
 
     /**
-     * @var        AttributeAv one-to-one related AttributeAv object
+     * @var        AttributeAv
      */
-    protected $singleAttributeAv;
+    protected $aAttributeAv;
 
     /**
-     * @var        Combination one-to-one related Combination object
+     * @var        Combination
      */
-    protected $singleCombination;
+    protected $aCombination;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -117,24 +115,6 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $attributesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $attributeAvsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $combinationsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -288,6 +268,10 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             $this->modifiedColumns[] = AttributeCombinationPeer::ATTRIBUTE_ID;
         }
 
+        if ($this->aAttribute !== null && $this->aAttribute->getId() !== $v) {
+            $this->aAttribute = null;
+        }
+
 
         return $this;
     } // setAttributeId()
@@ -309,6 +293,10 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             $this->modifiedColumns[] = AttributeCombinationPeer::COMBINATION_ID;
         }
 
+        if ($this->aCombination !== null && $this->aCombination->getId() !== $v) {
+            $this->aCombination = null;
+        }
+
 
         return $this;
     } // setCombinationId()
@@ -328,6 +316,10 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
         if ($this->attribute_av_id !== $v) {
             $this->attribute_av_id = $v;
             $this->modifiedColumns[] = AttributeCombinationPeer::ATTRIBUTE_AV_ID;
+        }
+
+        if ($this->aAttributeAv !== null && $this->aAttributeAv->getId() !== $v) {
+            $this->aAttributeAv = null;
         }
 
 
@@ -449,6 +441,15 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aAttribute !== null && $this->attribute_id !== $this->aAttribute->getId()) {
+            $this->aAttribute = null;
+        }
+        if ($this->aCombination !== null && $this->combination_id !== $this->aCombination->getId()) {
+            $this->aCombination = null;
+        }
+        if ($this->aAttributeAv !== null && $this->attribute_av_id !== $this->aAttributeAv->getId()) {
+            $this->aAttributeAv = null;
+        }
     } // ensureConsistency
 
     /**
@@ -488,12 +489,9 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleAttribute = null;
-
-            $this->singleAttributeAv = null;
-
-            $this->singleCombination = null;
-
+            $this->aAttribute = null;
+            $this->aAttributeAv = null;
+            $this->aCombination = null;
         } // if (deep)
     }
 
@@ -607,6 +605,32 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAttribute !== null) {
+                if ($this->aAttribute->isModified() || $this->aAttribute->isNew()) {
+                    $affectedRows += $this->aAttribute->save($con);
+                }
+                $this->setAttribute($this->aAttribute);
+            }
+
+            if ($this->aAttributeAv !== null) {
+                if ($this->aAttributeAv->isModified() || $this->aAttributeAv->isNew()) {
+                    $affectedRows += $this->aAttributeAv->save($con);
+                }
+                $this->setAttributeAv($this->aAttributeAv);
+            }
+
+            if ($this->aCombination !== null) {
+                if ($this->aCombination->isModified() || $this->aCombination->isNew()) {
+                    $affectedRows += $this->aCombination->save($con);
+                }
+                $this->setCombination($this->aCombination);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -616,51 +640,6 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->attributesScheduledForDeletion !== null) {
-                if (!$this->attributesScheduledForDeletion->isEmpty()) {
-                    AttributeQuery::create()
-                        ->filterByPrimaryKeys($this->attributesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleAttribute !== null) {
-                if (!$this->singleAttribute->isDeleted()) {
-                        $affectedRows += $this->singleAttribute->save($con);
-                }
-            }
-
-            if ($this->attributeAvsScheduledForDeletion !== null) {
-                if (!$this->attributeAvsScheduledForDeletion->isEmpty()) {
-                    AttributeAvQuery::create()
-                        ->filterByPrimaryKeys($this->attributeAvsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributeAvsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleAttributeAv !== null) {
-                if (!$this->singleAttributeAv->isDeleted()) {
-                        $affectedRows += $this->singleAttributeAv->save($con);
-                }
-            }
-
-            if ($this->combinationsScheduledForDeletion !== null) {
-                if (!$this->combinationsScheduledForDeletion->isEmpty()) {
-                    CombinationQuery::create()
-                        ->filterByPrimaryKeys($this->combinationsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->combinationsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCombination !== null) {
-                if (!$this->singleCombination->isDeleted()) {
-                        $affectedRows += $this->singleCombination->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -830,28 +809,34 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aAttribute !== null) {
+                if (!$this->aAttribute->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aAttribute->getValidationFailures());
+                }
+            }
+
+            if ($this->aAttributeAv !== null) {
+                if (!$this->aAttributeAv->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aAttributeAv->getValidationFailures());
+                }
+            }
+
+            if ($this->aCombination !== null) {
+                if (!$this->aCombination->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCombination->getValidationFailures());
+                }
+            }
+
+
             if (($retval = AttributeCombinationPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleAttribute !== null) {
-                    if (!$this->singleAttribute->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleAttribute->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleAttributeAv !== null) {
-                    if (!$this->singleAttributeAv->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleAttributeAv->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleCombination !== null) {
-                    if (!$this->singleCombination->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCombination->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -943,14 +928,14 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             $keys[5] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleAttribute) {
-                $result['Attribute'] = $this->singleAttribute->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aAttribute) {
+                $result['Attribute'] = $this->aAttribute->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleAttributeAv) {
-                $result['AttributeAv'] = $this->singleAttributeAv->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aAttributeAv) {
+                $result['AttributeAv'] = $this->aAttributeAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCombination) {
-                $result['Combination'] = $this->singleCombination->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCombination) {
+                $result['Combination'] = $this->aCombination->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1140,21 +1125,6 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAttribute();
-            if ($relObj) {
-                $copyObj->setAttribute($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getAttributeAv();
-            if ($relObj) {
-                $copyObj->setAttributeAv($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getCombination();
-            if ($relObj) {
-                $copyObj->setCombination($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1205,125 +1175,157 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Attribute object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Attribute object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Attribute
-     * @throws PropelException
-     */
-    public function getAttribute(PropelPDO $con = null)
-    {
-
-        if ($this->singleAttribute === null && !$this->isNew()) {
-            $this->singleAttribute = AttributeQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleAttribute;
-    }
-
-    /**
-     * Sets a single Attribute object as related to this object by a one-to-one relationship.
-     *
-     * @param             Attribute $v Attribute
+     * @param             Attribute $v
      * @return AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
     public function setAttribute(Attribute $v = null)
     {
-        $this->singleAttribute = $v;
-
-        // Make sure that that the passed-in Attribute isn't already associated with this object
-        if ($v !== null && $v->getAttributeCombination() === null) {
-            $v->setAttributeCombination($this);
+        if ($v === null) {
+            $this->setAttributeId(NULL);
+        } else {
+            $this->setAttributeId($v->getId());
         }
+
+        $this->aAttribute = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Attribute object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAttributeCombination($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single AttributeAv object, which is related to this object by a one-to-one relationship.
+     * Get the associated Attribute object
      *
-     * @param PropelPDO $con optional connection object
-     * @return AttributeAv
+     * @param PropelPDO $con Optional Connection object.
+     * @return Attribute The associated Attribute object.
      * @throws PropelException
      */
-    public function getAttributeAv(PropelPDO $con = null)
+    public function getAttribute(PropelPDO $con = null)
     {
-
-        if ($this->singleAttributeAv === null && !$this->isNew()) {
-            $this->singleAttributeAv = AttributeAvQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aAttribute === null && ($this->attribute_id !== null)) {
+            $this->aAttribute = AttributeQuery::create()->findPk($this->attribute_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAttribute->addAttributeCombinations($this);
+             */
         }
 
-        return $this->singleAttributeAv;
+        return $this->aAttribute;
     }
 
     /**
-     * Sets a single AttributeAv object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a AttributeAv object.
      *
-     * @param             AttributeAv $v AttributeAv
+     * @param             AttributeAv $v
      * @return AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
     public function setAttributeAv(AttributeAv $v = null)
     {
-        $this->singleAttributeAv = $v;
-
-        // Make sure that that the passed-in AttributeAv isn't already associated with this object
-        if ($v !== null && $v->getAttributeCombination() === null) {
-            $v->setAttributeCombination($this);
+        if ($v === null) {
+            $this->setAttributeAvId(NULL);
+        } else {
+            $this->setAttributeAvId($v->getId());
         }
+
+        $this->aAttributeAv = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the AttributeAv object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAttributeCombination($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single Combination object, which is related to this object by a one-to-one relationship.
+     * Get the associated AttributeAv object
      *
-     * @param PropelPDO $con optional connection object
-     * @return Combination
+     * @param PropelPDO $con Optional Connection object.
+     * @return AttributeAv The associated AttributeAv object.
      * @throws PropelException
      */
-    public function getCombination(PropelPDO $con = null)
+    public function getAttributeAv(PropelPDO $con = null)
     {
-
-        if ($this->singleCombination === null && !$this->isNew()) {
-            $this->singleCombination = CombinationQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aAttributeAv === null && ($this->attribute_av_id !== null)) {
+            $this->aAttributeAv = AttributeAvQuery::create()->findPk($this->attribute_av_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAttributeAv->addAttributeCombinations($this);
+             */
         }
 
-        return $this->singleCombination;
+        return $this->aAttributeAv;
     }
 
     /**
-     * Sets a single Combination object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a Combination object.
      *
-     * @param             Combination $v Combination
+     * @param             Combination $v
      * @return AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCombination(Combination $v = null)
     {
-        $this->singleCombination = $v;
-
-        // Make sure that that the passed-in Combination isn't already associated with this object
-        if ($v !== null && $v->getAttributeCombination() === null) {
-            $v->setAttributeCombination($this);
+        if ($v === null) {
+            $this->setCombinationId(NULL);
+        } else {
+            $this->setCombinationId($v->getId());
         }
 
+        $this->aCombination = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Combination object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAttributeCombination($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Combination object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Combination The associated Combination object.
+     * @throws PropelException
+     */
+    public function getCombination(PropelPDO $con = null)
+    {
+        if ($this->aCombination === null && ($this->combination_id !== null)) {
+            $this->aCombination = CombinationQuery::create()->findPk($this->combination_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCombination->addAttributeCombinations($this);
+             */
+        }
+
+        return $this->aCombination;
     }
 
     /**
@@ -1357,29 +1359,11 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleAttribute) {
-                $this->singleAttribute->clearAllReferences($deep);
-            }
-            if ($this->singleAttributeAv) {
-                $this->singleAttributeAv->clearAllReferences($deep);
-            }
-            if ($this->singleCombination) {
-                $this->singleCombination->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleAttribute instanceof PropelCollection) {
-            $this->singleAttribute->clearIterator();
-        }
-        $this->singleAttribute = null;
-        if ($this->singleAttributeAv instanceof PropelCollection) {
-            $this->singleAttributeAv->clearIterator();
-        }
-        $this->singleAttributeAv = null;
-        if ($this->singleCombination instanceof PropelCollection) {
-            $this->singleCombination->clearIterator();
-        }
-        $this->singleCombination = null;
+        $this->aAttribute = null;
+        $this->aAttributeAv = null;
+        $this->aCombination = null;
     }
 
     /**

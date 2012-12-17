@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Group;
 use Thelia\Model\GroupDesc;
@@ -98,9 +96,9 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Group one-to-one related Group object
+     * @var        Group
      */
-    protected $singleGroup;
+    protected $aGroup;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,12 +113,6 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $groupsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -292,6 +284,10 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
         if ($this->group_id !== $v) {
             $this->group_id = $v;
             $this->modifiedColumns[] = GroupDescPeer::GROUP_ID;
+        }
+
+        if ($this->aGroup !== null && $this->aGroup->getId() !== $v) {
+            $this->aGroup = null;
         }
 
 
@@ -499,6 +495,9 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aGroup !== null && $this->group_id !== $this->aGroup->getId()) {
+            $this->aGroup = null;
+        }
     } // ensureConsistency
 
     /**
@@ -538,8 +537,7 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleGroup = null;
-
+            $this->aGroup = null;
         } // if (deep)
     }
 
@@ -653,6 +651,18 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aGroup !== null) {
+                if ($this->aGroup->isModified() || $this->aGroup->isNew()) {
+                    $affectedRows += $this->aGroup->save($con);
+                }
+                $this->setGroup($this->aGroup);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -662,21 +672,6 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->groupsScheduledForDeletion !== null) {
-                if (!$this->groupsScheduledForDeletion->isEmpty()) {
-                    GroupQuery::create()
-                        ->filterByPrimaryKeys($this->groupsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->groupsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleGroup !== null) {
-                if (!$this->singleGroup->isDeleted()) {
-                        $affectedRows += $this->singleGroup->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -847,16 +842,22 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aGroup !== null) {
+                if (!$this->aGroup->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aGroup->getValidationFailures());
+                }
+            }
+
+
             if (($retval = GroupDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleGroup !== null) {
-                    if (!$this->singleGroup->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleGroup->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -956,8 +957,8 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleGroup) {
-                $result['Group'] = $this->singleGroup->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aGroup) {
+                $result['Group'] = $this->aGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1146,11 +1147,6 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getGroup();
-            if ($relObj) {
-                $copyObj->setGroup($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1201,53 +1197,55 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Group object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Group object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Group
-     * @throws PropelException
-     */
-    public function getGroup(PropelPDO $con = null)
-    {
-
-        if ($this->singleGroup === null && !$this->isNew()) {
-            $this->singleGroup = GroupQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleGroup;
-    }
-
-    /**
-     * Sets a single Group object as related to this object by a one-to-one relationship.
-     *
-     * @param             Group $v Group
+     * @param             Group $v
      * @return GroupDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setGroup(Group $v = null)
     {
-        $this->singleGroup = $v;
-
-        // Make sure that that the passed-in Group isn't already associated with this object
-        if ($v !== null && $v->getGroupDesc() === null) {
-            $v->setGroupDesc($this);
+        if ($v === null) {
+            $this->setGroupId(NULL);
+        } else {
+            $this->setGroupId($v->getId());
         }
 
+        $this->aGroup = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Group object, it will not be re-added.
+        if ($v !== null) {
+            $v->addGroupDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Group object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Group The associated Group object.
+     * @throws PropelException
+     */
+    public function getGroup(PropelPDO $con = null)
+    {
+        if ($this->aGroup === null && ($this->group_id !== null)) {
+            $this->aGroup = GroupQuery::create()->findPk($this->group_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aGroup->addGroupDescs($this);
+             */
+        }
+
+        return $this->aGroup;
     }
 
     /**
@@ -1283,15 +1281,9 @@ abstract class BaseGroupDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleGroup) {
-                $this->singleGroup->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleGroup instanceof PropelCollection) {
-            $this->singleGroup->clearIterator();
-        }
-        $this->singleGroup = null;
+        $this->aGroup = null;
     }
 
     /**

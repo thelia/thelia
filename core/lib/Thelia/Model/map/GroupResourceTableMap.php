@@ -43,8 +43,8 @@ class GroupResourceTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('GROUP_ID', 'GroupId', 'INTEGER', true, null, null);
-        $this->addColumn('RESOURCE_ID', 'ResourceId', 'INTEGER', true, null, null);
+        $this->addForeignKey('GROUP_ID', 'GroupId', 'INTEGER', 'group', 'ID', true, null, null);
+        $this->addForeignKey('RESOURCE_ID', 'ResourceId', 'INTEGER', 'resource', 'ID', true, null, null);
         $this->addColumn('READ', 'Read', 'TINYINT', false, null, 0);
         $this->addColumn('WRITE', 'Write', 'TINYINT', false, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -57,8 +57,8 @@ class GroupResourceTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::ONE_TO_ONE, array('group_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Resource', 'Thelia\\Model\\Resource', RelationMap::ONE_TO_ONE, array('resource_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::MANY_TO_ONE, array('group_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Resource', 'Thelia\\Model\\Resource', RelationMap::MANY_TO_ONE, array('resource_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // GroupResourceTableMap

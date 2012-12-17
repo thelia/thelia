@@ -25,7 +25,7 @@ abstract class BaseDelivzonePeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'delivzone';
@@ -383,9 +383,6 @@ abstract class BaseDelivzonePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AreaPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AreaPeer::clearInstancePool();
     }
 
     /**
@@ -480,6 +477,244 @@ abstract class BaseDelivzonePeer
         }
 
         return array($obj, $col);
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining the related Area table
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinArea(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(DelivzonePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            DelivzonePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(DelivzonePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(DelivzonePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(DelivzonePeer::AREA_ID, AreaPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+
+    /**
+     * Selects a collection of Delivzone objects pre-filled with their Area objects.
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Delivzone objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinArea(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(DelivzonePeer::DATABASE_NAME);
+        }
+
+        DelivzonePeer::addSelectColumns($criteria);
+        $startcol = DelivzonePeer::NUM_HYDRATE_COLUMNS;
+        AreaPeer::addSelectColumns($criteria);
+
+        $criteria->addJoin(DelivzonePeer::AREA_ID, AreaPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = DelivzonePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = DelivzonePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+
+                $cls = DelivzonePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                DelivzonePeer::addInstanceToPool($obj1, $key1);
+            } // if $obj1 already loaded
+
+            $key2 = AreaPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            if ($key2 !== null) {
+                $obj2 = AreaPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = AreaPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol);
+                    AreaPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 already loaded
+
+                // Add the $obj1 (Delivzone) to $obj2 (Area)
+                $obj2->addDelivzone($obj1);
+
+            } // if joined row was not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
+    }
+
+
+    /**
+     * Returns the number of rows matching criteria, joining all related tables
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return int Number of matching rows.
+     */
+    public static function doCountJoinAll(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        // we're going to modify criteria, so copy it first
+        $criteria = clone $criteria;
+
+        // We need to set the primary table name, since in the case that there are no WHERE columns
+        // it will be impossible for the BasePeer::createSelectSql() method to determine which
+        // tables go into the FROM clause.
+        $criteria->setPrimaryTableName(DelivzonePeer::TABLE_NAME);
+
+        if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
+            $criteria->setDistinct();
+        }
+
+        if (!$criteria->hasSelectClause()) {
+            DelivzonePeer::addSelectColumns($criteria);
+        }
+
+        $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
+
+        // Set the correct dbName
+        $criteria->setDbName(DelivzonePeer::DATABASE_NAME);
+
+        if ($con === null) {
+            $con = Propel::getConnection(DelivzonePeer::DATABASE_NAME, Propel::CONNECTION_READ);
+        }
+
+        $criteria->addJoin(DelivzonePeer::AREA_ID, AreaPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doCount($criteria, $con);
+
+        if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $count = (int) $row[0];
+        } else {
+            $count = 0; // no rows returned; we infer that means 0 matches.
+        }
+        $stmt->closeCursor();
+
+        return $count;
+    }
+
+    /**
+     * Selects a collection of Delivzone objects pre-filled with all related objects.
+     *
+     * @param      Criteria  $criteria
+     * @param      PropelPDO $con
+     * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
+     * @return array           Array of Delivzone objects.
+     * @throws PropelException Any exceptions caught during processing will be
+     *		 rethrown wrapped into a PropelException.
+     */
+    public static function doSelectJoinAll(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $criteria = clone $criteria;
+
+        // Set the correct dbName if it has not been overridden
+        if ($criteria->getDbName() == Propel::getDefaultDB()) {
+            $criteria->setDbName(DelivzonePeer::DATABASE_NAME);
+        }
+
+        DelivzonePeer::addSelectColumns($criteria);
+        $startcol2 = DelivzonePeer::NUM_HYDRATE_COLUMNS;
+
+        AreaPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + AreaPeer::NUM_HYDRATE_COLUMNS;
+
+        $criteria->addJoin(DelivzonePeer::AREA_ID, AreaPeer::ID, $join_behavior);
+
+        $stmt = BasePeer::doSelect($criteria, $con);
+        $results = array();
+
+        while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+            $key1 = DelivzonePeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = DelivzonePeer::getInstanceFromPool($key1))) {
+                // We no longer rehydrate the object, since this can cause data loss.
+                // See http://www.propelorm.org/ticket/509
+                // $obj1->hydrate($row, 0, true); // rehydrate
+            } else {
+                $cls = DelivzonePeer::getOMClass();
+
+                $obj1 = new $cls();
+                $obj1->hydrate($row);
+                DelivzonePeer::addInstanceToPool($obj1, $key1);
+            } // if obj1 already loaded
+
+            // Add objects for joined Area rows
+
+            $key2 = AreaPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            if ($key2 !== null) {
+                $obj2 = AreaPeer::getInstanceFromPool($key2);
+                if (!$obj2) {
+
+                    $cls = AreaPeer::getOMClass();
+
+                    $obj2 = new $cls();
+                    $obj2->hydrate($row, $startcol2);
+                    AreaPeer::addInstanceToPool($obj2, $key2);
+                } // if obj2 loaded
+
+                // Add the $obj1 (Delivzone) to the collection in $obj2 (Area)
+                $obj2->addDelivzone($obj1);
+            } // if joined row not null
+
+            $results[] = $obj1;
+        }
+        $stmt->closeCursor();
+
+        return $results;
     }
 
     /**
@@ -615,7 +850,6 @@ abstract class BaseDelivzonePeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            DelivzonePeer::doOnDeleteSetNull(new Criteria(DelivzonePeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(DelivzonePeer::TABLE_NAME, $con, DelivzonePeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -649,14 +883,24 @@ abstract class BaseDelivzonePeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            DelivzonePeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof Delivzone) { // it's a model object
+            // invalidate the cache for this single object
+            DelivzonePeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(DelivzonePeer::DATABASE_NAME);
             $criteria->add(DelivzonePeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                DelivzonePeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -669,23 +913,6 @@ abstract class BaseDelivzonePeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            DelivzonePeer::doOnDeleteSetNull($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                DelivzonePeer::clearInstancePool();
-            } elseif ($values instanceof Delivzone) { // it's a model object
-                DelivzonePeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    DelivzonePeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             DelivzonePeer::clearRelatedInstancePool();
             $con->commit();
@@ -694,37 +921,6 @@ abstract class BaseDelivzonePeer
         } catch (PropelException $e) {
             $con->rollBack();
             throw $e;
-        }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE SET NULL DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return void
-     */
-    protected static function doOnDeleteSetNull(Criteria $criteria, PropelPDO $con)
-    {
-
-        // first find the objects that are implicated by the $criteria
-        $objects = DelivzonePeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-            // set fkey col in related Area rows to null
-            $selectCriteria = new Criteria(DelivzonePeer::DATABASE_NAME);
-            $updateValues = new Criteria(DelivzonePeer::DATABASE_NAME);
-            $selectCriteria->add(AreaPeer::ID, $obj->getAreaId());
-            $updateValues->add(AreaPeer::ID, null);
-
-            BasePeer::doUpdate($selectCriteria, $updateValues, $con); // use BasePeer because generated Peer doUpdate() methods only update using pkey
-
         }
     }
 

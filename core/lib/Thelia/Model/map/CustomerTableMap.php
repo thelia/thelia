@@ -42,10 +42,9 @@ class CustomerTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'address', 'CUSTOMER_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order', 'CUSTOMER_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 50, null);
-        $this->addColumn('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', false, null, null);
+        $this->addForeignKey('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', 'customer_title', 'ID', false, null, null);
         $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
@@ -75,9 +74,9 @@ class CustomerTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Address', 'Thelia\\Model\\Address', RelationMap::MANY_TO_ONE, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('CustomerTitle', 'Thelia\\Model\\CustomerTitle', RelationMap::ONE_TO_ONE, array('customer_title_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('CustomerTitle', 'Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), 'SET NULL', null);
+        $this->addRelation('Address', 'Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', null, 'Addresss');
+        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', null, 'Orders');
     } // buildRelations()
 
 } // CustomerTableMap

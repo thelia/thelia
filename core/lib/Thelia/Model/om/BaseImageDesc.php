@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Image;
 use Thelia\Model\ImageDesc;
@@ -92,9 +90,9 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Image one-to-one related Image object
+     * @var        Image
      */
-    protected $singleImage;
+    protected $aImage;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -109,12 +107,6 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $imagesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -276,6 +268,10 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
         if ($this->image_id !== $v) {
             $this->image_id = $v;
             $this->modifiedColumns[] = ImageDescPeer::IMAGE_ID;
+        }
+
+        if ($this->aImage !== null && $this->aImage->getId() !== $v) {
+            $this->aImage = null;
         }
 
 
@@ -461,6 +457,9 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aImage !== null && $this->image_id !== $this->aImage->getId()) {
+            $this->aImage = null;
+        }
     } // ensureConsistency
 
     /**
@@ -500,8 +499,7 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleImage = null;
-
+            $this->aImage = null;
         } // if (deep)
     }
 
@@ -615,6 +613,18 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aImage !== null) {
+                if ($this->aImage->isModified() || $this->aImage->isNew()) {
+                    $affectedRows += $this->aImage->save($con);
+                }
+                $this->setImage($this->aImage);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -624,21 +634,6 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->imagesScheduledForDeletion !== null) {
-                if (!$this->imagesScheduledForDeletion->isEmpty()) {
-                    ImageQuery::create()
-                        ->filterByPrimaryKeys($this->imagesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->imagesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleImage !== null) {
-                if (!$this->singleImage->isDeleted()) {
-                        $affectedRows += $this->singleImage->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -814,16 +809,22 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aImage !== null) {
+                if (!$this->aImage->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aImage->getValidationFailures());
+                }
+            }
+
+
             if (($retval = ImageDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleImage !== null) {
-                    if (!$this->singleImage->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleImage->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -919,8 +920,8 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleImage) {
-                $result['Image'] = $this->singleImage->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aImage) {
+                $result['Image'] = $this->aImage->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1103,11 +1104,6 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getImage();
-            if ($relObj) {
-                $copyObj->setImage($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1158,53 +1154,55 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Image object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Image object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Image
-     * @throws PropelException
-     */
-    public function getImage(PropelPDO $con = null)
-    {
-
-        if ($this->singleImage === null && !$this->isNew()) {
-            $this->singleImage = ImageQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleImage;
-    }
-
-    /**
-     * Sets a single Image object as related to this object by a one-to-one relationship.
-     *
-     * @param             Image $v Image
+     * @param             Image $v
      * @return ImageDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setImage(Image $v = null)
     {
-        $this->singleImage = $v;
-
-        // Make sure that that the passed-in Image isn't already associated with this object
-        if ($v !== null && $v->getImageDesc() === null) {
-            $v->setImageDesc($this);
+        if ($v === null) {
+            $this->setImageId(NULL);
+        } else {
+            $this->setImageId($v->getId());
         }
 
+        $this->aImage = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Image object, it will not be re-added.
+        if ($v !== null) {
+            $v->addImageDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Image object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Image The associated Image object.
+     * @throws PropelException
+     */
+    public function getImage(PropelPDO $con = null)
+    {
+        if ($this->aImage === null && ($this->image_id !== null)) {
+            $this->aImage = ImageQuery::create()->findPk($this->image_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aImage->addImageDescs($this);
+             */
+        }
+
+        return $this->aImage;
     }
 
     /**
@@ -1239,15 +1237,9 @@ abstract class BaseImageDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleImage) {
-                $this->singleImage->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleImage instanceof PropelCollection) {
-            $this->singleImage->clearIterator();
-        }
-        $this->singleImage = null;
+        $this->aImage = null;
     }
 
     /**

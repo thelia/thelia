@@ -43,7 +43,7 @@ class OrderFeatureTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('ORDER_PRODUCT_ID', 'OrderProductId', 'INTEGER', true, null, null);
+        $this->addForeignKey('ORDER_PRODUCT_ID', 'OrderProductId', 'INTEGER', 'order_product', 'ID', true, null, null);
         $this->addColumn('FEATURE_DESC', 'FeatureDesc', 'VARCHAR', false, 255, null);
         $this->addColumn('FEATURE_AV_DESC', 'FeatureAvDesc', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -56,7 +56,7 @@ class OrderFeatureTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('OrderProduct', 'Thelia\\Model\\OrderProduct', RelationMap::ONE_TO_ONE, array('order_product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('OrderProduct', 'Thelia\\Model\\OrderProduct', RelationMap::MANY_TO_ONE, array('order_product_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // OrderFeatureTableMap

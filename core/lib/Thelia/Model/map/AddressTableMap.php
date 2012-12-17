@@ -44,8 +44,8 @@ class AddressTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('CUSTOMER_ID', 'CustomerId', 'INTEGER', true, null, null);
-        $this->addColumn('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', false, null, null);
+        $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
+        $this->addForeignKey('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', 'customer_title', 'ID', false, null, null);
         $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
@@ -66,8 +66,8 @@ class AddressTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::ONE_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('CustomerTitle', 'Thelia\\Model\\CustomerTitle', RelationMap::ONE_TO_ONE, array('customer_title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
+        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('CustomerTitle', 'Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), null, null);
     } // buildRelations()
 
 } // AddressTableMap

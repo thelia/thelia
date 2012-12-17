@@ -79,7 +79,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Group', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Group', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -255,14 +255,6 @@ abstract class BaseGroupQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByAdminGroup()
-     *
-     * @see       filterByGroupDesc()
-     *
-     * @see       filterByGroupModule()
-     *
-     * @see       filterByGroupResource()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -398,7 +390,7 @@ abstract class BaseGroupQuery extends ModelCriteria
     /**
      * Filter the query by a related AdminGroup object
      *
-     * @param   AdminGroup|PropelObjectCollection $adminGroup The related object(s) to use as filter
+     * @param   AdminGroup|PropelObjectCollection $adminGroup  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   GroupQuery The current query, for fluid interface
@@ -410,12 +402,10 @@ abstract class BaseGroupQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(GroupPeer::ID, $adminGroup->getGroupId(), $comparison);
         } elseif ($adminGroup instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(GroupPeer::ID, $adminGroup->toKeyValue('PrimaryKey', 'GroupId'), $comparison);
+                ->useAdminGroupQuery()
+                ->filterByPrimaryKeys($adminGroup->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByAdminGroup() only accepts arguments of type AdminGroup or PropelCollection');
         }
@@ -429,7 +419,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      *
      * @return GroupQuery The current query, for fluid interface
      */
-    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('AdminGroup');
@@ -464,7 +454,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AdminGroupQuery A secondary query class using the current class as primary query
      */
-    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinAdminGroup($relationAlias, $joinType)
@@ -474,7 +464,7 @@ abstract class BaseGroupQuery extends ModelCriteria
     /**
      * Filter the query by a related GroupDesc object
      *
-     * @param   GroupDesc|PropelObjectCollection $groupDesc The related object(s) to use as filter
+     * @param   GroupDesc|PropelObjectCollection $groupDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   GroupQuery The current query, for fluid interface
@@ -486,12 +476,10 @@ abstract class BaseGroupQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(GroupPeer::ID, $groupDesc->getGroupId(), $comparison);
         } elseif ($groupDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(GroupPeer::ID, $groupDesc->toKeyValue('PrimaryKey', 'GroupId'), $comparison);
+                ->useGroupDescQuery()
+                ->filterByPrimaryKeys($groupDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByGroupDesc() only accepts arguments of type GroupDesc or PropelCollection');
         }
@@ -550,7 +538,7 @@ abstract class BaseGroupQuery extends ModelCriteria
     /**
      * Filter the query by a related GroupModule object
      *
-     * @param   GroupModule|PropelObjectCollection $groupModule The related object(s) to use as filter
+     * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   GroupQuery The current query, for fluid interface
@@ -562,12 +550,10 @@ abstract class BaseGroupQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(GroupPeer::ID, $groupModule->getGroupId(), $comparison);
         } elseif ($groupModule instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(GroupPeer::ID, $groupModule->toKeyValue('PrimaryKey', 'GroupId'), $comparison);
+                ->useGroupModuleQuery()
+                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByGroupModule() only accepts arguments of type GroupModule or PropelCollection');
         }
@@ -626,7 +612,7 @@ abstract class BaseGroupQuery extends ModelCriteria
     /**
      * Filter the query by a related GroupResource object
      *
-     * @param   GroupResource|PropelObjectCollection $groupResource The related object(s) to use as filter
+     * @param   GroupResource|PropelObjectCollection $groupResource  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   GroupQuery The current query, for fluid interface
@@ -638,12 +624,10 @@ abstract class BaseGroupQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(GroupPeer::ID, $groupResource->getGroupId(), $comparison);
         } elseif ($groupResource instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(GroupPeer::ID, $groupResource->toKeyValue('PrimaryKey', 'GroupId'), $comparison);
+                ->useGroupResourceQuery()
+                ->filterByPrimaryKeys($groupResource->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByGroupResource() only accepts arguments of type GroupResource or PropelCollection');
         }

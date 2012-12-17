@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Folder;
 use Thelia\Model\FolderDesc;
@@ -104,9 +102,9 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Folder one-to-one related Folder object
+     * @var        Folder
      */
-    protected $singleFolder;
+    protected $aFolder;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,12 +119,6 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $foldersScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -308,6 +300,10 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
         if ($this->folder_id !== $v) {
             $this->folder_id = $v;
             $this->modifiedColumns[] = FolderDescPeer::FOLDER_ID;
+        }
+
+        if ($this->aFolder !== null && $this->aFolder->getId() !== $v) {
+            $this->aFolder = null;
         }
 
 
@@ -537,6 +533,9 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aFolder !== null && $this->folder_id !== $this->aFolder->getId()) {
+            $this->aFolder = null;
+        }
     } // ensureConsistency
 
     /**
@@ -576,8 +575,7 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleFolder = null;
-
+            $this->aFolder = null;
         } // if (deep)
     }
 
@@ -691,6 +689,18 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aFolder !== null) {
+                if ($this->aFolder->isModified() || $this->aFolder->isNew()) {
+                    $affectedRows += $this->aFolder->save($con);
+                }
+                $this->setFolder($this->aFolder);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -700,21 +710,6 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->foldersScheduledForDeletion !== null) {
-                if (!$this->foldersScheduledForDeletion->isEmpty()) {
-                    FolderQuery::create()
-                        ->filterByPrimaryKeys($this->foldersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->foldersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFolder !== null) {
-                if (!$this->singleFolder->isDeleted()) {
-                        $affectedRows += $this->singleFolder->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -902,16 +897,22 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aFolder !== null) {
+                if (!$this->aFolder->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFolder->getValidationFailures());
+                }
+            }
+
+
             if (($retval = FolderDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleFolder !== null) {
-                    if (!$this->singleFolder->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFolder->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -1015,8 +1016,8 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
             $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleFolder) {
-                $result['Folder'] = $this->singleFolder->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFolder) {
+                $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1211,11 +1212,6 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getFolder();
-            if ($relObj) {
-                $copyObj->setFolder($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1266,53 +1262,55 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Folder object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Folder object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Folder
-     * @throws PropelException
-     */
-    public function getFolder(PropelPDO $con = null)
-    {
-
-        if ($this->singleFolder === null && !$this->isNew()) {
-            $this->singleFolder = FolderQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleFolder;
-    }
-
-    /**
-     * Sets a single Folder object as related to this object by a one-to-one relationship.
-     *
-     * @param             Folder $v Folder
+     * @param             Folder $v
      * @return FolderDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFolder(Folder $v = null)
     {
-        $this->singleFolder = $v;
-
-        // Make sure that that the passed-in Folder isn't already associated with this object
-        if ($v !== null && $v->getFolderDesc() === null) {
-            $v->setFolderDesc($this);
+        if ($v === null) {
+            $this->setFolderId(NULL);
+        } else {
+            $this->setFolderId($v->getId());
         }
 
+        $this->aFolder = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Folder object, it will not be re-added.
+        if ($v !== null) {
+            $v->addFolderDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Folder object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Folder The associated Folder object.
+     * @throws PropelException
+     */
+    public function getFolder(PropelPDO $con = null)
+    {
+        if ($this->aFolder === null && ($this->folder_id !== null)) {
+            $this->aFolder = FolderQuery::create()->findPk($this->folder_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFolder->addFolderDescs($this);
+             */
+        }
+
+        return $this->aFolder;
     }
 
     /**
@@ -1349,15 +1347,9 @@ abstract class BaseFolderDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleFolder) {
-                $this->singleFolder->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleFolder instanceof PropelCollection) {
-            $this->singleFolder->clearIterator();
-        }
-        $this->singleFolder = null;
+        $this->aFolder = null;
     }
 
     /**

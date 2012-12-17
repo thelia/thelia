@@ -43,7 +43,7 @@ class MessageDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('MESSAGE_ID', 'MessageId', 'INTEGER', true, null, null);
+        $this->addForeignKey('MESSAGE_ID', 'MessageId', 'INTEGER', 'message', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 45, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -58,7 +58,7 @@ class MessageDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Message', 'Thelia\\Model\\Message', RelationMap::ONE_TO_ONE, array('message_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Message', 'Thelia\\Model\\Message', RelationMap::MANY_TO_ONE, array('message_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // MessageDescTableMap

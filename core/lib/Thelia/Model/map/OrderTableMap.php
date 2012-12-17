@@ -42,14 +42,13 @@ class OrderTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'coupon_order', 'ORDER_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order_product', 'ORDER_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', false, 45, null);
-        $this->addColumn('CUSTOMER_ID', 'CustomerId', 'INTEGER', true, null, null);
-        $this->addColumn('ADDRESS_INVOICE', 'AddressInvoice', 'INTEGER', false, null, null);
-        $this->addColumn('ADDRESS_DELIVERY', 'AddressDelivery', 'INTEGER', false, null, null);
+        $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
+        $this->addForeignKey('ADDRESS_INVOICE', 'AddressInvoice', 'INTEGER', 'order_address', 'ID', false, null, null);
+        $this->addForeignKey('ADDRESS_DELIVERY', 'AddressDelivery', 'INTEGER', 'order_address', 'ID', false, null, null);
         $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'DATE', false, null, null);
-        $this->addColumn('CURRENCY_ID', 'CurrencyId', 'INTEGER', false, null, null);
+        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', false, null, null);
         $this->addColumn('CURRENCY_RATE', 'CurrencyRate', 'FLOAT', true, null, null);
         $this->addColumn('TRANSACTION', 'Transaction', 'VARCHAR', false, 100, null);
         $this->addColumn('DELIVERY_NUM', 'DeliveryNum', 'VARCHAR', false, 100, null);
@@ -57,7 +56,7 @@ class OrderTableMap extends TableMap
         $this->addColumn('POSTAGE', 'Postage', 'FLOAT', false, null, null);
         $this->addColumn('PAYMENT', 'Payment', 'VARCHAR', true, 45, null);
         $this->addColumn('CARRIER', 'Carrier', 'VARCHAR', true, 45, null);
-        $this->addColumn('STATUS_ID', 'StatusId', 'INTEGER', false, null, null);
+        $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', false, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -69,13 +68,13 @@ class OrderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CouponOrder', 'Thelia\\Model\\CouponOrder', RelationMap::MANY_TO_ONE, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('OrderProduct', 'Thelia\\Model\\OrderProduct', RelationMap::MANY_TO_ONE, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Currency', 'Thelia\\Model\\Currency', RelationMap::ONE_TO_ONE, array('currency_id' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::ONE_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('OrderAddress', 'Thelia\\Model\\OrderAddress', RelationMap::ONE_TO_ONE, array('address_invoice' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('OrderAddress', 'Thelia\\Model\\OrderAddress', RelationMap::ONE_TO_ONE, array('address_delivery' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('OrderStatus', 'Thelia\\Model\\OrderStatus', RelationMap::ONE_TO_ONE, array('status_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Currency', 'Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'SET NULL', null);
+        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('OrderAddressRelatedByAddressInvoice', 'Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_invoice' => 'id', ), 'SET NULL', null);
+        $this->addRelation('OrderAddressRelatedByAddressDelivery', 'Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_delivery' => 'id', ), 'SET NULL', null);
+        $this->addRelation('OrderStatus', 'Thelia\\Model\\OrderStatus', RelationMap::MANY_TO_ONE, array('status_id' => 'id', ), 'SET NULL', null);
+        $this->addRelation('CouponOrder', 'Thelia\\Model\\CouponOrder', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', null, 'CouponOrders');
+        $this->addRelation('OrderProduct', 'Thelia\\Model\\OrderProduct', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', null, 'OrderProducts');
     } // buildRelations()
 
 } // OrderTableMap

@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Coupon;
 use Thelia\Model\CouponQuery;
@@ -92,9 +90,9 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Coupon one-to-one related Coupon object
+     * @var        Coupon
      */
-    protected $singleCoupon;
+    protected $aCoupon;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -109,12 +107,6 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $couponsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -276,6 +268,10 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
         if ($this->coupon_id !== $v) {
             $this->coupon_id = $v;
             $this->modifiedColumns[] = CouponRulePeer::COUPON_ID;
+        }
+
+        if ($this->aCoupon !== null && $this->aCoupon->getId() !== $v) {
+            $this->aCoupon = null;
         }
 
 
@@ -461,6 +457,9 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aCoupon !== null && $this->coupon_id !== $this->aCoupon->getId()) {
+            $this->aCoupon = null;
+        }
     } // ensureConsistency
 
     /**
@@ -500,8 +499,7 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCoupon = null;
-
+            $this->aCoupon = null;
         } // if (deep)
     }
 
@@ -615,6 +613,18 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCoupon !== null) {
+                if ($this->aCoupon->isModified() || $this->aCoupon->isNew()) {
+                    $affectedRows += $this->aCoupon->save($con);
+                }
+                $this->setCoupon($this->aCoupon);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -624,21 +634,6 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->couponsScheduledForDeletion !== null) {
-                if (!$this->couponsScheduledForDeletion->isEmpty()) {
-                    CouponQuery::create()
-                        ->filterByPrimaryKeys($this->couponsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->couponsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCoupon !== null) {
-                if (!$this->singleCoupon->isDeleted()) {
-                        $affectedRows += $this->singleCoupon->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -814,16 +809,22 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCoupon !== null) {
+                if (!$this->aCoupon->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCoupon->getValidationFailures());
+                }
+            }
+
+
             if (($retval = CouponRulePeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCoupon !== null) {
-                    if (!$this->singleCoupon->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCoupon->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -919,8 +920,8 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCoupon) {
-                $result['Coupon'] = $this->singleCoupon->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCoupon) {
+                $result['Coupon'] = $this->aCoupon->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1103,11 +1104,6 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCoupon();
-            if ($relObj) {
-                $copyObj->setCoupon($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1158,53 +1154,55 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Coupon object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Coupon object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Coupon
-     * @throws PropelException
-     */
-    public function getCoupon(PropelPDO $con = null)
-    {
-
-        if ($this->singleCoupon === null && !$this->isNew()) {
-            $this->singleCoupon = CouponQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCoupon;
-    }
-
-    /**
-     * Sets a single Coupon object as related to this object by a one-to-one relationship.
-     *
-     * @param             Coupon $v Coupon
+     * @param             Coupon $v
      * @return CouponRule The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCoupon(Coupon $v = null)
     {
-        $this->singleCoupon = $v;
-
-        // Make sure that that the passed-in Coupon isn't already associated with this object
-        if ($v !== null && $v->getCouponRule() === null) {
-            $v->setCouponRule($this);
+        if ($v === null) {
+            $this->setCouponId(NULL);
+        } else {
+            $this->setCouponId($v->getId());
         }
 
+        $this->aCoupon = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Coupon object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCouponRule($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Coupon object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Coupon The associated Coupon object.
+     * @throws PropelException
+     */
+    public function getCoupon(PropelPDO $con = null)
+    {
+        if ($this->aCoupon === null && ($this->coupon_id !== null)) {
+            $this->aCoupon = CouponQuery::create()->findPk($this->coupon_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCoupon->addCouponRules($this);
+             */
+        }
+
+        return $this->aCoupon;
     }
 
     /**
@@ -1239,15 +1237,9 @@ abstract class BaseCouponRule extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCoupon) {
-                $this->singleCoupon->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCoupon instanceof PropelCollection) {
-            $this->singleCoupon->clearIterator();
-        }
-        $this->singleCoupon = null;
+        $this->aCoupon = null;
     }
 
     /**

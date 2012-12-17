@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureAv;
@@ -102,19 +100,19 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Feature one-to-one related Feature object
+     * @var        FeatureAv
      */
-    protected $singleFeature;
+    protected $aFeatureAv;
 
     /**
-     * @var        FeatureAv one-to-one related FeatureAv object
+     * @var        Feature
      */
-    protected $singleFeatureAv;
+    protected $aFeature;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        Product
      */
-    protected $singleProduct;
+    protected $aProduct;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -129,24 +127,6 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $featuresScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $featureAvsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -320,6 +300,10 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             $this->modifiedColumns[] = FeatureProdPeer::PRODUCT_ID;
         }
 
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
+        }
+
 
         return $this;
     } // setProductId()
@@ -341,6 +325,10 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             $this->modifiedColumns[] = FeatureProdPeer::FEATURE_ID;
         }
 
+        if ($this->aFeature !== null && $this->aFeature->getId() !== $v) {
+            $this->aFeature = null;
+        }
+
 
         return $this;
     } // setFeatureId()
@@ -360,6 +348,10 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         if ($this->feature_av_id !== $v) {
             $this->feature_av_id = $v;
             $this->modifiedColumns[] = FeatureProdPeer::FEATURE_AV_ID;
+        }
+
+        if ($this->aFeatureAv !== null && $this->aFeatureAv->getId() !== $v) {
+            $this->aFeatureAv = null;
         }
 
 
@@ -525,6 +517,15 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
+        }
+        if ($this->aFeature !== null && $this->feature_id !== $this->aFeature->getId()) {
+            $this->aFeature = null;
+        }
+        if ($this->aFeatureAv !== null && $this->feature_av_id !== $this->aFeatureAv->getId()) {
+            $this->aFeatureAv = null;
+        }
     } // ensureConsistency
 
     /**
@@ -564,12 +565,9 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleFeature = null;
-
-            $this->singleFeatureAv = null;
-
-            $this->singleProduct = null;
-
+            $this->aFeatureAv = null;
+            $this->aFeature = null;
+            $this->aProduct = null;
         } // if (deep)
     }
 
@@ -683,6 +681,32 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aFeatureAv !== null) {
+                if ($this->aFeatureAv->isModified() || $this->aFeatureAv->isNew()) {
+                    $affectedRows += $this->aFeatureAv->save($con);
+                }
+                $this->setFeatureAv($this->aFeatureAv);
+            }
+
+            if ($this->aFeature !== null) {
+                if ($this->aFeature->isModified() || $this->aFeature->isNew()) {
+                    $affectedRows += $this->aFeature->save($con);
+                }
+                $this->setFeature($this->aFeature);
+            }
+
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
+                }
+                $this->setProduct($this->aProduct);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -692,51 +716,6 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->featuresScheduledForDeletion !== null) {
-                if (!$this->featuresScheduledForDeletion->isEmpty()) {
-                    FeatureQuery::create()
-                        ->filterByPrimaryKeys($this->featuresScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->featuresScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFeature !== null) {
-                if (!$this->singleFeature->isDeleted()) {
-                        $affectedRows += $this->singleFeature->save($con);
-                }
-            }
-
-            if ($this->featureAvsScheduledForDeletion !== null) {
-                if (!$this->featureAvsScheduledForDeletion->isEmpty()) {
-                    FeatureAvQuery::create()
-                        ->filterByPrimaryKeys($this->featureAvsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->featureAvsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFeatureAv !== null) {
-                if (!$this->singleFeatureAv->isDeleted()) {
-                        $affectedRows += $this->singleFeatureAv->save($con);
-                }
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -918,28 +897,34 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aFeatureAv !== null) {
+                if (!$this->aFeatureAv->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFeatureAv->getValidationFailures());
+                }
+            }
+
+            if ($this->aFeature !== null) {
+                if (!$this->aFeature->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFeature->getValidationFailures());
+                }
+            }
+
+            if ($this->aProduct !== null) {
+                if (!$this->aProduct->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
+                }
+            }
+
+
             if (($retval = FeatureProdPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleFeature !== null) {
-                    if (!$this->singleFeature->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFeature->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleFeatureAv !== null) {
-                    if (!$this->singleFeatureAv->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFeatureAv->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -1039,14 +1024,14 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleFeature) {
-                $result['Feature'] = $this->singleFeature->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFeatureAv) {
+                $result['FeatureAv'] = $this->aFeatureAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleFeatureAv) {
-                $result['FeatureAv'] = $this->singleFeatureAv->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFeature) {
+                $result['Feature'] = $this->aFeature->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1235,21 +1220,6 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getFeature();
-            if ($relObj) {
-                $copyObj->setFeature($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getFeatureAv();
-            if ($relObj) {
-                $copyObj->setFeatureAv($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1300,125 +1270,157 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a FeatureAv object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Feature object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Feature
-     * @throws PropelException
-     */
-    public function getFeature(PropelPDO $con = null)
-    {
-
-        if ($this->singleFeature === null && !$this->isNew()) {
-            $this->singleFeature = FeatureQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleFeature;
-    }
-
-    /**
-     * Sets a single Feature object as related to this object by a one-to-one relationship.
-     *
-     * @param             Feature $v Feature
-     * @return FeatureProd The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFeature(Feature $v = null)
-    {
-        $this->singleFeature = $v;
-
-        // Make sure that that the passed-in Feature isn't already associated with this object
-        if ($v !== null && $v->getFeatureProd() === null) {
-            $v->setFeatureProd($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single FeatureAv object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return FeatureAv
-     * @throws PropelException
-     */
-    public function getFeatureAv(PropelPDO $con = null)
-    {
-
-        if ($this->singleFeatureAv === null && !$this->isNew()) {
-            $this->singleFeatureAv = FeatureAvQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleFeatureAv;
-    }
-
-    /**
-     * Sets a single FeatureAv object as related to this object by a one-to-one relationship.
-     *
-     * @param             FeatureAv $v FeatureAv
+     * @param             FeatureAv $v
      * @return FeatureProd The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFeatureAv(FeatureAv $v = null)
     {
-        $this->singleFeatureAv = $v;
-
-        // Make sure that that the passed-in FeatureAv isn't already associated with this object
-        if ($v !== null && $v->getFeatureProd() === null) {
-            $v->setFeatureProd($this);
+        if ($v === null) {
+            $this->setFeatureAvId(NULL);
+        } else {
+            $this->setFeatureAvId($v->getId());
         }
+
+        $this->aFeatureAv = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the FeatureAv object, it will not be re-added.
+        if ($v !== null) {
+            $v->addFeatureProd($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
+     * Get the associated FeatureAv object
      *
-     * @param PropelPDO $con optional connection object
-     * @return Product
+     * @param PropelPDO $con Optional Connection object.
+     * @return FeatureAv The associated FeatureAv object.
      * @throws PropelException
      */
-    public function getProduct(PropelPDO $con = null)
+    public function getFeatureAv(PropelPDO $con = null)
     {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aFeatureAv === null && ($this->feature_av_id !== null)) {
+            $this->aFeatureAv = FeatureAvQuery::create()->findPk($this->feature_av_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFeatureAv->addFeatureProds($this);
+             */
         }
 
-        return $this->singleProduct;
+        return $this->aFeatureAv;
     }
 
     /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a Feature object.
      *
-     * @param             Product $v Product
+     * @param             Feature $v
+     * @return FeatureProd The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setFeature(Feature $v = null)
+    {
+        if ($v === null) {
+            $this->setFeatureId(NULL);
+        } else {
+            $this->setFeatureId($v->getId());
+        }
+
+        $this->aFeature = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Feature object, it will not be re-added.
+        if ($v !== null) {
+            $v->addFeatureProd($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Feature object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Feature The associated Feature object.
+     * @throws PropelException
+     */
+    public function getFeature(PropelPDO $con = null)
+    {
+        if ($this->aFeature === null && ($this->feature_id !== null)) {
+            $this->aFeature = FeatureQuery::create()->findPk($this->feature_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFeature->addFeatureProds($this);
+             */
+        }
+
+        return $this->aFeature;
+    }
+
+    /**
+     * Declares an association between this object and a Product object.
+     *
+     * @param             Product $v
      * @return FeatureProd The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(Product $v = null)
     {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getFeatureProd() === null) {
-            $v->setFeatureProd($this);
+        if ($v === null) {
+            $this->setProductId(NULL);
+        } else {
+            $this->setProductId($v->getId());
         }
 
+        $this->aProduct = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
+        if ($v !== null) {
+            $v->addFeatureProd($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Product object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Product The associated Product object.
+     * @throws PropelException
+     */
+    public function getProduct(PropelPDO $con = null)
+    {
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProduct->addFeatureProds($this);
+             */
+        }
+
+        return $this->aProduct;
     }
 
     /**
@@ -1454,29 +1456,11 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleFeature) {
-                $this->singleFeature->clearAllReferences($deep);
-            }
-            if ($this->singleFeatureAv) {
-                $this->singleFeatureAv->clearAllReferences($deep);
-            }
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleFeature instanceof PropelCollection) {
-            $this->singleFeature->clearIterator();
-        }
-        $this->singleFeature = null;
-        if ($this->singleFeatureAv instanceof PropelCollection) {
-            $this->singleFeatureAv->clearIterator();
-        }
-        $this->singleFeatureAv = null;
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
+        $this->aFeatureAv = null;
+        $this->aFeature = null;
+        $this->aProduct = null;
     }
 
     /**

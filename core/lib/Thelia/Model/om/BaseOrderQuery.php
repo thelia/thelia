@@ -69,14 +69,6 @@ use Thelia\Model\OrderStatus;
  * @method OrderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method OrderQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method OrderQuery leftJoinCouponOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponOrder relation
- * @method OrderQuery rightJoinCouponOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponOrder relation
- * @method OrderQuery innerJoinCouponOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponOrder relation
- *
- * @method OrderQuery leftJoinOrderProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProduct relation
- * @method OrderQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
- * @method OrderQuery innerJoinOrderProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProduct relation
- *
  * @method OrderQuery leftJoinCurrency($relationAlias = null) Adds a LEFT JOIN clause to the query using the Currency relation
  * @method OrderQuery rightJoinCurrency($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Currency relation
  * @method OrderQuery innerJoinCurrency($relationAlias = null) Adds a INNER JOIN clause to the query using the Currency relation
@@ -85,17 +77,25 @@ use Thelia\Model\OrderStatus;
  * @method OrderQuery rightJoinCustomer($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Customer relation
  * @method OrderQuery innerJoinCustomer($relationAlias = null) Adds a INNER JOIN clause to the query using the Customer relation
  *
- * @method OrderQuery leftJoinOrderAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddress relation
- * @method OrderQuery rightJoinOrderAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddress relation
- * @method OrderQuery innerJoinOrderAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddress relation
+ * @method OrderQuery leftJoinOrderAddressRelatedByAddressInvoice($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
+ * @method OrderQuery rightJoinOrderAddressRelatedByAddressInvoice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
+ * @method OrderQuery innerJoinOrderAddressRelatedByAddressInvoice($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
  *
- * @method OrderQuery leftJoinOrderAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddress relation
- * @method OrderQuery rightJoinOrderAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddress relation
- * @method OrderQuery innerJoinOrderAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddress relation
+ * @method OrderQuery leftJoinOrderAddressRelatedByAddressDelivery($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
+ * @method OrderQuery rightJoinOrderAddressRelatedByAddressDelivery($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
+ * @method OrderQuery innerJoinOrderAddressRelatedByAddressDelivery($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
  *
  * @method OrderQuery leftJoinOrderStatus($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderStatus relation
  * @method OrderQuery rightJoinOrderStatus($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderStatus relation
  * @method OrderQuery innerJoinOrderStatus($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderStatus relation
+ *
+ * @method OrderQuery leftJoinCouponOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponOrder relation
+ * @method OrderQuery rightJoinCouponOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponOrder relation
+ * @method OrderQuery innerJoinCouponOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponOrder relation
+ *
+ * @method OrderQuery leftJoinOrderProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProduct relation
+ * @method OrderQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
+ * @method OrderQuery innerJoinOrderProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProduct relation
  *
  * @method Order findOne(PropelPDO $con = null) Return the first Order matching the query
  * @method Order findOneOrCreate(PropelPDO $con = null) Return the first Order matching the query, or a new Order object populated from the query conditions when no match is found
@@ -149,7 +149,7 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Order', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Order', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -325,10 +325,6 @@ abstract class BaseOrderQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByCouponOrder()
-     *
-     * @see       filterByOrderProduct()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -385,6 +381,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id > 12
      * </code>
      *
+     * @see       filterByCustomer()
+     *
      * @param     mixed $customerId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -426,6 +424,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * $query->filterByAddressInvoice(array('min' => 12)); // WHERE address_invoice > 12
      * </code>
      *
+     * @see       filterByOrderAddressRelatedByAddressInvoice()
+     *
      * @param     mixed $addressInvoice The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -466,6 +466,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * $query->filterByAddressDelivery(array(12, 34)); // WHERE address_delivery IN (12, 34)
      * $query->filterByAddressDelivery(array('min' => 12)); // WHERE address_delivery > 12
      * </code>
+     *
+     * @see       filterByOrderAddressRelatedByAddressDelivery()
      *
      * @param     mixed $addressDelivery The value to use as filter.
      *              Use scalar values for equality.
@@ -550,6 +552,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * $query->filterByCurrencyId(array(12, 34)); // WHERE currency_id IN (12, 34)
      * $query->filterByCurrencyId(array('min' => 12)); // WHERE currency_id > 12
      * </code>
+     *
+     * @see       filterByCurrency()
      *
      * @param     mixed $currencyId The value to use as filter.
      *              Use scalar values for equality.
@@ -819,6 +823,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * $query->filterByStatusId(array('min' => 12)); // WHERE status_id > 12
      * </code>
      *
+     * @see       filterByOrderStatus()
+     *
      * @param     mixed $statusId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -966,161 +972,9 @@ abstract class BaseOrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related CouponOrder object
-     *
-     * @param   CouponOrder|PropelObjectCollection $couponOrder The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByCouponOrder($couponOrder, $comparison = null)
-    {
-        if ($couponOrder instanceof CouponOrder) {
-            return $this
-                ->addUsingAlias(OrderPeer::ID, $couponOrder->getOrderId(), $comparison);
-        } elseif ($couponOrder instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(OrderPeer::ID, $couponOrder->toKeyValue('PrimaryKey', 'OrderId'), $comparison);
-        } else {
-            throw new PropelException('filterByCouponOrder() only accepts arguments of type CouponOrder or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the CouponOrder relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return OrderQuery The current query, for fluid interface
-     */
-    public function joinCouponOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CouponOrder');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'CouponOrder');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the CouponOrder relation CouponOrder object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CouponOrderQuery A secondary query class using the current class as primary query
-     */
-    public function useCouponOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCouponOrder($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CouponOrder', '\Thelia\Model\CouponOrderQuery');
-    }
-
-    /**
-     * Filter the query by a related OrderProduct object
-     *
-     * @param   OrderProduct|PropelObjectCollection $orderProduct The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByOrderProduct($orderProduct, $comparison = null)
-    {
-        if ($orderProduct instanceof OrderProduct) {
-            return $this
-                ->addUsingAlias(OrderPeer::ID, $orderProduct->getOrderId(), $comparison);
-        } elseif ($orderProduct instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(OrderPeer::ID, $orderProduct->toKeyValue('PrimaryKey', 'OrderId'), $comparison);
-        } else {
-            throw new PropelException('filterByOrderProduct() only accepts arguments of type OrderProduct or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the OrderProduct relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return OrderQuery The current query, for fluid interface
-     */
-    public function joinOrderProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderProduct');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'OrderProduct');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the OrderProduct relation OrderProduct object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\OrderProductQuery A secondary query class using the current class as primary query
-     */
-    public function useOrderProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinOrderProduct($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderProduct', '\Thelia\Model\OrderProductQuery');
-    }
-
-    /**
      * Filter the query by a related Currency object
      *
-     * @param   Currency|PropelObjectCollection $currency  the related object to use as filter
+     * @param   Currency|PropelObjectCollection $currency The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderQuery The current query, for fluid interface
@@ -1132,10 +986,12 @@ abstract class BaseOrderQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderPeer::CURRENCY_ID, $currency->getId(), $comparison);
         } elseif ($currency instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCurrencyQuery()
-                ->filterByPrimaryKeys($currency->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderPeer::CURRENCY_ID, $currency->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCurrency() only accepts arguments of type Currency or PropelCollection');
         }
@@ -1149,7 +1005,7 @@ abstract class BaseOrderQuery extends ModelCriteria
      *
      * @return OrderQuery The current query, for fluid interface
      */
-    public function joinCurrency($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCurrency($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Currency');
@@ -1184,7 +1040,7 @@ abstract class BaseOrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\CurrencyQuery A secondary query class using the current class as primary query
      */
-    public function useCurrencyQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCurrencyQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinCurrency($relationAlias, $joinType)
@@ -1194,7 +1050,7 @@ abstract class BaseOrderQuery extends ModelCriteria
     /**
      * Filter the query by a related Customer object
      *
-     * @param   Customer|PropelObjectCollection $customer  the related object to use as filter
+     * @param   Customer|PropelObjectCollection $customer The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderQuery The current query, for fluid interface
@@ -1206,10 +1062,12 @@ abstract class BaseOrderQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderPeer::CUSTOMER_ID, $customer->getId(), $comparison);
         } elseif ($customer instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useCustomerQuery()
-                ->filterByPrimaryKeys($customer->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderPeer::CUSTOMER_ID, $customer->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCustomer() only accepts arguments of type Customer or PropelCollection');
         }
@@ -1268,39 +1126,41 @@ abstract class BaseOrderQuery extends ModelCriteria
     /**
      * Filter the query by a related OrderAddress object
      *
-     * @param   OrderAddress|PropelObjectCollection $orderAddress  the related object to use as filter
+     * @param   OrderAddress|PropelObjectCollection $orderAddress The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByOrderAddress($orderAddress, $comparison = null)
+    public function filterByOrderAddressRelatedByAddressInvoice($orderAddress, $comparison = null)
     {
         if ($orderAddress instanceof OrderAddress) {
             return $this
                 ->addUsingAlias(OrderPeer::ADDRESS_INVOICE, $orderAddress->getId(), $comparison);
         } elseif ($orderAddress instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useOrderAddressQuery()
-                ->filterByPrimaryKeys($orderAddress->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderPeer::ADDRESS_INVOICE, $orderAddress->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByOrderAddress() only accepts arguments of type OrderAddress or PropelCollection');
+            throw new PropelException('filterByOrderAddressRelatedByAddressInvoice() only accepts arguments of type OrderAddress or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderAddress relation
+     * Adds a JOIN clause to the query using the OrderAddressRelatedByAddressInvoice relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return OrderQuery The current query, for fluid interface
      */
-    public function joinOrderAddress($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinOrderAddressRelatedByAddressInvoice($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderAddress');
+        $relationMap = $tableMap->getRelation('OrderAddressRelatedByAddressInvoice');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1315,14 +1175,14 @@ abstract class BaseOrderQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderAddress');
+            $this->addJoinObject($join, 'OrderAddressRelatedByAddressInvoice');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderAddress relation OrderAddress object
+     * Use the OrderAddressRelatedByAddressInvoice relation OrderAddress object
      *
      * @see       useQuery()
      *
@@ -1332,49 +1192,51 @@ abstract class BaseOrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
      */
-    public function useOrderAddressQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useOrderAddressRelatedByAddressInvoiceQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinOrderAddress($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderAddress', '\Thelia\Model\OrderAddressQuery');
+            ->joinOrderAddressRelatedByAddressInvoice($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderAddressRelatedByAddressInvoice', '\Thelia\Model\OrderAddressQuery');
     }
 
     /**
      * Filter the query by a related OrderAddress object
      *
-     * @param   OrderAddress|PropelObjectCollection $orderAddress  the related object to use as filter
+     * @param   OrderAddress|PropelObjectCollection $orderAddress The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByOrderAddress($orderAddress, $comparison = null)
+    public function filterByOrderAddressRelatedByAddressDelivery($orderAddress, $comparison = null)
     {
         if ($orderAddress instanceof OrderAddress) {
             return $this
                 ->addUsingAlias(OrderPeer::ADDRESS_DELIVERY, $orderAddress->getId(), $comparison);
         } elseif ($orderAddress instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useOrderAddressQuery()
-                ->filterByPrimaryKeys($orderAddress->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderPeer::ADDRESS_DELIVERY, $orderAddress->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByOrderAddress() only accepts arguments of type OrderAddress or PropelCollection');
+            throw new PropelException('filterByOrderAddressRelatedByAddressDelivery() only accepts arguments of type OrderAddress or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderAddress relation
+     * Adds a JOIN clause to the query using the OrderAddressRelatedByAddressDelivery relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return OrderQuery The current query, for fluid interface
      */
-    public function joinOrderAddress($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinOrderAddressRelatedByAddressDelivery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderAddress');
+        $relationMap = $tableMap->getRelation('OrderAddressRelatedByAddressDelivery');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1389,14 +1251,14 @@ abstract class BaseOrderQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderAddress');
+            $this->addJoinObject($join, 'OrderAddressRelatedByAddressDelivery');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderAddress relation OrderAddress object
+     * Use the OrderAddressRelatedByAddressDelivery relation OrderAddress object
      *
      * @see       useQuery()
      *
@@ -1406,17 +1268,17 @@ abstract class BaseOrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderAddressQuery A secondary query class using the current class as primary query
      */
-    public function useOrderAddressQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useOrderAddressRelatedByAddressDeliveryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinOrderAddress($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderAddress', '\Thelia\Model\OrderAddressQuery');
+            ->joinOrderAddressRelatedByAddressDelivery($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderAddressRelatedByAddressDelivery', '\Thelia\Model\OrderAddressQuery');
     }
 
     /**
      * Filter the query by a related OrderStatus object
      *
-     * @param   OrderStatus|PropelObjectCollection $orderStatus  the related object to use as filter
+     * @param   OrderStatus|PropelObjectCollection $orderStatus The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderQuery The current query, for fluid interface
@@ -1428,10 +1290,12 @@ abstract class BaseOrderQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderPeer::STATUS_ID, $orderStatus->getId(), $comparison);
         } elseif ($orderStatus instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useOrderStatusQuery()
-                ->filterByPrimaryKeys($orderStatus->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderPeer::STATUS_ID, $orderStatus->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByOrderStatus() only accepts arguments of type OrderStatus or PropelCollection');
         }
@@ -1445,7 +1309,7 @@ abstract class BaseOrderQuery extends ModelCriteria
      *
      * @return OrderQuery The current query, for fluid interface
      */
-    public function joinOrderStatus($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinOrderStatus($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('OrderStatus');
@@ -1480,11 +1344,159 @@ abstract class BaseOrderQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\OrderStatusQuery A secondary query class using the current class as primary query
      */
-    public function useOrderStatusQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useOrderStatusQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinOrderStatus($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'OrderStatus', '\Thelia\Model\OrderStatusQuery');
+    }
+
+    /**
+     * Filter the query by a related CouponOrder object
+     *
+     * @param   CouponOrder|PropelObjectCollection $couponOrder  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   OrderQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCouponOrder($couponOrder, $comparison = null)
+    {
+        if ($couponOrder instanceof CouponOrder) {
+            return $this
+                ->addUsingAlias(OrderPeer::ID, $couponOrder->getOrderId(), $comparison);
+        } elseif ($couponOrder instanceof PropelObjectCollection) {
+            return $this
+                ->useCouponOrderQuery()
+                ->filterByPrimaryKeys($couponOrder->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCouponOrder() only accepts arguments of type CouponOrder or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CouponOrder relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return OrderQuery The current query, for fluid interface
+     */
+    public function joinCouponOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CouponOrder');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CouponOrder');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CouponOrder relation CouponOrder object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CouponOrderQuery A secondary query class using the current class as primary query
+     */
+    public function useCouponOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCouponOrder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CouponOrder', '\Thelia\Model\CouponOrderQuery');
+    }
+
+    /**
+     * Filter the query by a related OrderProduct object
+     *
+     * @param   OrderProduct|PropelObjectCollection $orderProduct  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   OrderQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByOrderProduct($orderProduct, $comparison = null)
+    {
+        if ($orderProduct instanceof OrderProduct) {
+            return $this
+                ->addUsingAlias(OrderPeer::ID, $orderProduct->getOrderId(), $comparison);
+        } elseif ($orderProduct instanceof PropelObjectCollection) {
+            return $this
+                ->useOrderProductQuery()
+                ->filterByPrimaryKeys($orderProduct->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderProduct() only accepts arguments of type OrderProduct or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderProduct relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return OrderQuery The current query, for fluid interface
+     */
+    public function joinOrderProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderProduct');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderProduct');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderProduct relation OrderProduct object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderProductQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderProduct($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderProduct', '\Thelia\Model\OrderProductQuery');
     }
 
     /**

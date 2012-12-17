@@ -42,7 +42,7 @@ class MessageTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'message_desc', 'MESSAGE_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
         $this->addColumn('SECURE', 'Secure', 'TINYINT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -55,7 +55,7 @@ class MessageTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('MessageDesc', 'Thelia\\Model\\MessageDesc', RelationMap::MANY_TO_ONE, array('id' => 'message_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('MessageDesc', 'Thelia\\Model\\MessageDesc', RelationMap::ONE_TO_MANY, array('id' => 'message_id', ), 'CASCADE', null, 'MessageDescs');
     } // buildRelations()
 
 } // MessageTableMap

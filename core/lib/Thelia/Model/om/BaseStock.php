@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Combination;
 use Thelia\Model\CombinationQuery;
@@ -94,14 +92,14 @@ abstract class BaseStock extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Combination one-to-one related Combination object
+     * @var        Combination
      */
-    protected $singleCombination;
+    protected $aCombination;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        Product
      */
-    protected $singleProduct;
+    protected $aProduct;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -116,18 +114,6 @@ abstract class BaseStock extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $combinationsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -291,6 +277,10 @@ abstract class BaseStock extends BaseObject implements Persistent
             $this->modifiedColumns[] = StockPeer::COMBINATION_ID;
         }
 
+        if ($this->aCombination !== null && $this->aCombination->getId() !== $v) {
+            $this->aCombination = null;
+        }
+
 
         return $this;
     } // setCombinationId()
@@ -310,6 +300,10 @@ abstract class BaseStock extends BaseObject implements Persistent
         if ($this->product_id !== $v) {
             $this->product_id = $v;
             $this->modifiedColumns[] = StockPeer::PRODUCT_ID;
+        }
+
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
         }
 
 
@@ -474,6 +468,12 @@ abstract class BaseStock extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aCombination !== null && $this->combination_id !== $this->aCombination->getId()) {
+            $this->aCombination = null;
+        }
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
+        }
     } // ensureConsistency
 
     /**
@@ -513,10 +513,8 @@ abstract class BaseStock extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCombination = null;
-
-            $this->singleProduct = null;
-
+            $this->aCombination = null;
+            $this->aProduct = null;
         } // if (deep)
     }
 
@@ -630,6 +628,25 @@ abstract class BaseStock extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCombination !== null) {
+                if ($this->aCombination->isModified() || $this->aCombination->isNew()) {
+                    $affectedRows += $this->aCombination->save($con);
+                }
+                $this->setCombination($this->aCombination);
+            }
+
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
+                }
+                $this->setProduct($this->aProduct);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -639,36 +656,6 @@ abstract class BaseStock extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->combinationsScheduledForDeletion !== null) {
-                if (!$this->combinationsScheduledForDeletion->isEmpty()) {
-                    CombinationQuery::create()
-                        ->filterByPrimaryKeys($this->combinationsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->combinationsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCombination !== null) {
-                if (!$this->singleCombination->isDeleted()) {
-                        $affectedRows += $this->singleCombination->save($con);
-                }
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -844,22 +831,28 @@ abstract class BaseStock extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCombination !== null) {
+                if (!$this->aCombination->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCombination->getValidationFailures());
+                }
+            }
+
+            if ($this->aProduct !== null) {
+                if (!$this->aProduct->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
+                }
+            }
+
+
             if (($retval = StockPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCombination !== null) {
-                    if (!$this->singleCombination->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCombination->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -955,11 +948,11 @@ abstract class BaseStock extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCombination) {
-                $result['Combination'] = $this->singleCombination->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCombination) {
+                $result['Combination'] = $this->aCombination->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1142,16 +1135,6 @@ abstract class BaseStock extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCombination();
-            if ($relObj) {
-                $copyObj->setCombination($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1202,89 +1185,106 @@ abstract class BaseStock extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Combination object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Combination object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Combination
-     * @throws PropelException
-     */
-    public function getCombination(PropelPDO $con = null)
-    {
-
-        if ($this->singleCombination === null && !$this->isNew()) {
-            $this->singleCombination = CombinationQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCombination;
-    }
-
-    /**
-     * Sets a single Combination object as related to this object by a one-to-one relationship.
-     *
-     * @param             Combination $v Combination
+     * @param             Combination $v
      * @return Stock The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCombination(Combination $v = null)
     {
-        $this->singleCombination = $v;
-
-        // Make sure that that the passed-in Combination isn't already associated with this object
-        if ($v !== null && $v->getStock() === null) {
-            $v->setStock($this);
+        if ($v === null) {
+            $this->setCombinationId(NULL);
+        } else {
+            $this->setCombinationId($v->getId());
         }
+
+        $this->aCombination = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Combination object, it will not be re-added.
+        if ($v !== null) {
+            $v->addStock($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
+     * Get the associated Combination object
      *
-     * @param PropelPDO $con optional connection object
-     * @return Product
+     * @param PropelPDO $con Optional Connection object.
+     * @return Combination The associated Combination object.
      * @throws PropelException
      */
-    public function getProduct(PropelPDO $con = null)
+    public function getCombination(PropelPDO $con = null)
     {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aCombination === null && ($this->combination_id !== null)) {
+            $this->aCombination = CombinationQuery::create()->findPk($this->combination_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCombination->addStocks($this);
+             */
         }
 
-        return $this->singleProduct;
+        return $this->aCombination;
     }
 
     /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a Product object.
      *
-     * @param             Product $v Product
+     * @param             Product $v
      * @return Stock The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(Product $v = null)
     {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getStock() === null) {
-            $v->setStock($this);
+        if ($v === null) {
+            $this->setProductId(NULL);
+        } else {
+            $this->setProductId($v->getId());
         }
 
+        $this->aProduct = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
+        if ($v !== null) {
+            $v->addStock($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Product object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Product The associated Product object.
+     * @throws PropelException
+     */
+    public function getProduct(PropelPDO $con = null)
+    {
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProduct->addStocks($this);
+             */
+        }
+
+        return $this->aProduct;
     }
 
     /**
@@ -1319,22 +1319,10 @@ abstract class BaseStock extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCombination) {
-                $this->singleCombination->clearAllReferences($deep);
-            }
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCombination instanceof PropelCollection) {
-            $this->singleCombination->clearIterator();
-        }
-        $this->singleCombination = null;
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
+        $this->aCombination = null;
+        $this->aProduct = null;
     }
 
     /**

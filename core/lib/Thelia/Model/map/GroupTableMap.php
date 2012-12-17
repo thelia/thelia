@@ -42,10 +42,7 @@ class GroupTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'admin_group', 'GROUP_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'group_desc', 'GROUP_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'group_module', 'GROUP_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'group_resource', 'GROUP_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 30, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -57,10 +54,10 @@ class GroupTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::MANY_TO_ONE, array('id' => 'group_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('GroupDesc', 'Thelia\\Model\\GroupDesc', RelationMap::MANY_TO_ONE, array('id' => 'group_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('GroupModule', 'Thelia\\Model\\GroupModule', RelationMap::MANY_TO_ONE, array('id' => 'group_id', ), 'CASCADE', 'CASCADE');
-        $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::MANY_TO_ONE, array('id' => 'group_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', null, 'AdminGroups');
+        $this->addRelation('GroupDesc', 'Thelia\\Model\\GroupDesc', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', null, 'GroupDescs');
+        $this->addRelation('GroupModule', 'Thelia\\Model\\GroupModule', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', 'CASCADE', 'GroupModules');
+        $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', null, 'GroupResources');
     } // buildRelations()
 
 } // GroupTableMap

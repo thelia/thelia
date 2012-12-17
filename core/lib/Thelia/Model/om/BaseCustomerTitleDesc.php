@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\CustomerTitle;
 use Thelia\Model\CustomerTitleDesc;
@@ -92,9 +90,9 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        CustomerTitle one-to-one related CustomerTitle object
+     * @var        CustomerTitle
      */
-    protected $singleCustomerTitle;
+    protected $aCustomerTitle;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -109,12 +107,6 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $customerTitlesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -276,6 +268,10 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
         if ($this->customer_title_id !== $v) {
             $this->customer_title_id = $v;
             $this->modifiedColumns[] = CustomerTitleDescPeer::CUSTOMER_TITLE_ID;
+        }
+
+        if ($this->aCustomerTitle !== null && $this->aCustomerTitle->getId() !== $v) {
+            $this->aCustomerTitle = null;
         }
 
 
@@ -461,6 +457,9 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aCustomerTitle !== null && $this->customer_title_id !== $this->aCustomerTitle->getId()) {
+            $this->aCustomerTitle = null;
+        }
     } // ensureConsistency
 
     /**
@@ -500,8 +499,7 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCustomerTitle = null;
-
+            $this->aCustomerTitle = null;
         } // if (deep)
     }
 
@@ -615,6 +613,18 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomerTitle !== null) {
+                if ($this->aCustomerTitle->isModified() || $this->aCustomerTitle->isNew()) {
+                    $affectedRows += $this->aCustomerTitle->save($con);
+                }
+                $this->setCustomerTitle($this->aCustomerTitle);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -624,21 +634,6 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->customerTitlesScheduledForDeletion !== null) {
-                if (!$this->customerTitlesScheduledForDeletion->isEmpty()) {
-                    CustomerTitleQuery::create()
-                        ->filterByPrimaryKeys($this->customerTitlesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->customerTitlesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCustomerTitle !== null) {
-                if (!$this->singleCustomerTitle->isDeleted()) {
-                        $affectedRows += $this->singleCustomerTitle->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -814,16 +809,22 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomerTitle !== null) {
+                if (!$this->aCustomerTitle->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCustomerTitle->getValidationFailures());
+                }
+            }
+
+
             if (($retval = CustomerTitleDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCustomerTitle !== null) {
-                    if (!$this->singleCustomerTitle->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCustomerTitle->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -919,8 +920,8 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCustomerTitle) {
-                $result['CustomerTitle'] = $this->singleCustomerTitle->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCustomerTitle) {
+                $result['CustomerTitle'] = $this->aCustomerTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1103,11 +1104,6 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCustomerTitle();
-            if ($relObj) {
-                $copyObj->setCustomerTitle($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1158,53 +1154,55 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a CustomerTitle object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single CustomerTitle object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return CustomerTitle
-     * @throws PropelException
-     */
-    public function getCustomerTitle(PropelPDO $con = null)
-    {
-
-        if ($this->singleCustomerTitle === null && !$this->isNew()) {
-            $this->singleCustomerTitle = CustomerTitleQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCustomerTitle;
-    }
-
-    /**
-     * Sets a single CustomerTitle object as related to this object by a one-to-one relationship.
-     *
-     * @param             CustomerTitle $v CustomerTitle
+     * @param             CustomerTitle $v
      * @return CustomerTitleDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCustomerTitle(CustomerTitle $v = null)
     {
-        $this->singleCustomerTitle = $v;
-
-        // Make sure that that the passed-in CustomerTitle isn't already associated with this object
-        if ($v !== null && $v->getCustomerTitleDesc() === null) {
-            $v->setCustomerTitleDesc($this);
+        if ($v === null) {
+            $this->setCustomerTitleId(NULL);
+        } else {
+            $this->setCustomerTitleId($v->getId());
         }
 
+        $this->aCustomerTitle = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the CustomerTitle object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCustomerTitleDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated CustomerTitle object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return CustomerTitle The associated CustomerTitle object.
+     * @throws PropelException
+     */
+    public function getCustomerTitle(PropelPDO $con = null)
+    {
+        if ($this->aCustomerTitle === null && ($this->customer_title_id !== null)) {
+            $this->aCustomerTitle = CustomerTitleQuery::create()->findPk($this->customer_title_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerTitle->addCustomerTitleDescs($this);
+             */
+        }
+
+        return $this->aCustomerTitle;
     }
 
     /**
@@ -1239,15 +1237,9 @@ abstract class BaseCustomerTitleDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCustomerTitle) {
-                $this->singleCustomerTitle->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCustomerTitle instanceof PropelCollection) {
-            $this->singleCustomerTitle->clearIterator();
-        }
-        $this->singleCustomerTitle = null;
+        $this->aCustomerTitle = null;
     }
 
     /**

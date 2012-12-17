@@ -68,7 +68,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Message', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Message', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -243,8 +243,6 @@ abstract class BaseMessageQuery extends ModelCriteria
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
-     *
-     * @see       filterByMessageDesc()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -422,7 +420,7 @@ abstract class BaseMessageQuery extends ModelCriteria
     /**
      * Filter the query by a related MessageDesc object
      *
-     * @param   MessageDesc|PropelObjectCollection $messageDesc The related object(s) to use as filter
+     * @param   MessageDesc|PropelObjectCollection $messageDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   MessageQuery The current query, for fluid interface
@@ -434,12 +432,10 @@ abstract class BaseMessageQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(MessagePeer::ID, $messageDesc->getMessageId(), $comparison);
         } elseif ($messageDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(MessagePeer::ID, $messageDesc->toKeyValue('PrimaryKey', 'MessageId'), $comparison);
+                ->useMessageDescQuery()
+                ->filterByPrimaryKeys($messageDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByMessageDesc() only accepts arguments of type MessageDesc or PropelCollection');
         }

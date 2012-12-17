@@ -43,7 +43,7 @@ class TaxDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('TAX_ID', 'TaxId', 'INTEGER', true, null, null);
+        $this->addForeignKey('TAX_ID', 'TaxId', 'INTEGER', 'tax', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
@@ -57,7 +57,7 @@ class TaxDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Tax', 'Thelia\\Model\\Tax', RelationMap::ONE_TO_ONE, array('tax_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Tax', 'Thelia\\Model\\Tax', RelationMap::MANY_TO_ONE, array('tax_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // TaxDescTableMap

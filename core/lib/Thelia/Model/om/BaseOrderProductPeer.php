@@ -26,7 +26,7 @@ abstract class BaseOrderProductPeer
 {
 
     /** the default database name for this class */
-    const DATABASE_NAME = 'mydb';
+    const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
     const TABLE_NAME = 'order_product';
@@ -419,9 +419,9 @@ abstract class BaseOrderProductPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in OrderPeer instance pool,
+        // Invalidate objects in OrderFeaturePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        OrderPeer::clearInstancePool();
+        OrderFeaturePeer::clearInstancePool();
     }
 
     /**
@@ -520,7 +520,7 @@ abstract class BaseOrderProductPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related OrderFeature table
+     * Returns the number of rows matching criteria, joining the related Order table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -528,7 +528,7 @@ abstract class BaseOrderProductPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinOrderFeature(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinOrder(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -555,7 +555,7 @@ abstract class BaseOrderProductPeer
             $con = Propel::getConnection(OrderProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(OrderProductPeer::ID, OrderFeaturePeer::ORDER_PRODUCT_ID, $join_behavior);
+        $criteria->addJoin(OrderProductPeer::ORDER_ID, OrderPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -571,7 +571,7 @@ abstract class BaseOrderProductPeer
 
 
     /**
-     * Selects a collection of OrderProduct objects pre-filled with their OrderFeature objects.
+     * Selects a collection of OrderProduct objects pre-filled with their Order objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -579,7 +579,7 @@ abstract class BaseOrderProductPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinOrderFeature(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinOrder(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -590,9 +590,9 @@ abstract class BaseOrderProductPeer
 
         OrderProductPeer::addSelectColumns($criteria);
         $startcol = OrderProductPeer::NUM_HYDRATE_COLUMNS;
-        OrderFeaturePeer::addSelectColumns($criteria);
+        OrderPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(OrderProductPeer::ID, OrderFeaturePeer::ORDER_PRODUCT_ID, $join_behavior);
+        $criteria->addJoin(OrderProductPeer::ORDER_ID, OrderPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -612,21 +612,20 @@ abstract class BaseOrderProductPeer
                 OrderProductPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = OrderFeaturePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = OrderPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = OrderFeaturePeer::getInstanceFromPool($key2);
+                $obj2 = OrderPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = OrderFeaturePeer::getOMClass();
+                    $cls = OrderPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    OrderFeaturePeer::addInstanceToPool($obj2, $key2);
+                    OrderPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (OrderProduct) to $obj2 (OrderFeature)
-                // one to one relationship
-                $obj1->setOrderFeature($obj2);
+                // Add the $obj1 (OrderProduct) to $obj2 (Order)
+                $obj2->addOrderProduct($obj1);
 
             } // if joined row was not null
 
@@ -674,7 +673,7 @@ abstract class BaseOrderProductPeer
             $con = Propel::getConnection(OrderProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(OrderProductPeer::ID, OrderFeaturePeer::ORDER_PRODUCT_ID, $join_behavior);
+        $criteria->addJoin(OrderProductPeer::ORDER_ID, OrderPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -710,10 +709,10 @@ abstract class BaseOrderProductPeer
         OrderProductPeer::addSelectColumns($criteria);
         $startcol2 = OrderProductPeer::NUM_HYDRATE_COLUMNS;
 
-        OrderFeaturePeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + OrderFeaturePeer::NUM_HYDRATE_COLUMNS;
+        OrderPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + OrderPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(OrderProductPeer::ID, OrderFeaturePeer::ORDER_PRODUCT_ID, $join_behavior);
+        $criteria->addJoin(OrderProductPeer::ORDER_ID, OrderPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -732,22 +731,22 @@ abstract class BaseOrderProductPeer
                 OrderProductPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined OrderFeature rows
+            // Add objects for joined Order rows
 
-            $key2 = OrderFeaturePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = OrderPeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = OrderFeaturePeer::getInstanceFromPool($key2);
+                $obj2 = OrderPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = OrderFeaturePeer::getOMClass();
+                    $cls = OrderPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    OrderFeaturePeer::addInstanceToPool($obj2, $key2);
+                    OrderPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (OrderProduct) to the collection in $obj2 (OrderFeature)
-                $obj1->setOrderFeature($obj2);
+                // Add the $obj1 (OrderProduct) to the collection in $obj2 (Order)
+                $obj2->addOrderProduct($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -890,7 +889,6 @@ abstract class BaseOrderProductPeer
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += OrderProductPeer::doOnDeleteCascade(new Criteria(OrderProductPeer::DATABASE_NAME), $con);
             $affectedRows += BasePeer::doDeleteAll(OrderProductPeer::TABLE_NAME, $con, OrderProductPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
@@ -924,14 +922,24 @@ abstract class BaseOrderProductPeer
         }
 
         if ($values instanceof Criteria) {
+            // invalidate the cache for all objects of this type, since we have no
+            // way of knowing (without running a query) what objects should be invalidated
+            // from the cache based on this Criteria.
+            OrderProductPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
         } elseif ($values instanceof OrderProduct) { // it's a model object
+            // invalidate the cache for this single object
+            OrderProductPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(OrderProductPeer::DATABASE_NAME);
             $criteria->add(OrderProductPeer::ID, (array) $values, Criteria::IN);
+            // invalidate the cache for this object(s)
+            foreach ((array) $values as $singleval) {
+                OrderProductPeer::removeInstanceFromPool($singleval);
+            }
         }
 
         // Set the correct dbName
@@ -944,23 +952,6 @@ abstract class BaseOrderProductPeer
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
 
-            // cloning the Criteria in case it's modified by doSelect() or doSelectStmt()
-            $c = clone $criteria;
-            $affectedRows += OrderProductPeer::doOnDeleteCascade($c, $con);
-
-            // Because this db requires some delete cascade/set null emulation, we have to
-            // clear the cached instance *after* the emulation has happened (since
-            // instances get re-added by the select statement contained therein).
-            if ($values instanceof Criteria) {
-                OrderProductPeer::clearInstancePool();
-            } elseif ($values instanceof OrderProduct) { // it's a model object
-                OrderProductPeer::removeInstanceFromPool($values);
-            } else { // it's a primary key, or an array of pks
-                foreach ((array) $values as $singleval) {
-                    OrderProductPeer::removeInstanceFromPool($singleval);
-                }
-            }
-
             $affectedRows += BasePeer::doDelete($criteria, $con);
             OrderProductPeer::clearRelatedInstancePool();
             $con->commit();
@@ -970,39 +961,6 @@ abstract class BaseOrderProductPeer
             $con->rollBack();
             throw $e;
         }
-    }
-
-    /**
-     * This is a method for emulating ON DELETE CASCADE for DBs that don't support this
-     * feature (like MySQL or SQLite).
-     *
-     * This method is not very speedy because it must perform a query first to get
-     * the implicated records and then perform the deletes by calling those Peer classes.
-     *
-     * This method should be used within a transaction if possible.
-     *
-     * @param      Criteria $criteria
-     * @param      PropelPDO $con
-     * @return int The number of affected rows (if supported by underlying database driver).
-     */
-    protected static function doOnDeleteCascade(Criteria $criteria, PropelPDO $con)
-    {
-        // initialize var to track total num of affected rows
-        $affectedRows = 0;
-
-        // first find the objects that are implicated by the $criteria
-        $objects = OrderProductPeer::doSelect($criteria, $con);
-        foreach ($objects as $obj) {
-
-
-            // delete related Order objects
-            $criteria = new Criteria(OrderPeer::DATABASE_NAME);
-
-            $criteria->add(OrderPeer::ID, $obj->getOrderId());
-            $affectedRows += OrderPeer::doDelete($criteria, $con);
-        }
-
-        return $affectedRows;
     }
 
     /**

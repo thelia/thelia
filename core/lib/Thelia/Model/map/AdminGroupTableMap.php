@@ -43,8 +43,8 @@ class AdminGroupTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('GROUP_ID', 'GroupId', 'INTEGER', false, null, null);
-        $this->addColumn('ADMIN_ID', 'AdminId', 'INTEGER', false, null, null);
+        $this->addForeignKey('GROUP_ID', 'GroupId', 'INTEGER', 'group', 'ID', false, null, null);
+        $this->addForeignKey('ADMIN_ID', 'AdminId', 'INTEGER', 'admin', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
         // validators
@@ -55,8 +55,8 @@ class AdminGroupTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Admin', 'Thelia\\Model\\Admin', RelationMap::ONE_TO_ONE, array('admin_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::ONE_TO_ONE, array('group_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::MANY_TO_ONE, array('group_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Admin', 'Thelia\\Model\\Admin', RelationMap::MANY_TO_ONE, array('admin_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // AdminGroupTableMap

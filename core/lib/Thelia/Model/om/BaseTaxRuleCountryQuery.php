@@ -44,10 +44,6 @@ use Thelia\Model\TaxRuleCountryQuery;
  * @method TaxRuleCountryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method TaxRuleCountryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method TaxRuleCountryQuery leftJoinCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the Country relation
- * @method TaxRuleCountryQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
- * @method TaxRuleCountryQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
- *
  * @method TaxRuleCountryQuery leftJoinTax($relationAlias = null) Adds a LEFT JOIN clause to the query using the Tax relation
  * @method TaxRuleCountryQuery rightJoinTax($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Tax relation
  * @method TaxRuleCountryQuery innerJoinTax($relationAlias = null) Adds a INNER JOIN clause to the query using the Tax relation
@@ -55,6 +51,10 @@ use Thelia\Model\TaxRuleCountryQuery;
  * @method TaxRuleCountryQuery leftJoinTaxRule($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRule relation
  * @method TaxRuleCountryQuery rightJoinTaxRule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRule relation
  * @method TaxRuleCountryQuery innerJoinTaxRule($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRule relation
+ *
+ * @method TaxRuleCountryQuery leftJoinCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the Country relation
+ * @method TaxRuleCountryQuery rightJoinCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Country relation
+ * @method TaxRuleCountryQuery innerJoinCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the Country relation
  *
  * @method TaxRuleCountry findOne(PropelPDO $con = null) Return the first TaxRuleCountry matching the query
  * @method TaxRuleCountry findOneOrCreate(PropelPDO $con = null) Return the first TaxRuleCountry matching the query, or a new TaxRuleCountry object populated from the query conditions when no match is found
@@ -86,7 +86,7 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\TaxRuleCountry', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\TaxRuleCountry', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -289,6 +289,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * $query->filterByTaxRuleId(array('min' => 12)); // WHERE tax_rule_id > 12
      * </code>
      *
+     * @see       filterByTaxRule()
+     *
      * @param     mixed $taxRuleId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -330,6 +332,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * $query->filterByCountryId(array('min' => 12)); // WHERE country_id > 12
      * </code>
      *
+     * @see       filterByCountry()
+     *
      * @param     mixed $countryId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -370,6 +374,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * $query->filterByTaxId(array(12, 34)); // WHERE tax_id IN (12, 34)
      * $query->filterByTaxId(array('min' => 12)); // WHERE tax_id > 12
      * </code>
+     *
+     * @see       filterByTax()
      *
      * @param     mixed $taxId The value to use as filter.
      *              Use scalar values for equality.
@@ -530,83 +536,9 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Country object
-     *
-     * @param   Country|PropelObjectCollection $country  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   TaxRuleCountryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByCountry($country, $comparison = null)
-    {
-        if ($country instanceof Country) {
-            return $this
-                ->addUsingAlias(TaxRuleCountryPeer::COUNTRY_ID, $country->getId(), $comparison);
-        } elseif ($country instanceof PropelObjectCollection) {
-            return $this
-                ->useCountryQuery()
-                ->filterByPrimaryKeys($country->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCountry() only accepts arguments of type Country or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Country relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return TaxRuleCountryQuery The current query, for fluid interface
-     */
-    public function joinCountry($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Country');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Country');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Country relation Country object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
-     */
-    public function useCountryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCountry($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Country', '\Thelia\Model\CountryQuery');
-    }
-
-    /**
      * Filter the query by a related Tax object
      *
-     * @param   Tax|PropelObjectCollection $tax  the related object to use as filter
+     * @param   Tax|PropelObjectCollection $tax The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TaxRuleCountryQuery The current query, for fluid interface
@@ -618,10 +550,12 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(TaxRuleCountryPeer::TAX_ID, $tax->getId(), $comparison);
         } elseif ($tax instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useTaxQuery()
-                ->filterByPrimaryKeys($tax->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(TaxRuleCountryPeer::TAX_ID, $tax->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByTax() only accepts arguments of type Tax or PropelCollection');
         }
@@ -635,7 +569,7 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      *
      * @return TaxRuleCountryQuery The current query, for fluid interface
      */
-    public function joinTax($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTax($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Tax');
@@ -670,7 +604,7 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TaxQuery A secondary query class using the current class as primary query
      */
-    public function useTaxQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTaxQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinTax($relationAlias, $joinType)
@@ -680,7 +614,7 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
     /**
      * Filter the query by a related TaxRule object
      *
-     * @param   TaxRule|PropelObjectCollection $taxRule  the related object to use as filter
+     * @param   TaxRule|PropelObjectCollection $taxRule The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   TaxRuleCountryQuery The current query, for fluid interface
@@ -692,10 +626,12 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(TaxRuleCountryPeer::TAX_RULE_ID, $taxRule->getId(), $comparison);
         } elseif ($taxRule instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useTaxRuleQuery()
-                ->filterByPrimaryKeys($taxRule->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(TaxRuleCountryPeer::TAX_RULE_ID, $taxRule->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByTaxRule() only accepts arguments of type TaxRule or PropelCollection');
         }
@@ -709,7 +645,7 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      *
      * @return TaxRuleCountryQuery The current query, for fluid interface
      */
-    public function joinTaxRule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinTaxRule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('TaxRule');
@@ -744,11 +680,87 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
      */
-    public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinTaxRule($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'TaxRule', '\Thelia\Model\TaxRuleQuery');
+    }
+
+    /**
+     * Filter the query by a related Country object
+     *
+     * @param   Country|PropelObjectCollection $country The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   TaxRuleCountryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCountry($country, $comparison = null)
+    {
+        if ($country instanceof Country) {
+            return $this
+                ->addUsingAlias(TaxRuleCountryPeer::COUNTRY_ID, $country->getId(), $comparison);
+        } elseif ($country instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(TaxRuleCountryPeer::COUNTRY_ID, $country->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCountry() only accepts arguments of type Country or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Country relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TaxRuleCountryQuery The current query, for fluid interface
+     */
+    public function joinCountry($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Country');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Country');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Country relation Country object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CountryQuery A secondary query class using the current class as primary query
+     */
+    public function useCountryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCountry($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Country', '\Thelia\Model\CountryQuery');
     }
 
     /**

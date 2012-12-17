@@ -42,8 +42,8 @@ class ProductCategoryTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('PRODUCT_ID', 'ProductId', 'INTEGER', true, null, null);
-        $this->addPrimaryKey('CATEGORY_ID', 'CategoryId', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('PRODUCT_ID', 'ProductId', 'INTEGER' , 'product', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('CATEGORY_ID', 'CategoryId', 'INTEGER' , 'category', 'ID', true, null, null);
         // validators
     } // initialize()
 
@@ -52,8 +52,8 @@ class ProductCategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Category', 'Thelia\\Model\\Category', RelationMap::ONE_TO_ONE, array('category_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Category', 'Thelia\\Model\\Category', RelationMap::MANY_TO_ONE, array('category_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // ProductCategoryTableMap

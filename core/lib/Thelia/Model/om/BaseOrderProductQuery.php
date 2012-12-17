@@ -53,13 +53,13 @@ use Thelia\Model\OrderProductQuery;
  * @method OrderProductQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method OrderProductQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method OrderProductQuery leftJoinOrderFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderFeature relation
- * @method OrderProductQuery rightJoinOrderFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderFeature relation
- * @method OrderProductQuery innerJoinOrderFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderFeature relation
- *
  * @method OrderProductQuery leftJoinOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the Order relation
  * @method OrderProductQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method OrderProductQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
+ *
+ * @method OrderProductQuery leftJoinOrderFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderFeature relation
+ * @method OrderProductQuery rightJoinOrderFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderFeature relation
+ * @method OrderProductQuery innerJoinOrderFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderFeature relation
  *
  * @method OrderProduct findOne(PropelPDO $con = null) Return the first OrderProduct matching the query
  * @method OrderProduct findOneOrCreate(PropelPDO $con = null) Return the first OrderProduct matching the query, or a new OrderProduct object populated from the query conditions when no match is found
@@ -101,7 +101,7 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\OrderProduct', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\OrderProduct', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -277,8 +277,6 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByOrderFeature()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -305,6 +303,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * $query->filterByOrderId(array(12, 34)); // WHERE order_id IN (12, 34)
      * $query->filterByOrderId(array('min' => 12)); // WHERE order_id > 12
      * </code>
+     *
+     * @see       filterByOrder()
      *
      * @param     mixed $orderId The value to use as filter.
      *              Use scalar values for equality.
@@ -704,85 +704,9 @@ abstract class BaseOrderProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related OrderFeature object
-     *
-     * @param   OrderFeature|PropelObjectCollection $orderFeature The related object(s) to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   OrderProductQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByOrderFeature($orderFeature, $comparison = null)
-    {
-        if ($orderFeature instanceof OrderFeature) {
-            return $this
-                ->addUsingAlias(OrderProductPeer::ID, $orderFeature->getOrderProductId(), $comparison);
-        } elseif ($orderFeature instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(OrderProductPeer::ID, $orderFeature->toKeyValue('PrimaryKey', 'OrderProductId'), $comparison);
-        } else {
-            throw new PropelException('filterByOrderFeature() only accepts arguments of type OrderFeature or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the OrderFeature relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return OrderProductQuery The current query, for fluid interface
-     */
-    public function joinOrderFeature($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderFeature');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'OrderFeature');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the OrderFeature relation OrderFeature object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\OrderFeatureQuery A secondary query class using the current class as primary query
-     */
-    public function useOrderFeatureQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinOrderFeature($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderFeature', '\Thelia\Model\OrderFeatureQuery');
-    }
-
-    /**
      * Filter the query by a related Order object
      *
-     * @param   Order|PropelObjectCollection $order  the related object to use as filter
+     * @param   Order|PropelObjectCollection $order The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderProductQuery The current query, for fluid interface
@@ -794,10 +718,12 @@ abstract class BaseOrderProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(OrderProductPeer::ORDER_ID, $order->getId(), $comparison);
         } elseif ($order instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useOrderQuery()
-                ->filterByPrimaryKeys($order->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(OrderProductPeer::ORDER_ID, $order->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByOrder() only accepts arguments of type Order or PropelCollection');
         }
@@ -851,6 +777,80 @@ abstract class BaseOrderProductQuery extends ModelCriteria
         return $this
             ->joinOrder($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Order', '\Thelia\Model\OrderQuery');
+    }
+
+    /**
+     * Filter the query by a related OrderFeature object
+     *
+     * @param   OrderFeature|PropelObjectCollection $orderFeature  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   OrderProductQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByOrderFeature($orderFeature, $comparison = null)
+    {
+        if ($orderFeature instanceof OrderFeature) {
+            return $this
+                ->addUsingAlias(OrderProductPeer::ID, $orderFeature->getOrderProductId(), $comparison);
+        } elseif ($orderFeature instanceof PropelObjectCollection) {
+            return $this
+                ->useOrderFeatureQuery()
+                ->filterByPrimaryKeys($orderFeature->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByOrderFeature() only accepts arguments of type OrderFeature or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the OrderFeature relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return OrderProductQuery The current query, for fluid interface
+     */
+    public function joinOrderFeature($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('OrderFeature');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'OrderFeature');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the OrderFeature relation OrderFeature object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\OrderFeatureQuery A secondary query class using the current class as primary query
+     */
+    public function useOrderFeatureQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinOrderFeature($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderFeature', '\Thelia\Model\OrderFeatureQuery');
     }
 
     /**

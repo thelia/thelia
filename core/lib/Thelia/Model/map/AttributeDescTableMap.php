@@ -44,7 +44,7 @@ class AttributeDescTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
-        $this->addColumn('ATTRIBUTE_ID', 'AttributeId', 'INTEGER', true, null, null);
+        $this->addForeignKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER', 'attribute', 'ID', true, null, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
         $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
@@ -58,7 +58,7 @@ class AttributeDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::ONE_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // AttributeDescTableMap

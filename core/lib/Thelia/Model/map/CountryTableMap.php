@@ -42,9 +42,8 @@ class CountryTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'country_desc', 'COUNTRY_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'tax_rule_country', 'COUNTRY_ID', true, null, null);
-        $this->addColumn('AREA_ID', 'AreaId', 'INTEGER', false, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('AREA_ID', 'AreaId', 'INTEGER', 'area', 'ID', false, null, null);
         $this->addColumn('ISOCODE', 'Isocode', 'VARCHAR', true, 4, null);
         $this->addColumn('ISOALPHA2', 'Isoalpha2', 'VARCHAR', false, 2, null);
         $this->addColumn('ISOALPHA3', 'Isoalpha3', 'VARCHAR', false, 4, null);
@@ -58,9 +57,9 @@ class CountryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CountryDesc', 'Thelia\\Model\\CountryDesc', RelationMap::MANY_TO_ONE, array('id' => 'country_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::MANY_TO_ONE, array('id' => 'country_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Area', 'Thelia\\Model\\Area', RelationMap::ONE_TO_ONE, array('area_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Area', 'Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'SET NULL', null);
+        $this->addRelation('CountryDesc', 'Thelia\\Model\\CountryDesc', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'CASCADE', null, 'CountryDescs');
+        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'CASCADE', null, 'TaxRuleCountrys');
     } // buildRelations()
 
 } // CountryTableMap

@@ -42,7 +42,7 @@ class CurrencyTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'order', 'CURRENCY_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('NAME', 'Name', 'VARCHAR', false, 45, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
         $this->addColumn('SYMBOL', 'Symbol', 'VARCHAR', false, 45, null);
@@ -58,7 +58,7 @@ class CurrencyTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('id' => 'currency_id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'SET NULL', null, 'Orders');
     } // buildRelations()
 
 } // CurrencyTableMap

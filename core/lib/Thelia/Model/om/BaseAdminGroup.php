@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Admin;
 use Thelia\Model\AdminGroup;
@@ -82,14 +80,14 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Admin one-to-one related Admin object
+     * @var        Group
      */
-    protected $singleAdmin;
+    protected $aGroup;
 
     /**
-     * @var        Group one-to-one related Group object
+     * @var        Admin
      */
-    protected $singleGroup;
+    protected $aAdmin;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -104,18 +102,6 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $adminsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $groupsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -259,6 +245,10 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             $this->modifiedColumns[] = AdminGroupPeer::GROUP_ID;
         }
 
+        if ($this->aGroup !== null && $this->aGroup->getId() !== $v) {
+            $this->aGroup = null;
+        }
+
 
         return $this;
     } // setGroupId()
@@ -278,6 +268,10 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
         if ($this->admin_id !== $v) {
             $this->admin_id = $v;
             $this->modifiedColumns[] = AdminGroupPeer::ADMIN_ID;
+        }
+
+        if ($this->aAdmin !== null && $this->aAdmin->getId() !== $v) {
+            $this->aAdmin = null;
         }
 
 
@@ -398,6 +392,12 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aGroup !== null && $this->group_id !== $this->aGroup->getId()) {
+            $this->aGroup = null;
+        }
+        if ($this->aAdmin !== null && $this->admin_id !== $this->aAdmin->getId()) {
+            $this->aAdmin = null;
+        }
     } // ensureConsistency
 
     /**
@@ -437,10 +437,8 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleAdmin = null;
-
-            $this->singleGroup = null;
-
+            $this->aGroup = null;
+            $this->aAdmin = null;
         } // if (deep)
     }
 
@@ -554,6 +552,25 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aGroup !== null) {
+                if ($this->aGroup->isModified() || $this->aGroup->isNew()) {
+                    $affectedRows += $this->aGroup->save($con);
+                }
+                $this->setGroup($this->aGroup);
+            }
+
+            if ($this->aAdmin !== null) {
+                if ($this->aAdmin->isModified() || $this->aAdmin->isNew()) {
+                    $affectedRows += $this->aAdmin->save($con);
+                }
+                $this->setAdmin($this->aAdmin);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -563,36 +580,6 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->adminsScheduledForDeletion !== null) {
-                if (!$this->adminsScheduledForDeletion->isEmpty()) {
-                    AdminQuery::create()
-                        ->filterByPrimaryKeys($this->adminsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->adminsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleAdmin !== null) {
-                if (!$this->singleAdmin->isDeleted()) {
-                        $affectedRows += $this->singleAdmin->save($con);
-                }
-            }
-
-            if ($this->groupsScheduledForDeletion !== null) {
-                if (!$this->groupsScheduledForDeletion->isEmpty()) {
-                    GroupQuery::create()
-                        ->filterByPrimaryKeys($this->groupsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->groupsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleGroup !== null) {
-                if (!$this->singleGroup->isDeleted()) {
-                        $affectedRows += $this->singleGroup->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -756,22 +743,28 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aGroup !== null) {
+                if (!$this->aGroup->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aGroup->getValidationFailures());
+                }
+            }
+
+            if ($this->aAdmin !== null) {
+                if (!$this->aAdmin->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aAdmin->getValidationFailures());
+                }
+            }
+
+
             if (($retval = AdminGroupPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleAdmin !== null) {
-                    if (!$this->singleAdmin->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleAdmin->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleGroup !== null) {
-                    if (!$this->singleGroup->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleGroup->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -859,11 +852,11 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleAdmin) {
-                $result['Admin'] = $this->singleAdmin->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aGroup) {
+                $result['Group'] = $this->aGroup->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleGroup) {
-                $result['Group'] = $this->singleGroup->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aAdmin) {
+                $result['Admin'] = $this->aAdmin->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1034,16 +1027,6 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getAdmin();
-            if ($relObj) {
-                $copyObj->setAdmin($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getGroup();
-            if ($relObj) {
-                $copyObj->setGroup($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1094,89 +1077,106 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Group object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Admin object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Admin
-     * @throws PropelException
-     */
-    public function getAdmin(PropelPDO $con = null)
-    {
-
-        if ($this->singleAdmin === null && !$this->isNew()) {
-            $this->singleAdmin = AdminQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleAdmin;
-    }
-
-    /**
-     * Sets a single Admin object as related to this object by a one-to-one relationship.
-     *
-     * @param             Admin $v Admin
-     * @return AdminGroup The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setAdmin(Admin $v = null)
-    {
-        $this->singleAdmin = $v;
-
-        // Make sure that that the passed-in Admin isn't already associated with this object
-        if ($v !== null && $v->getAdminGroup() === null) {
-            $v->setAdminGroup($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Group object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Group
-     * @throws PropelException
-     */
-    public function getGroup(PropelPDO $con = null)
-    {
-
-        if ($this->singleGroup === null && !$this->isNew()) {
-            $this->singleGroup = GroupQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleGroup;
-    }
-
-    /**
-     * Sets a single Group object as related to this object by a one-to-one relationship.
-     *
-     * @param             Group $v Group
+     * @param             Group $v
      * @return AdminGroup The current object (for fluent API support)
      * @throws PropelException
      */
     public function setGroup(Group $v = null)
     {
-        $this->singleGroup = $v;
-
-        // Make sure that that the passed-in Group isn't already associated with this object
-        if ($v !== null && $v->getAdminGroup() === null) {
-            $v->setAdminGroup($this);
+        if ($v === null) {
+            $this->setGroupId(NULL);
+        } else {
+            $this->setGroupId($v->getId());
         }
 
+        $this->aGroup = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Group object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAdminGroup($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Group object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Group The associated Group object.
+     * @throws PropelException
+     */
+    public function getGroup(PropelPDO $con = null)
+    {
+        if ($this->aGroup === null && ($this->group_id !== null)) {
+            $this->aGroup = GroupQuery::create()->findPk($this->group_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aGroup->addAdminGroups($this);
+             */
+        }
+
+        return $this->aGroup;
+    }
+
+    /**
+     * Declares an association between this object and a Admin object.
+     *
+     * @param             Admin $v
+     * @return AdminGroup The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setAdmin(Admin $v = null)
+    {
+        if ($v === null) {
+            $this->setAdminId(NULL);
+        } else {
+            $this->setAdminId($v->getId());
+        }
+
+        $this->aAdmin = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Admin object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAdminGroup($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Admin object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Admin The associated Admin object.
+     * @throws PropelException
+     */
+    public function getAdmin(PropelPDO $con = null)
+    {
+        if ($this->aAdmin === null && ($this->admin_id !== null)) {
+            $this->aAdmin = AdminQuery::create()->findPk($this->admin_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aAdmin->addAdminGroups($this);
+             */
+        }
+
+        return $this->aAdmin;
     }
 
     /**
@@ -1209,22 +1209,10 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleAdmin) {
-                $this->singleAdmin->clearAllReferences($deep);
-            }
-            if ($this->singleGroup) {
-                $this->singleGroup->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleAdmin instanceof PropelCollection) {
-            $this->singleAdmin->clearIterator();
-        }
-        $this->singleAdmin = null;
-        if ($this->singleGroup instanceof PropelCollection) {
-            $this->singleGroup->clearIterator();
-        }
-        $this->singleGroup = null;
+        $this->aGroup = null;
+        $this->aAdmin = null;
     }
 
     /**

@@ -42,8 +42,7 @@ class AreaTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'country', 'AREA_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'delivzone', 'AREA_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('NAME', 'Name', 'VARCHAR', true, 100, null);
         $this->addColumn('UNIT', 'Unit', 'FLOAT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -56,8 +55,8 @@ class AreaTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Country', 'Thelia\\Model\\Country', RelationMap::MANY_TO_ONE, array('id' => 'area_id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('Delivzone', 'Thelia\\Model\\Delivzone', RelationMap::MANY_TO_ONE, array('id' => 'area_id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Country', 'Thelia\\Model\\Country', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'SET NULL', null, 'Countrys');
+        $this->addRelation('Delivzone', 'Thelia\\Model\\Delivzone', RelationMap::ONE_TO_MANY, array('id' => 'area_id', ), 'SET NULL', null, 'Delivzones');
     } // buildRelations()
 
 } // AreaTableMap

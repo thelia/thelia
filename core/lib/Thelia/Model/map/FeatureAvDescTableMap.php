@@ -43,7 +43,7 @@ class FeatureAvDescTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('FEATURE_AV_ID', 'FeatureAvId', 'INTEGER', true, null, null);
+        $this->addForeignKey('FEATURE_AV_ID', 'FeatureAvId', 'INTEGER', 'feature_av', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
         $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', true, null, null);
@@ -56,7 +56,7 @@ class FeatureAvDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FeatureAv', 'Thelia\\Model\\FeatureAv', RelationMap::ONE_TO_ONE, array('feature_av_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('FeatureAv', 'Thelia\\Model\\FeatureAv', RelationMap::MANY_TO_ONE, array('feature_av_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // FeatureAvDescTableMap

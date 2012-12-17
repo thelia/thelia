@@ -43,8 +43,8 @@ class GroupModuleTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('GROUP_ID', 'GroupId', 'INTEGER', true, null, null);
-        $this->addColumn('MODULE_ID', 'ModuleId', 'INTEGER', false, null, null);
+        $this->addForeignKey('GROUP_ID', 'GroupId', 'INTEGER', 'group', 'ID', true, null, null);
+        $this->addForeignKey('MODULE_ID', 'ModuleId', 'INTEGER', 'module', 'ID', false, null, null);
         $this->addColumn('ACCESS', 'Access', 'TINYINT', false, null, 0);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
@@ -56,8 +56,8 @@ class GroupModuleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::ONE_TO_ONE, array('group_id' => 'id', ), 'CASCADE', 'CASCADE');
-        $this->addRelation('Module', 'Thelia\\Model\\Module', RelationMap::ONE_TO_ONE, array('module_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::MANY_TO_ONE, array('group_id' => 'id', ), 'CASCADE', 'CASCADE');
+        $this->addRelation('Module', 'Thelia\\Model\\Module', RelationMap::MANY_TO_ONE, array('module_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
 } // GroupModuleTableMap

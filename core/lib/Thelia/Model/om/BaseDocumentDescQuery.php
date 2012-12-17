@@ -80,7 +80,7 @@ abstract class BaseDocumentDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\DocumentDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\DocumentDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -282,6 +282,8 @@ abstract class BaseDocumentDescQuery extends ModelCriteria
      * $query->filterByDocumentId(array(12, 34)); // WHERE document_id IN (12, 34)
      * $query->filterByDocumentId(array('min' => 12)); // WHERE document_id > 12
      * </code>
+     *
+     * @see       filterByDocument()
      *
      * @param     mixed $documentId The value to use as filter.
      *              Use scalar values for equality.
@@ -519,7 +521,7 @@ abstract class BaseDocumentDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Document object
      *
-     * @param   Document|PropelObjectCollection $document  the related object to use as filter
+     * @param   Document|PropelObjectCollection $document The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   DocumentDescQuery The current query, for fluid interface
@@ -531,10 +533,12 @@ abstract class BaseDocumentDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(DocumentDescPeer::DOCUMENT_ID, $document->getId(), $comparison);
         } elseif ($document instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useDocumentQuery()
-                ->filterByPrimaryKeys($document->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(DocumentDescPeer::DOCUMENT_ID, $document->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
         }

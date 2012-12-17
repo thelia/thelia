@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Address;
 use Thelia\Model\AddressPeer;
@@ -148,14 +146,14 @@ abstract class BaseAddress extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Customer one-to-one related Customer object
+     * @var        Customer
      */
-    protected $singleCustomer;
+    protected $aCustomer;
 
     /**
-     * @var        CustomerTitle one-to-one related CustomerTitle object
+     * @var        CustomerTitle
      */
-    protected $singleCustomerTitle;
+    protected $aCustomerTitle;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -170,18 +168,6 @@ abstract class BaseAddress extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $customersScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $customerTitlesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -456,6 +442,10 @@ abstract class BaseAddress extends BaseObject implements Persistent
             $this->modifiedColumns[] = AddressPeer::CUSTOMER_ID;
         }
 
+        if ($this->aCustomer !== null && $this->aCustomer->getId() !== $v) {
+            $this->aCustomer = null;
+        }
+
 
         return $this;
     } // setCustomerId()
@@ -475,6 +465,10 @@ abstract class BaseAddress extends BaseObject implements Persistent
         if ($this->customer_title_id !== $v) {
             $this->customer_title_id = $v;
             $this->modifiedColumns[] = AddressPeer::CUSTOMER_TITLE_ID;
+        }
+
+        if ($this->aCustomerTitle !== null && $this->aCustomerTitle->getId() !== $v) {
+            $this->aCustomerTitle = null;
         }
 
 
@@ -816,6 +810,12 @@ abstract class BaseAddress extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aCustomer !== null && $this->customer_id !== $this->aCustomer->getId()) {
+            $this->aCustomer = null;
+        }
+        if ($this->aCustomerTitle !== null && $this->customer_title_id !== $this->aCustomerTitle->getId()) {
+            $this->aCustomerTitle = null;
+        }
     } // ensureConsistency
 
     /**
@@ -855,10 +855,8 @@ abstract class BaseAddress extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCustomer = null;
-
-            $this->singleCustomerTitle = null;
-
+            $this->aCustomer = null;
+            $this->aCustomerTitle = null;
         } // if (deep)
     }
 
@@ -972,6 +970,25 @@ abstract class BaseAddress extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomer !== null) {
+                if ($this->aCustomer->isModified() || $this->aCustomer->isNew()) {
+                    $affectedRows += $this->aCustomer->save($con);
+                }
+                $this->setCustomer($this->aCustomer);
+            }
+
+            if ($this->aCustomerTitle !== null) {
+                if ($this->aCustomerTitle->isModified() || $this->aCustomerTitle->isNew()) {
+                    $affectedRows += $this->aCustomerTitle->save($con);
+                }
+                $this->setCustomerTitle($this->aCustomerTitle);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -981,36 +998,6 @@ abstract class BaseAddress extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->customersScheduledForDeletion !== null) {
-                if (!$this->customersScheduledForDeletion->isEmpty()) {
-                    CustomerQuery::create()
-                        ->filterByPrimaryKeys($this->customersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->customersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCustomer !== null) {
-                if (!$this->singleCustomer->isDeleted()) {
-                        $affectedRows += $this->singleCustomer->save($con);
-                }
-            }
-
-            if ($this->customerTitlesScheduledForDeletion !== null) {
-                if (!$this->customerTitlesScheduledForDeletion->isEmpty()) {
-                    CustomerTitleQuery::create()
-                        ->filterByPrimaryKeys($this->customerTitlesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->customerTitlesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCustomerTitle !== null) {
-                if (!$this->singleCustomerTitle->isDeleted()) {
-                        $affectedRows += $this->singleCustomerTitle->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -1240,22 +1227,28 @@ abstract class BaseAddress extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomer !== null) {
+                if (!$this->aCustomer->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCustomer->getValidationFailures());
+                }
+            }
+
+            if ($this->aCustomerTitle !== null) {
+                if (!$this->aCustomerTitle->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCustomerTitle->getValidationFailures());
+                }
+            }
+
+
             if (($retval = AddressPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCustomer !== null) {
-                    if (!$this->singleCustomer->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCustomer->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleCustomerTitle !== null) {
-                    if (!$this->singleCustomerTitle->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCustomerTitle->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -1387,11 +1380,11 @@ abstract class BaseAddress extends BaseObject implements Persistent
             $keys[15] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCustomer) {
-                $result['Customer'] = $this->singleCustomer->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCustomer) {
+                $result['Customer'] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCustomerTitle) {
-                $result['CustomerTitle'] = $this->singleCustomerTitle->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCustomerTitle) {
+                $result['CustomerTitle'] = $this->aCustomerTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1628,16 +1621,6 @@ abstract class BaseAddress extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCustomer();
-            if ($relObj) {
-                $copyObj->setCustomer($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getCustomerTitle();
-            if ($relObj) {
-                $copyObj->setCustomerTitle($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1688,89 +1671,106 @@ abstract class BaseAddress extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Customer object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Customer object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Customer
-     * @throws PropelException
-     */
-    public function getCustomer(PropelPDO $con = null)
-    {
-
-        if ($this->singleCustomer === null && !$this->isNew()) {
-            $this->singleCustomer = CustomerQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCustomer;
-    }
-
-    /**
-     * Sets a single Customer object as related to this object by a one-to-one relationship.
-     *
-     * @param             Customer $v Customer
+     * @param             Customer $v
      * @return Address The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCustomer(Customer $v = null)
     {
-        $this->singleCustomer = $v;
-
-        // Make sure that that the passed-in Customer isn't already associated with this object
-        if ($v !== null && $v->getAddress() === null) {
-            $v->setAddress($this);
+        if ($v === null) {
+            $this->setCustomerId(NULL);
+        } else {
+            $this->setCustomerId($v->getId());
         }
+
+        $this->aCustomer = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Customer object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAddress($this);
+        }
+
 
         return $this;
     }
 
+
     /**
-     * Gets a single CustomerTitle object, which is related to this object by a one-to-one relationship.
+     * Get the associated Customer object
      *
-     * @param PropelPDO $con optional connection object
-     * @return CustomerTitle
+     * @param PropelPDO $con Optional Connection object.
+     * @return Customer The associated Customer object.
      * @throws PropelException
      */
-    public function getCustomerTitle(PropelPDO $con = null)
+    public function getCustomer(PropelPDO $con = null)
     {
-
-        if ($this->singleCustomerTitle === null && !$this->isNew()) {
-            $this->singleCustomerTitle = CustomerTitleQuery::create()->findPk($this->getPrimaryKey(), $con);
+        if ($this->aCustomer === null && ($this->customer_id !== null)) {
+            $this->aCustomer = CustomerQuery::create()->findPk($this->customer_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomer->addAddresss($this);
+             */
         }
 
-        return $this->singleCustomerTitle;
+        return $this->aCustomer;
     }
 
     /**
-     * Sets a single CustomerTitle object as related to this object by a one-to-one relationship.
+     * Declares an association between this object and a CustomerTitle object.
      *
-     * @param             CustomerTitle $v CustomerTitle
+     * @param             CustomerTitle $v
      * @return Address The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCustomerTitle(CustomerTitle $v = null)
     {
-        $this->singleCustomerTitle = $v;
-
-        // Make sure that that the passed-in CustomerTitle isn't already associated with this object
-        if ($v !== null && $v->getAddress() === null) {
-            $v->setAddress($this);
+        if ($v === null) {
+            $this->setCustomerTitleId(NULL);
+        } else {
+            $this->setCustomerTitleId($v->getId());
         }
 
+        $this->aCustomerTitle = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the CustomerTitle object, it will not be re-added.
+        if ($v !== null) {
+            $v->addAddress($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated CustomerTitle object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return CustomerTitle The associated CustomerTitle object.
+     * @throws PropelException
+     */
+    public function getCustomerTitle(PropelPDO $con = null)
+    {
+        if ($this->aCustomerTitle === null && ($this->customer_title_id !== null)) {
+            $this->aCustomerTitle = CustomerTitleQuery::create()->findPk($this->customer_title_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerTitle->addAddresss($this);
+             */
+        }
+
+        return $this->aCustomerTitle;
     }
 
     /**
@@ -1814,22 +1814,10 @@ abstract class BaseAddress extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCustomer) {
-                $this->singleCustomer->clearAllReferences($deep);
-            }
-            if ($this->singleCustomerTitle) {
-                $this->singleCustomerTitle->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCustomer instanceof PropelCollection) {
-            $this->singleCustomer->clearIterator();
-        }
-        $this->singleCustomer = null;
-        if ($this->singleCustomerTitle instanceof PropelCollection) {
-            $this->singleCustomerTitle->clearIterator();
-        }
-        $this->singleCustomerTitle = null;
+        $this->aCustomer = null;
+        $this->aCustomerTitle = null;
     }
 
     /**

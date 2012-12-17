@@ -76,7 +76,7 @@ abstract class BaseImageDescQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\ImageDesc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\ImageDesc', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -278,6 +278,8 @@ abstract class BaseImageDescQuery extends ModelCriteria
      * $query->filterByImageId(array(12, 34)); // WHERE image_id IN (12, 34)
      * $query->filterByImageId(array('min' => 12)); // WHERE image_id > 12
      * </code>
+     *
+     * @see       filterByImage()
      *
      * @param     mixed $imageId The value to use as filter.
      *              Use scalar values for equality.
@@ -486,7 +488,7 @@ abstract class BaseImageDescQuery extends ModelCriteria
     /**
      * Filter the query by a related Image object
      *
-     * @param   Image|PropelObjectCollection $image  the related object to use as filter
+     * @param   Image|PropelObjectCollection $image The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ImageDescQuery The current query, for fluid interface
@@ -498,10 +500,12 @@ abstract class BaseImageDescQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ImageDescPeer::IMAGE_ID, $image->getId(), $comparison);
         } elseif ($image instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
             return $this
-                ->useImageQuery()
-                ->filterByPrimaryKeys($image->getPrimaryKeys())
-                ->endUse();
+                ->addUsingAlias(ImageDescPeer::IMAGE_ID, $image->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByImage() only accepts arguments of type Image or PropelCollection');
         }
@@ -515,7 +519,7 @@ abstract class BaseImageDescQuery extends ModelCriteria
      *
      * @return ImageDescQuery The current query, for fluid interface
      */
-    public function joinImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinImage($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Image');
@@ -550,7 +554,7 @@ abstract class BaseImageDescQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ImageQuery A secondary query class using the current class as primary query
      */
-    public function useImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useImageQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinImage($relationAlias, $joinType)

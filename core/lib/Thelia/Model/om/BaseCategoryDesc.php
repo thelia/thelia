@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryDesc;
@@ -104,9 +102,9 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Category one-to-one related Category object
+     * @var        Category
      */
-    protected $singleCategory;
+    protected $aCategory;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,12 +119,6 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $categorysScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -308,6 +300,10 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
         if ($this->category_id !== $v) {
             $this->category_id = $v;
             $this->modifiedColumns[] = CategoryDescPeer::CATEGORY_ID;
+        }
+
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
         }
 
 
@@ -537,6 +533,9 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
+        }
     } // ensureConsistency
 
     /**
@@ -576,8 +575,7 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCategory = null;
-
+            $this->aCategory = null;
         } // if (deep)
     }
 
@@ -691,6 +689,18 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
+                }
+                $this->setCategory($this->aCategory);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -700,21 +710,6 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->categorysScheduledForDeletion !== null) {
-                if (!$this->categorysScheduledForDeletion->isEmpty()) {
-                    CategoryQuery::create()
-                        ->filterByPrimaryKeys($this->categorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->categorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCategory !== null) {
-                if (!$this->singleCategory->isDeleted()) {
-                        $affectedRows += $this->singleCategory->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -902,16 +897,22 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
+                }
+            }
+
+
             if (($retval = CategoryDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCategory !== null) {
-                    if (!$this->singleCategory->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCategory->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -1015,8 +1016,8 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
             $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCategory) {
-                $result['Category'] = $this->singleCategory->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1211,11 +1212,6 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCategory();
-            if ($relObj) {
-                $copyObj->setCategory($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1266,53 +1262,55 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Category object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Category object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Category
-     * @throws PropelException
-     */
-    public function getCategory(PropelPDO $con = null)
-    {
-
-        if ($this->singleCategory === null && !$this->isNew()) {
-            $this->singleCategory = CategoryQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCategory;
-    }
-
-    /**
-     * Sets a single Category object as related to this object by a one-to-one relationship.
-     *
-     * @param             Category $v Category
+     * @param             Category $v
      * @return CategoryDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCategory(Category $v = null)
     {
-        $this->singleCategory = $v;
-
-        // Make sure that that the passed-in Category isn't already associated with this object
-        if ($v !== null && $v->getCategoryDesc() === null) {
-            $v->setCategoryDesc($this);
+        if ($v === null) {
+            $this->setCategoryId(NULL);
+        } else {
+            $this->setCategoryId($v->getId());
         }
 
+        $this->aCategory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Category object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCategoryDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Category object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Category The associated Category object.
+     * @throws PropelException
+     */
+    public function getCategory(PropelPDO $con = null)
+    {
+        if ($this->aCategory === null && ($this->category_id !== null)) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategory->addCategoryDescs($this);
+             */
+        }
+
+        return $this->aCategory;
     }
 
     /**
@@ -1349,15 +1347,9 @@ abstract class BaseCategoryDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCategory) {
-                $this->singleCategory->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCategory instanceof PropelCollection) {
-            $this->singleCategory->clearIterator();
-        }
-        $this->singleCategory = null;
+        $this->aCategory = null;
     }
 
     /**

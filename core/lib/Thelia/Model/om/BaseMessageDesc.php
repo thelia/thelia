@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Message;
 use Thelia\Model\MessageDesc;
@@ -98,9 +96,9 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Message one-to-one related Message object
+     * @var        Message
      */
-    protected $singleMessage;
+    protected $aMessage;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,12 +113,6 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $messagesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -265,6 +257,10 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
         if ($this->message_id !== $v) {
             $this->message_id = $v;
             $this->modifiedColumns[] = MessageDescPeer::MESSAGE_ID;
+        }
+
+        if ($this->aMessage !== null && $this->aMessage->getId() !== $v) {
+            $this->aMessage = null;
         }
 
 
@@ -470,6 +466,9 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aMessage !== null && $this->message_id !== $this->aMessage->getId()) {
+            $this->aMessage = null;
+        }
     } // ensureConsistency
 
     /**
@@ -509,8 +508,7 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleMessage = null;
-
+            $this->aMessage = null;
         } // if (deep)
     }
 
@@ -624,6 +622,18 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aMessage !== null) {
+                if ($this->aMessage->isModified() || $this->aMessage->isNew()) {
+                    $affectedRows += $this->aMessage->save($con);
+                }
+                $this->setMessage($this->aMessage);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -633,21 +643,6 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->messagesScheduledForDeletion !== null) {
-                if (!$this->messagesScheduledForDeletion->isEmpty()) {
-                    MessageQuery::create()
-                        ->filterByPrimaryKeys($this->messagesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->messagesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleMessage !== null) {
-                if (!$this->singleMessage->isDeleted()) {
-                        $affectedRows += $this->singleMessage->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -829,16 +824,22 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aMessage !== null) {
+                if (!$this->aMessage->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aMessage->getValidationFailures());
+                }
+            }
+
+
             if (($retval = MessageDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleMessage !== null) {
-                    if (!$this->singleMessage->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleMessage->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -938,8 +939,8 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleMessage) {
-                $result['Message'] = $this->singleMessage->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aMessage) {
+                $result['Message'] = $this->aMessage->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1128,11 +1129,6 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getMessage();
-            if ($relObj) {
-                $copyObj->setMessage($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1183,53 +1179,55 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Message object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Message object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Message
-     * @throws PropelException
-     */
-    public function getMessage(PropelPDO $con = null)
-    {
-
-        if ($this->singleMessage === null && !$this->isNew()) {
-            $this->singleMessage = MessageQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleMessage;
-    }
-
-    /**
-     * Sets a single Message object as related to this object by a one-to-one relationship.
-     *
-     * @param             Message $v Message
+     * @param             Message $v
      * @return MessageDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setMessage(Message $v = null)
     {
-        $this->singleMessage = $v;
-
-        // Make sure that that the passed-in Message isn't already associated with this object
-        if ($v !== null && $v->getMessageDesc() === null) {
-            $v->setMessageDesc($this);
+        if ($v === null) {
+            $this->setMessageId(NULL);
+        } else {
+            $this->setMessageId($v->getId());
         }
 
+        $this->aMessage = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Message object, it will not be re-added.
+        if ($v !== null) {
+            $v->addMessageDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Message object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Message The associated Message object.
+     * @throws PropelException
+     */
+    public function getMessage(PropelPDO $con = null)
+    {
+        if ($this->aMessage === null && ($this->message_id !== null)) {
+            $this->aMessage = MessageQuery::create()->findPk($this->message_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aMessage->addMessageDescs($this);
+             */
+        }
+
+        return $this->aMessage;
     }
 
     /**
@@ -1265,15 +1263,9 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleMessage) {
-                $this->singleMessage->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleMessage instanceof PropelCollection) {
-            $this->singleMessage->clearIterator();
-        }
-        $this->singleMessage = null;
+        $this->aMessage = null;
     }
 
     /**

@@ -9,9 +9,7 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryQuery;
@@ -62,14 +60,14 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
     protected $category_id;
 
     /**
-     * @var        Category one-to-one related Category object
+     * @var        Product
      */
-    protected $singleCategory;
+    protected $aProduct;
 
     /**
-     * @var        Product one-to-one related Product object
+     * @var        Category
      */
-    protected $singleProduct;
+    protected $aCategory;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -84,18 +82,6 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $categorysScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $productsScheduledForDeletion = null;
 
     /**
      * Get the [product_id] column value.
@@ -134,6 +120,10 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
             $this->modifiedColumns[] = ProductCategoryPeer::PRODUCT_ID;
         }
 
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
+        }
+
 
         return $this;
     } // setProductId()
@@ -153,6 +143,10 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
         if ($this->category_id !== $v) {
             $this->category_id = $v;
             $this->modifiedColumns[] = ProductCategoryPeer::CATEGORY_ID;
+        }
+
+        if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
+            $this->aCategory = null;
         }
 
 
@@ -224,6 +218,12 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
+        }
+        if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
+            $this->aCategory = null;
+        }
     } // ensureConsistency
 
     /**
@@ -263,10 +263,8 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleCategory = null;
-
-            $this->singleProduct = null;
-
+            $this->aProduct = null;
+            $this->aCategory = null;
         } // if (deep)
     }
 
@@ -380,6 +378,25 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
+                }
+                $this->setProduct($this->aProduct);
+            }
+
+            if ($this->aCategory !== null) {
+                if ($this->aCategory->isModified() || $this->aCategory->isNew()) {
+                    $affectedRows += $this->aCategory->save($con);
+                }
+                $this->setCategory($this->aCategory);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -389,36 +406,6 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->categorysScheduledForDeletion !== null) {
-                if (!$this->categorysScheduledForDeletion->isEmpty()) {
-                    CategoryQuery::create()
-                        ->filterByPrimaryKeys($this->categorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->categorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleCategory !== null) {
-                if (!$this->singleCategory->isDeleted()) {
-                        $affectedRows += $this->singleCategory->save($con);
-                }
-            }
-
-            if ($this->productsScheduledForDeletion !== null) {
-                if (!$this->productsScheduledForDeletion->isEmpty()) {
-                    ProductQuery::create()
-                        ->filterByPrimaryKeys($this->productsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleProduct !== null) {
-                if (!$this->singleProduct->isDeleted()) {
-                        $affectedRows += $this->singleProduct->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -553,22 +540,28 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProduct !== null) {
+                if (!$this->aProduct->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
+                }
+            }
+
+            if ($this->aCategory !== null) {
+                if (!$this->aCategory->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCategory->getValidationFailures());
+                }
+            }
+
+
             if (($retval = ProductCategoryPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleCategory !== null) {
-                    if (!$this->singleCategory->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCategory->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleProduct !== null) {
-                    if (!$this->singleProduct->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleProduct->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -644,11 +637,11 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
             $keys[1] => $this->getCategoryId(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleCategory) {
-                $result['Category'] = $this->singleCategory->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleProduct) {
-                $result['Product'] = $this->singleProduct->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aCategory) {
+                $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -809,16 +802,6 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCategory();
-            if ($relObj) {
-                $copyObj->setCategory($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getProduct();
-            if ($relObj) {
-                $copyObj->setProduct($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -868,89 +851,106 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Product object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Category object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Category
-     * @throws PropelException
-     */
-    public function getCategory(PropelPDO $con = null)
-    {
-
-        if ($this->singleCategory === null && !$this->isNew()) {
-            $this->singleCategory = CategoryQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCategory;
-    }
-
-    /**
-     * Sets a single Category object as related to this object by a one-to-one relationship.
-     *
-     * @param             Category $v Category
-     * @return ProductCategory The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCategory(Category $v = null)
-    {
-        $this->singleCategory = $v;
-
-        // Make sure that that the passed-in Category isn't already associated with this object
-        if ($v !== null && $v->getProductCategory() === null) {
-            $v->setProductCategory($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single Product object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Product
-     * @throws PropelException
-     */
-    public function getProduct(PropelPDO $con = null)
-    {
-
-        if ($this->singleProduct === null && !$this->isNew()) {
-            $this->singleProduct = ProductQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleProduct;
-    }
-
-    /**
-     * Sets a single Product object as related to this object by a one-to-one relationship.
-     *
-     * @param             Product $v Product
+     * @param             Product $v
      * @return ProductCategory The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(Product $v = null)
     {
-        $this->singleProduct = $v;
-
-        // Make sure that that the passed-in Product isn't already associated with this object
-        if ($v !== null && $v->getProductCategory() === null) {
-            $v->setProductCategory($this);
+        if ($v === null) {
+            $this->setProductId(NULL);
+        } else {
+            $this->setProductId($v->getId());
         }
 
+        $this->aProduct = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Product object, it will not be re-added.
+        if ($v !== null) {
+            $v->addProductCategory($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Product object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Product The associated Product object.
+     * @throws PropelException
+     */
+    public function getProduct(PropelPDO $con = null)
+    {
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProduct->addProductCategorys($this);
+             */
+        }
+
+        return $this->aProduct;
+    }
+
+    /**
+     * Declares an association between this object and a Category object.
+     *
+     * @param             Category $v
+     * @return ProductCategory The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCategory(Category $v = null)
+    {
+        if ($v === null) {
+            $this->setCategoryId(NULL);
+        } else {
+            $this->setCategoryId($v->getId());
+        }
+
+        $this->aCategory = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Category object, it will not be re-added.
+        if ($v !== null) {
+            $v->addProductCategory($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated Category object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Category The associated Category object.
+     * @throws PropelException
+     */
+    public function getCategory(PropelPDO $con = null)
+    {
+        if ($this->aCategory === null && ($this->category_id !== null)) {
+            $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCategory->addProductCategorys($this);
+             */
+        }
+
+        return $this->aCategory;
     }
 
     /**
@@ -980,22 +980,10 @@ abstract class BaseProductCategory extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCategory) {
-                $this->singleCategory->clearAllReferences($deep);
-            }
-            if ($this->singleProduct) {
-                $this->singleProduct->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleCategory instanceof PropelCollection) {
-            $this->singleCategory->clearIterator();
-        }
-        $this->singleCategory = null;
-        if ($this->singleProduct instanceof PropelCollection) {
-            $this->singleProduct->clearIterator();
-        }
-        $this->singleProduct = null;
+        $this->aProduct = null;
+        $this->aCategory = null;
     }
 
     /**

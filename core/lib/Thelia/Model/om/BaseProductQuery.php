@@ -65,13 +65,17 @@ use Thelia\Model\TaxRule;
  * @method ProductQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ProductQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ProductQuery leftJoinAccessory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Accessory relation
- * @method ProductQuery rightJoinAccessory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Accessory relation
- * @method ProductQuery innerJoinAccessory($relationAlias = null) Adds a INNER JOIN clause to the query using the Accessory relation
+ * @method ProductQuery leftJoinTaxRule($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRule relation
+ * @method ProductQuery rightJoinTaxRule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRule relation
+ * @method ProductQuery innerJoinTaxRule($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRule relation
  *
- * @method ProductQuery leftJoinAccessory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Accessory relation
- * @method ProductQuery rightJoinAccessory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Accessory relation
- * @method ProductQuery innerJoinAccessory($relationAlias = null) Adds a INNER JOIN clause to the query using the Accessory relation
+ * @method ProductQuery leftJoinAccessoryRelatedByProductId($relationAlias = null) Adds a LEFT JOIN clause to the query using the AccessoryRelatedByProductId relation
+ * @method ProductQuery rightJoinAccessoryRelatedByProductId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AccessoryRelatedByProductId relation
+ * @method ProductQuery innerJoinAccessoryRelatedByProductId($relationAlias = null) Adds a INNER JOIN clause to the query using the AccessoryRelatedByProductId relation
+ *
+ * @method ProductQuery leftJoinAccessoryRelatedByAccessory($relationAlias = null) Adds a LEFT JOIN clause to the query using the AccessoryRelatedByAccessory relation
+ * @method ProductQuery rightJoinAccessoryRelatedByAccessory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AccessoryRelatedByAccessory relation
+ * @method ProductQuery innerJoinAccessoryRelatedByAccessory($relationAlias = null) Adds a INNER JOIN clause to the query using the AccessoryRelatedByAccessory relation
  *
  * @method ProductQuery leftJoinContentAssoc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentAssoc relation
  * @method ProductQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
@@ -104,10 +108,6 @@ use Thelia\Model\TaxRule;
  * @method ProductQuery leftJoinStock($relationAlias = null) Adds a LEFT JOIN clause to the query using the Stock relation
  * @method ProductQuery rightJoinStock($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Stock relation
  * @method ProductQuery innerJoinStock($relationAlias = null) Adds a INNER JOIN clause to the query using the Stock relation
- *
- * @method ProductQuery leftJoinTaxRule($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRule relation
- * @method ProductQuery rightJoinTaxRule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRule relation
- * @method ProductQuery innerJoinTaxRule($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRule relation
  *
  * @method Product findOne(PropelPDO $con = null) Return the first Product matching the query
  * @method Product findOneOrCreate(PropelPDO $con = null) Return the first Product matching the query, or a new Product object populated from the query conditions when no match is found
@@ -153,7 +153,7 @@ abstract class BaseProductQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\Product', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\Product', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -329,26 +329,6 @@ abstract class BaseProductQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByAccessory()
-     *
-     * @see       filterByAccessory()
-     *
-     * @see       filterByContentAssoc()
-     *
-     * @see       filterByDocument()
-     *
-     * @see       filterByFeatureProd()
-     *
-     * @see       filterByImage()
-     *
-     * @see       filterByProductCategory()
-     *
-     * @see       filterByProductDesc()
-     *
-     * @see       filterByRewriting()
-     *
-     * @see       filterByStock()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -375,6 +355,8 @@ abstract class BaseProductQuery extends ModelCriteria
      * $query->filterByTaxRuleId(array(12, 34)); // WHERE tax_rule_id IN (12, 34)
      * $query->filterByTaxRuleId(array('min' => 12)); // WHERE tax_rule_id > 12
      * </code>
+     *
+     * @see       filterByTaxRule()
      *
      * @param     mixed $taxRuleId The value to use as filter.
      *              Use scalar values for equality.
@@ -892,43 +874,117 @@ abstract class BaseProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Accessory object
+     * Filter the query by a related TaxRule object
      *
-     * @param   Accessory|PropelObjectCollection $accessory The related object(s) to use as filter
+     * @param   TaxRule|PropelObjectCollection $taxRule The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByAccessory($accessory, $comparison = null)
+    public function filterByTaxRule($taxRule, $comparison = null)
+    {
+        if ($taxRule instanceof TaxRule) {
+            return $this
+                ->addUsingAlias(ProductPeer::TAX_RULE_ID, $taxRule->getId(), $comparison);
+        } elseif ($taxRule instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(ProductPeer::TAX_RULE_ID, $taxRule->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByTaxRule() only accepts arguments of type TaxRule or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TaxRule relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ProductQuery The current query, for fluid interface
+     */
+    public function joinTaxRule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TaxRule');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TaxRule');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TaxRule relation TaxRule object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
+     */
+    public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinTaxRule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TaxRule', '\Thelia\Model\TaxRuleQuery');
+    }
+
+    /**
+     * Filter the query by a related Accessory object
+     *
+     * @param   Accessory|PropelObjectCollection $accessory  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ProductQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByAccessoryRelatedByProductId($accessory, $comparison = null)
     {
         if ($accessory instanceof Accessory) {
             return $this
                 ->addUsingAlias(ProductPeer::ID, $accessory->getProductId(), $comparison);
         } elseif ($accessory instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $accessory->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useAccessoryRelatedByProductIdQuery()
+                ->filterByPrimaryKeys($accessory->getPrimaryKeys())
+                ->endUse();
         } else {
-            throw new PropelException('filterByAccessory() only accepts arguments of type Accessory or PropelCollection');
+            throw new PropelException('filterByAccessoryRelatedByProductId() only accepts arguments of type Accessory or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Accessory relation
+     * Adds a JOIN clause to the query using the AccessoryRelatedByProductId relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ProductQuery The current query, for fluid interface
      */
-    public function joinAccessory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAccessoryRelatedByProductId($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Accessory');
+        $relationMap = $tableMap->getRelation('AccessoryRelatedByProductId');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -943,14 +999,14 @@ abstract class BaseProductQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Accessory');
+            $this->addJoinObject($join, 'AccessoryRelatedByProductId');
         }
 
         return $this;
     }
 
     /**
-     * Use the Accessory relation Accessory object
+     * Use the AccessoryRelatedByProductId relation Accessory object
      *
      * @see       useQuery()
      *
@@ -960,51 +1016,49 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AccessoryQuery A secondary query class using the current class as primary query
      */
-    public function useAccessoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAccessoryRelatedByProductIdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinAccessory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Accessory', '\Thelia\Model\AccessoryQuery');
+            ->joinAccessoryRelatedByProductId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AccessoryRelatedByProductId', '\Thelia\Model\AccessoryQuery');
     }
 
     /**
      * Filter the query by a related Accessory object
      *
-     * @param   Accessory|PropelObjectCollection $accessory The related object(s) to use as filter
+     * @param   Accessory|PropelObjectCollection $accessory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByAccessory($accessory, $comparison = null)
+    public function filterByAccessoryRelatedByAccessory($accessory, $comparison = null)
     {
         if ($accessory instanceof Accessory) {
             return $this
                 ->addUsingAlias(ProductPeer::ID, $accessory->getAccessory(), $comparison);
         } elseif ($accessory instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $accessory->toKeyValue('PrimaryKey', 'Accessory'), $comparison);
+                ->useAccessoryRelatedByAccessoryQuery()
+                ->filterByPrimaryKeys($accessory->getPrimaryKeys())
+                ->endUse();
         } else {
-            throw new PropelException('filterByAccessory() only accepts arguments of type Accessory or PropelCollection');
+            throw new PropelException('filterByAccessoryRelatedByAccessory() only accepts arguments of type Accessory or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Accessory relation
+     * Adds a JOIN clause to the query using the AccessoryRelatedByAccessory relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ProductQuery The current query, for fluid interface
      */
-    public function joinAccessory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAccessoryRelatedByAccessory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Accessory');
+        $relationMap = $tableMap->getRelation('AccessoryRelatedByAccessory');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1019,14 +1073,14 @@ abstract class BaseProductQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Accessory');
+            $this->addJoinObject($join, 'AccessoryRelatedByAccessory');
         }
 
         return $this;
     }
 
     /**
-     * Use the Accessory relation Accessory object
+     * Use the AccessoryRelatedByAccessory relation Accessory object
      *
      * @see       useQuery()
      *
@@ -1036,17 +1090,17 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AccessoryQuery A secondary query class using the current class as primary query
      */
-    public function useAccessoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAccessoryRelatedByAccessoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinAccessory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Accessory', '\Thelia\Model\AccessoryQuery');
+            ->joinAccessoryRelatedByAccessory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AccessoryRelatedByAccessory', '\Thelia\Model\AccessoryQuery');
     }
 
     /**
      * Filter the query by a related ContentAssoc object
      *
-     * @param   ContentAssoc|PropelObjectCollection $contentAssoc The related object(s) to use as filter
+     * @param   ContentAssoc|PropelObjectCollection $contentAssoc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1058,12 +1112,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $contentAssoc->getProductId(), $comparison);
         } elseif ($contentAssoc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $contentAssoc->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useContentAssocQuery()
+                ->filterByPrimaryKeys($contentAssoc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByContentAssoc() only accepts arguments of type ContentAssoc or PropelCollection');
         }
@@ -1077,7 +1129,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return ProductQuery The current query, for fluid interface
      */
-    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('ContentAssoc');
@@ -1112,7 +1164,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ContentAssocQuery A secondary query class using the current class as primary query
      */
-    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinContentAssoc($relationAlias, $joinType)
@@ -1122,7 +1174,7 @@ abstract class BaseProductQuery extends ModelCriteria
     /**
      * Filter the query by a related Document object
      *
-     * @param   Document|PropelObjectCollection $document The related object(s) to use as filter
+     * @param   Document|PropelObjectCollection $document  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1134,12 +1186,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $document->getProductId(), $comparison);
         } elseif ($document instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $document->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useDocumentQuery()
+                ->filterByPrimaryKeys($document->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
         }
@@ -1153,7 +1203,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return ProductQuery The current query, for fluid interface
      */
-    public function joinDocument($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Document');
@@ -1188,7 +1238,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
      */
-    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinDocument($relationAlias, $joinType)
@@ -1198,7 +1248,7 @@ abstract class BaseProductQuery extends ModelCriteria
     /**
      * Filter the query by a related FeatureProd object
      *
-     * @param   FeatureProd|PropelObjectCollection $featureProd The related object(s) to use as filter
+     * @param   FeatureProd|PropelObjectCollection $featureProd  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1210,12 +1260,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $featureProd->getProductId(), $comparison);
         } elseif ($featureProd instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $featureProd->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useFeatureProdQuery()
+                ->filterByPrimaryKeys($featureProd->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByFeatureProd() only accepts arguments of type FeatureProd or PropelCollection');
         }
@@ -1274,7 +1322,7 @@ abstract class BaseProductQuery extends ModelCriteria
     /**
      * Filter the query by a related Image object
      *
-     * @param   Image|PropelObjectCollection $image The related object(s) to use as filter
+     * @param   Image|PropelObjectCollection $image  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1286,12 +1334,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $image->getProductId(), $comparison);
         } elseif ($image instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $image->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useImageQuery()
+                ->filterByPrimaryKeys($image->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByImage() only accepts arguments of type Image or PropelCollection');
         }
@@ -1305,7 +1351,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return ProductQuery The current query, for fluid interface
      */
-    public function joinImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinImage($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Image');
@@ -1340,7 +1386,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ImageQuery A secondary query class using the current class as primary query
      */
-    public function useImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useImageQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinImage($relationAlias, $joinType)
@@ -1350,7 +1396,7 @@ abstract class BaseProductQuery extends ModelCriteria
     /**
      * Filter the query by a related ProductCategory object
      *
-     * @param   ProductCategory|PropelObjectCollection $productCategory The related object(s) to use as filter
+     * @param   ProductCategory|PropelObjectCollection $productCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1362,12 +1408,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $productCategory->getProductId(), $comparison);
         } elseif ($productCategory instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $productCategory->toKeyValue('ProductId', 'ProductId'), $comparison);
+                ->useProductCategoryQuery()
+                ->filterByPrimaryKeys($productCategory->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByProductCategory() only accepts arguments of type ProductCategory or PropelCollection');
         }
@@ -1426,7 +1470,7 @@ abstract class BaseProductQuery extends ModelCriteria
     /**
      * Filter the query by a related ProductDesc object
      *
-     * @param   ProductDesc|PropelObjectCollection $productDesc The related object(s) to use as filter
+     * @param   ProductDesc|PropelObjectCollection $productDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1438,12 +1482,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $productDesc->getProductId(), $comparison);
         } elseif ($productDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $productDesc->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useProductDescQuery()
+                ->filterByPrimaryKeys($productDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByProductDesc() only accepts arguments of type ProductDesc or PropelCollection');
         }
@@ -1502,7 +1544,7 @@ abstract class BaseProductQuery extends ModelCriteria
     /**
      * Filter the query by a related Rewriting object
      *
-     * @param   Rewriting|PropelObjectCollection $rewriting The related object(s) to use as filter
+     * @param   Rewriting|PropelObjectCollection $rewriting  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1514,12 +1556,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $rewriting->getProductId(), $comparison);
         } elseif ($rewriting instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $rewriting->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useRewritingQuery()
+                ->filterByPrimaryKeys($rewriting->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByRewriting() only accepts arguments of type Rewriting or PropelCollection');
         }
@@ -1533,7 +1573,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return ProductQuery The current query, for fluid interface
      */
-    public function joinRewriting($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinRewriting($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Rewriting');
@@ -1568,7 +1608,7 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\RewritingQuery A secondary query class using the current class as primary query
      */
-    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useRewritingQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinRewriting($relationAlias, $joinType)
@@ -1578,7 +1618,7 @@ abstract class BaseProductQuery extends ModelCriteria
     /**
      * Filter the query by a related Stock object
      *
-     * @param   Stock|PropelObjectCollection $stock The related object(s) to use as filter
+     * @param   Stock|PropelObjectCollection $stock  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ProductQuery The current query, for fluid interface
@@ -1590,12 +1630,10 @@ abstract class BaseProductQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(ProductPeer::ID, $stock->getProductId(), $comparison);
         } elseif ($stock instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(ProductPeer::ID, $stock->toKeyValue('PrimaryKey', 'ProductId'), $comparison);
+                ->useStockQuery()
+                ->filterByPrimaryKeys($stock->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByStock() only accepts arguments of type Stock or PropelCollection');
         }
@@ -1649,80 +1687,6 @@ abstract class BaseProductQuery extends ModelCriteria
         return $this
             ->joinStock($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Stock', '\Thelia\Model\StockQuery');
-    }
-
-    /**
-     * Filter the query by a related TaxRule object
-     *
-     * @param   TaxRule|PropelObjectCollection $taxRule  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   ProductQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByTaxRule($taxRule, $comparison = null)
-    {
-        if ($taxRule instanceof TaxRule) {
-            return $this
-                ->addUsingAlias(ProductPeer::TAX_RULE_ID, $taxRule->getId(), $comparison);
-        } elseif ($taxRule instanceof PropelObjectCollection) {
-            return $this
-                ->useTaxRuleQuery()
-                ->filterByPrimaryKeys($taxRule->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByTaxRule() only accepts arguments of type TaxRule or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the TaxRule relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ProductQuery The current query, for fluid interface
-     */
-    public function joinTaxRule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('TaxRule');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'TaxRule');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the TaxRule relation TaxRule object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\TaxRuleQuery A secondary query class using the current class as primary query
-     */
-    public function useTaxRuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinTaxRule($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'TaxRule', '\Thelia\Model\TaxRuleQuery');
     }
 
     /**

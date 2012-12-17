@@ -78,19 +78,21 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        FeatureAvDesc
+     * @var        Feature
      */
-    protected $aFeatureAvDesc;
+    protected $aFeature;
 
     /**
-     * @var        FeatureProd
+     * @var        PropelObjectCollection|FeatureAvDesc[] Collection to store aggregation of FeatureAvDesc objects.
      */
-    protected $aFeatureProd;
+    protected $collFeatureAvDescs;
+    protected $collFeatureAvDescsPartial;
 
     /**
-     * @var        Feature one-to-one related Feature object
+     * @var        PropelObjectCollection|FeatureProd[] Collection to store aggregation of FeatureProd objects.
      */
-    protected $singleFeature;
+    protected $collFeatureProds;
+    protected $collFeatureProdsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -110,7 +112,13 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $featuresScheduledForDeletion = null;
+    protected $featureAvDescsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $featureProdsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -223,14 +231,6 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $this->modifiedColumns[] = FeatureAvPeer::ID;
         }
 
-        if ($this->aFeatureAvDesc !== null && $this->aFeatureAvDesc->getFeatureAvId() !== $v) {
-            $this->aFeatureAvDesc = null;
-        }
-
-        if ($this->aFeatureProd !== null && $this->aFeatureProd->getFeatureAvId() !== $v) {
-            $this->aFeatureProd = null;
-        }
-
 
         return $this;
     } // setId()
@@ -250,6 +250,10 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
         if ($this->feature_id !== $v) {
             $this->feature_id = $v;
             $this->modifiedColumns[] = FeatureAvPeer::FEATURE_ID;
+        }
+
+        if ($this->aFeature !== null && $this->aFeature->getId() !== $v) {
+            $this->aFeature = null;
         }
 
 
@@ -369,11 +373,8 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aFeatureAvDesc !== null && $this->id !== $this->aFeatureAvDesc->getFeatureAvId()) {
-            $this->aFeatureAvDesc = null;
-        }
-        if ($this->aFeatureProd !== null && $this->id !== $this->aFeatureProd->getFeatureAvId()) {
-            $this->aFeatureProd = null;
+        if ($this->aFeature !== null && $this->feature_id !== $this->aFeature->getId()) {
+            $this->aFeature = null;
         }
     } // ensureConsistency
 
@@ -414,9 +415,10 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aFeatureAvDesc = null;
-            $this->aFeatureProd = null;
-            $this->singleFeature = null;
+            $this->aFeature = null;
+            $this->collFeatureAvDescs = null;
+
+            $this->collFeatureProds = null;
 
         } // if (deep)
     }
@@ -536,18 +538,11 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aFeatureAvDesc !== null) {
-                if ($this->aFeatureAvDesc->isModified() || $this->aFeatureAvDesc->isNew()) {
-                    $affectedRows += $this->aFeatureAvDesc->save($con);
+            if ($this->aFeature !== null) {
+                if ($this->aFeature->isModified() || $this->aFeature->isNew()) {
+                    $affectedRows += $this->aFeature->save($con);
                 }
-                $this->setFeatureAvDesc($this->aFeatureAvDesc);
-            }
-
-            if ($this->aFeatureProd !== null) {
-                if ($this->aFeatureProd->isModified() || $this->aFeatureProd->isNew()) {
-                    $affectedRows += $this->aFeatureProd->save($con);
-                }
-                $this->setFeatureProd($this->aFeatureProd);
+                $this->setFeature($this->aFeature);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -561,18 +556,38 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->featuresScheduledForDeletion !== null) {
-                if (!$this->featuresScheduledForDeletion->isEmpty()) {
-                    FeatureQuery::create()
-                        ->filterByPrimaryKeys($this->featuresScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->featureAvDescsScheduledForDeletion !== null) {
+                if (!$this->featureAvDescsScheduledForDeletion->isEmpty()) {
+                    FeatureAvDescQuery::create()
+                        ->filterByPrimaryKeys($this->featureAvDescsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->featuresScheduledForDeletion = null;
+                    $this->featureAvDescsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->singleFeature !== null) {
-                if (!$this->singleFeature->isDeleted()) {
-                        $affectedRows += $this->singleFeature->save($con);
+            if ($this->collFeatureAvDescs !== null) {
+                foreach ($this->collFeatureAvDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->featureProdsScheduledForDeletion !== null) {
+                if (!$this->featureProdsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->featureProdsScheduledForDeletion as $featureProd) {
+                        // need to save related object because we set the relation to null
+                        $featureProd->save($con);
+                    }
+                    $this->featureProdsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFeatureProds !== null) {
+                foreach ($this->collFeatureProds as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
                 }
             }
 
@@ -736,15 +751,9 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aFeatureAvDesc !== null) {
-                if (!$this->aFeatureAvDesc->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aFeatureAvDesc->getValidationFailures());
-                }
-            }
-
-            if ($this->aFeatureProd !== null) {
-                if (!$this->aFeatureProd->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aFeatureProd->getValidationFailures());
+            if ($this->aFeature !== null) {
+                if (!$this->aFeature->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFeature->getValidationFailures());
                 }
             }
 
@@ -754,9 +763,19 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             }
 
 
-                if ($this->singleFeature !== null) {
-                    if (!$this->singleFeature->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFeature->getValidationFailures());
+                if ($this->collFeatureAvDescs !== null) {
+                    foreach ($this->collFeatureAvDescs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collFeatureProds !== null) {
+                    foreach ($this->collFeatureProds as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
                     }
                 }
 
@@ -842,14 +861,14 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aFeatureAvDesc) {
-                $result['FeatureAvDesc'] = $this->aFeatureAvDesc->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aFeature) {
+                $result['Feature'] = $this->aFeature->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aFeatureProd) {
-                $result['FeatureProd'] = $this->aFeatureProd->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->collFeatureAvDescs) {
+                $result['FeatureAvDescs'] = $this->collFeatureAvDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->singleFeature) {
-                $result['Feature'] = $this->singleFeature->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->collFeatureProds) {
+                $result['FeatureProds'] = $this->collFeatureProds->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1014,19 +1033,16 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getFeature();
-            if ($relObj) {
-                $copyObj->setFeature($relObj->copy($deepCopy));
+            foreach ($this->getFeatureAvDescs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFeatureAvDesc($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getFeatureAvDesc();
-            if ($relObj) {
-                $copyObj->setFeatureAvDesc($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getFeatureProd();
-            if ($relObj) {
-                $copyObj->setFeatureProd($relObj->copy($deepCopy));
+            foreach ($this->getFeatureProds() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFeatureProd($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -1080,25 +1096,26 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a FeatureAvDesc object.
+     * Declares an association between this object and a Feature object.
      *
-     * @param             FeatureAvDesc $v
+     * @param             Feature $v
      * @return FeatureAv The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setFeatureAvDesc(FeatureAvDesc $v = null)
+    public function setFeature(Feature $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setFeatureId(NULL);
         } else {
-            $this->setId($v->getFeatureAvId());
+            $this->setFeatureId($v->getId());
         }
 
-        $this->aFeatureAvDesc = $v;
+        $this->aFeature = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Feature object, it will not be re-added.
         if ($v !== null) {
-            $v->setFeatureAv($this);
+            $v->addFeatureAv($this);
         }
 
 
@@ -1107,70 +1124,26 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated FeatureAvDesc object
+     * Get the associated Feature object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return FeatureAvDesc The associated FeatureAvDesc object.
+     * @return Feature The associated Feature object.
      * @throws PropelException
      */
-    public function getFeatureAvDesc(PropelPDO $con = null)
+    public function getFeature(PropelPDO $con = null)
     {
-        if ($this->aFeatureAvDesc === null && ($this->id !== null)) {
-            $this->aFeatureAvDesc = FeatureAvDescQuery::create()
-                ->filterByFeatureAv($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aFeatureAvDesc->setFeatureAv($this);
+        if ($this->aFeature === null && ($this->feature_id !== null)) {
+            $this->aFeature = FeatureQuery::create()->findPk($this->feature_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFeature->addFeatureAvs($this);
+             */
         }
 
-        return $this->aFeatureAvDesc;
-    }
-
-    /**
-     * Declares an association between this object and a FeatureProd object.
-     *
-     * @param             FeatureProd $v
-     * @return FeatureAv The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setFeatureProd(FeatureProd $v = null)
-    {
-        if ($v === null) {
-            $this->setId(NULL);
-        } else {
-            $this->setId($v->getFeatureAvId());
-        }
-
-        $this->aFeatureProd = $v;
-
-        // Add binding for other direction of this 1:1 relationship.
-        if ($v !== null) {
-            $v->setFeatureAv($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated FeatureProd object
-     *
-     * @param PropelPDO $con Optional Connection object.
-     * @return FeatureProd The associated FeatureProd object.
-     * @throws PropelException
-     */
-    public function getFeatureProd(PropelPDO $con = null)
-    {
-        if ($this->aFeatureProd === null && ($this->id !== null)) {
-            $this->aFeatureProd = FeatureProdQuery::create()
-                ->filterByFeatureAv($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aFeatureProd->setFeatureAv($this);
-        }
-
-        return $this->aFeatureProd;
+        return $this->aFeature;
     }
 
 
@@ -1184,42 +1157,476 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('FeatureAvDesc' == $relationName) {
+            $this->initFeatureAvDescs();
+        }
+        if ('FeatureProd' == $relationName) {
+            $this->initFeatureProds();
+        }
     }
 
     /**
-     * Gets a single Feature object, which is related to this object by a one-to-one relationship.
+     * Clears out the collFeatureAvDescs collection
      *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFeatureAvDescs()
+     */
+    public function clearFeatureAvDescs()
+    {
+        $this->collFeatureAvDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collFeatureAvDescsPartial = null;
+    }
+
+    /**
+     * reset is the collFeatureAvDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeatureAvDescs($v = true)
+    {
+        $this->collFeatureAvDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeatureAvDescs collection.
+     *
+     * By default this just sets the collFeatureAvDescs collection to an empty array (like clearcollFeatureAvDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeatureAvDescs($overrideExisting = true)
+    {
+        if (null !== $this->collFeatureAvDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collFeatureAvDescs = new PropelObjectCollection();
+        $this->collFeatureAvDescs->setModel('FeatureAvDesc');
+    }
+
+    /**
+     * Gets an array of FeatureAvDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this FeatureAv is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return Feature
+     * @return PropelObjectCollection|FeatureAvDesc[] List of FeatureAvDesc objects
      * @throws PropelException
      */
-    public function getFeature(PropelPDO $con = null)
+    public function getFeatureAvDescs($criteria = null, PropelPDO $con = null)
     {
+        $partial = $this->collFeatureAvDescsPartial && !$this->isNew();
+        if (null === $this->collFeatureAvDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeatureAvDescs) {
+                // return empty collection
+                $this->initFeatureAvDescs();
+            } else {
+                $collFeatureAvDescs = FeatureAvDescQuery::create(null, $criteria)
+                    ->filterByFeatureAv($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeatureAvDescsPartial && count($collFeatureAvDescs)) {
+                      $this->initFeatureAvDescs(false);
 
-        if ($this->singleFeature === null && !$this->isNew()) {
-            $this->singleFeature = FeatureQuery::create()->findPk($this->getPrimaryKey(), $con);
+                      foreach($collFeatureAvDescs as $obj) {
+                        if (false == $this->collFeatureAvDescs->contains($obj)) {
+                          $this->collFeatureAvDescs->append($obj);
+                        }
+                      }
+
+                      $this->collFeatureAvDescsPartial = true;
+                    }
+
+                    return $collFeatureAvDescs;
+                }
+
+                if($partial && $this->collFeatureAvDescs) {
+                    foreach($this->collFeatureAvDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collFeatureAvDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeatureAvDescs = $collFeatureAvDescs;
+                $this->collFeatureAvDescsPartial = false;
+            }
         }
 
-        return $this->singleFeature;
+        return $this->collFeatureAvDescs;
     }
 
     /**
-     * Sets a single Feature object as related to this object by a one-to-one relationship.
+     * Sets a collection of FeatureAvDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
      *
-     * @param             Feature $v Feature
-     * @return FeatureAv The current object (for fluent API support)
+     * @param PropelCollection $featureAvDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setFeatureAvDescs(PropelCollection $featureAvDescs, PropelPDO $con = null)
+    {
+        $this->featureAvDescsScheduledForDeletion = $this->getFeatureAvDescs(new Criteria(), $con)->diff($featureAvDescs);
+
+        foreach ($this->featureAvDescsScheduledForDeletion as $featureAvDescRemoved) {
+            $featureAvDescRemoved->setFeatureAv(null);
+        }
+
+        $this->collFeatureAvDescs = null;
+        foreach ($featureAvDescs as $featureAvDesc) {
+            $this->addFeatureAvDesc($featureAvDesc);
+        }
+
+        $this->collFeatureAvDescs = $featureAvDescs;
+        $this->collFeatureAvDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related FeatureAvDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeatureAvDesc objects.
      * @throws PropelException
      */
-    public function setFeature(Feature $v = null)
+    public function countFeatureAvDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $this->singleFeature = $v;
+        $partial = $this->collFeatureAvDescsPartial && !$this->isNew();
+        if (null === $this->collFeatureAvDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeatureAvDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getFeatureAvDescs());
+                }
+                $query = FeatureAvDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
 
-        // Make sure that that the passed-in Feature isn't already associated with this object
-        if ($v !== null && $v->getFeatureAv() === null) {
-            $v->setFeatureAv($this);
+                return $query
+                    ->filterByFeatureAv($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFeatureAvDescs);
+        }
+    }
+
+    /**
+     * Method called to associate a FeatureAvDesc object to this object
+     * through the FeatureAvDesc foreign key attribute.
+     *
+     * @param    FeatureAvDesc $l FeatureAvDesc
+     * @return FeatureAv The current object (for fluent API support)
+     */
+    public function addFeatureAvDesc(FeatureAvDesc $l)
+    {
+        if ($this->collFeatureAvDescs === null) {
+            $this->initFeatureAvDescs();
+            $this->collFeatureAvDescsPartial = true;
+        }
+        if (!$this->collFeatureAvDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddFeatureAvDesc($l);
         }
 
         return $this;
+    }
+
+    /**
+     * @param	FeatureAvDesc $featureAvDesc The featureAvDesc object to add.
+     */
+    protected function doAddFeatureAvDesc($featureAvDesc)
+    {
+        $this->collFeatureAvDescs[]= $featureAvDesc;
+        $featureAvDesc->setFeatureAv($this);
+    }
+
+    /**
+     * @param	FeatureAvDesc $featureAvDesc The featureAvDesc object to remove.
+     */
+    public function removeFeatureAvDesc($featureAvDesc)
+    {
+        if ($this->getFeatureAvDescs()->contains($featureAvDesc)) {
+            $this->collFeatureAvDescs->remove($this->collFeatureAvDescs->search($featureAvDesc));
+            if (null === $this->featureAvDescsScheduledForDeletion) {
+                $this->featureAvDescsScheduledForDeletion = clone $this->collFeatureAvDescs;
+                $this->featureAvDescsScheduledForDeletion->clear();
+            }
+            $this->featureAvDescsScheduledForDeletion[]= $featureAvDesc;
+            $featureAvDesc->setFeatureAv(null);
+        }
+    }
+
+    /**
+     * Clears out the collFeatureProds collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFeatureProds()
+     */
+    public function clearFeatureProds()
+    {
+        $this->collFeatureProds = null; // important to set this to null since that means it is uninitialized
+        $this->collFeatureProdsPartial = null;
+    }
+
+    /**
+     * reset is the collFeatureProds collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeatureProds($v = true)
+    {
+        $this->collFeatureProdsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeatureProds collection.
+     *
+     * By default this just sets the collFeatureProds collection to an empty array (like clearcollFeatureProds());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeatureProds($overrideExisting = true)
+    {
+        if (null !== $this->collFeatureProds && !$overrideExisting) {
+            return;
+        }
+        $this->collFeatureProds = new PropelObjectCollection();
+        $this->collFeatureProds->setModel('FeatureProd');
+    }
+
+    /**
+     * Gets an array of FeatureProd objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this FeatureAv is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
+     * @throws PropelException
+     */
+    public function getFeatureProds($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFeatureProdsPartial && !$this->isNew();
+        if (null === $this->collFeatureProds || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProds) {
+                // return empty collection
+                $this->initFeatureProds();
+            } else {
+                $collFeatureProds = FeatureProdQuery::create(null, $criteria)
+                    ->filterByFeatureAv($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeatureProdsPartial && count($collFeatureProds)) {
+                      $this->initFeatureProds(false);
+
+                      foreach($collFeatureProds as $obj) {
+                        if (false == $this->collFeatureProds->contains($obj)) {
+                          $this->collFeatureProds->append($obj);
+                        }
+                      }
+
+                      $this->collFeatureProdsPartial = true;
+                    }
+
+                    return $collFeatureProds;
+                }
+
+                if($partial && $this->collFeatureProds) {
+                    foreach($this->collFeatureProds as $obj) {
+                        if($obj->isNew()) {
+                            $collFeatureProds[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeatureProds = $collFeatureProds;
+                $this->collFeatureProdsPartial = false;
+            }
+        }
+
+        return $this->collFeatureProds;
+    }
+
+    /**
+     * Sets a collection of FeatureProd objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $featureProds A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setFeatureProds(PropelCollection $featureProds, PropelPDO $con = null)
+    {
+        $this->featureProdsScheduledForDeletion = $this->getFeatureProds(new Criteria(), $con)->diff($featureProds);
+
+        foreach ($this->featureProdsScheduledForDeletion as $featureProdRemoved) {
+            $featureProdRemoved->setFeatureAv(null);
+        }
+
+        $this->collFeatureProds = null;
+        foreach ($featureProds as $featureProd) {
+            $this->addFeatureProd($featureProd);
+        }
+
+        $this->collFeatureProds = $featureProds;
+        $this->collFeatureProdsPartial = false;
+    }
+
+    /**
+     * Returns the number of related FeatureProd objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeatureProd objects.
+     * @throws PropelException
+     */
+    public function countFeatureProds(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFeatureProdsPartial && !$this->isNew();
+        if (null === $this->collFeatureProds || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProds) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getFeatureProds());
+                }
+                $query = FeatureProdQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByFeatureAv($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFeatureProds);
+        }
+    }
+
+    /**
+     * Method called to associate a FeatureProd object to this object
+     * through the FeatureProd foreign key attribute.
+     *
+     * @param    FeatureProd $l FeatureProd
+     * @return FeatureAv The current object (for fluent API support)
+     */
+    public function addFeatureProd(FeatureProd $l)
+    {
+        if ($this->collFeatureProds === null) {
+            $this->initFeatureProds();
+            $this->collFeatureProdsPartial = true;
+        }
+        if (!$this->collFeatureProds->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddFeatureProd($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FeatureProd $featureProd The featureProd object to add.
+     */
+    protected function doAddFeatureProd($featureProd)
+    {
+        $this->collFeatureProds[]= $featureProd;
+        $featureProd->setFeatureAv($this);
+    }
+
+    /**
+     * @param	FeatureProd $featureProd The featureProd object to remove.
+     */
+    public function removeFeatureProd($featureProd)
+    {
+        if ($this->getFeatureProds()->contains($featureProd)) {
+            $this->collFeatureProds->remove($this->collFeatureProds->search($featureProd));
+            if (null === $this->featureProdsScheduledForDeletion) {
+                $this->featureProdsScheduledForDeletion = clone $this->collFeatureProds;
+                $this->featureProdsScheduledForDeletion->clear();
+            }
+            $this->featureProdsScheduledForDeletion[]= $featureProd;
+            $featureProd->setFeatureAv(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this FeatureAv is new, it will return
+     * an empty collection; or if this FeatureAv has previously
+     * been saved, it will retrieve related FeatureProds from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in FeatureAv.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
+     */
+    public function getFeatureProdsJoinFeature($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeatureProdQuery::create(null, $criteria);
+        $query->joinWith('Feature', $join_behavior);
+
+        return $this->getFeatureProds($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this FeatureAv is new, it will return
+     * an empty collection; or if this FeatureAv has previously
+     * been saved, it will retrieve related FeatureProds from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in FeatureAv.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
+     */
+    public function getFeatureProdsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeatureProdQuery::create(null, $criteria);
+        $query->joinWith('Product', $join_behavior);
+
+        return $this->getFeatureProds($query, $con);
     }
 
     /**
@@ -1251,17 +1658,27 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleFeature) {
-                $this->singleFeature->clearAllReferences($deep);
+            if ($this->collFeatureAvDescs) {
+                foreach ($this->collFeatureAvDescs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFeatureProds) {
+                foreach ($this->collFeatureProds as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
         } // if ($deep)
 
-        if ($this->singleFeature instanceof PropelCollection) {
-            $this->singleFeature->clearIterator();
+        if ($this->collFeatureAvDescs instanceof PropelCollection) {
+            $this->collFeatureAvDescs->clearIterator();
         }
-        $this->singleFeature = null;
-        $this->aFeatureAvDesc = null;
-        $this->aFeatureProd = null;
+        $this->collFeatureAvDescs = null;
+        if ($this->collFeatureProds instanceof PropelCollection) {
+            $this->collFeatureProds->clearIterator();
+        }
+        $this->collFeatureProds = null;
+        $this->aFeature = null;
     }
 
     /**

@@ -10,10 +10,8 @@ use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
-use \PropelCollection;
 use \PropelDateTime;
 use \PropelException;
-use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureDesc;
@@ -98,9 +96,9 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        Feature one-to-one related Feature object
+     * @var        Feature
      */
-    protected $singleFeature;
+    protected $aFeature;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,12 +113,6 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $featuresScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -292,6 +284,10 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
         if ($this->feature_id !== $v) {
             $this->feature_id = $v;
             $this->modifiedColumns[] = FeatureDescPeer::FEATURE_ID;
+        }
+
+        if ($this->aFeature !== null && $this->aFeature->getId() !== $v) {
+            $this->aFeature = null;
         }
 
 
@@ -499,6 +495,9 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
+        if ($this->aFeature !== null && $this->feature_id !== $this->aFeature->getId()) {
+            $this->aFeature = null;
+        }
     } // ensureConsistency
 
     /**
@@ -538,8 +537,7 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->singleFeature = null;
-
+            $this->aFeature = null;
         } // if (deep)
     }
 
@@ -653,6 +651,18 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aFeature !== null) {
+                if ($this->aFeature->isModified() || $this->aFeature->isNew()) {
+                    $affectedRows += $this->aFeature->save($con);
+                }
+                $this->setFeature($this->aFeature);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -662,21 +672,6 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->featuresScheduledForDeletion !== null) {
-                if (!$this->featuresScheduledForDeletion->isEmpty()) {
-                    FeatureQuery::create()
-                        ->filterByPrimaryKeys($this->featuresScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->featuresScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleFeature !== null) {
-                if (!$this->singleFeature->isDeleted()) {
-                        $affectedRows += $this->singleFeature->save($con);
-                }
             }
 
             $this->alreadyInSave = false;
@@ -858,16 +853,22 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
             $failureMap = array();
 
 
+            // We call the validate method on the following object(s) if they
+            // were passed to this object by their coresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aFeature !== null) {
+                if (!$this->aFeature->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFeature->getValidationFailures());
+                }
+            }
+
+
             if (($retval = FeatureDescPeer::doValidate($this, $columns)) !== true) {
                 $failureMap = array_merge($failureMap, $retval);
             }
 
-
-                if ($this->singleFeature !== null) {
-                    if (!$this->singleFeature->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleFeature->getValidationFailures());
-                    }
-                }
 
 
             $this->alreadyInValidation = false;
@@ -967,8 +968,8 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->singleFeature) {
-                $result['Feature'] = $this->singleFeature->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aFeature) {
+                $result['Feature'] = $this->aFeature->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1157,11 +1158,6 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getFeature();
-            if ($relObj) {
-                $copyObj->setFeature($relObj->copy($deepCopy));
-            }
-
             //unflag object copy
             $this->startCopy = false;
         } // if ($deepCopy)
@@ -1212,53 +1208,55 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
         return self::$peer;
     }
 
-
     /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
+     * Declares an association between this object and a Feature object.
      *
-     * @param string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-    }
-
-    /**
-     * Gets a single Feature object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Feature
-     * @throws PropelException
-     */
-    public function getFeature(PropelPDO $con = null)
-    {
-
-        if ($this->singleFeature === null && !$this->isNew()) {
-            $this->singleFeature = FeatureQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleFeature;
-    }
-
-    /**
-     * Sets a single Feature object as related to this object by a one-to-one relationship.
-     *
-     * @param             Feature $v Feature
+     * @param             Feature $v
      * @return FeatureDesc The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFeature(Feature $v = null)
     {
-        $this->singleFeature = $v;
-
-        // Make sure that that the passed-in Feature isn't already associated with this object
-        if ($v !== null && $v->getFeatureDesc() === null) {
-            $v->setFeatureDesc($this);
+        if ($v === null) {
+            $this->setFeatureId(NULL);
+        } else {
+            $this->setFeatureId($v->getId());
         }
 
+        $this->aFeature = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Feature object, it will not be re-added.
+        if ($v !== null) {
+            $v->addFeatureDesc($this);
+        }
+
+
         return $this;
+    }
+
+
+    /**
+     * Get the associated Feature object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return Feature The associated Feature object.
+     * @throws PropelException
+     */
+    public function getFeature(PropelPDO $con = null)
+    {
+        if ($this->aFeature === null && ($this->feature_id !== null)) {
+            $this->aFeature = FeatureQuery::create()->findPk($this->feature_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aFeature->addFeatureDescs($this);
+             */
+        }
+
+        return $this->aFeature;
     }
 
     /**
@@ -1294,15 +1292,9 @@ abstract class BaseFeatureDesc extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleFeature) {
-                $this->singleFeature->clearAllReferences($deep);
-            }
         } // if ($deep)
 
-        if ($this->singleFeature instanceof PropelCollection) {
-            $this->singleFeature->clearIterator();
-        }
-        $this->singleFeature = null;
+        $this->aFeature = null;
     }
 
     /**

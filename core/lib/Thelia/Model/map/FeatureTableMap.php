@@ -42,10 +42,7 @@ class FeatureTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_av', 'FEATURE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_category', 'FEATURE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_desc', 'FEATURE_ID', true, null, null);
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'feature_prod', 'FEATURE_ID', true, null, null);
+        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('VISIBLE', 'Visible', 'INTEGER', false, null, 0);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
@@ -58,10 +55,10 @@ class FeatureTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FeatureAv', 'Thelia\\Model\\FeatureAv', RelationMap::MANY_TO_ONE, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FeatureCategory', 'Thelia\\Model\\FeatureCategory', RelationMap::MANY_TO_ONE, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FeatureDesc', 'Thelia\\Model\\FeatureDesc', RelationMap::MANY_TO_ONE, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::MANY_TO_ONE, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('FeatureAv', 'Thelia\\Model\\FeatureAv', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', null, 'FeatureAvs');
+        $this->addRelation('FeatureCategory', 'Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', null, 'FeatureCategorys');
+        $this->addRelation('FeatureDesc', 'Thelia\\Model\\FeatureDesc', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', null, 'FeatureDescs');
+        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', null, 'FeatureProds');
     } // buildRelations()
 
 } // FeatureTableMap

@@ -168,39 +168,41 @@ abstract class BaseOrder extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        CouponOrder
+     * @var        Currency
      */
-    protected $aCouponOrder;
+    protected $aCurrency;
 
     /**
-     * @var        OrderProduct
+     * @var        Customer
      */
-    protected $aOrderProduct;
+    protected $aCustomer;
 
     /**
-     * @var        Currency one-to-one related Currency object
+     * @var        OrderAddress
      */
-    protected $singleCurrency;
+    protected $aOrderAddressRelatedByAddressInvoice;
 
     /**
-     * @var        Customer one-to-one related Customer object
+     * @var        OrderAddress
      */
-    protected $singleCustomer;
+    protected $aOrderAddressRelatedByAddressDelivery;
 
     /**
-     * @var        OrderAddress one-to-one related OrderAddress object
+     * @var        OrderStatus
      */
-    protected $singleOrderAddress;
+    protected $aOrderStatus;
 
     /**
-     * @var        OrderAddress one-to-one related OrderAddress object
+     * @var        PropelObjectCollection|CouponOrder[] Collection to store aggregation of CouponOrder objects.
      */
-    protected $singleOrderAddress;
+    protected $collCouponOrders;
+    protected $collCouponOrdersPartial;
 
     /**
-     * @var        OrderStatus one-to-one related OrderStatus object
+     * @var        PropelObjectCollection|OrderProduct[] Collection to store aggregation of OrderProduct objects.
      */
-    protected $singleOrderStatus;
+    protected $collOrderProducts;
+    protected $collOrderProductsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -220,31 +222,13 @@ abstract class BaseOrder extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $currencysScheduledForDeletion = null;
+    protected $couponOrdersScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $customersScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $orderAddresssScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $orderAddresssScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $orderStatussScheduledForDeletion = null;
+    protected $orderProductsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -524,14 +508,6 @@ abstract class BaseOrder extends BaseObject implements Persistent
             $this->modifiedColumns[] = OrderPeer::ID;
         }
 
-        if ($this->aCouponOrder !== null && $this->aCouponOrder->getOrderId() !== $v) {
-            $this->aCouponOrder = null;
-        }
-
-        if ($this->aOrderProduct !== null && $this->aOrderProduct->getOrderId() !== $v) {
-            $this->aOrderProduct = null;
-        }
-
 
         return $this;
     } // setId()
@@ -574,6 +550,10 @@ abstract class BaseOrder extends BaseObject implements Persistent
             $this->modifiedColumns[] = OrderPeer::CUSTOMER_ID;
         }
 
+        if ($this->aCustomer !== null && $this->aCustomer->getId() !== $v) {
+            $this->aCustomer = null;
+        }
+
 
         return $this;
     } // setCustomerId()
@@ -595,6 +575,10 @@ abstract class BaseOrder extends BaseObject implements Persistent
             $this->modifiedColumns[] = OrderPeer::ADDRESS_INVOICE;
         }
 
+        if ($this->aOrderAddressRelatedByAddressInvoice !== null && $this->aOrderAddressRelatedByAddressInvoice->getId() !== $v) {
+            $this->aOrderAddressRelatedByAddressInvoice = null;
+        }
+
 
         return $this;
     } // setAddressInvoice()
@@ -614,6 +598,10 @@ abstract class BaseOrder extends BaseObject implements Persistent
         if ($this->address_delivery !== $v) {
             $this->address_delivery = $v;
             $this->modifiedColumns[] = OrderPeer::ADDRESS_DELIVERY;
+        }
+
+        if ($this->aOrderAddressRelatedByAddressDelivery !== null && $this->aOrderAddressRelatedByAddressDelivery->getId() !== $v) {
+            $this->aOrderAddressRelatedByAddressDelivery = null;
         }
 
 
@@ -658,6 +646,10 @@ abstract class BaseOrder extends BaseObject implements Persistent
         if ($this->currency_id !== $v) {
             $this->currency_id = $v;
             $this->modifiedColumns[] = OrderPeer::CURRENCY_ID;
+        }
+
+        if ($this->aCurrency !== null && $this->aCurrency->getId() !== $v) {
+            $this->aCurrency = null;
         }
 
 
@@ -828,6 +820,10 @@ abstract class BaseOrder extends BaseObject implements Persistent
             $this->modifiedColumns[] = OrderPeer::STATUS_ID;
         }
 
+        if ($this->aOrderStatus !== null && $this->aOrderStatus->getId() !== $v) {
+            $this->aOrderStatus = null;
+        }
+
 
         return $this;
     } // setStatusId()
@@ -980,11 +976,20 @@ abstract class BaseOrder extends BaseObject implements Persistent
     public function ensureConsistency()
     {
 
-        if ($this->aCouponOrder !== null && $this->id !== $this->aCouponOrder->getOrderId()) {
-            $this->aCouponOrder = null;
+        if ($this->aCustomer !== null && $this->customer_id !== $this->aCustomer->getId()) {
+            $this->aCustomer = null;
         }
-        if ($this->aOrderProduct !== null && $this->id !== $this->aOrderProduct->getOrderId()) {
-            $this->aOrderProduct = null;
+        if ($this->aOrderAddressRelatedByAddressInvoice !== null && $this->address_invoice !== $this->aOrderAddressRelatedByAddressInvoice->getId()) {
+            $this->aOrderAddressRelatedByAddressInvoice = null;
+        }
+        if ($this->aOrderAddressRelatedByAddressDelivery !== null && $this->address_delivery !== $this->aOrderAddressRelatedByAddressDelivery->getId()) {
+            $this->aOrderAddressRelatedByAddressDelivery = null;
+        }
+        if ($this->aCurrency !== null && $this->currency_id !== $this->aCurrency->getId()) {
+            $this->aCurrency = null;
+        }
+        if ($this->aOrderStatus !== null && $this->status_id !== $this->aOrderStatus->getId()) {
+            $this->aOrderStatus = null;
         }
     } // ensureConsistency
 
@@ -1025,17 +1030,14 @@ abstract class BaseOrder extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aCouponOrder = null;
-            $this->aOrderProduct = null;
-            $this->singleCurrency = null;
+            $this->aCurrency = null;
+            $this->aCustomer = null;
+            $this->aOrderAddressRelatedByAddressInvoice = null;
+            $this->aOrderAddressRelatedByAddressDelivery = null;
+            $this->aOrderStatus = null;
+            $this->collCouponOrders = null;
 
-            $this->singleCustomer = null;
-
-            $this->singleOrderAddress = null;
-
-            $this->singleOrderAddress = null;
-
-            $this->singleOrderStatus = null;
+            $this->collOrderProducts = null;
 
         } // if (deep)
     }
@@ -1155,18 +1157,39 @@ abstract class BaseOrder extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aCouponOrder !== null) {
-                if ($this->aCouponOrder->isModified() || $this->aCouponOrder->isNew()) {
-                    $affectedRows += $this->aCouponOrder->save($con);
+            if ($this->aCurrency !== null) {
+                if ($this->aCurrency->isModified() || $this->aCurrency->isNew()) {
+                    $affectedRows += $this->aCurrency->save($con);
                 }
-                $this->setCouponOrder($this->aCouponOrder);
+                $this->setCurrency($this->aCurrency);
             }
 
-            if ($this->aOrderProduct !== null) {
-                if ($this->aOrderProduct->isModified() || $this->aOrderProduct->isNew()) {
-                    $affectedRows += $this->aOrderProduct->save($con);
+            if ($this->aCustomer !== null) {
+                if ($this->aCustomer->isModified() || $this->aCustomer->isNew()) {
+                    $affectedRows += $this->aCustomer->save($con);
                 }
-                $this->setOrderProduct($this->aOrderProduct);
+                $this->setCustomer($this->aCustomer);
+            }
+
+            if ($this->aOrderAddressRelatedByAddressInvoice !== null) {
+                if ($this->aOrderAddressRelatedByAddressInvoice->isModified() || $this->aOrderAddressRelatedByAddressInvoice->isNew()) {
+                    $affectedRows += $this->aOrderAddressRelatedByAddressInvoice->save($con);
+                }
+                $this->setOrderAddressRelatedByAddressInvoice($this->aOrderAddressRelatedByAddressInvoice);
+            }
+
+            if ($this->aOrderAddressRelatedByAddressDelivery !== null) {
+                if ($this->aOrderAddressRelatedByAddressDelivery->isModified() || $this->aOrderAddressRelatedByAddressDelivery->isNew()) {
+                    $affectedRows += $this->aOrderAddressRelatedByAddressDelivery->save($con);
+                }
+                $this->setOrderAddressRelatedByAddressDelivery($this->aOrderAddressRelatedByAddressDelivery);
+            }
+
+            if ($this->aOrderStatus !== null) {
+                if ($this->aOrderStatus->isModified() || $this->aOrderStatus->isNew()) {
+                    $affectedRows += $this->aOrderStatus->save($con);
+                }
+                $this->setOrderStatus($this->aOrderStatus);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1180,78 +1203,37 @@ abstract class BaseOrder extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->currencysScheduledForDeletion !== null) {
-                if (!$this->currencysScheduledForDeletion->isEmpty()) {
-                    CurrencyQuery::create()
-                        ->filterByPrimaryKeys($this->currencysScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->couponOrdersScheduledForDeletion !== null) {
+                if (!$this->couponOrdersScheduledForDeletion->isEmpty()) {
+                    CouponOrderQuery::create()
+                        ->filterByPrimaryKeys($this->couponOrdersScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->currencysScheduledForDeletion = null;
+                    $this->couponOrdersScheduledForDeletion = null;
                 }
             }
 
-            if ($this->singleCurrency !== null) {
-                if (!$this->singleCurrency->isDeleted()) {
-                        $affectedRows += $this->singleCurrency->save($con);
+            if ($this->collCouponOrders !== null) {
+                foreach ($this->collCouponOrders as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
                 }
             }
 
-            if ($this->customersScheduledForDeletion !== null) {
-                if (!$this->customersScheduledForDeletion->isEmpty()) {
-                    CustomerQuery::create()
-                        ->filterByPrimaryKeys($this->customersScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->orderProductsScheduledForDeletion !== null) {
+                if (!$this->orderProductsScheduledForDeletion->isEmpty()) {
+                    OrderProductQuery::create()
+                        ->filterByPrimaryKeys($this->orderProductsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->customersScheduledForDeletion = null;
+                    $this->orderProductsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->singleCustomer !== null) {
-                if (!$this->singleCustomer->isDeleted()) {
-                        $affectedRows += $this->singleCustomer->save($con);
-                }
-            }
-
-            if ($this->orderAddresssScheduledForDeletion !== null) {
-                if (!$this->orderAddresssScheduledForDeletion->isEmpty()) {
-                    OrderAddressQuery::create()
-                        ->filterByPrimaryKeys($this->orderAddresssScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->orderAddresssScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleOrderAddress !== null) {
-                if (!$this->singleOrderAddress->isDeleted()) {
-                        $affectedRows += $this->singleOrderAddress->save($con);
-                }
-            }
-
-            if ($this->orderAddresssScheduledForDeletion !== null) {
-                if (!$this->orderAddresssScheduledForDeletion->isEmpty()) {
-                    OrderAddressQuery::create()
-                        ->filterByPrimaryKeys($this->orderAddresssScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->orderAddresssScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleOrderAddress !== null) {
-                if (!$this->singleOrderAddress->isDeleted()) {
-                        $affectedRows += $this->singleOrderAddress->save($con);
-                }
-            }
-
-            if ($this->orderStatussScheduledForDeletion !== null) {
-                if (!$this->orderStatussScheduledForDeletion->isEmpty()) {
-                    OrderStatusQuery::create()
-                        ->filterByPrimaryKeys($this->orderStatussScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->orderStatussScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->singleOrderStatus !== null) {
-                if (!$this->singleOrderStatus->isDeleted()) {
-                        $affectedRows += $this->singleOrderStatus->save($con);
+            if ($this->collOrderProducts !== null) {
+                foreach ($this->collOrderProducts as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
                 }
             }
 
@@ -1499,15 +1481,33 @@ abstract class BaseOrder extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aCouponOrder !== null) {
-                if (!$this->aCouponOrder->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aCouponOrder->getValidationFailures());
+            if ($this->aCurrency !== null) {
+                if (!$this->aCurrency->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCurrency->getValidationFailures());
                 }
             }
 
-            if ($this->aOrderProduct !== null) {
-                if (!$this->aOrderProduct->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aOrderProduct->getValidationFailures());
+            if ($this->aCustomer !== null) {
+                if (!$this->aCustomer->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aCustomer->getValidationFailures());
+                }
+            }
+
+            if ($this->aOrderAddressRelatedByAddressInvoice !== null) {
+                if (!$this->aOrderAddressRelatedByAddressInvoice->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aOrderAddressRelatedByAddressInvoice->getValidationFailures());
+                }
+            }
+
+            if ($this->aOrderAddressRelatedByAddressDelivery !== null) {
+                if (!$this->aOrderAddressRelatedByAddressDelivery->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aOrderAddressRelatedByAddressDelivery->getValidationFailures());
+                }
+            }
+
+            if ($this->aOrderStatus !== null) {
+                if (!$this->aOrderStatus->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aOrderStatus->getValidationFailures());
                 }
             }
 
@@ -1517,33 +1517,19 @@ abstract class BaseOrder extends BaseObject implements Persistent
             }
 
 
-                if ($this->singleCurrency !== null) {
-                    if (!$this->singleCurrency->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCurrency->getValidationFailures());
+                if ($this->collCouponOrders !== null) {
+                    foreach ($this->collCouponOrders as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
                     }
                 }
 
-                if ($this->singleCustomer !== null) {
-                    if (!$this->singleCustomer->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleCustomer->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleOrderAddress !== null) {
-                    if (!$this->singleOrderAddress->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleOrderAddress->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleOrderAddress !== null) {
-                    if (!$this->singleOrderAddress->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleOrderAddress->getValidationFailures());
-                    }
-                }
-
-                if ($this->singleOrderStatus !== null) {
-                    if (!$this->singleOrderStatus->validate($columns)) {
-                        $failureMap = array_merge($failureMap, $this->singleOrderStatus->getValidationFailures());
+                if ($this->collOrderProducts !== null) {
+                    foreach ($this->collOrderProducts as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
                     }
                 }
 
@@ -1685,26 +1671,26 @@ abstract class BaseOrder extends BaseObject implements Persistent
             $keys[17] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aCouponOrder) {
-                $result['CouponOrder'] = $this->aCouponOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aCurrency) {
+                $result['Currency'] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aOrderProduct) {
-                $result['OrderProduct'] = $this->aOrderProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aCustomer) {
+                $result['Customer'] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCurrency) {
-                $result['Currency'] = $this->singleCurrency->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aOrderAddressRelatedByAddressInvoice) {
+                $result['OrderAddressRelatedByAddressInvoice'] = $this->aOrderAddressRelatedByAddressInvoice->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleCustomer) {
-                $result['Customer'] = $this->singleCustomer->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aOrderAddressRelatedByAddressDelivery) {
+                $result['OrderAddressRelatedByAddressDelivery'] = $this->aOrderAddressRelatedByAddressDelivery->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleOrderAddress) {
-                $result['OrderAddress'] = $this->singleOrderAddress->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->aOrderStatus) {
+                $result['OrderStatus'] = $this->aOrderStatus->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->singleOrderAddress) {
-                $result['OrderAddress'] = $this->singleOrderAddress->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->collCouponOrders) {
+                $result['CouponOrders'] = $this->collCouponOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->singleOrderStatus) {
-                $result['OrderStatus'] = $this->singleOrderStatus->toArray($keyType, $includeLazyLoadColumns, $alreadyDumpedObjects, true);
+            if (null !== $this->collOrderProducts) {
+                $result['OrderProducts'] = $this->collOrderProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1953,39 +1939,16 @@ abstract class BaseOrder extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            $relObj = $this->getCurrency();
-            if ($relObj) {
-                $copyObj->setCurrency($relObj->copy($deepCopy));
+            foreach ($this->getCouponOrders() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCouponOrder($relObj->copy($deepCopy));
+                }
             }
 
-            $relObj = $this->getCustomer();
-            if ($relObj) {
-                $copyObj->setCustomer($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getOrderAddress();
-            if ($relObj) {
-                $copyObj->setOrderAddress($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getOrderAddress();
-            if ($relObj) {
-                $copyObj->setOrderAddress($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getOrderStatus();
-            if ($relObj) {
-                $copyObj->setOrderStatus($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getCouponOrder();
-            if ($relObj) {
-                $copyObj->setCouponOrder($relObj->copy($deepCopy));
-            }
-
-            $relObj = $this->getOrderProduct();
-            if ($relObj) {
-                $copyObj->setOrderProduct($relObj->copy($deepCopy));
+            foreach ($this->getOrderProducts() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addOrderProduct($relObj->copy($deepCopy));
+                }
             }
 
             //unflag object copy
@@ -2039,25 +2002,26 @@ abstract class BaseOrder extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a CouponOrder object.
+     * Declares an association between this object and a Currency object.
      *
-     * @param             CouponOrder $v
+     * @param             Currency $v
      * @return Order The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCouponOrder(CouponOrder $v = null)
+    public function setCurrency(Currency $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setCurrencyId(NULL);
         } else {
-            $this->setId($v->getOrderId());
+            $this->setCurrencyId($v->getId());
         }
 
-        $this->aCouponOrder = $v;
+        $this->aCurrency = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Currency object, it will not be re-added.
         if ($v !== null) {
-            $v->setOrder($this);
+            $v->addOrder($this);
         }
 
 
@@ -2066,45 +2030,49 @@ abstract class BaseOrder extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated CouponOrder object
+     * Get the associated Currency object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return CouponOrder The associated CouponOrder object.
+     * @return Currency The associated Currency object.
      * @throws PropelException
      */
-    public function getCouponOrder(PropelPDO $con = null)
+    public function getCurrency(PropelPDO $con = null)
     {
-        if ($this->aCouponOrder === null && ($this->id !== null)) {
-            $this->aCouponOrder = CouponOrderQuery::create()
-                ->filterByOrder($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aCouponOrder->setOrder($this);
+        if ($this->aCurrency === null && ($this->currency_id !== null)) {
+            $this->aCurrency = CurrencyQuery::create()->findPk($this->currency_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCurrency->addOrders($this);
+             */
         }
 
-        return $this->aCouponOrder;
+        return $this->aCurrency;
     }
 
     /**
-     * Declares an association between this object and a OrderProduct object.
+     * Declares an association between this object and a Customer object.
      *
-     * @param             OrderProduct $v
+     * @param             Customer $v
      * @return Order The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setOrderProduct(OrderProduct $v = null)
+    public function setCustomer(Customer $v = null)
     {
         if ($v === null) {
-            $this->setId(NULL);
+            $this->setCustomerId(NULL);
         } else {
-            $this->setId($v->getOrderId());
+            $this->setCustomerId($v->getId());
         }
 
-        $this->aOrderProduct = $v;
+        $this->aCustomer = $v;
 
-        // Add binding for other direction of this 1:1 relationship.
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the Customer object, it will not be re-added.
         if ($v !== null) {
-            $v->setOrder($this);
+            $v->addOrder($this);
         }
 
 
@@ -2113,23 +2081,179 @@ abstract class BaseOrder extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated OrderProduct object
+     * Get the associated Customer object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return OrderProduct The associated OrderProduct object.
+     * @return Customer The associated Customer object.
      * @throws PropelException
      */
-    public function getOrderProduct(PropelPDO $con = null)
+    public function getCustomer(PropelPDO $con = null)
     {
-        if ($this->aOrderProduct === null && ($this->id !== null)) {
-            $this->aOrderProduct = OrderProductQuery::create()
-                ->filterByOrder($this) // here
-                ->findOne($con);
-            // Because this foreign key represents a one-to-one relationship, we will create a bi-directional association.
-            $this->aOrderProduct->setOrder($this);
+        if ($this->aCustomer === null && ($this->customer_id !== null)) {
+            $this->aCustomer = CustomerQuery::create()->findPk($this->customer_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomer->addOrders($this);
+             */
         }
 
-        return $this->aOrderProduct;
+        return $this->aCustomer;
+    }
+
+    /**
+     * Declares an association between this object and a OrderAddress object.
+     *
+     * @param             OrderAddress $v
+     * @return Order The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setOrderAddressRelatedByAddressInvoice(OrderAddress $v = null)
+    {
+        if ($v === null) {
+            $this->setAddressInvoice(NULL);
+        } else {
+            $this->setAddressInvoice($v->getId());
+        }
+
+        $this->aOrderAddressRelatedByAddressInvoice = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the OrderAddress object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderRelatedByAddressInvoice($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated OrderAddress object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return OrderAddress The associated OrderAddress object.
+     * @throws PropelException
+     */
+    public function getOrderAddressRelatedByAddressInvoice(PropelPDO $con = null)
+    {
+        if ($this->aOrderAddressRelatedByAddressInvoice === null && ($this->address_invoice !== null)) {
+            $this->aOrderAddressRelatedByAddressInvoice = OrderAddressQuery::create()->findPk($this->address_invoice, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aOrderAddressRelatedByAddressInvoice->addOrdersRelatedByAddressInvoice($this);
+             */
+        }
+
+        return $this->aOrderAddressRelatedByAddressInvoice;
+    }
+
+    /**
+     * Declares an association between this object and a OrderAddress object.
+     *
+     * @param             OrderAddress $v
+     * @return Order The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setOrderAddressRelatedByAddressDelivery(OrderAddress $v = null)
+    {
+        if ($v === null) {
+            $this->setAddressDelivery(NULL);
+        } else {
+            $this->setAddressDelivery($v->getId());
+        }
+
+        $this->aOrderAddressRelatedByAddressDelivery = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the OrderAddress object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrderRelatedByAddressDelivery($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated OrderAddress object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return OrderAddress The associated OrderAddress object.
+     * @throws PropelException
+     */
+    public function getOrderAddressRelatedByAddressDelivery(PropelPDO $con = null)
+    {
+        if ($this->aOrderAddressRelatedByAddressDelivery === null && ($this->address_delivery !== null)) {
+            $this->aOrderAddressRelatedByAddressDelivery = OrderAddressQuery::create()->findPk($this->address_delivery, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aOrderAddressRelatedByAddressDelivery->addOrdersRelatedByAddressDelivery($this);
+             */
+        }
+
+        return $this->aOrderAddressRelatedByAddressDelivery;
+    }
+
+    /**
+     * Declares an association between this object and a OrderStatus object.
+     *
+     * @param             OrderStatus $v
+     * @return Order The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setOrderStatus(OrderStatus $v = null)
+    {
+        if ($v === null) {
+            $this->setStatusId(NULL);
+        } else {
+            $this->setStatusId($v->getId());
+        }
+
+        $this->aOrderStatus = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the OrderStatus object, it will not be re-added.
+        if ($v !== null) {
+            $v->addOrder($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated OrderStatus object
+     *
+     * @param PropelPDO $con Optional Connection object.
+     * @return OrderStatus The associated OrderStatus object.
+     * @throws PropelException
+     */
+    public function getOrderStatus(PropelPDO $con = null)
+    {
+        if ($this->aOrderStatus === null && ($this->status_id !== null)) {
+            $this->aOrderStatus = OrderStatusQuery::create()->findPk($this->status_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aOrderStatus->addOrders($this);
+             */
+        }
+
+        return $this->aOrderStatus;
     }
 
 
@@ -2143,186 +2267,426 @@ abstract class BaseOrder extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('CouponOrder' == $relationName) {
+            $this->initCouponOrders();
+        }
+        if ('OrderProduct' == $relationName) {
+            $this->initOrderProducts();
+        }
     }
 
     /**
-     * Gets a single Currency object, which is related to this object by a one-to-one relationship.
+     * Clears out the collCouponOrders collection
      *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCouponOrders()
+     */
+    public function clearCouponOrders()
+    {
+        $this->collCouponOrders = null; // important to set this to null since that means it is uninitialized
+        $this->collCouponOrdersPartial = null;
+    }
+
+    /**
+     * reset is the collCouponOrders collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCouponOrders($v = true)
+    {
+        $this->collCouponOrdersPartial = $v;
+    }
+
+    /**
+     * Initializes the collCouponOrders collection.
+     *
+     * By default this just sets the collCouponOrders collection to an empty array (like clearcollCouponOrders());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCouponOrders($overrideExisting = true)
+    {
+        if (null !== $this->collCouponOrders && !$overrideExisting) {
+            return;
+        }
+        $this->collCouponOrders = new PropelObjectCollection();
+        $this->collCouponOrders->setModel('CouponOrder');
+    }
+
+    /**
+     * Gets an array of CouponOrder objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Order is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return Currency
+     * @return PropelObjectCollection|CouponOrder[] List of CouponOrder objects
      * @throws PropelException
      */
-    public function getCurrency(PropelPDO $con = null)
+    public function getCouponOrders($criteria = null, PropelPDO $con = null)
     {
+        $partial = $this->collCouponOrdersPartial && !$this->isNew();
+        if (null === $this->collCouponOrders || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCouponOrders) {
+                // return empty collection
+                $this->initCouponOrders();
+            } else {
+                $collCouponOrders = CouponOrderQuery::create(null, $criteria)
+                    ->filterByOrder($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCouponOrdersPartial && count($collCouponOrders)) {
+                      $this->initCouponOrders(false);
 
-        if ($this->singleCurrency === null && !$this->isNew()) {
-            $this->singleCurrency = CurrencyQuery::create()->findPk($this->getPrimaryKey(), $con);
+                      foreach($collCouponOrders as $obj) {
+                        if (false == $this->collCouponOrders->contains($obj)) {
+                          $this->collCouponOrders->append($obj);
+                        }
+                      }
+
+                      $this->collCouponOrdersPartial = true;
+                    }
+
+                    return $collCouponOrders;
+                }
+
+                if($partial && $this->collCouponOrders) {
+                    foreach($this->collCouponOrders as $obj) {
+                        if($obj->isNew()) {
+                            $collCouponOrders[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCouponOrders = $collCouponOrders;
+                $this->collCouponOrdersPartial = false;
+            }
         }
 
-        return $this->singleCurrency;
+        return $this->collCouponOrders;
     }
 
     /**
-     * Sets a single Currency object as related to this object by a one-to-one relationship.
+     * Sets a collection of CouponOrder objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
      *
-     * @param             Currency $v Currency
-     * @return Order The current object (for fluent API support)
+     * @param PropelCollection $couponOrders A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCouponOrders(PropelCollection $couponOrders, PropelPDO $con = null)
+    {
+        $this->couponOrdersScheduledForDeletion = $this->getCouponOrders(new Criteria(), $con)->diff($couponOrders);
+
+        foreach ($this->couponOrdersScheduledForDeletion as $couponOrderRemoved) {
+            $couponOrderRemoved->setOrder(null);
+        }
+
+        $this->collCouponOrders = null;
+        foreach ($couponOrders as $couponOrder) {
+            $this->addCouponOrder($couponOrder);
+        }
+
+        $this->collCouponOrders = $couponOrders;
+        $this->collCouponOrdersPartial = false;
+    }
+
+    /**
+     * Returns the number of related CouponOrder objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CouponOrder objects.
      * @throws PropelException
      */
-    public function setCurrency(Currency $v = null)
+    public function countCouponOrders(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $this->singleCurrency = $v;
+        $partial = $this->collCouponOrdersPartial && !$this->isNew();
+        if (null === $this->collCouponOrders || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCouponOrders) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCouponOrders());
+                }
+                $query = CouponOrderQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
 
-        // Make sure that that the passed-in Currency isn't already associated with this object
-        if ($v !== null && $v->getOrder() === null) {
-            $v->setOrder($this);
+                return $query
+                    ->filterByOrder($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCouponOrders);
+        }
+    }
+
+    /**
+     * Method called to associate a CouponOrder object to this object
+     * through the CouponOrder foreign key attribute.
+     *
+     * @param    CouponOrder $l CouponOrder
+     * @return Order The current object (for fluent API support)
+     */
+    public function addCouponOrder(CouponOrder $l)
+    {
+        if ($this->collCouponOrders === null) {
+            $this->initCouponOrders();
+            $this->collCouponOrdersPartial = true;
+        }
+        if (!$this->collCouponOrders->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCouponOrder($l);
         }
 
         return $this;
     }
 
     /**
-     * Gets a single Customer object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return Customer
-     * @throws PropelException
+     * @param	CouponOrder $couponOrder The couponOrder object to add.
      */
-    public function getCustomer(PropelPDO $con = null)
+    protected function doAddCouponOrder($couponOrder)
     {
-
-        if ($this->singleCustomer === null && !$this->isNew()) {
-            $this->singleCustomer = CustomerQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleCustomer;
+        $this->collCouponOrders[]= $couponOrder;
+        $couponOrder->setOrder($this);
     }
 
     /**
-     * Sets a single Customer object as related to this object by a one-to-one relationship.
+     * @param	CouponOrder $couponOrder The couponOrder object to remove.
+     */
+    public function removeCouponOrder($couponOrder)
+    {
+        if ($this->getCouponOrders()->contains($couponOrder)) {
+            $this->collCouponOrders->remove($this->collCouponOrders->search($couponOrder));
+            if (null === $this->couponOrdersScheduledForDeletion) {
+                $this->couponOrdersScheduledForDeletion = clone $this->collCouponOrders;
+                $this->couponOrdersScheduledForDeletion->clear();
+            }
+            $this->couponOrdersScheduledForDeletion[]= $couponOrder;
+            $couponOrder->setOrder(null);
+        }
+    }
+
+    /**
+     * Clears out the collOrderProducts collection
      *
-     * @param             Customer $v Customer
-     * @return Order The current object (for fluent API support)
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addOrderProducts()
+     */
+    public function clearOrderProducts()
+    {
+        $this->collOrderProducts = null; // important to set this to null since that means it is uninitialized
+        $this->collOrderProductsPartial = null;
+    }
+
+    /**
+     * reset is the collOrderProducts collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialOrderProducts($v = true)
+    {
+        $this->collOrderProductsPartial = $v;
+    }
+
+    /**
+     * Initializes the collOrderProducts collection.
+     *
+     * By default this just sets the collOrderProducts collection to an empty array (like clearcollOrderProducts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initOrderProducts($overrideExisting = true)
+    {
+        if (null !== $this->collOrderProducts && !$overrideExisting) {
+            return;
+        }
+        $this->collOrderProducts = new PropelObjectCollection();
+        $this->collOrderProducts->setModel('OrderProduct');
+    }
+
+    /**
+     * Gets an array of OrderProduct objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Order is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|OrderProduct[] List of OrderProduct objects
      * @throws PropelException
      */
-    public function setCustomer(Customer $v = null)
+    public function getOrderProducts($criteria = null, PropelPDO $con = null)
     {
-        $this->singleCustomer = $v;
+        $partial = $this->collOrderProductsPartial && !$this->isNew();
+        if (null === $this->collOrderProducts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderProducts) {
+                // return empty collection
+                $this->initOrderProducts();
+            } else {
+                $collOrderProducts = OrderProductQuery::create(null, $criteria)
+                    ->filterByOrder($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collOrderProductsPartial && count($collOrderProducts)) {
+                      $this->initOrderProducts(false);
 
-        // Make sure that that the passed-in Customer isn't already associated with this object
-        if ($v !== null && $v->getOrder() === null) {
-            $v->setOrder($this);
+                      foreach($collOrderProducts as $obj) {
+                        if (false == $this->collOrderProducts->contains($obj)) {
+                          $this->collOrderProducts->append($obj);
+                        }
+                      }
+
+                      $this->collOrderProductsPartial = true;
+                    }
+
+                    return $collOrderProducts;
+                }
+
+                if($partial && $this->collOrderProducts) {
+                    foreach($this->collOrderProducts as $obj) {
+                        if($obj->isNew()) {
+                            $collOrderProducts[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collOrderProducts = $collOrderProducts;
+                $this->collOrderProductsPartial = false;
+            }
+        }
+
+        return $this->collOrderProducts;
+    }
+
+    /**
+     * Sets a collection of OrderProduct objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $orderProducts A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setOrderProducts(PropelCollection $orderProducts, PropelPDO $con = null)
+    {
+        $this->orderProductsScheduledForDeletion = $this->getOrderProducts(new Criteria(), $con)->diff($orderProducts);
+
+        foreach ($this->orderProductsScheduledForDeletion as $orderProductRemoved) {
+            $orderProductRemoved->setOrder(null);
+        }
+
+        $this->collOrderProducts = null;
+        foreach ($orderProducts as $orderProduct) {
+            $this->addOrderProduct($orderProduct);
+        }
+
+        $this->collOrderProducts = $orderProducts;
+        $this->collOrderProductsPartial = false;
+    }
+
+    /**
+     * Returns the number of related OrderProduct objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related OrderProduct objects.
+     * @throws PropelException
+     */
+    public function countOrderProducts(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collOrderProductsPartial && !$this->isNew();
+        if (null === $this->collOrderProducts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderProducts) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getOrderProducts());
+                }
+                $query = OrderProductQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByOrder($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collOrderProducts);
+        }
+    }
+
+    /**
+     * Method called to associate a OrderProduct object to this object
+     * through the OrderProduct foreign key attribute.
+     *
+     * @param    OrderProduct $l OrderProduct
+     * @return Order The current object (for fluent API support)
+     */
+    public function addOrderProduct(OrderProduct $l)
+    {
+        if ($this->collOrderProducts === null) {
+            $this->initOrderProducts();
+            $this->collOrderProductsPartial = true;
+        }
+        if (!$this->collOrderProducts->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderProduct($l);
         }
 
         return $this;
     }
 
     /**
-     * Gets a single OrderAddress object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return OrderAddress
-     * @throws PropelException
+     * @param	OrderProduct $orderProduct The orderProduct object to add.
      */
-    public function getOrderAddress(PropelPDO $con = null)
+    protected function doAddOrderProduct($orderProduct)
     {
-
-        if ($this->singleOrderAddress === null && !$this->isNew()) {
-            $this->singleOrderAddress = OrderAddressQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleOrderAddress;
+        $this->collOrderProducts[]= $orderProduct;
+        $orderProduct->setOrder($this);
     }
 
     /**
-     * Sets a single OrderAddress object as related to this object by a one-to-one relationship.
-     *
-     * @param             OrderAddress $v OrderAddress
-     * @return Order The current object (for fluent API support)
-     * @throws PropelException
+     * @param	OrderProduct $orderProduct The orderProduct object to remove.
      */
-    public function setOrderAddress(OrderAddress $v = null)
+    public function removeOrderProduct($orderProduct)
     {
-        $this->singleOrderAddress = $v;
-
-        // Make sure that that the passed-in OrderAddress isn't already associated with this object
-        if ($v !== null && $v->getOrder() === null) {
-            $v->setOrder($this);
+        if ($this->getOrderProducts()->contains($orderProduct)) {
+            $this->collOrderProducts->remove($this->collOrderProducts->search($orderProduct));
+            if (null === $this->orderProductsScheduledForDeletion) {
+                $this->orderProductsScheduledForDeletion = clone $this->collOrderProducts;
+                $this->orderProductsScheduledForDeletion->clear();
+            }
+            $this->orderProductsScheduledForDeletion[]= $orderProduct;
+            $orderProduct->setOrder(null);
         }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single OrderAddress object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return OrderAddress
-     * @throws PropelException
-     */
-    public function getOrderAddress(PropelPDO $con = null)
-    {
-
-        if ($this->singleOrderAddress === null && !$this->isNew()) {
-            $this->singleOrderAddress = OrderAddressQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleOrderAddress;
-    }
-
-    /**
-     * Sets a single OrderAddress object as related to this object by a one-to-one relationship.
-     *
-     * @param             OrderAddress $v OrderAddress
-     * @return Order The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setOrderAddress(OrderAddress $v = null)
-    {
-        $this->singleOrderAddress = $v;
-
-        // Make sure that that the passed-in OrderAddress isn't already associated with this object
-        if ($v !== null && $v->getOrder() === null) {
-            $v->setOrder($this);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Gets a single OrderStatus object, which is related to this object by a one-to-one relationship.
-     *
-     * @param PropelPDO $con optional connection object
-     * @return OrderStatus
-     * @throws PropelException
-     */
-    public function getOrderStatus(PropelPDO $con = null)
-    {
-
-        if ($this->singleOrderStatus === null && !$this->isNew()) {
-            $this->singleOrderStatus = OrderStatusQuery::create()->findPk($this->getPrimaryKey(), $con);
-        }
-
-        return $this->singleOrderStatus;
-    }
-
-    /**
-     * Sets a single OrderStatus object as related to this object by a one-to-one relationship.
-     *
-     * @param             OrderStatus $v OrderStatus
-     * @return Order The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setOrderStatus(OrderStatus $v = null)
-    {
-        $this->singleOrderStatus = $v;
-
-        // Make sure that that the passed-in OrderStatus isn't already associated with this object
-        if ($v !== null && $v->getOrder() === null) {
-            $v->setOrder($this);
-        }
-
-        return $this;
     }
 
     /**
@@ -2368,45 +2732,31 @@ abstract class BaseOrder extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->singleCurrency) {
-                $this->singleCurrency->clearAllReferences($deep);
+            if ($this->collCouponOrders) {
+                foreach ($this->collCouponOrders as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
-            if ($this->singleCustomer) {
-                $this->singleCustomer->clearAllReferences($deep);
-            }
-            if ($this->singleOrderAddress) {
-                $this->singleOrderAddress->clearAllReferences($deep);
-            }
-            if ($this->singleOrderAddress) {
-                $this->singleOrderAddress->clearAllReferences($deep);
-            }
-            if ($this->singleOrderStatus) {
-                $this->singleOrderStatus->clearAllReferences($deep);
+            if ($this->collOrderProducts) {
+                foreach ($this->collOrderProducts as $o) {
+                    $o->clearAllReferences($deep);
+                }
             }
         } // if ($deep)
 
-        if ($this->singleCurrency instanceof PropelCollection) {
-            $this->singleCurrency->clearIterator();
+        if ($this->collCouponOrders instanceof PropelCollection) {
+            $this->collCouponOrders->clearIterator();
         }
-        $this->singleCurrency = null;
-        if ($this->singleCustomer instanceof PropelCollection) {
-            $this->singleCustomer->clearIterator();
+        $this->collCouponOrders = null;
+        if ($this->collOrderProducts instanceof PropelCollection) {
+            $this->collOrderProducts->clearIterator();
         }
-        $this->singleCustomer = null;
-        if ($this->singleOrderAddress instanceof PropelCollection) {
-            $this->singleOrderAddress->clearIterator();
-        }
-        $this->singleOrderAddress = null;
-        if ($this->singleOrderAddress instanceof PropelCollection) {
-            $this->singleOrderAddress->clearIterator();
-        }
-        $this->singleOrderAddress = null;
-        if ($this->singleOrderStatus instanceof PropelCollection) {
-            $this->singleOrderStatus->clearIterator();
-        }
-        $this->singleOrderStatus = null;
-        $this->aCouponOrder = null;
-        $this->aOrderProduct = null;
+        $this->collOrderProducts = null;
+        $this->aCurrency = null;
+        $this->aCustomer = null;
+        $this->aOrderAddressRelatedByAddressInvoice = null;
+        $this->aOrderAddressRelatedByAddressDelivery = null;
+        $this->aOrderStatus = null;
     }
 
     /**

@@ -38,6 +38,10 @@ use Thelia\Model\FeatureProd;
  * @method FeatureAvQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method FeatureAvQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method FeatureAvQuery leftJoinFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the Feature relation
+ * @method FeatureAvQuery rightJoinFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Feature relation
+ * @method FeatureAvQuery innerJoinFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the Feature relation
+ *
  * @method FeatureAvQuery leftJoinFeatureAvDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureAvDesc relation
  * @method FeatureAvQuery rightJoinFeatureAvDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAvDesc relation
  * @method FeatureAvQuery innerJoinFeatureAvDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAvDesc relation
@@ -45,10 +49,6 @@ use Thelia\Model\FeatureProd;
  * @method FeatureAvQuery leftJoinFeatureProd($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureProd relation
  * @method FeatureAvQuery rightJoinFeatureProd($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureProd relation
  * @method FeatureAvQuery innerJoinFeatureProd($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureProd relation
- *
- * @method FeatureAvQuery leftJoinFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the Feature relation
- * @method FeatureAvQuery rightJoinFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Feature relation
- * @method FeatureAvQuery innerJoinFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the Feature relation
  *
  * @method FeatureAv findOne(PropelPDO $con = null) Return the first FeatureAv matching the query
  * @method FeatureAv findOneOrCreate(PropelPDO $con = null) Return the first FeatureAv matching the query, or a new FeatureAv object populated from the query conditions when no match is found
@@ -74,7 +74,7 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'mydb', $modelName = 'Thelia\\Model\\FeatureAv', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = 'Thelia\\Model\\FeatureAv', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
@@ -250,10 +250,6 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByFeatureAvDesc()
-     *
-     * @see       filterByFeatureProd()
-     *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
@@ -280,6 +276,8 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
      * $query->filterByFeatureId(array(12, 34)); // WHERE feature_id IN (12, 34)
      * $query->filterByFeatureId(array('min' => 12)); // WHERE feature_id > 12
      * </code>
+     *
+     * @see       filterByFeature()
      *
      * @param     mixed $featureId The value to use as filter.
      *              Use scalar values for equality.
@@ -399,9 +397,85 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related Feature object
+     *
+     * @param   Feature|PropelObjectCollection $feature The related object(s) to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FeatureAvQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFeature($feature, $comparison = null)
+    {
+        if ($feature instanceof Feature) {
+            return $this
+                ->addUsingAlias(FeatureAvPeer::FEATURE_ID, $feature->getId(), $comparison);
+        } elseif ($feature instanceof PropelObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(FeatureAvPeer::FEATURE_ID, $feature->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByFeature() only accepts arguments of type Feature or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Feature relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FeatureAvQuery The current query, for fluid interface
+     */
+    public function joinFeature($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Feature');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Feature');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Feature relation Feature object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\FeatureQuery A secondary query class using the current class as primary query
+     */
+    public function useFeatureQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinFeature($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Feature', '\Thelia\Model\FeatureQuery');
+    }
+
+    /**
      * Filter the query by a related FeatureAvDesc object
      *
-     * @param   FeatureAvDesc|PropelObjectCollection $featureAvDesc The related object(s) to use as filter
+     * @param   FeatureAvDesc|PropelObjectCollection $featureAvDesc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureAvQuery The current query, for fluid interface
@@ -413,12 +487,10 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(FeatureAvPeer::ID, $featureAvDesc->getFeatureAvId(), $comparison);
         } elseif ($featureAvDesc instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(FeatureAvPeer::ID, $featureAvDesc->toKeyValue('PrimaryKey', 'FeatureAvId'), $comparison);
+                ->useFeatureAvDescQuery()
+                ->filterByPrimaryKeys($featureAvDesc->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByFeatureAvDesc() only accepts arguments of type FeatureAvDesc or PropelCollection');
         }
@@ -477,7 +549,7 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
     /**
      * Filter the query by a related FeatureProd object
      *
-     * @param   FeatureProd|PropelObjectCollection $featureProd The related object(s) to use as filter
+     * @param   FeatureProd|PropelObjectCollection $featureProd  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureAvQuery The current query, for fluid interface
@@ -489,12 +561,10 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
             return $this
                 ->addUsingAlias(FeatureAvPeer::ID, $featureProd->getFeatureAvId(), $comparison);
         } elseif ($featureProd instanceof PropelObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
             return $this
-                ->addUsingAlias(FeatureAvPeer::ID, $featureProd->toKeyValue('PrimaryKey', 'FeatureAvId'), $comparison);
+                ->useFeatureProdQuery()
+                ->filterByPrimaryKeys($featureProd->getPrimaryKeys())
+                ->endUse();
         } else {
             throw new PropelException('filterByFeatureProd() only accepts arguments of type FeatureProd or PropelCollection');
         }
@@ -508,7 +578,7 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
      *
      * @return FeatureAvQuery The current query, for fluid interface
      */
-    public function joinFeatureProd($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinFeatureProd($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('FeatureProd');
@@ -543,85 +613,11 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\FeatureProdQuery A secondary query class using the current class as primary query
      */
-    public function useFeatureProdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useFeatureProdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinFeatureProd($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'FeatureProd', '\Thelia\Model\FeatureProdQuery');
-    }
-
-    /**
-     * Filter the query by a related Feature object
-     *
-     * @param   Feature|PropelObjectCollection $feature  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   FeatureAvQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByFeature($feature, $comparison = null)
-    {
-        if ($feature instanceof Feature) {
-            return $this
-                ->addUsingAlias(FeatureAvPeer::FEATURE_ID, $feature->getId(), $comparison);
-        } elseif ($feature instanceof PropelObjectCollection) {
-            return $this
-                ->useFeatureQuery()
-                ->filterByPrimaryKeys($feature->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByFeature() only accepts arguments of type Feature or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Feature relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return FeatureAvQuery The current query, for fluid interface
-     */
-    public function joinFeature($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Feature');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Feature');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Feature relation Feature object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\FeatureQuery A secondary query class using the current class as primary query
-     */
-    public function useFeatureQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinFeature($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Feature', '\Thelia\Model\FeatureQuery');
     }
 
     /**
