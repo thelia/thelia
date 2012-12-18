@@ -3,9 +3,6 @@
 if (!isset($env)) {
     $env = 'prod';
 }
-//
-//use Symfony\Component\DependencyInjection;
-//use Symfony\Component\DependencyInjection\Reference;
 
 /**
  *
@@ -16,3 +13,10 @@ if (!isset($env)) {
 $loader = require __DIR__ . '/autoload.php';
 
 define('THELIA_ROOT', __DIR__ .'/../');
+
+if(file_exists(THELIA_ROOT . '/local/config/config_db.php'))
+{
+    require THELIA_ROOT . '/local/config/config_db.php';
+} else {
+    define('THELIA_INSTALL_MODE',true);
+}
