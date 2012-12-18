@@ -1,8 +1,0 @@
-.buildpath
-.project
-.settings
-build/full
-build/pear
-test/reports
-docs/api/docs
-vendor
