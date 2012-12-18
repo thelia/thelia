@@ -5,7 +5,7 @@ use Thelia\Core\Thelia;
 
 //use Symfony\Component\DependencyInjection;
 
-$env = 'debug';
+$env = 'dev';
 require __DIR__ . '/core/bootstrap.php';
 
 $trustIp = array(
@@ -19,7 +19,7 @@ if ( false === in_array($request->getClientIp(), $trustIp)) {
     //change request to send to a 404 error page
 }
 
-$thelia = new Thelia('dev', true);
+$thelia = new Thelia($env, true);
 
 $response = $thelia->handle($request)->prepare($request)->send();
 
