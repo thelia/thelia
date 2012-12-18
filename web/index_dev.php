@@ -6,7 +6,7 @@ use Thelia\Core\Thelia;
 //use Symfony\Component\DependencyInjection;
 
 $env = 'dev';
-require __DIR__ . '/core/bootstrap.php';
+require __DIR__ . '/../core/bootstrap.php';
 
 $trustIp = array(
   '::1',
