@@ -25,11 +25,46 @@ class Thelia extends Kernel
      * The cached version of the service container is used when fresh, otherwise the
      * container is built.
      */
-    protected function initializeContainer()
+//    protected function initializeContainer()
+//    {
+//        $this->container = $this->buildContainer();
+//        $this->container->set('kernel', $this);
+//
+//    }
+    
+    /**
+     * Gets the cache directory.
+     *
+     * @return string The cache directory
+     *
+     * @api
+     */
+    public function getCacheDir()
     {
-        $this->container = $this->buildContainer();
-        $this->container->set('kernel', $this);
-
+        if(defined('THELIA_ROOT'))
+        {
+            return THELIA_ROOT.'cache/'.$this->environment;
+        } else {
+            return parent::getCacheDir();
+        }
+        
+    }
+    
+    /**
+     * Gets the log directory.
+     *
+     * @return string The log directory
+     *
+     * @api
+     */
+    public function getLogDir()
+    {
+        if(defined('THELIA_ROOT'))
+        {
+            return THELIA_ROOT.'log/';
+        } else {
+            return parent::getLogDir();
+        }
     }
 
     /**
@@ -37,16 +72,16 @@ class Thelia extends Kernel
      *
      * @return ContainerBuilder The compiled service container
      */
-    protected function buildContainer()
-    {
-        $container = $this->getContainerBuilder();
-
-        foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-        }
-
-        return $container;
-    }
+//    protected function buildContainer()
+//    {
+//        $container = $this->getContainerBuilder();
+//
+//        foreach ($this->bundles as $bundle) {
+//            $bundle->build($container);
+//        }
+//
+//        return $container;
+//    }
 
     /**
      * return available bundle

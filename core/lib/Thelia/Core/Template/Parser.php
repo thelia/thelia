@@ -4,7 +4,7 @@ namespace Thelia\Core\Template;
 
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  *
@@ -25,12 +25,22 @@ class Parser implements ParserInterface
     const ALLOW_DEBUG = true;
     const USE_CACHE = true;
 
+    /**
+     *
+     * @var Symfony\Component\DependencyInjection\ContainerInterface
+     */
     protected $container;
 
     protected $content;
     protected $status = 200;
 
-    public function __construct(ContainerBuilder $container)
+    /**
+     * 
+     * @param type $container
+     * 
+     * public function __construct(ContainerBuilder $container)
+     */
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
     }
@@ -43,7 +53,10 @@ class Parser implements ParserInterface
     public function getContent()
     {
        $this->loadParser();
-       $this->content = "toto";
+       
+       $request = $this->container->get('request');
+              
+       $this->content = $request->get("test");
 
        return $this->content;
     }
