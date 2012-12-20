@@ -10,5 +10,8 @@
         "symfony-cmf/routing" : "1.0.*@dev",
         "vrana/notorm": "dev-master"
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "autoload" : {
+        "classmap" : ["vendor/vrana/notorm/NotORM.php","vendor/vrana/notorm/NotORM"]
+    }
 }
