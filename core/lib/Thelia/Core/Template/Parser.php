@@ -57,7 +57,9 @@ class Parser implements ParserInterface
        $request = $this->container->get('request');
               
        $this->content = $request->get("test");
-
+       
+       var_dump($this->container->get("database"));
+       
        return $this->content;
     }
 

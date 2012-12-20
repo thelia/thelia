@@ -13,7 +13,9 @@ namespace Thelia\Core;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Thelia\Core\TheliaBundle;
+use Thelia\Core\Bundle\TheliaBundle;
+use Thelia\Core\Bundle\NotORMBundle;
+use Thelia\Core\Bundle\ModelBundle;
 
 class Thelia extends Kernel
 {
@@ -28,7 +30,7 @@ class Thelia extends Kernel
     protected function initializeContainer()
     {
         $this->container = $this->buildContainer();
-        $this->container->set('kernel', $this);
+        //$this->container->set('kernel', $this);
 
     }
     
@@ -75,6 +77,7 @@ class Thelia extends Kernel
     protected function buildContainer()
     {
         $container = $this->getContainerBuilder();
+        $container->set('kernel', $this);
 
         foreach ($this->bundles as $bundle) {
             $bundle->build($container);
@@ -95,7 +98,9 @@ class Thelia extends Kernel
     {
         $bundles = array(
             /* TheliaBundle contain all the dependency injection description */
-            new TheliaBundle()
+            new TheliaBundle(),
+            new NotORMBundle(),
+            new ModelBundle()
         );
 
         /**

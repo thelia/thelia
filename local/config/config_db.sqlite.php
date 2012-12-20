@@ -13,3 +13,8 @@ define('THELIA_DB_USER', '__DB_LOGIN__');
 define('THELIA_DB_PASSWORD', '__DB_PASSWORD__');
 
 define('THELIA_DB_DSN','sqlite:__DB_FILE__');
+
+define('THELIA_DB_CACHE', 'file');
+//define('THELIA_DB_CACHE', 'apc');
+//define('THELIA_DB_CACHE', 'memcache');
+//define('THELIA_DB_CACHE', 'session');
