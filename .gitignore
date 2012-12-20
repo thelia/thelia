@@ -3,3 +3,4 @@ local/config/build.properties
 local/config/config_db.php
 local/config/build
 core/vendor
+local/config/runtime-conf.xml

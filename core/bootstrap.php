@@ -9,10 +9,10 @@ if (!isset($env)) {
  * @file
  * Functions needed for Thelia bootstrap
  */
-
+define('THELIA_ROOT', __DIR__ .'/../');
 $loader = require __DIR__ . '/autoload.php';
 
-define('THELIA_ROOT', __DIR__ .'/../');
+
 
 if(file_exists(THELIA_ROOT . '/local/config/config_db.php'))
 {
