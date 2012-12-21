@@ -18,3 +18,4 @@ define('THELIA_DB_CACHE', 'file');
 //define('THELIA_DB_CACHE', 'apc');
 //define('THELIA_DB_CACHE', 'memcache');
 //define('THELIA_DB_CACHE', 'session');
+//define('THELIA_DB_CACHE', 'include');

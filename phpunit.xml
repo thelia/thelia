@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit 
+    colors="true"
+    bootstrap="core/autoload.php"
+    verbose="true"
+>
+    <testsuites>
+	    <testsuite name="Thelia">
+	        <directory>core/lib/Thelia/Tests</directory>
+	    </testsuite>
+    </testsuites>
+</phpunit>
