@@ -20,6 +20,7 @@ class DIGeneratorTest extends \PHPUnit_Framework_TestCase
         
         $this->assertArrayHasKey("A", $models);
         $this->assertArrayHasKey("B", $models);
+        $this->assertEquals("Thelia\Tests\Tools\_files\A", $models["A"]);
         $this->assertCount(2, $models, "There is more than 2 models in this directory");
     }
     

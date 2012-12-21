@@ -4,6 +4,7 @@
     colors="true"
     bootstrap="core/autoload.php"
     verbose="true"
+    backupGlobals="false"
 >
     <testsuites>
 	    <testsuite name="Thelia">
