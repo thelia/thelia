@@ -1,0 +1,98 @@
+<?php
+
+namespace Thelia\Core\Bundle;
+
+use Symfony\Component\HttpKernel\Bundle\Bundle;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+use Symfony\Component\DependencyInjection\Scope;
+
+/**
+ * First Bundle use in Thelia
+ * It initialize dependency injection container.
+ *
+ * @TODO load configuration from thelia plugin
+ * @TODO register database configuration.
+ *
+ *
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
+
+class TheliaBundle extends Bundle
+{
+    /**
+     *
+     * Construct the depency injection builder
+     *
+     * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
+     */
+
+    public function build(ContainerBuilder $container)
+    {
+        $container->addScope( new Scope('request'));
+
+        $container->register('request', 'Symfony\Component\HttpFoundation\Request')
+                ->setSynthetic(true);
+
+        $container->register('controller.default','Thelia\Controller\DefaultController');
+        $container->register('matcher.default','Thelia\Routing\Matcher\DefaultMatcher')
+                ->addArgument(new Reference('controller.default'));
+
+        $container->register('matcher','Thelia\Routing\Matcher\theliaMatcherCollection')
+                ->addMethodCall('add', array(new Reference('matcher.default'), -255))
+                //->addMethodCall('add','a matcher class (instance or class name)
+
+        ;
+
+        $container->register('resolver', 'Symfony\Component\HttpKernel\Controller\ControllerResolver');
+
+        $container->register('parser','Thelia\Core\Template\Parser')
+                ->addArgument(new Reference('service_container'))
+        ;
+        
+//        $container->setParameter("logger.class", "\Thelia\Log\Tlog");
+//        $container->register("logger","%logger.class%");
+        /**
+         * RouterListener implements EventSubscriberInterface and listen for kernel.request event
+         */
+        $container->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
+            ->setArguments(array(new Reference('matcher')))
+        ;
+        
+        /**
+         * @TODO add an other listener on kernel.request for checking some params Like check if User is log in, set the language and other.
+         *
+         * $container->register()
+         *
+         *
+         * $container->register('listener.request', 'Thelia\Core\EventListener\RequestListener')
+         *      ->addArgument(new Reference('');
+         * ;
+         */
+
+        $container->register('thelia.listener.view','Thelia\Core\EventListener\ViewListener')
+                ->addArgument(new Reference('parser'))
+        ;
+
+        
+
+        $container->register('dispatcher','Symfony\Component\EventDispatcher\EventDispatcher')
+                ->addArgument(new Reference('service_container'))
+                ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
+                ->addMethodCall('addSubscriber', array(new Reference('thelia.listener.view')))
+        ;
+        
+        $container->register('http_kernel','Thelia\Core\TheliaHttpKernel')
+            ->addArgument(new Reference('dispatcher'))
+            ->addArgument(new Reference('service_container'))
+            ->addArgument(new Reference('resolver'))
+        ;
+
+        // DEFINE DEFAULT PARAMETER LIKE
+
+        /**
+         * @TODO learn about container compilation
+         */
+
+    }
+}

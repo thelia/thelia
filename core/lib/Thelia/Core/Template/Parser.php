@@ -58,8 +58,8 @@ class Parser implements ParserInterface
               
        $this->content = $request->get("test");
        
-       var_dump($this->container->get("database"));
-       
+       $config = $this->container->get("model.config");
+              
        return $this->content;
     }
 
