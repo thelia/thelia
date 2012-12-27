@@ -1,20 +1,48 @@
 <?php
-
+/*************************************************************************************/
+/*                                                                                   */
+/*      Thelia	                                                                     */
+/*                                                                                   */
+/*      Copyright (c) OpenStudio                                                     */
+/*	email : info@thelia.net                                                      */
+/*      web : http://www.thelia.net                                                  */
+/*                                                                                   */
+/*      This program is free software; you can redistribute it and/or modify         */
+/*      it under the terms of the GNU General Public License as published by         */
+/*      the Free Software Foundation; either version 3 of the License                */
+/*                                                                                   */
+/*      This program is distributed in the hope that it will be useful,              */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
+/*      GNU General Public License for more details.                                 */
+/*                                                                                   */
+/*      You should have received a copy of the GNU General Public License            */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*                                                                                   */
+/*************************************************************************************/
 namespace Thelia\Log;
 
 use Thelia\Model\Config;
 
+/**
+ * 
+ * Thelia Logger
+ * 
+ * Allow to define different level and output.
+ * 
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
 class Tlog
 {
     // Nom des variables de configuration
-    const VAR_NIVEAU 		= "tlog_niveau";
+    const VAR_LEVEL 		= "tlog_level";
     const VAR_DESTINATIONS 	= "tlog_destinations";
-    const VAR_PREFIXE 		= "tlog_prefixe";
+    const VAR_PREFIXE 		= "tlog_prefix";
     const VAR_FILES 		= "tlog_files";
-    const VAR_IP 			= "tlog_ip";
-    const VAR_SHOW_REDIRECT = "tlog_show_redirect";
+    const VAR_IP                = "tlog_ip";
+    const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
 
-    // Les differents niveaux de trace
+    // all level of trace
     const TRACE = 1;
     const DEBUG = 2;
     const WARNING = 3;
@@ -23,8 +51,8 @@ class Tlog
     const FATAL = 6;
     const MUET = PHP_INT_MAX;
 
-    // Valeurs par defaut
-    const DEFAUT_NIVEAU 		= self::MUET;
+    // default values
+    const DEFAULT_LEVEL 		= self::MUET;
     const DEFAUT_DESTINATIONS 	= "Thelia\Log\Destination\TlogDestinationHtml";
     const DEFAUT_PREFIXE 		= "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: ";
     const DEFAUT_FILES 			= "*";
@@ -36,7 +64,7 @@ class Tlog
     protected $destinations = array();
 
     protected $mode_back_office = false;
-    protected $niveau = self::MUET;
+    protected $level = self::MUET;
     protected $prefixe = "";
     protected $files = array();
     protected $all_files = false;
@@ -46,7 +74,7 @@ class Tlog
 
     protected static $ecrire_effectue = false;
 
-    // Les repertoires où rechercher les classes destination
+    // directories where are the Destinations Files
     public $dir_destinations = array();
 
     public static function instance() {
@@ -63,12 +91,12 @@ class Tlog
     }
 
     protected function init() {
-            $niveau = Config::read(self::VAR_NIVEAU, self::DEFAUT_NIVEAU);
+            $level = Config::read(self::VAR_LEVEL, self::DEFAULT_LEVEL);
 
-            $this->set_niveau($niveau);
+            $this->set_niveau($level);
 
             $this->dir_destinations = array(
-                    __DIR__.'/tlog/destinations'
+                    __DIR__.'/Destination'
                     //, __DIR__.'/../client/tlog/destinations'
             );
 
@@ -85,7 +113,7 @@ class Tlog
     // Configuration
     // -------------
 
-    public function set_destinations($destinations) {
+    public function set_destinations(AbstractTlogDestination $destinations) {
             if (! empty($destinations)) {
 
                     $this->destinations = array();
@@ -95,8 +123,8 @@ class Tlog
             }
     }
 
-    public function set_niveau($niveau) {
-            $this->niveau = $niveau;
+    public function set_niveau($level) {
+            $this->niveau = $level;
     }
 
     public function set_prefixe($prefixe) {
@@ -247,9 +275,9 @@ class Tlog
 
 	// Permet de déterminer si la trace est active, en prenant en compte
 	// le niveau et le filtrage par fichier
-	public function active($niveau) {
+	public function active($level) {
 
-		if ($this->niveau <= $niveau) {
+		if ($this->niveau <= $level) {
 
 			$origine = $this->trouver_origine();
 
