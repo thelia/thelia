@@ -69,9 +69,6 @@ class TheliaBundle extends Bundle
         $container->register('parser','Thelia\Core\Template\Parser')
                 ->addArgument(new Reference('service_container'))
         ;
-        
-//        $container->setParameter("logger.class", "\Thelia\Log\Tlog");
-//        $container->register("logger","%logger.class%");
         /**
          * RouterListener implements EventSubscriberInterface and listen for kernel.request event
          */

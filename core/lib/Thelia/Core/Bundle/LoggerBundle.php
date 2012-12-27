@@ -26,8 +26,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Thelia\Log\Tlog;
-
 /**
  * First Bundle use in Thelia
  * It initialize dependency injection container.
@@ -39,70 +37,46 @@ use Thelia\Log\Tlog;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class NotORMBundle extends Bundle
+class LoggerBundle extends Bundle
 {
     /**
      *
      * Construct the depency injection builder
+     * 
+     * Reference all Model in the Container here
      *
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      */
 
     public function build(ContainerBuilder $container)
-    {
-        $config = array(
-           // \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
-        );
+    {   
+        $container->setParameter("logger.class", "\Thelia\Log\Tlog");
+        $container->register("logger","%logger.class%")
+                ->addArgument(new Reference('service_container'));
         
         $kernel = $container->get('kernel');
-
-        $pdo = new \PDO(THELIA_DB_DSN,THELIA_DB_USER, THELIA_DB_PASSWORD, $config);
         
-        $pdo->exec("SET NAMES UTF8");
-        
-        $container->register('database','\Thelia\Database\NotORM')
-                ->addArgument($pdo);
-        
-        if(defined('THELIA_DB_CACHE') && !$kernel->isDebug())
+        if($kernel->isDebug())
         {
-            switch(THELIA_DB_CACHE)
-            {
-                case 'file':
-                    $container->register('database_cache','\NotORM_Cache_File')
-                        ->addArgument($kernel->getCacheDir().'/database.php');
-                    break;
-                case 'include':
-                    $container->register('database_cache','\NotORM_Cache_Include')
-                        ->addArgument($kernel->getCacheDir().'/database_include.php');
-                    break;
-                case 'apc':
-                    if (extension_loaded('apc'))
-                    {
-                        $container->register('database_cache','\NotORM_Cache_APC');
-                    }
-                    break;
-                case 'session':
-                    $container->register('database_cache','\NotORM_Cache_Session');
-                    break;
-                case 'memcache':
-                    if(class_exists('Memcache'))
-                    {
-                        $container->register('database_cache','\NotORM_Cache_Memcache')
-                                ->addArgument(new \Memcache());
-                    }
-                    break;
-                    
-            }
+//            $debug = function ($query, $parameters)
+//            {
+//                
+//                $pattern = '(^' . preg_quote(dirname(__FILE__)) . '(\\.php$|[/\\\\]))'; // can be static
+//                foreach (debug_backtrace() as $backtrace) {
+//                        if (isset($backtrace["file"]) && !preg_match($pattern, $backtrace["file"])) { // stop on first file outside NotORM source codes
+//                                break;
+//                        }
+//                }
+//                file_put_contents(THELIA_ROOT . 'log/request_debug.log', "$backtrace[file]:$backtrace[line]:$query", FILE_APPEND);
+//                file_put_contents(THELIA_ROOT . 'log/request_debug.log', is_scalar($parameters) ? $parameters : print_r($parameters, true), FILE_APPEND);
+//                
+//            };
+//            
+//            $container->getDefinition('database')
+//                        ->addMethodCall('setDebug', array($debug));
             
-            if($container->hasDefinition('database_cache'))
-            {
-                $container->getDefinition('database')
-                        ->addMethodCall('setCache', array(new Reference('database_cache')));
-            }
+            $container->get('database')
+                    ->setLogger($container->get('logger'));
         }
-        
-        
-        
-        
     }
 }

@@ -33,6 +33,8 @@ abstract class AbstractTlogDestination {
 
     // Vaudra true si on est dans le back office.
     protected $flag_back_office = false;
+    
+    protected $configModel;
 
     public function __construct() {
         $this->_configs = array();
@@ -58,6 +60,16 @@ abstract class AbstractTlogDestination {
         }
         return false;
     }
+    
+    public function setConfigModel($configModel)
+    {
+        $this->configModel = $configModel;
+    }
+    
+    public function getConfigModel()
+    {
+        return $this->configModel;
+    }
 
     //Récupère la valeur affectée à une configuration de la destination
     public function get_config($nom) {
@@ -73,33 +85,33 @@ abstract class AbstractTlogDestination {
         return $this->_configs;
     }
 
-	public function mode_back_office($bool) {
-		$this->flag_back_office = $bool;
-	}
+    public function mode_back_office($bool) {
+            $this->flag_back_office = $bool;
+    }
 
     //Ajoute une ligne de logs à la destination
     public function ajouter($string) {
         $this->_logs[] = $string;
     }
 
-	protected function inserer_apres_body(&$res, $logdata) {
+    protected function inserer_apres_body(&$res, $logdata) {
 
-		$match = array();
+            $match = array();
 
-		if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
-			$res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
-		}
-		else {
-			$res = $logdata . $res;
-		}
-	}
+            if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
+                    $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
+            }
+            else {
+                    $res = $logdata . $res;
+            }
+    }
 
-	// Demande à la destination de se configurer pour être prête
-	// a fonctionner. Si $config est != false, celà indique
-	// que seul le paramètre de configuration indiqué a été modifié.
-	protected function configurer($config = false) {
-		// Cette methode doit etre surchargée si nécessaire.
-	}
+    // Demande à la destination de se configurer pour être prête
+    // a fonctionner. Si $config est != false, celà indique
+    // que seul le paramètre de configuration indiqué a été modifié.
+    protected function configurer($config = false) {
+            // Cette methode doit etre surchargée si nécessaire.
+    }
 
     //Lance l'écriture de tous les logs par la destination
     //$res : contenu de la page html

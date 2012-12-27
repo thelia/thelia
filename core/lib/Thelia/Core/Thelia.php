@@ -34,9 +34,7 @@ namespace Thelia\Core;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Thelia\Core\Bundle\TheliaBundle;
-use Thelia\Core\Bundle\NotORMBundle;
-use Thelia\Core\Bundle\ModelBundle;
+use Thelia\Core\Bundle;
 
 class Thelia extends Kernel
 {
@@ -119,9 +117,10 @@ class Thelia extends Kernel
     {
         $bundles = array(
             /* TheliaBundle contain all the dependency injection description */
-            new TheliaBundle(),
-            new NotORMBundle(),
-            new ModelBundle()
+            new Bundle\TheliaBundle(),
+            new Bundle\NotORMBundle(),
+            new Bundle\ModelBundle(),
+            new Bundle\LoggerBundle()
         );
 
         /**

@@ -20,55 +20,45 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Database;
 
-use Thelia\Log\TlogInterface;
-use Thelia\Database\NotORM\Result;
+namespace Thelia\Log;
 
-
-/**
- * 
- * Class Thelia\Database\NotORM extending \NotORM library http://www.notorm.com/
- * 
- * This class create or redifine some setters 
- * 
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class NotORM extends \NotORM
+class TlogDestinationConfig
 {
-    
-    public $logger = false;
-    
-    public function setCache(\NotORM_Cache $cache)
-    {
-        $this->cache = $cache;
-    }
-    
-    public function setLogger(TlogInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-    
-    public function setDebug($debug)
-    {
-        if(is_callable($debug))
+
+    const TYPE_TEXTAREA = 1;
+    const TYPE_TEXTFIELD = 2;
+
+    public $titre;
+    public $label;
+    public $defaut;
+    public $type;
+    public $valeur;
+
+    public function __construct($nom, $titre, $label, $defaut, $type, $config = null) {
+
+        $this->nom = $nom;
+        $this->titre = $titre;
+        $this->label = $label;
+        $this->defaut = $defaut;
+        $this->type = $type;
+
+//        @$this->charger();
+        
+        if($config)
         {
-            $this->debug = $debug;
-        } else {
-            $this->debug = true;
+            $this->valeur = $config->read($this->nom, $this->defaut);
         }
     }
-    
-    /** Get table data
-    * @param string
-    * @param array (["condition"[, array("value")]]) passed to NotORM_Result::where()
-    * @return NotORM_Result
-    */
-    function __call($table, array $where) {
-            $return = new Result($this->structure->getReferencingTable($table, ''), $this);
-            if ($where) {
-                    call_user_func_array(array($return, 'where'), $where);
-            }
-            return $return;
-    }
+
+//    public function charger() {
+//         // La variable n'existe pas ? La créer en y affectant la valeur par defaut
+//        if (! parent::charger($this->nom)) {
+//        	$this->valeur = $this->defaut;
+//        	$this->protege = 1;
+//			$this->cache = 1;
+//
+//			$this->add();
+//        }
+//    }
 }

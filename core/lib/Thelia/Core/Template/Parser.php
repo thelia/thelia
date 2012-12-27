@@ -79,6 +79,8 @@ class Parser implements ParserInterface
        $this->content = $request->get("test");
        
        $config = $this->container->get("model.config");
+       
+       echo $config->read("toto","tutu");
               
        return $this->content;
     }
