@@ -31,8 +31,9 @@ class Result extends \NotORM_Result
         $return = $this->notORM->connection->prepare($query);
         if (!$return || !$return->execute(array_map(array($this, 'formatValue'), $parameters))) {
             $this->notORM->logger->fatal("Error for this query : ".$query);
-            $this->notORM->logger->fatal($this->notORM->errorCode);
-            $this->notORM->logger->fatal($this->notORM->errorInfo);
+            $this->notORM->logger->fatal($this->notORM->errorCode());
+            $this->notORM->logger->fatal(print_r($this->notORM->errorInfo(), true));
+            $this->notORM->logger->fatal(print_r($return->errorInfo(), true));
                 return false;
         }
         return $return;
