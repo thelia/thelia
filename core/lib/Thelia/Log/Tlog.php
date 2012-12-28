@@ -54,7 +54,7 @@ class Tlog Implements TlogInterface
 
     // default values
     const DEFAULT_LEVEL 		= self::DEBUG;
-    const DEFAUT_DESTINATIONS           = "Thelia\Log\Destination\TlogDestinationFile";
+    const DEFAUT_DESTINATIONS           = "Thelia\Log\Destination\TlogDestinationNull";
     const DEFAUT_PREFIXE 		= "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: ";
     const DEFAUT_FILES 			= "*";
     const DEFAUT_IP 			= "";
@@ -97,7 +97,7 @@ class Tlog Implements TlogInterface
 //            if (self::$instance == false) {
 //                    self::$instance = new Tlog();
 //
-//                    // On doit placer les initialisations à ce niveau pour pouvoir
+//                    // On doit placer les initialisations à ce level pour pouvoir
 //                    // utiliser la classe Tlog dans les classes de base (Cnx, BaseObj, etc.)
 //                    // Les placer dans le constructeur provoquerait une boucle
 //                    self::$instance->init();
@@ -111,7 +111,7 @@ class Tlog Implements TlogInterface
         
             $level = $config->read(self::VAR_LEVEL, self::DEFAULT_LEVEL);
 
-            $this->set_niveau($level);
+            $this->set_level($level);
 
             $this->dir_destinations = array(
                     __DIR__.'/Destination'
@@ -141,8 +141,8 @@ class Tlog Implements TlogInterface
             }
     }
 
-    public function set_niveau($level) {
-            $this->niveau = $level;
+    public function set_level($level) {
+            $this->level = $level;
     }
 
     public function set_prefixe($prefixe) {
@@ -157,7 +157,7 @@ class Tlog Implements TlogInterface
     }
 
     public function set_ip($ips) {
-            if (! empty($ips) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->niveau = self::MUET;
+            if (! empty($ips) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
     }
 
     public function set_show_redirect($bool) {
@@ -186,7 +186,7 @@ class Tlog Implements TlogInterface
     // ---------------------------
 
     public function trace() {
-        if ($this->niveau > self::TRACE)
+        if ($this->level > self::TRACE)
             return;
 
         $args = func_get_args();
@@ -195,7 +195,7 @@ class Tlog Implements TlogInterface
     }
 
     public function debug() {
-        if ($this->niveau > self::DEBUG)
+        if ($this->level > self::DEBUG)
             return;
 
         $args = func_get_args();
@@ -204,7 +204,7 @@ class Tlog Implements TlogInterface
     }
 
     public function info() {
-        if ($this->niveau > self::INFO)
+        if ($this->level > self::INFO)
             return;
 
         $args = func_get_args();
@@ -213,7 +213,7 @@ class Tlog Implements TlogInterface
     }
 
     public function warning() {
-        if (Tlog::instance()->niveau > self::WARNING)
+        if ($this->level > self::WARNING)
             return;
 
         $args = func_get_args();
@@ -222,7 +222,7 @@ class Tlog Implements TlogInterface
     }
 
     public function error() {
-        if ($this->niveau > self::ERROR)
+        if ($this->level > self::ERROR)
             return;
 
         $args = func_get_args();
@@ -231,7 +231,7 @@ class Tlog Implements TlogInterface
     }
 
     public function fatal() {
-        if ($this->niveau > self::FATAL)
+        if ($this->level > self::FATAL)
             return;
 
         $args = func_get_args();
@@ -253,7 +253,7 @@ class Tlog Implements TlogInterface
             self::$ecrire_effectue = true;
 
             // Muet ? On ne fait rien
-            if ($this->niveau == self::MUET) return;
+            if ($this->level == self::MUET) return;
 
             foreach($this->destinations as $dest) {
                     $dest->ecrire($res);
@@ -274,7 +274,7 @@ class Tlog Implements TlogInterface
 
     public function afficher_redirections($url) {
 
-        if ($this->niveau != self::MUET && $this->show_redirect) {
+        if ($this->level != self::MUET && $this->show_redirect) {
                 echo "
 <html>
 <head><title>Redirection...</title></head>
@@ -292,10 +292,10 @@ class Tlog Implements TlogInterface
     }
 
     // Permet de déterminer si la trace est active, en prenant en compte
-    // le niveau et le filtrage par fichier
+    // le level et le filtrage par fichier
     public function active($level) {
 
-        if ($this->niveau <= $level) {
+        if ($this->level <= $level) {
 
             $origine = $this->trouver_origine();
 
