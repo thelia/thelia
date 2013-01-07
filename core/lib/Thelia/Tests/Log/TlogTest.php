@@ -47,6 +47,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
                 ->will($this->returnValue($configModel));
         $containerMock->expects($this->any())
                 ->method("getParameter")
+                ->with($this->stringContains("logger.class"))
                 ->will($this->returnValue("Thelia\Log\Tlog"));
         
         

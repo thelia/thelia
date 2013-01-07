@@ -44,21 +44,21 @@ class Tlog Implements TlogInterface
     const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
 
     // all level of trace
-    const TRACE = 1;
-    const DEBUG = 2;
-    const WARNING = 3;
-    const INFO = 4;
-    const ERROR = 5;
-    const FATAL = 6;
-    const MUET = PHP_INT_MAX;
+    const TRACE                 = 1;
+    const DEBUG                 = 2;
+    const WARNING               = 3;
+    const INFO                  = 4;
+    const ERROR                 = 5;
+    const FATAL                 = 6;
+    const MUET                  = PHP_INT_MAX;
 
     // default values
-    const DEFAULT_LEVEL 		= self::DEBUG;
-    const DEFAUT_DESTINATIONS           = "Thelia\Log\Destination\TlogDestinationNull";
-    const DEFAUT_PREFIXE 		= "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: ";
-    const DEFAUT_FILES 			= "*";
-    const DEFAUT_IP 			= "";
-    const DEFAUT_SHOW_REDIRECT	= 0;
+    const DEFAULT_LEVEL 	= self::DEBUG;
+    const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationFile";
+    const DEFAUT_PREFIXE 	= "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: ";
+    const DEFAUT_FILES 		= "*";
+    const DEFAUT_IP 		= "";
+    const DEFAUT_SHOW_REDIRECT  = 0;
 
     private static $instance = false;
 

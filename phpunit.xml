@@ -2,7 +2,7 @@
 
 <phpunit 
     colors="true"
-    bootstrap="core/autoload.php"
+    bootstrap="core/lib/Thelia/Tests/bootstrap.php"
     verbose="true"
     backupGlobals="false"
 >
