@@ -6,9 +6,23 @@ use Thelia\Model\Base\Base;
 
 class Config extends Base
 {
+    protected $name;
+    protected $value;
+    protected $secure;
+    protected $hidden;
+
+
+    protected $properties = array(
+        "name",
+        "value",
+        "secure",
+        "hidden"
+    );
 
     public function read($search, $default)
     {
-       return $this->db->config()->where("name",$search)->fetch()?:$default;
+       $result = $this->findOneBy("name",$search);
+
+       return $result ? $result->name : $default;
     }
 }

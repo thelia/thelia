@@ -49,7 +49,7 @@ class NotORMBundle extends Bundle
     public function build(ContainerBuilder $container)
     {
         $config = array(
-           // \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
+            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
         );
 
         $kernel = $container->get('kernel');
