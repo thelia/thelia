@@ -75,7 +75,7 @@ class TheliaBundle extends Bundle
         $container->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
             ->setArguments(array(new Reference('matcher')))
         ;
-        
+
         /**
          * @TODO add an other listener on kernel.request for checking some params Like check if User is log in, set the language and other.
          *
@@ -91,14 +91,14 @@ class TheliaBundle extends Bundle
                 ->addArgument(new Reference('parser'))
         ;
 
-        
+
 
         $container->register('dispatcher','Symfony\Component\EventDispatcher\EventDispatcher')
                 ->addArgument(new Reference('service_container'))
                 ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
                 ->addMethodCall('addSubscriber', array(new Reference('thelia.listener.view')))
         ;
-        
+
         $container->register('http_kernel','Thelia\Core\TheliaHttpKernel')
             ->addArgument(new Reference('dispatcher'))
             ->addArgument(new Reference('service_container'))

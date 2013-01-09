@@ -35,8 +35,8 @@ class TlogDestinationConfig
     public $type;
     public $valeur;
 
-    public function __construct($nom, $titre, $label, $defaut, $type, $config = null) {
-
+    public function __construct($nom, $titre, $label, $defaut, $type, $config = null)
+    {
         $this->nom = $nom;
         $this->titre = $titre;
         $this->label = $label;
@@ -44,9 +44,8 @@ class TlogDestinationConfig
         $this->type = $type;
 
 //        @$this->charger();
-        
-        if($config)
-        {
+
+        if ($config) {
             $this->valeur = $config->read($this->nom, $this->defaut);
         }
     }

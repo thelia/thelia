@@ -26,11 +26,11 @@ use Thelia\Model\Config;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * 
+ *
  * Thelia Logger
- * 
+ *
  * Allow to define different level and output.
- * 
+ *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class Tlog Implements TlogInterface
@@ -77,19 +77,19 @@ class Tlog Implements TlogInterface
 
     // directories where are the Destinations Files
     public $dir_destinations = array();
-    
+
     protected $container;
-    
+
     /**
-     * 
+     *
      * @param type $container
-     * 
+     *
      * public function __construct(ContainerBuilder $container)
      */
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        
+
         $this->init();
     }
 
@@ -106,9 +106,10 @@ class Tlog Implements TlogInterface
 //            return self::$instance;
 //    }
 
-    protected function init() {
+    protected function init()
+    {
             $config = $this->container->get("model.config");
-        
+
             $level = $config->read(self::VAR_LEVEL, self::DEFAULT_LEVEL);
 
             $this->set_level($level);
@@ -131,7 +132,8 @@ class Tlog Implements TlogInterface
     // Configuration
     // -------------
 
-    public function set_destinations($destinations) {
+    public function set_destinations($destinations)
+    {
             if (! empty($destinations)) {
 
                     $this->destinations = array();
@@ -141,40 +143,44 @@ class Tlog Implements TlogInterface
             }
     }
 
-    public function set_level($level) {
+    public function set_level($level)
+    {
             $this->level = $level;
     }
 
-    public function set_prefixe($prefixe) {
-
+    public function set_prefixe($prefixe)
+    {
             $this->prefixe = $prefixe;
     }
 
-    public function set_files($files) {
+    public function set_files($files)
+    {
             $this->files = explode(";", $files);
 
             $this->all_files = in_array('*', $this->files);
     }
 
-    public function set_ip($ips) {
+    public function set_ip($ips)
+    {
             if (! empty($ips) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
     }
 
-    public function set_show_redirect($bool) {
+    public function set_show_redirect($bool)
+    {
             $this->show_redirect = $bool;
     }
 
     // Configuration d'une destination
-    public function set_config($destination, $param, $valeur) {
-
+    public function set_config($destination, $param, $valeur)
+    {
             if (isset($this->destinations[$destination])) {
                     $this->destinations[$destination]->set_config($param, $valeur);
             }
     }
 
     // Configuration d'une destination
-    public function get_config($destination, $param) {
-
+    public function get_config($destination, $param)
+    {
             if (isset($this->destinations[$destination])) {
                     return $this->destinations[$destination]->get_config($param);
             }
@@ -185,7 +191,8 @@ class Tlog Implements TlogInterface
     // Methodes d'accès aux traces
     // ---------------------------
 
-    public function trace() {
+    public function trace()
+    {
         if ($this->level > self::TRACE)
             return;
 
@@ -194,7 +201,8 @@ class Tlog Implements TlogInterface
         $this->out("TRACE", $args);
     }
 
-    public function debug() {
+    public function debug()
+    {
         if ($this->level > self::DEBUG)
             return;
 
@@ -203,7 +211,8 @@ class Tlog Implements TlogInterface
         $this->out("DEBUG", $args);
     }
 
-    public function info() {
+    public function info()
+    {
         if ($this->level > self::INFO)
             return;
 
@@ -212,7 +221,8 @@ class Tlog Implements TlogInterface
         $this->out("INFO", $args);
     }
 
-    public function warning() {
+    public function warning()
+    {
         if ($this->level > self::WARNING)
             return;
 
@@ -221,7 +231,8 @@ class Tlog Implements TlogInterface
         $this->out("WARNING", $args);
     }
 
-    public function error() {
+    public function error()
+    {
         if ($this->level > self::ERROR)
             return;
 
@@ -230,7 +241,8 @@ class Tlog Implements TlogInterface
         $this->out("ERREUR", $args);
     }
 
-    public function fatal() {
+    public function fatal()
+    {
         if ($this->level > self::FATAL)
             return;
 
@@ -240,27 +252,28 @@ class Tlog Implements TlogInterface
     }
 
     // Mode back office
-    public static function mode_back_office($booleen) {
-
-            foreach(Tlog::instance()->destinations as $dest) {
+    public static function mode_back_office($booleen)
+    {
+            foreach (Tlog::instance()->destinations as $dest) {
                     $dest->mode_back_office($booleen);
             }
     }
 
     // Ecriture finale
-    public function ecrire(&$res) {
-
+    public function ecrire(&$res)
+    {
             self::$ecrire_effectue = true;
 
             // Muet ? On ne fait rien
             if ($this->level == self::MUET) return;
 
-            foreach($this->destinations as $dest) {
+            foreach ($this->destinations as $dest) {
                     $dest->ecrire($res);
             }
     }
 
-    public function ecrire_si_exit() {
+    public function ecrire_si_exit()
+    {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
         if (self::$ecrire_effectue === false) {
 
@@ -272,8 +285,8 @@ class Tlog Implements TlogInterface
         }
     }
 
-    public function afficher_redirections($url) {
-
+    public function afficher_redirections($url)
+    {
         if ($this->level != self::MUET && $this->show_redirect) {
                 echo "
 <html>
@@ -285,16 +298,15 @@ class Tlog Implements TlogInterface
         ";
 
                 return true;
-        }
-        else {
+        } else {
                 return false;
         }
     }
 
     // Permet de déterminer si la trace est active, en prenant en compte
     // le level et le filtrage par fichier
-    public function active($level) {
-
+    public function active($level)
+    {
         if ($this->level <= $level) {
 
             $origine = $this->trouver_origine();
@@ -309,26 +321,27 @@ class Tlog Implements TlogInterface
         return false;
     }
 
-    public function is_file_active($file) {
+    public function is_file_active($file)
+    {
         return ($this->all_files || in_array($file, $this->files)) && ! in_array("!$file", $this->files);
     }
 
     /* -- Methodes privees ---------------------------------------- */
 
     // Adapté de LoggerLoginEvent dans log4php
-    private function trouver_origine() {
-
+    private function trouver_origine()
+    {
         $origine = array();
 
-        if(function_exists('debug_backtrace')) {
+        if (function_exists('debug_backtrace')) {
 
             $trace = debug_backtrace();
             $prevHop = null;
             // make a downsearch to identify the caller
             $hop = array_pop($trace);
-            
-            while($hop !== null) {
-                if(isset($hop['class'])) {
+
+            while ($hop !== null) {
+                if (isset($hop['class'])) {
                     // we are sometimes in functions = no class available: avoid php warning here
                     $className = $hop['class'];
 
@@ -359,8 +372,8 @@ class Tlog Implements TlogInterface
         return $origine;
     }
 
-    private function out($level, $tabargs) {
-
+    private function out($level, $tabargs)
+    {
         $text = '';
 
         foreach ($tabargs as $arg) {
@@ -384,32 +397,29 @@ class Tlog Implements TlogInterface
 
             $trace = $prefixe . $text;
 
-            foreach($this->destinations as $dest) {
+            foreach ($this->destinations as $dest) {
                 $dest->ajouter($trace);
             }
 
             $this->linecount++;
         }
     }
-    
+
     /**
-     * 
-     * @param type $destinations
-     * @param array $actives array containing classes instanceof AbstractTlogDestination
+     *
+     * @param type  $destinations
+     * @param array $actives      array containing classes instanceof AbstractTlogDestination
      */
-    protected function loadDestinations(&$destinations, array $actives = NULL) {
-        
-        foreach($actives as $active)
-        {
-            if(class_exists($active))
-            {
+    protected function loadDestinations(&$destinations, array $actives = NULL)
+    {
+        foreach ($actives as $active) {
+            if (class_exists($active)) {
                 $class = new $active($this->container->get('model.config'));
-                
-                if(!$class instanceof AbstractTlogDestination)
-                {
+
+                if (!$class instanceof AbstractTlogDestination) {
                     throw new \UnexpectedValueException($active." must extends Thelia\Tlog\AbstractTlogDestination");
                 }
-                
+
                 $destinations[$active] = $class;
             }
         }

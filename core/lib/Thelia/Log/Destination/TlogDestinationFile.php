@@ -25,9 +25,9 @@ namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
 use Thelia\Log\TlogDestinationConfig;
-    
-class TlogDestinationFile extends AbstractTlogDestination {
 
+class TlogDestinationFile extends AbstractTlogDestination
+{
     // Nom des variables de configuration
     // ----------------------------------
     const VAR_PATH_FILE = "tlog_destinationfile_path";
@@ -39,21 +39,22 @@ class TlogDestinationFile extends AbstractTlogDestination {
     protected $path_defaut = false;
     protected $fh = false;
 
-    public function __construct($configModel = null) {
-
+    public function __construct($configModel = null)
+    {
             $this->path_defaut = THELIA_ROOT . "log/" . self::TLOG_DEFAULT_NAME;
             $this->setConfigModel($configModel);
             parent::__construct();
     }
 
-    public function configurer($config = false) {
+    public function configurer($config = false)
+    {
         $file_path = $this->get_config(self::VAR_PATH_FILE);
         $mode = strtolower($this->get_config(self::VAR_MODE)) == 'a' ? 'a' : 'w';
 
         if (! empty($file_path)) {
             if (! is_file($file_path)) {
                     $dir = dirname($file_path);
-                    if(! is_dir($dir)) {
+                    if (! is_dir($dir)) {
                             mkdir($dir, 0777, true);
                     }
             }
@@ -64,15 +65,18 @@ class TlogDestinationFile extends AbstractTlogDestination {
         }
     }
 
-    public function get_titre() {
+    public function get_titre()
+    {
             return "Text File";
     }
 
-    public function get_description() {
+    public function get_description()
+    {
             return "Store logs into text file";
     }
 
-    public function get_configs() {
+    public function get_configs()
+    {
         return array(
             new TlogDestinationConfig(
                 self::VAR_PATH_FILE,
@@ -93,13 +97,15 @@ class TlogDestinationFile extends AbstractTlogDestination {
         );
     }
 
-    public function ajouter($texte) {
+    public function ajouter($texte)
+    {
         if ($this->fh) {
             fwrite($this->fh, $texte."\n");
         }
     }
 
-    public function ecrire(&$res) {
+    public function ecrire(&$res)
+    {
         if ($this->fh) @fclose($this->fh);
 
         $this->fh = false;

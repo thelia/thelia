@@ -23,8 +23,8 @@
 
 namespace Thelia\Log;
 
-abstract class AbstractTlogDestination {
-
+abstract class AbstractTlogDestination
+{
     //Tableau de TlogDestinationConfig paramétrant la destination
     protected $_configs;
 
@@ -33,14 +33,15 @@ abstract class AbstractTlogDestination {
 
     // Vaudra true si on est dans le back office.
     protected $flag_back_office = false;
-    
+
     protected $configModel;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->_configs = array();
         $this->_logs = array();
 
-		// Initialiser les variables de configuration
+        // Initialiser les variables de configuration
          $this->_configs = $this->get_configs();
 
          // Appliquer la configuration
@@ -48,9 +49,10 @@ abstract class AbstractTlogDestination {
     }
 
     //Affecte une valeur à une configuration de la destination
-    public function set_config($nom, $valeur) {
-        foreach($this->_configs as $config) {
-            if($config->nom == $nom) {
+    public function set_config($nom, $valeur)
+    {
+        foreach ($this->_configs as $config) {
+            if ($config->nom == $nom) {
                 $config->valeur = $valeur;
                 // Appliquer les changements
                 $this->configurer($config);
@@ -58,50 +60,55 @@ abstract class AbstractTlogDestination {
                 return true;
             }
         }
+
         return false;
     }
-    
+
     public function setConfigModel($configModel)
     {
         $this->configModel = $configModel;
     }
-    
+
     public function getConfigModel()
     {
         return $this->configModel;
     }
 
     //Récupère la valeur affectée à une configuration de la destination
-    public function get_config($nom) {
-        foreach($this->_configs as $config) {
-            if($config->nom == $nom) {
+    public function get_config($nom)
+    {
+        foreach ($this->_configs as $config) {
+            if ($config->nom == $nom) {
                 return $config->valeur;
             }
         }
+
         return false;
     }
 
-    public function get_configs() {
+    public function get_configs()
+    {
         return $this->_configs;
     }
 
-    public function mode_back_office($bool) {
+    public function mode_back_office($bool)
+    {
             $this->flag_back_office = $bool;
     }
 
     //Ajoute une ligne de logs à la destination
-    public function ajouter($string) {
+    public function ajouter($string)
+    {
         $this->_logs[] = $string;
     }
 
-    protected function inserer_apres_body(&$res, $logdata) {
-
+    protected function inserer_apres_body(&$res, $logdata)
+    {
             $match = array();
 
             if (preg_match("/(<body[^>]*>)/i", $res, $match)) {
                     $res = str_replace($match[0], $match[0] . "\n" . $logdata, $res);
-            }
-            else {
+            } else {
                     $res = $logdata . $res;
             }
     }
@@ -109,7 +116,8 @@ abstract class AbstractTlogDestination {
     // Demande à la destination de se configurer pour être prête
     // a fonctionner. Si $config est != false, celà indique
     // que seul le paramètre de configuration indiqué a été modifié.
-    protected function configurer($config = false) {
+    protected function configurer($config = false)
+    {
             // Cette methode doit etre surchargée si nécessaire.
     }
 

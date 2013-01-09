@@ -28,96 +28,160 @@ namespace Thelia\Model\Base;
 abstract class Base
 {
     /**
+     * Primary key
+     * @var int
+     */
+    protected $id;
+    /**
      *
      * @var \NotORM
      */
     protected $db;
-    
+
     /**
      *
      * @var string
      */
     protected $table;
-    
+
     /**
      *
      * @var string date when the record had been updated
      */
     protected $updated_at;
-    
 
         /**
      *
      * @var string date when the record had been saved
      */
     protected $created_at;
-    
-    
-    
+     /**
+      *
+      * base properties for all models
+      *
+      * @var array
+      */
+    private $baseProperties = array(
+        "created_at",
+        "update_at"
+    );
 
-    /**
-     * 
-     * 
-     * 
+        /**
+     *
+     *
+     *
      * @param \NotORM $NotORM
      */
-    public function __construct(\NotORM $NotORM) {
+    public function __construct(\NotORM $NotORM)
+    {
         $this->db = $NotORM;
         $this->table = $this->getTableName();
     }
-    
-    public function getUpdatedAt() {
+
+    public function getUpdatedAt()
+    {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt($updated_at) {
+    public function setUpdatedAt($updated_at)
+    {
         $this->updated_at = $updated_at;
     }
 
-    public function getCreatedAt() {
+    public function getCreatedAt()
+    {
         return $this->created_at;
     }
 
-    public function setCreatedAt($created_at) {
+    public function setCreatedAt($created_at)
+    {
         $this->created_at = $created_at;
     }
-    
+
+    private function getBaseProperties()
+    {
+        return $this->baseProperties;
+    }
+
+    public function getProperties()
+    {
+        return $this->properties;
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
     /**
-     * 
+     *
      * @return \NotORM
      */
-    public function getDb() {
+    public function getDb()
+    {
         return $this->db;
     }
 
-    public function getTable() {
+    public function getTable()
+    {
         return $this->table;
     }
 
-        
     public function save()
     {
         $this->updated_at = $this->created_at = date('Y-m-d H:i:s');
+
+        $values = $this->prepare();
+
+//        $this->db->insert_update(
+//                array("id", $this->getId()),
+//                $values,
+//
+//        );
+
     }
-    
+
+    private function prepare()
+    {
+        $properties = array_merge($this->getBaseProperties(), $this->getProperties());
+
+        $values = array();
+
+        foreach ($properties as $property) {
+            $values[$property] = $this->$property;
+        }
+
+        return $values;
+    }
+
+    public function isNew()
+    {
+        return $this->getId() ? false:true;
+    }
+
     /**
-     * 
+     *
      * @return string name of the current table
      */
     protected function getTableName()
-    {   
+    {
         return $this->underscore(__CLASS__);
     }
-    
+
     /**
-     * 
+     *
      * extract from symfony 1.4
-     * 
-     * change camelized wirnd into underscore word. 
-     * 
+     *
+     * change camelized wirnd into underscore word.
+     *
      * ex : AttributeCategory => attribute_category
-     * 
-     * @param string $camel_cased_word
+     *
+     * @param  string $camel_cased_word
      * @return string
      */
     protected function underscore($camel_cased_word)
@@ -126,9 +190,10 @@ abstract class Base
         $tmp = str_replace('::', '/', $tmp);
         $tmp = self::pregtr($tmp, array('/([A-Z]+)([A-Z][a-z])/' => '\\1_\\2',
                                                '/([a-z\d])([A-Z])/'     => '\\1_\\2'));
+
         return strtolower($tmp);
     }
-    
+
     public static function pregtr($search, $replacePairs)
     {
         return preg_replace(array_keys($replacePairs), array_values($replacePairs), $search);

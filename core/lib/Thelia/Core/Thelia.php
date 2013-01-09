@@ -52,7 +52,7 @@ class Thelia extends Kernel
         //$this->container->set('kernel', $this);
 
     }
-    
+
     /**
      * Gets the cache directory.
      *
@@ -62,15 +62,14 @@ class Thelia extends Kernel
      */
     public function getCacheDir()
     {
-        if(defined('THELIA_ROOT'))
-        {
+        if (defined('THELIA_ROOT')) {
             return THELIA_ROOT.'cache/'.$this->environment;
         } else {
             return parent::getCacheDir();
         }
-        
+
     }
-    
+
     /**
      * Gets the log directory.
      *
@@ -80,8 +79,7 @@ class Thelia extends Kernel
      */
     public function getLogDir()
     {
-        if(defined('THELIA_ROOT'))
-        {
+        if (defined('THELIA_ROOT')) {
             return THELIA_ROOT.'log/';
         } else {
             return parent::getLogDir();

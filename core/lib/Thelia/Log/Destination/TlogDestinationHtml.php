@@ -25,8 +25,8 @@ namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
 
-class TlogDestinationHtml extends AbstractTlogDestination {
-
+class TlogDestinationHtml extends AbstractTlogDestination
+{
             // Nom des variables de configuration
             // ----------------------------------
             const VAR_STYLE = "tlog_destinationhtml_style";
@@ -34,24 +34,29 @@ class TlogDestinationHtml extends AbstractTlogDestination {
 
             private $style;
 
-            public function __construct() {
+            public function __construct()
+            {
                     parent::__construct();
 
             }
 
-            public function configurer($config = false) {
+            public function configurer($config = false)
+            {
                     $this->style = $this->get_config(self::VAR_STYLE);
             }
 
-            public function get_titre() {
+            public function get_titre()
+            {
                     return "Affichage direct dans la page, en HTML";
             }
 
-            public function get_description() {
+            public function get_description()
+            {
                     return "Permet d'afficher les logs directement dans la page resultat, avec une mise en forme HTML.";
             }
 
-            public function get_configs() {
+            public function get_configs()
+            {
 //                    return array(
 //                            new TlogDestinationConfig(
 //                                            self::VAR_STYLE,
@@ -63,8 +68,8 @@ class TlogDestinationHtml extends AbstractTlogDestination {
 //                    );
             }
 
-    public function ecrire(&$res) {
-
+    public function ecrire(&$res)
+    {
                     $block = sprintf('<pre class="tlog-trace" style="%s">%s</pre>', $this->style, htmlspecialchars(implode("\n", $this->_logs)));
 
                     $this->inserer_apres_body($res, $block);

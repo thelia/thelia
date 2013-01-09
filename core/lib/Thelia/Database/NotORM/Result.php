@@ -4,7 +4,8 @@ namespace Thelia\Database\NotORM;
 
 class Result extends \NotORM_Result
 {
-    protected function query($query, $parameters) {
+    protected function query($query, $parameters)
+    {
         if ($this->notORM->debug) {
             if (!is_callable($this->notORM->debug)) {
                 $debug = "$query;";
@@ -22,9 +23,8 @@ class Result extends \NotORM_Result
                 return false;
             }
         }
-        
-        if($this->notORM->logger !== false)
-        {
+
+        if ($this->notORM->logger !== false) {
             $this->notORM->logger->debug($query);
             $this->notORM->logger->debug($parameters);
         }
@@ -34,8 +34,10 @@ class Result extends \NotORM_Result
             $this->notORM->logger->fatal($this->notORM->errorCode());
             $this->notORM->logger->fatal(print_r($this->notORM->errorInfo(), true));
             $this->notORM->logger->fatal(print_r($return->errorInfo(), true));
+
                 return false;
         }
+
         return $return;
     }
 }

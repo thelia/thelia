@@ -25,21 +25,25 @@ namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
 
-class TlogDestinationNull extends AbstractTlogDestination {
-
-    public function get_titre() {
+class TlogDestinationNull extends AbstractTlogDestination
+{
+    public function get_titre()
+    {
             return "Trou noir";
     }
 
-    public function get_description() {
+    public function get_description()
+    {
             return "Cette destination ne provoque aucune sortie";
     }
 
-    public function ajouter($string) {
+    public function ajouter($string)
+    {
                     // Rien
     }
 
-    public function ecrire(&$res) {
+    public function ecrire(&$res)
+    {
                     // Rien
     }
 }

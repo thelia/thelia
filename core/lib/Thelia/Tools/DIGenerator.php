@@ -23,58 +23,54 @@
 namespace Thelia\Tools;
 
 class DIGenerator
-{   
+{
     /**
      * Find all models in a directory
-     * 
+     *
      * @param string $directory Directory where models have to be find.
-     * @param array $exclude Model to be exclude in the return
-     * 
+     * @param array  $exclude   Model to be exclude in the return
+     *
      * @return array key is the service name and value the full Class name (including namespace if needed)
-     * 
+     *
      * @throws \RuntimeException id $directory is not a valid directory
-     * 
+     *
      */
     public static function genDiModel($directory, array $exclude = array())
     {
         if(!is_string($directory)) return array();
-        
-        if(!is_dir($directory))
-        {
+
+        if (!is_dir($directory)) {
             throw new \RuntimeException($directory." is not a valid directory");
         }
-        
+
         $results = array();
-        
+
         $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($directory));
-        
-        foreach($files as $file)
-        {
+
+        foreach ($files as $file) {
             //$file is instance of SplFileInfo
             if(!$file->isFile()) continue;
-            
+
             $filePath = $file->getRealPath();
-            
+
             $classes = self::findClasses($filePath);
-            
-            foreach($classes as $class)
-            {
+
+            foreach ($classes as $class) {
                 $classInfo = new \ReflectionClass($class);
                 $shortName = $classInfo->getShortName();
-                if(!in_array($shortName, $exclude))
-                {
+                if (!in_array($shortName, $exclude)) {
                     $results[$shortName] = $class;
                 }
             }
         }
-        
+
         return $results;
-        
+
     }
-    
+
     /**
      * Extract the classes in the given file
-     * 
+     *
      * copied from Composer\Autoload\GenerateClassMap::findClasses()
      *
      * @param string $path The file to check
@@ -132,5 +128,5 @@ class DIGenerator
 
         return $classes;
     }
-    
+
 }

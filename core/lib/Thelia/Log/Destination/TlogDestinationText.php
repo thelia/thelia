@@ -25,26 +25,30 @@ namespace Thelia\Log\Destination;
 
 use Thelia\Log\AbstractTlogDestination;
 
-
-class TlogDestinationText extends AbstractTlogDestination {
-
-    public function __construct() {
+class TlogDestinationText extends AbstractTlogDestination
+{
+    public function __construct()
+    {
             parent::__construct();
     }
 
-    public function get_titre() {
+    public function get_titre()
+    {
             return "Affichage direct dans la page, en texte brut";
     }
 
-    public function get_description() {
+    public function get_description()
+    {
             return "Permet d'afficher les logs directement dans la page resultat, au format texte brut.";
     }
 
-    public function ajouter($texte) {
+    public function ajouter($texte)
+    {
             echo $texte."\n";
     }
 
-    public function ecrire(&$res) {
+    public function ecrire(&$res)
+    {
                     // Rien
     }
 }

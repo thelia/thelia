@@ -43,16 +43,15 @@ class ModelBundle extends Bundle
     /**
      *
      * Construct the depency injection builder
-     * 
+     *
      * Reference all Model in the Container here
      *
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      */
 
     public function build(ContainerBuilder $container)
-    {   
-        foreach(DIGenerator::genDiModel(realpath(THELIA_ROOT . "core/lib/Thelia/Model"), array('Base')) as $name => $class)
-        {
+    {
+        foreach (DIGenerator::genDiModel(realpath(THELIA_ROOT . "core/lib/Thelia/Model"), array('Base')) as $name => $class) {
             $container->register('model.'.$name, $class)
                     ->addArgument(new Reference("database"));
         }

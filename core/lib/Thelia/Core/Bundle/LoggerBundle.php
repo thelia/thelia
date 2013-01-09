@@ -42,25 +42,24 @@ class LoggerBundle extends Bundle
     /**
      *
      * Construct the depency injection builder
-     * 
+     *
      * Reference all Model in the Container here
      *
      * @param \Symfony\Component\DependencyInjection\ContainerBuilder $container
      */
 
     public function build(ContainerBuilder $container)
-    {   
+    {
         $container->setParameter("logger.class", "\Thelia\Log\Tlog");
         $container->register("logger","%logger.class%")
                 ->addArgument(new Reference('service_container'));
-        
+
         $kernel = $container->get('kernel');
-        
-        if($kernel->isDebug())
-        {
+
+        if ($kernel->isDebug()) {
 //            $debug = function ($query, $parameters)
 //            {
-//                
+//
 //                $pattern = '(^' . preg_quote(dirname(__FILE__)) . '(\\.php$|[/\\\\]))'; // can be static
 //                foreach (debug_backtrace() as $backtrace) {
 //                        if (isset($backtrace["file"]) && !preg_match($pattern, $backtrace["file"])) { // stop on first file outside NotORM source codes
@@ -69,12 +68,12 @@ class LoggerBundle extends Bundle
 //                }
 //                file_put_contents(THELIA_ROOT . 'log/request_debug.log', "$backtrace[file]:$backtrace[line]:$query", FILE_APPEND);
 //                file_put_contents(THELIA_ROOT . 'log/request_debug.log', is_scalar($parameters) ? $parameters : print_r($parameters, true), FILE_APPEND);
-//                
+//
 //            };
-//            
+//
 //            $container->getDefinition('database')
 //                        ->addMethodCall('setDebug', array($debug));
-            
+
             $container->get('database')
                     ->setLogger($container->get('logger'));
         }

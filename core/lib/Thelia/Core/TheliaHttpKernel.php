@@ -30,7 +30,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * 
+ *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
@@ -42,8 +42,7 @@ class TheliaHttpKernel extends HttpKernel
 
         $this->container = $container;
     }
-    
-    
+
     /**
      * Handles a Request to convert it to a Response.
      *

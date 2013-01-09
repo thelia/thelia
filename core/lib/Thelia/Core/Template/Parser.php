@@ -55,9 +55,9 @@ class Parser implements ParserInterface
     protected $status = 200;
 
     /**
-     * 
+     *
      * @param type $container
-     * 
+     *
      * public function __construct(ContainerBuilder $container)
      */
     public function __construct(ContainerInterface $container)
@@ -73,15 +73,15 @@ class Parser implements ParserInterface
     public function getContent()
     {
        $this->loadParser();
-       
+
        $request = $this->container->get('request');
-              
+
        $this->content = $request->get("test");
-       
+
        $config = $this->container->get("model.config");
-       
+
        echo $config->read("toto","tutu");
-              
+
        return $this->content;
     }
 

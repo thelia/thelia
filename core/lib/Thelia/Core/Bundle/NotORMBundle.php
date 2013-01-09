@@ -26,8 +26,6 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Thelia\Log\Tlog;
-
 /**
  * First Bundle use in Thelia
  * It initialize dependency injection container.
@@ -53,20 +51,18 @@ class NotORMBundle extends Bundle
         $config = array(
            // \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
         );
-        
+
         $kernel = $container->get('kernel');
 
         $pdo = new \PDO(THELIA_DB_DSN,THELIA_DB_USER, THELIA_DB_PASSWORD, $config);
-        
+
         $pdo->exec("SET NAMES UTF8");
-        
+
         $container->register('database','\Thelia\Database\NotORM')
                 ->addArgument($pdo);
-        
-        if(defined('THELIA_DB_CACHE') && !$kernel->isDebug())
-        {
-            switch(THELIA_DB_CACHE)
-            {
+
+        if (defined('THELIA_DB_CACHE') && !$kernel->isDebug()) {
+            switch (THELIA_DB_CACHE) {
                 case 'file':
                     $container->register('database_cache','\NotORM_Cache_File')
                         ->addArgument($kernel->getCacheDir().'/database.php');
@@ -76,8 +72,7 @@ class NotORMBundle extends Bundle
                         ->addArgument($kernel->getCacheDir().'/database_include.php');
                     break;
                 case 'apc':
-                    if (extension_loaded('apc'))
-                    {
+                    if (extension_loaded('apc')) {
                         $container->register('database_cache','\NotORM_Cache_APC');
                     }
                     break;
@@ -85,24 +80,19 @@ class NotORMBundle extends Bundle
                     $container->register('database_cache','\NotORM_Cache_Session');
                     break;
                 case 'memcache':
-                    if(class_exists('Memcache'))
-                    {
+                    if (class_exists('Memcache')) {
                         $container->register('database_cache','\NotORM_Cache_Memcache')
                                 ->addArgument(new \Memcache());
                     }
                     break;
-                    
+
             }
-            
-            if($container->hasDefinition('database_cache'))
-            {
+
+            if ($container->hasDefinition('database_cache')) {
                 $container->getDefinition('database')
                         ->addMethodCall('setCache', array(new Reference('database_cache')));
             }
         }
-        
-        
-        
-        
+
     }
 }
