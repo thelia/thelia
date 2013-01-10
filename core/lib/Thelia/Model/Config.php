@@ -23,6 +23,6 @@ class Config extends Base
     {
        $result = $this->findOneBy("name",$search);
 
-       return $result ? $result->name : $default;
+       return $result ? $result->value : $default;
     }
 }
