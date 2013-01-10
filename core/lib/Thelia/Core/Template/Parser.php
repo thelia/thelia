@@ -28,7 +28,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  *
- * Master class of Thelia's parser. The loop mechnism depends of this parser
+ * Master class of Thelia's parser. The loop mechanism depends of this parser
  *
  * From this class all the parser is lunch
  *
@@ -80,11 +80,7 @@ class Parser implements ParserInterface
 
        $config = $this->container->get("model.config");
 
-       $results = $config->find(1);
-
-       var_dump($results->delete());
-
-
+       var_dump($config->read("tlog_niveau","tutu"));
 
        return $this->content;
     }

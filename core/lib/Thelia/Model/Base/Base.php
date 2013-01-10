@@ -22,9 +22,12 @@
 /*************************************************************************************/
 namespace Thelia\Model\Base;
 
-use Thelia\Exception\MemberAccessException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
+ *
+ * Abstract class. All model classes inherit from this class
+ *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 abstract class Base
@@ -39,6 +42,20 @@ abstract class Base
      * @var \NotORM
      */
     protected $db;
+
+    /**
+     *
+     * @var Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    protected $container;
+
+    /**
+     *
+     * Short name of the current class instance
+     *
+     * @var string
+     */
+    protected $className;
 
     /**
      *
@@ -68,77 +85,135 @@ abstract class Base
         "updated_at"
     );
 
-        /**
-     *
-     *
+    /**
      *
      * @param \NotORM $NotORM
+     * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
      */
-    public function __construct(\NotORM $NotORM)
+    public function __construct(\NotORM $NotORM, ContainerInterface $container)
     {
         $this->db = $NotORM;
-        $this->table = $this->getTableName();
+        $this->className = $this->getShortClassName();
+        $this->table = $this->underscore($this->className);
+        $this->container = $container;
     }
 
-    public function __call($name, $arguments) {
-        if (substr($name,0,3) == "get") {
-            return $this->_get($this->underscore(substr($name,3)));
-        }
-
-        if (substr($name,0,3) == "set") {
-            return $this->_set($this->underscore(substr($name,3)), $arguments[0]);
-        }
-        $calee = next(debug_backtrace());
-        throw new MemberAccessException(sprintf("Call to undefined method %s->%s in %s on line %s",  $calee['class'], $name,$calee['file'],$calee['line']));
-    }
-
+    /**
+     *
+     * return the date and time when the record had been updated.
+     *
+     * @return \DateTime
+     */
     public function getUpdatedAt()
+    {
+        if ($this->updated_at) {
+            return new \DateTime($this->updated_at);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *
+     * return the raw date time when the record had been updated
+     *
+     * @return string
+     */
+    public function getRawUpadtedAt()
     {
         return $this->updated_at;
     }
 
+    /**
+     *
+     * string date time when the record had been updated
+     *
+     * @param string $updated_at
+     */
     public function setUpdatedAt($updated_at)
     {
         $this->updated_at = $updated_at;
     }
 
+    /**
+     *
+     * return the date and time when the record had been created.
+     *
+     * @return \DateTime
+     */
     public function getCreatedAt()
+    {
+        if ($this->created_at) {
+            return new \DateTime($this->created_at);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     *
+     * return the raw date time when the record had been created
+     *
+     * @return string
+     */
+    public function getRawCreatedAt()
     {
         return $this->created_at;
     }
 
+    /**
+     *
+     * string date time when the record had been updated
+     *
+     * @param string $created_at
+     */
     public function setCreatedAt($created_at)
     {
         $this->created_at = $created_at;
     }
 
+    /**
+     *
+     * return the base properties like created_at, updated_at
+     *
+     * @return array
+     */
     private function getBaseProperties()
     {
         return $this->baseProperties;
     }
 
+    /**
+     *
+     * return the public properties of the current model.
+     *
+     * @return array
+     */
     public function getProperties()
     {
         return $this->properties;
     }
 
+    /**
+     *
+     * return the id of the current record
+     *
+     * @return type
+     */
     public function getId()
     {
         return $this->id;
     }
 
+    /**
+     *
+     * fix the id if needed
+     *
+     * @param int $id
+     */
     public function setId($id)
     {
         $this->id = $id;
-    }
-
-    /**
-     *
-     * @return \NotORM
-     */
-    public function getDb()
-    {
-        return $this->db;
     }
 
     /**
@@ -159,26 +234,31 @@ abstract class Base
         return $this->db;
     }
 
-    private function _get($property)
+    /**
+     *
+     * @return Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    public function getContainer()
     {
-        if (!property_exists($this, $property)) {
-            throw new \InvalidArgumentException($property." property does not exists");
-        }
-
-        return $this->$property;
+        return $this->container;
     }
 
-    private function _set($property, $value)
+    /**
+     *
+     * return the short name (without namespace) of the current instance class name.
+     *
+     * @return string
+     */
+    public function getClassName()
     {
-        if (!property_exists($this, $property)) {
-            throw new \InvalidArgumentException($property." property does not exists");
-        }
-
-        $this->$property = $value;
+        return $this->className;
     }
 
     /**
      * Persist data in current table
+     *
+     * Same method for saving or updating a record
+     *
      */
     public function save()
     {
@@ -202,7 +282,7 @@ abstract class Base
      *
      * Find record by primary key
      *
-     * @param  int            $pk
+     * @param  int    $pk
      * @return Object
      */
     public function find($pk)
@@ -239,7 +319,7 @@ abstract class Base
 
     /**
      *
-     * Find record for a specific column
+     * Find the first record for a specific column
      *
      * @param  mixed                     $column column name
      * @param  mixed                     $search value searching
@@ -260,6 +340,13 @@ abstract class Base
         return $this->parseOneQuery($result);
     }
 
+    /**
+     *
+     * delete the current record
+     *
+     * @return int
+     * @throws \RuntimeException
+     */
     public function delete()
     {
         if ($this->isNew()) {
@@ -275,7 +362,7 @@ abstract class Base
 
     /**
      *
-     * @param \NotORM_Result $results
+     * @param  \NotORM_Result $results
      * @return array
      */
     private function parseQuery(\NotORM_Result $results)
@@ -286,9 +373,10 @@ abstract class Base
         // @TODO : change hard code assignation
         array_push($properties, "id");
         foreach ($results as $result) {
-            $class = new static($this->getConnection());
-            foreach($properties as $property)
-            {
+            //$class = new static($this->getConnection());
+            $class = $this->getContainer()->get("model.".$this->getClassName());
+
+            foreach ($properties as $property) {
                 call_user_func(array($class, "set".ucfirst(self::camelize($property))), $result[$property]);
             }
             array_push($return, $class);
@@ -323,6 +411,12 @@ abstract class Base
         return $values;
     }
 
+    /**
+     *
+     * check if the current record is new or not.
+     *
+     * @return boolean
+     */
     public function isNew()
     {
         return $this->getId() ? false:true;
@@ -332,10 +426,11 @@ abstract class Base
      *
      * @return string name of the current table
      */
-    protected function getTableName()
+    protected function getShortClassName()
     {
         $info = new \ReflectionObject($this);
-        return $this->underscore($info->getShortName());
+
+        return $info->getShortName();
     }
 
     /**

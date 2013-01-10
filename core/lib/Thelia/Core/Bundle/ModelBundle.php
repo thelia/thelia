@@ -53,7 +53,8 @@ class ModelBundle extends Bundle
     {
         foreach (DIGenerator::genDiModel(realpath(THELIA_ROOT . "core/lib/Thelia/Model"), array('Base')) as $name => $class) {
             $container->register('model.'.$name, $class)
-                    ->addArgument(new Reference("database"));
+                    ->addArgument(new Reference("database"))
+                    ->addArgument(new Reference('service_container'));
         }
     }
 }
