@@ -203,13 +203,15 @@ abstract class Base
      * Find record by primary key
      *
      * @param  int            $pk
-     * @return \NotORM_Result
+     * @return Object
      */
     public function find($pk)
     {
         $table = $this->getTable();
 
-        return $this->getConnection()->$table()->where("id", $pk);
+        $result =  $this->getConnection()->$table()->where("id", $pk);
+
+         return $this->parseOneQuery($result);
     }
 
     /**
@@ -218,7 +220,7 @@ abstract class Base
      *
      * @param  mixed                     $column column name
      * @param  mixed                     $search value searching
-     * @return \NotORM_Result
+     * @return array
      * @throws \InvalidArgumentException column name cannot be empty
      */
     public function findBy($column, $search)
@@ -241,7 +243,7 @@ abstract class Base
      *
      * @param  mixed                     $column column name
      * @param  mixed                     $search value searching
-     * @return \NotORM_Result
+     * @return Object
      * @throws \InvalidArgumentException column name cannot be empty
      */
     public function findOneBy($column, $search)
@@ -255,9 +257,7 @@ abstract class Base
 
         $result =  $this->getConnection()->$table()->where($column, $search)->limit(1);
 
-        $return = $this->parseQuery($result);
-
-        return count($return) ? $return[0] : null ;
+        return $this->parseOneQuery($result);
     }
 
     public function delete()
@@ -295,6 +295,13 @@ abstract class Base
         }
 
         return $return;
+    }
+
+    private function parseOneQuery(\NotORM_Result $results)
+    {
+        $return = $this->parseQuery($results);
+
+        return count($return) ? $return[0] : null ;
     }
 
     /**

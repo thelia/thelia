@@ -80,7 +80,11 @@ class Parser implements ParserInterface
 
        $config = $this->container->get("model.config");
 
-       var_dump($config->read("tlog_niveau","tutu"));
+       $results = $config->find(1);
+
+       var_dump($results->delete());
+
+
 
        return $this->content;
     }
