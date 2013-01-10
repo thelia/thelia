@@ -58,7 +58,7 @@ class TheliaBundle extends Bundle
         $container->register('matcher.default','Thelia\Routing\Matcher\DefaultMatcher')
                 ->addArgument(new Reference('controller.default'));
 
-        $container->register('matcher','Thelia\Routing\Matcher\theliaMatcherCollection')
+        $container->register('matcher','Thelia\Routing\Matcher\TheliaMatcherCollection')
                 ->addMethodCall('add', array(new Reference('matcher.default'), -255))
                 //->addMethodCall('add','a matcher class (instance or class name)
 
