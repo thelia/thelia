@@ -87,7 +87,7 @@ abstract class Base
 
     /**
      *
-     * @param \NotORM $NotORM
+     * @param \NotORM                                                   $NotORM
      * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
      */
     public function __construct(\NotORM $NotORM, ContainerInterface $container)

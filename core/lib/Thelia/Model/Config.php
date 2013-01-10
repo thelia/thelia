@@ -31,6 +31,13 @@ class Config extends Base
     protected $secure;
     protected $hidden;
 
+    protected $properties = array(
+        "name",
+        "value",
+        "secure",
+        "hidden"
+    );
+
     public function getName()
     {
         return $this->name;
@@ -70,13 +77,6 @@ class Config extends Base
     {
         $this->hidden = $hidden;
     }
-
-    protected $properties = array(
-        "name",
-        "value",
-        "secure",
-        "hidden"
-    );
 
     public function read($search, $default)
     {
