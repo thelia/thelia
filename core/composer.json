@@ -1,4 +1,6 @@
 {
+    "description" : "Thelia is an ecommerce CMS.",
+    "licence" : "GPL 3",
     "require":{
         "symfony/class-loader": "2.1.*",
         "symfony/http-kernel" : "2.1.*",
