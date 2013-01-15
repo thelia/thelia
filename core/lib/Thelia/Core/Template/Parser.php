@@ -74,14 +74,6 @@ class Parser implements ParserInterface
     {
        $this->loadParser();
 
-       $request = $this->container->get('request');
-
-       $this->content = $request->get("test");
-
-       $config = $this->container->get("model.config");
-
-       var_dump($config->read("tlog_niveau","tutu"));
-
        return $this->content;
     }
 
