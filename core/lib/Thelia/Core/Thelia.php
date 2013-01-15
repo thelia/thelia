@@ -116,9 +116,6 @@ class Thelia extends Kernel
         $bundles = array(
             /* TheliaBundle contain all the dependency injection description */
             new Bundle\TheliaBundle(),
-            new Bundle\NotORMBundle(),
-            new Bundle\ModelBundle(),
-            new Bundle\LoggerBundle()
         );
 
         /**

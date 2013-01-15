@@ -1,6 +1,118 @@
 {
-    "hash": "4dac998c040ba1f3fcdd8ddd3e49262c",
+    "hash": "2be3cc68d014718aa32d78effb38b917",
     "packages": [
+        {
+            "name": "phing/phing",
+            "version": "2.4.14",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phingofficial/phing",
+                "reference": "2.4.14"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/phingofficial/phing/archive/2.4.14.zip",
+                "reference": "2.4.14",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.0"
+            },
+            "time": "2012-11-29 21:23:47",
+            "bin": [
+                "bin/phing"
+            ],
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "classes/phing/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "classes"
+            ],
+            "license": [
+                "LGPL3"
+            ],
+            "authors": [
+                {
+                    "name": "Michiel Rook",
+                    "email": "mrook@php.net"
+                },
+                {
+                    "name": "Phing Community",
+                    "homepage": "http://www.phing.info/trac/wiki/Development/Contributors"
+                }
+            ],
+            "description": "PHing Is Not GNU make; it's a PHP project build system or build tool based on Apache Ant.",
+            "homepage": "http://www.phing.info/",
+            "keywords": [
+                "build",
+                "task",
+                "tool"
+            ]
+        },
+        {
+            "name": "propel/propel1",
+            "version": "1.6.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/propelorm/Propel",
+                "reference": "1.6.7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/propelorm/Propel/zipball/1.6.7",
+                "reference": "1.6.7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2.4",
+                "phing/phing": ">=2.4.12,2.4.*"
+            },
+            "time": "2012-07-30 00:58:15",
+            "bin": [
+                "generator/bin/propel-gen",
+                "generator/bin/propel-gen.bat"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.6-dev"
+                }
+            },
+            "autoload": {
+                "classmap": [
+                    "runtime/lib",
+                    "generator/lib"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "include-path": [
+                "runtime/lib",
+                "generator/lib"
+            ],
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "William Durand",
+                    "email": "william.durand1@gmail.com",
+                    "homepage": "http://www.willdurand.fr"
+                }
+            ],
+            "description": "Propel is an open-source Object-Relational Mapping (ORM) for PHP5.",
+            "homepage": "http://www.propelorm.org/",
+            "keywords": [
+                "database",
+                "orm",
+                "persistence",
+                "Active Record",
+                "mapping"
+            ]
+        },
         {
             "name": "symfony-cmf/routing",
             "version": "dev-master",
@@ -28,7 +140,6 @@
                     "dev-master": "1.0-dev"
                 }
             },
-            "installation-source": "source",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Cmf\\Component\\Routing": ""
@@ -52,17 +163,17 @@
         },
         {
             "name": "symfony/class-loader",
-            "version": "v2.1.4",
+            "version": "v2.1.6",
             "target-dir": "Symfony/Component/ClassLoader",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/ClassLoader",
-                "reference": "v2.1.4"
+                "reference": "v2.1.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/ClassLoader/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/ClassLoader/archive/v2.1.6.zip",
+                "reference": "v2.1.6",
                 "shasum": ""
             },
             "require": {
@@ -71,19 +182,14 @@
             "require-dev": {
                 "symfony/finder": "2.1.*"
             },
-            "time": "2012-11-08 09:51:48",
+            "time": "2012-12-06 10:00:55",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\ClassLoader": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -102,35 +208,30 @@
         },
         {
             "name": "symfony/config",
-            "version": "v2.1.4",
+            "version": "v2.1.6",
             "target-dir": "Symfony/Component/Config",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Config",
-                "reference": "v2.1.4"
+                "reference": "v2.1.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Config/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/Config/archive/v2.1.6.zip",
+                "reference": "v2.1.6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-11-08 09:51:48",
+            "time": "2012-12-11 10:40:22",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\Config": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -149,35 +250,30 @@
         },
         {
             "name": "symfony/console",
-            "version": "v2.1.4",
+            "version": "v2.1.6",
             "target-dir": "Symfony/Component/Console",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Console",
-                "reference": "v2.1.4"
+                "reference": "v2.1.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Console/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/Console/archive/v2.1.6.zip",
+                "reference": "v2.1.6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-11-09 08:52:51",
+            "time": "2012-12-13 17:42:00",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\Console": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -196,17 +292,17 @@
         },
         {
             "name": "symfony/dependency-injection",
-            "version": "v2.1.4",
+            "version": "v2.1.6",
             "target-dir": "Symfony/Component/DependencyInjection",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/DependencyInjection",
-                "reference": "v2.1.4"
+                "reference": "v2.1.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/DependencyInjection/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/DependencyInjection/archive/v2.1.6.zip",
+                "reference": "v2.1.6",
                 "shasum": ""
             },
             "require": {
@@ -220,19 +316,14 @@
                 "symfony/yaml": "2.1.*",
                 "symfony/config": "2.1.*"
             },
-            "time": "2012-11-11 11:59:36",
+            "time": "2012-12-06 10:00:55",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\DependencyInjection": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -251,17 +342,17 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v2.1.4",
+            "version": "v2.1.6",
             "target-dir": "Symfony/Component/EventDispatcher",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/EventDispatcher",
-                "reference": "v2.1.4"
+                "reference": "v2.1.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/EventDispatcher/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/EventDispatcher/archive/v2.1.6.zip",
+                "reference": "v2.1.6",
                 "shasum": ""
             },
             "require": {
@@ -274,19 +365,14 @@
                 "symfony/dependency-injection": "2.1.*",
                 "symfony/http-kernel": "2.1.*"
             },
-            "time": "2012-11-08 09:51:48",
+            "time": "2012-12-06 10:00:55",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\EventDispatcher": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -305,36 +391,31 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v2.1.4",
+            "version": "v2.1.6",
             "target-dir": "Symfony/Component/HttpFoundation",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpFoundation",
-                "reference": "v2.1.4"
+                "reference": "v2.1.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/HttpFoundation/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/HttpFoundation/archive/v2.1.6.zip",
+                "reference": "v2.1.6",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.3.3"
             },
-            "time": "2012-11-30 12:53:14",
+            "time": "2012-12-14 21:03:29",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\HttpFoundation": "",
                     "SessionHandlerInterface": "Symfony/Component/HttpFoundation/Resources/stubs"
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -353,17 +434,17 @@
         },
         {
             "name": "symfony/http-kernel",
-            "version": "v2.1.4",
+            "version": "v2.1.7",
             "target-dir": "Symfony/Component/HttpKernel",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/HttpKernel",
-                "reference": "v2.1.4"
+                "reference": "v2.1.7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/HttpKernel/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/HttpKernel/archive/v2.1.7.zip",
+                "reference": "v2.1.7",
                 "shasum": ""
             },
             "require": {
@@ -389,19 +470,14 @@
                 "symfony/dependency-injection": "2.1.*",
                 "symfony/finder": "2.1.*"
             },
-            "time": "2012-11-29 11:56:19",
+            "time": "2012-12-21 10:24:53",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\HttpKernel": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -420,17 +496,17 @@
         },
         {
             "name": "symfony/routing",
-            "version": "v2.1.4",
+            "version": "v2.1.6",
             "target-dir": "Symfony/Component/Routing",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Routing",
-                "reference": "v2.1.4"
+                "reference": "v2.1.6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony/Routing/archive/v2.1.4.zip",
-                "reference": "v2.1.4",
+                "url": "https://github.com/symfony/Routing/archive/v2.1.6.zip",
+                "reference": "v2.1.6",
                 "shasum": ""
             },
             "require": {
@@ -447,19 +523,14 @@
                 "symfony/yaml": "2.1.*",
                 "doctrine/common": ">=2.2,<2.4-dev"
             },
-            "time": "2012-11-19 10:35:29",
+            "time": "2012-12-11 10:40:22",
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "2.1-dev"
-                }
-            },
-            "installation-source": "dist",
             "autoload": {
                 "psr-0": {
                     "Symfony\\Component\\Routing": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -475,40 +546,6 @@
             ],
             "description": "Symfony Routing Component",
             "homepage": "http://symfony.com"
-        },
-        {
-            "name": "vrana/notorm",
-            "version": "dev-master",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/vrana/notorm.git",
-                "reference": "80131ce82afb8c1ea50868374b8ec8996b770fe3"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://github.com/vrana/notorm/archive/80131ce82afb8c1ea50868374b8ec8996b770fe3.zip",
-                "reference": "80131ce82afb8c1ea50868374b8ec8996b770fe3",
-                "shasum": ""
-            },
-            "time": "2012-09-15 17:29:05",
-            "type": "library",
-            "installation-source": "source",
-            "license": [
-                "Apache-2.0",
-                "GPL-2.0+"
-            ],
-            "authors": [
-                {
-                    "name": "Jakub Vrána",
-                    "homepage": "http://www.vrana.cz/"
-                }
-            ],
-            "description": "NotORM is a PHP library for simple working with data in the database.",
-            "homepage": "http://www.notorm.com/",
-            "keywords": [
-                "database",
-                "dbal"
-            ]
         }
     ],
     "packages-dev": null,
@@ -517,7 +554,6 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "symfony-cmf/routing": 20,
-        "vrana/notorm": 20
+        "symfony-cmf/routing": 20
     }
 }

@@ -10,10 +10,7 @@
         "symfony/console" : "2.1.*",
         "symfony/event-dispatcher" : "2.1.*",
         "symfony-cmf/routing" : "1.0.*@dev",
-        "vrana/notorm": "dev-master"
+        "propel/propel1" : "1.6.*"
     },
-    "minimum-stability": "stable",
-    "autoload" : {
-        "classmap" : ["vendor/vrana/notorm/NotORM.php","vendor/vrana/notorm/NotORM"]
-    }
+    "minimum-stability": "stable"
 }
