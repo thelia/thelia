@@ -1,4 +1,3 @@
-cache/*
 local/config/build.properties
 local/config/config_db.php
 local/config/build
