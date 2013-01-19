@@ -23,7 +23,6 @@
 namespace Thelia\Log;
 
 use Thelia\Model\ConfigQuery;
-use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -61,6 +60,10 @@ class Tlog Implements TlogInterface
     const DEFAUT_IP 		= "";
     const DEFAUT_SHOW_REDIRECT  = 0;
 
+    /**
+     *
+     * @var \Thelia\Log\Tlog
+     */
     private static $instance = false;
 
     protected $destinations = array();
@@ -88,7 +91,7 @@ class Tlog Implements TlogInterface
      * 
      * @return \Thelia\Log\Tlog
      */
-    public static function instance() {
+    public static function getInstance() {
         if (self::$instance == false) {
             self::$instance = new Tlog();
 

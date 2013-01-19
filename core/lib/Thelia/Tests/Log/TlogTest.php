@@ -28,40 +28,24 @@ use Thelia\Core\Thelia;
 
 class TlogTest extends \PHPUnit_Framework_TestCase
 {
-    protected $logger;
+    protected static $logger;
 
     protected $regex = "/(\\d)(.)(\\s+)((?:[a-z][a-z]+))(\\s+)(\\[.*?\\])(\\s+)(\\{.*?\\})(\\s+)((?:2|1)\\d{3}(?:-|\\/)(?:(?:0[1-9])|(?:1[0-2]))(?:-|\\/)(?:(?:0[1-9])|(?:[1-2][0-9])|(?:3[0-1]))(?:T|\\s)(?:(?:[0-1][0-9])|(?:2[0-3])):(?:[0-5][0-9]):(?:[0-5][0-9]))(.)(\\s+)(%s)/is";
 
-    public function setUp()
-    {
-        parent::setUp();
-
-        $_SERVER['REMOTE_ADDR'] = '::1';
-
-        $containerMock = $this->getMock("Symfony\Component\DependencyInjection\Container", array("get", "getParameter"));
-
-        $configModel = new ConfigModel();
-
-        $containerMock->expects($this->any())
-                ->method("get")
-                ->will($this->returnValue($configModel));
-        $containerMock->expects($this->any())
-                ->method("getParameter")
-                ->with($this->stringContains("logger.class"))
-                ->will($this->returnValue("Thelia\Log\Tlog"));
-
-        $this->logger = new Tlog($containerMock);
-
-        $this->logger->set_destinations("Thelia\Log\Destination\TlogDestinationText");
-        $this->logger->set_level(Tlog::TRACE);
-        $this->logger->set_files("*");
+    public static function setUpBeforeClass()
+    {        
+        self::$logger = Tlog::getInstance();
+        
+        self::$logger->setDestinations("Thelia\Log\Destination\TlogDestinationText");
+        self::$logger->setLevel(Tlog::TRACE);
+        self::$logger->setFiles("*");
     }
 
     public function testTraceWithTraceLevel()
     {
 
-        $logger = $this->logger;
-        $logger->set_level(Tlog::TRACE);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::TRACE);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, "foo"));
@@ -70,8 +54,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testTraceWitoutTraceLevel()
     {
-        $logger = $this->logger;
-        $logger->set_level(Tlog::MUET);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::MUET);
 
         $this->expectOutputRegex("/^$/");
         $logger->trace("foo");
@@ -80,8 +64,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
     public function testDebugWithDebugLevel()
     {
 
-        $logger = $this->logger;
-        $logger->set_level(Tlog::DEBUG);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::DEBUG);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, "foo"));
@@ -90,8 +74,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testDebugWitoutDebugLevel()
     {
-        $logger = $this->logger;
-        $logger->set_level(Tlog::MUET);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::MUET);
 
         $this->expectOutputRegex("/^$/");
         $logger->debug("foo");
@@ -100,8 +84,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
     public function testInfoWithInfoLevel()
     {
 
-        $logger = $this->logger;
-        $logger->set_level(Tlog::INFO);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::INFO);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, "foo"));
@@ -110,8 +94,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testInfoWitoutInfoLevel()
     {
-        $logger = $this->logger;
-        $logger->set_level(Tlog::MUET);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::MUET);
 
         $this->expectOutputRegex("/^$/");
         $logger->info("foo");
@@ -120,8 +104,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
     public function testWarningWithWarningLevel()
     {
 
-        $logger = $this->logger;
-        $logger->set_level(Tlog::WARNING);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::WARNING);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, "foo"));
@@ -130,8 +114,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testWarningWitoutWarningLevel()
     {
-        $logger = $this->logger;
-        $logger->set_level(Tlog::MUET);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::MUET);
 
         $this->expectOutputRegex("/^$/");
         $logger->warning("foo");
@@ -140,8 +124,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
     public function testErrorWithErrorLevel()
     {
 
-        $logger = $this->logger;
-        $logger->set_level(Tlog::ERROR);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::ERROR);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, "foo"));
@@ -150,8 +134,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testErrorWitoutErrorLevel()
     {
-        $logger = $this->logger;
-        $logger->set_level(Tlog::MUET);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::MUET);
 
         $this->expectOutputRegex("/^$/");
         $logger->error("foo");
@@ -160,8 +144,8 @@ class TlogTest extends \PHPUnit_Framework_TestCase
     public function testFatalWithFatalLevel()
     {
 
-        $logger = $this->logger;
-        $logger->set_level(Tlog::FATAL);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::FATAL);
 
         //"#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: "
         $this->expectOutputRegex(sprintf($this->regex, "foo"));
@@ -170,18 +154,10 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public function testFatalWitoutFatalLevel()
     {
-        $logger = $this->logger;
-        $logger->set_level(Tlog::MUET);
+        $logger = self::$logger;
+        $logger->setLevel(Tlog::MUET);
 
         $this->expectOutputRegex("/^$/");
         $logger->fatal("foo");
-    }
-}
-
-class ConfigModel
-{
-    public function __call($name, $arguments)
-    {
-        return $arguments[1];
     }
 }

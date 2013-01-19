@@ -11,4 +11,8 @@ if (extension_loaded('apc') && $env == 'prod') {
     
     $apcLoader = new Symfony\Component\ClassLoader\ApcClassLoader("thelia",$loader);
     $apcLoader->register();
+    
+    return $apcLoader;
 }
+
+return $loader;

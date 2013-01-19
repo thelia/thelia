@@ -32,22 +32,22 @@ class TlogDestinationText extends AbstractTlogDestination
             parent::__construct();
     }
 
-    public function get_titre()
+    public function getTitle()
     {
             return "Affichage direct dans la page, en texte brut";
     }
 
-    public function get_description()
+    public function getDescription()
     {
             return "Permet d'afficher les logs directement dans la page resultat, au format texte brut.";
     }
 
-    public function ajouter($texte)
+    public function add($texte)
     {
             echo $texte."\n";
     }
 
-    public function ecrire(&$res)
+    public function write(&$res)
     {
                     // Rien
     }

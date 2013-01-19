@@ -56,6 +56,9 @@ class TlogDestinationFile extends AbstractTlogDestination
                     if (! is_dir($dir)) {
                             mkdir($dir, 0777, true);
                     }
+                    
+                    touch($file_path);
+                    chmod($file_path, 0777);
             }
 
             if ($this->fh) @fclose($this->fh);
