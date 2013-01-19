@@ -23,6 +23,7 @@
 namespace Thelia\Log;
 
 use Thelia\Model\ConfigQuery;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -44,12 +45,12 @@ class Tlog Implements TlogInterface
     const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
 
     // all level of trace
-    const TRACE                 = 1;
-    const DEBUG                 = 2;
-    const WARNING               = 3;
-    const INFO                  = 4;
-    const ERROR                 = 5;
-    const FATAL                 = 6;
+    const TRACE                 = 100;
+    const DEBUG                 = 200;
+    const WARNING               = 300;
+    const INFO                  = 400;
+    const ERROR                 = 500;
+    const FATAL                 = 600;
     const MUET                  = PHP_INT_MAX;
 
     // default values
@@ -81,9 +82,7 @@ class Tlog Implements TlogInterface
     /**
      * 
      */
-    private function __construct()
-    {
-    }
+    private function __construct(){}
 
     /**
      * 
