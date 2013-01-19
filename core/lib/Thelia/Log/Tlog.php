@@ -31,6 +31,7 @@ use Thelia\Model\ConfigQuery;
  * Allow to define different level and output.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 class Tlog Implements TlogInterface
 {
@@ -72,7 +73,7 @@ class Tlog Implements TlogInterface
 
     private $linecount = 0;
 
-    protected static $ecrire_effectue = false;
+    protected static $done = false;
 
     // directories where are the Destinations Files
     public $dir_destinations = array();
@@ -89,92 +90,93 @@ class Tlog Implements TlogInterface
      * @return \Thelia\Log\Tlog
      */
     public static function instance() {
-            if (self::$instance == false) {
-                    self::$instance = new Tlog();
+        if (self::$instance == false) {
+            self::$instance = new Tlog();
 
-                    // On doit placer les initialisations à ce level pour pouvoir
-                    // utiliser la classe Tlog dans les classes de base (Cnx, BaseObj, etc.)
-                    // Les placer dans le constructeur provoquerait une boucle
-                    self::$instance->init();
-            }
+            // On doit placer les initialisations à ce level pour pouvoir
+            // utiliser la classe Tlog dans les classes de base (Cnx, BaseObj, etc.)
+            // Les placer dans le constructeur provoquerait une boucle
+            self::$instance->init();
+        }
 
-            return self::$instance;
+        return self::$instance;
     }
 
     protected function init()
     {
 
-            $this->set_level(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
+        $this->setLevel(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
-            $this->dir_destinations = array(
-                    __DIR__.'/Destination'
-                    //, __DIR__.'/../client/tlog/destinations'
-            );
+        $this->dir_destinations = array(
+                __DIR__.'/Destination'
+                //, __DIR__.'/../client/tlog/destinations'
+        );
 
-            $this->set_prefixe(ConfigQuery::read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
-            $this->set_files(ConfigQuery::read(self::VAR_FILES, self::DEFAUT_FILES));
-            $this->set_ip(ConfigQuery::read(self::VAR_IP, self::DEFAUT_IP));
-            $this->set_destinations(ConfigQuery::read(self::VAR_DESTINATIONS, self::DEFAUT_DESTINATIONS));
-            $this->set_show_redirect(ConfigQuery::read(self::VAR_SHOW_REDIRECT, self::DEFAUT_SHOW_REDIRECT));
+        $this->setPrefix(ConfigQuery::read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
+        $this->setFiles(ConfigQuery::read(self::VAR_FILES, self::DEFAUT_FILES));
+        $this->setIp(ConfigQuery::read(self::VAR_IP, self::DEFAUT_IP));
+        $this->setDestinations(ConfigQuery::read(self::VAR_DESTINATIONS, self::DEFAUT_DESTINATIONS));
+        $this->setShowRedirect(ConfigQuery::read(self::VAR_SHOW_REDIRECT, self::DEFAUT_SHOW_REDIRECT));
 
-            // Au cas ou il y aurait un exit() quelque part dans le code.
-            register_shutdown_function(array($this, 'ecrire_si_exit'));
+        // Au cas ou il y aurait un exit() quelque part dans le code.
+        register_shutdown_function(array($this, 'writeOnExit'));
     }
 
     // Configuration
     // -------------
 
-    public function set_destinations($destinations)
+    public function setDestinations($destinations)
     {
-            if (! empty($destinations)) {
+        if (! empty($destinations)) {
 
-                    $this->destinations = array();
+            $this->destinations = array();
 
-                    $classes_destinations = explode(';', $destinations);
-                    $this->loadDestinations($this->destinations, $classes_destinations);
-            }
+            $classes_destinations = explode(';', $destinations);
+            $this->loadDestinations($this->destinations, $classes_destinations);
+        }
     }
 
-    public function set_level($level)
+    public function setLevel($level)
     {
             $this->level = $level;
     }
 
-    public function set_prefixe($prefixe)
+    public function setPrefix($prefixe)
     {
             $this->prefixe = $prefixe;
     }
 
-    public function set_files($files)
+    public function setFiles($files)
     {
             $this->files = explode(";", $files);
 
             $this->all_files = in_array('*', $this->files);
     }
 
-    public function set_ip($ips)
+    public function setIp($ips)
     {
-            if (! empty($ips) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
+            // isset($_SERVER['REMOTE_ADDR']) if we are in cli mode
+            if (! empty($ips) && isset($_SERVER['REMOTE_ADDR']) && ! in_array($_SERVER['REMOTE_ADDR'], explode(";", $ips))) $this->level = self::MUET;
     }
 
-    public function set_show_redirect($bool)
+    public function setShowRedirect($bool)
     {
             $this->show_redirect = $bool;
     }
 
     // Configuration d'une destination
-    public function set_config($destination, $param, $valeur)
+    public function setConfig($destination, $param, $valeur)
     {
             if (isset($this->destinations[$destination])) {
-                    $this->destinations[$destination]->set_config($param, $valeur);
+                    $this->destinations[$destination]->setConfig($param, $valeur);
             }
     }
 
     // Configuration d'une destination
-    public function get_config($destination, $param)
+    public function getConfig($destination, $param)
     {
             if (isset($this->destinations[$destination])) {
-                    return $this->destinations[$destination]->get_config($param);
+                    return $this->destinations[$destination]->getConfig($param);
             }
 
             return false;
@@ -244,40 +246,41 @@ class Tlog Implements TlogInterface
     }
 
     // Mode back office
-    public static function mode_back_office($booleen)
+    public static function SetBackOfficeMode($booleen)
     {
             foreach (Tlog::instance()->destinations as $dest) {
-                    $dest->mode_back_office($booleen);
+                    $dest->SetBackOfficeMode($booleen);
             }
     }
 
     // Ecriture finale
-    public function ecrire(&$res)
+    public function write(&$res)
     {
-            self::$ecrire_effectue = true;
+            self::$done = true;
 
             // Muet ? On ne fait rien
             if ($this->level == self::MUET) return;
 
             foreach ($this->destinations as $dest) {
-                    $dest->ecrire($res);
+                    $dest->write($res);
             }
     }
 
-    public function ecrire_si_exit()
+    //function register into register shutdown function stack
+    public function writeOnExit()
     {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
-        if (self::$ecrire_effectue === false) {
+        if (self::$done === false) {
 
                 $res = "";
 
-                $this->ecrire($res);
+                $this->write($res);
 
                 echo $res;
         }
     }
 
-    public function afficher_redirections($url)
+    public function showRedirect($url)
     {
         if ($this->level != self::MUET && $this->show_redirect) {
                 echo "
@@ -297,15 +300,15 @@ class Tlog Implements TlogInterface
 
     // Permet de déterminer si la trace est active, en prenant en compte
     // le level et le filtrage par fichier
-    public function active($level)
+    public function isActivated($level)
     {
         if ($this->level <= $level) {
 
-            $origine = $this->trouver_origine();
+            $origin = $this->findOrigin();
 
-            $file = basename($origine['file']);
+            $file = basename($origin['file']);
 
-            if ($this->is_file_active($file)) {
+            if ($this->isActivedFile($file)) {
                     return true;
             }
         }
@@ -313,7 +316,7 @@ class Tlog Implements TlogInterface
         return false;
     }
 
-    public function is_file_active($file)
+    public function isActivedFile($file)
     {
         return ($this->all_files || in_array($file, $this->files)) && ! in_array("!$file", $this->files);
     }
@@ -321,7 +324,7 @@ class Tlog Implements TlogInterface
     /* -- Methodes privees ---------------------------------------- */
 
     // Adapté de LoggerLoginEvent dans log4php
-    private function trouver_origine()
+    private function findOrigin()
     {
         $origine = array();
 
@@ -372,11 +375,11 @@ class Tlog Implements TlogInterface
             $text .= is_scalar($arg) ? $arg : print_r($arg, true);
         }
 
-        $origine = $this->trouver_origine();
+        $origine = $this->findOrigin();
 
         $file = basename($origine['file']);
 
-        if ($this->is_file_active($file)) {
+        if ($this->isActivedFile($file)) {
 
             $function = $origine['function'];
             $line = $origine['line'];
@@ -390,7 +393,7 @@ class Tlog Implements TlogInterface
             $trace = $prefixe . $text;
 
             foreach ($this->destinations as $dest) {
-                $dest->ajouter($trace);
+                $dest->add($trace);
             }
 
             $this->linecount++;

@@ -45,10 +45,10 @@ class TlogDestinationFile extends AbstractTlogDestination
             parent::__construct();
     }
 
-    public function configurer()
+    public function configure()
     {
-        $file_path = $this->get_config(self::VAR_PATH_FILE);
-        $mode = strtolower($this->get_config(self::VAR_MODE)) == 'a' ? 'a' : 'w';
+        $file_path = $this->getConfig(self::VAR_PATH_FILE);
+        $mode = strtolower($this->getConfig(self::VAR_MODE)) == 'a' ? 'a' : 'w';
 
         if (! empty($file_path)) {
             if (! is_file($file_path)) {
@@ -64,17 +64,17 @@ class TlogDestinationFile extends AbstractTlogDestination
         }
     }
 
-    public function get_titre()
+    public function getTitle()
     {
             return "Text File";
     }
 
-    public function get_description()
+    public function getDescription()
     {
             return "Store logs into text file";
     }
 
-    public function get_configs()
+    public function getConfigs()
     {
         return array(
             new TlogDestinationConfig(
@@ -94,14 +94,14 @@ class TlogDestinationFile extends AbstractTlogDestination
         );
     }
 
-    public function ajouter($texte)
+    public function add($texte)
     {
         if ($this->fh) {
             fwrite($this->fh, $texte."\n");
         }
     }
 
-    public function ecrire(&$res)
+    public function write(&$res)
     {
         if ($this->fh) @fclose($this->fh);
 
