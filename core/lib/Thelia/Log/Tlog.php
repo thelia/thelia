@@ -22,8 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Log;
 
-use Thelia\Model\Config;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Model\ConfigQuery;
 
 /**
  *
@@ -53,7 +52,7 @@ class Tlog Implements TlogInterface
     const MUET                  = PHP_INT_MAX;
 
     // default values
-    const DEFAULT_LEVEL 	= self::DEBUG;
+    const DEFAULT_LEVEL     	= self::DEBUG;
     const DEFAUT_DESTINATIONS   = "Thelia\Log\Destination\TlogDestinationFile";
     const DEFAUT_PREFIXE 	= "#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: ";
     const DEFAUT_FILES 		= "*";
@@ -78,52 +77,45 @@ class Tlog Implements TlogInterface
     // directories where are the Destinations Files
     public $dir_destinations = array();
 
-    protected $container;
-
     /**
-     *
-     * @param type $container
-     *
-     * public function __construct(ContainerBuilder $container)
+     * 
      */
-    public function __construct(ContainerInterface $container)
+    private function __construct()
     {
-        $this->container = $container;
-
-        $this->init();
     }
 
-//    public static function instance() {
-//            if (self::$instance == false) {
-//                    self::$instance = new Tlog();
-//
-//                    // On doit placer les initialisations à ce level pour pouvoir
-//                    // utiliser la classe Tlog dans les classes de base (Cnx, BaseObj, etc.)
-//                    // Les placer dans le constructeur provoquerait une boucle
-//                    self::$instance->init();
-//            }
-//
-//            return self::$instance;
-//    }
+    /**
+     * 
+     * @return \Thelia\Log\Tlog
+     */
+    public static function instance() {
+            if (self::$instance == false) {
+                    self::$instance = new Tlog();
+
+                    // On doit placer les initialisations à ce level pour pouvoir
+                    // utiliser la classe Tlog dans les classes de base (Cnx, BaseObj, etc.)
+                    // Les placer dans le constructeur provoquerait une boucle
+                    self::$instance->init();
+            }
+
+            return self::$instance;
+    }
 
     protected function init()
     {
-            $config = $this->container->get("model.config");
 
-            $level = $config->read(self::VAR_LEVEL, self::DEFAULT_LEVEL);
-
-            $this->set_level($level);
+            $this->set_level(ConfigQuery::read(self::VAR_LEVEL, self::DEFAULT_LEVEL));
 
             $this->dir_destinations = array(
                     __DIR__.'/Destination'
                     //, __DIR__.'/../client/tlog/destinations'
             );
 
-            $this->set_prefixe($config->read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
-            $this->set_files($config->read(self::VAR_FILES, self::DEFAUT_FILES));
-            $this->set_ip($config->read(self::VAR_IP, self::DEFAUT_IP));
-            $this->set_destinations($config->read(self::VAR_DESTINATIONS, self::DEFAUT_DESTINATIONS));
-            $this->set_show_redirect($config->read(self::VAR_SHOW_REDIRECT, self::DEFAUT_SHOW_REDIRECT));
+            $this->set_prefixe(ConfigQuery::read(self::VAR_PREFIXE, self::DEFAUT_PREFIXE));
+            $this->set_files(ConfigQuery::read(self::VAR_FILES, self::DEFAUT_FILES));
+            $this->set_ip(ConfigQuery::read(self::VAR_IP, self::DEFAUT_IP));
+            $this->set_destinations(ConfigQuery::read(self::VAR_DESTINATIONS, self::DEFAUT_DESTINATIONS));
+            $this->set_show_redirect(ConfigQuery::read(self::VAR_SHOW_REDIRECT, self::DEFAUT_SHOW_REDIRECT));
 
             // Au cas ou il y aurait un exit() quelque part dans le code.
             register_shutdown_function(array($this, 'ecrire_si_exit'));
@@ -345,7 +337,7 @@ class Tlog Implements TlogInterface
                     // we are sometimes in functions = no class available: avoid php warning here
                     $className = $hop['class'];
 
-                    if (! empty($className) and ($className == ltrim($this->container->getParameter("logger.class"),'\\') or strtolower(get_parent_class($className)) == ltrim($this->container->getParameter("logger.class"),'\\'))) {
+                    if (! empty($className) and ($className == ltrim(__CLASS__,'\\') or strtolower(get_parent_class($className)) == ltrim(__CLASS__,'\\'))) {
                             $origine['line'] = $hop['line'];
                             $origine['file'] = $hop['file'];
                             break;
@@ -414,7 +406,7 @@ class Tlog Implements TlogInterface
     {
         foreach ($actives as $active) {
             if (class_exists($active)) {
-                $class = new $active($this->container->get('model.config'));
+                $class = new $active();
 
                 if (!$class instanceof AbstractTlogDestination) {
                     throw new \UnexpectedValueException($active." must extends Thelia\Tlog\AbstractTlogDestination");

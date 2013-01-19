@@ -40,7 +40,7 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
             }
 
-            public function configurer($config = false)
+            public function configurer()
             {
                     $this->style = $this->get_config(self::VAR_STYLE);
             }
@@ -57,15 +57,15 @@ class TlogDestinationHtml extends AbstractTlogDestination
 
             public function get_configs()
             {
-//                    return array(
-//                            new TlogDestinationConfig(
-//                                            self::VAR_STYLE,
-//                                            "Style d'affichage direct dans la page",
-//                                            "Vous pouvez aussi laisser ce champ vide, et créer un style \"tlog-trace\" dans votre feuille de style.",
-//                                            self::VALEUR_STYLE_DEFAUT,
-//                                            TlogDestinationConfig::TYPE_TEXTAREA
-//                            )
-//                    );
+                return array(
+                    new TlogDestinationConfig(
+                        self::VAR_STYLE,
+                        "Style d'affichage direct dans la page",
+                        "Vous pouvez aussi laisser ce champ vide, et créer un style \"tlog-trace\" dans votre feuille de style.",
+                        self::VALEUR_STYLE_DEFAUT,
+                        TlogDestinationConfig::TYPE_TEXTAREA
+                    )
+                );
             }
 
     public function ecrire(&$res)

@@ -23,41 +23,46 @@
 
 namespace Thelia\Log;
 
+use Thelia\Model\Config;
+use Thelia\Model\ConfigQuery;
+
 class TlogDestinationConfig
 {
 
     const TYPE_TEXTAREA = 1;
     const TYPE_TEXTFIELD = 2;
 
-    public $titre;
+    public $name;
+    public $title;
     public $label;
-    public $defaut;
+    public $default;
     public $type;
-    public $valeur;
+    public $value;
 
-    public function __construct($nom, $titre, $label, $defaut, $type, $config = null)
+    public function __construct($name, $title, $label, $default, $type)
     {
-        $this->nom = $nom;
-        $this->titre = $titre;
+        $this->name = $name;
+        $this->title = $title;
         $this->label = $label;
-        $this->defaut = $defaut;
+        $this->default = $default;
         $this->type = $type;
 
-//        @$this->charger();
-
-        if ($config) {
-            $this->valeur = $config->read($this->nom, $this->defaut);
-        }
+        $this->load();
     }
 
-//    public function charger() {
-//         // La variable n'existe pas ? La créer en y affectant la valeur par defaut
-//        if (! parent::charger($this->nom)) {
-//        	$this->valeur = $this->defaut;
-//        	$this->protege = 1;
-//			$this->cache = 1;
-//
-//			$this->add();
-//        }
-//    }
+    
+    public function load()
+    {
+        if (null === $config = ConfigQuery::create()->findOneByName($this->name))
+        {
+            $config = new Config();
+            $config->setName($this->name);
+            $config->setValue($this->default);
+            $config->setHidden(1);
+            $config->setSecure(1);
+            $config->save();
+        }
+        
+        $this->value = $config->getValue();
+    }
 }

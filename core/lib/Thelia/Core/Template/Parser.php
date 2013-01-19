@@ -74,6 +74,9 @@ class Parser implements ParserInterface
     {
        $this->loadParser();
 
+       
+       \Thelia\Log\Tlog::instance()->debug("tutu");
+       
        return $this->content;
     }
 

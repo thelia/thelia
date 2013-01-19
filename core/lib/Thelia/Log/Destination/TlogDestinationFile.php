@@ -34,19 +34,18 @@ class TlogDestinationFile extends AbstractTlogDestination
     const TLOG_DEFAULT_NAME = "log-thelia.txt";
 
     const VAR_MODE = "tlog_destinationfile_mode";
-    const VALEUR_MODE_DEFAUT = "A";
+    const VALEUR_MODE_DEFAULT = "A";
 
     protected $path_defaut = false;
     protected $fh = false;
 
-    public function __construct($configModel = null)
+    public function __construct()
     {
             $this->path_defaut = THELIA_ROOT . "log/" . self::TLOG_DEFAULT_NAME;
-            $this->setConfigModel($configModel);
             parent::__construct();
     }
 
-    public function configurer($config = false)
+    public function configurer()
     {
         $file_path = $this->get_config(self::VAR_PATH_FILE);
         $mode = strtolower($this->get_config(self::VAR_MODE)) == 'a' ? 'a' : 'w';
@@ -83,16 +82,14 @@ class TlogDestinationFile extends AbstractTlogDestination
                 "Chemin du fichier",
                 "Attention, vous devez indiquer un chemin absolu.<br />Le répertoire de base de votre Thelia est ".dirname(getcwd()),
                 $this->path_defaut,
-                TlogDestinationConfig::TYPE_TEXTFIELD,
-                $this->getConfigModel()
+                TlogDestinationConfig::TYPE_TEXTFIELD
             ),
             new TlogDestinationConfig(
                 self::VAR_MODE,
                 "Mode d'ouverture (A ou E)",
                 "Indiquez E pour ré-initialiser le fichier à chaque requête, A pour ne jamais réinitialiser le fichier. Pensez à le vider de temps en temps !",
-                self::VALEUR_MODE_DEFAUT,
-                TlogDestinationConfig::TYPE_TEXTFIELD,
-                $this->getConfigModel()
+                self::VALEUR_MODE_DEFAULT,
+                TlogDestinationConfig::TYPE_TEXTFIELD
             )
         );
     }

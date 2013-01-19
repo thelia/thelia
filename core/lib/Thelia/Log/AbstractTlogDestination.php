@@ -34,13 +34,11 @@ abstract class AbstractTlogDestination
     // Vaudra true si on est dans le back office.
     protected $flag_back_office = false;
 
-    protected $configModel;
-
     public function __construct()
     {
         $this->_configs = array();
         $this->_logs = array();
-
+        
         // Initialiser les variables de configuration
          $this->_configs = $this->get_configs();
 
@@ -49,13 +47,13 @@ abstract class AbstractTlogDestination
     }
 
     //Affecte une valeur à une configuration de la destination
-    public function set_config($nom, $valeur)
+    public function set_config($name, $value)
     {
         foreach ($this->_configs as $config) {
-            if ($config->nom == $nom) {
-                $config->valeur = $valeur;
+            if ($config->name == $name) {
+                $config->value = $value;
                 // Appliquer les changements
-                $this->configurer($config);
+                $this->configurer();
 
                 return true;
             }
@@ -64,22 +62,12 @@ abstract class AbstractTlogDestination
         return false;
     }
 
-    public function setConfigModel($configModel)
-    {
-        $this->configModel = $configModel;
-    }
-
-    public function getConfigModel()
-    {
-        return $this->configModel;
-    }
-
     //Récupère la valeur affectée à une configuration de la destination
-    public function get_config($nom)
+    public function get_config($name)
     {
         foreach ($this->_configs as $config) {
-            if ($config->nom == $nom) {
-                return $config->valeur;
+            if ($config->name == $name) {
+                return $config->value;
             }
         }
 
@@ -116,7 +104,7 @@ abstract class AbstractTlogDestination
     // Demande à la destination de se configurer pour être prête
     // a fonctionner. Si $config est != false, celà indique
     // que seul le paramètre de configuration indiqué a été modifié.
-    protected function configurer($config = false)
+    protected function configurer()
     {
             // Cette methode doit etre surchargée si nécessaire.
     }
