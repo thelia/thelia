@@ -1,5 +1,5 @@
 {
-    "hash": "2be3cc68d014718aa32d78effb38b917",
+    "hash": "8a668b67ef3c3dd2fe8f426c37b2db5d",
     "packages": [
         {
             "name": "phing/phing",
@@ -114,18 +114,56 @@
             ]
         },
         {
+            "name": "psr/log",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://github.com/php-fig/log/archive/1.0.0.zip",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "time": "2012-12-21 11:40:51",
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Psr\\Log\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ]
+        },
+        {
             "name": "symfony-cmf/routing",
             "version": "dev-master",
             "target-dir": "Symfony/Cmf/Component/Routing",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony-cmf/Routing",
-                "reference": "1.0.0-alpha3"
+                "reference": "817b65edad2a4318cffd5017ff7eaabb9f2b65f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/symfony-cmf/Routing/archive/1.0.0-alpha3.zip",
-                "reference": "1.0.0-alpha3",
+                "url": "https://github.com/symfony-cmf/Routing/archive/817b65edad2a4318cffd5017ff7eaabb9f2b65f8.zip",
+                "reference": "817b65edad2a4318cffd5017ff7eaabb9f2b65f8",
                 "shasum": ""
             },
             "require": {
@@ -133,7 +171,7 @@
                 "symfony/routing": ">=2.1,<2.3-dev",
                 "symfony/http-kernel": ">=2.1,<2.3-dev"
             },
-            "time": "2012-12-16 17:52:57",
+            "time": "2013-01-20 20:39:41",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -145,6 +183,7 @@
                     "Symfony\\Cmf\\Component\\Routing": ""
                 }
             },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -554,6 +593,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
-        "symfony-cmf/routing": 20
+        "symfony-cmf/routing": 20,
+        "psr/log": 20
     }
 }

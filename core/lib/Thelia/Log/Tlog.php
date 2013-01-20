@@ -23,6 +23,7 @@
 namespace Thelia\Log;
 
 use Thelia\Model\ConfigQuery;
+use Psr\Log\LoggerInterface;
 
 /**
  *
@@ -33,7 +34,7 @@ use Thelia\Model\ConfigQuery;
  * @author Franck Allimant <franck@cqfdev.fr>
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Tlog Implements TlogInterface
+class Tlog Implements LoggerInterface
 {
     // Nom des variables de configuration
     const VAR_LEVEL 		= "tlog_level";
@@ -44,13 +45,26 @@ class Tlog Implements TlogInterface
     const VAR_SHOW_REDIRECT     = "tlog_show_redirect";
 
     // all level of trace
-    const TRACE                 = 100;
-    const DEBUG                 = 200;
-    const WARNING               = 300;
-    const INFO                  = 400;
+    const DEBUG                 = 100;
+    const INFO                  = 200;
+    const NOTICE                = 300;
+    const WARNING               = 400;
     const ERROR                 = 500;
-    const FATAL                 = 600;
+    const CRITICAL              = 600;
+    const ALERT                 = 700;
+    const EMERGENCY             = 800;
     const MUET                  = PHP_INT_MAX;
+    
+    protected $levels = array(
+        100 => "DEBUG",
+        200 => "INFO",
+        300 => "NOTICE",
+        400 => "WARNING",
+        500 => "ERROR",
+        600 => "CRITICAL",
+        700 => "ALERT",
+        800 => "EMERGENCY"
+    );
 
     // default values
     const DEFAULT_LEVEL     	= self::DEBUG;
@@ -187,65 +201,54 @@ class Tlog Implements TlogInterface
     // Methodes d'accès aux traces
     // ---------------------------
 
-    public function trace()
+    public function debug($message, array $context = array())
     {
-        if ($this->level > self::TRACE)
-            return;
-
-        $args = func_get_args();
-
-        $this->out("TRACE", $args);
+        $this->log(self::DEBUG, $message, $context);
     }
 
-    public function debug()
+    public function info($message, array $context = array())
     {
-        if ($this->level > self::DEBUG)
-            return;
-
-        $args = func_get_args();
-
-        $this->out("DEBUG", $args);
+        $this->log(self::INFO, $message, $context);
+    }
+    
+    public function notice($message, array $context = array())
+    {
+        $this->log(self::NOTICE, $message, $context);
     }
 
-    public function info()
+    public function warning($message, array $context = array())
     {
-        if ($this->level > self::INFO)
-            return;
-
-        $args = func_get_args();
-
-        $this->out("INFO", $args);
+        $this->log(self::WARNING, $message, $context);
     }
 
-    public function warning()
+    public function error($message, array $context = array())
     {
-        if ($this->level > self::WARNING)
+        $this->log(self::ERROR, $message, $context);
+    }
+    
+    public function critical($message, array $context = array())
+    {
+        $this->log(self::CRITICAL, $message, $context);
+    }
+    
+    public function alert($message, array $context = array())
+    {
+        $this->log(self::ALERT, $message, $context);
+    }
+    
+    public function emergency($message, array $context = array())
+    {
+        $this->log(self::EMERGENCY, $message, $context);
+    }
+    
+    public function log($level, $message, array $context = array()) {
+        if($this->level > $level && array_key_exists($level, $this->levels) === false)
             return;
-
-        $args = func_get_args();
-
-        $this->out("WARNING", $args);
+        
+        $this->out($this->levels[$level], $message, $context);
     }
 
-    public function error()
-    {
-        if ($this->level > self::ERROR)
-            return;
-
-        $args = func_get_args();
-
-        $this->out("ERREUR", $args);
-    }
-
-    public function fatal()
-    {
-        if ($this->level > self::FATAL)
-            return;
-
-        $args = func_get_args();
-
-        $this->out("FATAL", $args);
-    }
+    
 
     // Mode back office
     public static function SetBackOfficeMode($booleen)
@@ -368,14 +371,34 @@ class Tlog Implements TlogInterface
 
         return $origine;
     }
+    
+    protected function interpolate($message, array $context = array())
+    {
+        // build a replacement array with braces around the context keys
+        $replace = array();
+        foreach ($context as $key => $val) {
+            $replace['{' . $key . '}'] = $val;
+        }
 
-    private function out($level, $tabargs)
+        // interpolate replacement values into the message and return
+        return strtr($message, $replace);
+    }
+
+    private function out($level, $message, array $context = array())
     {
         $text = '';
-
-        foreach ($tabargs as $arg) {
-            $text .= is_scalar($arg) ? $arg : print_r($arg, true);
+        
+        /*if (is_array($message)) {
+            foreach ($message as $arg) {
+                $text .= is_scalar($arg) ? $arg : print_r($arg, true);
+            }
+        } else */ if (is_scalar($message) === false) {
+            $text = print_r($message, true);
+        } else {
+            $text = $message;
         }
+         
+        $text = $this->interpolate($text, $context);
 
         $origine = $this->findOrigin();
 

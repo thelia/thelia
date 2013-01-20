@@ -34,10 +34,25 @@ namespace Thelia\Core;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Thelia\Core\Bundle;
+use Propel;
 
 class Thelia extends Kernel
 {
+    
+    public function init()
+    {
+        parent::init(); 
+        
+        $this->initPropel();
+    }
+    
+    protected function initPropel()
+    {
+        Propel::init(THELIA_CONF_DIR . "/config_thelia.php");
+    }
     /**
      * Initializes the service container.
      *
@@ -46,12 +61,27 @@ class Thelia extends Kernel
      * The cached version of the service container is used when fresh, otherwise the
      * container is built.
      */
-    protected function initializeContainer()
-    {
-        $this->container = $this->buildContainer();
-        //$this->container->set('kernel', $this);
-
-    }
+//    protected function initializeContainer()
+//    {
+//        $class = $this->getContainerClass();
+//        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
+//        $fresh = true;
+//        if (!$cache->isFresh()) {
+//            $container = $this->buildContainer();
+//            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
+//
+//            $fresh = false;
+//        }
+//
+//        require_once $cache;
+//        
+//        $this->container = new $class();
+//
+//        if (!$fresh && $this->container->has('cache_warmer')) {
+//            $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
+//        }
+//
+//    }
 
     /**
      * Gets the cache directory.
@@ -91,17 +121,17 @@ class Thelia extends Kernel
      *
      * @return ContainerBuilder The compiled service container
      */
-    protected function buildContainer()
-    {
-        $container = $this->getContainerBuilder();
-        $container->set('kernel', $this);
-
-        foreach ($this->bundles as $bundle) {
-            $bundle->build($container);
-        }
-
-        return $container;
-    }
+//    protected function buildContainer()
+//    {
+//        $container = $this->getContainerBuilder();
+//        $container->set('kernel', $this);
+//
+//        foreach ($this->bundles as $bundle) {
+//            $bundle->build($container);
+//        }
+//
+//        return $container;
+//    }
 
     /**
      * return available bundle
@@ -115,8 +145,7 @@ class Thelia extends Kernel
     {
         $bundles = array(
             /* TheliaBundle contain all the dependency injection description */
-            new Bundle\TheliaBundle(),
-            new Bundle\PropelBundle()
+            new Bundle\TheliaBundle()
         );
 
         /**

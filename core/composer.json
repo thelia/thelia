@@ -10,7 +10,8 @@
         "symfony/console" : "2.1.*",
         "symfony/event-dispatcher" : "2.1.*",
         "symfony-cmf/routing" : "1.0.*@dev",
-        "propel/propel1" : "1.6.*"
+        "propel/propel1" : "1.6.*",
+        "psr/log" : "dev-master"
     },
     "minimum-stability": "stable"
 }
