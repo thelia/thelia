@@ -80,6 +80,10 @@ class Tlog Implements LoggerInterface
      */
     private static $instance = false;
 
+    /**
+     *
+     * @var array containing class of destination handler
+     */
     protected $destinations = array();
 
     protected $mode_back_office = false;
@@ -118,6 +122,9 @@ class Tlog Implements LoggerInterface
         return self::$instance;
     }
 
+    /**
+     * initialize default configuration
+     */
     protected function init()
     {
 
@@ -141,6 +148,10 @@ class Tlog Implements LoggerInterface
     // Configuration
     // -------------
 
+    /**
+     * 
+     * @param string $destinations
+     */
     public function setDestinations($destinations)
     {
         if (! empty($destinations)) {
@@ -151,7 +162,13 @@ class Tlog Implements LoggerInterface
             $this->loadDestinations($this->destinations, $classes_destinations);
         }
     }
-
+    
+    /**
+     * 
+     * change the debug level. Use Tlog constant : \Thelia\Log\Tlog::DEBUG set level to Debug
+     * 
+     * @param int $level
+     */
     public function setLevel($level)
     {
             $this->level = $level;
@@ -201,48 +218,141 @@ class Tlog Implements LoggerInterface
     // Methodes d'accès aux traces
     // ---------------------------
 
+    /**
+     * Detailed debug information.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function debug($message, array $context = array())
     {
         $this->log(self::DEBUG, $message, $context);
     }
 
+    /**
+     * Interesting events.
+     *
+     * Example: User logs in, SQL logs.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function info($message, array $context = array())
     {
         $this->log(self::INFO, $message, $context);
     }
     
+    /**
+     * Normal but significant events.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function notice($message, array $context = array())
     {
         $this->log(self::NOTICE, $message, $context);
     }
 
+    /**
+     * Exceptional occurrences that are not errors.
+     *
+     * Example: Use of deprecated APIs, poor use of an API, undesirable things
+     * that are not necessarily wrong.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function warning($message, array $context = array())
     {
         $this->log(self::WARNING, $message, $context);
     }
 
+    /**
+     * Runtime errors that do not require immediate action but should typically
+     * be logged and monitored.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function error($message, array $context = array())
     {
         $this->log(self::ERROR, $message, $context);
     }
     
+    /**
+     * 
+     * @see error()
+     */
+    public function err($message, array $context = array())
+    {
+        $this->error($message, $context);
+    }
+    
+    /**
+     * Critical conditions.
+     *
+     * Example: Application component unavailable, unexpected exception.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function critical($message, array $context = array())
     {
         $this->log(self::CRITICAL, $message, $context);
     }
     
+    /**
+     * 
+     * @see critical()
+     */
+    public function crit($message, array $context = array())
+    {
+        $this->critical($message, $context);
+    }
+    
+    /**
+     * Action must be taken immediately.
+     *
+     * Example: Entire website down, database unavailable, etc. This should
+     * trigger the SMS alerts and wake you up.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function alert($message, array $context = array())
     {
         $this->log(self::ALERT, $message, $context);
     }
     
+    /**
+     * System is unusable.
+     *
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function emergency($message, array $context = array())
     {
         $this->log(self::EMERGENCY, $message, $context);
     }
     
+    /**
+     * Logs with an arbitrary level.
+     *
+     * @param mixed $level
+     * @param string $message
+     * @param array $context
+     * @return null
+     */
     public function log($level, $message, array $context = array()) {
-        if($this->level > $level && array_key_exists($level, $this->levels) === false)
+        if($this->level > $level || array_key_exists($level, $this->levels) === false)
             return;
         
         $this->out($this->levels[$level], $message, $context);
@@ -253,12 +363,18 @@ class Tlog Implements LoggerInterface
     // Mode back office
     public static function SetBackOfficeMode($booleen)
     {
-            foreach (Tlog::instance()->destinations as $dest) {
+            foreach (Tlog::getInstance()->destinations as $dest) {
                     $dest->SetBackOfficeMode($booleen);
             }
     }
 
-    // Ecriture finale
+    /**
+     * 
+     * final end method. Write log for each destination handler
+     * 
+     * @param string $res
+     * @return void
+     */
     public function write(&$res)
     {
             self::$done = true;
@@ -271,7 +387,9 @@ class Tlog Implements LoggerInterface
             }
     }
 
-    //function register into register shutdown function stack
+    /**
+     * @see write()
+     */
     public function writeOnExit()
     {
         // Si les infos de debug n'ont pas été ecrites, le faire maintenant
@@ -303,8 +421,13 @@ class Tlog Implements LoggerInterface
         }
     }
 
-    // Permet de déterminer si la trace est active, en prenant en compte
-    // le level et le filtrage par fichier
+    /**
+     * 
+     * check if level is activated and control if current file is activated
+     * 
+     * @param int $level
+     * @return boolean
+     */
     public function isActivated($level)
     {
         if ($this->level <= $level) {
@@ -320,7 +443,14 @@ class Tlog Implements LoggerInterface
 
         return false;
     }
-
+    
+    /**
+     * 
+     * check if $file is in authorized files
+     * 
+     * @param string $file
+     * @return boolean
+     */
     public function isActivedFile($file)
     {
         return ($this->all_files || in_array($file, $this->files)) && ! in_array("!$file", $this->files);
@@ -328,7 +458,7 @@ class Tlog Implements LoggerInterface
 
     /* -- Methodes privees ---------------------------------------- */
 
-    // Adapté de LoggerLoginEvent dans log4php
+    
     private function findOrigin()
     {
         $origine = array();

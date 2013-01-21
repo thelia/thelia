@@ -44,7 +44,7 @@ class TlogDestinationText extends AbstractTlogDestination
 
     public function add($texte)
     {
-            echo $texte."\n";
+            echo trim($texte)."\n";
     }
 
     public function write(&$res)
