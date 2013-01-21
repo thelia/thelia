@@ -24,7 +24,6 @@
 namespace Thelia\Tests\Log;
 
 use Thelia\Log\Tlog;
-use Thelia\Core\Thelia;
 
 class TlogTest extends \PHPUnit_Framework_TestCase
 {
