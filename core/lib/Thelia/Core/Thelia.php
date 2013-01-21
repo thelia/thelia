@@ -34,10 +34,10 @@ namespace Thelia\Core;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 use Thelia\Core\Bundle;
+use Thelia\Log\Tlog;
 use Propel;
+use PropelConfiguration;
 
 class Thelia extends Kernel
 {
@@ -52,6 +52,17 @@ class Thelia extends Kernel
     protected function initPropel()
     {
         Propel::init(THELIA_CONF_DIR . "/config_thelia.php");
+        
+        if ($this->isDebug()) {
+            Propel::setLogger(Tlog::getInstance());
+            $config = Propel::getConfiguration(PropelConfiguration::TYPE_OBJECT);
+            $config->setParameter('debugpdo.logging.details.method.enabled', true);
+            $config->setParameter('debugpdo.logging.details.time.enabled', true);
+            $config->setParameter('debugpdo.logging.details.mem.enabled', true);
+            
+            $con = Propel::getConnection("thelia");
+            $con->useDebug(true);
+        }
     }
     /**
      * Initializes the service container.

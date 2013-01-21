@@ -74,7 +74,7 @@ class Parser implements ParserInterface
     {
        $this->loadParser();
 
-       
+       echo \Thelia\Model\ConfigQuery::read("alfred", "dupont");
        \Thelia\Log\Tlog::getInstance()->debug("tutu");
        
        return $this->content;
