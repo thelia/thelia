@@ -229,6 +229,22 @@ class Tlog Implements LoggerInterface
     {
         $this->log(self::DEBUG, $message, $context);
     }
+    
+    /**
+     * 
+     * Alias of debug method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addDebug($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addDebug()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::DEBUG, $arg);
+        }
+    }
 
     /**
      * Interesting events.
@@ -245,6 +261,22 @@ class Tlog Implements LoggerInterface
     }
     
     /**
+     * 
+     * Alias of info method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addInfo($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addInfo()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::INFO, $arg);
+        }
+    }
+    
+    /**
      * Normal but significant events.
      *
      * @param string $message
@@ -254,6 +286,22 @@ class Tlog Implements LoggerInterface
     public function notice($message, array $context = array())
     {
         $this->log(self::NOTICE, $message, $context);
+    }
+    
+    /**
+     * 
+     * Alias of notice method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addNotice($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addNotice()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::NOTICE, $arg);
+        }
     }
 
     /**
@@ -270,6 +318,22 @@ class Tlog Implements LoggerInterface
     {
         $this->log(self::WARNING, $message, $context);
     }
+    
+    /**
+     * 
+     * Alias of warning method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addWarning($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addWarning()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::WARNING, $arg);
+        }
+    }
 
     /**
      * Runtime errors that do not require immediate action but should typically
@@ -282,6 +346,22 @@ class Tlog Implements LoggerInterface
     public function error($message, array $context = array())
     {
         $this->log(self::ERROR, $message, $context);
+    }
+    
+    /**
+     * 
+     * Alias of error method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addError($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addError()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::ERROR, $arg);
+        }
     }
     
     /**
@@ -309,6 +389,22 @@ class Tlog Implements LoggerInterface
     
     /**
      * 
+     * Alias of critical method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addCritical($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addCritical()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::CRITICAL, $arg);
+        }
+    }
+    
+    /**
+     * 
      * @see critical()
      */
     public function crit($message, array $context = array())
@@ -332,6 +428,22 @@ class Tlog Implements LoggerInterface
     }
     
     /**
+     * 
+     * Alias of alert method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addAlert($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addAlert()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::ALERT, $arg);
+        }
+    }
+    
+    /**
      * System is unusable.
      *
      * @param string $message
@@ -341,6 +453,22 @@ class Tlog Implements LoggerInterface
     public function emergency($message, array $context = array())
     {
         $this->log(self::EMERGENCY, $message, $context);
+    }
+    
+    /**
+     * 
+     * Alias of emergency method. With this method you can put all parameter you want
+     * 
+     * ex : Tlog::getInstance()->addEmergency($arg1, $arg2, $arg3);
+     * 
+     */
+    public function addEmergency()
+    {
+        $args = func_get_args();
+        
+        foreach ($args as $arg) {
+            $this->log(self::EMERGENCY, $arg);
+        }
     }
     
     /**
