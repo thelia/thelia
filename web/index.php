@@ -10,7 +10,7 @@ require __DIR__ . '/../core/bootstrap.php';
 
 $request = Request::createFromGlobals();
 
-$thelia = new Thelia($env, false);
+$thelia = new Thelia("prod", false);
 
 $response = $thelia->handle($request)->prepare($request)->send();
 
