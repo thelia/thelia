@@ -78,8 +78,8 @@ abstract class BaseProductPeer
     /** the column name for the PROMO field */
     const PROMO = 'product.PROMO';
 
-    /** the column name for the QUANTITY field */
-    const QUANTITY = 'product.QUANTITY';
+    /** the column name for the STOCK field */
+    const STOCK = 'product.STOCK';
 
     /** the column name for the VISIBLE field */
     const VISIBLE = 'product.VISIBLE';
@@ -115,11 +115,11 @@ abstract class BaseProductPeer
      * e.g. ProductPeer::$fieldNames[ProductPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TaxRuleId', 'Ref', 'Price', 'Price2', 'Ecotax', 'Newness', 'Promo', 'Quantity', 'Visible', 'Weight', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'taxRuleId', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'quantity', 'visible', 'weight', 'position', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (ProductPeer::ID, ProductPeer::TAX_RULE_ID, ProductPeer::REF, ProductPeer::PRICE, ProductPeer::PRICE2, ProductPeer::ECOTAX, ProductPeer::NEWNESS, ProductPeer::PROMO, ProductPeer::QUANTITY, ProductPeer::VISIBLE, ProductPeer::WEIGHT, ProductPeer::POSITION, ProductPeer::CREATED_AT, ProductPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAX_RULE_ID', 'REF', 'PRICE', 'PRICE2', 'ECOTAX', 'NEWNESS', 'PROMO', 'QUANTITY', 'VISIBLE', 'WEIGHT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'tax_rule_id', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'quantity', 'visible', 'weight', 'position', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TaxRuleId', 'Ref', 'Price', 'Price2', 'Ecotax', 'Newness', 'Promo', 'Stock', 'Visible', 'Weight', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'taxRuleId', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'stock', 'visible', 'weight', 'position', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ProductPeer::ID, ProductPeer::TAX_RULE_ID, ProductPeer::REF, ProductPeer::PRICE, ProductPeer::PRICE2, ProductPeer::ECOTAX, ProductPeer::NEWNESS, ProductPeer::PROMO, ProductPeer::STOCK, ProductPeer::VISIBLE, ProductPeer::WEIGHT, ProductPeer::POSITION, ProductPeer::CREATED_AT, ProductPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAX_RULE_ID', 'REF', 'PRICE', 'PRICE2', 'ECOTAX', 'NEWNESS', 'PROMO', 'STOCK', 'VISIBLE', 'WEIGHT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'tax_rule_id', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'stock', 'visible', 'weight', 'position', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
@@ -130,11 +130,11 @@ abstract class BaseProductPeer
      * e.g. ProductPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Price' => 3, 'Price2' => 4, 'Ecotax' => 5, 'Newness' => 6, 'Promo' => 7, 'Quantity' => 8, 'Visible' => 9, 'Weight' => 10, 'Position' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'quantity' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'createdAt' => 12, 'updatedAt' => 13, ),
-        BasePeer::TYPE_COLNAME => array (ProductPeer::ID => 0, ProductPeer::TAX_RULE_ID => 1, ProductPeer::REF => 2, ProductPeer::PRICE => 3, ProductPeer::PRICE2 => 4, ProductPeer::ECOTAX => 5, ProductPeer::NEWNESS => 6, ProductPeer::PROMO => 7, ProductPeer::QUANTITY => 8, ProductPeer::VISIBLE => 9, ProductPeer::WEIGHT => 10, ProductPeer::POSITION => 11, ProductPeer::CREATED_AT => 12, ProductPeer::UPDATED_AT => 13, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'PRICE' => 3, 'PRICE2' => 4, 'ECOTAX' => 5, 'NEWNESS' => 6, 'PROMO' => 7, 'QUANTITY' => 8, 'VISIBLE' => 9, 'WEIGHT' => 10, 'POSITION' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'quantity' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'created_at' => 12, 'updated_at' => 13, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Price' => 3, 'Price2' => 4, 'Ecotax' => 5, 'Newness' => 6, 'Promo' => 7, 'Stock' => 8, 'Visible' => 9, 'Weight' => 10, 'Position' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'stock' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'createdAt' => 12, 'updatedAt' => 13, ),
+        BasePeer::TYPE_COLNAME => array (ProductPeer::ID => 0, ProductPeer::TAX_RULE_ID => 1, ProductPeer::REF => 2, ProductPeer::PRICE => 3, ProductPeer::PRICE2 => 4, ProductPeer::ECOTAX => 5, ProductPeer::NEWNESS => 6, ProductPeer::PROMO => 7, ProductPeer::STOCK => 8, ProductPeer::VISIBLE => 9, ProductPeer::WEIGHT => 10, ProductPeer::POSITION => 11, ProductPeer::CREATED_AT => 12, ProductPeer::UPDATED_AT => 13, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'PRICE' => 3, 'PRICE2' => 4, 'ECOTAX' => 5, 'NEWNESS' => 6, 'PROMO' => 7, 'STOCK' => 8, 'VISIBLE' => 9, 'WEIGHT' => 10, 'POSITION' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'stock' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'created_at' => 12, 'updated_at' => 13, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
@@ -217,7 +217,7 @@ abstract class BaseProductPeer
             $criteria->addSelectColumn(ProductPeer::ECOTAX);
             $criteria->addSelectColumn(ProductPeer::NEWNESS);
             $criteria->addSelectColumn(ProductPeer::PROMO);
-            $criteria->addSelectColumn(ProductPeer::QUANTITY);
+            $criteria->addSelectColumn(ProductPeer::STOCK);
             $criteria->addSelectColumn(ProductPeer::VISIBLE);
             $criteria->addSelectColumn(ProductPeer::WEIGHT);
             $criteria->addSelectColumn(ProductPeer::POSITION);
@@ -232,7 +232,7 @@ abstract class BaseProductPeer
             $criteria->addSelectColumn($alias . '.ECOTAX');
             $criteria->addSelectColumn($alias . '.NEWNESS');
             $criteria->addSelectColumn($alias . '.PROMO');
-            $criteria->addSelectColumn($alias . '.QUANTITY');
+            $criteria->addSelectColumn($alias . '.STOCK');
             $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.WEIGHT');
             $criteria->addSelectColumn($alias . '.POSITION');
@@ -437,36 +437,36 @@ abstract class BaseProductPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AccessoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AccessoryPeer::clearInstancePool();
-        // Invalidate objects in AccessoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AccessoryPeer::clearInstancePool();
-        // Invalidate objects in ContentAssocPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ContentAssocPeer::clearInstancePool();
-        // Invalidate objects in DocumentPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        DocumentPeer::clearInstancePool();
-        // Invalidate objects in FeatureProdPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FeatureProdPeer::clearInstancePool();
-        // Invalidate objects in ImagePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ImagePeer::clearInstancePool();
-        // Invalidate objects in ProductCategoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ProductCategoryPeer::clearInstancePool();
         // Invalidate objects in ProductDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ProductDescPeer::clearInstancePool();
-        // Invalidate objects in RewritingPeer instance pool,
+        // Invalidate objects in ProductCategoryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        RewritingPeer::clearInstancePool();
+        ProductCategoryPeer::clearInstancePool();
+        // Invalidate objects in FeatureProdPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeatureProdPeer::clearInstancePool();
         // Invalidate objects in StockPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         StockPeer::clearInstancePool();
+        // Invalidate objects in ContentAssocPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ContentAssocPeer::clearInstancePool();
+        // Invalidate objects in ImagePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ImagePeer::clearInstancePool();
+        // Invalidate objects in DocumentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        DocumentPeer::clearInstancePool();
+        // Invalidate objects in AccessoryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AccessoryPeer::clearInstancePool();
+        // Invalidate objects in AccessoryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AccessoryPeer::clearInstancePool();
+        // Invalidate objects in RewritingPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        RewritingPeer::clearInstancePool();
     }
 
     /**

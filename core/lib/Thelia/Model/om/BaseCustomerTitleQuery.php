@@ -25,13 +25,13 @@ use Thelia\Model\CustomerTitleQuery;
  *
  *
  * @method CustomerTitleQuery orderById($order = Criteria::ASC) Order by the id column
- * @method CustomerTitleQuery orderByDefaultUtility($order = Criteria::ASC) Order by the default_utility column
+ * @method CustomerTitleQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method CustomerTitleQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method CustomerTitleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method CustomerTitleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method CustomerTitleQuery groupById() Group by the id column
- * @method CustomerTitleQuery groupByDefaultUtility() Group by the default_utility column
+ * @method CustomerTitleQuery groupByByDefault() Group by the by_default column
  * @method CustomerTitleQuery groupByPosition() Group by the position column
  * @method CustomerTitleQuery groupByCreatedAt() Group by the created_at column
  * @method CustomerTitleQuery groupByUpdatedAt() Group by the updated_at column
@@ -40,13 +40,13 @@ use Thelia\Model\CustomerTitleQuery;
  * @method CustomerTitleQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method CustomerTitleQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method CustomerTitleQuery leftJoinAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the Address relation
- * @method CustomerTitleQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
- * @method CustomerTitleQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
- *
  * @method CustomerTitleQuery leftJoinCustomer($relationAlias = null) Adds a LEFT JOIN clause to the query using the Customer relation
  * @method CustomerTitleQuery rightJoinCustomer($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Customer relation
  * @method CustomerTitleQuery innerJoinCustomer($relationAlias = null) Adds a INNER JOIN clause to the query using the Customer relation
+ *
+ * @method CustomerTitleQuery leftJoinAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the Address relation
+ * @method CustomerTitleQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
+ * @method CustomerTitleQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
  *
  * @method CustomerTitleQuery leftJoinCustomerTitleDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitleDesc relation
  * @method CustomerTitleQuery rightJoinCustomerTitleDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitleDesc relation
@@ -56,13 +56,13 @@ use Thelia\Model\CustomerTitleQuery;
  * @method CustomerTitle findOneOrCreate(PropelPDO $con = null) Return the first CustomerTitle matching the query, or a new CustomerTitle object populated from the query conditions when no match is found
  *
  * @method CustomerTitle findOneById(int $id) Return the first CustomerTitle filtered by the id column
- * @method CustomerTitle findOneByDefaultUtility(int $default_utility) Return the first CustomerTitle filtered by the default_utility column
+ * @method CustomerTitle findOneByByDefault(int $by_default) Return the first CustomerTitle filtered by the by_default column
  * @method CustomerTitle findOneByPosition(string $position) Return the first CustomerTitle filtered by the position column
  * @method CustomerTitle findOneByCreatedAt(string $created_at) Return the first CustomerTitle filtered by the created_at column
  * @method CustomerTitle findOneByUpdatedAt(string $updated_at) Return the first CustomerTitle filtered by the updated_at column
  *
  * @method array findById(int $id) Return CustomerTitle objects filtered by the id column
- * @method array findByDefaultUtility(int $default_utility) Return CustomerTitle objects filtered by the default_utility column
+ * @method array findByByDefault(int $by_default) Return CustomerTitle objects filtered by the by_default column
  * @method array findByPosition(string $position) Return CustomerTitle objects filtered by the position column
  * @method array findByCreatedAt(string $created_at) Return CustomerTitle objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return CustomerTitle objects filtered by the updated_at column
@@ -155,7 +155,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `DEFAULT_UTILITY`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `customer_title` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `customer_title` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -272,16 +272,16 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the default_utility column
+     * Filter the query on the by_default column
      *
      * Example usage:
      * <code>
-     * $query->filterByDefaultUtility(1234); // WHERE default_utility = 1234
-     * $query->filterByDefaultUtility(array(12, 34)); // WHERE default_utility IN (12, 34)
-     * $query->filterByDefaultUtility(array('min' => 12)); // WHERE default_utility > 12
+     * $query->filterByByDefault(1234); // WHERE by_default = 1234
+     * $query->filterByByDefault(array(12, 34)); // WHERE by_default IN (12, 34)
+     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default > 12
      * </code>
      *
-     * @param     mixed $defaultUtility The value to use as filter.
+     * @param     mixed $byDefault The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -289,16 +289,16 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return CustomerTitleQuery The current query, for fluid interface
      */
-    public function filterByDefaultUtility($defaultUtility = null, $comparison = null)
+    public function filterByByDefault($byDefault = null, $comparison = null)
     {
-        if (is_array($defaultUtility)) {
+        if (is_array($byDefault)) {
             $useMinMax = false;
-            if (isset($defaultUtility['min'])) {
-                $this->addUsingAlias(CustomerTitlePeer::DEFAULT_UTILITY, $defaultUtility['min'], Criteria::GREATER_EQUAL);
+            if (isset($byDefault['min'])) {
+                $this->addUsingAlias(CustomerTitlePeer::BY_DEFAULT, $byDefault['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($defaultUtility['max'])) {
-                $this->addUsingAlias(CustomerTitlePeer::DEFAULT_UTILITY, $defaultUtility['max'], Criteria::LESS_EQUAL);
+            if (isset($byDefault['max'])) {
+                $this->addUsingAlias(CustomerTitlePeer::BY_DEFAULT, $byDefault['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -309,7 +309,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CustomerTitlePeer::DEFAULT_UTILITY, $defaultUtility, $comparison);
+        return $this->addUsingAlias(CustomerTitlePeer::BY_DEFAULT, $byDefault, $comparison);
     }
 
     /**
@@ -428,80 +428,6 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Address object
-     *
-     * @param   Address|PropelObjectCollection $address  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   CustomerTitleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByAddress($address, $comparison = null)
-    {
-        if ($address instanceof Address) {
-            return $this
-                ->addUsingAlias(CustomerTitlePeer::ID, $address->getCustomerTitleId(), $comparison);
-        } elseif ($address instanceof PropelObjectCollection) {
-            return $this
-                ->useAddressQuery()
-                ->filterByPrimaryKeys($address->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByAddress() only accepts arguments of type Address or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Address relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return CustomerTitleQuery The current query, for fluid interface
-     */
-    public function joinAddress($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Address');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Address');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Address relation Address object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
-     */
-    public function useAddressQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinAddress($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Address', '\Thelia\Model\AddressQuery');
-    }
-
-    /**
      * Filter the query by a related Customer object
      *
      * @param   Customer|PropelObjectCollection $customer  the related object to use as filter
@@ -573,6 +499,80 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
         return $this
             ->joinCustomer($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Customer', '\Thelia\Model\CustomerQuery');
+    }
+
+    /**
+     * Filter the query by a related Address object
+     *
+     * @param   Address|PropelObjectCollection $address  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CustomerTitleQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByAddress($address, $comparison = null)
+    {
+        if ($address instanceof Address) {
+            return $this
+                ->addUsingAlias(CustomerTitlePeer::ID, $address->getCustomerTitleId(), $comparison);
+        } elseif ($address instanceof PropelObjectCollection) {
+            return $this
+                ->useAddressQuery()
+                ->filterByPrimaryKeys($address->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAddress() only accepts arguments of type Address or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Address relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CustomerTitleQuery The current query, for fluid interface
+     */
+    public function joinAddress($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Address');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Address');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Address relation Address object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
+     */
+    public function useAddressQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinAddress($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Address', '\Thelia\Model\AddressQuery');
     }
 
     /**
@@ -665,4 +665,69 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     CustomerTitleQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(CustomerTitlePeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     CustomerTitleQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CustomerTitlePeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     CustomerTitleQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CustomerTitlePeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     CustomerTitleQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(CustomerTitlePeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     CustomerTitleQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CustomerTitlePeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     CustomerTitleQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CustomerTitlePeer::CREATED_AT);
+    }
 }

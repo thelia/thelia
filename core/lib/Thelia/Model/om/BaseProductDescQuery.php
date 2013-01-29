@@ -30,7 +30,7 @@ use Thelia\Model\ProductDescQuery;
  * @method ProductDescQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
  * @method ProductDescQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
  * @method ProductDescQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method ProductDescQuery orderByUpdatetAt($order = Criteria::ASC) Order by the updatet_at column
+ * @method ProductDescQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method ProductDescQuery groupById() Group by the id column
  * @method ProductDescQuery groupByProductId() Group by the product_id column
@@ -40,7 +40,7 @@ use Thelia\Model\ProductDescQuery;
  * @method ProductDescQuery groupByChapo() Group by the chapo column
  * @method ProductDescQuery groupByPostscriptum() Group by the postscriptum column
  * @method ProductDescQuery groupByCreatedAt() Group by the created_at column
- * @method ProductDescQuery groupByUpdatetAt() Group by the updatet_at column
+ * @method ProductDescQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method ProductDescQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method ProductDescQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -61,7 +61,7 @@ use Thelia\Model\ProductDescQuery;
  * @method ProductDesc findOneByChapo(string $chapo) Return the first ProductDesc filtered by the chapo column
  * @method ProductDesc findOneByPostscriptum(string $postscriptum) Return the first ProductDesc filtered by the postscriptum column
  * @method ProductDesc findOneByCreatedAt(string $created_at) Return the first ProductDesc filtered by the created_at column
- * @method ProductDesc findOneByUpdatetAt(string $updatet_at) Return the first ProductDesc filtered by the updatet_at column
+ * @method ProductDesc findOneByUpdatedAt(string $updated_at) Return the first ProductDesc filtered by the updated_at column
  *
  * @method array findById(int $id) Return ProductDesc objects filtered by the id column
  * @method array findByProductId(int $product_id) Return ProductDesc objects filtered by the product_id column
@@ -71,7 +71,7 @@ use Thelia\Model\ProductDescQuery;
  * @method array findByChapo(string $chapo) Return ProductDesc objects filtered by the chapo column
  * @method array findByPostscriptum(string $postscriptum) Return ProductDesc objects filtered by the postscriptum column
  * @method array findByCreatedAt(string $created_at) Return ProductDesc objects filtered by the created_at column
- * @method array findByUpdatetAt(string $updatet_at) Return ProductDesc objects filtered by the updatet_at column
+ * @method array findByUpdatedAt(string $updated_at) Return ProductDesc objects filtered by the updated_at column
  *
  * @package    propel.generator.Thelia.Model.om
  */
@@ -161,7 +161,7 @@ abstract class BaseProductDescQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `LANG`, `TITLE`, `DESCRIPTION`, `CHAPO`, `POSTSCRIPTUM`, `CREATED_AT`, `UPDATET_AT` FROM `product_desc` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `PRODUCT_ID`, `LANG`, `TITLE`, `DESCRIPTION`, `CHAPO`, `POSTSCRIPTUM`, `CREATED_AT`, `UPDATED_AT` FROM `product_desc` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -509,32 +509,46 @@ abstract class BaseProductDescQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the updatet_at column
+     * Filter the query on the updated_at column
      *
      * Example usage:
      * <code>
-     * $query->filterByUpdatetAt('fooValue');   // WHERE updatet_at = 'fooValue'
-     * $query->filterByUpdatetAt('%fooValue%'); // WHERE updatet_at LIKE '%fooValue%'
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
-     * @param     string $updatetAt The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ProductDescQuery The current query, for fluid interface
      */
-    public function filterByUpdatetAt($updatetAt = null, $comparison = null)
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
-        if (null === $comparison) {
-            if (is_array($updatetAt)) {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(ProductDescPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(ProductDescPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $updatetAt)) {
-                $updatetAt = str_replace('*', '%', $updatetAt);
-                $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(ProductDescPeer::UPDATET_AT, $updatetAt, $comparison);
+        return $this->addUsingAlias(ProductDescPeer::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -629,4 +643,69 @@ abstract class BaseProductDescQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ProductDescQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ProductDescPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ProductDescQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ProductDescPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ProductDescQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ProductDescPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ProductDescQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ProductDescPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ProductDescQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ProductDescPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ProductDescQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ProductDescPeer::CREATED_AT);
+    }
 }

@@ -37,13 +37,13 @@ use Thelia\Model\ResourceQuery;
  * @method ResourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ResourceQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ResourceQuery leftJoinGroupResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupResource relation
- * @method ResourceQuery rightJoinGroupResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupResource relation
- * @method ResourceQuery innerJoinGroupResource($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupResource relation
- *
  * @method ResourceQuery leftJoinResourceDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ResourceDesc relation
  * @method ResourceQuery rightJoinResourceDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ResourceDesc relation
  * @method ResourceQuery innerJoinResourceDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the ResourceDesc relation
+ *
+ * @method ResourceQuery leftJoinGroupResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupResource relation
+ * @method ResourceQuery rightJoinGroupResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupResource relation
+ * @method ResourceQuery innerJoinGroupResource($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupResource relation
  *
  * @method Resource findOne(PropelPDO $con = null) Return the first Resource matching the query
  * @method Resource findOneOrCreate(PropelPDO $con = null) Return the first Resource matching the query, or a new Resource object populated from the query conditions when no match is found
@@ -378,80 +378,6 @@ abstract class BaseResourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related GroupResource object
-     *
-     * @param   GroupResource|PropelObjectCollection $groupResource  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   ResourceQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByGroupResource($groupResource, $comparison = null)
-    {
-        if ($groupResource instanceof GroupResource) {
-            return $this
-                ->addUsingAlias(ResourcePeer::ID, $groupResource->getResourceId(), $comparison);
-        } elseif ($groupResource instanceof PropelObjectCollection) {
-            return $this
-                ->useGroupResourceQuery()
-                ->filterByPrimaryKeys($groupResource->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByGroupResource() only accepts arguments of type GroupResource or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the GroupResource relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ResourceQuery The current query, for fluid interface
-     */
-    public function joinGroupResource($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupResource');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'GroupResource');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the GroupResource relation GroupResource object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\GroupResourceQuery A secondary query class using the current class as primary query
-     */
-    public function useGroupResourceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinGroupResource($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupResource', '\Thelia\Model\GroupResourceQuery');
-    }
-
-    /**
      * Filter the query by a related ResourceDesc object
      *
      * @param   ResourceDesc|PropelObjectCollection $resourceDesc  the related object to use as filter
@@ -526,6 +452,80 @@ abstract class BaseResourceQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related GroupResource object
+     *
+     * @param   GroupResource|PropelObjectCollection $groupResource  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ResourceQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByGroupResource($groupResource, $comparison = null)
+    {
+        if ($groupResource instanceof GroupResource) {
+            return $this
+                ->addUsingAlias(ResourcePeer::ID, $groupResource->getResourceId(), $comparison);
+        } elseif ($groupResource instanceof PropelObjectCollection) {
+            return $this
+                ->useGroupResourceQuery()
+                ->filterByPrimaryKeys($groupResource->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByGroupResource() only accepts arguments of type GroupResource or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the GroupResource relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ResourceQuery The current query, for fluid interface
+     */
+    public function joinGroupResource($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('GroupResource');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'GroupResource');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the GroupResource relation GroupResource object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\GroupResourceQuery A secondary query class using the current class as primary query
+     */
+    public function useGroupResourceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinGroupResource($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'GroupResource', '\Thelia\Model\GroupResourceQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Resource $resource Object to remove from the list of results
@@ -541,4 +541,69 @@ abstract class BaseResourceQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ResourceQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ResourcePeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ResourceQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ResourcePeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ResourceQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ResourcePeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ResourceQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ResourcePeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ResourceQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ResourcePeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ResourceQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ResourcePeer::CREATED_AT);
+    }
 }

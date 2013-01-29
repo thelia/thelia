@@ -80,16 +80,16 @@ abstract class BaseAttribute extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
+     * @var        PropelObjectCollection|AttributeDesc[] Collection to store aggregation of AttributeDesc objects.
+     */
+    protected $collAttributeDescs;
+    protected $collAttributeDescsPartial;
+
+    /**
      * @var        PropelObjectCollection|AttributeAv[] Collection to store aggregation of AttributeAv objects.
      */
     protected $collAttributeAvs;
     protected $collAttributeAvsPartial;
-
-    /**
-     * @var        PropelObjectCollection|AttributeCategory[] Collection to store aggregation of AttributeCategory objects.
-     */
-    protected $collAttributeCategorys;
-    protected $collAttributeCategorysPartial;
 
     /**
      * @var        PropelObjectCollection|AttributeCombination[] Collection to store aggregation of AttributeCombination objects.
@@ -98,10 +98,10 @@ abstract class BaseAttribute extends BaseObject implements Persistent
     protected $collAttributeCombinationsPartial;
 
     /**
-     * @var        PropelObjectCollection|AttributeDesc[] Collection to store aggregation of AttributeDesc objects.
+     * @var        PropelObjectCollection|AttributeCategory[] Collection to store aggregation of AttributeCategory objects.
      */
-    protected $collAttributeDescs;
-    protected $collAttributeDescsPartial;
+    protected $collAttributeCategorys;
+    protected $collAttributeCategorysPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,13 +121,13 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $attributeAvsScheduledForDeletion = null;
+    protected $attributeDescsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $attributeCategorysScheduledForDeletion = null;
+    protected $attributeAvsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -139,7 +139,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $attributeDescsScheduledForDeletion = null;
+    protected $attributeCategorysScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -429,13 +429,13 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAttributeAvs = null;
+            $this->collAttributeDescs = null;
 
-            $this->collAttributeCategorys = null;
+            $this->collAttributeAvs = null;
 
             $this->collAttributeCombinations = null;
 
-            $this->collAttributeDescs = null;
+            $this->collAttributeCategorys = null;
 
         } // if (deep)
     }
@@ -509,8 +509,19 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(AttributePeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(AttributePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(AttributePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -561,6 +572,23 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->attributeDescsScheduledForDeletion !== null) {
+                if (!$this->attributeDescsScheduledForDeletion->isEmpty()) {
+                    AttributeDescQuery::create()
+                        ->filterByPrimaryKeys($this->attributeDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->attributeDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAttributeDescs !== null) {
+                foreach ($this->collAttributeDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->attributeAvsScheduledForDeletion !== null) {
                 if (!$this->attributeAvsScheduledForDeletion->isEmpty()) {
                     AttributeAvQuery::create()
@@ -572,23 +600,6 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
             if ($this->collAttributeAvs !== null) {
                 foreach ($this->collAttributeAvs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->attributeCategorysScheduledForDeletion !== null) {
-                if (!$this->attributeCategorysScheduledForDeletion->isEmpty()) {
-                    AttributeCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->attributeCategorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributeCategorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collAttributeCategorys !== null) {
-                foreach ($this->collAttributeCategorys as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -612,17 +623,17 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->attributeDescsScheduledForDeletion !== null) {
-                if (!$this->attributeDescsScheduledForDeletion->isEmpty()) {
-                    AttributeDescQuery::create()
-                        ->filterByPrimaryKeys($this->attributeDescsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->attributeCategorysScheduledForDeletion !== null) {
+                if (!$this->attributeCategorysScheduledForDeletion->isEmpty()) {
+                    AttributeCategoryQuery::create()
+                        ->filterByPrimaryKeys($this->attributeCategorysScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->attributeDescsScheduledForDeletion = null;
+                    $this->attributeCategorysScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collAttributeDescs !== null) {
-                foreach ($this->collAttributeDescs as $referrerFK) {
+            if ($this->collAttributeCategorys !== null) {
+                foreach ($this->collAttributeCategorys as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -789,16 +800,16 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             }
 
 
-                if ($this->collAttributeAvs !== null) {
-                    foreach ($this->collAttributeAvs as $referrerFK) {
+                if ($this->collAttributeDescs !== null) {
+                    foreach ($this->collAttributeDescs as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collAttributeCategorys !== null) {
-                    foreach ($this->collAttributeCategorys as $referrerFK) {
+                if ($this->collAttributeAvs !== null) {
+                    foreach ($this->collAttributeAvs as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -813,8 +824,8 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collAttributeDescs !== null) {
-                    foreach ($this->collAttributeDescs as $referrerFK) {
+                if ($this->collAttributeCategorys !== null) {
+                    foreach ($this->collAttributeCategorys as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -903,17 +914,17 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
+            if (null !== $this->collAttributeDescs) {
+                $result['AttributeDescs'] = $this->collAttributeDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collAttributeAvs) {
                 $result['AttributeAvs'] = $this->collAttributeAvs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collAttributeCategorys) {
-                $result['AttributeCategorys'] = $this->collAttributeCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collAttributeCombinations) {
                 $result['AttributeCombinations'] = $this->collAttributeCombinations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collAttributeDescs) {
-                $result['AttributeDescs'] = $this->collAttributeDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collAttributeCategorys) {
+                $result['AttributeCategorys'] = $this->collAttributeCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1078,15 +1089,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getAttributeAvs() as $relObj) {
+            foreach ($this->getAttributeDescs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAttributeAv($relObj->copy($deepCopy));
+                    $copyObj->addAttributeDesc($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getAttributeCategorys() as $relObj) {
+            foreach ($this->getAttributeAvs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAttributeCategory($relObj->copy($deepCopy));
+                    $copyObj->addAttributeAv($relObj->copy($deepCopy));
                 }
             }
 
@@ -1096,9 +1107,9 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                 }
             }
 
-            foreach ($this->getAttributeDescs() as $relObj) {
+            foreach ($this->getAttributeCategorys() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAttributeDesc($relObj->copy($deepCopy));
+                    $copyObj->addAttributeCategory($relObj->copy($deepCopy));
                 }
             }
 
@@ -1163,17 +1174,224 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('AttributeDesc' == $relationName) {
+            $this->initAttributeDescs();
+        }
         if ('AttributeAv' == $relationName) {
             $this->initAttributeAvs();
-        }
-        if ('AttributeCategory' == $relationName) {
-            $this->initAttributeCategorys();
         }
         if ('AttributeCombination' == $relationName) {
             $this->initAttributeCombinations();
         }
-        if ('AttributeDesc' == $relationName) {
+        if ('AttributeCategory' == $relationName) {
+            $this->initAttributeCategorys();
+        }
+    }
+
+    /**
+     * Clears out the collAttributeDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAttributeDescs()
+     */
+    public function clearAttributeDescs()
+    {
+        $this->collAttributeDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collAttributeDescsPartial = null;
+    }
+
+    /**
+     * reset is the collAttributeDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAttributeDescs($v = true)
+    {
+        $this->collAttributeDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collAttributeDescs collection.
+     *
+     * By default this just sets the collAttributeDescs collection to an empty array (like clearcollAttributeDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAttributeDescs($overrideExisting = true)
+    {
+        if (null !== $this->collAttributeDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collAttributeDescs = new PropelObjectCollection();
+        $this->collAttributeDescs->setModel('AttributeDesc');
+    }
+
+    /**
+     * Gets an array of AttributeDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Attribute is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|AttributeDesc[] List of AttributeDesc objects
+     * @throws PropelException
+     */
+    public function getAttributeDescs($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collAttributeDescsPartial && !$this->isNew();
+        if (null === $this->collAttributeDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAttributeDescs) {
+                // return empty collection
+                $this->initAttributeDescs();
+            } else {
+                $collAttributeDescs = AttributeDescQuery::create(null, $criteria)
+                    ->filterByAttribute($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAttributeDescsPartial && count($collAttributeDescs)) {
+                      $this->initAttributeDescs(false);
+
+                      foreach($collAttributeDescs as $obj) {
+                        if (false == $this->collAttributeDescs->contains($obj)) {
+                          $this->collAttributeDescs->append($obj);
+                        }
+                      }
+
+                      $this->collAttributeDescsPartial = true;
+                    }
+
+                    return $collAttributeDescs;
+                }
+
+                if($partial && $this->collAttributeDescs) {
+                    foreach($this->collAttributeDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collAttributeDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAttributeDescs = $collAttributeDescs;
+                $this->collAttributeDescsPartial = false;
+            }
+        }
+
+        return $this->collAttributeDescs;
+    }
+
+    /**
+     * Sets a collection of AttributeDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $attributeDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAttributeDescs(PropelCollection $attributeDescs, PropelPDO $con = null)
+    {
+        $this->attributeDescsScheduledForDeletion = $this->getAttributeDescs(new Criteria(), $con)->diff($attributeDescs);
+
+        foreach ($this->attributeDescsScheduledForDeletion as $attributeDescRemoved) {
+            $attributeDescRemoved->setAttribute(null);
+        }
+
+        $this->collAttributeDescs = null;
+        foreach ($attributeDescs as $attributeDesc) {
+            $this->addAttributeDesc($attributeDesc);
+        }
+
+        $this->collAttributeDescs = $attributeDescs;
+        $this->collAttributeDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related AttributeDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related AttributeDesc objects.
+     * @throws PropelException
+     */
+    public function countAttributeDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAttributeDescsPartial && !$this->isNew();
+        if (null === $this->collAttributeDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAttributeDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAttributeDescs());
+                }
+                $query = AttributeDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByAttribute($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAttributeDescs);
+        }
+    }
+
+    /**
+     * Method called to associate a AttributeDesc object to this object
+     * through the AttributeDesc foreign key attribute.
+     *
+     * @param    AttributeDesc $l AttributeDesc
+     * @return Attribute The current object (for fluent API support)
+     */
+    public function addAttributeDesc(AttributeDesc $l)
+    {
+        if ($this->collAttributeDescs === null) {
             $this->initAttributeDescs();
+            $this->collAttributeDescsPartial = true;
+        }
+        if (!$this->collAttributeDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAttributeDesc($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	AttributeDesc $attributeDesc The attributeDesc object to add.
+     */
+    protected function doAddAttributeDesc($attributeDesc)
+    {
+        $this->collAttributeDescs[]= $attributeDesc;
+        $attributeDesc->setAttribute($this);
+    }
+
+    /**
+     * @param	AttributeDesc $attributeDesc The attributeDesc object to remove.
+     */
+    public function removeAttributeDesc($attributeDesc)
+    {
+        if ($this->getAttributeDescs()->contains($attributeDesc)) {
+            $this->collAttributeDescs->remove($this->collAttributeDescs->search($attributeDesc));
+            if (null === $this->attributeDescsScheduledForDeletion) {
+                $this->attributeDescsScheduledForDeletion = clone $this->collAttributeDescs;
+                $this->attributeDescsScheduledForDeletion->clear();
+            }
+            $this->attributeDescsScheduledForDeletion[]= $attributeDesc;
+            $attributeDesc->setAttribute(null);
         }
     }
 
@@ -1382,238 +1600,6 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $this->attributeAvsScheduledForDeletion[]= $attributeAv;
             $attributeAv->setAttribute(null);
         }
-    }
-
-    /**
-     * Clears out the collAttributeCategorys collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addAttributeCategorys()
-     */
-    public function clearAttributeCategorys()
-    {
-        $this->collAttributeCategorys = null; // important to set this to null since that means it is uninitialized
-        $this->collAttributeCategorysPartial = null;
-    }
-
-    /**
-     * reset is the collAttributeCategorys collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialAttributeCategorys($v = true)
-    {
-        $this->collAttributeCategorysPartial = $v;
-    }
-
-    /**
-     * Initializes the collAttributeCategorys collection.
-     *
-     * By default this just sets the collAttributeCategorys collection to an empty array (like clearcollAttributeCategorys());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initAttributeCategorys($overrideExisting = true)
-    {
-        if (null !== $this->collAttributeCategorys && !$overrideExisting) {
-            return;
-        }
-        $this->collAttributeCategorys = new PropelObjectCollection();
-        $this->collAttributeCategorys->setModel('AttributeCategory');
-    }
-
-    /**
-     * Gets an array of AttributeCategory objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Attribute is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|AttributeCategory[] List of AttributeCategory objects
-     * @throws PropelException
-     */
-    public function getAttributeCategorys($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collAttributeCategorysPartial && !$this->isNew();
-        if (null === $this->collAttributeCategorys || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAttributeCategorys) {
-                // return empty collection
-                $this->initAttributeCategorys();
-            } else {
-                $collAttributeCategorys = AttributeCategoryQuery::create(null, $criteria)
-                    ->filterByAttribute($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collAttributeCategorysPartial && count($collAttributeCategorys)) {
-                      $this->initAttributeCategorys(false);
-
-                      foreach($collAttributeCategorys as $obj) {
-                        if (false == $this->collAttributeCategorys->contains($obj)) {
-                          $this->collAttributeCategorys->append($obj);
-                        }
-                      }
-
-                      $this->collAttributeCategorysPartial = true;
-                    }
-
-                    return $collAttributeCategorys;
-                }
-
-                if($partial && $this->collAttributeCategorys) {
-                    foreach($this->collAttributeCategorys as $obj) {
-                        if($obj->isNew()) {
-                            $collAttributeCategorys[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collAttributeCategorys = $collAttributeCategorys;
-                $this->collAttributeCategorysPartial = false;
-            }
-        }
-
-        return $this->collAttributeCategorys;
-    }
-
-    /**
-     * Sets a collection of AttributeCategory objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $attributeCategorys A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setAttributeCategorys(PropelCollection $attributeCategorys, PropelPDO $con = null)
-    {
-        $this->attributeCategorysScheduledForDeletion = $this->getAttributeCategorys(new Criteria(), $con)->diff($attributeCategorys);
-
-        foreach ($this->attributeCategorysScheduledForDeletion as $attributeCategoryRemoved) {
-            $attributeCategoryRemoved->setAttribute(null);
-        }
-
-        $this->collAttributeCategorys = null;
-        foreach ($attributeCategorys as $attributeCategory) {
-            $this->addAttributeCategory($attributeCategory);
-        }
-
-        $this->collAttributeCategorys = $attributeCategorys;
-        $this->collAttributeCategorysPartial = false;
-    }
-
-    /**
-     * Returns the number of related AttributeCategory objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related AttributeCategory objects.
-     * @throws PropelException
-     */
-    public function countAttributeCategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collAttributeCategorysPartial && !$this->isNew();
-        if (null === $this->collAttributeCategorys || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAttributeCategorys) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAttributeCategorys());
-                }
-                $query = AttributeCategoryQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAttribute($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collAttributeCategorys);
-        }
-    }
-
-    /**
-     * Method called to associate a AttributeCategory object to this object
-     * through the AttributeCategory foreign key attribute.
-     *
-     * @param    AttributeCategory $l AttributeCategory
-     * @return Attribute The current object (for fluent API support)
-     */
-    public function addAttributeCategory(AttributeCategory $l)
-    {
-        if ($this->collAttributeCategorys === null) {
-            $this->initAttributeCategorys();
-            $this->collAttributeCategorysPartial = true;
-        }
-        if (!$this->collAttributeCategorys->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddAttributeCategory($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	AttributeCategory $attributeCategory The attributeCategory object to add.
-     */
-    protected function doAddAttributeCategory($attributeCategory)
-    {
-        $this->collAttributeCategorys[]= $attributeCategory;
-        $attributeCategory->setAttribute($this);
-    }
-
-    /**
-     * @param	AttributeCategory $attributeCategory The attributeCategory object to remove.
-     */
-    public function removeAttributeCategory($attributeCategory)
-    {
-        if ($this->getAttributeCategorys()->contains($attributeCategory)) {
-            $this->collAttributeCategorys->remove($this->collAttributeCategorys->search($attributeCategory));
-            if (null === $this->attributeCategorysScheduledForDeletion) {
-                $this->attributeCategorysScheduledForDeletion = clone $this->collAttributeCategorys;
-                $this->attributeCategorysScheduledForDeletion->clear();
-            }
-            $this->attributeCategorysScheduledForDeletion[]= $attributeCategory;
-            $attributeCategory->setAttribute(null);
-        }
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Attribute is new, it will return
-     * an empty collection; or if this Attribute has previously
-     * been saved, it will retrieve related AttributeCategorys from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Attribute.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|AttributeCategory[] List of AttributeCategory objects
-     */
-    public function getAttributeCategorysJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = AttributeCategoryQuery::create(null, $criteria);
-        $query->joinWith('Category', $join_behavior);
-
-        return $this->getAttributeCategorys($query, $con);
     }
 
     /**
@@ -1874,34 +1860,34 @@ abstract class BaseAttribute extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collAttributeDescs collection
+     * Clears out the collAttributeCategorys collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addAttributeDescs()
+     * @see        addAttributeCategorys()
      */
-    public function clearAttributeDescs()
+    public function clearAttributeCategorys()
     {
-        $this->collAttributeDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collAttributeDescsPartial = null;
+        $this->collAttributeCategorys = null; // important to set this to null since that means it is uninitialized
+        $this->collAttributeCategorysPartial = null;
     }
 
     /**
-     * reset is the collAttributeDescs collection loaded partially
+     * reset is the collAttributeCategorys collection loaded partially
      *
      * @return void
      */
-    public function resetPartialAttributeDescs($v = true)
+    public function resetPartialAttributeCategorys($v = true)
     {
-        $this->collAttributeDescsPartial = $v;
+        $this->collAttributeCategorysPartial = $v;
     }
 
     /**
-     * Initializes the collAttributeDescs collection.
+     * Initializes the collAttributeCategorys collection.
      *
-     * By default this just sets the collAttributeDescs collection to an empty array (like clearcollAttributeDescs());
+     * By default this just sets the collAttributeCategorys collection to an empty array (like clearcollAttributeCategorys());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1910,17 +1896,17 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initAttributeDescs($overrideExisting = true)
+    public function initAttributeCategorys($overrideExisting = true)
     {
-        if (null !== $this->collAttributeDescs && !$overrideExisting) {
+        if (null !== $this->collAttributeCategorys && !$overrideExisting) {
             return;
         }
-        $this->collAttributeDescs = new PropelObjectCollection();
-        $this->collAttributeDescs->setModel('AttributeDesc');
+        $this->collAttributeCategorys = new PropelObjectCollection();
+        $this->collAttributeCategorys->setModel('AttributeCategory');
     }
 
     /**
-     * Gets an array of AttributeDesc objects which contain a foreign key that references this object.
+     * Gets an array of AttributeCategory objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1930,98 +1916,98 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|AttributeDesc[] List of AttributeDesc objects
+     * @return PropelObjectCollection|AttributeCategory[] List of AttributeCategory objects
      * @throws PropelException
      */
-    public function getAttributeDescs($criteria = null, PropelPDO $con = null)
+    public function getAttributeCategorys($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collAttributeDescsPartial && !$this->isNew();
-        if (null === $this->collAttributeDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAttributeDescs) {
+        $partial = $this->collAttributeCategorysPartial && !$this->isNew();
+        if (null === $this->collAttributeCategorys || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAttributeCategorys) {
                 // return empty collection
-                $this->initAttributeDescs();
+                $this->initAttributeCategorys();
             } else {
-                $collAttributeDescs = AttributeDescQuery::create(null, $criteria)
+                $collAttributeCategorys = AttributeCategoryQuery::create(null, $criteria)
                     ->filterByAttribute($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collAttributeDescsPartial && count($collAttributeDescs)) {
-                      $this->initAttributeDescs(false);
+                    if (false !== $this->collAttributeCategorysPartial && count($collAttributeCategorys)) {
+                      $this->initAttributeCategorys(false);
 
-                      foreach($collAttributeDescs as $obj) {
-                        if (false == $this->collAttributeDescs->contains($obj)) {
-                          $this->collAttributeDescs->append($obj);
+                      foreach($collAttributeCategorys as $obj) {
+                        if (false == $this->collAttributeCategorys->contains($obj)) {
+                          $this->collAttributeCategorys->append($obj);
                         }
                       }
 
-                      $this->collAttributeDescsPartial = true;
+                      $this->collAttributeCategorysPartial = true;
                     }
 
-                    return $collAttributeDescs;
+                    return $collAttributeCategorys;
                 }
 
-                if($partial && $this->collAttributeDescs) {
-                    foreach($this->collAttributeDescs as $obj) {
+                if($partial && $this->collAttributeCategorys) {
+                    foreach($this->collAttributeCategorys as $obj) {
                         if($obj->isNew()) {
-                            $collAttributeDescs[] = $obj;
+                            $collAttributeCategorys[] = $obj;
                         }
                     }
                 }
 
-                $this->collAttributeDescs = $collAttributeDescs;
-                $this->collAttributeDescsPartial = false;
+                $this->collAttributeCategorys = $collAttributeCategorys;
+                $this->collAttributeCategorysPartial = false;
             }
         }
 
-        return $this->collAttributeDescs;
+        return $this->collAttributeCategorys;
     }
 
     /**
-     * Sets a collection of AttributeDesc objects related by a one-to-many relationship
+     * Sets a collection of AttributeCategory objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $attributeDescs A Propel collection.
+     * @param PropelCollection $attributeCategorys A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setAttributeDescs(PropelCollection $attributeDescs, PropelPDO $con = null)
+    public function setAttributeCategorys(PropelCollection $attributeCategorys, PropelPDO $con = null)
     {
-        $this->attributeDescsScheduledForDeletion = $this->getAttributeDescs(new Criteria(), $con)->diff($attributeDescs);
+        $this->attributeCategorysScheduledForDeletion = $this->getAttributeCategorys(new Criteria(), $con)->diff($attributeCategorys);
 
-        foreach ($this->attributeDescsScheduledForDeletion as $attributeDescRemoved) {
-            $attributeDescRemoved->setAttribute(null);
+        foreach ($this->attributeCategorysScheduledForDeletion as $attributeCategoryRemoved) {
+            $attributeCategoryRemoved->setAttribute(null);
         }
 
-        $this->collAttributeDescs = null;
-        foreach ($attributeDescs as $attributeDesc) {
-            $this->addAttributeDesc($attributeDesc);
+        $this->collAttributeCategorys = null;
+        foreach ($attributeCategorys as $attributeCategory) {
+            $this->addAttributeCategory($attributeCategory);
         }
 
-        $this->collAttributeDescs = $attributeDescs;
-        $this->collAttributeDescsPartial = false;
+        $this->collAttributeCategorys = $attributeCategorys;
+        $this->collAttributeCategorysPartial = false;
     }
 
     /**
-     * Returns the number of related AttributeDesc objects.
+     * Returns the number of related AttributeCategory objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related AttributeDesc objects.
+     * @return int             Count of related AttributeCategory objects.
      * @throws PropelException
      */
-    public function countAttributeDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countAttributeCategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collAttributeDescsPartial && !$this->isNew();
-        if (null === $this->collAttributeDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAttributeDescs) {
+        $partial = $this->collAttributeCategorysPartial && !$this->isNew();
+        if (null === $this->collAttributeCategorys || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAttributeCategorys) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getAttributeDescs());
+                    return count($this->getAttributeCategorys());
                 }
-                $query = AttributeDescQuery::create(null, $criteria);
+                $query = AttributeCategoryQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -2031,53 +2017,78 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collAttributeDescs);
+            return count($this->collAttributeCategorys);
         }
     }
 
     /**
-     * Method called to associate a AttributeDesc object to this object
-     * through the AttributeDesc foreign key attribute.
+     * Method called to associate a AttributeCategory object to this object
+     * through the AttributeCategory foreign key attribute.
      *
-     * @param    AttributeDesc $l AttributeDesc
+     * @param    AttributeCategory $l AttributeCategory
      * @return Attribute The current object (for fluent API support)
      */
-    public function addAttributeDesc(AttributeDesc $l)
+    public function addAttributeCategory(AttributeCategory $l)
     {
-        if ($this->collAttributeDescs === null) {
-            $this->initAttributeDescs();
-            $this->collAttributeDescsPartial = true;
+        if ($this->collAttributeCategorys === null) {
+            $this->initAttributeCategorys();
+            $this->collAttributeCategorysPartial = true;
         }
-        if (!$this->collAttributeDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddAttributeDesc($l);
+        if (!$this->collAttributeCategorys->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAttributeCategory($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	AttributeDesc $attributeDesc The attributeDesc object to add.
+     * @param	AttributeCategory $attributeCategory The attributeCategory object to add.
      */
-    protected function doAddAttributeDesc($attributeDesc)
+    protected function doAddAttributeCategory($attributeCategory)
     {
-        $this->collAttributeDescs[]= $attributeDesc;
-        $attributeDesc->setAttribute($this);
+        $this->collAttributeCategorys[]= $attributeCategory;
+        $attributeCategory->setAttribute($this);
     }
 
     /**
-     * @param	AttributeDesc $attributeDesc The attributeDesc object to remove.
+     * @param	AttributeCategory $attributeCategory The attributeCategory object to remove.
      */
-    public function removeAttributeDesc($attributeDesc)
+    public function removeAttributeCategory($attributeCategory)
     {
-        if ($this->getAttributeDescs()->contains($attributeDesc)) {
-            $this->collAttributeDescs->remove($this->collAttributeDescs->search($attributeDesc));
-            if (null === $this->attributeDescsScheduledForDeletion) {
-                $this->attributeDescsScheduledForDeletion = clone $this->collAttributeDescs;
-                $this->attributeDescsScheduledForDeletion->clear();
+        if ($this->getAttributeCategorys()->contains($attributeCategory)) {
+            $this->collAttributeCategorys->remove($this->collAttributeCategorys->search($attributeCategory));
+            if (null === $this->attributeCategorysScheduledForDeletion) {
+                $this->attributeCategorysScheduledForDeletion = clone $this->collAttributeCategorys;
+                $this->attributeCategorysScheduledForDeletion->clear();
             }
-            $this->attributeDescsScheduledForDeletion[]= $attributeDesc;
-            $attributeDesc->setAttribute(null);
+            $this->attributeCategorysScheduledForDeletion[]= $attributeCategory;
+            $attributeCategory->setAttribute(null);
         }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Attribute is new, it will return
+     * an empty collection; or if this Attribute has previously
+     * been saved, it will retrieve related AttributeCategorys from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Attribute.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|AttributeCategory[] List of AttributeCategory objects
+     */
+    public function getAttributeCategorysJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = AttributeCategoryQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getAttributeCategorys($query, $con);
     }
 
     /**
@@ -2109,13 +2120,13 @@ abstract class BaseAttribute extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAttributeAvs) {
-                foreach ($this->collAttributeAvs as $o) {
+            if ($this->collAttributeDescs) {
+                foreach ($this->collAttributeDescs as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collAttributeCategorys) {
-                foreach ($this->collAttributeCategorys as $o) {
+            if ($this->collAttributeAvs) {
+                foreach ($this->collAttributeAvs as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2124,29 +2135,29 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collAttributeDescs) {
-                foreach ($this->collAttributeDescs as $o) {
+            if ($this->collAttributeCategorys) {
+                foreach ($this->collAttributeCategorys as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        if ($this->collAttributeAvs instanceof PropelCollection) {
-            $this->collAttributeAvs->clearIterator();
-        }
-        $this->collAttributeAvs = null;
-        if ($this->collAttributeCategorys instanceof PropelCollection) {
-            $this->collAttributeCategorys->clearIterator();
-        }
-        $this->collAttributeCategorys = null;
-        if ($this->collAttributeCombinations instanceof PropelCollection) {
-            $this->collAttributeCombinations->clearIterator();
-        }
-        $this->collAttributeCombinations = null;
         if ($this->collAttributeDescs instanceof PropelCollection) {
             $this->collAttributeDescs->clearIterator();
         }
         $this->collAttributeDescs = null;
+        if ($this->collAttributeAvs instanceof PropelCollection) {
+            $this->collAttributeAvs->clearIterator();
+        }
+        $this->collAttributeAvs = null;
+        if ($this->collAttributeCombinations instanceof PropelCollection) {
+            $this->collAttributeCombinations->clearIterator();
+        }
+        $this->collAttributeCombinations = null;
+        if ($this->collAttributeCategorys instanceof PropelCollection) {
+            $this->collAttributeCategorys->clearIterator();
+        }
+        $this->collAttributeCategorys = null;
     }
 
     /**
@@ -2167,6 +2178,20 @@ abstract class BaseAttribute extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Attribute The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = AttributePeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

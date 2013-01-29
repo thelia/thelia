@@ -25,7 +25,7 @@ use Thelia\Model\ConfigQuery;
  * @method ConfigQuery orderById($order = Criteria::ASC) Order by the id column
  * @method ConfigQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method ConfigQuery orderByValue($order = Criteria::ASC) Order by the value column
- * @method ConfigQuery orderBySecure($order = Criteria::ASC) Order by the secure column
+ * @method ConfigQuery orderBySecured($order = Criteria::ASC) Order by the secured column
  * @method ConfigQuery orderByHidden($order = Criteria::ASC) Order by the hidden column
  * @method ConfigQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method ConfigQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -33,7 +33,7 @@ use Thelia\Model\ConfigQuery;
  * @method ConfigQuery groupById() Group by the id column
  * @method ConfigQuery groupByName() Group by the name column
  * @method ConfigQuery groupByValue() Group by the value column
- * @method ConfigQuery groupBySecure() Group by the secure column
+ * @method ConfigQuery groupBySecured() Group by the secured column
  * @method ConfigQuery groupByHidden() Group by the hidden column
  * @method ConfigQuery groupByCreatedAt() Group by the created_at column
  * @method ConfigQuery groupByUpdatedAt() Group by the updated_at column
@@ -52,7 +52,7 @@ use Thelia\Model\ConfigQuery;
  * @method Config findOneById(int $id) Return the first Config filtered by the id column
  * @method Config findOneByName(string $name) Return the first Config filtered by the name column
  * @method Config findOneByValue(string $value) Return the first Config filtered by the value column
- * @method Config findOneBySecure(int $secure) Return the first Config filtered by the secure column
+ * @method Config findOneBySecured(int $secured) Return the first Config filtered by the secured column
  * @method Config findOneByHidden(int $hidden) Return the first Config filtered by the hidden column
  * @method Config findOneByCreatedAt(string $created_at) Return the first Config filtered by the created_at column
  * @method Config findOneByUpdatedAt(string $updated_at) Return the first Config filtered by the updated_at column
@@ -60,7 +60,7 @@ use Thelia\Model\ConfigQuery;
  * @method array findById(int $id) Return Config objects filtered by the id column
  * @method array findByName(string $name) Return Config objects filtered by the name column
  * @method array findByValue(string $value) Return Config objects filtered by the value column
- * @method array findBySecure(int $secure) Return Config objects filtered by the secure column
+ * @method array findBySecured(int $secured) Return Config objects filtered by the secured column
  * @method array findByHidden(int $hidden) Return Config objects filtered by the hidden column
  * @method array findByCreatedAt(string $created_at) Return Config objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Config objects filtered by the updated_at column
@@ -153,7 +153,7 @@ abstract class BaseConfigQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `NAME`, `VALUE`, `SECURE`, `HIDDEN`, `CREATED_AT`, `UPDATED_AT` FROM `config` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `NAME`, `VALUE`, `SECURED`, `HIDDEN`, `CREATED_AT`, `UPDATED_AT` FROM `config` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -328,16 +328,16 @@ abstract class BaseConfigQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the secure column
+     * Filter the query on the secured column
      *
      * Example usage:
      * <code>
-     * $query->filterBySecure(1234); // WHERE secure = 1234
-     * $query->filterBySecure(array(12, 34)); // WHERE secure IN (12, 34)
-     * $query->filterBySecure(array('min' => 12)); // WHERE secure > 12
+     * $query->filterBySecured(1234); // WHERE secured = 1234
+     * $query->filterBySecured(array(12, 34)); // WHERE secured IN (12, 34)
+     * $query->filterBySecured(array('min' => 12)); // WHERE secured > 12
      * </code>
      *
-     * @param     mixed $secure The value to use as filter.
+     * @param     mixed $secured The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -345,16 +345,16 @@ abstract class BaseConfigQuery extends ModelCriteria
      *
      * @return ConfigQuery The current query, for fluid interface
      */
-    public function filterBySecure($secure = null, $comparison = null)
+    public function filterBySecured($secured = null, $comparison = null)
     {
-        if (is_array($secure)) {
+        if (is_array($secured)) {
             $useMinMax = false;
-            if (isset($secure['min'])) {
-                $this->addUsingAlias(ConfigPeer::SECURE, $secure['min'], Criteria::GREATER_EQUAL);
+            if (isset($secured['min'])) {
+                $this->addUsingAlias(ConfigPeer::SECURED, $secured['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($secure['max'])) {
-                $this->addUsingAlias(ConfigPeer::SECURE, $secure['max'], Criteria::LESS_EQUAL);
+            if (isset($secured['max'])) {
+                $this->addUsingAlias(ConfigPeer::SECURED, $secured['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -365,7 +365,7 @@ abstract class BaseConfigQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ConfigPeer::SECURE, $secure, $comparison);
+        return $this->addUsingAlias(ConfigPeer::SECURED, $secured, $comparison);
     }
 
     /**
@@ -585,4 +585,69 @@ abstract class BaseConfigQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ConfigQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ConfigPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ConfigQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ConfigPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ConfigQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ConfigPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ConfigQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ConfigPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ConfigQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ConfigPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ConfigQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ConfigPeer::CREATED_AT);
+    }
 }

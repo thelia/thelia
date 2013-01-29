@@ -383,12 +383,12 @@ abstract class BaseTaxRulePeer
         // Invalidate objects in ProductPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ProductPeer::clearInstancePool();
-        // Invalidate objects in TaxRuleCountryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        TaxRuleCountryPeer::clearInstancePool();
         // Invalidate objects in TaxRuleDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         TaxRuleDescPeer::clearInstancePool();
+        // Invalidate objects in TaxRuleCountryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        TaxRuleCountryPeer::clearInstancePool();
     }
 
     /**

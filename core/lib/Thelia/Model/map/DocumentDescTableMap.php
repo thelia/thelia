@@ -58,7 +58,20 @@ class DocumentDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::MANY_TO_ONE, array('document_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::MANY_TO_ONE, array('document_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // DocumentDescTableMap

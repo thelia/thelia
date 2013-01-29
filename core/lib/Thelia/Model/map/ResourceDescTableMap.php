@@ -46,8 +46,8 @@ class ResourceDescTableMap extends TableMap
         $this->addForeignKey('RESOURCE_ID', 'ResourceId', 'INTEGER', 'resource', 'ID', true, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -56,7 +56,20 @@ class ResourceDescTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Resource', 'Thelia\\Model\\Resource', RelationMap::MANY_TO_ONE, array('resource_id' => 'id', ), 'CASCADE', null);
+        $this->addRelation('Resource', 'Thelia\\Model\\Resource', RelationMap::MANY_TO_ONE, array('resource_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // ResourceDescTableMap

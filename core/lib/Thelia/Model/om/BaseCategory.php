@@ -106,28 +106,16 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|AttributeCategory[] Collection to store aggregation of AttributeCategory objects.
-     */
-    protected $collAttributeCategorys;
-    protected $collAttributeCategorysPartial;
-
-    /**
      * @var        PropelObjectCollection|CategoryDesc[] Collection to store aggregation of CategoryDesc objects.
      */
     protected $collCategoryDescs;
     protected $collCategoryDescsPartial;
 
     /**
-     * @var        PropelObjectCollection|ContentAssoc[] Collection to store aggregation of ContentAssoc objects.
+     * @var        PropelObjectCollection|ProductCategory[] Collection to store aggregation of ProductCategory objects.
      */
-    protected $collContentAssocs;
-    protected $collContentAssocsPartial;
-
-    /**
-     * @var        PropelObjectCollection|Document[] Collection to store aggregation of Document objects.
-     */
-    protected $collDocuments;
-    protected $collDocumentsPartial;
+    protected $collProductCategorys;
+    protected $collProductCategorysPartial;
 
     /**
      * @var        PropelObjectCollection|FeatureCategory[] Collection to store aggregation of FeatureCategory objects.
@@ -136,16 +124,28 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $collFeatureCategorysPartial;
 
     /**
+     * @var        PropelObjectCollection|AttributeCategory[] Collection to store aggregation of AttributeCategory objects.
+     */
+    protected $collAttributeCategorys;
+    protected $collAttributeCategorysPartial;
+
+    /**
+     * @var        PropelObjectCollection|ContentAssoc[] Collection to store aggregation of ContentAssoc objects.
+     */
+    protected $collContentAssocs;
+    protected $collContentAssocsPartial;
+
+    /**
      * @var        PropelObjectCollection|Image[] Collection to store aggregation of Image objects.
      */
     protected $collImages;
     protected $collImagesPartial;
 
     /**
-     * @var        PropelObjectCollection|ProductCategory[] Collection to store aggregation of ProductCategory objects.
+     * @var        PropelObjectCollection|Document[] Collection to store aggregation of Document objects.
      */
-    protected $collProductCategorys;
-    protected $collProductCategorysPartial;
+    protected $collDocuments;
+    protected $collDocumentsPartial;
 
     /**
      * @var        PropelObjectCollection|Rewriting[] Collection to store aggregation of Rewriting objects.
@@ -171,25 +171,13 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $attributeCategorysScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
     protected $categoryDescsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $contentAssocsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $documentsScheduledForDeletion = null;
+    protected $productCategorysScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -201,13 +189,25 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $attributeCategorysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $contentAssocsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $imagesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $productCategorysScheduledForDeletion = null;
+    protected $documentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -599,19 +599,19 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAttributeCategorys = null;
-
             $this->collCategoryDescs = null;
 
-            $this->collContentAssocs = null;
-
-            $this->collDocuments = null;
+            $this->collProductCategorys = null;
 
             $this->collFeatureCategorys = null;
 
+            $this->collAttributeCategorys = null;
+
+            $this->collContentAssocs = null;
+
             $this->collImages = null;
 
-            $this->collProductCategorys = null;
+            $this->collDocuments = null;
 
             $this->collRewritings = null;
 
@@ -687,8 +687,19 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(CategoryPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(CategoryPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(CategoryPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -739,23 +750,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->attributeCategorysScheduledForDeletion !== null) {
-                if (!$this->attributeCategorysScheduledForDeletion->isEmpty()) {
-                    AttributeCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->attributeCategorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributeCategorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collAttributeCategorys !== null) {
-                foreach ($this->collAttributeCategorys as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->categoryDescsScheduledForDeletion !== null) {
                 if (!$this->categoryDescsScheduledForDeletion->isEmpty()) {
                     CategoryDescQuery::create()
@@ -767,6 +761,57 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
             if ($this->collCategoryDescs !== null) {
                 foreach ($this->collCategoryDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productCategorysScheduledForDeletion !== null) {
+                if (!$this->productCategorysScheduledForDeletion->isEmpty()) {
+                    ProductCategoryQuery::create()
+                        ->filterByPrimaryKeys($this->productCategorysScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productCategorysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collProductCategorys !== null) {
+                foreach ($this->collProductCategorys as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->featureCategorysScheduledForDeletion !== null) {
+                if (!$this->featureCategorysScheduledForDeletion->isEmpty()) {
+                    FeatureCategoryQuery::create()
+                        ->filterByPrimaryKeys($this->featureCategorysScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->featureCategorysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFeatureCategorys !== null) {
+                foreach ($this->collFeatureCategorys as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->attributeCategorysScheduledForDeletion !== null) {
+                if (!$this->attributeCategorysScheduledForDeletion->isEmpty()) {
+                    AttributeCategoryQuery::create()
+                        ->filterByPrimaryKeys($this->attributeCategorysScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->attributeCategorysScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAttributeCategorys !== null) {
+                foreach ($this->collAttributeCategorys as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -791,41 +836,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->documentsScheduledForDeletion !== null) {
-                if (!$this->documentsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->documentsScheduledForDeletion as $document) {
-                        // need to save related object because we set the relation to null
-                        $document->save($con);
-                    }
-                    $this->documentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collDocuments !== null) {
-                foreach ($this->collDocuments as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->featureCategorysScheduledForDeletion !== null) {
-                if (!$this->featureCategorysScheduledForDeletion->isEmpty()) {
-                    FeatureCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->featureCategorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->featureCategorysScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collFeatureCategorys !== null) {
-                foreach ($this->collFeatureCategorys as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->imagesScheduledForDeletion !== null) {
                 if (!$this->imagesScheduledForDeletion->isEmpty()) {
                     foreach ($this->imagesScheduledForDeletion as $image) {
@@ -844,17 +854,18 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->productCategorysScheduledForDeletion !== null) {
-                if (!$this->productCategorysScheduledForDeletion->isEmpty()) {
-                    ProductCategoryQuery::create()
-                        ->filterByPrimaryKeys($this->productCategorysScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productCategorysScheduledForDeletion = null;
+            if ($this->documentsScheduledForDeletion !== null) {
+                if (!$this->documentsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->documentsScheduledForDeletion as $document) {
+                        // need to save related object because we set the relation to null
+                        $document->save($con);
+                    }
+                    $this->documentsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collProductCategorys !== null) {
-                foreach ($this->collProductCategorys as $referrerFK) {
+            if ($this->collDocuments !== null) {
+                foreach ($this->collDocuments as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1057,14 +1068,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
             }
 
 
-                if ($this->collAttributeCategorys !== null) {
-                    foreach ($this->collAttributeCategorys as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collCategoryDescs !== null) {
                     foreach ($this->collCategoryDescs as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1073,16 +1076,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collContentAssocs !== null) {
-                    foreach ($this->collContentAssocs as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collDocuments !== null) {
-                    foreach ($this->collDocuments as $referrerFK) {
+                if ($this->collProductCategorys !== null) {
+                    foreach ($this->collProductCategorys as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1097,6 +1092,22 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collAttributeCategorys !== null) {
+                    foreach ($this->collAttributeCategorys as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collContentAssocs !== null) {
+                    foreach ($this->collContentAssocs as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collImages !== null) {
                     foreach ($this->collImages as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1105,8 +1116,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collProductCategorys !== null) {
-                    foreach ($this->collProductCategorys as $referrerFK) {
+                if ($this->collDocuments !== null) {
+                    foreach ($this->collDocuments as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1215,26 +1226,26 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collAttributeCategorys) {
-                $result['AttributeCategorys'] = $this->collAttributeCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collCategoryDescs) {
                 $result['CategoryDescs'] = $this->collCategoryDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collContentAssocs) {
-                $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collDocuments) {
-                $result['Documents'] = $this->collDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProductCategorys) {
+                $result['ProductCategorys'] = $this->collProductCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collFeatureCategorys) {
                 $result['FeatureCategorys'] = $this->collFeatureCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collAttributeCategorys) {
+                $result['AttributeCategorys'] = $this->collAttributeCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collContentAssocs) {
+                $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collImages) {
                 $result['Images'] = $this->collImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collProductCategorys) {
-                $result['ProductCategorys'] = $this->collProductCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collDocuments) {
+                $result['Documents'] = $this->collDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collRewritings) {
                 $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1420,27 +1431,15 @@ abstract class BaseCategory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getAttributeCategorys() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAttributeCategory($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getCategoryDescs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCategoryDesc($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getContentAssocs() as $relObj) {
+            foreach ($this->getProductCategorys() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addContentAssoc($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getDocuments() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addDocument($relObj->copy($deepCopy));
+                    $copyObj->addProductCategory($relObj->copy($deepCopy));
                 }
             }
 
@@ -1450,15 +1449,27 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getAttributeCategorys() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAttributeCategory($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getContentAssocs() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addContentAssoc($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getImages() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addImage($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getProductCategorys() as $relObj) {
+            foreach ($this->getDocuments() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addProductCategory($relObj->copy($deepCopy));
+                    $copyObj->addDocument($relObj->copy($deepCopy));
                 }
             }
 
@@ -1529,30 +1540,701 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('AttributeCategory' == $relationName) {
-            $this->initAttributeCategorys();
-        }
         if ('CategoryDesc' == $relationName) {
             $this->initCategoryDescs();
-        }
-        if ('ContentAssoc' == $relationName) {
-            $this->initContentAssocs();
-        }
-        if ('Document' == $relationName) {
-            $this->initDocuments();
-        }
-        if ('FeatureCategory' == $relationName) {
-            $this->initFeatureCategorys();
-        }
-        if ('Image' == $relationName) {
-            $this->initImages();
         }
         if ('ProductCategory' == $relationName) {
             $this->initProductCategorys();
         }
+        if ('FeatureCategory' == $relationName) {
+            $this->initFeatureCategorys();
+        }
+        if ('AttributeCategory' == $relationName) {
+            $this->initAttributeCategorys();
+        }
+        if ('ContentAssoc' == $relationName) {
+            $this->initContentAssocs();
+        }
+        if ('Image' == $relationName) {
+            $this->initImages();
+        }
+        if ('Document' == $relationName) {
+            $this->initDocuments();
+        }
         if ('Rewriting' == $relationName) {
             $this->initRewritings();
         }
+    }
+
+    /**
+     * Clears out the collCategoryDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCategoryDescs()
+     */
+    public function clearCategoryDescs()
+    {
+        $this->collCategoryDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collCategoryDescsPartial = null;
+    }
+
+    /**
+     * reset is the collCategoryDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCategoryDescs($v = true)
+    {
+        $this->collCategoryDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCategoryDescs collection.
+     *
+     * By default this just sets the collCategoryDescs collection to an empty array (like clearcollCategoryDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCategoryDescs($overrideExisting = true)
+    {
+        if (null !== $this->collCategoryDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collCategoryDescs = new PropelObjectCollection();
+        $this->collCategoryDescs->setModel('CategoryDesc');
+    }
+
+    /**
+     * Gets an array of CategoryDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CategoryDesc[] List of CategoryDesc objects
+     * @throws PropelException
+     */
+    public function getCategoryDescs($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryDescsPartial && !$this->isNew();
+        if (null === $this->collCategoryDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryDescs) {
+                // return empty collection
+                $this->initCategoryDescs();
+            } else {
+                $collCategoryDescs = CategoryDescQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCategoryDescsPartial && count($collCategoryDescs)) {
+                      $this->initCategoryDescs(false);
+
+                      foreach($collCategoryDescs as $obj) {
+                        if (false == $this->collCategoryDescs->contains($obj)) {
+                          $this->collCategoryDescs->append($obj);
+                        }
+                      }
+
+                      $this->collCategoryDescsPartial = true;
+                    }
+
+                    return $collCategoryDescs;
+                }
+
+                if($partial && $this->collCategoryDescs) {
+                    foreach($this->collCategoryDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collCategoryDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCategoryDescs = $collCategoryDescs;
+                $this->collCategoryDescsPartial = false;
+            }
+        }
+
+        return $this->collCategoryDescs;
+    }
+
+    /**
+     * Sets a collection of CategoryDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $categoryDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCategoryDescs(PropelCollection $categoryDescs, PropelPDO $con = null)
+    {
+        $this->categoryDescsScheduledForDeletion = $this->getCategoryDescs(new Criteria(), $con)->diff($categoryDescs);
+
+        foreach ($this->categoryDescsScheduledForDeletion as $categoryDescRemoved) {
+            $categoryDescRemoved->setCategory(null);
+        }
+
+        $this->collCategoryDescs = null;
+        foreach ($categoryDescs as $categoryDesc) {
+            $this->addCategoryDesc($categoryDesc);
+        }
+
+        $this->collCategoryDescs = $categoryDescs;
+        $this->collCategoryDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related CategoryDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CategoryDesc objects.
+     * @throws PropelException
+     */
+    public function countCategoryDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryDescsPartial && !$this->isNew();
+        if (null === $this->collCategoryDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCategoryDescs());
+                }
+                $query = CategoryDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCategoryDescs);
+        }
+    }
+
+    /**
+     * Method called to associate a CategoryDesc object to this object
+     * through the CategoryDesc foreign key attribute.
+     *
+     * @param    CategoryDesc $l CategoryDesc
+     * @return Category The current object (for fluent API support)
+     */
+    public function addCategoryDesc(CategoryDesc $l)
+    {
+        if ($this->collCategoryDescs === null) {
+            $this->initCategoryDescs();
+            $this->collCategoryDescsPartial = true;
+        }
+        if (!$this->collCategoryDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryDesc($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CategoryDesc $categoryDesc The categoryDesc object to add.
+     */
+    protected function doAddCategoryDesc($categoryDesc)
+    {
+        $this->collCategoryDescs[]= $categoryDesc;
+        $categoryDesc->setCategory($this);
+    }
+
+    /**
+     * @param	CategoryDesc $categoryDesc The categoryDesc object to remove.
+     */
+    public function removeCategoryDesc($categoryDesc)
+    {
+        if ($this->getCategoryDescs()->contains($categoryDesc)) {
+            $this->collCategoryDescs->remove($this->collCategoryDescs->search($categoryDesc));
+            if (null === $this->categoryDescsScheduledForDeletion) {
+                $this->categoryDescsScheduledForDeletion = clone $this->collCategoryDescs;
+                $this->categoryDescsScheduledForDeletion->clear();
+            }
+            $this->categoryDescsScheduledForDeletion[]= $categoryDesc;
+            $categoryDesc->setCategory(null);
+        }
+    }
+
+    /**
+     * Clears out the collProductCategorys collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductCategorys()
+     */
+    public function clearProductCategorys()
+    {
+        $this->collProductCategorys = null; // important to set this to null since that means it is uninitialized
+        $this->collProductCategorysPartial = null;
+    }
+
+    /**
+     * reset is the collProductCategorys collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialProductCategorys($v = true)
+    {
+        $this->collProductCategorysPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductCategorys collection.
+     *
+     * By default this just sets the collProductCategorys collection to an empty array (like clearcollProductCategorys());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductCategorys($overrideExisting = true)
+    {
+        if (null !== $this->collProductCategorys && !$overrideExisting) {
+            return;
+        }
+        $this->collProductCategorys = new PropelObjectCollection();
+        $this->collProductCategorys->setModel('ProductCategory');
+    }
+
+    /**
+     * Gets an array of ProductCategory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ProductCategory[] List of ProductCategory objects
+     * @throws PropelException
+     */
+    public function getProductCategorys($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collProductCategorysPartial && !$this->isNew();
+        if (null === $this->collProductCategorys || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductCategorys) {
+                // return empty collection
+                $this->initProductCategorys();
+            } else {
+                $collProductCategorys = ProductCategoryQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collProductCategorysPartial && count($collProductCategorys)) {
+                      $this->initProductCategorys(false);
+
+                      foreach($collProductCategorys as $obj) {
+                        if (false == $this->collProductCategorys->contains($obj)) {
+                          $this->collProductCategorys->append($obj);
+                        }
+                      }
+
+                      $this->collProductCategorysPartial = true;
+                    }
+
+                    return $collProductCategorys;
+                }
+
+                if($partial && $this->collProductCategorys) {
+                    foreach($this->collProductCategorys as $obj) {
+                        if($obj->isNew()) {
+                            $collProductCategorys[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductCategorys = $collProductCategorys;
+                $this->collProductCategorysPartial = false;
+            }
+        }
+
+        return $this->collProductCategorys;
+    }
+
+    /**
+     * Sets a collection of ProductCategory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productCategorys A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setProductCategorys(PropelCollection $productCategorys, PropelPDO $con = null)
+    {
+        $this->productCategorysScheduledForDeletion = $this->getProductCategorys(new Criteria(), $con)->diff($productCategorys);
+
+        foreach ($this->productCategorysScheduledForDeletion as $productCategoryRemoved) {
+            $productCategoryRemoved->setCategory(null);
+        }
+
+        $this->collProductCategorys = null;
+        foreach ($productCategorys as $productCategory) {
+            $this->addProductCategory($productCategory);
+        }
+
+        $this->collProductCategorys = $productCategorys;
+        $this->collProductCategorysPartial = false;
+    }
+
+    /**
+     * Returns the number of related ProductCategory objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ProductCategory objects.
+     * @throws PropelException
+     */
+    public function countProductCategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collProductCategorysPartial && !$this->isNew();
+        if (null === $this->collProductCategorys || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductCategorys) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getProductCategorys());
+                }
+                $query = ProductCategoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductCategorys);
+        }
+    }
+
+    /**
+     * Method called to associate a ProductCategory object to this object
+     * through the ProductCategory foreign key attribute.
+     *
+     * @param    ProductCategory $l ProductCategory
+     * @return Category The current object (for fluent API support)
+     */
+    public function addProductCategory(ProductCategory $l)
+    {
+        if ($this->collProductCategorys === null) {
+            $this->initProductCategorys();
+            $this->collProductCategorysPartial = true;
+        }
+        if (!$this->collProductCategorys->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddProductCategory($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductCategory $productCategory The productCategory object to add.
+     */
+    protected function doAddProductCategory($productCategory)
+    {
+        $this->collProductCategorys[]= $productCategory;
+        $productCategory->setCategory($this);
+    }
+
+    /**
+     * @param	ProductCategory $productCategory The productCategory object to remove.
+     */
+    public function removeProductCategory($productCategory)
+    {
+        if ($this->getProductCategorys()->contains($productCategory)) {
+            $this->collProductCategorys->remove($this->collProductCategorys->search($productCategory));
+            if (null === $this->productCategorysScheduledForDeletion) {
+                $this->productCategorysScheduledForDeletion = clone $this->collProductCategorys;
+                $this->productCategorysScheduledForDeletion->clear();
+            }
+            $this->productCategorysScheduledForDeletion[]= $productCategory;
+            $productCategory->setCategory(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Category is new, it will return
+     * an empty collection; or if this Category has previously
+     * been saved, it will retrieve related ProductCategorys from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Category.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|ProductCategory[] List of ProductCategory objects
+     */
+    public function getProductCategorysJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ProductCategoryQuery::create(null, $criteria);
+        $query->joinWith('Product', $join_behavior);
+
+        return $this->getProductCategorys($query, $con);
+    }
+
+    /**
+     * Clears out the collFeatureCategorys collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFeatureCategorys()
+     */
+    public function clearFeatureCategorys()
+    {
+        $this->collFeatureCategorys = null; // important to set this to null since that means it is uninitialized
+        $this->collFeatureCategorysPartial = null;
+    }
+
+    /**
+     * reset is the collFeatureCategorys collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFeatureCategorys($v = true)
+    {
+        $this->collFeatureCategorysPartial = $v;
+    }
+
+    /**
+     * Initializes the collFeatureCategorys collection.
+     *
+     * By default this just sets the collFeatureCategorys collection to an empty array (like clearcollFeatureCategorys());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFeatureCategorys($overrideExisting = true)
+    {
+        if (null !== $this->collFeatureCategorys && !$overrideExisting) {
+            return;
+        }
+        $this->collFeatureCategorys = new PropelObjectCollection();
+        $this->collFeatureCategorys->setModel('FeatureCategory');
+    }
+
+    /**
+     * Gets an array of FeatureCategory objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FeatureCategory[] List of FeatureCategory objects
+     * @throws PropelException
+     */
+    public function getFeatureCategorys($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFeatureCategorysPartial && !$this->isNew();
+        if (null === $this->collFeatureCategorys || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeatureCategorys) {
+                // return empty collection
+                $this->initFeatureCategorys();
+            } else {
+                $collFeatureCategorys = FeatureCategoryQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFeatureCategorysPartial && count($collFeatureCategorys)) {
+                      $this->initFeatureCategorys(false);
+
+                      foreach($collFeatureCategorys as $obj) {
+                        if (false == $this->collFeatureCategorys->contains($obj)) {
+                          $this->collFeatureCategorys->append($obj);
+                        }
+                      }
+
+                      $this->collFeatureCategorysPartial = true;
+                    }
+
+                    return $collFeatureCategorys;
+                }
+
+                if($partial && $this->collFeatureCategorys) {
+                    foreach($this->collFeatureCategorys as $obj) {
+                        if($obj->isNew()) {
+                            $collFeatureCategorys[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFeatureCategorys = $collFeatureCategorys;
+                $this->collFeatureCategorysPartial = false;
+            }
+        }
+
+        return $this->collFeatureCategorys;
+    }
+
+    /**
+     * Sets a collection of FeatureCategory objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $featureCategorys A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setFeatureCategorys(PropelCollection $featureCategorys, PropelPDO $con = null)
+    {
+        $this->featureCategorysScheduledForDeletion = $this->getFeatureCategorys(new Criteria(), $con)->diff($featureCategorys);
+
+        foreach ($this->featureCategorysScheduledForDeletion as $featureCategoryRemoved) {
+            $featureCategoryRemoved->setCategory(null);
+        }
+
+        $this->collFeatureCategorys = null;
+        foreach ($featureCategorys as $featureCategory) {
+            $this->addFeatureCategory($featureCategory);
+        }
+
+        $this->collFeatureCategorys = $featureCategorys;
+        $this->collFeatureCategorysPartial = false;
+    }
+
+    /**
+     * Returns the number of related FeatureCategory objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FeatureCategory objects.
+     * @throws PropelException
+     */
+    public function countFeatureCategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFeatureCategorysPartial && !$this->isNew();
+        if (null === $this->collFeatureCategorys || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeatureCategorys) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getFeatureCategorys());
+                }
+                $query = FeatureCategoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFeatureCategorys);
+        }
+    }
+
+    /**
+     * Method called to associate a FeatureCategory object to this object
+     * through the FeatureCategory foreign key attribute.
+     *
+     * @param    FeatureCategory $l FeatureCategory
+     * @return Category The current object (for fluent API support)
+     */
+    public function addFeatureCategory(FeatureCategory $l)
+    {
+        if ($this->collFeatureCategorys === null) {
+            $this->initFeatureCategorys();
+            $this->collFeatureCategorysPartial = true;
+        }
+        if (!$this->collFeatureCategorys->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddFeatureCategory($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FeatureCategory $featureCategory The featureCategory object to add.
+     */
+    protected function doAddFeatureCategory($featureCategory)
+    {
+        $this->collFeatureCategorys[]= $featureCategory;
+        $featureCategory->setCategory($this);
+    }
+
+    /**
+     * @param	FeatureCategory $featureCategory The featureCategory object to remove.
+     */
+    public function removeFeatureCategory($featureCategory)
+    {
+        if ($this->getFeatureCategorys()->contains($featureCategory)) {
+            $this->collFeatureCategorys->remove($this->collFeatureCategorys->search($featureCategory));
+            if (null === $this->featureCategorysScheduledForDeletion) {
+                $this->featureCategorysScheduledForDeletion = clone $this->collFeatureCategorys;
+                $this->featureCategorysScheduledForDeletion->clear();
+            }
+            $this->featureCategorysScheduledForDeletion[]= $featureCategory;
+            $featureCategory->setCategory(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Category is new, it will return
+     * an empty collection; or if this Category has previously
+     * been saved, it will retrieve related FeatureCategorys from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Category.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|FeatureCategory[] List of FeatureCategory objects
+     */
+    public function getFeatureCategorysJoinFeature($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = FeatureCategoryQuery::create(null, $criteria);
+        $query->joinWith('Feature', $join_behavior);
+
+        return $this->getFeatureCategorys($query, $con);
     }
 
     /**
@@ -1785,213 +2467,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
         $query->joinWith('Attribute', $join_behavior);
 
         return $this->getAttributeCategorys($query, $con);
-    }
-
-    /**
-     * Clears out the collCategoryDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addCategoryDescs()
-     */
-    public function clearCategoryDescs()
-    {
-        $this->collCategoryDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collCategoryDescsPartial = null;
-    }
-
-    /**
-     * reset is the collCategoryDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialCategoryDescs($v = true)
-    {
-        $this->collCategoryDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collCategoryDescs collection.
-     *
-     * By default this just sets the collCategoryDescs collection to an empty array (like clearcollCategoryDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initCategoryDescs($overrideExisting = true)
-    {
-        if (null !== $this->collCategoryDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collCategoryDescs = new PropelObjectCollection();
-        $this->collCategoryDescs->setModel('CategoryDesc');
-    }
-
-    /**
-     * Gets an array of CategoryDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Category is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|CategoryDesc[] List of CategoryDesc objects
-     * @throws PropelException
-     */
-    public function getCategoryDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collCategoryDescsPartial && !$this->isNew();
-        if (null === $this->collCategoryDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCategoryDescs) {
-                // return empty collection
-                $this->initCategoryDescs();
-            } else {
-                $collCategoryDescs = CategoryDescQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collCategoryDescsPartial && count($collCategoryDescs)) {
-                      $this->initCategoryDescs(false);
-
-                      foreach($collCategoryDescs as $obj) {
-                        if (false == $this->collCategoryDescs->contains($obj)) {
-                          $this->collCategoryDescs->append($obj);
-                        }
-                      }
-
-                      $this->collCategoryDescsPartial = true;
-                    }
-
-                    return $collCategoryDescs;
-                }
-
-                if($partial && $this->collCategoryDescs) {
-                    foreach($this->collCategoryDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collCategoryDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCategoryDescs = $collCategoryDescs;
-                $this->collCategoryDescsPartial = false;
-            }
-        }
-
-        return $this->collCategoryDescs;
-    }
-
-    /**
-     * Sets a collection of CategoryDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $categoryDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setCategoryDescs(PropelCollection $categoryDescs, PropelPDO $con = null)
-    {
-        $this->categoryDescsScheduledForDeletion = $this->getCategoryDescs(new Criteria(), $con)->diff($categoryDescs);
-
-        foreach ($this->categoryDescsScheduledForDeletion as $categoryDescRemoved) {
-            $categoryDescRemoved->setCategory(null);
-        }
-
-        $this->collCategoryDescs = null;
-        foreach ($categoryDescs as $categoryDesc) {
-            $this->addCategoryDesc($categoryDesc);
-        }
-
-        $this->collCategoryDescs = $categoryDescs;
-        $this->collCategoryDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related CategoryDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related CategoryDesc objects.
-     * @throws PropelException
-     */
-    public function countCategoryDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collCategoryDescsPartial && !$this->isNew();
-        if (null === $this->collCategoryDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCategoryDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getCategoryDescs());
-                }
-                $query = CategoryDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCategory($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collCategoryDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a CategoryDesc object to this object
-     * through the CategoryDesc foreign key attribute.
-     *
-     * @param    CategoryDesc $l CategoryDesc
-     * @return Category The current object (for fluent API support)
-     */
-    public function addCategoryDesc(CategoryDesc $l)
-    {
-        if ($this->collCategoryDescs === null) {
-            $this->initCategoryDescs();
-            $this->collCategoryDescsPartial = true;
-        }
-        if (!$this->collCategoryDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddCategoryDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	CategoryDesc $categoryDesc The categoryDesc object to add.
-     */
-    protected function doAddCategoryDesc($categoryDesc)
-    {
-        $this->collCategoryDescs[]= $categoryDesc;
-        $categoryDesc->setCategory($this);
-    }
-
-    /**
-     * @param	CategoryDesc $categoryDesc The categoryDesc object to remove.
-     */
-    public function removeCategoryDesc($categoryDesc)
-    {
-        if ($this->getCategoryDescs()->contains($categoryDesc)) {
-            $this->collCategoryDescs->remove($this->collCategoryDescs->search($categoryDesc));
-            if (null === $this->categoryDescsScheduledForDeletion) {
-                $this->categoryDescsScheduledForDeletion = clone $this->collCategoryDescs;
-                $this->categoryDescsScheduledForDeletion->clear();
-            }
-            $this->categoryDescsScheduledForDeletion[]= $categoryDesc;
-            $categoryDesc->setCategory(null);
-        }
     }
 
     /**
@@ -2249,520 +2724,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
         $query->joinWith('Content', $join_behavior);
 
         return $this->getContentAssocs($query, $con);
-    }
-
-    /**
-     * Clears out the collDocuments collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addDocuments()
-     */
-    public function clearDocuments()
-    {
-        $this->collDocuments = null; // important to set this to null since that means it is uninitialized
-        $this->collDocumentsPartial = null;
-    }
-
-    /**
-     * reset is the collDocuments collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialDocuments($v = true)
-    {
-        $this->collDocumentsPartial = $v;
-    }
-
-    /**
-     * Initializes the collDocuments collection.
-     *
-     * By default this just sets the collDocuments collection to an empty array (like clearcollDocuments());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initDocuments($overrideExisting = true)
-    {
-        if (null !== $this->collDocuments && !$overrideExisting) {
-            return;
-        }
-        $this->collDocuments = new PropelObjectCollection();
-        $this->collDocuments->setModel('Document');
-    }
-
-    /**
-     * Gets an array of Document objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Category is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Document[] List of Document objects
-     * @throws PropelException
-     */
-    public function getDocuments($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                // return empty collection
-                $this->initDocuments();
-            } else {
-                $collDocuments = DocumentQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collDocumentsPartial && count($collDocuments)) {
-                      $this->initDocuments(false);
-
-                      foreach($collDocuments as $obj) {
-                        if (false == $this->collDocuments->contains($obj)) {
-                          $this->collDocuments->append($obj);
-                        }
-                      }
-
-                      $this->collDocumentsPartial = true;
-                    }
-
-                    return $collDocuments;
-                }
-
-                if($partial && $this->collDocuments) {
-                    foreach($this->collDocuments as $obj) {
-                        if($obj->isNew()) {
-                            $collDocuments[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collDocuments = $collDocuments;
-                $this->collDocumentsPartial = false;
-            }
-        }
-
-        return $this->collDocuments;
-    }
-
-    /**
-     * Sets a collection of Document objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $documents A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setDocuments(PropelCollection $documents, PropelPDO $con = null)
-    {
-        $this->documentsScheduledForDeletion = $this->getDocuments(new Criteria(), $con)->diff($documents);
-
-        foreach ($this->documentsScheduledForDeletion as $documentRemoved) {
-            $documentRemoved->setCategory(null);
-        }
-
-        $this->collDocuments = null;
-        foreach ($documents as $document) {
-            $this->addDocument($document);
-        }
-
-        $this->collDocuments = $documents;
-        $this->collDocumentsPartial = false;
-    }
-
-    /**
-     * Returns the number of related Document objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Document objects.
-     * @throws PropelException
-     */
-    public function countDocuments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getDocuments());
-                }
-                $query = DocumentQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCategory($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collDocuments);
-        }
-    }
-
-    /**
-     * Method called to associate a Document object to this object
-     * through the Document foreign key attribute.
-     *
-     * @param    Document $l Document
-     * @return Category The current object (for fluent API support)
-     */
-    public function addDocument(Document $l)
-    {
-        if ($this->collDocuments === null) {
-            $this->initDocuments();
-            $this->collDocumentsPartial = true;
-        }
-        if (!$this->collDocuments->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddDocument($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Document $document The document object to add.
-     */
-    protected function doAddDocument($document)
-    {
-        $this->collDocuments[]= $document;
-        $document->setCategory($this);
-    }
-
-    /**
-     * @param	Document $document The document object to remove.
-     */
-    public function removeDocument($document)
-    {
-        if ($this->getDocuments()->contains($document)) {
-            $this->collDocuments->remove($this->collDocuments->search($document));
-            if (null === $this->documentsScheduledForDeletion) {
-                $this->documentsScheduledForDeletion = clone $this->collDocuments;
-                $this->documentsScheduledForDeletion->clear();
-            }
-            $this->documentsScheduledForDeletion[]= $document;
-            $document->setCategory(null);
-        }
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Document[] List of Document objects
-     */
-    public function getDocumentsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = DocumentQuery::create(null, $criteria);
-        $query->joinWith('Product', $join_behavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Document[] List of Document objects
-     */
-    public function getDocumentsJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = DocumentQuery::create(null, $criteria);
-        $query->joinWith('Content', $join_behavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Document[] List of Document objects
-     */
-    public function getDocumentsJoinFolder($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = DocumentQuery::create(null, $criteria);
-        $query->joinWith('Folder', $join_behavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-    /**
-     * Clears out the collFeatureCategorys collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addFeatureCategorys()
-     */
-    public function clearFeatureCategorys()
-    {
-        $this->collFeatureCategorys = null; // important to set this to null since that means it is uninitialized
-        $this->collFeatureCategorysPartial = null;
-    }
-
-    /**
-     * reset is the collFeatureCategorys collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialFeatureCategorys($v = true)
-    {
-        $this->collFeatureCategorysPartial = $v;
-    }
-
-    /**
-     * Initializes the collFeatureCategorys collection.
-     *
-     * By default this just sets the collFeatureCategorys collection to an empty array (like clearcollFeatureCategorys());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initFeatureCategorys($overrideExisting = true)
-    {
-        if (null !== $this->collFeatureCategorys && !$overrideExisting) {
-            return;
-        }
-        $this->collFeatureCategorys = new PropelObjectCollection();
-        $this->collFeatureCategorys->setModel('FeatureCategory');
-    }
-
-    /**
-     * Gets an array of FeatureCategory objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Category is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|FeatureCategory[] List of FeatureCategory objects
-     * @throws PropelException
-     */
-    public function getFeatureCategorys($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collFeatureCategorysPartial && !$this->isNew();
-        if (null === $this->collFeatureCategorys || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collFeatureCategorys) {
-                // return empty collection
-                $this->initFeatureCategorys();
-            } else {
-                $collFeatureCategorys = FeatureCategoryQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collFeatureCategorysPartial && count($collFeatureCategorys)) {
-                      $this->initFeatureCategorys(false);
-
-                      foreach($collFeatureCategorys as $obj) {
-                        if (false == $this->collFeatureCategorys->contains($obj)) {
-                          $this->collFeatureCategorys->append($obj);
-                        }
-                      }
-
-                      $this->collFeatureCategorysPartial = true;
-                    }
-
-                    return $collFeatureCategorys;
-                }
-
-                if($partial && $this->collFeatureCategorys) {
-                    foreach($this->collFeatureCategorys as $obj) {
-                        if($obj->isNew()) {
-                            $collFeatureCategorys[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collFeatureCategorys = $collFeatureCategorys;
-                $this->collFeatureCategorysPartial = false;
-            }
-        }
-
-        return $this->collFeatureCategorys;
-    }
-
-    /**
-     * Sets a collection of FeatureCategory objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $featureCategorys A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setFeatureCategorys(PropelCollection $featureCategorys, PropelPDO $con = null)
-    {
-        $this->featureCategorysScheduledForDeletion = $this->getFeatureCategorys(new Criteria(), $con)->diff($featureCategorys);
-
-        foreach ($this->featureCategorysScheduledForDeletion as $featureCategoryRemoved) {
-            $featureCategoryRemoved->setCategory(null);
-        }
-
-        $this->collFeatureCategorys = null;
-        foreach ($featureCategorys as $featureCategory) {
-            $this->addFeatureCategory($featureCategory);
-        }
-
-        $this->collFeatureCategorys = $featureCategorys;
-        $this->collFeatureCategorysPartial = false;
-    }
-
-    /**
-     * Returns the number of related FeatureCategory objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related FeatureCategory objects.
-     * @throws PropelException
-     */
-    public function countFeatureCategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collFeatureCategorysPartial && !$this->isNew();
-        if (null === $this->collFeatureCategorys || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collFeatureCategorys) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getFeatureCategorys());
-                }
-                $query = FeatureCategoryQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCategory($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collFeatureCategorys);
-        }
-    }
-
-    /**
-     * Method called to associate a FeatureCategory object to this object
-     * through the FeatureCategory foreign key attribute.
-     *
-     * @param    FeatureCategory $l FeatureCategory
-     * @return Category The current object (for fluent API support)
-     */
-    public function addFeatureCategory(FeatureCategory $l)
-    {
-        if ($this->collFeatureCategorys === null) {
-            $this->initFeatureCategorys();
-            $this->collFeatureCategorysPartial = true;
-        }
-        if (!$this->collFeatureCategorys->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddFeatureCategory($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	FeatureCategory $featureCategory The featureCategory object to add.
-     */
-    protected function doAddFeatureCategory($featureCategory)
-    {
-        $this->collFeatureCategorys[]= $featureCategory;
-        $featureCategory->setCategory($this);
-    }
-
-    /**
-     * @param	FeatureCategory $featureCategory The featureCategory object to remove.
-     */
-    public function removeFeatureCategory($featureCategory)
-    {
-        if ($this->getFeatureCategorys()->contains($featureCategory)) {
-            $this->collFeatureCategorys->remove($this->collFeatureCategorys->search($featureCategory));
-            if (null === $this->featureCategorysScheduledForDeletion) {
-                $this->featureCategorysScheduledForDeletion = clone $this->collFeatureCategorys;
-                $this->featureCategorysScheduledForDeletion->clear();
-            }
-            $this->featureCategorysScheduledForDeletion[]= $featureCategory;
-            $featureCategory->setCategory(null);
-        }
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related FeatureCategorys from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|FeatureCategory[] List of FeatureCategory objects
-     */
-    public function getFeatureCategorysJoinFeature($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = FeatureCategoryQuery::create(null, $criteria);
-        $query->joinWith('Feature', $join_behavior);
-
-        return $this->getFeatureCategorys($query, $con);
     }
 
     /**
@@ -3048,34 +3009,34 @@ abstract class BaseCategory extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collProductCategorys collection
+     * Clears out the collDocuments collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addProductCategorys()
+     * @see        addDocuments()
      */
-    public function clearProductCategorys()
+    public function clearDocuments()
     {
-        $this->collProductCategorys = null; // important to set this to null since that means it is uninitialized
-        $this->collProductCategorysPartial = null;
+        $this->collDocuments = null; // important to set this to null since that means it is uninitialized
+        $this->collDocumentsPartial = null;
     }
 
     /**
-     * reset is the collProductCategorys collection loaded partially
+     * reset is the collDocuments collection loaded partially
      *
      * @return void
      */
-    public function resetPartialProductCategorys($v = true)
+    public function resetPartialDocuments($v = true)
     {
-        $this->collProductCategorysPartial = $v;
+        $this->collDocumentsPartial = $v;
     }
 
     /**
-     * Initializes the collProductCategorys collection.
+     * Initializes the collDocuments collection.
      *
-     * By default this just sets the collProductCategorys collection to an empty array (like clearcollProductCategorys());
+     * By default this just sets the collDocuments collection to an empty array (like clearcollDocuments());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -3084,17 +3045,17 @@ abstract class BaseCategory extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initProductCategorys($overrideExisting = true)
+    public function initDocuments($overrideExisting = true)
     {
-        if (null !== $this->collProductCategorys && !$overrideExisting) {
+        if (null !== $this->collDocuments && !$overrideExisting) {
             return;
         }
-        $this->collProductCategorys = new PropelObjectCollection();
-        $this->collProductCategorys->setModel('ProductCategory');
+        $this->collDocuments = new PropelObjectCollection();
+        $this->collDocuments->setModel('Document');
     }
 
     /**
-     * Gets an array of ProductCategory objects which contain a foreign key that references this object.
+     * Gets an array of Document objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -3104,98 +3065,98 @@ abstract class BaseCategory extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ProductCategory[] List of ProductCategory objects
+     * @return PropelObjectCollection|Document[] List of Document objects
      * @throws PropelException
      */
-    public function getProductCategorys($criteria = null, PropelPDO $con = null)
+    public function getDocuments($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collProductCategorysPartial && !$this->isNew();
-        if (null === $this->collProductCategorys || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collProductCategorys) {
+        $partial = $this->collDocumentsPartial && !$this->isNew();
+        if (null === $this->collDocuments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDocuments) {
                 // return empty collection
-                $this->initProductCategorys();
+                $this->initDocuments();
             } else {
-                $collProductCategorys = ProductCategoryQuery::create(null, $criteria)
+                $collDocuments = DocumentQuery::create(null, $criteria)
                     ->filterByCategory($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collProductCategorysPartial && count($collProductCategorys)) {
-                      $this->initProductCategorys(false);
+                    if (false !== $this->collDocumentsPartial && count($collDocuments)) {
+                      $this->initDocuments(false);
 
-                      foreach($collProductCategorys as $obj) {
-                        if (false == $this->collProductCategorys->contains($obj)) {
-                          $this->collProductCategorys->append($obj);
+                      foreach($collDocuments as $obj) {
+                        if (false == $this->collDocuments->contains($obj)) {
+                          $this->collDocuments->append($obj);
                         }
                       }
 
-                      $this->collProductCategorysPartial = true;
+                      $this->collDocumentsPartial = true;
                     }
 
-                    return $collProductCategorys;
+                    return $collDocuments;
                 }
 
-                if($partial && $this->collProductCategorys) {
-                    foreach($this->collProductCategorys as $obj) {
+                if($partial && $this->collDocuments) {
+                    foreach($this->collDocuments as $obj) {
                         if($obj->isNew()) {
-                            $collProductCategorys[] = $obj;
+                            $collDocuments[] = $obj;
                         }
                     }
                 }
 
-                $this->collProductCategorys = $collProductCategorys;
-                $this->collProductCategorysPartial = false;
+                $this->collDocuments = $collDocuments;
+                $this->collDocumentsPartial = false;
             }
         }
 
-        return $this->collProductCategorys;
+        return $this->collDocuments;
     }
 
     /**
-     * Sets a collection of ProductCategory objects related by a one-to-many relationship
+     * Sets a collection of Document objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $productCategorys A Propel collection.
+     * @param PropelCollection $documents A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setProductCategorys(PropelCollection $productCategorys, PropelPDO $con = null)
+    public function setDocuments(PropelCollection $documents, PropelPDO $con = null)
     {
-        $this->productCategorysScheduledForDeletion = $this->getProductCategorys(new Criteria(), $con)->diff($productCategorys);
+        $this->documentsScheduledForDeletion = $this->getDocuments(new Criteria(), $con)->diff($documents);
 
-        foreach ($this->productCategorysScheduledForDeletion as $productCategoryRemoved) {
-            $productCategoryRemoved->setCategory(null);
+        foreach ($this->documentsScheduledForDeletion as $documentRemoved) {
+            $documentRemoved->setCategory(null);
         }
 
-        $this->collProductCategorys = null;
-        foreach ($productCategorys as $productCategory) {
-            $this->addProductCategory($productCategory);
+        $this->collDocuments = null;
+        foreach ($documents as $document) {
+            $this->addDocument($document);
         }
 
-        $this->collProductCategorys = $productCategorys;
-        $this->collProductCategorysPartial = false;
+        $this->collDocuments = $documents;
+        $this->collDocumentsPartial = false;
     }
 
     /**
-     * Returns the number of related ProductCategory objects.
+     * Returns the number of related Document objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related ProductCategory objects.
+     * @return int             Count of related Document objects.
      * @throws PropelException
      */
-    public function countProductCategorys(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countDocuments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collProductCategorysPartial && !$this->isNew();
-        if (null === $this->collProductCategorys || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collProductCategorys) {
+        $partial = $this->collDocumentsPartial && !$this->isNew();
+        if (null === $this->collDocuments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDocuments) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getProductCategorys());
+                    return count($this->getDocuments());
                 }
-                $query = ProductCategoryQuery::create(null, $criteria);
+                $query = DocumentQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -3205,52 +3166,52 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collProductCategorys);
+            return count($this->collDocuments);
         }
     }
 
     /**
-     * Method called to associate a ProductCategory object to this object
-     * through the ProductCategory foreign key attribute.
+     * Method called to associate a Document object to this object
+     * through the Document foreign key attribute.
      *
-     * @param    ProductCategory $l ProductCategory
+     * @param    Document $l Document
      * @return Category The current object (for fluent API support)
      */
-    public function addProductCategory(ProductCategory $l)
+    public function addDocument(Document $l)
     {
-        if ($this->collProductCategorys === null) {
-            $this->initProductCategorys();
-            $this->collProductCategorysPartial = true;
+        if ($this->collDocuments === null) {
+            $this->initDocuments();
+            $this->collDocumentsPartial = true;
         }
-        if (!$this->collProductCategorys->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddProductCategory($l);
+        if (!$this->collDocuments->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddDocument($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	ProductCategory $productCategory The productCategory object to add.
+     * @param	Document $document The document object to add.
      */
-    protected function doAddProductCategory($productCategory)
+    protected function doAddDocument($document)
     {
-        $this->collProductCategorys[]= $productCategory;
-        $productCategory->setCategory($this);
+        $this->collDocuments[]= $document;
+        $document->setCategory($this);
     }
 
     /**
-     * @param	ProductCategory $productCategory The productCategory object to remove.
+     * @param	Document $document The document object to remove.
      */
-    public function removeProductCategory($productCategory)
+    public function removeDocument($document)
     {
-        if ($this->getProductCategorys()->contains($productCategory)) {
-            $this->collProductCategorys->remove($this->collProductCategorys->search($productCategory));
-            if (null === $this->productCategorysScheduledForDeletion) {
-                $this->productCategorysScheduledForDeletion = clone $this->collProductCategorys;
-                $this->productCategorysScheduledForDeletion->clear();
+        if ($this->getDocuments()->contains($document)) {
+            $this->collDocuments->remove($this->collDocuments->search($document));
+            if (null === $this->documentsScheduledForDeletion) {
+                $this->documentsScheduledForDeletion = clone $this->collDocuments;
+                $this->documentsScheduledForDeletion->clear();
             }
-            $this->productCategorysScheduledForDeletion[]= $productCategory;
-            $productCategory->setCategory(null);
+            $this->documentsScheduledForDeletion[]= $document;
+            $document->setCategory(null);
         }
     }
 
@@ -3260,7 +3221,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * an identical criteria, it returns the collection.
      * Otherwise if this Category is new, it will return
      * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related ProductCategorys from storage.
+     * been saved, it will retrieve related Documents from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -3269,14 +3230,64 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|ProductCategory[] List of ProductCategory objects
+     * @return PropelObjectCollection|Document[] List of Document objects
      */
-    public function getProductCategorysJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getDocumentsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
-        $query = ProductCategoryQuery::create(null, $criteria);
+        $query = DocumentQuery::create(null, $criteria);
         $query->joinWith('Product', $join_behavior);
 
-        return $this->getProductCategorys($query, $con);
+        return $this->getDocuments($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Category is new, it will return
+     * an empty collection; or if this Category has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Category.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Content', $join_behavior);
+
+        return $this->getDocuments($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Category is new, it will return
+     * an empty collection; or if this Category has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Category.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinFolder($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Folder', $join_behavior);
+
+        return $this->getDocuments($query, $con);
     }
 
     /**
@@ -3593,23 +3604,13 @@ abstract class BaseCategory extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAttributeCategorys) {
-                foreach ($this->collAttributeCategorys as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collCategoryDescs) {
                 foreach ($this->collCategoryDescs as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collContentAssocs) {
-                foreach ($this->collContentAssocs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collDocuments) {
-                foreach ($this->collDocuments as $o) {
+            if ($this->collProductCategorys) {
+                foreach ($this->collProductCategorys as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3618,13 +3619,23 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collAttributeCategorys) {
+                foreach ($this->collAttributeCategorys as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collContentAssocs) {
+                foreach ($this->collContentAssocs as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collImages) {
                 foreach ($this->collImages as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collProductCategorys) {
-                foreach ($this->collProductCategorys as $o) {
+            if ($this->collDocuments) {
+                foreach ($this->collDocuments as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3635,34 +3646,34 @@ abstract class BaseCategory extends BaseObject implements Persistent
             }
         } // if ($deep)
 
-        if ($this->collAttributeCategorys instanceof PropelCollection) {
-            $this->collAttributeCategorys->clearIterator();
-        }
-        $this->collAttributeCategorys = null;
         if ($this->collCategoryDescs instanceof PropelCollection) {
             $this->collCategoryDescs->clearIterator();
         }
         $this->collCategoryDescs = null;
-        if ($this->collContentAssocs instanceof PropelCollection) {
-            $this->collContentAssocs->clearIterator();
-        }
-        $this->collContentAssocs = null;
-        if ($this->collDocuments instanceof PropelCollection) {
-            $this->collDocuments->clearIterator();
-        }
-        $this->collDocuments = null;
-        if ($this->collFeatureCategorys instanceof PropelCollection) {
-            $this->collFeatureCategorys->clearIterator();
-        }
-        $this->collFeatureCategorys = null;
-        if ($this->collImages instanceof PropelCollection) {
-            $this->collImages->clearIterator();
-        }
-        $this->collImages = null;
         if ($this->collProductCategorys instanceof PropelCollection) {
             $this->collProductCategorys->clearIterator();
         }
         $this->collProductCategorys = null;
+        if ($this->collFeatureCategorys instanceof PropelCollection) {
+            $this->collFeatureCategorys->clearIterator();
+        }
+        $this->collFeatureCategorys = null;
+        if ($this->collAttributeCategorys instanceof PropelCollection) {
+            $this->collAttributeCategorys->clearIterator();
+        }
+        $this->collAttributeCategorys = null;
+        if ($this->collContentAssocs instanceof PropelCollection) {
+            $this->collContentAssocs->clearIterator();
+        }
+        $this->collContentAssocs = null;
+        if ($this->collImages instanceof PropelCollection) {
+            $this->collImages->clearIterator();
+        }
+        $this->collImages = null;
+        if ($this->collDocuments instanceof PropelCollection) {
+            $this->collDocuments->clearIterator();
+        }
+        $this->collDocuments = null;
         if ($this->collRewritings instanceof PropelCollection) {
             $this->collRewritings->clearIterator();
         }
@@ -3687,6 +3698,20 @@ abstract class BaseCategory extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Category The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = CategoryPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

@@ -44,8 +44,8 @@ class TaxRuleTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -54,9 +54,22 @@ class TaxRuleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'SET NULL', null, 'Products');
-        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'CASCADE', null, 'TaxRuleCountrys');
-        $this->addRelation('TaxRuleDesc', 'Thelia\\Model\\TaxRuleDesc', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'CASCADE', null, 'TaxRuleDescs');
+        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'SET NULL', 'RESTRICT', 'Products');
+        $this->addRelation('TaxRuleDesc', 'Thelia\\Model\\TaxRuleDesc', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleDescs');
+        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleCountrys');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // TaxRuleTableMap

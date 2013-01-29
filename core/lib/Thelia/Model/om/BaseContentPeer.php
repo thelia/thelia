@@ -388,24 +388,24 @@ abstract class BaseContentPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ContentAssocPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ContentAssocPeer::clearInstancePool();
         // Invalidate objects in ContentDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ContentDescPeer::clearInstancePool();
-        // Invalidate objects in ContentFolderPeer instance pool,
+        // Invalidate objects in ContentAssocPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ContentFolderPeer::clearInstancePool();
-        // Invalidate objects in DocumentPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        DocumentPeer::clearInstancePool();
+        ContentAssocPeer::clearInstancePool();
         // Invalidate objects in ImagePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ImagePeer::clearInstancePool();
+        // Invalidate objects in DocumentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        DocumentPeer::clearInstancePool();
         // Invalidate objects in RewritingPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         RewritingPeer::clearInstancePool();
+        // Invalidate objects in ContentFolderPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ContentFolderPeer::clearInstancePool();
     }
 
     /**

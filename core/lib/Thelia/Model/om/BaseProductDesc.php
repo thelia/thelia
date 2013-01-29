@@ -96,10 +96,10 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
     protected $created_at;
 
     /**
-     * The value for the updatet_at field.
+     * The value for the updated_at field.
      * @var        string
      */
-    protected $updatet_at;
+    protected $updated_at;
 
     /**
      * @var        Product
@@ -228,13 +228,40 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [updatet_at] column value.
+     * Get the [optionally formatted] temporal [updated_at] column value.
      *
-     * @return string
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getUpdatetAt()
+    public function getUpdatedAt($format = 'Y-m-d H:i:s')
     {
-        return $this->updatet_at;
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+        if ($this->updated_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->updated_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
     }
 
     /**
@@ -412,25 +439,27 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
     } // setCreatedAt()
 
     /**
-     * Set the value of [updatet_at] column.
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param string $v new value
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
      * @return ProductDesc The current object (for fluent API support)
      */
-    public function setUpdatetAt($v)
+    public function setUpdatedAt($v)
     {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->updatet_at !== $v) {
-            $this->updatet_at = $v;
-            $this->modifiedColumns[] = ProductDescPeer::UPDATET_AT;
-        }
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = ProductDescPeer::UPDATED_AT;
+            }
+        } // if either are not null
 
 
         return $this;
-    } // setUpdatetAt()
+    } // setUpdatedAt()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -472,7 +501,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
             $this->chapo = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->postscriptum = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
-            $this->updatet_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->updated_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -619,8 +648,19 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(ProductDescPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(ProductDescPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(ProductDescPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -733,8 +773,8 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
         if ($this->isColumnModified(ProductDescPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
-        if ($this->isColumnModified(ProductDescPeer::UPDATET_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATET_AT`';
+        if ($this->isColumnModified(ProductDescPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
 
         $sql = sprintf(
@@ -771,8 +811,8 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATET_AT`':
-                        $stmt->bindValue($identifier, $this->updatet_at, PDO::PARAM_STR);
+                    case '`UPDATED_AT`':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -945,7 +985,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
                 return $this->getCreatedAt();
                 break;
             case 8:
-                return $this->getUpdatetAt();
+                return $this->getUpdatedAt();
                 break;
             default:
                 return null;
@@ -984,7 +1024,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
             $keys[5] => $this->getChapo(),
             $keys[6] => $this->getPostscriptum(),
             $keys[7] => $this->getCreatedAt(),
-            $keys[8] => $this->getUpdatetAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aProduct) {
@@ -1049,7 +1089,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
                 $this->setCreatedAt($value);
                 break;
             case 8:
-                $this->setUpdatetAt($value);
+                $this->setUpdatedAt($value);
                 break;
         } // switch()
     }
@@ -1083,7 +1123,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
         if (array_key_exists($keys[5], $arr)) $this->setChapo($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPostscriptum($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setUpdatetAt($arr[$keys[8]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
     }
 
     /**
@@ -1103,7 +1143,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
         if ($this->isColumnModified(ProductDescPeer::CHAPO)) $criteria->add(ProductDescPeer::CHAPO, $this->chapo);
         if ($this->isColumnModified(ProductDescPeer::POSTSCRIPTUM)) $criteria->add(ProductDescPeer::POSTSCRIPTUM, $this->postscriptum);
         if ($this->isColumnModified(ProductDescPeer::CREATED_AT)) $criteria->add(ProductDescPeer::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(ProductDescPeer::UPDATET_AT)) $criteria->add(ProductDescPeer::UPDATET_AT, $this->updatet_at);
+        if ($this->isColumnModified(ProductDescPeer::UPDATED_AT)) $criteria->add(ProductDescPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1174,7 +1214,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
         $copyObj->setChapo($this->getChapo());
         $copyObj->setPostscriptum($this->getPostscriptum());
         $copyObj->setCreatedAt($this->getCreatedAt());
-        $copyObj->setUpdatetAt($this->getUpdatetAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1297,7 +1337,7 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
         $this->chapo = null;
         $this->postscriptum = null;
         $this->created_at = null;
-        $this->updatet_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
@@ -1341,6 +1381,20 @@ abstract class BaseProductDesc extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ProductDesc The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = ProductDescPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

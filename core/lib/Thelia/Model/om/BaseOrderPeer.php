@@ -453,12 +453,12 @@ abstract class BaseOrderPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in CouponOrderPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CouponOrderPeer::clearInstancePool();
         // Invalidate objects in OrderProductPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         OrderProductPeer::clearInstancePool();
+        // Invalidate objects in CouponOrderPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CouponOrderPeer::clearInstancePool();
     }
 
     /**

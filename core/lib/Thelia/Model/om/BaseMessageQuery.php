@@ -24,13 +24,13 @@ use Thelia\Model\MessageQuery;
  *
  * @method MessageQuery orderById($order = Criteria::ASC) Order by the id column
  * @method MessageQuery orderByCode($order = Criteria::ASC) Order by the code column
- * @method MessageQuery orderBySecure($order = Criteria::ASC) Order by the secure column
+ * @method MessageQuery orderBySecured($order = Criteria::ASC) Order by the secured column
  * @method MessageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method MessageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method MessageQuery groupById() Group by the id column
  * @method MessageQuery groupByCode() Group by the code column
- * @method MessageQuery groupBySecure() Group by the secure column
+ * @method MessageQuery groupBySecured() Group by the secured column
  * @method MessageQuery groupByCreatedAt() Group by the created_at column
  * @method MessageQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -47,13 +47,13 @@ use Thelia\Model\MessageQuery;
  *
  * @method Message findOneById(int $id) Return the first Message filtered by the id column
  * @method Message findOneByCode(string $code) Return the first Message filtered by the code column
- * @method Message findOneBySecure(int $secure) Return the first Message filtered by the secure column
+ * @method Message findOneBySecured(int $secured) Return the first Message filtered by the secured column
  * @method Message findOneByCreatedAt(string $created_at) Return the first Message filtered by the created_at column
  * @method Message findOneByUpdatedAt(string $updated_at) Return the first Message filtered by the updated_at column
  *
  * @method array findById(int $id) Return Message objects filtered by the id column
  * @method array findByCode(string $code) Return Message objects filtered by the code column
- * @method array findBySecure(int $secure) Return Message objects filtered by the secure column
+ * @method array findBySecured(int $secured) Return Message objects filtered by the secured column
  * @method array findByCreatedAt(string $created_at) Return Message objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Message objects filtered by the updated_at column
  *
@@ -145,7 +145,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `SECURE`, `CREATED_AT`, `UPDATED_AT` FROM `message` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `SECURED`, `CREATED_AT`, `UPDATED_AT` FROM `message` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -291,16 +291,16 @@ abstract class BaseMessageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the secure column
+     * Filter the query on the secured column
      *
      * Example usage:
      * <code>
-     * $query->filterBySecure(1234); // WHERE secure = 1234
-     * $query->filterBySecure(array(12, 34)); // WHERE secure IN (12, 34)
-     * $query->filterBySecure(array('min' => 12)); // WHERE secure > 12
+     * $query->filterBySecured(1234); // WHERE secured = 1234
+     * $query->filterBySecured(array(12, 34)); // WHERE secured IN (12, 34)
+     * $query->filterBySecured(array('min' => 12)); // WHERE secured > 12
      * </code>
      *
-     * @param     mixed $secure The value to use as filter.
+     * @param     mixed $secured The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -308,16 +308,16 @@ abstract class BaseMessageQuery extends ModelCriteria
      *
      * @return MessageQuery The current query, for fluid interface
      */
-    public function filterBySecure($secure = null, $comparison = null)
+    public function filterBySecured($secured = null, $comparison = null)
     {
-        if (is_array($secure)) {
+        if (is_array($secured)) {
             $useMinMax = false;
-            if (isset($secure['min'])) {
-                $this->addUsingAlias(MessagePeer::SECURE, $secure['min'], Criteria::GREATER_EQUAL);
+            if (isset($secured['min'])) {
+                $this->addUsingAlias(MessagePeer::SECURED, $secured['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($secure['max'])) {
-                $this->addUsingAlias(MessagePeer::SECURE, $secure['max'], Criteria::LESS_EQUAL);
+            if (isset($secured['max'])) {
+                $this->addUsingAlias(MessagePeer::SECURED, $secured['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -328,7 +328,7 @@ abstract class BaseMessageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(MessagePeer::SECURE, $secure, $comparison);
+        return $this->addUsingAlias(MessagePeer::SECURED, $secured, $comparison);
     }
 
     /**
@@ -507,4 +507,69 @@ abstract class BaseMessageQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     MessageQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MessagePeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     MessageQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MessagePeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     MessageQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MessagePeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     MessageQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(MessagePeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     MessageQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(MessagePeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     MessageQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(MessagePeer::CREATED_AT);
+    }
 }

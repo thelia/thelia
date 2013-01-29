@@ -27,7 +27,7 @@ use Thelia\Model\Order;
  * @method CurrencyQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method CurrencyQuery orderBySymbol($order = Criteria::ASC) Order by the symbol column
  * @method CurrencyQuery orderByRate($order = Criteria::ASC) Order by the rate column
- * @method CurrencyQuery orderByDefaultUtility($order = Criteria::ASC) Order by the default_utility column
+ * @method CurrencyQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method CurrencyQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method CurrencyQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -36,7 +36,7 @@ use Thelia\Model\Order;
  * @method CurrencyQuery groupByCode() Group by the code column
  * @method CurrencyQuery groupBySymbol() Group by the symbol column
  * @method CurrencyQuery groupByRate() Group by the rate column
- * @method CurrencyQuery groupByDefaultUtility() Group by the default_utility column
+ * @method CurrencyQuery groupByByDefault() Group by the by_default column
  * @method CurrencyQuery groupByCreatedAt() Group by the created_at column
  * @method CurrencyQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -56,7 +56,7 @@ use Thelia\Model\Order;
  * @method Currency findOneByCode(string $code) Return the first Currency filtered by the code column
  * @method Currency findOneBySymbol(string $symbol) Return the first Currency filtered by the symbol column
  * @method Currency findOneByRate(double $rate) Return the first Currency filtered by the rate column
- * @method Currency findOneByDefaultUtility(int $default_utility) Return the first Currency filtered by the default_utility column
+ * @method Currency findOneByByDefault(int $by_default) Return the first Currency filtered by the by_default column
  * @method Currency findOneByCreatedAt(string $created_at) Return the first Currency filtered by the created_at column
  * @method Currency findOneByUpdatedAt(string $updated_at) Return the first Currency filtered by the updated_at column
  *
@@ -65,7 +65,7 @@ use Thelia\Model\Order;
  * @method array findByCode(string $code) Return Currency objects filtered by the code column
  * @method array findBySymbol(string $symbol) Return Currency objects filtered by the symbol column
  * @method array findByRate(double $rate) Return Currency objects filtered by the rate column
- * @method array findByDefaultUtility(int $default_utility) Return Currency objects filtered by the default_utility column
+ * @method array findByByDefault(int $by_default) Return Currency objects filtered by the by_default column
  * @method array findByCreatedAt(string $created_at) Return Currency objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Currency objects filtered by the updated_at column
  *
@@ -157,7 +157,7 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `NAME`, `CODE`, `SYMBOL`, `RATE`, `DEFAULT_UTILITY`, `CREATED_AT`, `UPDATED_AT` FROM `currency` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `NAME`, `CODE`, `SYMBOL`, `RATE`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `currency` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -402,16 +402,16 @@ abstract class BaseCurrencyQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the default_utility column
+     * Filter the query on the by_default column
      *
      * Example usage:
      * <code>
-     * $query->filterByDefaultUtility(1234); // WHERE default_utility = 1234
-     * $query->filterByDefaultUtility(array(12, 34)); // WHERE default_utility IN (12, 34)
-     * $query->filterByDefaultUtility(array('min' => 12)); // WHERE default_utility > 12
+     * $query->filterByByDefault(1234); // WHERE by_default = 1234
+     * $query->filterByByDefault(array(12, 34)); // WHERE by_default IN (12, 34)
+     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default > 12
      * </code>
      *
-     * @param     mixed $defaultUtility The value to use as filter.
+     * @param     mixed $byDefault The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -419,16 +419,16 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      *
      * @return CurrencyQuery The current query, for fluid interface
      */
-    public function filterByDefaultUtility($defaultUtility = null, $comparison = null)
+    public function filterByByDefault($byDefault = null, $comparison = null)
     {
-        if (is_array($defaultUtility)) {
+        if (is_array($byDefault)) {
             $useMinMax = false;
-            if (isset($defaultUtility['min'])) {
-                $this->addUsingAlias(CurrencyPeer::DEFAULT_UTILITY, $defaultUtility['min'], Criteria::GREATER_EQUAL);
+            if (isset($byDefault['min'])) {
+                $this->addUsingAlias(CurrencyPeer::BY_DEFAULT, $byDefault['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($defaultUtility['max'])) {
-                $this->addUsingAlias(CurrencyPeer::DEFAULT_UTILITY, $defaultUtility['max'], Criteria::LESS_EQUAL);
+            if (isset($byDefault['max'])) {
+                $this->addUsingAlias(CurrencyPeer::BY_DEFAULT, $byDefault['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -439,7 +439,7 @@ abstract class BaseCurrencyQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CurrencyPeer::DEFAULT_UTILITY, $defaultUtility, $comparison);
+        return $this->addUsingAlias(CurrencyPeer::BY_DEFAULT, $byDefault, $comparison);
     }
 
     /**
@@ -618,4 +618,69 @@ abstract class BaseCurrencyQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     CurrencyQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(CurrencyPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     CurrencyQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CurrencyPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     CurrencyQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CurrencyPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     CurrencyQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(CurrencyPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     CurrencyQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CurrencyPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     CurrencyQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CurrencyPeer::CREATED_AT);
+    }
 }

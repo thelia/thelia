@@ -39,21 +39,21 @@ use Thelia\Model\GroupResource;
  * @method GroupQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method GroupQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method GroupQuery leftJoinAdminGroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the AdminGroup relation
- * @method GroupQuery rightJoinAdminGroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AdminGroup relation
- * @method GroupQuery innerJoinAdminGroup($relationAlias = null) Adds a INNER JOIN clause to the query using the AdminGroup relation
- *
  * @method GroupQuery leftJoinGroupDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupDesc relation
  * @method GroupQuery rightJoinGroupDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupDesc relation
  * @method GroupQuery innerJoinGroupDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupDesc relation
  *
- * @method GroupQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
- * @method GroupQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
- * @method GroupQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
+ * @method GroupQuery leftJoinAdminGroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the AdminGroup relation
+ * @method GroupQuery rightJoinAdminGroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AdminGroup relation
+ * @method GroupQuery innerJoinAdminGroup($relationAlias = null) Adds a INNER JOIN clause to the query using the AdminGroup relation
  *
  * @method GroupQuery leftJoinGroupResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupResource relation
  * @method GroupQuery rightJoinGroupResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupResource relation
  * @method GroupQuery innerJoinGroupResource($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupResource relation
+ *
+ * @method GroupQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
+ * @method GroupQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
+ * @method GroupQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
  *
  * @method Group findOne(PropelPDO $con = null) Return the first Group matching the query
  * @method Group findOneOrCreate(PropelPDO $con = null) Return the first Group matching the query, or a new Group object populated from the query conditions when no match is found
@@ -388,80 +388,6 @@ abstract class BaseGroupQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related AdminGroup object
-     *
-     * @param   AdminGroup|PropelObjectCollection $adminGroup  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   GroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByAdminGroup($adminGroup, $comparison = null)
-    {
-        if ($adminGroup instanceof AdminGroup) {
-            return $this
-                ->addUsingAlias(GroupPeer::ID, $adminGroup->getGroupId(), $comparison);
-        } elseif ($adminGroup instanceof PropelObjectCollection) {
-            return $this
-                ->useAdminGroupQuery()
-                ->filterByPrimaryKeys($adminGroup->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByAdminGroup() only accepts arguments of type AdminGroup or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the AdminGroup relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return GroupQuery The current query, for fluid interface
-     */
-    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('AdminGroup');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'AdminGroup');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the AdminGroup relation AdminGroup object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\AdminGroupQuery A secondary query class using the current class as primary query
-     */
-    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinAdminGroup($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'AdminGroup', '\Thelia\Model\AdminGroupQuery');
-    }
-
-    /**
      * Filter the query by a related GroupDesc object
      *
      * @param   GroupDesc|PropelObjectCollection $groupDesc  the related object to use as filter
@@ -536,41 +462,41 @@ abstract class BaseGroupQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related GroupModule object
+     * Filter the query by a related AdminGroup object
      *
-     * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
+     * @param   AdminGroup|PropelObjectCollection $adminGroup  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   GroupQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByGroupModule($groupModule, $comparison = null)
+    public function filterByAdminGroup($adminGroup, $comparison = null)
     {
-        if ($groupModule instanceof GroupModule) {
+        if ($adminGroup instanceof AdminGroup) {
             return $this
-                ->addUsingAlias(GroupPeer::ID, $groupModule->getGroupId(), $comparison);
-        } elseif ($groupModule instanceof PropelObjectCollection) {
+                ->addUsingAlias(GroupPeer::ID, $adminGroup->getGroupId(), $comparison);
+        } elseif ($adminGroup instanceof PropelObjectCollection) {
             return $this
-                ->useGroupModuleQuery()
-                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
+                ->useAdminGroupQuery()
+                ->filterByPrimaryKeys($adminGroup->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByGroupModule() only accepts arguments of type GroupModule or PropelCollection');
+            throw new PropelException('filterByAdminGroup() only accepts arguments of type AdminGroup or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the GroupModule relation
+     * Adds a JOIN clause to the query using the AdminGroup relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return GroupQuery The current query, for fluid interface
      */
-    public function joinGroupModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupModule');
+        $relationMap = $tableMap->getRelation('AdminGroup');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -585,14 +511,14 @@ abstract class BaseGroupQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'GroupModule');
+            $this->addJoinObject($join, 'AdminGroup');
         }
 
         return $this;
     }
 
     /**
-     * Use the GroupModule relation GroupModule object
+     * Use the AdminGroup relation AdminGroup object
      *
      * @see       useQuery()
      *
@@ -600,13 +526,13 @@ abstract class BaseGroupQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\GroupModuleQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\AdminGroupQuery A secondary query class using the current class as primary query
      */
-    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinGroupModule($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
+            ->joinAdminGroup($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AdminGroup', '\Thelia\Model\AdminGroupQuery');
     }
 
     /**
@@ -684,6 +610,80 @@ abstract class BaseGroupQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related GroupModule object
+     *
+     * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   GroupQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByGroupModule($groupModule, $comparison = null)
+    {
+        if ($groupModule instanceof GroupModule) {
+            return $this
+                ->addUsingAlias(GroupPeer::ID, $groupModule->getGroupId(), $comparison);
+        } elseif ($groupModule instanceof PropelObjectCollection) {
+            return $this
+                ->useGroupModuleQuery()
+                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByGroupModule() only accepts arguments of type GroupModule or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the GroupModule relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return GroupQuery The current query, for fluid interface
+     */
+    public function joinGroupModule($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('GroupModule');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'GroupModule');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the GroupModule relation GroupModule object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\GroupModuleQuery A secondary query class using the current class as primary query
+     */
+    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinGroupModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Group $group Object to remove from the list of results
@@ -699,4 +699,69 @@ abstract class BaseGroupQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     GroupQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(GroupPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     GroupQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(GroupPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     GroupQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(GroupPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     GroupQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(GroupPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     GroupQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(GroupPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     GroupQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(GroupPeer::CREATED_AT);
+    }
 }

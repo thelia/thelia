@@ -47,8 +47,8 @@ class CustomerTitleDescTableMap extends TableMap
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
         $this->addColumn('SHORT', 'Short', 'VARCHAR', false, 10, null);
         $this->addColumn('LONG', 'Long', 'VARCHAR', false, 45, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -59,5 +59,18 @@ class CustomerTitleDescTableMap extends TableMap
     {
         $this->addRelation('CustomerTitle', 'Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('customer_title_id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // CustomerTitleDescTableMap

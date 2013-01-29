@@ -25,7 +25,7 @@ use Thelia\Model\ModuleQuery;
  *
  * @method ModuleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method ModuleQuery orderByCode($order = Criteria::ASC) Order by the code column
- * @method ModuleQuery orderByType($order = Criteria::ASC) Order by the type column
+ * @method ModuleQuery orderBy type($order = Criteria::ASC) Order by the  type column
  * @method ModuleQuery orderByActivate($order = Criteria::ASC) Order by the activate column
  * @method ModuleQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method ModuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -33,7 +33,7 @@ use Thelia\Model\ModuleQuery;
  *
  * @method ModuleQuery groupById() Group by the id column
  * @method ModuleQuery groupByCode() Group by the code column
- * @method ModuleQuery groupByType() Group by the type column
+ * @method ModuleQuery groupBy type() Group by the  type column
  * @method ModuleQuery groupByActivate() Group by the activate column
  * @method ModuleQuery groupByPosition() Group by the position column
  * @method ModuleQuery groupByCreatedAt() Group by the created_at column
@@ -43,20 +43,20 @@ use Thelia\Model\ModuleQuery;
  * @method ModuleQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ModuleQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ModuleQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
- * @method ModuleQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
- * @method ModuleQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
- *
  * @method ModuleQuery leftJoinModuleDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleDesc relation
  * @method ModuleQuery rightJoinModuleDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleDesc relation
  * @method ModuleQuery innerJoinModuleDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleDesc relation
+ *
+ * @method ModuleQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
+ * @method ModuleQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
+ * @method ModuleQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
  *
  * @method Module findOne(PropelPDO $con = null) Return the first Module matching the query
  * @method Module findOneOrCreate(PropelPDO $con = null) Return the first Module matching the query, or a new Module object populated from the query conditions when no match is found
  *
  * @method Module findOneById(int $id) Return the first Module filtered by the id column
  * @method Module findOneByCode(string $code) Return the first Module filtered by the code column
- * @method Module findOneByType(int $type) Return the first Module filtered by the type column
+ * @method Module findOneBy type(int $ type) Return the first Module filtered by the  type column
  * @method Module findOneByActivate(int $activate) Return the first Module filtered by the activate column
  * @method Module findOneByPosition(int $position) Return the first Module filtered by the position column
  * @method Module findOneByCreatedAt(string $created_at) Return the first Module filtered by the created_at column
@@ -64,7 +64,7 @@ use Thelia\Model\ModuleQuery;
  *
  * @method array findById(int $id) Return Module objects filtered by the id column
  * @method array findByCode(string $code) Return Module objects filtered by the code column
- * @method array findByType(int $type) Return Module objects filtered by the type column
+ * @method array findBy type(int $ type) Return Module objects filtered by the  type column
  * @method array findByActivate(int $activate) Return Module objects filtered by the activate column
  * @method array findByPosition(int $position) Return Module objects filtered by the position column
  * @method array findByCreatedAt(string $created_at) Return Module objects filtered by the created_at column
@@ -158,7 +158,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `TYPE`, `ACTIVATE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, ` TYPE`, `ACTIVATE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -304,16 +304,16 @@ abstract class BaseModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the type column
+     * Filter the query on the  type column
      *
      * Example usage:
      * <code>
-     * $query->filterByType(1234); // WHERE type = 1234
-     * $query->filterByType(array(12, 34)); // WHERE type IN (12, 34)
-     * $query->filterByType(array('min' => 12)); // WHERE type > 12
+     * $query->filterBy type(1234); // WHERE  type = 1234
+     * $query->filterBy type(array(12, 34)); // WHERE  type IN (12, 34)
+     * $query->filterBy type(array('min' => 12)); // WHERE  type > 12
      * </code>
      *
-     * @param     mixed $type The value to use as filter.
+     * @param     mixed $ type The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -321,16 +321,16 @@ abstract class BaseModuleQuery extends ModelCriteria
      *
      * @return ModuleQuery The current query, for fluid interface
      */
-    public function filterByType($type = null, $comparison = null)
+    public function filterBy type($ type = null, $comparison = null)
     {
-        if (is_array($type)) {
+        if (is_array($ type)) {
             $useMinMax = false;
-            if (isset($type['min'])) {
-                $this->addUsingAlias(ModulePeer::TYPE, $type['min'], Criteria::GREATER_EQUAL);
+            if (isset($ type['min'])) {
+                $this->addUsingAlias(ModulePeer:: TYPE, $ type['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($type['max'])) {
-                $this->addUsingAlias(ModulePeer::TYPE, $type['max'], Criteria::LESS_EQUAL);
+            if (isset($ type['max'])) {
+                $this->addUsingAlias(ModulePeer:: TYPE, $ type['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -341,7 +341,7 @@ abstract class BaseModuleQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ModulePeer::TYPE, $type, $comparison);
+        return $this->addUsingAlias(ModulePeer:: TYPE, $ type, $comparison);
     }
 
     /**
@@ -513,80 +513,6 @@ abstract class BaseModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related GroupModule object
-     *
-     * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   ModuleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByGroupModule($groupModule, $comparison = null)
-    {
-        if ($groupModule instanceof GroupModule) {
-            return $this
-                ->addUsingAlias(ModulePeer::ID, $groupModule->getModuleId(), $comparison);
-        } elseif ($groupModule instanceof PropelObjectCollection) {
-            return $this
-                ->useGroupModuleQuery()
-                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByGroupModule() only accepts arguments of type GroupModule or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the GroupModule relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ModuleQuery The current query, for fluid interface
-     */
-    public function joinGroupModule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupModule');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'GroupModule');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the GroupModule relation GroupModule object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\GroupModuleQuery A secondary query class using the current class as primary query
-     */
-    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinGroupModule($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
-    }
-
-    /**
      * Filter the query by a related ModuleDesc object
      *
      * @param   ModuleDesc|PropelObjectCollection $moduleDesc  the related object to use as filter
@@ -661,6 +587,80 @@ abstract class BaseModuleQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related GroupModule object
+     *
+     * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ModuleQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByGroupModule($groupModule, $comparison = null)
+    {
+        if ($groupModule instanceof GroupModule) {
+            return $this
+                ->addUsingAlias(ModulePeer::ID, $groupModule->getModuleId(), $comparison);
+        } elseif ($groupModule instanceof PropelObjectCollection) {
+            return $this
+                ->useGroupModuleQuery()
+                ->filterByPrimaryKeys($groupModule->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByGroupModule() only accepts arguments of type GroupModule or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the GroupModule relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ModuleQuery The current query, for fluid interface
+     */
+    public function joinGroupModule($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('GroupModule');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'GroupModule');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the GroupModule relation GroupModule object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\GroupModuleQuery A secondary query class using the current class as primary query
+     */
+    public function useGroupModuleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinGroupModule($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Module $module Object to remove from the list of results
@@ -676,4 +676,69 @@ abstract class BaseModuleQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ModuleQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ModulePeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ModuleQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ModulePeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ModuleQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ModulePeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ModuleQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ModulePeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ModuleQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ModulePeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ModuleQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ModulePeer::CREATED_AT);
+    }
 }

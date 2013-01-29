@@ -43,10 +43,10 @@ class CustomerTitleTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('DEFAULT_UTILITY', 'DefaultUtility', 'INTEGER', true, null, 0);
+        $this->addColumn('BY_DEFAULT', 'ByDefault', 'INTEGER', true, null, 0);
         $this->addColumn('POSITION', 'Position', 'VARCHAR', true, 45, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -55,9 +55,22 @@ class CustomerTitleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Address', 'Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), null, null, 'Addresss');
-        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'SET NULL', null, 'Customers');
+        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'SET NULL', 'RESTRICT', 'Customers');
+        $this->addRelation('Address', 'Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'RESTRICT', 'RESTRICT', 'Addresss');
         $this->addRelation('CustomerTitleDesc', 'Thelia\\Model\\CustomerTitleDesc', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'CASCADE', null, 'CustomerTitleDescs');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // CustomerTitleTableMap

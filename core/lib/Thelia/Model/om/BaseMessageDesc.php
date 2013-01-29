@@ -212,13 +212,40 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [updated_at] column value.
+     * Get the [optionally formatted] temporal [updated_at] column value.
      *
-     * @return string
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt($format = 'Y-m-d H:i:s')
     {
-        return $this->updated_at;
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+        if ($this->updated_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->updated_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
     }
 
     /**
@@ -375,21 +402,23 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
     } // setCreatedAt()
 
     /**
-     * Set the value of [updated_at] column.
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
      *
-     * @param string $v new value
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
      * @return MessageDesc The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->updated_at !== $v) {
-            $this->updated_at = $v;
-            $this->modifiedColumns[] = MessageDescPeer::UPDATED_AT;
-        }
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = MessageDescPeer::UPDATED_AT;
+            }
+        } // if either are not null
 
 
         return $this;
@@ -581,8 +610,19 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(MessageDescPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(MessageDescPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(MessageDescPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -1286,6 +1326,20 @@ abstract class BaseMessageDesc extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     MessageDesc The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = MessageDescPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

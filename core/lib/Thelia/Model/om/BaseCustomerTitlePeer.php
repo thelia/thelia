@@ -49,8 +49,8 @@ abstract class BaseCustomerTitlePeer
     /** the column name for the ID field */
     const ID = 'customer_title.ID';
 
-    /** the column name for the DEFAULT_UTILITY field */
-    const DEFAULT_UTILITY = 'customer_title.DEFAULT_UTILITY';
+    /** the column name for the BY_DEFAULT field */
+    const BY_DEFAULT = 'customer_title.BY_DEFAULT';
 
     /** the column name for the POSITION field */
     const POSITION = 'customer_title.POSITION';
@@ -80,11 +80,11 @@ abstract class BaseCustomerTitlePeer
      * e.g. CustomerTitlePeer::$fieldNames[CustomerTitlePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'DefaultUtility', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'defaultUtility', 'position', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (CustomerTitlePeer::ID, CustomerTitlePeer::DEFAULT_UTILITY, CustomerTitlePeer::POSITION, CustomerTitlePeer::CREATED_AT, CustomerTitlePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'DEFAULT_UTILITY', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'default_utility', 'position', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'ByDefault', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'byDefault', 'position', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (CustomerTitlePeer::ID, CustomerTitlePeer::BY_DEFAULT, CustomerTitlePeer::POSITION, CustomerTitlePeer::CREATED_AT, CustomerTitlePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'BY_DEFAULT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'by_default', 'position', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
@@ -95,11 +95,11 @@ abstract class BaseCustomerTitlePeer
      * e.g. CustomerTitlePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'DefaultUtility' => 1, 'Position' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'defaultUtility' => 1, 'position' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        BasePeer::TYPE_COLNAME => array (CustomerTitlePeer::ID => 0, CustomerTitlePeer::DEFAULT_UTILITY => 1, CustomerTitlePeer::POSITION => 2, CustomerTitlePeer::CREATED_AT => 3, CustomerTitlePeer::UPDATED_AT => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'DEFAULT_UTILITY' => 1, 'POSITION' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'default_utility' => 1, 'position' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ByDefault' => 1, 'Position' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'byDefault' => 1, 'position' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (CustomerTitlePeer::ID => 0, CustomerTitlePeer::BY_DEFAULT => 1, CustomerTitlePeer::POSITION => 2, CustomerTitlePeer::CREATED_AT => 3, CustomerTitlePeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'BY_DEFAULT' => 1, 'POSITION' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'by_default' => 1, 'position' => 2, 'created_at' => 3, 'updated_at' => 4, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
@@ -175,13 +175,13 @@ abstract class BaseCustomerTitlePeer
     {
         if (null === $alias) {
             $criteria->addSelectColumn(CustomerTitlePeer::ID);
-            $criteria->addSelectColumn(CustomerTitlePeer::DEFAULT_UTILITY);
+            $criteria->addSelectColumn(CustomerTitlePeer::BY_DEFAULT);
             $criteria->addSelectColumn(CustomerTitlePeer::POSITION);
             $criteria->addSelectColumn(CustomerTitlePeer::CREATED_AT);
             $criteria->addSelectColumn(CustomerTitlePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.DEFAULT_UTILITY');
+            $criteria->addSelectColumn($alias . '.BY_DEFAULT');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

@@ -379,12 +379,12 @@ abstract class BaseResourcePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in GroupResourcePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        GroupResourcePeer::clearInstancePool();
         // Invalidate objects in ResourceDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ResourceDescPeer::clearInstancePool();
+        // Invalidate objects in GroupResourcePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        GroupResourcePeer::clearInstancePool();
     }
 
     /**

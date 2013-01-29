@@ -59,7 +59,7 @@ class TlogDestinationConfig
             $config->setName($this->name);
             $config->setValue($this->default);
             $config->setHidden(1);
-            $config->setSecure(1);
+            $config->setSecured(1);
             $config->save();
         }
         

@@ -70,10 +70,10 @@ abstract class BaseLang extends BaseObject implements Persistent
     protected $url;
 
     /**
-     * The value for the default_utility field.
+     * The value for the by_default field.
      * @var        int
      */
-    protected $default_utility;
+    protected $by_default;
 
     /**
      * The value for the created_at field.
@@ -142,13 +142,13 @@ abstract class BaseLang extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [default_utility] column value.
+     * Get the [by_default] column value.
      *
      * @return int
      */
-    public function getDefaultUtility()
+    public function getByDefault()
     {
-        return $this->default_utility;
+        return $this->by_default;
     }
 
     /**
@@ -310,25 +310,25 @@ abstract class BaseLang extends BaseObject implements Persistent
     } // setUrl()
 
     /**
-     * Set the value of [default_utility] column.
+     * Set the value of [by_default] column.
      *
      * @param int $v new value
      * @return Lang The current object (for fluent API support)
      */
-    public function setDefaultUtility($v)
+    public function setByDefault($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->default_utility !== $v) {
-            $this->default_utility = $v;
-            $this->modifiedColumns[] = LangPeer::DEFAULT_UTILITY;
+        if ($this->by_default !== $v) {
+            $this->by_default = $v;
+            $this->modifiedColumns[] = LangPeer::BY_DEFAULT;
         }
 
 
         return $this;
-    } // setDefaultUtility()
+    } // setByDefault()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -412,7 +412,7 @@ abstract class BaseLang extends BaseObject implements Persistent
             $this->title = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->code = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->url = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->default_utility = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
+            $this->by_default = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->resetModified();
@@ -557,8 +557,19 @@ abstract class BaseLang extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(LangPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(LangPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(LangPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -647,8 +658,8 @@ abstract class BaseLang extends BaseObject implements Persistent
         if ($this->isColumnModified(LangPeer::URL)) {
             $modifiedColumns[':p' . $index++]  = '`URL`';
         }
-        if ($this->isColumnModified(LangPeer::DEFAULT_UTILITY)) {
-            $modifiedColumns[':p' . $index++]  = '`DEFAULT_UTILITY`';
+        if ($this->isColumnModified(LangPeer::BY_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
         }
         if ($this->isColumnModified(LangPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
@@ -679,8 +690,8 @@ abstract class BaseLang extends BaseObject implements Persistent
                     case '`URL`':
                         $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
                         break;
-                    case '`DEFAULT_UTILITY`':
-                        $stmt->bindValue($identifier, $this->default_utility, PDO::PARAM_INT);
+                    case '`BY_DEFAULT`':
+                        $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -835,7 +846,7 @@ abstract class BaseLang extends BaseObject implements Persistent
                 return $this->getUrl();
                 break;
             case 4:
-                return $this->getDefaultUtility();
+                return $this->getByDefault();
                 break;
             case 5:
                 return $this->getCreatedAt();
@@ -875,7 +886,7 @@ abstract class BaseLang extends BaseObject implements Persistent
             $keys[1] => $this->getTitle(),
             $keys[2] => $this->getCode(),
             $keys[3] => $this->getUrl(),
-            $keys[4] => $this->getDefaultUtility(),
+            $keys[4] => $this->getByDefault(),
             $keys[5] => $this->getCreatedAt(),
             $keys[6] => $this->getUpdatedAt(),
         );
@@ -925,7 +936,7 @@ abstract class BaseLang extends BaseObject implements Persistent
                 $this->setUrl($value);
                 break;
             case 4:
-                $this->setDefaultUtility($value);
+                $this->setByDefault($value);
                 break;
             case 5:
                 $this->setCreatedAt($value);
@@ -961,7 +972,7 @@ abstract class BaseLang extends BaseObject implements Persistent
         if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setCode($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setUrl($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setDefaultUtility($arr[$keys[4]]);
+        if (array_key_exists($keys[4], $arr)) $this->setByDefault($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
@@ -979,7 +990,7 @@ abstract class BaseLang extends BaseObject implements Persistent
         if ($this->isColumnModified(LangPeer::TITLE)) $criteria->add(LangPeer::TITLE, $this->title);
         if ($this->isColumnModified(LangPeer::CODE)) $criteria->add(LangPeer::CODE, $this->code);
         if ($this->isColumnModified(LangPeer::URL)) $criteria->add(LangPeer::URL, $this->url);
-        if ($this->isColumnModified(LangPeer::DEFAULT_UTILITY)) $criteria->add(LangPeer::DEFAULT_UTILITY, $this->default_utility);
+        if ($this->isColumnModified(LangPeer::BY_DEFAULT)) $criteria->add(LangPeer::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(LangPeer::CREATED_AT)) $criteria->add(LangPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(LangPeer::UPDATED_AT)) $criteria->add(LangPeer::UPDATED_AT, $this->updated_at);
 
@@ -1048,7 +1059,7 @@ abstract class BaseLang extends BaseObject implements Persistent
         $copyObj->setTitle($this->getTitle());
         $copyObj->setCode($this->getCode());
         $copyObj->setUrl($this->getUrl());
-        $copyObj->setDefaultUtility($this->getDefaultUtility());
+        $copyObj->setByDefault($this->getByDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1106,7 +1117,7 @@ abstract class BaseLang extends BaseObject implements Persistent
         $this->title = null;
         $this->code = null;
         $this->url = null;
-        $this->default_utility = null;
+        $this->by_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1151,6 +1162,20 @@ abstract class BaseLang extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Lang The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = LangPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

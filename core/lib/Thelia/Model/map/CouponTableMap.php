@@ -50,8 +50,8 @@ class CouponTableMap extends TableMap
         $this->addColumn('AVAILABLE_SINCE', 'AvailableSince', 'TIMESTAMP', false, null, null);
         $this->addColumn('DATE_LIMIT', 'DateLimit', 'TIMESTAMP', false, null, null);
         $this->addColumn('ACTIVATE', 'Activate', 'TINYINT', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -60,7 +60,20 @@ class CouponTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CouponRule', 'Thelia\\Model\\CouponRule', RelationMap::ONE_TO_MANY, array('id' => 'coupon_id', ), 'CASCADE', null, 'CouponRules');
+        $this->addRelation('CouponRule', 'Thelia\\Model\\CouponRule', RelationMap::ONE_TO_MANY, array('id' => 'coupon_id', ), 'CASCADE', 'RESTRICT', 'CouponRules');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // CouponTableMap

@@ -47,8 +47,8 @@ class FolderTableMap extends TableMap
         $this->addColumn('LINK', 'Link', 'VARCHAR', false, 255, null);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', false, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -57,11 +57,24 @@ class FolderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'ContentFolders');
-        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'Documents');
-        $this->addRelation('FolderDesc', 'Thelia\\Model\\FolderDesc', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'FolderDescs');
-        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'Images');
-        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', null, 'Rewritings');
+        $this->addRelation('FolderDesc', 'Thelia\\Model\\FolderDesc', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'FolderDescs');
+        $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Images');
+        $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Documents');
+        $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
+        $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // FolderTableMap

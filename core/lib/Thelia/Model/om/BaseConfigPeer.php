@@ -54,8 +54,8 @@ abstract class BaseConfigPeer
     /** the column name for the VALUE field */
     const VALUE = 'config.VALUE';
 
-    /** the column name for the SECURE field */
-    const SECURE = 'config.SECURE';
+    /** the column name for the SECURED field */
+    const SECURED = 'config.SECURED';
 
     /** the column name for the HIDDEN field */
     const HIDDEN = 'config.HIDDEN';
@@ -85,11 +85,11 @@ abstract class BaseConfigPeer
      * e.g. ConfigPeer::$fieldNames[ConfigPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Value', 'Secure', 'Hidden', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'value', 'secure', 'hidden', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (ConfigPeer::ID, ConfigPeer::NAME, ConfigPeer::VALUE, ConfigPeer::SECURE, ConfigPeer::HIDDEN, ConfigPeer::CREATED_AT, ConfigPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'VALUE', 'SECURE', 'HIDDEN', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'value', 'secure', 'hidden', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Value', 'Secured', 'Hidden', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'value', 'secured', 'hidden', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ConfigPeer::ID, ConfigPeer::NAME, ConfigPeer::VALUE, ConfigPeer::SECURED, ConfigPeer::HIDDEN, ConfigPeer::CREATED_AT, ConfigPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'VALUE', 'SECURED', 'HIDDEN', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'value', 'secured', 'hidden', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -100,11 +100,11 @@ abstract class BaseConfigPeer
      * e.g. ConfigPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Value' => 2, 'Secure' => 3, 'Hidden' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'value' => 2, 'secure' => 3, 'hidden' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        BasePeer::TYPE_COLNAME => array (ConfigPeer::ID => 0, ConfigPeer::NAME => 1, ConfigPeer::VALUE => 2, ConfigPeer::SECURE => 3, ConfigPeer::HIDDEN => 4, ConfigPeer::CREATED_AT => 5, ConfigPeer::UPDATED_AT => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'VALUE' => 2, 'SECURE' => 3, 'HIDDEN' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'value' => 2, 'secure' => 3, 'hidden' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Value' => 2, 'Secured' => 3, 'Hidden' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'value' => 2, 'secured' => 3, 'hidden' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        BasePeer::TYPE_COLNAME => array (ConfigPeer::ID => 0, ConfigPeer::NAME => 1, ConfigPeer::VALUE => 2, ConfigPeer::SECURED => 3, ConfigPeer::HIDDEN => 4, ConfigPeer::CREATED_AT => 5, ConfigPeer::UPDATED_AT => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'VALUE' => 2, 'SECURED' => 3, 'HIDDEN' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'value' => 2, 'secured' => 3, 'hidden' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -182,7 +182,7 @@ abstract class BaseConfigPeer
             $criteria->addSelectColumn(ConfigPeer::ID);
             $criteria->addSelectColumn(ConfigPeer::NAME);
             $criteria->addSelectColumn(ConfigPeer::VALUE);
-            $criteria->addSelectColumn(ConfigPeer::SECURE);
+            $criteria->addSelectColumn(ConfigPeer::SECURED);
             $criteria->addSelectColumn(ConfigPeer::HIDDEN);
             $criteria->addSelectColumn(ConfigPeer::CREATED_AT);
             $criteria->addSelectColumn(ConfigPeer::UPDATED_AT);
@@ -190,7 +190,7 @@ abstract class BaseConfigPeer
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.NAME');
             $criteria->addSelectColumn($alias . '.VALUE');
-            $criteria->addSelectColumn($alias . '.SECURE');
+            $criteria->addSelectColumn($alias . '.SECURED');
             $criteria->addSelectColumn($alias . '.HIDDEN');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

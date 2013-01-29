@@ -29,14 +29,14 @@ use Thelia\Model\Combination;
  * @method AttributeCombinationQuery orderByCombinationId($order = Criteria::ASC) Order by the combination_id column
  * @method AttributeCombinationQuery orderByAttributeAvId($order = Criteria::ASC) Order by the attribute_av_id column
  * @method AttributeCombinationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method AttributeCombinationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_At column
+ * @method AttributeCombinationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method AttributeCombinationQuery groupById() Group by the id column
  * @method AttributeCombinationQuery groupByAttributeId() Group by the attribute_id column
  * @method AttributeCombinationQuery groupByCombinationId() Group by the combination_id column
  * @method AttributeCombinationQuery groupByAttributeAvId() Group by the attribute_av_id column
  * @method AttributeCombinationQuery groupByCreatedAt() Group by the created_at column
- * @method AttributeCombinationQuery groupByUpdatedAt() Group by the updated_At column
+ * @method AttributeCombinationQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method AttributeCombinationQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method AttributeCombinationQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -62,14 +62,14 @@ use Thelia\Model\Combination;
  * @method AttributeCombination findOneByCombinationId(int $combination_id) Return the first AttributeCombination filtered by the combination_id column
  * @method AttributeCombination findOneByAttributeAvId(int $attribute_av_id) Return the first AttributeCombination filtered by the attribute_av_id column
  * @method AttributeCombination findOneByCreatedAt(string $created_at) Return the first AttributeCombination filtered by the created_at column
- * @method AttributeCombination findOneByUpdatedAt(string $updated_At) Return the first AttributeCombination filtered by the updated_At column
+ * @method AttributeCombination findOneByUpdatedAt(string $updated_at) Return the first AttributeCombination filtered by the updated_at column
  *
  * @method array findById(int $id) Return AttributeCombination objects filtered by the id column
  * @method array findByAttributeId(int $attribute_id) Return AttributeCombination objects filtered by the attribute_id column
  * @method array findByCombinationId(int $combination_id) Return AttributeCombination objects filtered by the combination_id column
  * @method array findByAttributeAvId(int $attribute_av_id) Return AttributeCombination objects filtered by the attribute_av_id column
  * @method array findByCreatedAt(string $created_at) Return AttributeCombination objects filtered by the created_at column
- * @method array findByUpdatedAt(string $updated_At) Return AttributeCombination objects filtered by the updated_At column
+ * @method array findByUpdatedAt(string $updated_at) Return AttributeCombination objects filtered by the updated_at column
  *
  * @package    propel.generator.Thelia.Model.om
  */
@@ -427,13 +427,13 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the updated_At column
+     * Filter the query on the updated_at column
      *
      * Example usage:
      * <code>
-     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_At = '2011-03-14'
-     * $query->filterByUpdatedAt('now'); // WHERE updated_At = '2011-03-14'
-     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_At > '2011-03-13'
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
      * </code>
      *
      * @param     mixed $updatedAt The value to use as filter.
@@ -717,4 +717,69 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     AttributeCombinationQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(AttributeCombinationPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     AttributeCombinationQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(AttributeCombinationPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     AttributeCombinationQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(AttributeCombinationPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     AttributeCombinationQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(AttributeCombinationPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     AttributeCombinationQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(AttributeCombinationPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     AttributeCombinationQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(AttributeCombinationPeer::CREATED_AT);
+    }
 }

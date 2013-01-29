@@ -47,9 +47,9 @@ class CurrencyTableMap extends TableMap
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
         $this->addColumn('SYMBOL', 'Symbol', 'VARCHAR', false, 45, null);
         $this->addColumn('RATE', 'Rate', 'FLOAT', false, null, null);
-        $this->addColumn('DEFAULT_UTILITY', 'DefaultUtility', 'TINYINT', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -58,7 +58,20 @@ class CurrencyTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'SET NULL', null, 'Orders');
+        $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'SET NULL', 'RESTRICT', 'Orders');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // CurrencyTableMap

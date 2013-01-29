@@ -76,10 +76,10 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     protected $feature_av_id;
 
     /**
-     * The value for the default_utility field.
+     * The value for the by_default field.
      * @var        string
      */
-    protected $default_utility;
+    protected $by_default;
 
     /**
      * The value for the position field.
@@ -100,9 +100,9 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        FeatureAv
+     * @var        Product
      */
-    protected $aFeatureAv;
+    protected $aProduct;
 
     /**
      * @var        Feature
@@ -110,9 +110,9 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     protected $aFeature;
 
     /**
-     * @var        Product
+     * @var        FeatureAv
      */
-    protected $aProduct;
+    protected $aFeatureAv;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -169,13 +169,13 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [default_utility] column value.
+     * Get the [by_default] column value.
      *
      * @return string
      */
-    public function getDefaultUtility()
+    public function getByDefault()
     {
-        return $this->default_utility;
+        return $this->by_default;
     }
 
     /**
@@ -359,25 +359,25 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     } // setFeatureAvId()
 
     /**
-     * Set the value of [default_utility] column.
+     * Set the value of [by_default] column.
      *
      * @param string $v new value
      * @return FeatureProd The current object (for fluent API support)
      */
-    public function setDefaultUtility($v)
+    public function setByDefault($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->default_utility !== $v) {
-            $this->default_utility = $v;
-            $this->modifiedColumns[] = FeatureProdPeer::DEFAULT_UTILITY;
+        if ($this->by_default !== $v) {
+            $this->by_default = $v;
+            $this->modifiedColumns[] = FeatureProdPeer::BY_DEFAULT;
         }
 
 
         return $this;
-    } // setDefaultUtility()
+    } // setByDefault()
 
     /**
      * Set the value of [position] column.
@@ -482,7 +482,7 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             $this->product_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
             $this->feature_id = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->feature_av_id = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
-            $this->default_utility = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->by_default = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->position = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
@@ -565,9 +565,9 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aFeatureAv = null;
-            $this->aFeature = null;
             $this->aProduct = null;
+            $this->aFeature = null;
+            $this->aFeatureAv = null;
         } // if (deep)
     }
 
@@ -640,8 +640,19 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(FeatureProdPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(FeatureProdPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(FeatureProdPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -686,11 +697,11 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aFeatureAv !== null) {
-                if ($this->aFeatureAv->isModified() || $this->aFeatureAv->isNew()) {
-                    $affectedRows += $this->aFeatureAv->save($con);
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
                 }
-                $this->setFeatureAv($this->aFeatureAv);
+                $this->setProduct($this->aProduct);
             }
 
             if ($this->aFeature !== null) {
@@ -700,11 +711,11 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
                 $this->setFeature($this->aFeature);
             }
 
-            if ($this->aProduct !== null) {
-                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
-                    $affectedRows += $this->aProduct->save($con);
+            if ($this->aFeatureAv !== null) {
+                if ($this->aFeatureAv->isModified() || $this->aFeatureAv->isNew()) {
+                    $affectedRows += $this->aFeatureAv->save($con);
                 }
-                $this->setProduct($this->aProduct);
+                $this->setFeatureAv($this->aFeatureAv);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -756,8 +767,8 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         if ($this->isColumnModified(FeatureProdPeer::FEATURE_AV_ID)) {
             $modifiedColumns[':p' . $index++]  = '`FEATURE_AV_ID`';
         }
-        if ($this->isColumnModified(FeatureProdPeer::DEFAULT_UTILITY)) {
-            $modifiedColumns[':p' . $index++]  = '`DEFAULT_UTILITY`';
+        if ($this->isColumnModified(FeatureProdPeer::BY_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
         }
         if ($this->isColumnModified(FeatureProdPeer::POSITION)) {
             $modifiedColumns[':p' . $index++]  = '`POSITION`';
@@ -791,8 +802,8 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
                     case '`FEATURE_AV_ID`':
                         $stmt->bindValue($identifier, $this->feature_av_id, PDO::PARAM_INT);
                         break;
-                    case '`DEFAULT_UTILITY`':
-                        $stmt->bindValue($identifier, $this->default_utility, PDO::PARAM_STR);
+                    case '`BY_DEFAULT`':
+                        $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_STR);
                         break;
                     case '`POSITION`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
@@ -902,9 +913,9 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aFeatureAv !== null) {
-                if (!$this->aFeatureAv->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aFeatureAv->getValidationFailures());
+            if ($this->aProduct !== null) {
+                if (!$this->aProduct->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
                 }
             }
 
@@ -914,9 +925,9 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->aProduct !== null) {
-                if (!$this->aProduct->validate($columns)) {
-                    $failureMap = array_merge($failureMap, $this->aProduct->getValidationFailures());
+            if ($this->aFeatureAv !== null) {
+                if (!$this->aFeatureAv->validate($columns)) {
+                    $failureMap = array_merge($failureMap, $this->aFeatureAv->getValidationFailures());
                 }
             }
 
@@ -974,7 +985,7 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
                 return $this->getFeatureAvId();
                 break;
             case 4:
-                return $this->getDefaultUtility();
+                return $this->getByDefault();
                 break;
             case 5:
                 return $this->getPosition();
@@ -1018,20 +1029,20 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
             $keys[1] => $this->getProductId(),
             $keys[2] => $this->getFeatureId(),
             $keys[3] => $this->getFeatureAvId(),
-            $keys[4] => $this->getDefaultUtility(),
+            $keys[4] => $this->getByDefault(),
             $keys[5] => $this->getPosition(),
             $keys[6] => $this->getCreatedAt(),
             $keys[7] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->aFeatureAv) {
-                $result['FeatureAv'] = $this->aFeatureAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aFeature) {
                 $result['Feature'] = $this->aFeature->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aProduct) {
-                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aFeatureAv) {
+                $result['FeatureAv'] = $this->aFeatureAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1080,7 +1091,7 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
                 $this->setFeatureAvId($value);
                 break;
             case 4:
-                $this->setDefaultUtility($value);
+                $this->setByDefault($value);
                 break;
             case 5:
                 $this->setPosition($value);
@@ -1119,7 +1130,7 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setFeatureId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setFeatureAvId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setDefaultUtility($arr[$keys[4]]);
+        if (array_key_exists($keys[4], $arr)) $this->setByDefault($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setPosition($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
@@ -1138,7 +1149,7 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         if ($this->isColumnModified(FeatureProdPeer::PRODUCT_ID)) $criteria->add(FeatureProdPeer::PRODUCT_ID, $this->product_id);
         if ($this->isColumnModified(FeatureProdPeer::FEATURE_ID)) $criteria->add(FeatureProdPeer::FEATURE_ID, $this->feature_id);
         if ($this->isColumnModified(FeatureProdPeer::FEATURE_AV_ID)) $criteria->add(FeatureProdPeer::FEATURE_AV_ID, $this->feature_av_id);
-        if ($this->isColumnModified(FeatureProdPeer::DEFAULT_UTILITY)) $criteria->add(FeatureProdPeer::DEFAULT_UTILITY, $this->default_utility);
+        if ($this->isColumnModified(FeatureProdPeer::BY_DEFAULT)) $criteria->add(FeatureProdPeer::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(FeatureProdPeer::POSITION)) $criteria->add(FeatureProdPeer::POSITION, $this->position);
         if ($this->isColumnModified(FeatureProdPeer::CREATED_AT)) $criteria->add(FeatureProdPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(FeatureProdPeer::UPDATED_AT)) $criteria->add(FeatureProdPeer::UPDATED_AT, $this->updated_at);
@@ -1208,7 +1219,7 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         $copyObj->setProductId($this->getProductId());
         $copyObj->setFeatureId($this->getFeatureId());
         $copyObj->setFeatureAvId($this->getFeatureAvId());
-        $copyObj->setDefaultUtility($this->getDefaultUtility());
+        $copyObj->setByDefault($this->getByDefault());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1271,24 +1282,24 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a FeatureAv object.
+     * Declares an association between this object and a Product object.
      *
-     * @param             FeatureAv $v
+     * @param             Product $v
      * @return FeatureProd The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setFeatureAv(FeatureAv $v = null)
+    public function setProduct(Product $v = null)
     {
         if ($v === null) {
-            $this->setFeatureAvId(NULL);
+            $this->setProductId(NULL);
         } else {
-            $this->setFeatureAvId($v->getId());
+            $this->setProductId($v->getId());
         }
 
-        $this->aFeatureAv = $v;
+        $this->aProduct = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the FeatureAv object, it will not be re-added.
+        // If this object has already been added to the Product object, it will not be re-added.
         if ($v !== null) {
             $v->addFeatureProd($this);
         }
@@ -1299,26 +1310,26 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated FeatureAv object
+     * Get the associated Product object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return FeatureAv The associated FeatureAv object.
+     * @return Product The associated Product object.
      * @throws PropelException
      */
-    public function getFeatureAv(PropelPDO $con = null)
+    public function getProduct(PropelPDO $con = null)
     {
-        if ($this->aFeatureAv === null && ($this->feature_av_id !== null)) {
-            $this->aFeatureAv = FeatureAvQuery::create()->findPk($this->feature_av_id, $con);
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aFeatureAv->addFeatureProds($this);
+                $this->aProduct->addFeatureProds($this);
              */
         }
 
-        return $this->aFeatureAv;
+        return $this->aProduct;
     }
 
     /**
@@ -1373,24 +1384,24 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     }
 
     /**
-     * Declares an association between this object and a Product object.
+     * Declares an association between this object and a FeatureAv object.
      *
-     * @param             Product $v
+     * @param             FeatureAv $v
      * @return FeatureProd The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setProduct(Product $v = null)
+    public function setFeatureAv(FeatureAv $v = null)
     {
         if ($v === null) {
-            $this->setProductId(NULL);
+            $this->setFeatureAvId(NULL);
         } else {
-            $this->setProductId($v->getId());
+            $this->setFeatureAvId($v->getId());
         }
 
-        $this->aProduct = $v;
+        $this->aFeatureAv = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the Product object, it will not be re-added.
+        // If this object has already been added to the FeatureAv object, it will not be re-added.
         if ($v !== null) {
             $v->addFeatureProd($this);
         }
@@ -1401,26 +1412,26 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
 
 
     /**
-     * Get the associated Product object
+     * Get the associated FeatureAv object
      *
      * @param PropelPDO $con Optional Connection object.
-     * @return Product The associated Product object.
+     * @return FeatureAv The associated FeatureAv object.
      * @throws PropelException
      */
-    public function getProduct(PropelPDO $con = null)
+    public function getFeatureAv(PropelPDO $con = null)
     {
-        if ($this->aProduct === null && ($this->product_id !== null)) {
-            $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
+        if ($this->aFeatureAv === null && ($this->feature_av_id !== null)) {
+            $this->aFeatureAv = FeatureAvQuery::create()->findPk($this->feature_av_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProduct->addFeatureProds($this);
+                $this->aFeatureAv->addFeatureProds($this);
              */
         }
 
-        return $this->aProduct;
+        return $this->aFeatureAv;
     }
 
     /**
@@ -1432,7 +1443,7 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         $this->product_id = null;
         $this->feature_id = null;
         $this->feature_av_id = null;
-        $this->default_utility = null;
+        $this->by_default = null;
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
@@ -1458,9 +1469,9 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
         if ($deep) {
         } // if ($deep)
 
-        $this->aFeatureAv = null;
-        $this->aFeature = null;
         $this->aProduct = null;
+        $this->aFeature = null;
+        $this->aFeatureAv = null;
     }
 
     /**
@@ -1481,6 +1492,20 @@ abstract class BaseFeatureProd extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     FeatureProd The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = FeatureProdPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

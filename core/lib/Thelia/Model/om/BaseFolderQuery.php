@@ -46,14 +46,6 @@ use Thelia\Model\Rewriting;
  * @method FolderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method FolderQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method FolderQuery leftJoinContentFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentFolder relation
- * @method FolderQuery rightJoinContentFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentFolder relation
- * @method FolderQuery innerJoinContentFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentFolder relation
- *
- * @method FolderQuery leftJoinDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the Document relation
- * @method FolderQuery rightJoinDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Document relation
- * @method FolderQuery innerJoinDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the Document relation
- *
  * @method FolderQuery leftJoinFolderDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the FolderDesc relation
  * @method FolderQuery rightJoinFolderDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FolderDesc relation
  * @method FolderQuery innerJoinFolderDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the FolderDesc relation
@@ -62,9 +54,17 @@ use Thelia\Model\Rewriting;
  * @method FolderQuery rightJoinImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Image relation
  * @method FolderQuery innerJoinImage($relationAlias = null) Adds a INNER JOIN clause to the query using the Image relation
  *
+ * @method FolderQuery leftJoinDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the Document relation
+ * @method FolderQuery rightJoinDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Document relation
+ * @method FolderQuery innerJoinDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the Document relation
+ *
  * @method FolderQuery leftJoinRewriting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Rewriting relation
  * @method FolderQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
  * @method FolderQuery innerJoinRewriting($relationAlias = null) Adds a INNER JOIN clause to the query using the Rewriting relation
+ *
+ * @method FolderQuery leftJoinContentFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentFolder relation
+ * @method FolderQuery rightJoinContentFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentFolder relation
+ * @method FolderQuery innerJoinContentFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentFolder relation
  *
  * @method Folder findOne(PropelPDO $con = null) Return the first Folder matching the query
  * @method Folder findOneOrCreate(PropelPDO $con = null) Return the first Folder matching the query, or a new Folder object populated from the query conditions when no match is found
@@ -528,154 +528,6 @@ abstract class BaseFolderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ContentFolder object
-     *
-     * @param   ContentFolder|PropelObjectCollection $contentFolder  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   FolderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByContentFolder($contentFolder, $comparison = null)
-    {
-        if ($contentFolder instanceof ContentFolder) {
-            return $this
-                ->addUsingAlias(FolderPeer::ID, $contentFolder->getFolderId(), $comparison);
-        } elseif ($contentFolder instanceof PropelObjectCollection) {
-            return $this
-                ->useContentFolderQuery()
-                ->filterByPrimaryKeys($contentFolder->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByContentFolder() only accepts arguments of type ContentFolder or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the ContentFolder relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return FolderQuery The current query, for fluid interface
-     */
-    public function joinContentFolder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ContentFolder');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'ContentFolder');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the ContentFolder relation ContentFolder object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ContentFolderQuery A secondary query class using the current class as primary query
-     */
-    public function useContentFolderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinContentFolder($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ContentFolder', '\Thelia\Model\ContentFolderQuery');
-    }
-
-    /**
-     * Filter the query by a related Document object
-     *
-     * @param   Document|PropelObjectCollection $document  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   FolderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByDocument($document, $comparison = null)
-    {
-        if ($document instanceof Document) {
-            return $this
-                ->addUsingAlias(FolderPeer::ID, $document->getFolderId(), $comparison);
-        } elseif ($document instanceof PropelObjectCollection) {
-            return $this
-                ->useDocumentQuery()
-                ->filterByPrimaryKeys($document->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Document relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return FolderQuery The current query, for fluid interface
-     */
-    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Document');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Document');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Document relation Document object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
-     */
-    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinDocument($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Document', '\Thelia\Model\DocumentQuery');
-    }
-
-    /**
      * Filter the query by a related FolderDesc object
      *
      * @param   FolderDesc|PropelObjectCollection $folderDesc  the related object to use as filter
@@ -824,6 +676,80 @@ abstract class BaseFolderQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related Document object
+     *
+     * @param   Document|PropelObjectCollection $document  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FolderQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByDocument($document, $comparison = null)
+    {
+        if ($document instanceof Document) {
+            return $this
+                ->addUsingAlias(FolderPeer::ID, $document->getFolderId(), $comparison);
+        } elseif ($document instanceof PropelObjectCollection) {
+            return $this
+                ->useDocumentQuery()
+                ->filterByPrimaryKeys($document->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Document relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FolderQuery The current query, for fluid interface
+     */
+    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Document');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Document');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Document relation Document object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
+     */
+    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinDocument($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Document', '\Thelia\Model\DocumentQuery');
+    }
+
+    /**
      * Filter the query by a related Rewriting object
      *
      * @param   Rewriting|PropelObjectCollection $rewriting  the related object to use as filter
@@ -898,6 +824,80 @@ abstract class BaseFolderQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related ContentFolder object
+     *
+     * @param   ContentFolder|PropelObjectCollection $contentFolder  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FolderQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByContentFolder($contentFolder, $comparison = null)
+    {
+        if ($contentFolder instanceof ContentFolder) {
+            return $this
+                ->addUsingAlias(FolderPeer::ID, $contentFolder->getFolderId(), $comparison);
+        } elseif ($contentFolder instanceof PropelObjectCollection) {
+            return $this
+                ->useContentFolderQuery()
+                ->filterByPrimaryKeys($contentFolder->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByContentFolder() only accepts arguments of type ContentFolder or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ContentFolder relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FolderQuery The current query, for fluid interface
+     */
+    public function joinContentFolder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ContentFolder');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ContentFolder');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ContentFolder relation ContentFolder object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ContentFolderQuery A secondary query class using the current class as primary query
+     */
+    public function useContentFolderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinContentFolder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ContentFolder', '\Thelia\Model\ContentFolderQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Folder $folder Object to remove from the list of results
@@ -913,4 +913,69 @@ abstract class BaseFolderQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     FolderQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FolderPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     FolderQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FolderPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     FolderQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FolderPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     FolderQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FolderPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     FolderQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FolderPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     FolderQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FolderPeer::CREATED_AT);
+    }
 }

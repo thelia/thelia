@@ -88,7 +88,7 @@ abstract class BaseAttributeCombinationPeer
         BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'attributeId', 'combinationId', 'attributeAvId', 'createdAt', 'updatedAt', ),
         BasePeer::TYPE_COLNAME => array (AttributeCombinationPeer::ID, AttributeCombinationPeer::ATTRIBUTE_ID, AttributeCombinationPeer::COMBINATION_ID, AttributeCombinationPeer::ATTRIBUTE_AV_ID, AttributeCombinationPeer::CREATED_AT, AttributeCombinationPeer::UPDATED_AT, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID', 'ATTRIBUTE_ID', 'COMBINATION_ID', 'ATTRIBUTE_AV_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'attribute_id', 'combination_id', 'attribute_av_id', 'created_at', 'updated_At', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'attribute_id', 'combination_id', 'attribute_av_id', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
@@ -103,7 +103,7 @@ abstract class BaseAttributeCombinationPeer
         BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'attributeId' => 1, 'combinationId' => 2, 'attributeAvId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
         BasePeer::TYPE_COLNAME => array (AttributeCombinationPeer::ID => 0, AttributeCombinationPeer::ATTRIBUTE_ID => 1, AttributeCombinationPeer::COMBINATION_ID => 2, AttributeCombinationPeer::ATTRIBUTE_AV_ID => 3, AttributeCombinationPeer::CREATED_AT => 4, AttributeCombinationPeer::UPDATED_AT => 5, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'ATTRIBUTE_ID' => 1, 'COMBINATION_ID' => 2, 'ATTRIBUTE_AV_ID' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'attribute_id' => 1, 'combination_id' => 2, 'attribute_av_id' => 3, 'created_at' => 4, 'updated_At' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'attribute_id' => 1, 'combination_id' => 2, 'attribute_av_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 

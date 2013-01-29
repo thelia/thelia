@@ -400,27 +400,27 @@ abstract class BaseCategoryPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AttributeCategoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AttributeCategoryPeer::clearInstancePool();
         // Invalidate objects in CategoryDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CategoryDescPeer::clearInstancePool();
-        // Invalidate objects in ContentAssocPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ContentAssocPeer::clearInstancePool();
-        // Invalidate objects in DocumentPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        DocumentPeer::clearInstancePool();
-        // Invalidate objects in FeatureCategoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FeatureCategoryPeer::clearInstancePool();
-        // Invalidate objects in ImagePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ImagePeer::clearInstancePool();
         // Invalidate objects in ProductCategoryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ProductCategoryPeer::clearInstancePool();
+        // Invalidate objects in FeatureCategoryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeatureCategoryPeer::clearInstancePool();
+        // Invalidate objects in AttributeCategoryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttributeCategoryPeer::clearInstancePool();
+        // Invalidate objects in ContentAssocPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ContentAssocPeer::clearInstancePool();
+        // Invalidate objects in ImagePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ImagePeer::clearInstancePool();
+        // Invalidate objects in DocumentPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        DocumentPeer::clearInstancePool();
         // Invalidate objects in RewritingPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         RewritingPeer::clearInstancePool();

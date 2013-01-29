@@ -38,19 +38,25 @@ abstract class BaseProductCategoryPeer
     const TM_CLASS = 'ProductCategoryTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the PRODUCT_ID field */
     const PRODUCT_ID = 'product_category.PRODUCT_ID';
 
     /** the column name for the CATEGORY_ID field */
     const CATEGORY_ID = 'product_category.CATEGORY_ID';
+
+    /** the column name for the CREATED_AT field */
+    const CREATED_AT = 'product_category.CREATED_AT';
+
+    /** the column name for the UPDATED_AT field */
+    const UPDATED_AT = 'product_category.UPDATED_AT';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -71,12 +77,12 @@ abstract class BaseProductCategoryPeer
      * e.g. ProductCategoryPeer::$fieldNames[ProductCategoryPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('ProductId', 'CategoryId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('productId', 'categoryId', ),
-        BasePeer::TYPE_COLNAME => array (ProductCategoryPeer::PRODUCT_ID, ProductCategoryPeer::CATEGORY_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PRODUCT_ID', 'CATEGORY_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('product_id', 'category_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('ProductId', 'CategoryId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('productId', 'categoryId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ProductCategoryPeer::PRODUCT_ID, ProductCategoryPeer::CATEGORY_ID, ProductCategoryPeer::CREATED_AT, ProductCategoryPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PRODUCT_ID', 'CATEGORY_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('product_id', 'category_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -86,12 +92,12 @@ abstract class BaseProductCategoryPeer
      * e.g. ProductCategoryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('ProductId' => 0, 'CategoryId' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('productId' => 0, 'categoryId' => 1, ),
-        BasePeer::TYPE_COLNAME => array (ProductCategoryPeer::PRODUCT_ID => 0, ProductCategoryPeer::CATEGORY_ID => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('PRODUCT_ID' => 0, 'CATEGORY_ID' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('product_id' => 0, 'category_id' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('ProductId' => 0, 'CategoryId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('productId' => 0, 'categoryId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (ProductCategoryPeer::PRODUCT_ID => 0, ProductCategoryPeer::CATEGORY_ID => 1, ProductCategoryPeer::CREATED_AT => 2, ProductCategoryPeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('PRODUCT_ID' => 0, 'CATEGORY_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('product_id' => 0, 'category_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -167,9 +173,13 @@ abstract class BaseProductCategoryPeer
         if (null === $alias) {
             $criteria->addSelectColumn(ProductCategoryPeer::PRODUCT_ID);
             $criteria->addSelectColumn(ProductCategoryPeer::CATEGORY_ID);
+            $criteria->addSelectColumn(ProductCategoryPeer::CREATED_AT);
+            $criteria->addSelectColumn(ProductCategoryPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.CATEGORY_ID');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 

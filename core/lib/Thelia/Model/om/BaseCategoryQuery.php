@@ -49,33 +49,33 @@ use Thelia\Model\Rewriting;
  * @method CategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method CategoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method CategoryQuery leftJoinAttributeCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeCategory relation
- * @method CategoryQuery rightJoinAttributeCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCategory relation
- * @method CategoryQuery innerJoinAttributeCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCategory relation
- *
  * @method CategoryQuery leftJoinCategoryDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryDesc relation
  * @method CategoryQuery rightJoinCategoryDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryDesc relation
  * @method CategoryQuery innerJoinCategoryDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryDesc relation
  *
- * @method CategoryQuery leftJoinContentAssoc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentAssoc relation
- * @method CategoryQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
- * @method CategoryQuery innerJoinContentAssoc($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentAssoc relation
- *
- * @method CategoryQuery leftJoinDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the Document relation
- * @method CategoryQuery rightJoinDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Document relation
- * @method CategoryQuery innerJoinDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the Document relation
+ * @method CategoryQuery leftJoinProductCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductCategory relation
+ * @method CategoryQuery rightJoinProductCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductCategory relation
+ * @method CategoryQuery innerJoinProductCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductCategory relation
  *
  * @method CategoryQuery leftJoinFeatureCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureCategory relation
  * @method CategoryQuery rightJoinFeatureCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureCategory relation
  * @method CategoryQuery innerJoinFeatureCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureCategory relation
  *
+ * @method CategoryQuery leftJoinAttributeCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeCategory relation
+ * @method CategoryQuery rightJoinAttributeCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCategory relation
+ * @method CategoryQuery innerJoinAttributeCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCategory relation
+ *
+ * @method CategoryQuery leftJoinContentAssoc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentAssoc relation
+ * @method CategoryQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
+ * @method CategoryQuery innerJoinContentAssoc($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentAssoc relation
+ *
  * @method CategoryQuery leftJoinImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the Image relation
  * @method CategoryQuery rightJoinImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Image relation
  * @method CategoryQuery innerJoinImage($relationAlias = null) Adds a INNER JOIN clause to the query using the Image relation
  *
- * @method CategoryQuery leftJoinProductCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductCategory relation
- * @method CategoryQuery rightJoinProductCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductCategory relation
- * @method CategoryQuery innerJoinProductCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductCategory relation
+ * @method CategoryQuery leftJoinDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the Document relation
+ * @method CategoryQuery rightJoinDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Document relation
+ * @method CategoryQuery innerJoinDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the Document relation
  *
  * @method CategoryQuery leftJoinRewriting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Rewriting relation
  * @method CategoryQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
@@ -543,80 +543,6 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related AttributeCategory object
-     *
-     * @param   AttributeCategory|PropelObjectCollection $attributeCategory  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByAttributeCategory($attributeCategory, $comparison = null)
-    {
-        if ($attributeCategory instanceof AttributeCategory) {
-            return $this
-                ->addUsingAlias(CategoryPeer::ID, $attributeCategory->getCategoryId(), $comparison);
-        } elseif ($attributeCategory instanceof PropelObjectCollection) {
-            return $this
-                ->useAttributeCategoryQuery()
-                ->filterByPrimaryKeys($attributeCategory->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByAttributeCategory() only accepts arguments of type AttributeCategory or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the AttributeCategory relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return CategoryQuery The current query, for fluid interface
-     */
-    public function joinAttributeCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('AttributeCategory');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'AttributeCategory');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the AttributeCategory relation AttributeCategory object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\AttributeCategoryQuery A secondary query class using the current class as primary query
-     */
-    public function useAttributeCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinAttributeCategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'AttributeCategory', '\Thelia\Model\AttributeCategoryQuery');
-    }
-
-    /**
      * Filter the query by a related CategoryDesc object
      *
      * @param   CategoryDesc|PropelObjectCollection $categoryDesc  the related object to use as filter
@@ -691,41 +617,41 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ContentAssoc object
+     * Filter the query by a related ProductCategory object
      *
-     * @param   ContentAssoc|PropelObjectCollection $contentAssoc  the related object to use as filter
+     * @param   ProductCategory|PropelObjectCollection $productCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByContentAssoc($contentAssoc, $comparison = null)
+    public function filterByProductCategory($productCategory, $comparison = null)
     {
-        if ($contentAssoc instanceof ContentAssoc) {
+        if ($productCategory instanceof ProductCategory) {
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $contentAssoc->getCategoryId(), $comparison);
-        } elseif ($contentAssoc instanceof PropelObjectCollection) {
+                ->addUsingAlias(CategoryPeer::ID, $productCategory->getCategoryId(), $comparison);
+        } elseif ($productCategory instanceof PropelObjectCollection) {
             return $this
-                ->useContentAssocQuery()
-                ->filterByPrimaryKeys($contentAssoc->getPrimaryKeys())
+                ->useProductCategoryQuery()
+                ->filterByPrimaryKeys($productCategory->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByContentAssoc() only accepts arguments of type ContentAssoc or PropelCollection');
+            throw new PropelException('filterByProductCategory() only accepts arguments of type ProductCategory or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ContentAssoc relation
+     * Adds a JOIN clause to the query using the ProductCategory relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinProductCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ContentAssoc');
+        $relationMap = $tableMap->getRelation('ProductCategory');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -740,14 +666,14 @@ abstract class BaseCategoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ContentAssoc');
+            $this->addJoinObject($join, 'ProductCategory');
         }
 
         return $this;
     }
 
     /**
-     * Use the ContentAssoc relation ContentAssoc object
+     * Use the ProductCategory relation ProductCategory object
      *
      * @see       useQuery()
      *
@@ -755,87 +681,13 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ContentAssocQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductCategoryQuery A secondary query class using the current class as primary query
      */
-    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useProductCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinContentAssoc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ContentAssoc', '\Thelia\Model\ContentAssocQuery');
-    }
-
-    /**
-     * Filter the query by a related Document object
-     *
-     * @param   Document|PropelObjectCollection $document  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByDocument($document, $comparison = null)
-    {
-        if ($document instanceof Document) {
-            return $this
-                ->addUsingAlias(CategoryPeer::ID, $document->getCategoryId(), $comparison);
-        } elseif ($document instanceof PropelObjectCollection) {
-            return $this
-                ->useDocumentQuery()
-                ->filterByPrimaryKeys($document->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Document relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return CategoryQuery The current query, for fluid interface
-     */
-    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Document');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Document');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Document relation Document object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
-     */
-    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinDocument($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Document', '\Thelia\Model\DocumentQuery');
+            ->joinProductCategory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductCategory', '\Thelia\Model\ProductCategoryQuery');
     }
 
     /**
@@ -913,6 +765,154 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related AttributeCategory object
+     *
+     * @param   AttributeCategory|PropelObjectCollection $attributeCategory  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CategoryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByAttributeCategory($attributeCategory, $comparison = null)
+    {
+        if ($attributeCategory instanceof AttributeCategory) {
+            return $this
+                ->addUsingAlias(CategoryPeer::ID, $attributeCategory->getCategoryId(), $comparison);
+        } elseif ($attributeCategory instanceof PropelObjectCollection) {
+            return $this
+                ->useAttributeCategoryQuery()
+                ->filterByPrimaryKeys($attributeCategory->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAttributeCategory() only accepts arguments of type AttributeCategory or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the AttributeCategory relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CategoryQuery The current query, for fluid interface
+     */
+    public function joinAttributeCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('AttributeCategory');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'AttributeCategory');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the AttributeCategory relation AttributeCategory object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\AttributeCategoryQuery A secondary query class using the current class as primary query
+     */
+    public function useAttributeCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinAttributeCategory($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AttributeCategory', '\Thelia\Model\AttributeCategoryQuery');
+    }
+
+    /**
+     * Filter the query by a related ContentAssoc object
+     *
+     * @param   ContentAssoc|PropelObjectCollection $contentAssoc  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CategoryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByContentAssoc($contentAssoc, $comparison = null)
+    {
+        if ($contentAssoc instanceof ContentAssoc) {
+            return $this
+                ->addUsingAlias(CategoryPeer::ID, $contentAssoc->getCategoryId(), $comparison);
+        } elseif ($contentAssoc instanceof PropelObjectCollection) {
+            return $this
+                ->useContentAssocQuery()
+                ->filterByPrimaryKeys($contentAssoc->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByContentAssoc() only accepts arguments of type ContentAssoc or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ContentAssoc relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CategoryQuery The current query, for fluid interface
+     */
+    public function joinContentAssoc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ContentAssoc');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ContentAssoc');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ContentAssoc relation ContentAssoc object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ContentAssocQuery A secondary query class using the current class as primary query
+     */
+    public function useContentAssocQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinContentAssoc($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ContentAssoc', '\Thelia\Model\ContentAssocQuery');
+    }
+
+    /**
      * Filter the query by a related Image object
      *
      * @param   Image|PropelObjectCollection $image  the related object to use as filter
@@ -987,41 +987,41 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ProductCategory object
+     * Filter the query by a related Document object
      *
-     * @param   ProductCategory|PropelObjectCollection $productCategory  the related object to use as filter
+     * @param   Document|PropelObjectCollection $document  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CategoryQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByProductCategory($productCategory, $comparison = null)
+    public function filterByDocument($document, $comparison = null)
     {
-        if ($productCategory instanceof ProductCategory) {
+        if ($document instanceof Document) {
             return $this
-                ->addUsingAlias(CategoryPeer::ID, $productCategory->getCategoryId(), $comparison);
-        } elseif ($productCategory instanceof PropelObjectCollection) {
+                ->addUsingAlias(CategoryPeer::ID, $document->getCategoryId(), $comparison);
+        } elseif ($document instanceof PropelObjectCollection) {
             return $this
-                ->useProductCategoryQuery()
-                ->filterByPrimaryKeys($productCategory->getPrimaryKeys())
+                ->useDocumentQuery()
+                ->filterByPrimaryKeys($document->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByProductCategory() only accepts arguments of type ProductCategory or PropelCollection');
+            throw new PropelException('filterByDocument() only accepts arguments of type Document or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ProductCategory relation
+     * Adds a JOIN clause to the query using the Document relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return CategoryQuery The current query, for fluid interface
      */
-    public function joinProductCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ProductCategory');
+        $relationMap = $tableMap->getRelation('Document');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1036,14 +1036,14 @@ abstract class BaseCategoryQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ProductCategory');
+            $this->addJoinObject($join, 'Document');
         }
 
         return $this;
     }
 
     /**
-     * Use the ProductCategory relation ProductCategory object
+     * Use the Document relation Document object
      *
      * @see       useQuery()
      *
@@ -1051,13 +1051,13 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductCategoryQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
      */
-    public function useProductCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinProductCategory($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ProductCategory', '\Thelia\Model\ProductCategoryQuery');
+            ->joinDocument($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Document', '\Thelia\Model\DocumentQuery');
     }
 
     /**
@@ -1150,4 +1150,69 @@ abstract class BaseCategoryQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     CategoryQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(CategoryPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     CategoryQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CategoryPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     CategoryQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CategoryPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     CategoryQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(CategoryPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     CategoryQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(CategoryPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     CategoryQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(CategoryPeer::CREATED_AT);
+    }
 }

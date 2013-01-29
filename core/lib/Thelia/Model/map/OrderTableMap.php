@@ -58,8 +58,8 @@ class OrderTableMap extends TableMap
         $this->addColumn('CARRIER', 'Carrier', 'VARCHAR', true, 45, null);
         $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', false, null, null);
         $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -68,13 +68,26 @@ class OrderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Currency', 'Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'SET NULL', null);
-        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', null);
-        $this->addRelation('OrderAddressRelatedByAddressInvoice', 'Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_invoice' => 'id', ), 'SET NULL', null);
-        $this->addRelation('OrderAddressRelatedByAddressDelivery', 'Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_delivery' => 'id', ), 'SET NULL', null);
-        $this->addRelation('OrderStatus', 'Thelia\\Model\\OrderStatus', RelationMap::MANY_TO_ONE, array('status_id' => 'id', ), 'SET NULL', null);
-        $this->addRelation('CouponOrder', 'Thelia\\Model\\CouponOrder', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', null, 'CouponOrders');
-        $this->addRelation('OrderProduct', 'Thelia\\Model\\OrderProduct', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', null, 'OrderProducts');
+        $this->addRelation('Currency', 'Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::MANY_TO_ONE, array('customer_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('OrderAddressRelatedByAddressInvoice', 'Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_invoice' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('OrderAddressRelatedByAddressDelivery', 'Thelia\\Model\\OrderAddress', RelationMap::MANY_TO_ONE, array('address_delivery' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('OrderStatus', 'Thelia\\Model\\OrderStatus', RelationMap::MANY_TO_ONE, array('status_id' => 'id', ), 'SET NULL', 'RESTRICT');
+        $this->addRelation('OrderProduct', 'Thelia\\Model\\OrderProduct', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'OrderProducts');
+        $this->addRelation('CouponOrder', 'Thelia\\Model\\CouponOrder', RelationMap::ONE_TO_MANY, array('id' => 'order_id', ), 'CASCADE', 'RESTRICT', 'CouponOrders');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // OrderTableMap

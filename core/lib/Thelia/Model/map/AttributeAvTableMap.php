@@ -45,8 +45,8 @@ class AttributeAvTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER', 'attribute', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -55,9 +55,22 @@ class AttributeAvTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', null);
-        $this->addRelation('AttributeAvDesc', 'Thelia\\Model\\AttributeAvDesc', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', null, 'AttributeAvDescs');
-        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', null, 'AttributeCombinations');
+        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('AttributeAvDesc', 'Thelia\\Model\\AttributeAvDesc', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT', 'AttributeAvDescs');
+        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // AttributeAvTableMap

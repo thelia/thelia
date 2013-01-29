@@ -69,8 +69,8 @@ abstract class BaseProductDescPeer
     /** the column name for the CREATED_AT field */
     const CREATED_AT = 'product_desc.CREATED_AT';
 
-    /** the column name for the UPDATET_AT field */
-    const UPDATET_AT = 'product_desc.UPDATET_AT';
+    /** the column name for the UPDATED_AT field */
+    const UPDATED_AT = 'product_desc.UPDATED_AT';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -91,11 +91,11 @@ abstract class BaseProductDescPeer
      * e.g. ProductDescPeer::$fieldNames[ProductDescPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'ProductId', 'Lang', 'Title', 'Description', 'Chapo', 'Postscriptum', 'CreatedAt', 'UpdatetAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'productId', 'lang', 'title', 'description', 'chapo', 'postscriptum', 'createdAt', 'updatetAt', ),
-        BasePeer::TYPE_COLNAME => array (ProductDescPeer::ID, ProductDescPeer::PRODUCT_ID, ProductDescPeer::LANG, ProductDescPeer::TITLE, ProductDescPeer::DESCRIPTION, ProductDescPeer::CHAPO, ProductDescPeer::POSTSCRIPTUM, ProductDescPeer::CREATED_AT, ProductDescPeer::UPDATET_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRODUCT_ID', 'LANG', 'TITLE', 'DESCRIPTION', 'CHAPO', 'POSTSCRIPTUM', 'CREATED_AT', 'UPDATET_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'product_id', 'lang', 'title', 'description', 'chapo', 'postscriptum', 'created_at', 'updatet_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'ProductId', 'Lang', 'Title', 'Description', 'Chapo', 'Postscriptum', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'productId', 'lang', 'title', 'description', 'chapo', 'postscriptum', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ProductDescPeer::ID, ProductDescPeer::PRODUCT_ID, ProductDescPeer::LANG, ProductDescPeer::TITLE, ProductDescPeer::DESCRIPTION, ProductDescPeer::CHAPO, ProductDescPeer::POSTSCRIPTUM, ProductDescPeer::CREATED_AT, ProductDescPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRODUCT_ID', 'LANG', 'TITLE', 'DESCRIPTION', 'CHAPO', 'POSTSCRIPTUM', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'product_id', 'lang', 'title', 'description', 'chapo', 'postscriptum', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -106,11 +106,11 @@ abstract class BaseProductDescPeer
      * e.g. ProductDescPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ProductId' => 1, 'Lang' => 2, 'Title' => 3, 'Description' => 4, 'Chapo' => 5, 'Postscriptum' => 6, 'CreatedAt' => 7, 'UpdatetAt' => 8, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'productId' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'postscriptum' => 6, 'createdAt' => 7, 'updatetAt' => 8, ),
-        BasePeer::TYPE_COLNAME => array (ProductDescPeer::ID => 0, ProductDescPeer::PRODUCT_ID => 1, ProductDescPeer::LANG => 2, ProductDescPeer::TITLE => 3, ProductDescPeer::DESCRIPTION => 4, ProductDescPeer::CHAPO => 5, ProductDescPeer::POSTSCRIPTUM => 6, ProductDescPeer::CREATED_AT => 7, ProductDescPeer::UPDATET_AT => 8, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRODUCT_ID' => 1, 'LANG' => 2, 'TITLE' => 3, 'DESCRIPTION' => 4, 'CHAPO' => 5, 'POSTSCRIPTUM' => 6, 'CREATED_AT' => 7, 'UPDATET_AT' => 8, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'product_id' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'postscriptum' => 6, 'created_at' => 7, 'updatet_at' => 8, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ProductId' => 1, 'Lang' => 2, 'Title' => 3, 'Description' => 4, 'Chapo' => 5, 'Postscriptum' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'productId' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'postscriptum' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
+        BasePeer::TYPE_COLNAME => array (ProductDescPeer::ID => 0, ProductDescPeer::PRODUCT_ID => 1, ProductDescPeer::LANG => 2, ProductDescPeer::TITLE => 3, ProductDescPeer::DESCRIPTION => 4, ProductDescPeer::CHAPO => 5, ProductDescPeer::POSTSCRIPTUM => 6, ProductDescPeer::CREATED_AT => 7, ProductDescPeer::UPDATED_AT => 8, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRODUCT_ID' => 1, 'LANG' => 2, 'TITLE' => 3, 'DESCRIPTION' => 4, 'CHAPO' => 5, 'POSTSCRIPTUM' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'product_id' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'postscriptum' => 6, 'created_at' => 7, 'updated_at' => 8, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
@@ -193,7 +193,7 @@ abstract class BaseProductDescPeer
             $criteria->addSelectColumn(ProductDescPeer::CHAPO);
             $criteria->addSelectColumn(ProductDescPeer::POSTSCRIPTUM);
             $criteria->addSelectColumn(ProductDescPeer::CREATED_AT);
-            $criteria->addSelectColumn(ProductDescPeer::UPDATET_AT);
+            $criteria->addSelectColumn(ProductDescPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
@@ -203,7 +203,7 @@ abstract class BaseProductDescPeer
             $criteria->addSelectColumn($alias . '.CHAPO');
             $criteria->addSelectColumn($alias . '.POSTSCRIPTUM');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATET_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 

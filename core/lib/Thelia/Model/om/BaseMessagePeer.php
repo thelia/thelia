@@ -51,8 +51,8 @@ abstract class BaseMessagePeer
     /** the column name for the CODE field */
     const CODE = 'message.CODE';
 
-    /** the column name for the SECURE field */
-    const SECURE = 'message.SECURE';
+    /** the column name for the SECURED field */
+    const SECURED = 'message.SECURED';
 
     /** the column name for the CREATED_AT field */
     const CREATED_AT = 'message.CREATED_AT';
@@ -79,11 +79,11 @@ abstract class BaseMessagePeer
      * e.g. MessagePeer::$fieldNames[MessagePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', 'Secure', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', 'secure', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (MessagePeer::ID, MessagePeer::CODE, MessagePeer::SECURE, MessagePeer::CREATED_AT, MessagePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', 'SECURE', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'code', 'secure', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', 'Secured', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', 'secured', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (MessagePeer::ID, MessagePeer::CODE, MessagePeer::SECURED, MessagePeer::CREATED_AT, MessagePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', 'SECURED', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'code', 'secured', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
@@ -94,11 +94,11 @@ abstract class BaseMessagePeer
      * e.g. MessagePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, 'Secure' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, 'secure' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        BasePeer::TYPE_COLNAME => array (MessagePeer::ID => 0, MessagePeer::CODE => 1, MessagePeer::SECURE => 2, MessagePeer::CREATED_AT => 3, MessagePeer::UPDATED_AT => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, 'SECURE' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, 'secure' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, 'Secured' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, 'secured' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        BasePeer::TYPE_COLNAME => array (MessagePeer::ID => 0, MessagePeer::CODE => 1, MessagePeer::SECURED => 2, MessagePeer::CREATED_AT => 3, MessagePeer::UPDATED_AT => 4, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, 'SECURED' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, 'secured' => 2, 'created_at' => 3, 'updated_at' => 4, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
     );
 
@@ -175,13 +175,13 @@ abstract class BaseMessagePeer
         if (null === $alias) {
             $criteria->addSelectColumn(MessagePeer::ID);
             $criteria->addSelectColumn(MessagePeer::CODE);
-            $criteria->addSelectColumn(MessagePeer::SECURE);
+            $criteria->addSelectColumn(MessagePeer::SECURED);
             $criteria->addSelectColumn(MessagePeer::CREATED_AT);
             $criteria->addSelectColumn(MessagePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.SECURE');
+            $criteria->addSelectColumn($alias . '.SECURED');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

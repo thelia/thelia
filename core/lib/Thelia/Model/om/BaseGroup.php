@@ -80,28 +80,28 @@ abstract class BaseGroup extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|AdminGroup[] Collection to store aggregation of AdminGroup objects.
-     */
-    protected $collAdminGroups;
-    protected $collAdminGroupsPartial;
-
-    /**
      * @var        PropelObjectCollection|GroupDesc[] Collection to store aggregation of GroupDesc objects.
      */
     protected $collGroupDescs;
     protected $collGroupDescsPartial;
 
     /**
-     * @var        PropelObjectCollection|GroupModule[] Collection to store aggregation of GroupModule objects.
+     * @var        PropelObjectCollection|AdminGroup[] Collection to store aggregation of AdminGroup objects.
      */
-    protected $collGroupModules;
-    protected $collGroupModulesPartial;
+    protected $collAdminGroups;
+    protected $collAdminGroupsPartial;
 
     /**
      * @var        PropelObjectCollection|GroupResource[] Collection to store aggregation of GroupResource objects.
      */
     protected $collGroupResources;
     protected $collGroupResourcesPartial;
+
+    /**
+     * @var        PropelObjectCollection|GroupModule[] Collection to store aggregation of GroupModule objects.
+     */
+    protected $collGroupModules;
+    protected $collGroupModulesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,25 +121,25 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $adminGroupsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
     protected $groupDescsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $groupModulesScheduledForDeletion = null;
+    protected $adminGroupsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $groupResourcesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupModulesScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -429,13 +429,13 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collAdminGroups = null;
-
             $this->collGroupDescs = null;
 
-            $this->collGroupModules = null;
+            $this->collAdminGroups = null;
 
             $this->collGroupResources = null;
+
+            $this->collGroupModules = null;
 
         } // if (deep)
     }
@@ -509,8 +509,19 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(GroupPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(GroupPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(GroupPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -561,6 +572,23 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->groupDescsScheduledForDeletion !== null) {
+                if (!$this->groupDescsScheduledForDeletion->isEmpty()) {
+                    GroupDescQuery::create()
+                        ->filterByPrimaryKeys($this->groupDescsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->groupDescsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGroupDescs !== null) {
+                foreach ($this->collGroupDescs as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->adminGroupsScheduledForDeletion !== null) {
                 if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
                     foreach ($this->adminGroupsScheduledForDeletion as $adminGroup) {
@@ -579,17 +607,17 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->groupDescsScheduledForDeletion !== null) {
-                if (!$this->groupDescsScheduledForDeletion->isEmpty()) {
-                    GroupDescQuery::create()
-                        ->filterByPrimaryKeys($this->groupDescsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->groupResourcesScheduledForDeletion !== null) {
+                if (!$this->groupResourcesScheduledForDeletion->isEmpty()) {
+                    GroupResourceQuery::create()
+                        ->filterByPrimaryKeys($this->groupResourcesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->groupDescsScheduledForDeletion = null;
+                    $this->groupResourcesScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collGroupDescs !== null) {
-                foreach ($this->collGroupDescs as $referrerFK) {
+            if ($this->collGroupResources !== null) {
+                foreach ($this->collGroupResources as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -607,23 +635,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
             if ($this->collGroupModules !== null) {
                 foreach ($this->collGroupModules as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->groupResourcesScheduledForDeletion !== null) {
-                if (!$this->groupResourcesScheduledForDeletion->isEmpty()) {
-                    GroupResourceQuery::create()
-                        ->filterByPrimaryKeys($this->groupResourcesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->groupResourcesScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collGroupResources !== null) {
-                foreach ($this->collGroupResources as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -790,14 +801,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
             }
 
 
-                if ($this->collAdminGroups !== null) {
-                    foreach ($this->collAdminGroups as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collGroupDescs !== null) {
                     foreach ($this->collGroupDescs as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -806,8 +809,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collGroupModules !== null) {
-                    foreach ($this->collGroupModules as $referrerFK) {
+                if ($this->collAdminGroups !== null) {
+                    foreach ($this->collAdminGroups as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -816,6 +819,14 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
                 if ($this->collGroupResources !== null) {
                     foreach ($this->collGroupResources as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collGroupModules !== null) {
+                    foreach ($this->collGroupModules as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -904,17 +915,17 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collAdminGroups) {
-                $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collGroupDescs) {
                 $result['GroupDescs'] = $this->collGroupDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collGroupModules) {
-                $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collAdminGroups) {
+                $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collGroupResources) {
                 $result['GroupResources'] = $this->collGroupResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collGroupModules) {
+                $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1079,27 +1090,27 @@ abstract class BaseGroup extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getAdminGroups() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAdminGroup($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getGroupDescs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addGroupDesc($relObj->copy($deepCopy));
                 }
             }
 
-            foreach ($this->getGroupModules() as $relObj) {
+            foreach ($this->getAdminGroups() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGroupModule($relObj->copy($deepCopy));
+                    $copyObj->addAdminGroup($relObj->copy($deepCopy));
                 }
             }
 
             foreach ($this->getGroupResources() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addGroupResource($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getGroupModules() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGroupModule($relObj->copy($deepCopy));
                 }
             }
 
@@ -1164,17 +1175,224 @@ abstract class BaseGroup extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
+        if ('GroupDesc' == $relationName) {
+            $this->initGroupDescs();
+        }
         if ('AdminGroup' == $relationName) {
             $this->initAdminGroups();
         }
-        if ('GroupDesc' == $relationName) {
-            $this->initGroupDescs();
+        if ('GroupResource' == $relationName) {
+            $this->initGroupResources();
         }
         if ('GroupModule' == $relationName) {
             $this->initGroupModules();
         }
-        if ('GroupResource' == $relationName) {
-            $this->initGroupResources();
+    }
+
+    /**
+     * Clears out the collGroupDescs collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addGroupDescs()
+     */
+    public function clearGroupDescs()
+    {
+        $this->collGroupDescs = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupDescsPartial = null;
+    }
+
+    /**
+     * reset is the collGroupDescs collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGroupDescs($v = true)
+    {
+        $this->collGroupDescsPartial = $v;
+    }
+
+    /**
+     * Initializes the collGroupDescs collection.
+     *
+     * By default this just sets the collGroupDescs collection to an empty array (like clearcollGroupDescs());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGroupDescs($overrideExisting = true)
+    {
+        if (null !== $this->collGroupDescs && !$overrideExisting) {
+            return;
+        }
+        $this->collGroupDescs = new PropelObjectCollection();
+        $this->collGroupDescs->setModel('GroupDesc');
+    }
+
+    /**
+     * Gets an array of GroupDesc objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GroupDesc[] List of GroupDesc objects
+     * @throws PropelException
+     */
+    public function getGroupDescs($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupDescsPartial && !$this->isNew();
+        if (null === $this->collGroupDescs || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGroupDescs) {
+                // return empty collection
+                $this->initGroupDescs();
+            } else {
+                $collGroupDescs = GroupDescQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGroupDescsPartial && count($collGroupDescs)) {
+                      $this->initGroupDescs(false);
+
+                      foreach($collGroupDescs as $obj) {
+                        if (false == $this->collGroupDescs->contains($obj)) {
+                          $this->collGroupDescs->append($obj);
+                        }
+                      }
+
+                      $this->collGroupDescsPartial = true;
+                    }
+
+                    return $collGroupDescs;
+                }
+
+                if($partial && $this->collGroupDescs) {
+                    foreach($this->collGroupDescs as $obj) {
+                        if($obj->isNew()) {
+                            $collGroupDescs[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGroupDescs = $collGroupDescs;
+                $this->collGroupDescsPartial = false;
+            }
+        }
+
+        return $this->collGroupDescs;
+    }
+
+    /**
+     * Sets a collection of GroupDesc objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groupDescs A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setGroupDescs(PropelCollection $groupDescs, PropelPDO $con = null)
+    {
+        $this->groupDescsScheduledForDeletion = $this->getGroupDescs(new Criteria(), $con)->diff($groupDescs);
+
+        foreach ($this->groupDescsScheduledForDeletion as $groupDescRemoved) {
+            $groupDescRemoved->setGroup(null);
+        }
+
+        $this->collGroupDescs = null;
+        foreach ($groupDescs as $groupDesc) {
+            $this->addGroupDesc($groupDesc);
+        }
+
+        $this->collGroupDescs = $groupDescs;
+        $this->collGroupDescsPartial = false;
+    }
+
+    /**
+     * Returns the number of related GroupDesc objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GroupDesc objects.
+     * @throws PropelException
+     */
+    public function countGroupDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupDescsPartial && !$this->isNew();
+        if (null === $this->collGroupDescs || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGroupDescs) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getGroupDescs());
+                }
+                $query = GroupDescQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collGroupDescs);
+        }
+    }
+
+    /**
+     * Method called to associate a GroupDesc object to this object
+     * through the GroupDesc foreign key attribute.
+     *
+     * @param    GroupDesc $l GroupDesc
+     * @return Group The current object (for fluent API support)
+     */
+    public function addGroupDesc(GroupDesc $l)
+    {
+        if ($this->collGroupDescs === null) {
+            $this->initGroupDescs();
+            $this->collGroupDescsPartial = true;
+        }
+        if (!$this->collGroupDescs->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddGroupDesc($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	GroupDesc $groupDesc The groupDesc object to add.
+     */
+    protected function doAddGroupDesc($groupDesc)
+    {
+        $this->collGroupDescs[]= $groupDesc;
+        $groupDesc->setGroup($this);
+    }
+
+    /**
+     * @param	GroupDesc $groupDesc The groupDesc object to remove.
+     */
+    public function removeGroupDesc($groupDesc)
+    {
+        if ($this->getGroupDescs()->contains($groupDesc)) {
+            $this->collGroupDescs->remove($this->collGroupDescs->search($groupDesc));
+            if (null === $this->groupDescsScheduledForDeletion) {
+                $this->groupDescsScheduledForDeletion = clone $this->collGroupDescs;
+                $this->groupDescsScheduledForDeletion->clear();
+            }
+            $this->groupDescsScheduledForDeletion[]= $groupDesc;
+            $groupDesc->setGroup(null);
         }
     }
 
@@ -1411,34 +1629,34 @@ abstract class BaseGroup extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collGroupDescs collection
+     * Clears out the collGroupResources collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addGroupDescs()
+     * @see        addGroupResources()
      */
-    public function clearGroupDescs()
+    public function clearGroupResources()
     {
-        $this->collGroupDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collGroupDescsPartial = null;
+        $this->collGroupResources = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupResourcesPartial = null;
     }
 
     /**
-     * reset is the collGroupDescs collection loaded partially
+     * reset is the collGroupResources collection loaded partially
      *
      * @return void
      */
-    public function resetPartialGroupDescs($v = true)
+    public function resetPartialGroupResources($v = true)
     {
-        $this->collGroupDescsPartial = $v;
+        $this->collGroupResourcesPartial = $v;
     }
 
     /**
-     * Initializes the collGroupDescs collection.
+     * Initializes the collGroupResources collection.
      *
-     * By default this just sets the collGroupDescs collection to an empty array (like clearcollGroupDescs());
+     * By default this just sets the collGroupResources collection to an empty array (like clearcollGroupResources());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1447,17 +1665,17 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initGroupDescs($overrideExisting = true)
+    public function initGroupResources($overrideExisting = true)
     {
-        if (null !== $this->collGroupDescs && !$overrideExisting) {
+        if (null !== $this->collGroupResources && !$overrideExisting) {
             return;
         }
-        $this->collGroupDescs = new PropelObjectCollection();
-        $this->collGroupDescs->setModel('GroupDesc');
+        $this->collGroupResources = new PropelObjectCollection();
+        $this->collGroupResources->setModel('GroupResource');
     }
 
     /**
-     * Gets an array of GroupDesc objects which contain a foreign key that references this object.
+     * Gets an array of GroupResource objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1467,98 +1685,98 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|GroupDesc[] List of GroupDesc objects
+     * @return PropelObjectCollection|GroupResource[] List of GroupResource objects
      * @throws PropelException
      */
-    public function getGroupDescs($criteria = null, PropelPDO $con = null)
+    public function getGroupResources($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collGroupDescsPartial && !$this->isNew();
-        if (null === $this->collGroupDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupDescs) {
+        $partial = $this->collGroupResourcesPartial && !$this->isNew();
+        if (null === $this->collGroupResources || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGroupResources) {
                 // return empty collection
-                $this->initGroupDescs();
+                $this->initGroupResources();
             } else {
-                $collGroupDescs = GroupDescQuery::create(null, $criteria)
+                $collGroupResources = GroupResourceQuery::create(null, $criteria)
                     ->filterByGroup($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collGroupDescsPartial && count($collGroupDescs)) {
-                      $this->initGroupDescs(false);
+                    if (false !== $this->collGroupResourcesPartial && count($collGroupResources)) {
+                      $this->initGroupResources(false);
 
-                      foreach($collGroupDescs as $obj) {
-                        if (false == $this->collGroupDescs->contains($obj)) {
-                          $this->collGroupDescs->append($obj);
+                      foreach($collGroupResources as $obj) {
+                        if (false == $this->collGroupResources->contains($obj)) {
+                          $this->collGroupResources->append($obj);
                         }
                       }
 
-                      $this->collGroupDescsPartial = true;
+                      $this->collGroupResourcesPartial = true;
                     }
 
-                    return $collGroupDescs;
+                    return $collGroupResources;
                 }
 
-                if($partial && $this->collGroupDescs) {
-                    foreach($this->collGroupDescs as $obj) {
+                if($partial && $this->collGroupResources) {
+                    foreach($this->collGroupResources as $obj) {
                         if($obj->isNew()) {
-                            $collGroupDescs[] = $obj;
+                            $collGroupResources[] = $obj;
                         }
                     }
                 }
 
-                $this->collGroupDescs = $collGroupDescs;
-                $this->collGroupDescsPartial = false;
+                $this->collGroupResources = $collGroupResources;
+                $this->collGroupResourcesPartial = false;
             }
         }
 
-        return $this->collGroupDescs;
+        return $this->collGroupResources;
     }
 
     /**
-     * Sets a collection of GroupDesc objects related by a one-to-many relationship
+     * Sets a collection of GroupResource objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $groupDescs A Propel collection.
+     * @param PropelCollection $groupResources A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setGroupDescs(PropelCollection $groupDescs, PropelPDO $con = null)
+    public function setGroupResources(PropelCollection $groupResources, PropelPDO $con = null)
     {
-        $this->groupDescsScheduledForDeletion = $this->getGroupDescs(new Criteria(), $con)->diff($groupDescs);
+        $this->groupResourcesScheduledForDeletion = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
 
-        foreach ($this->groupDescsScheduledForDeletion as $groupDescRemoved) {
-            $groupDescRemoved->setGroup(null);
+        foreach ($this->groupResourcesScheduledForDeletion as $groupResourceRemoved) {
+            $groupResourceRemoved->setGroup(null);
         }
 
-        $this->collGroupDescs = null;
-        foreach ($groupDescs as $groupDesc) {
-            $this->addGroupDesc($groupDesc);
+        $this->collGroupResources = null;
+        foreach ($groupResources as $groupResource) {
+            $this->addGroupResource($groupResource);
         }
 
-        $this->collGroupDescs = $groupDescs;
-        $this->collGroupDescsPartial = false;
+        $this->collGroupResources = $groupResources;
+        $this->collGroupResourcesPartial = false;
     }
 
     /**
-     * Returns the number of related GroupDesc objects.
+     * Returns the number of related GroupResource objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related GroupDesc objects.
+     * @return int             Count of related GroupResource objects.
      * @throws PropelException
      */
-    public function countGroupDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countGroupResources(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collGroupDescsPartial && !$this->isNew();
-        if (null === $this->collGroupDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupDescs) {
+        $partial = $this->collGroupResourcesPartial && !$this->isNew();
+        if (null === $this->collGroupResources || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGroupResources) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getGroupDescs());
+                    return count($this->getGroupResources());
                 }
-                $query = GroupDescQuery::create(null, $criteria);
+                $query = GroupResourceQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1568,53 +1786,78 @@ abstract class BaseGroup extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collGroupDescs);
+            return count($this->collGroupResources);
         }
     }
 
     /**
-     * Method called to associate a GroupDesc object to this object
-     * through the GroupDesc foreign key attribute.
+     * Method called to associate a GroupResource object to this object
+     * through the GroupResource foreign key attribute.
      *
-     * @param    GroupDesc $l GroupDesc
+     * @param    GroupResource $l GroupResource
      * @return Group The current object (for fluent API support)
      */
-    public function addGroupDesc(GroupDesc $l)
+    public function addGroupResource(GroupResource $l)
     {
-        if ($this->collGroupDescs === null) {
-            $this->initGroupDescs();
-            $this->collGroupDescsPartial = true;
+        if ($this->collGroupResources === null) {
+            $this->initGroupResources();
+            $this->collGroupResourcesPartial = true;
         }
-        if (!$this->collGroupDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupDesc($l);
+        if (!$this->collGroupResources->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddGroupResource($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	GroupDesc $groupDesc The groupDesc object to add.
+     * @param	GroupResource $groupResource The groupResource object to add.
      */
-    protected function doAddGroupDesc($groupDesc)
+    protected function doAddGroupResource($groupResource)
     {
-        $this->collGroupDescs[]= $groupDesc;
-        $groupDesc->setGroup($this);
+        $this->collGroupResources[]= $groupResource;
+        $groupResource->setGroup($this);
     }
 
     /**
-     * @param	GroupDesc $groupDesc The groupDesc object to remove.
+     * @param	GroupResource $groupResource The groupResource object to remove.
      */
-    public function removeGroupDesc($groupDesc)
+    public function removeGroupResource($groupResource)
     {
-        if ($this->getGroupDescs()->contains($groupDesc)) {
-            $this->collGroupDescs->remove($this->collGroupDescs->search($groupDesc));
-            if (null === $this->groupDescsScheduledForDeletion) {
-                $this->groupDescsScheduledForDeletion = clone $this->collGroupDescs;
-                $this->groupDescsScheduledForDeletion->clear();
+        if ($this->getGroupResources()->contains($groupResource)) {
+            $this->collGroupResources->remove($this->collGroupResources->search($groupResource));
+            if (null === $this->groupResourcesScheduledForDeletion) {
+                $this->groupResourcesScheduledForDeletion = clone $this->collGroupResources;
+                $this->groupResourcesScheduledForDeletion->clear();
             }
-            $this->groupDescsScheduledForDeletion[]= $groupDesc;
-            $groupDesc->setGroup(null);
+            $this->groupResourcesScheduledForDeletion[]= $groupResource;
+            $groupResource->setGroup(null);
         }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Group is new, it will return
+     * an empty collection; or if this Group has previously
+     * been saved, it will retrieve related GroupResources from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Group.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|GroupResource[] List of GroupResource objects
+     */
+    public function getGroupResourcesJoinResource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = GroupResourceQuery::create(null, $criteria);
+        $query->joinWith('Resource', $join_behavior);
+
+        return $this->getGroupResources($query, $con);
     }
 
     /**
@@ -1850,238 +2093,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collGroupResources collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addGroupResources()
-     */
-    public function clearGroupResources()
-    {
-        $this->collGroupResources = null; // important to set this to null since that means it is uninitialized
-        $this->collGroupResourcesPartial = null;
-    }
-
-    /**
-     * reset is the collGroupResources collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialGroupResources($v = true)
-    {
-        $this->collGroupResourcesPartial = $v;
-    }
-
-    /**
-     * Initializes the collGroupResources collection.
-     *
-     * By default this just sets the collGroupResources collection to an empty array (like clearcollGroupResources());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initGroupResources($overrideExisting = true)
-    {
-        if (null !== $this->collGroupResources && !$overrideExisting) {
-            return;
-        }
-        $this->collGroupResources = new PropelObjectCollection();
-        $this->collGroupResources->setModel('GroupResource');
-    }
-
-    /**
-     * Gets an array of GroupResource objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Group is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|GroupResource[] List of GroupResource objects
-     * @throws PropelException
-     */
-    public function getGroupResources($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collGroupResourcesPartial && !$this->isNew();
-        if (null === $this->collGroupResources || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupResources) {
-                // return empty collection
-                $this->initGroupResources();
-            } else {
-                $collGroupResources = GroupResourceQuery::create(null, $criteria)
-                    ->filterByGroup($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collGroupResourcesPartial && count($collGroupResources)) {
-                      $this->initGroupResources(false);
-
-                      foreach($collGroupResources as $obj) {
-                        if (false == $this->collGroupResources->contains($obj)) {
-                          $this->collGroupResources->append($obj);
-                        }
-                      }
-
-                      $this->collGroupResourcesPartial = true;
-                    }
-
-                    return $collGroupResources;
-                }
-
-                if($partial && $this->collGroupResources) {
-                    foreach($this->collGroupResources as $obj) {
-                        if($obj->isNew()) {
-                            $collGroupResources[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collGroupResources = $collGroupResources;
-                $this->collGroupResourcesPartial = false;
-            }
-        }
-
-        return $this->collGroupResources;
-    }
-
-    /**
-     * Sets a collection of GroupResource objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $groupResources A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setGroupResources(PropelCollection $groupResources, PropelPDO $con = null)
-    {
-        $this->groupResourcesScheduledForDeletion = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
-
-        foreach ($this->groupResourcesScheduledForDeletion as $groupResourceRemoved) {
-            $groupResourceRemoved->setGroup(null);
-        }
-
-        $this->collGroupResources = null;
-        foreach ($groupResources as $groupResource) {
-            $this->addGroupResource($groupResource);
-        }
-
-        $this->collGroupResources = $groupResources;
-        $this->collGroupResourcesPartial = false;
-    }
-
-    /**
-     * Returns the number of related GroupResource objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related GroupResource objects.
-     * @throws PropelException
-     */
-    public function countGroupResources(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collGroupResourcesPartial && !$this->isNew();
-        if (null === $this->collGroupResources || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupResources) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGroupResources());
-                }
-                $query = GroupResourceQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGroup($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collGroupResources);
-        }
-    }
-
-    /**
-     * Method called to associate a GroupResource object to this object
-     * through the GroupResource foreign key attribute.
-     *
-     * @param    GroupResource $l GroupResource
-     * @return Group The current object (for fluent API support)
-     */
-    public function addGroupResource(GroupResource $l)
-    {
-        if ($this->collGroupResources === null) {
-            $this->initGroupResources();
-            $this->collGroupResourcesPartial = true;
-        }
-        if (!$this->collGroupResources->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupResource($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	GroupResource $groupResource The groupResource object to add.
-     */
-    protected function doAddGroupResource($groupResource)
-    {
-        $this->collGroupResources[]= $groupResource;
-        $groupResource->setGroup($this);
-    }
-
-    /**
-     * @param	GroupResource $groupResource The groupResource object to remove.
-     */
-    public function removeGroupResource($groupResource)
-    {
-        if ($this->getGroupResources()->contains($groupResource)) {
-            $this->collGroupResources->remove($this->collGroupResources->search($groupResource));
-            if (null === $this->groupResourcesScheduledForDeletion) {
-                $this->groupResourcesScheduledForDeletion = clone $this->collGroupResources;
-                $this->groupResourcesScheduledForDeletion->clear();
-            }
-            $this->groupResourcesScheduledForDeletion[]= $groupResource;
-            $groupResource->setGroup(null);
-        }
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Group is new, it will return
-     * an empty collection; or if this Group has previously
-     * been saved, it will retrieve related GroupResources from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Group.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|GroupResource[] List of GroupResource objects
-     */
-    public function getGroupResourcesJoinResource($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = GroupResourceQuery::create(null, $criteria);
-        $query->joinWith('Resource', $join_behavior);
-
-        return $this->getGroupResources($query, $con);
-    }
-
-    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2110,18 +2121,13 @@ abstract class BaseGroup extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAdminGroups) {
-                foreach ($this->collAdminGroups as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collGroupDescs) {
                 foreach ($this->collGroupDescs as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collGroupModules) {
-                foreach ($this->collGroupModules as $o) {
+            if ($this->collAdminGroups) {
+                foreach ($this->collAdminGroups as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2130,24 +2136,29 @@ abstract class BaseGroup extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collGroupModules) {
+                foreach ($this->collGroupModules as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collAdminGroups instanceof PropelCollection) {
-            $this->collAdminGroups->clearIterator();
-        }
-        $this->collAdminGroups = null;
         if ($this->collGroupDescs instanceof PropelCollection) {
             $this->collGroupDescs->clearIterator();
         }
         $this->collGroupDescs = null;
-        if ($this->collGroupModules instanceof PropelCollection) {
-            $this->collGroupModules->clearIterator();
+        if ($this->collAdminGroups instanceof PropelCollection) {
+            $this->collAdminGroups->clearIterator();
         }
-        $this->collGroupModules = null;
+        $this->collAdminGroups = null;
         if ($this->collGroupResources instanceof PropelCollection) {
             $this->collGroupResources->clearIterator();
         }
         $this->collGroupResources = null;
+        if ($this->collGroupModules instanceof PropelCollection) {
+            $this->collGroupModules->clearIterator();
+        }
+        $this->collGroupModules = null;
     }
 
     /**
@@ -2168,6 +2179,20 @@ abstract class BaseGroup extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Group The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = GroupPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

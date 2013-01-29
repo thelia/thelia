@@ -492,8 +492,19 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(FeatureAvPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(FeatureAvPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(FeatureAvPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -1596,10 +1607,10 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
      */
-    public function getFeatureProdsJoinFeature($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getFeatureProdsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = FeatureProdQuery::create(null, $criteria);
-        $query->joinWith('Feature', $join_behavior);
+        $query->joinWith('Product', $join_behavior);
 
         return $this->getFeatureProds($query, $con);
     }
@@ -1621,10 +1632,10 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return PropelObjectCollection|FeatureProd[] List of FeatureProd objects
      */
-    public function getFeatureProdsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public function getFeatureProdsJoinFeature($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $query = FeatureProdQuery::create(null, $criteria);
-        $query->joinWith('Product', $join_behavior);
+        $query->joinWith('Feature', $join_behavior);
 
         return $this->getFeatureProds($query, $con);
     }
@@ -1699,6 +1710,20 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     FeatureAv The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = FeatureAvPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

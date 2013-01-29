@@ -64,8 +64,21 @@ class OrderAddressTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('OrderRelatedByAddressInvoice', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_invoice', ), 'SET NULL', null, 'OrdersRelatedByAddressInvoice');
-        $this->addRelation('OrderRelatedByAddressDelivery', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_delivery', ), 'SET NULL', null, 'OrdersRelatedByAddressDelivery');
+        $this->addRelation('OrderRelatedByAddressInvoice', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_invoice', ), 'SET NULL', 'RESTRICT', 'OrdersRelatedByAddressInvoice');
+        $this->addRelation('OrderRelatedByAddressDelivery', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'address_delivery', ), 'SET NULL', 'RESTRICT', 'OrdersRelatedByAddressDelivery');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // OrderAddressTableMap

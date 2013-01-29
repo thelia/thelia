@@ -28,6 +28,8 @@ use Thelia\Model\FeatureAvDescQuery;
  * @method FeatureAvDescQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method FeatureAvDescQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method FeatureAvDescQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
+ * @method FeatureAvDescQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method FeatureAvDescQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method FeatureAvDescQuery groupById() Group by the id column
  * @method FeatureAvDescQuery groupByFeatureAvId() Group by the feature_av_id column
@@ -35,6 +37,8 @@ use Thelia\Model\FeatureAvDescQuery;
  * @method FeatureAvDescQuery groupByTitle() Group by the title column
  * @method FeatureAvDescQuery groupByDescription() Group by the description column
  * @method FeatureAvDescQuery groupByChapo() Group by the chapo column
+ * @method FeatureAvDescQuery groupByCreatedAt() Group by the created_at column
+ * @method FeatureAvDescQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method FeatureAvDescQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method FeatureAvDescQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -53,6 +57,8 @@ use Thelia\Model\FeatureAvDescQuery;
  * @method FeatureAvDesc findOneByTitle(string $title) Return the first FeatureAvDesc filtered by the title column
  * @method FeatureAvDesc findOneByDescription(string $description) Return the first FeatureAvDesc filtered by the description column
  * @method FeatureAvDesc findOneByChapo(string $chapo) Return the first FeatureAvDesc filtered by the chapo column
+ * @method FeatureAvDesc findOneByCreatedAt(string $created_at) Return the first FeatureAvDesc filtered by the created_at column
+ * @method FeatureAvDesc findOneByUpdatedAt(string $updated_at) Return the first FeatureAvDesc filtered by the updated_at column
  *
  * @method array findById(int $id) Return FeatureAvDesc objects filtered by the id column
  * @method array findByFeatureAvId(int $feature_av_id) Return FeatureAvDesc objects filtered by the feature_av_id column
@@ -60,6 +66,8 @@ use Thelia\Model\FeatureAvDescQuery;
  * @method array findByTitle(string $title) Return FeatureAvDesc objects filtered by the title column
  * @method array findByDescription(string $description) Return FeatureAvDesc objects filtered by the description column
  * @method array findByChapo(string $chapo) Return FeatureAvDesc objects filtered by the chapo column
+ * @method array findByCreatedAt(string $created_at) Return FeatureAvDesc objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return FeatureAvDesc objects filtered by the updated_at column
  *
  * @package    propel.generator.Thelia.Model.om
  */
@@ -149,7 +157,7 @@ abstract class BaseFeatureAvDescQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `FEATURE_AV_ID`, `LANG`, `TITLE`, `DESCRIPTION`, `CHAPO` FROM `feature_av_desc` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `FEATURE_AV_ID`, `LANG`, `TITLE`, `DESCRIPTION`, `CHAPO`, `CREATED_AT`, `UPDATED_AT` FROM `feature_av_desc` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -425,6 +433,92 @@ abstract class BaseFeatureAvDescQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(FeatureAvDescPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(FeatureAvDescPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(FeatureAvDescPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(FeatureAvDescPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(FeatureAvDescPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(FeatureAvDescPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
      * Filter the query by a related FeatureAv object
      *
      * @param   FeatureAv|PropelObjectCollection $featureAv The related object(s) to use as filter
@@ -516,4 +610,69 @@ abstract class BaseFeatureAvDescQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FeatureAvDescPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FeatureAvDescPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FeatureAvDescPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FeatureAvDescPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FeatureAvDescPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     FeatureAvDescQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FeatureAvDescPeer::CREATED_AT);
+    }
 }

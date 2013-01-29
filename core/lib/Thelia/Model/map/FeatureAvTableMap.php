@@ -44,8 +44,8 @@ class FeatureAvTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('FEATURE_ID', 'FeatureId', 'INTEGER', 'feature', 'ID', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -54,9 +54,22 @@ class FeatureAvTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::MANY_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', null);
-        $this->addRelation('FeatureAvDesc', 'Thelia\\Model\\FeatureAvDesc', RelationMap::ONE_TO_MANY, array('id' => 'feature_av_id', ), 'CASCADE', null, 'FeatureAvDescs');
-        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::ONE_TO_MANY, array('id' => 'feature_av_id', ), 'CASCADE', null, 'FeatureProds');
+        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::MANY_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('FeatureAvDesc', 'Thelia\\Model\\FeatureAvDesc', RelationMap::ONE_TO_MANY, array('id' => 'feature_av_id', ), 'CASCADE', 'RESTRICT', 'FeatureAvDescs');
+        $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::ONE_TO_MANY, array('id' => 'feature_av_id', ), 'CASCADE', 'RESTRICT', 'FeatureProds');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // FeatureAvTableMap

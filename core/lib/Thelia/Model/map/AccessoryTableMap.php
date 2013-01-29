@@ -46,8 +46,8 @@ class AccessoryTableMap extends TableMap
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addForeignKey('ACCESSORY', 'Accessory', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -56,8 +56,21 @@ class AccessoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ProductRelatedByProductId', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', null);
-        $this->addRelation('ProductRelatedByAccessory', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('accessory' => 'id', ), 'CASCADE', null);
+        $this->addRelation('ProductRelatedByProductId', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ProductRelatedByAccessory', 'Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('accessory' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // AccessoryTableMap

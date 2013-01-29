@@ -100,18 +100,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|ContentFolder[] Collection to store aggregation of ContentFolder objects.
-     */
-    protected $collContentFolders;
-    protected $collContentFoldersPartial;
-
-    /**
-     * @var        PropelObjectCollection|Document[] Collection to store aggregation of Document objects.
-     */
-    protected $collDocuments;
-    protected $collDocumentsPartial;
-
-    /**
      * @var        PropelObjectCollection|FolderDesc[] Collection to store aggregation of FolderDesc objects.
      */
     protected $collFolderDescs;
@@ -124,10 +112,22 @@ abstract class BaseFolder extends BaseObject implements Persistent
     protected $collImagesPartial;
 
     /**
+     * @var        PropelObjectCollection|Document[] Collection to store aggregation of Document objects.
+     */
+    protected $collDocuments;
+    protected $collDocumentsPartial;
+
+    /**
      * @var        PropelObjectCollection|Rewriting[] Collection to store aggregation of Rewriting objects.
      */
     protected $collRewritings;
     protected $collRewritingsPartial;
+
+    /**
+     * @var        PropelObjectCollection|ContentFolder[] Collection to store aggregation of ContentFolder objects.
+     */
+    protected $collContentFolders;
+    protected $collContentFoldersPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -147,18 +147,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $contentFoldersScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
-    protected $documentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
-     */
     protected $folderDescsScheduledForDeletion = null;
 
     /**
@@ -171,7 +159,19 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
+    protected $documentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
     protected $rewritingsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $contentFoldersScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -557,15 +557,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collContentFolders = null;
-
-            $this->collDocuments = null;
-
             $this->collFolderDescs = null;
 
             $this->collImages = null;
 
+            $this->collDocuments = null;
+
             $this->collRewritings = null;
+
+            $this->collContentFolders = null;
 
         } // if (deep)
     }
@@ -639,8 +639,19 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(FolderPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(FolderPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(FolderPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -691,41 +702,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->contentFoldersScheduledForDeletion !== null) {
-                if (!$this->contentFoldersScheduledForDeletion->isEmpty()) {
-                    ContentFolderQuery::create()
-                        ->filterByPrimaryKeys($this->contentFoldersScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentFoldersScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collContentFolders !== null) {
-                foreach ($this->collContentFolders as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->documentsScheduledForDeletion !== null) {
-                if (!$this->documentsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->documentsScheduledForDeletion as $document) {
-                        // need to save related object because we set the relation to null
-                        $document->save($con);
-                    }
-                    $this->documentsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collDocuments !== null) {
-                foreach ($this->collDocuments as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->folderDescsScheduledForDeletion !== null) {
                 if (!$this->folderDescsScheduledForDeletion->isEmpty()) {
                     FolderDescQuery::create()
@@ -761,6 +737,24 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->documentsScheduledForDeletion !== null) {
+                if (!$this->documentsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->documentsScheduledForDeletion as $document) {
+                        // need to save related object because we set the relation to null
+                        $document->save($con);
+                    }
+                    $this->documentsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collDocuments !== null) {
+                foreach ($this->collDocuments as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             if ($this->rewritingsScheduledForDeletion !== null) {
                 if (!$this->rewritingsScheduledForDeletion->isEmpty()) {
                     foreach ($this->rewritingsScheduledForDeletion as $rewriting) {
@@ -773,6 +767,23 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collRewritings !== null) {
                 foreach ($this->collRewritings as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->contentFoldersScheduledForDeletion !== null) {
+                if (!$this->contentFoldersScheduledForDeletion->isEmpty()) {
+                    ContentFolderQuery::create()
+                        ->filterByPrimaryKeys($this->contentFoldersScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->contentFoldersScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collContentFolders !== null) {
+                foreach ($this->collContentFolders as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -957,22 +968,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
             }
 
 
-                if ($this->collContentFolders !== null) {
-                    foreach ($this->collContentFolders as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
-                if ($this->collDocuments !== null) {
-                    foreach ($this->collDocuments as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collFolderDescs !== null) {
                     foreach ($this->collFolderDescs as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -989,8 +984,24 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collDocuments !== null) {
+                    foreach ($this->collDocuments as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
                 if ($this->collRewritings !== null) {
                     foreach ($this->collRewritings as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collContentFolders !== null) {
+                    foreach ($this->collContentFolders as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1091,20 +1102,20 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collContentFolders) {
-                $result['ContentFolders'] = $this->collContentFolders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collDocuments) {
-                $result['Documents'] = $this->collDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collFolderDescs) {
                 $result['FolderDescs'] = $this->collFolderDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collImages) {
                 $result['Images'] = $this->collImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collDocuments) {
+                $result['Documents'] = $this->collDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collRewritings) {
                 $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collContentFolders) {
+                $result['ContentFolders'] = $this->collContentFolders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1287,18 +1298,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getContentFolders() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addContentFolder($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getDocuments() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addDocument($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getFolderDescs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addFolderDesc($relObj->copy($deepCopy));
@@ -1311,9 +1310,21 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 }
             }
 
+            foreach ($this->getDocuments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addDocument($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getRewritings() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addRewriting($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getContentFolders() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addContentFolder($relObj->copy($deepCopy));
                 }
             }
 
@@ -1378,535 +1389,21 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('ContentFolder' == $relationName) {
-            $this->initContentFolders();
-        }
-        if ('Document' == $relationName) {
-            $this->initDocuments();
-        }
         if ('FolderDesc' == $relationName) {
             $this->initFolderDescs();
         }
         if ('Image' == $relationName) {
             $this->initImages();
         }
+        if ('Document' == $relationName) {
+            $this->initDocuments();
+        }
         if ('Rewriting' == $relationName) {
             $this->initRewritings();
         }
-    }
-
-    /**
-     * Clears out the collContentFolders collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addContentFolders()
-     */
-    public function clearContentFolders()
-    {
-        $this->collContentFolders = null; // important to set this to null since that means it is uninitialized
-        $this->collContentFoldersPartial = null;
-    }
-
-    /**
-     * reset is the collContentFolders collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialContentFolders($v = true)
-    {
-        $this->collContentFoldersPartial = $v;
-    }
-
-    /**
-     * Initializes the collContentFolders collection.
-     *
-     * By default this just sets the collContentFolders collection to an empty array (like clearcollContentFolders());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initContentFolders($overrideExisting = true)
-    {
-        if (null !== $this->collContentFolders && !$overrideExisting) {
-            return;
-        }
-        $this->collContentFolders = new PropelObjectCollection();
-        $this->collContentFolders->setModel('ContentFolder');
-    }
-
-    /**
-     * Gets an array of ContentFolder objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Folder is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ContentFolder[] List of ContentFolder objects
-     * @throws PropelException
-     */
-    public function getContentFolders($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collContentFoldersPartial && !$this->isNew();
-        if (null === $this->collContentFolders || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collContentFolders) {
-                // return empty collection
-                $this->initContentFolders();
-            } else {
-                $collContentFolders = ContentFolderQuery::create(null, $criteria)
-                    ->filterByFolder($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collContentFoldersPartial && count($collContentFolders)) {
-                      $this->initContentFolders(false);
-
-                      foreach($collContentFolders as $obj) {
-                        if (false == $this->collContentFolders->contains($obj)) {
-                          $this->collContentFolders->append($obj);
-                        }
-                      }
-
-                      $this->collContentFoldersPartial = true;
-                    }
-
-                    return $collContentFolders;
-                }
-
-                if($partial && $this->collContentFolders) {
-                    foreach($this->collContentFolders as $obj) {
-                        if($obj->isNew()) {
-                            $collContentFolders[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collContentFolders = $collContentFolders;
-                $this->collContentFoldersPartial = false;
-            }
-        }
-
-        return $this->collContentFolders;
-    }
-
-    /**
-     * Sets a collection of ContentFolder objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $contentFolders A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setContentFolders(PropelCollection $contentFolders, PropelPDO $con = null)
-    {
-        $this->contentFoldersScheduledForDeletion = $this->getContentFolders(new Criteria(), $con)->diff($contentFolders);
-
-        foreach ($this->contentFoldersScheduledForDeletion as $contentFolderRemoved) {
-            $contentFolderRemoved->setFolder(null);
-        }
-
-        $this->collContentFolders = null;
-        foreach ($contentFolders as $contentFolder) {
-            $this->addContentFolder($contentFolder);
-        }
-
-        $this->collContentFolders = $contentFolders;
-        $this->collContentFoldersPartial = false;
-    }
-
-    /**
-     * Returns the number of related ContentFolder objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related ContentFolder objects.
-     * @throws PropelException
-     */
-    public function countContentFolders(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collContentFoldersPartial && !$this->isNew();
-        if (null === $this->collContentFolders || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collContentFolders) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getContentFolders());
-                }
-                $query = ContentFolderQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collContentFolders);
-        }
-    }
-
-    /**
-     * Method called to associate a ContentFolder object to this object
-     * through the ContentFolder foreign key attribute.
-     *
-     * @param    ContentFolder $l ContentFolder
-     * @return Folder The current object (for fluent API support)
-     */
-    public function addContentFolder(ContentFolder $l)
-    {
-        if ($this->collContentFolders === null) {
+        if ('ContentFolder' == $relationName) {
             $this->initContentFolders();
-            $this->collContentFoldersPartial = true;
         }
-        if (!$this->collContentFolders->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddContentFolder($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	ContentFolder $contentFolder The contentFolder object to add.
-     */
-    protected function doAddContentFolder($contentFolder)
-    {
-        $this->collContentFolders[]= $contentFolder;
-        $contentFolder->setFolder($this);
-    }
-
-    /**
-     * @param	ContentFolder $contentFolder The contentFolder object to remove.
-     */
-    public function removeContentFolder($contentFolder)
-    {
-        if ($this->getContentFolders()->contains($contentFolder)) {
-            $this->collContentFolders->remove($this->collContentFolders->search($contentFolder));
-            if (null === $this->contentFoldersScheduledForDeletion) {
-                $this->contentFoldersScheduledForDeletion = clone $this->collContentFolders;
-                $this->contentFoldersScheduledForDeletion->clear();
-            }
-            $this->contentFoldersScheduledForDeletion[]= $contentFolder;
-            $contentFolder->setFolder(null);
-        }
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related ContentFolders from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|ContentFolder[] List of ContentFolder objects
-     */
-    public function getContentFoldersJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = ContentFolderQuery::create(null, $criteria);
-        $query->joinWith('Content', $join_behavior);
-
-        return $this->getContentFolders($query, $con);
-    }
-
-    /**
-     * Clears out the collDocuments collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addDocuments()
-     */
-    public function clearDocuments()
-    {
-        $this->collDocuments = null; // important to set this to null since that means it is uninitialized
-        $this->collDocumentsPartial = null;
-    }
-
-    /**
-     * reset is the collDocuments collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialDocuments($v = true)
-    {
-        $this->collDocumentsPartial = $v;
-    }
-
-    /**
-     * Initializes the collDocuments collection.
-     *
-     * By default this just sets the collDocuments collection to an empty array (like clearcollDocuments());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initDocuments($overrideExisting = true)
-    {
-        if (null !== $this->collDocuments && !$overrideExisting) {
-            return;
-        }
-        $this->collDocuments = new PropelObjectCollection();
-        $this->collDocuments->setModel('Document');
-    }
-
-    /**
-     * Gets an array of Document objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Folder is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|Document[] List of Document objects
-     * @throws PropelException
-     */
-    public function getDocuments($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                // return empty collection
-                $this->initDocuments();
-            } else {
-                $collDocuments = DocumentQuery::create(null, $criteria)
-                    ->filterByFolder($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collDocumentsPartial && count($collDocuments)) {
-                      $this->initDocuments(false);
-
-                      foreach($collDocuments as $obj) {
-                        if (false == $this->collDocuments->contains($obj)) {
-                          $this->collDocuments->append($obj);
-                        }
-                      }
-
-                      $this->collDocumentsPartial = true;
-                    }
-
-                    return $collDocuments;
-                }
-
-                if($partial && $this->collDocuments) {
-                    foreach($this->collDocuments as $obj) {
-                        if($obj->isNew()) {
-                            $collDocuments[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collDocuments = $collDocuments;
-                $this->collDocumentsPartial = false;
-            }
-        }
-
-        return $this->collDocuments;
-    }
-
-    /**
-     * Sets a collection of Document objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $documents A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setDocuments(PropelCollection $documents, PropelPDO $con = null)
-    {
-        $this->documentsScheduledForDeletion = $this->getDocuments(new Criteria(), $con)->diff($documents);
-
-        foreach ($this->documentsScheduledForDeletion as $documentRemoved) {
-            $documentRemoved->setFolder(null);
-        }
-
-        $this->collDocuments = null;
-        foreach ($documents as $document) {
-            $this->addDocument($document);
-        }
-
-        $this->collDocuments = $documents;
-        $this->collDocumentsPartial = false;
-    }
-
-    /**
-     * Returns the number of related Document objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related Document objects.
-     * @throws PropelException
-     */
-    public function countDocuments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getDocuments());
-                }
-                $query = DocumentQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collDocuments);
-        }
-    }
-
-    /**
-     * Method called to associate a Document object to this object
-     * through the Document foreign key attribute.
-     *
-     * @param    Document $l Document
-     * @return Folder The current object (for fluent API support)
-     */
-    public function addDocument(Document $l)
-    {
-        if ($this->collDocuments === null) {
-            $this->initDocuments();
-            $this->collDocumentsPartial = true;
-        }
-        if (!$this->collDocuments->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddDocument($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	Document $document The document object to add.
-     */
-    protected function doAddDocument($document)
-    {
-        $this->collDocuments[]= $document;
-        $document->setFolder($this);
-    }
-
-    /**
-     * @param	Document $document The document object to remove.
-     */
-    public function removeDocument($document)
-    {
-        if ($this->getDocuments()->contains($document)) {
-            $this->collDocuments->remove($this->collDocuments->search($document));
-            if (null === $this->documentsScheduledForDeletion) {
-                $this->documentsScheduledForDeletion = clone $this->collDocuments;
-                $this->documentsScheduledForDeletion->clear();
-            }
-            $this->documentsScheduledForDeletion[]= $document;
-            $document->setFolder(null);
-        }
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Document[] List of Document objects
-     */
-    public function getDocumentsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = DocumentQuery::create(null, $criteria);
-        $query->joinWith('Product', $join_behavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Document[] List of Document objects
-     */
-    public function getDocumentsJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = DocumentQuery::create(null, $criteria);
-        $query->joinWith('Category', $join_behavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return PropelObjectCollection|Document[] List of Document objects
-     */
-    public function getDocumentsJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
-    {
-        $query = DocumentQuery::create(null, $criteria);
-        $query->joinWith('Content', $join_behavior);
-
-        return $this->getDocuments($query, $con);
     }
 
     /**
@@ -2399,6 +1896,288 @@ abstract class BaseFolder extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collDocuments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addDocuments()
+     */
+    public function clearDocuments()
+    {
+        $this->collDocuments = null; // important to set this to null since that means it is uninitialized
+        $this->collDocumentsPartial = null;
+    }
+
+    /**
+     * reset is the collDocuments collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialDocuments($v = true)
+    {
+        $this->collDocumentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collDocuments collection.
+     *
+     * By default this just sets the collDocuments collection to an empty array (like clearcollDocuments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initDocuments($overrideExisting = true)
+    {
+        if (null !== $this->collDocuments && !$overrideExisting) {
+            return;
+        }
+        $this->collDocuments = new PropelObjectCollection();
+        $this->collDocuments->setModel('Document');
+    }
+
+    /**
+     * Gets an array of Document objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Folder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|Document[] List of Document objects
+     * @throws PropelException
+     */
+    public function getDocuments($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collDocumentsPartial && !$this->isNew();
+        if (null === $this->collDocuments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDocuments) {
+                // return empty collection
+                $this->initDocuments();
+            } else {
+                $collDocuments = DocumentQuery::create(null, $criteria)
+                    ->filterByFolder($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collDocumentsPartial && count($collDocuments)) {
+                      $this->initDocuments(false);
+
+                      foreach($collDocuments as $obj) {
+                        if (false == $this->collDocuments->contains($obj)) {
+                          $this->collDocuments->append($obj);
+                        }
+                      }
+
+                      $this->collDocumentsPartial = true;
+                    }
+
+                    return $collDocuments;
+                }
+
+                if($partial && $this->collDocuments) {
+                    foreach($this->collDocuments as $obj) {
+                        if($obj->isNew()) {
+                            $collDocuments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collDocuments = $collDocuments;
+                $this->collDocumentsPartial = false;
+            }
+        }
+
+        return $this->collDocuments;
+    }
+
+    /**
+     * Sets a collection of Document objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $documents A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setDocuments(PropelCollection $documents, PropelPDO $con = null)
+    {
+        $this->documentsScheduledForDeletion = $this->getDocuments(new Criteria(), $con)->diff($documents);
+
+        foreach ($this->documentsScheduledForDeletion as $documentRemoved) {
+            $documentRemoved->setFolder(null);
+        }
+
+        $this->collDocuments = null;
+        foreach ($documents as $document) {
+            $this->addDocument($document);
+        }
+
+        $this->collDocuments = $documents;
+        $this->collDocumentsPartial = false;
+    }
+
+    /**
+     * Returns the number of related Document objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related Document objects.
+     * @throws PropelException
+     */
+    public function countDocuments(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collDocumentsPartial && !$this->isNew();
+        if (null === $this->collDocuments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDocuments) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getDocuments());
+                }
+                $query = DocumentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByFolder($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collDocuments);
+        }
+    }
+
+    /**
+     * Method called to associate a Document object to this object
+     * through the Document foreign key attribute.
+     *
+     * @param    Document $l Document
+     * @return Folder The current object (for fluent API support)
+     */
+    public function addDocument(Document $l)
+    {
+        if ($this->collDocuments === null) {
+            $this->initDocuments();
+            $this->collDocumentsPartial = true;
+        }
+        if (!$this->collDocuments->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddDocument($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Document $document The document object to add.
+     */
+    protected function doAddDocument($document)
+    {
+        $this->collDocuments[]= $document;
+        $document->setFolder($this);
+    }
+
+    /**
+     * @param	Document $document The document object to remove.
+     */
+    public function removeDocument($document)
+    {
+        if ($this->getDocuments()->contains($document)) {
+            $this->collDocuments->remove($this->collDocuments->search($document));
+            if (null === $this->documentsScheduledForDeletion) {
+                $this->documentsScheduledForDeletion = clone $this->collDocuments;
+                $this->documentsScheduledForDeletion->clear();
+            }
+            $this->documentsScheduledForDeletion[]= $document;
+            $document->setFolder(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Folder is new, it will return
+     * an empty collection; or if this Folder has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Folder.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinProduct($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Product', $join_behavior);
+
+        return $this->getDocuments($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Folder is new, it will return
+     * an empty collection; or if this Folder has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Folder.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinCategory($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Category', $join_behavior);
+
+        return $this->getDocuments($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Folder is new, it will return
+     * an empty collection; or if this Folder has previously
+     * been saved, it will retrieve related Documents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Folder.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|Document[] List of Document objects
+     */
+    public function getDocumentsJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = DocumentQuery::create(null, $criteria);
+        $query->joinWith('Content', $join_behavior);
+
+        return $this->getDocuments($query, $con);
+    }
+
+    /**
      * Clears out the collRewritings collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -2681,6 +2460,238 @@ abstract class BaseFolder extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collContentFolders collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addContentFolders()
+     */
+    public function clearContentFolders()
+    {
+        $this->collContentFolders = null; // important to set this to null since that means it is uninitialized
+        $this->collContentFoldersPartial = null;
+    }
+
+    /**
+     * reset is the collContentFolders collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialContentFolders($v = true)
+    {
+        $this->collContentFoldersPartial = $v;
+    }
+
+    /**
+     * Initializes the collContentFolders collection.
+     *
+     * By default this just sets the collContentFolders collection to an empty array (like clearcollContentFolders());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initContentFolders($overrideExisting = true)
+    {
+        if (null !== $this->collContentFolders && !$overrideExisting) {
+            return;
+        }
+        $this->collContentFolders = new PropelObjectCollection();
+        $this->collContentFolders->setModel('ContentFolder');
+    }
+
+    /**
+     * Gets an array of ContentFolder objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Folder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ContentFolder[] List of ContentFolder objects
+     * @throws PropelException
+     */
+    public function getContentFolders($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collContentFoldersPartial && !$this->isNew();
+        if (null === $this->collContentFolders || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collContentFolders) {
+                // return empty collection
+                $this->initContentFolders();
+            } else {
+                $collContentFolders = ContentFolderQuery::create(null, $criteria)
+                    ->filterByFolder($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collContentFoldersPartial && count($collContentFolders)) {
+                      $this->initContentFolders(false);
+
+                      foreach($collContentFolders as $obj) {
+                        if (false == $this->collContentFolders->contains($obj)) {
+                          $this->collContentFolders->append($obj);
+                        }
+                      }
+
+                      $this->collContentFoldersPartial = true;
+                    }
+
+                    return $collContentFolders;
+                }
+
+                if($partial && $this->collContentFolders) {
+                    foreach($this->collContentFolders as $obj) {
+                        if($obj->isNew()) {
+                            $collContentFolders[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collContentFolders = $collContentFolders;
+                $this->collContentFoldersPartial = false;
+            }
+        }
+
+        return $this->collContentFolders;
+    }
+
+    /**
+     * Sets a collection of ContentFolder objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $contentFolders A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setContentFolders(PropelCollection $contentFolders, PropelPDO $con = null)
+    {
+        $this->contentFoldersScheduledForDeletion = $this->getContentFolders(new Criteria(), $con)->diff($contentFolders);
+
+        foreach ($this->contentFoldersScheduledForDeletion as $contentFolderRemoved) {
+            $contentFolderRemoved->setFolder(null);
+        }
+
+        $this->collContentFolders = null;
+        foreach ($contentFolders as $contentFolder) {
+            $this->addContentFolder($contentFolder);
+        }
+
+        $this->collContentFolders = $contentFolders;
+        $this->collContentFoldersPartial = false;
+    }
+
+    /**
+     * Returns the number of related ContentFolder objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ContentFolder objects.
+     * @throws PropelException
+     */
+    public function countContentFolders(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collContentFoldersPartial && !$this->isNew();
+        if (null === $this->collContentFolders || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collContentFolders) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getContentFolders());
+                }
+                $query = ContentFolderQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByFolder($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collContentFolders);
+        }
+    }
+
+    /**
+     * Method called to associate a ContentFolder object to this object
+     * through the ContentFolder foreign key attribute.
+     *
+     * @param    ContentFolder $l ContentFolder
+     * @return Folder The current object (for fluent API support)
+     */
+    public function addContentFolder(ContentFolder $l)
+    {
+        if ($this->collContentFolders === null) {
+            $this->initContentFolders();
+            $this->collContentFoldersPartial = true;
+        }
+        if (!$this->collContentFolders->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddContentFolder($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ContentFolder $contentFolder The contentFolder object to add.
+     */
+    protected function doAddContentFolder($contentFolder)
+    {
+        $this->collContentFolders[]= $contentFolder;
+        $contentFolder->setFolder($this);
+    }
+
+    /**
+     * @param	ContentFolder $contentFolder The contentFolder object to remove.
+     */
+    public function removeContentFolder($contentFolder)
+    {
+        if ($this->getContentFolders()->contains($contentFolder)) {
+            $this->collContentFolders->remove($this->collContentFolders->search($contentFolder));
+            if (null === $this->contentFoldersScheduledForDeletion) {
+                $this->contentFoldersScheduledForDeletion = clone $this->collContentFolders;
+                $this->contentFoldersScheduledForDeletion->clear();
+            }
+            $this->contentFoldersScheduledForDeletion[]= $contentFolder;
+            $contentFolder->setFolder(null);
+        }
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Folder is new, it will return
+     * an empty collection; or if this Folder has previously
+     * been saved, it will retrieve related ContentFolders from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Folder.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @param string $join_behavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return PropelObjectCollection|ContentFolder[] List of ContentFolder objects
+     */
+    public function getContentFoldersJoinContent($criteria = null, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    {
+        $query = ContentFolderQuery::create(null, $criteria);
+        $query->joinWith('Content', $join_behavior);
+
+        return $this->getContentFolders($query, $con);
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2712,16 +2723,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collContentFolders) {
-                foreach ($this->collContentFolders as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collDocuments) {
-                foreach ($this->collDocuments as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collFolderDescs) {
                 foreach ($this->collFolderDescs as $o) {
                     $o->clearAllReferences($deep);
@@ -2732,21 +2733,23 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collDocuments) {
+                foreach ($this->collDocuments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collRewritings) {
                 foreach ($this->collRewritings as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collContentFolders) {
+                foreach ($this->collContentFolders as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collContentFolders instanceof PropelCollection) {
-            $this->collContentFolders->clearIterator();
-        }
-        $this->collContentFolders = null;
-        if ($this->collDocuments instanceof PropelCollection) {
-            $this->collDocuments->clearIterator();
-        }
-        $this->collDocuments = null;
         if ($this->collFolderDescs instanceof PropelCollection) {
             $this->collFolderDescs->clearIterator();
         }
@@ -2755,10 +2758,18 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->collImages->clearIterator();
         }
         $this->collImages = null;
+        if ($this->collDocuments instanceof PropelCollection) {
+            $this->collDocuments->clearIterator();
+        }
+        $this->collDocuments = null;
         if ($this->collRewritings instanceof PropelCollection) {
             $this->collRewritings->clearIterator();
         }
         $this->collRewritings = null;
+        if ($this->collContentFolders instanceof PropelCollection) {
+            $this->collContentFolders->clearIterator();
+        }
+        $this->collContentFolders = null;
     }
 
     /**
@@ -2779,6 +2790,20 @@ abstract class BaseFolder extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Folder The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = FolderPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

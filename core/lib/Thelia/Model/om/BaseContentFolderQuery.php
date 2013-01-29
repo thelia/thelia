@@ -25,9 +25,13 @@ use Thelia\Model\Folder;
  *
  * @method ContentFolderQuery orderByContentId($order = Criteria::ASC) Order by the content_id column
  * @method ContentFolderQuery orderByFolderId($order = Criteria::ASC) Order by the folder_id column
+ * @method ContentFolderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method ContentFolderQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method ContentFolderQuery groupByContentId() Group by the content_id column
  * @method ContentFolderQuery groupByFolderId() Group by the folder_id column
+ * @method ContentFolderQuery groupByCreatedAt() Group by the created_at column
+ * @method ContentFolderQuery groupByUpdatedAt() Group by the updated_at column
  *
  * @method ContentFolderQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method ContentFolderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -46,9 +50,13 @@ use Thelia\Model\Folder;
  *
  * @method ContentFolder findOneByContentId(int $content_id) Return the first ContentFolder filtered by the content_id column
  * @method ContentFolder findOneByFolderId(int $folder_id) Return the first ContentFolder filtered by the folder_id column
+ * @method ContentFolder findOneByCreatedAt(string $created_at) Return the first ContentFolder filtered by the created_at column
+ * @method ContentFolder findOneByUpdatedAt(string $updated_at) Return the first ContentFolder filtered by the updated_at column
  *
  * @method array findByContentId(int $content_id) Return ContentFolder objects filtered by the content_id column
  * @method array findByFolderId(int $folder_id) Return ContentFolder objects filtered by the folder_id column
+ * @method array findByCreatedAt(string $created_at) Return ContentFolder objects filtered by the created_at column
+ * @method array findByUpdatedAt(string $updated_at) Return ContentFolder objects filtered by the updated_at column
  *
  * @package    propel.generator.Thelia.Model.om
  */
@@ -139,7 +147,7 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `CONTENT_ID`, `FOLDER_ID` FROM `content_folder` WHERE `CONTENT_ID` = :p0 AND `FOLDER_ID` = :p1';
+        $sql = 'SELECT `CONTENT_ID`, `FOLDER_ID`, `CREATED_AT`, `UPDATED_AT` FROM `content_folder` WHERE `CONTENT_ID` = :p0 AND `FOLDER_ID` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -296,6 +304,92 @@ abstract class BaseContentFolderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ContentFolderPeer::FOLDER_ID, $folderId, $comparison);
+    }
+
+    /**
+     * Filter the query on the created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCreatedAt('2011-03-14'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt('now'); // WHERE created_at = '2011-03-14'
+     * $query->filterByCreatedAt(array('max' => 'yesterday')); // WHERE created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $createdAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ContentFolderQuery The current query, for fluid interface
+     */
+    public function filterByCreatedAt($createdAt = null, $comparison = null)
+    {
+        if (is_array($createdAt)) {
+            $useMinMax = false;
+            if (isset($createdAt['min'])) {
+                $this->addUsingAlias(ContentFolderPeer::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($createdAt['max'])) {
+                $this->addUsingAlias(ContentFolderPeer::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContentFolderPeer::CREATED_AT, $createdAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the updated_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByUpdatedAt('2011-03-14'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt('now'); // WHERE updated_at = '2011-03-14'
+     * $query->filterByUpdatedAt(array('max' => 'yesterday')); // WHERE updated_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $updatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ContentFolderQuery The current query, for fluid interface
+     */
+    public function filterByUpdatedAt($updatedAt = null, $comparison = null)
+    {
+        if (is_array($updatedAt)) {
+            $useMinMax = false;
+            if (isset($updatedAt['min'])) {
+                $this->addUsingAlias(ContentFolderPeer::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($updatedAt['max'])) {
+                $this->addUsingAlias(ContentFolderPeer::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContentFolderPeer::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -468,4 +562,69 @@ abstract class BaseContentFolderQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     ContentFolderQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ContentFolderPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     ContentFolderQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ContentFolderPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     ContentFolderQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ContentFolderPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     ContentFolderQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(ContentFolderPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     ContentFolderQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(ContentFolderPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     ContentFolderQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(ContentFolderPeer::CREATED_AT);
+    }
 }

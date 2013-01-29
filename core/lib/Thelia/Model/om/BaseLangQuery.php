@@ -23,7 +23,7 @@ use Thelia\Model\LangQuery;
  * @method LangQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method LangQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method LangQuery orderByUrl($order = Criteria::ASC) Order by the url column
- * @method LangQuery orderByDefaultUtility($order = Criteria::ASC) Order by the default_utility column
+ * @method LangQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method LangQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method LangQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -31,7 +31,7 @@ use Thelia\Model\LangQuery;
  * @method LangQuery groupByTitle() Group by the title column
  * @method LangQuery groupByCode() Group by the code column
  * @method LangQuery groupByUrl() Group by the url column
- * @method LangQuery groupByDefaultUtility() Group by the default_utility column
+ * @method LangQuery groupByByDefault() Group by the by_default column
  * @method LangQuery groupByCreatedAt() Group by the created_at column
  * @method LangQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -46,7 +46,7 @@ use Thelia\Model\LangQuery;
  * @method Lang findOneByTitle(string $title) Return the first Lang filtered by the title column
  * @method Lang findOneByCode(string $code) Return the first Lang filtered by the code column
  * @method Lang findOneByUrl(string $url) Return the first Lang filtered by the url column
- * @method Lang findOneByDefaultUtility(int $default_utility) Return the first Lang filtered by the default_utility column
+ * @method Lang findOneByByDefault(int $by_default) Return the first Lang filtered by the by_default column
  * @method Lang findOneByCreatedAt(string $created_at) Return the first Lang filtered by the created_at column
  * @method Lang findOneByUpdatedAt(string $updated_at) Return the first Lang filtered by the updated_at column
  *
@@ -54,7 +54,7 @@ use Thelia\Model\LangQuery;
  * @method array findByTitle(string $title) Return Lang objects filtered by the title column
  * @method array findByCode(string $code) Return Lang objects filtered by the code column
  * @method array findByUrl(string $url) Return Lang objects filtered by the url column
- * @method array findByDefaultUtility(int $default_utility) Return Lang objects filtered by the default_utility column
+ * @method array findByByDefault(int $by_default) Return Lang objects filtered by the by_default column
  * @method array findByCreatedAt(string $created_at) Return Lang objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Lang objects filtered by the updated_at column
  *
@@ -146,7 +146,7 @@ abstract class BaseLangQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `URL`, `DEFAULT_UTILITY`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `URL`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -350,16 +350,16 @@ abstract class BaseLangQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the default_utility column
+     * Filter the query on the by_default column
      *
      * Example usage:
      * <code>
-     * $query->filterByDefaultUtility(1234); // WHERE default_utility = 1234
-     * $query->filterByDefaultUtility(array(12, 34)); // WHERE default_utility IN (12, 34)
-     * $query->filterByDefaultUtility(array('min' => 12)); // WHERE default_utility > 12
+     * $query->filterByByDefault(1234); // WHERE by_default = 1234
+     * $query->filterByByDefault(array(12, 34)); // WHERE by_default IN (12, 34)
+     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default > 12
      * </code>
      *
-     * @param     mixed $defaultUtility The value to use as filter.
+     * @param     mixed $byDefault The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -367,16 +367,16 @@ abstract class BaseLangQuery extends ModelCriteria
      *
      * @return LangQuery The current query, for fluid interface
      */
-    public function filterByDefaultUtility($defaultUtility = null, $comparison = null)
+    public function filterByByDefault($byDefault = null, $comparison = null)
     {
-        if (is_array($defaultUtility)) {
+        if (is_array($byDefault)) {
             $useMinMax = false;
-            if (isset($defaultUtility['min'])) {
-                $this->addUsingAlias(LangPeer::DEFAULT_UTILITY, $defaultUtility['min'], Criteria::GREATER_EQUAL);
+            if (isset($byDefault['min'])) {
+                $this->addUsingAlias(LangPeer::BY_DEFAULT, $byDefault['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($defaultUtility['max'])) {
-                $this->addUsingAlias(LangPeer::DEFAULT_UTILITY, $defaultUtility['max'], Criteria::LESS_EQUAL);
+            if (isset($byDefault['max'])) {
+                $this->addUsingAlias(LangPeer::BY_DEFAULT, $byDefault['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -387,7 +387,7 @@ abstract class BaseLangQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(LangPeer::DEFAULT_UTILITY, $defaultUtility, $comparison);
+        return $this->addUsingAlias(LangPeer::BY_DEFAULT, $byDefault, $comparison);
     }
 
     /**
@@ -492,4 +492,69 @@ abstract class BaseLangQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     LangQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(LangPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     LangQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(LangPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     LangQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(LangPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     LangQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(LangPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     LangQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(LangPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     LangQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(LangPeer::CREATED_AT);
+    }
 }

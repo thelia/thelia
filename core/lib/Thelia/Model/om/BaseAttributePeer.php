@@ -381,18 +381,18 @@ abstract class BaseAttributePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AttributeAvPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AttributeAvPeer::clearInstancePool();
-        // Invalidate objects in AttributeCategoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AttributeCategoryPeer::clearInstancePool();
-        // Invalidate objects in AttributeCombinationPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AttributeCombinationPeer::clearInstancePool();
         // Invalidate objects in AttributeDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         AttributeDescPeer::clearInstancePool();
+        // Invalidate objects in AttributeAvPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttributeAvPeer::clearInstancePool();
+        // Invalidate objects in AttributeCombinationPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttributeCombinationPeer::clearInstancePool();
+        // Invalidate objects in AttributeCategoryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttributeCategoryPeer::clearInstancePool();
     }
 
     /**

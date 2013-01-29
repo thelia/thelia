@@ -80,10 +80,10 @@ abstract class BaseCurrency extends BaseObject implements Persistent
     protected $rate;
 
     /**
-     * The value for the default_utility field.
+     * The value for the by_default field.
      * @var        int
      */
-    protected $default_utility;
+    protected $by_default;
 
     /**
      * The value for the created_at field.
@@ -174,13 +174,13 @@ abstract class BaseCurrency extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [default_utility] column value.
+     * Get the [by_default] column value.
      *
      * @return int
      */
-    public function getDefaultUtility()
+    public function getByDefault()
     {
-        return $this->default_utility;
+        return $this->by_default;
     }
 
     /**
@@ -363,25 +363,25 @@ abstract class BaseCurrency extends BaseObject implements Persistent
     } // setRate()
 
     /**
-     * Set the value of [default_utility] column.
+     * Set the value of [by_default] column.
      *
      * @param int $v new value
      * @return Currency The current object (for fluent API support)
      */
-    public function setDefaultUtility($v)
+    public function setByDefault($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->default_utility !== $v) {
-            $this->default_utility = $v;
-            $this->modifiedColumns[] = CurrencyPeer::DEFAULT_UTILITY;
+        if ($this->by_default !== $v) {
+            $this->by_default = $v;
+            $this->modifiedColumns[] = CurrencyPeer::BY_DEFAULT;
         }
 
 
         return $this;
-    } // setDefaultUtility()
+    } // setByDefault()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -466,7 +466,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
             $this->code = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
             $this->symbol = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->rate = ($row[$startcol + 4] !== null) ? (double) $row[$startcol + 4] : null;
-            $this->default_utility = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->by_default = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
             $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
             $this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
             $this->resetModified();
@@ -613,8 +613,19 @@ abstract class BaseCurrency extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(CurrencyPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(CurrencyPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(CurrencyPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -724,8 +735,8 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         if ($this->isColumnModified(CurrencyPeer::RATE)) {
             $modifiedColumns[':p' . $index++]  = '`RATE`';
         }
-        if ($this->isColumnModified(CurrencyPeer::DEFAULT_UTILITY)) {
-            $modifiedColumns[':p' . $index++]  = '`DEFAULT_UTILITY`';
+        if ($this->isColumnModified(CurrencyPeer::BY_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = '`BY_DEFAULT`';
         }
         if ($this->isColumnModified(CurrencyPeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
@@ -759,8 +770,8 @@ abstract class BaseCurrency extends BaseObject implements Persistent
                     case '`RATE`':
                         $stmt->bindValue($identifier, $this->rate, PDO::PARAM_STR);
                         break;
-                    case '`DEFAULT_UTILITY`':
-                        $stmt->bindValue($identifier, $this->default_utility, PDO::PARAM_INT);
+                    case '`BY_DEFAULT`':
+                        $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -926,7 +937,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
                 return $this->getRate();
                 break;
             case 5:
-                return $this->getDefaultUtility();
+                return $this->getByDefault();
                 break;
             case 6:
                 return $this->getCreatedAt();
@@ -968,7 +979,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
             $keys[2] => $this->getCode(),
             $keys[3] => $this->getSymbol(),
             $keys[4] => $this->getRate(),
-            $keys[5] => $this->getDefaultUtility(),
+            $keys[5] => $this->getByDefault(),
             $keys[6] => $this->getCreatedAt(),
             $keys[7] => $this->getUpdatedAt(),
         );
@@ -1026,7 +1037,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
                 $this->setRate($value);
                 break;
             case 5:
-                $this->setDefaultUtility($value);
+                $this->setByDefault($value);
                 break;
             case 6:
                 $this->setCreatedAt($value);
@@ -1063,7 +1074,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         if (array_key_exists($keys[2], $arr)) $this->setCode($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setSymbol($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setRate($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setDefaultUtility($arr[$keys[5]]);
+        if (array_key_exists($keys[5], $arr)) $this->setByDefault($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
@@ -1082,7 +1093,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         if ($this->isColumnModified(CurrencyPeer::CODE)) $criteria->add(CurrencyPeer::CODE, $this->code);
         if ($this->isColumnModified(CurrencyPeer::SYMBOL)) $criteria->add(CurrencyPeer::SYMBOL, $this->symbol);
         if ($this->isColumnModified(CurrencyPeer::RATE)) $criteria->add(CurrencyPeer::RATE, $this->rate);
-        if ($this->isColumnModified(CurrencyPeer::DEFAULT_UTILITY)) $criteria->add(CurrencyPeer::DEFAULT_UTILITY, $this->default_utility);
+        if ($this->isColumnModified(CurrencyPeer::BY_DEFAULT)) $criteria->add(CurrencyPeer::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(CurrencyPeer::CREATED_AT)) $criteria->add(CurrencyPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CurrencyPeer::UPDATED_AT)) $criteria->add(CurrencyPeer::UPDATED_AT, $this->updated_at);
 
@@ -1152,7 +1163,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         $copyObj->setCode($this->getCode());
         $copyObj->setSymbol($this->getSymbol());
         $copyObj->setRate($this->getRate());
-        $copyObj->setDefaultUtility($this->getDefaultUtility());
+        $copyObj->setByDefault($this->getByDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1552,7 +1563,7 @@ abstract class BaseCurrency extends BaseObject implements Persistent
         $this->code = null;
         $this->symbol = null;
         $this->rate = null;
-        $this->default_utility = null;
+        $this->by_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1606,6 +1617,20 @@ abstract class BaseCurrency extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Currency The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = CurrencyPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

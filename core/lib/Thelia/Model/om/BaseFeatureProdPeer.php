@@ -59,8 +59,8 @@ abstract class BaseFeatureProdPeer
     /** the column name for the FEATURE_AV_ID field */
     const FEATURE_AV_ID = 'feature_prod.FEATURE_AV_ID';
 
-    /** the column name for the DEFAULT_UTILITY field */
-    const DEFAULT_UTILITY = 'feature_prod.DEFAULT_UTILITY';
+    /** the column name for the BY_DEFAULT field */
+    const BY_DEFAULT = 'feature_prod.BY_DEFAULT';
 
     /** the column name for the POSITION field */
     const POSITION = 'feature_prod.POSITION';
@@ -90,11 +90,11 @@ abstract class BaseFeatureProdPeer
      * e.g. FeatureProdPeer::$fieldNames[FeatureProdPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'ProductId', 'FeatureId', 'FeatureAvId', 'DefaultUtility', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'productId', 'featureId', 'featureAvId', 'defaultUtility', 'position', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (FeatureProdPeer::ID, FeatureProdPeer::PRODUCT_ID, FeatureProdPeer::FEATURE_ID, FeatureProdPeer::FEATURE_AV_ID, FeatureProdPeer::DEFAULT_UTILITY, FeatureProdPeer::POSITION, FeatureProdPeer::CREATED_AT, FeatureProdPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRODUCT_ID', 'FEATURE_ID', 'FEATURE_AV_ID', 'DEFAULT_UTILITY', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'product_id', 'feature_id', 'feature_av_id', 'default_utility', 'position', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'ProductId', 'FeatureId', 'FeatureAvId', 'ByDefault', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'productId', 'featureId', 'featureAvId', 'byDefault', 'position', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (FeatureProdPeer::ID, FeatureProdPeer::PRODUCT_ID, FeatureProdPeer::FEATURE_ID, FeatureProdPeer::FEATURE_AV_ID, FeatureProdPeer::BY_DEFAULT, FeatureProdPeer::POSITION, FeatureProdPeer::CREATED_AT, FeatureProdPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PRODUCT_ID', 'FEATURE_ID', 'FEATURE_AV_ID', 'BY_DEFAULT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'product_id', 'feature_id', 'feature_av_id', 'by_default', 'position', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -105,11 +105,11 @@ abstract class BaseFeatureProdPeer
      * e.g. FeatureProdPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ProductId' => 1, 'FeatureId' => 2, 'FeatureAvId' => 3, 'DefaultUtility' => 4, 'Position' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'productId' => 1, 'featureId' => 2, 'featureAvId' => 3, 'defaultUtility' => 4, 'position' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        BasePeer::TYPE_COLNAME => array (FeatureProdPeer::ID => 0, FeatureProdPeer::PRODUCT_ID => 1, FeatureProdPeer::FEATURE_ID => 2, FeatureProdPeer::FEATURE_AV_ID => 3, FeatureProdPeer::DEFAULT_UTILITY => 4, FeatureProdPeer::POSITION => 5, FeatureProdPeer::CREATED_AT => 6, FeatureProdPeer::UPDATED_AT => 7, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRODUCT_ID' => 1, 'FEATURE_ID' => 2, 'FEATURE_AV_ID' => 3, 'DEFAULT_UTILITY' => 4, 'POSITION' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'product_id' => 1, 'feature_id' => 2, 'feature_av_id' => 3, 'default_utility' => 4, 'position' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'ProductId' => 1, 'FeatureId' => 2, 'FeatureAvId' => 3, 'ByDefault' => 4, 'Position' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'productId' => 1, 'featureId' => 2, 'featureAvId' => 3, 'byDefault' => 4, 'position' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        BasePeer::TYPE_COLNAME => array (FeatureProdPeer::ID => 0, FeatureProdPeer::PRODUCT_ID => 1, FeatureProdPeer::FEATURE_ID => 2, FeatureProdPeer::FEATURE_AV_ID => 3, FeatureProdPeer::BY_DEFAULT => 4, FeatureProdPeer::POSITION => 5, FeatureProdPeer::CREATED_AT => 6, FeatureProdPeer::UPDATED_AT => 7, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PRODUCT_ID' => 1, 'FEATURE_ID' => 2, 'FEATURE_AV_ID' => 3, 'BY_DEFAULT' => 4, 'POSITION' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'product_id' => 1, 'feature_id' => 2, 'feature_av_id' => 3, 'by_default' => 4, 'position' => 5, 'created_at' => 6, 'updated_at' => 7, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -188,7 +188,7 @@ abstract class BaseFeatureProdPeer
             $criteria->addSelectColumn(FeatureProdPeer::PRODUCT_ID);
             $criteria->addSelectColumn(FeatureProdPeer::FEATURE_ID);
             $criteria->addSelectColumn(FeatureProdPeer::FEATURE_AV_ID);
-            $criteria->addSelectColumn(FeatureProdPeer::DEFAULT_UTILITY);
+            $criteria->addSelectColumn(FeatureProdPeer::BY_DEFAULT);
             $criteria->addSelectColumn(FeatureProdPeer::POSITION);
             $criteria->addSelectColumn(FeatureProdPeer::CREATED_AT);
             $criteria->addSelectColumn(FeatureProdPeer::UPDATED_AT);
@@ -197,7 +197,7 @@ abstract class BaseFeatureProdPeer
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.FEATURE_ID');
             $criteria->addSelectColumn($alias . '.FEATURE_AV_ID');
-            $criteria->addSelectColumn($alias . '.DEFAULT_UTILITY');
+            $criteria->addSelectColumn($alias . '.BY_DEFAULT');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
@@ -498,7 +498,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related FeatureAv table
+     * Returns the number of rows matching criteria, joining the related Product table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -506,7 +506,7 @@ abstract class BaseFeatureProdPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinFeatureAv(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinProduct(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -533,7 +533,7 @@ abstract class BaseFeatureProdPeer
             $con = Propel::getConnection(FeatureProdPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -600,7 +600,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Product table
+     * Returns the number of rows matching criteria, joining the related FeatureAv table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -608,7 +608,7 @@ abstract class BaseFeatureProdPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinProduct(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinFeatureAv(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -635,7 +635,7 @@ abstract class BaseFeatureProdPeer
             $con = Propel::getConnection(FeatureProdPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -651,7 +651,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Selects a collection of FeatureProd objects pre-filled with their FeatureAv objects.
+     * Selects a collection of FeatureProd objects pre-filled with their Product objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -659,7 +659,7 @@ abstract class BaseFeatureProdPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinFeatureAv(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinProduct(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -670,9 +670,9 @@ abstract class BaseFeatureProdPeer
 
         FeatureProdPeer::addSelectColumns($criteria);
         $startcol = FeatureProdPeer::NUM_HYDRATE_COLUMNS;
-        FeatureAvPeer::addSelectColumns($criteria);
+        ProductPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -692,19 +692,19 @@ abstract class BaseFeatureProdPeer
                 FeatureProdPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = FeatureAvPeer::getInstanceFromPool($key2);
+                $obj2 = ProductPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = FeatureAvPeer::getOMClass();
+                    $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    FeatureAvPeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (FeatureProd) to $obj2 (FeatureAv)
+                // Add the $obj1 (FeatureProd) to $obj2 (Product)
                 $obj2->addFeatureProd($obj1);
 
             } // if joined row was not null
@@ -785,7 +785,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Selects a collection of FeatureProd objects pre-filled with their Product objects.
+     * Selects a collection of FeatureProd objects pre-filled with their FeatureAv objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
@@ -793,7 +793,7 @@ abstract class BaseFeatureProdPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinProduct(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinFeatureAv(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -804,9 +804,9 @@ abstract class BaseFeatureProdPeer
 
         FeatureProdPeer::addSelectColumns($criteria);
         $startcol = FeatureProdPeer::NUM_HYDRATE_COLUMNS;
-        ProductPeer::addSelectColumns($criteria);
+        FeatureAvPeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -826,19 +826,19 @@ abstract class BaseFeatureProdPeer
                 FeatureProdPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = ProductPeer::getInstanceFromPool($key2);
+                $obj2 = FeatureAvPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = ProductPeer::getOMClass();
+                    $cls = FeatureAvPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    ProductPeer::addInstanceToPool($obj2, $key2);
+                    FeatureAvPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (FeatureProd) to $obj2 (Product)
+                // Add the $obj1 (FeatureProd) to $obj2 (FeatureAv)
                 $obj2->addFeatureProd($obj1);
 
             } // if joined row was not null
@@ -887,11 +887,11 @@ abstract class BaseFeatureProdPeer
             $con = Propel::getConnection(FeatureProdPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $criteria->addJoin(FeatureProdPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
-        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -927,20 +927,20 @@ abstract class BaseFeatureProdPeer
         FeatureProdPeer::addSelectColumns($criteria);
         $startcol2 = FeatureProdPeer::NUM_HYDRATE_COLUMNS;
 
-        FeatureAvPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + FeatureAvPeer::NUM_HYDRATE_COLUMNS;
+        ProductPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
 
         FeaturePeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + FeaturePeer::NUM_HYDRATE_COLUMNS;
 
-        ProductPeer::addSelectColumns($criteria);
-        $startcol5 = $startcol4 + ProductPeer::NUM_HYDRATE_COLUMNS;
+        FeatureAvPeer::addSelectColumns($criteria);
+        $startcol5 = $startcol4 + FeatureAvPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $criteria->addJoin(FeatureProdPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
-        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
@@ -959,21 +959,21 @@ abstract class BaseFeatureProdPeer
                 FeatureProdPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined FeatureAv rows
+            // Add objects for joined Product rows
 
-            $key2 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = FeatureAvPeer::getInstanceFromPool($key2);
+                $obj2 = ProductPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = FeatureAvPeer::getOMClass();
+                    $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    FeatureAvPeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (FeatureProd) to the collection in $obj2 (FeatureAv)
+                // Add the $obj1 (FeatureProd) to the collection in $obj2 (Product)
                 $obj2->addFeatureProd($obj1);
             } // if joined row not null
 
@@ -995,21 +995,21 @@ abstract class BaseFeatureProdPeer
                 $obj3->addFeatureProd($obj1);
             } // if joined row not null
 
-            // Add objects for joined Product rows
+            // Add objects for joined FeatureAv rows
 
-            $key4 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol4);
+            $key4 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol4);
             if ($key4 !== null) {
-                $obj4 = ProductPeer::getInstanceFromPool($key4);
+                $obj4 = FeatureAvPeer::getInstanceFromPool($key4);
                 if (!$obj4) {
 
-                    $cls = ProductPeer::getOMClass();
+                    $cls = FeatureAvPeer::getOMClass();
 
                     $obj4 = new $cls();
                     $obj4->hydrate($row, $startcol4);
-                    ProductPeer::addInstanceToPool($obj4, $key4);
+                    FeatureAvPeer::addInstanceToPool($obj4, $key4);
                 } // if obj4 loaded
 
-                // Add the $obj1 (FeatureProd) to the collection in $obj4 (Product)
+                // Add the $obj1 (FeatureProd) to the collection in $obj4 (FeatureAv)
                 $obj4->addFeatureProd($obj1);
             } // if joined row not null
 
@@ -1022,7 +1022,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related FeatureAv table
+     * Returns the number of rows matching criteria, joining the related Product table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1030,7 +1030,7 @@ abstract class BaseFeatureProdPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptFeatureAv(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptProduct(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1059,7 +1059,7 @@ abstract class BaseFeatureProdPeer
 
         $criteria->addJoin(FeatureProdPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
-        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -1110,9 +1110,9 @@ abstract class BaseFeatureProdPeer
             $con = Propel::getConnection(FeatureProdPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
-
         $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -1128,7 +1128,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related Product table
+     * Returns the number of rows matching criteria, joining the related FeatureAv table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -1136,7 +1136,7 @@ abstract class BaseFeatureProdPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinAllExceptProduct(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinAllExceptFeatureAv(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -1163,7 +1163,7 @@ abstract class BaseFeatureProdPeer
             $con = Propel::getConnection(FeatureProdPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $criteria->addJoin(FeatureProdPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
@@ -1181,7 +1181,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Selects a collection of FeatureProd objects pre-filled with all related objects except FeatureAv.
+     * Selects a collection of FeatureProd objects pre-filled with all related objects except Product.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1190,7 +1190,7 @@ abstract class BaseFeatureProdPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptFeatureAv(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptProduct(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1207,12 +1207,12 @@ abstract class BaseFeatureProdPeer
         FeaturePeer::addSelectColumns($criteria);
         $startcol3 = $startcol2 + FeaturePeer::NUM_HYDRATE_COLUMNS;
 
-        ProductPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + ProductPeer::NUM_HYDRATE_COLUMNS;
+        FeatureAvPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + FeatureAvPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(FeatureProdPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
-        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1251,21 +1251,21 @@ abstract class BaseFeatureProdPeer
 
             } // if joined row is not null
 
-                // Add objects for joined Product rows
+                // Add objects for joined FeatureAv rows
 
-                $key3 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                $key3 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol3);
                 if ($key3 !== null) {
-                    $obj3 = ProductPeer::getInstanceFromPool($key3);
+                    $obj3 = FeatureAvPeer::getInstanceFromPool($key3);
                     if (!$obj3) {
 
-                        $cls = ProductPeer::getOMClass();
+                        $cls = FeatureAvPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    ProductPeer::addInstanceToPool($obj3, $key3);
+                    FeatureAvPeer::addInstanceToPool($obj3, $key3);
                 } // if $obj3 already loaded
 
-                // Add the $obj1 (FeatureProd) to the collection in $obj3 (Product)
+                // Add the $obj1 (FeatureProd) to the collection in $obj3 (FeatureAv)
                 $obj3->addFeatureProd($obj1);
 
             } // if joined row is not null
@@ -1302,15 +1302,15 @@ abstract class BaseFeatureProdPeer
         FeatureProdPeer::addSelectColumns($criteria);
         $startcol2 = FeatureProdPeer::NUM_HYDRATE_COLUMNS;
 
-        FeatureAvPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + FeatureAvPeer::NUM_HYDRATE_COLUMNS;
-
         ProductPeer::addSelectColumns($criteria);
-        $startcol4 = $startcol3 + ProductPeer::NUM_HYDRATE_COLUMNS;
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
+        FeatureAvPeer::addSelectColumns($criteria);
+        $startcol4 = $startcol3 + FeatureAvPeer::NUM_HYDRATE_COLUMNS;
 
         $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
+
+        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
 
 
         $stmt = BasePeer::doSelect($criteria, $con);
@@ -1330,40 +1330,40 @@ abstract class BaseFeatureProdPeer
                 FeatureProdPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-                // Add objects for joined FeatureAv rows
+                // Add objects for joined Product rows
 
-                $key2 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
                 if ($key2 !== null) {
-                    $obj2 = FeatureAvPeer::getInstanceFromPool($key2);
+                    $obj2 = ProductPeer::getInstanceFromPool($key2);
                     if (!$obj2) {
 
-                        $cls = FeatureAvPeer::getOMClass();
+                        $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    FeatureAvPeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (FeatureProd) to the collection in $obj2 (FeatureAv)
+                // Add the $obj1 (FeatureProd) to the collection in $obj2 (Product)
                 $obj2->addFeatureProd($obj1);
 
             } // if joined row is not null
 
-                // Add objects for joined Product rows
+                // Add objects for joined FeatureAv rows
 
-                $key3 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol3);
+                $key3 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol3);
                 if ($key3 !== null) {
-                    $obj3 = ProductPeer::getInstanceFromPool($key3);
+                    $obj3 = FeatureAvPeer::getInstanceFromPool($key3);
                     if (!$obj3) {
 
-                        $cls = ProductPeer::getOMClass();
+                        $cls = FeatureAvPeer::getOMClass();
 
                     $obj3 = new $cls();
                     $obj3->hydrate($row, $startcol3);
-                    ProductPeer::addInstanceToPool($obj3, $key3);
+                    FeatureAvPeer::addInstanceToPool($obj3, $key3);
                 } // if $obj3 already loaded
 
-                // Add the $obj1 (FeatureProd) to the collection in $obj3 (Product)
+                // Add the $obj1 (FeatureProd) to the collection in $obj3 (FeatureAv)
                 $obj3->addFeatureProd($obj1);
 
             } // if joined row is not null
@@ -1377,7 +1377,7 @@ abstract class BaseFeatureProdPeer
 
 
     /**
-     * Selects a collection of FeatureProd objects pre-filled with all related objects except Product.
+     * Selects a collection of FeatureProd objects pre-filled with all related objects except FeatureAv.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
@@ -1386,7 +1386,7 @@ abstract class BaseFeatureProdPeer
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinAllExceptProduct(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinAllExceptFeatureAv(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
@@ -1400,13 +1400,13 @@ abstract class BaseFeatureProdPeer
         FeatureProdPeer::addSelectColumns($criteria);
         $startcol2 = FeatureProdPeer::NUM_HYDRATE_COLUMNS;
 
-        FeatureAvPeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + FeatureAvPeer::NUM_HYDRATE_COLUMNS;
+        ProductPeer::addSelectColumns($criteria);
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
 
         FeaturePeer::addSelectColumns($criteria);
         $startcol4 = $startcol3 + FeaturePeer::NUM_HYDRATE_COLUMNS;
 
-        $criteria->addJoin(FeatureProdPeer::FEATURE_AV_ID, FeatureAvPeer::ID, $join_behavior);
+        $criteria->addJoin(FeatureProdPeer::PRODUCT_ID, ProductPeer::ID, $join_behavior);
 
         $criteria->addJoin(FeatureProdPeer::FEATURE_ID, FeaturePeer::ID, $join_behavior);
 
@@ -1428,21 +1428,21 @@ abstract class BaseFeatureProdPeer
                 FeatureProdPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-                // Add objects for joined FeatureAv rows
+                // Add objects for joined Product rows
 
-                $key2 = FeatureAvPeer::getPrimaryKeyHashFromRow($row, $startcol2);
+                $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
                 if ($key2 !== null) {
-                    $obj2 = FeatureAvPeer::getInstanceFromPool($key2);
+                    $obj2 = ProductPeer::getInstanceFromPool($key2);
                     if (!$obj2) {
 
-                        $cls = FeatureAvPeer::getOMClass();
+                        $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    FeatureAvPeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if $obj2 already loaded
 
-                // Add the $obj1 (FeatureProd) to the collection in $obj2 (FeatureAv)
+                // Add the $obj1 (FeatureProd) to the collection in $obj2 (Product)
                 $obj2->addFeatureProd($obj1);
 
             } // if joined row is not null

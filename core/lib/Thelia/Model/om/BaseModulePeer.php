@@ -52,8 +52,8 @@ abstract class BaseModulePeer
     /** the column name for the CODE field */
     const CODE = 'module.CODE';
 
-    /** the column name for the TYPE field */
-    const TYPE = 'module.TYPE';
+    /** the column name for the  TYPE field */
+    const  TYPE = 'module. TYPE';
 
     /** the column name for the ACTIVATE field */
     const ACTIVATE = 'module.ACTIVATE';
@@ -86,11 +86,11 @@ abstract class BaseModulePeer
      * e.g. ModulePeer::$fieldNames[ModulePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', 'Type', 'Activate', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', 'type', 'activate', 'position', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (ModulePeer::ID, ModulePeer::CODE, ModulePeer::TYPE, ModulePeer::ACTIVATE, ModulePeer::POSITION, ModulePeer::CREATED_AT, ModulePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', 'TYPE', 'ACTIVATE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'code', 'type', 'activate', 'position', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', ' type', 'Activate', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', ' type', 'activate', 'position', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ModulePeer::ID, ModulePeer::CODE, ModulePeer:: TYPE, ModulePeer::ACTIVATE, ModulePeer::POSITION, ModulePeer::CREATED_AT, ModulePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', ' TYPE', 'ACTIVATE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'code', ' type', 'activate', 'position', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -101,11 +101,11 @@ abstract class BaseModulePeer
      * e.g. ModulePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, 'Type' => 2, 'Activate' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        BasePeer::TYPE_COLNAME => array (ModulePeer::ID => 0, ModulePeer::CODE => 1, ModulePeer::TYPE => 2, ModulePeer::ACTIVATE => 3, ModulePeer::POSITION => 4, ModulePeer::CREATED_AT => 5, ModulePeer::UPDATED_AT => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'ACTIVATE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, 'type' => 2, 'activate' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, ' type' => 2, 'Activate' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, ' type' => 2, 'activate' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        BasePeer::TYPE_COLNAME => array (ModulePeer::ID => 0, ModulePeer::CODE => 1, ModulePeer:: TYPE => 2, ModulePeer::ACTIVATE => 3, ModulePeer::POSITION => 4, ModulePeer::CREATED_AT => 5, ModulePeer::UPDATED_AT => 6, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, ' TYPE' => 2, 'ACTIVATE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, ' type' => 2, 'activate' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -182,7 +182,7 @@ abstract class BaseModulePeer
         if (null === $alias) {
             $criteria->addSelectColumn(ModulePeer::ID);
             $criteria->addSelectColumn(ModulePeer::CODE);
-            $criteria->addSelectColumn(ModulePeer::TYPE);
+            $criteria->addSelectColumn(ModulePeer:: TYPE);
             $criteria->addSelectColumn(ModulePeer::ACTIVATE);
             $criteria->addSelectColumn(ModulePeer::POSITION);
             $criteria->addSelectColumn(ModulePeer::CREATED_AT);
@@ -190,7 +190,7 @@ abstract class BaseModulePeer
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.TYPE');
+            $criteria->addSelectColumn($alias . '. TYPE');
             $criteria->addSelectColumn($alias . '.ACTIVATE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
@@ -394,12 +394,12 @@ abstract class BaseModulePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in GroupModulePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        GroupModulePeer::clearInstancePool();
         // Invalidate objects in ModuleDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ModuleDescPeer::clearInstancePool();
+        // Invalidate objects in GroupModulePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        GroupModulePeer::clearInstancePool();
     }
 
     /**

@@ -60,8 +60,8 @@ abstract class BaseCurrencyPeer
     /** the column name for the RATE field */
     const RATE = 'currency.RATE';
 
-    /** the column name for the DEFAULT_UTILITY field */
-    const DEFAULT_UTILITY = 'currency.DEFAULT_UTILITY';
+    /** the column name for the BY_DEFAULT field */
+    const BY_DEFAULT = 'currency.BY_DEFAULT';
 
     /** the column name for the CREATED_AT field */
     const CREATED_AT = 'currency.CREATED_AT';
@@ -88,11 +88,11 @@ abstract class BaseCurrencyPeer
      * e.g. CurrencyPeer::$fieldNames[CurrencyPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Code', 'Symbol', 'Rate', 'DefaultUtility', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'code', 'symbol', 'rate', 'defaultUtility', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (CurrencyPeer::ID, CurrencyPeer::NAME, CurrencyPeer::CODE, CurrencyPeer::SYMBOL, CurrencyPeer::RATE, CurrencyPeer::DEFAULT_UTILITY, CurrencyPeer::CREATED_AT, CurrencyPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'CODE', 'SYMBOL', 'RATE', 'DEFAULT_UTILITY', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'code', 'symbol', 'rate', 'default_utility', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Name', 'Code', 'Symbol', 'Rate', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'name', 'code', 'symbol', 'rate', 'byDefault', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (CurrencyPeer::ID, CurrencyPeer::NAME, CurrencyPeer::CODE, CurrencyPeer::SYMBOL, CurrencyPeer::RATE, CurrencyPeer::BY_DEFAULT, CurrencyPeer::CREATED_AT, CurrencyPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'NAME', 'CODE', 'SYMBOL', 'RATE', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'name', 'code', 'symbol', 'rate', 'by_default', 'created_at', 'updated_at', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -103,11 +103,11 @@ abstract class BaseCurrencyPeer
      * e.g. CurrencyPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Code' => 2, 'Symbol' => 3, 'Rate' => 4, 'DefaultUtility' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'code' => 2, 'symbol' => 3, 'rate' => 4, 'defaultUtility' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        BasePeer::TYPE_COLNAME => array (CurrencyPeer::ID => 0, CurrencyPeer::NAME => 1, CurrencyPeer::CODE => 2, CurrencyPeer::SYMBOL => 3, CurrencyPeer::RATE => 4, CurrencyPeer::DEFAULT_UTILITY => 5, CurrencyPeer::CREATED_AT => 6, CurrencyPeer::UPDATED_AT => 7, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'CODE' => 2, 'SYMBOL' => 3, 'RATE' => 4, 'DEFAULT_UTILITY' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'code' => 2, 'symbol' => 3, 'rate' => 4, 'default_utility' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Name' => 1, 'Code' => 2, 'Symbol' => 3, 'Rate' => 4, 'ByDefault' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'name' => 1, 'code' => 2, 'symbol' => 3, 'rate' => 4, 'byDefault' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        BasePeer::TYPE_COLNAME => array (CurrencyPeer::ID => 0, CurrencyPeer::NAME => 1, CurrencyPeer::CODE => 2, CurrencyPeer::SYMBOL => 3, CurrencyPeer::RATE => 4, CurrencyPeer::BY_DEFAULT => 5, CurrencyPeer::CREATED_AT => 6, CurrencyPeer::UPDATED_AT => 7, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'NAME' => 1, 'CODE' => 2, 'SYMBOL' => 3, 'RATE' => 4, 'BY_DEFAULT' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'name' => 1, 'code' => 2, 'symbol' => 3, 'rate' => 4, 'by_default' => 5, 'created_at' => 6, 'updated_at' => 7, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
@@ -187,7 +187,7 @@ abstract class BaseCurrencyPeer
             $criteria->addSelectColumn(CurrencyPeer::CODE);
             $criteria->addSelectColumn(CurrencyPeer::SYMBOL);
             $criteria->addSelectColumn(CurrencyPeer::RATE);
-            $criteria->addSelectColumn(CurrencyPeer::DEFAULT_UTILITY);
+            $criteria->addSelectColumn(CurrencyPeer::BY_DEFAULT);
             $criteria->addSelectColumn(CurrencyPeer::CREATED_AT);
             $criteria->addSelectColumn(CurrencyPeer::UPDATED_AT);
         } else {
@@ -196,7 +196,7 @@ abstract class BaseCurrencyPeer
             $criteria->addSelectColumn($alias . '.CODE');
             $criteria->addSelectColumn($alias . '.SYMBOL');
             $criteria->addSelectColumn($alias . '.RATE');
-            $criteria->addSelectColumn($alias . '.DEFAULT_UTILITY');
+            $criteria->addSelectColumn($alias . '.BY_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

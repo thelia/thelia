@@ -62,10 +62,10 @@ abstract class BaseMessage extends BaseObject implements Persistent
     protected $code;
 
     /**
-     * The value for the secure field.
+     * The value for the secured field.
      * @var        int
      */
-    protected $secure;
+    protected $secured;
 
     /**
      * The value for the created_at field.
@@ -126,13 +126,13 @@ abstract class BaseMessage extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [secure] column value.
+     * Get the [secured] column value.
      *
      * @return int
      */
-    public function getSecure()
+    public function getSecured()
     {
-        return $this->secure;
+        return $this->secured;
     }
 
     /**
@@ -252,25 +252,25 @@ abstract class BaseMessage extends BaseObject implements Persistent
     } // setCode()
 
     /**
-     * Set the value of [secure] column.
+     * Set the value of [secured] column.
      *
      * @param int $v new value
      * @return Message The current object (for fluent API support)
      */
-    public function setSecure($v)
+    public function setSecured($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->secure !== $v) {
-            $this->secure = $v;
-            $this->modifiedColumns[] = MessagePeer::SECURE;
+        if ($this->secured !== $v) {
+            $this->secured = $v;
+            $this->modifiedColumns[] = MessagePeer::SECURED;
         }
 
 
         return $this;
-    } // setSecure()
+    } // setSecured()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -352,7 +352,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->code = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this->secure = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->secured = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->resetModified();
@@ -499,8 +499,19 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(MessagePeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(MessagePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(MessagePeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -600,8 +611,8 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if ($this->isColumnModified(MessagePeer::CODE)) {
             $modifiedColumns[':p' . $index++]  = '`CODE`';
         }
-        if ($this->isColumnModified(MessagePeer::SECURE)) {
-            $modifiedColumns[':p' . $index++]  = '`SECURE`';
+        if ($this->isColumnModified(MessagePeer::SECURED)) {
+            $modifiedColumns[':p' . $index++]  = '`SECURED`';
         }
         if ($this->isColumnModified(MessagePeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
@@ -626,8 +637,8 @@ abstract class BaseMessage extends BaseObject implements Persistent
                     case '`CODE`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`SECURE`':
-                        $stmt->bindValue($identifier, $this->secure, PDO::PARAM_INT);
+                    case '`SECURED`':
+                        $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -784,7 +795,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 return $this->getCode();
                 break;
             case 2:
-                return $this->getSecure();
+                return $this->getSecured();
                 break;
             case 3:
                 return $this->getCreatedAt();
@@ -823,7 +834,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
-            $keys[2] => $this->getSecure(),
+            $keys[2] => $this->getSecured(),
             $keys[3] => $this->getCreatedAt(),
             $keys[4] => $this->getUpdatedAt(),
         );
@@ -872,7 +883,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 $this->setCode($value);
                 break;
             case 2:
-                $this->setSecure($value);
+                $this->setSecured($value);
                 break;
             case 3:
                 $this->setCreatedAt($value);
@@ -906,7 +917,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setSecure($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setSecured($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
@@ -922,7 +933,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
 
         if ($this->isColumnModified(MessagePeer::ID)) $criteria->add(MessagePeer::ID, $this->id);
         if ($this->isColumnModified(MessagePeer::CODE)) $criteria->add(MessagePeer::CODE, $this->code);
-        if ($this->isColumnModified(MessagePeer::SECURE)) $criteria->add(MessagePeer::SECURE, $this->secure);
+        if ($this->isColumnModified(MessagePeer::SECURED)) $criteria->add(MessagePeer::SECURED, $this->secured);
         if ($this->isColumnModified(MessagePeer::CREATED_AT)) $criteria->add(MessagePeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(MessagePeer::UPDATED_AT)) $criteria->add(MessagePeer::UPDATED_AT, $this->updated_at);
 
@@ -989,7 +1000,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCode($this->getCode());
-        $copyObj->setSecure($this->getSecure());
+        $copyObj->setSecured($this->getSecured());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1286,7 +1297,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->code = null;
-        $this->secure = null;
+        $this->secured = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1340,6 +1351,20 @@ abstract class BaseMessage extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Message The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = MessagePeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

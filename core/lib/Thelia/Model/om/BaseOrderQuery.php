@@ -89,13 +89,13 @@ use Thelia\Model\OrderStatus;
  * @method OrderQuery rightJoinOrderStatus($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderStatus relation
  * @method OrderQuery innerJoinOrderStatus($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderStatus relation
  *
- * @method OrderQuery leftJoinCouponOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponOrder relation
- * @method OrderQuery rightJoinCouponOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponOrder relation
- * @method OrderQuery innerJoinCouponOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponOrder relation
- *
  * @method OrderQuery leftJoinOrderProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderProduct relation
  * @method OrderQuery rightJoinOrderProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderProduct relation
  * @method OrderQuery innerJoinOrderProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderProduct relation
+ *
+ * @method OrderQuery leftJoinCouponOrder($relationAlias = null) Adds a LEFT JOIN clause to the query using the CouponOrder relation
+ * @method OrderQuery rightJoinCouponOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CouponOrder relation
+ * @method OrderQuery innerJoinCouponOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the CouponOrder relation
  *
  * @method Order findOne(PropelPDO $con = null) Return the first Order matching the query
  * @method Order findOneOrCreate(PropelPDO $con = null) Return the first Order matching the query, or a new Order object populated from the query conditions when no match is found
@@ -1352,80 +1352,6 @@ abstract class BaseOrderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related CouponOrder object
-     *
-     * @param   CouponOrder|PropelObjectCollection $couponOrder  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByCouponOrder($couponOrder, $comparison = null)
-    {
-        if ($couponOrder instanceof CouponOrder) {
-            return $this
-                ->addUsingAlias(OrderPeer::ID, $couponOrder->getOrderId(), $comparison);
-        } elseif ($couponOrder instanceof PropelObjectCollection) {
-            return $this
-                ->useCouponOrderQuery()
-                ->filterByPrimaryKeys($couponOrder->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCouponOrder() only accepts arguments of type CouponOrder or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the CouponOrder relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return OrderQuery The current query, for fluid interface
-     */
-    public function joinCouponOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CouponOrder');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'CouponOrder');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the CouponOrder relation CouponOrder object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CouponOrderQuery A secondary query class using the current class as primary query
-     */
-    public function useCouponOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCouponOrder($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CouponOrder', '\Thelia\Model\CouponOrderQuery');
-    }
-
-    /**
      * Filter the query by a related OrderProduct object
      *
      * @param   OrderProduct|PropelObjectCollection $orderProduct  the related object to use as filter
@@ -1500,6 +1426,80 @@ abstract class BaseOrderQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related CouponOrder object
+     *
+     * @param   CouponOrder|PropelObjectCollection $couponOrder  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   OrderQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCouponOrder($couponOrder, $comparison = null)
+    {
+        if ($couponOrder instanceof CouponOrder) {
+            return $this
+                ->addUsingAlias(OrderPeer::ID, $couponOrder->getOrderId(), $comparison);
+        } elseif ($couponOrder instanceof PropelObjectCollection) {
+            return $this
+                ->useCouponOrderQuery()
+                ->filterByPrimaryKeys($couponOrder->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCouponOrder() only accepts arguments of type CouponOrder or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CouponOrder relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return OrderQuery The current query, for fluid interface
+     */
+    public function joinCouponOrder($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CouponOrder');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CouponOrder');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CouponOrder relation CouponOrder object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CouponOrderQuery A secondary query class using the current class as primary query
+     */
+    public function useCouponOrderQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCouponOrder($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CouponOrder', '\Thelia\Model\CouponOrderQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Order $order Object to remove from the list of results
@@ -1515,4 +1515,69 @@ abstract class BaseOrderQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     OrderQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(OrderPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     OrderQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(OrderPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     OrderQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(OrderPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     OrderQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(OrderPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     OrderQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(OrderPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     OrderQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(OrderPeer::CREATED_AT);
+    }
 }

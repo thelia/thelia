@@ -45,10 +45,10 @@ class ConfigTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('NAME', 'Name', 'VARCHAR', true, 255, null);
         $this->addColumn('VALUE', 'Value', 'VARCHAR', true, 255, null);
-        $this->addColumn('SECURE', 'Secure', 'TINYINT', true, null, 1);
+        $this->addColumn('SECURED', 'Secured', 'TINYINT', true, null, 1);
         $this->addColumn('HIDDEN', 'Hidden', 'TINYINT', true, null, 1);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -57,7 +57,20 @@ class ConfigTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ConfigDesc', 'Thelia\\Model\\ConfigDesc', RelationMap::ONE_TO_MANY, array('id' => 'config_id', ), 'CASCADE', null, 'ConfigDescs');
+        $this->addRelation('ConfigDesc', 'Thelia\\Model\\ConfigDesc', RelationMap::ONE_TO_MANY, array('id' => 'config_id', ), 'CASCADE', 'RESTRICT', 'ConfigDescs');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // ConfigTableMap

@@ -68,11 +68,11 @@ abstract class BaseConfig extends BaseObject implements Persistent
     protected $value;
 
     /**
-     * The value for the secure field.
+     * The value for the secured field.
      * Note: this column has a database default value of: 1
      * @var        int
      */
-    protected $secure;
+    protected $secured;
 
     /**
      * The value for the hidden field.
@@ -127,7 +127,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function applyDefaultValues()
     {
-        $this->secure = 1;
+        $this->secured = 1;
         $this->hidden = 1;
     }
 
@@ -172,13 +172,13 @@ abstract class BaseConfig extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [secure] column value.
+     * Get the [secured] column value.
      *
      * @return int
      */
-    public function getSecure()
+    public function getSecured()
     {
-        return $this->secure;
+        return $this->secured;
     }
 
     /**
@@ -329,25 +329,25 @@ abstract class BaseConfig extends BaseObject implements Persistent
     } // setValue()
 
     /**
-     * Set the value of [secure] column.
+     * Set the value of [secured] column.
      *
      * @param int $v new value
      * @return Config The current object (for fluent API support)
      */
-    public function setSecure($v)
+    public function setSecured($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->secure !== $v) {
-            $this->secure = $v;
-            $this->modifiedColumns[] = ConfigPeer::SECURE;
+        if ($this->secured !== $v) {
+            $this->secured = $v;
+            $this->modifiedColumns[] = ConfigPeer::SECURED;
         }
 
 
         return $this;
-    } // setSecure()
+    } // setSecured()
 
     /**
      * Set the value of [hidden] column.
@@ -426,7 +426,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->secure !== 1) {
+            if ($this->secured !== 1) {
                 return false;
             }
 
@@ -459,7 +459,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->name = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->value = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->secure = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
+            $this->secured = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->hidden = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
@@ -607,8 +607,19 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(ConfigPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(ConfigPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(ConfigPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -711,8 +722,8 @@ abstract class BaseConfig extends BaseObject implements Persistent
         if ($this->isColumnModified(ConfigPeer::VALUE)) {
             $modifiedColumns[':p' . $index++]  = '`VALUE`';
         }
-        if ($this->isColumnModified(ConfigPeer::SECURE)) {
-            $modifiedColumns[':p' . $index++]  = '`SECURE`';
+        if ($this->isColumnModified(ConfigPeer::SECURED)) {
+            $modifiedColumns[':p' . $index++]  = '`SECURED`';
         }
         if ($this->isColumnModified(ConfigPeer::HIDDEN)) {
             $modifiedColumns[':p' . $index++]  = '`HIDDEN`';
@@ -743,8 +754,8 @@ abstract class BaseConfig extends BaseObject implements Persistent
                     case '`VALUE`':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
-                    case '`SECURE`':
-                        $stmt->bindValue($identifier, $this->secure, PDO::PARAM_INT);
+                    case '`SECURED`':
+                        $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
                         break;
                     case '`HIDDEN`':
                         $stmt->bindValue($identifier, $this->hidden, PDO::PARAM_INT);
@@ -907,7 +918,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
                 return $this->getValue();
                 break;
             case 3:
-                return $this->getSecure();
+                return $this->getSecured();
                 break;
             case 4:
                 return $this->getHidden();
@@ -950,7 +961,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getName(),
             $keys[2] => $this->getValue(),
-            $keys[3] => $this->getSecure(),
+            $keys[3] => $this->getSecured(),
             $keys[4] => $this->getHidden(),
             $keys[5] => $this->getCreatedAt(),
             $keys[6] => $this->getUpdatedAt(),
@@ -1003,7 +1014,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
                 $this->setValue($value);
                 break;
             case 3:
-                $this->setSecure($value);
+                $this->setSecured($value);
                 break;
             case 4:
                 $this->setHidden($value);
@@ -1041,7 +1052,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setName($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setValue($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setSecure($arr[$keys[3]]);
+        if (array_key_exists($keys[3], $arr)) $this->setSecured($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setHidden($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
@@ -1059,7 +1070,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
         if ($this->isColumnModified(ConfigPeer::ID)) $criteria->add(ConfigPeer::ID, $this->id);
         if ($this->isColumnModified(ConfigPeer::NAME)) $criteria->add(ConfigPeer::NAME, $this->name);
         if ($this->isColumnModified(ConfigPeer::VALUE)) $criteria->add(ConfigPeer::VALUE, $this->value);
-        if ($this->isColumnModified(ConfigPeer::SECURE)) $criteria->add(ConfigPeer::SECURE, $this->secure);
+        if ($this->isColumnModified(ConfigPeer::SECURED)) $criteria->add(ConfigPeer::SECURED, $this->secured);
         if ($this->isColumnModified(ConfigPeer::HIDDEN)) $criteria->add(ConfigPeer::HIDDEN, $this->hidden);
         if ($this->isColumnModified(ConfigPeer::CREATED_AT)) $criteria->add(ConfigPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ConfigPeer::UPDATED_AT)) $criteria->add(ConfigPeer::UPDATED_AT, $this->updated_at);
@@ -1128,7 +1139,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
     {
         $copyObj->setName($this->getName());
         $copyObj->setValue($this->getValue());
-        $copyObj->setSecure($this->getSecure());
+        $copyObj->setSecured($this->getSecured());
         $copyObj->setHidden($this->getHidden());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1427,7 +1438,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
         $this->id = null;
         $this->name = null;
         $this->value = null;
-        $this->secure = null;
+        $this->secured = null;
         $this->hidden = null;
         $this->created_at = null;
         $this->updated_at = null;
@@ -1483,6 +1494,20 @@ abstract class BaseConfig extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     Config The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = ConfigPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

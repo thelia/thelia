@@ -37,13 +37,13 @@ abstract class BaseFeatureAvDescPeer
     const TM_CLASS = 'FeatureAvDescTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 8;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /** the column name for the ID field */
     const ID = 'feature_av_desc.ID';
@@ -62,6 +62,12 @@ abstract class BaseFeatureAvDescPeer
 
     /** the column name for the CHAPO field */
     const CHAPO = 'feature_av_desc.CHAPO';
+
+    /** the column name for the CREATED_AT field */
+    const CREATED_AT = 'feature_av_desc.CREATED_AT';
+
+    /** the column name for the UPDATED_AT field */
+    const UPDATED_AT = 'feature_av_desc.UPDATED_AT';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -82,12 +88,12 @@ abstract class BaseFeatureAvDescPeer
      * e.g. FeatureAvDescPeer::$fieldNames[FeatureAvDescPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'FeatureAvId', 'Lang', 'Title', 'Description', 'Chapo', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'featureAvId', 'lang', 'title', 'description', 'chapo', ),
-        BasePeer::TYPE_COLNAME => array (FeatureAvDescPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, FeatureAvDescPeer::LANG, FeatureAvDescPeer::TITLE, FeatureAvDescPeer::DESCRIPTION, FeatureAvDescPeer::CHAPO, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FEATURE_AV_ID', 'LANG', 'TITLE', 'DESCRIPTION', 'CHAPO', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'feature_av_id', 'lang', 'title', 'description', 'chapo', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'FeatureAvId', 'Lang', 'Title', 'Description', 'Chapo', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'featureAvId', 'lang', 'title', 'description', 'chapo', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (FeatureAvDescPeer::ID, FeatureAvDescPeer::FEATURE_AV_ID, FeatureAvDescPeer::LANG, FeatureAvDescPeer::TITLE, FeatureAvDescPeer::DESCRIPTION, FeatureAvDescPeer::CHAPO, FeatureAvDescPeer::CREATED_AT, FeatureAvDescPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'FEATURE_AV_ID', 'LANG', 'TITLE', 'DESCRIPTION', 'CHAPO', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'feature_av_id', 'lang', 'title', 'description', 'chapo', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -97,12 +103,12 @@ abstract class BaseFeatureAvDescPeer
      * e.g. FeatureAvDescPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FeatureAvId' => 1, 'Lang' => 2, 'Title' => 3, 'Description' => 4, 'Chapo' => 5, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'featureAvId' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, ),
-        BasePeer::TYPE_COLNAME => array (FeatureAvDescPeer::ID => 0, FeatureAvDescPeer::FEATURE_AV_ID => 1, FeatureAvDescPeer::LANG => 2, FeatureAvDescPeer::TITLE => 3, FeatureAvDescPeer::DESCRIPTION => 4, FeatureAvDescPeer::CHAPO => 5, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FEATURE_AV_ID' => 1, 'LANG' => 2, 'TITLE' => 3, 'DESCRIPTION' => 4, 'CHAPO' => 5, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'feature_av_id' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'FeatureAvId' => 1, 'Lang' => 2, 'Title' => 3, 'Description' => 4, 'Chapo' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'featureAvId' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        BasePeer::TYPE_COLNAME => array (FeatureAvDescPeer::ID => 0, FeatureAvDescPeer::FEATURE_AV_ID => 1, FeatureAvDescPeer::LANG => 2, FeatureAvDescPeer::TITLE => 3, FeatureAvDescPeer::DESCRIPTION => 4, FeatureAvDescPeer::CHAPO => 5, FeatureAvDescPeer::CREATED_AT => 6, FeatureAvDescPeer::UPDATED_AT => 7, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'FEATURE_AV_ID' => 1, 'LANG' => 2, 'TITLE' => 3, 'DESCRIPTION' => 4, 'CHAPO' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'feature_av_id' => 1, 'lang' => 2, 'title' => 3, 'description' => 4, 'chapo' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -182,6 +188,8 @@ abstract class BaseFeatureAvDescPeer
             $criteria->addSelectColumn(FeatureAvDescPeer::TITLE);
             $criteria->addSelectColumn(FeatureAvDescPeer::DESCRIPTION);
             $criteria->addSelectColumn(FeatureAvDescPeer::CHAPO);
+            $criteria->addSelectColumn(FeatureAvDescPeer::CREATED_AT);
+            $criteria->addSelectColumn(FeatureAvDescPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.FEATURE_AV_ID');
@@ -189,6 +197,8 @@ abstract class BaseFeatureAvDescPeer
             $criteria->addSelectColumn($alias . '.TITLE');
             $criteria->addSelectColumn($alias . '.DESCRIPTION');
             $criteria->addSelectColumn($alias . '.CHAPO');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 

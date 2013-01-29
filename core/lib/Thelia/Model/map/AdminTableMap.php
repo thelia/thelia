@@ -49,8 +49,8 @@ class AdminTableMap extends TableMap
         $this->addColumn('PASSWORD', 'Password', 'VARCHAR', true, 128, null);
         $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
         $this->addColumn('SALT', 'Salt', 'VARCHAR', false, 128, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -59,7 +59,20 @@ class AdminTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::ONE_TO_MANY, array('id' => 'admin_id', ), 'CASCADE', null, 'AdminGroups');
+        $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::ONE_TO_MANY, array('id' => 'admin_id', ), 'CASCADE', 'RESTRICT', 'AdminGroups');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // AdminTableMap

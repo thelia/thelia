@@ -44,8 +44,8 @@ class AttributeTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -54,10 +54,23 @@ class AttributeTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeAv', 'Thelia\\Model\\AttributeAv', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeAvs');
-        $this->addRelation('AttributeCategory', 'Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeCategorys');
-        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeCombinations');
-        $this->addRelation('AttributeDesc', 'Thelia\\Model\\AttributeDesc', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', null, 'AttributeDescs');
+        $this->addRelation('AttributeDesc', 'Thelia\\Model\\AttributeDesc', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeDescs');
+        $this->addRelation('AttributeAv', 'Thelia\\Model\\AttributeAv', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeAvs');
+        $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
+        $this->addRelation('AttributeCategory', 'Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'attribute_id', ), 'CASCADE', 'RESTRICT', 'AttributeCategorys');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // AttributeTableMap

@@ -386,18 +386,18 @@ abstract class BaseFeaturePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FeatureAvPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FeatureAvPeer::clearInstancePool();
-        // Invalidate objects in FeatureCategoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FeatureCategoryPeer::clearInstancePool();
         // Invalidate objects in FeatureDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         FeatureDescPeer::clearInstancePool();
+        // Invalidate objects in FeatureAvPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeatureAvPeer::clearInstancePool();
         // Invalidate objects in FeatureProdPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         FeatureProdPeer::clearInstancePool();
+        // Invalidate objects in FeatureCategoryPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeatureCategoryPeer::clearInstancePool();
     }
 
     /**

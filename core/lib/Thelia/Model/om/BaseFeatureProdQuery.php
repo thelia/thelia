@@ -28,7 +28,7 @@ use Thelia\Model\Product;
  * @method FeatureProdQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method FeatureProdQuery orderByFeatureId($order = Criteria::ASC) Order by the feature_id column
  * @method FeatureProdQuery orderByFeatureAvId($order = Criteria::ASC) Order by the feature_av_id column
- * @method FeatureProdQuery orderByDefaultUtility($order = Criteria::ASC) Order by the default_utility column
+ * @method FeatureProdQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method FeatureProdQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method FeatureProdQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method FeatureProdQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -37,7 +37,7 @@ use Thelia\Model\Product;
  * @method FeatureProdQuery groupByProductId() Group by the product_id column
  * @method FeatureProdQuery groupByFeatureId() Group by the feature_id column
  * @method FeatureProdQuery groupByFeatureAvId() Group by the feature_av_id column
- * @method FeatureProdQuery groupByDefaultUtility() Group by the default_utility column
+ * @method FeatureProdQuery groupByByDefault() Group by the by_default column
  * @method FeatureProdQuery groupByPosition() Group by the position column
  * @method FeatureProdQuery groupByCreatedAt() Group by the created_at column
  * @method FeatureProdQuery groupByUpdatedAt() Group by the updated_at column
@@ -46,17 +46,17 @@ use Thelia\Model\Product;
  * @method FeatureProdQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method FeatureProdQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method FeatureProdQuery leftJoinFeatureAv($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureAv relation
- * @method FeatureProdQuery rightJoinFeatureAv($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAv relation
- * @method FeatureProdQuery innerJoinFeatureAv($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAv relation
+ * @method FeatureProdQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
+ * @method FeatureProdQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
+ * @method FeatureProdQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
  *
  * @method FeatureProdQuery leftJoinFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the Feature relation
  * @method FeatureProdQuery rightJoinFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Feature relation
  * @method FeatureProdQuery innerJoinFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the Feature relation
  *
- * @method FeatureProdQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method FeatureProdQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method FeatureProdQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method FeatureProdQuery leftJoinFeatureAv($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureAv relation
+ * @method FeatureProdQuery rightJoinFeatureAv($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAv relation
+ * @method FeatureProdQuery innerJoinFeatureAv($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAv relation
  *
  * @method FeatureProd findOne(PropelPDO $con = null) Return the first FeatureProd matching the query
  * @method FeatureProd findOneOrCreate(PropelPDO $con = null) Return the first FeatureProd matching the query, or a new FeatureProd object populated from the query conditions when no match is found
@@ -65,7 +65,7 @@ use Thelia\Model\Product;
  * @method FeatureProd findOneByProductId(int $product_id) Return the first FeatureProd filtered by the product_id column
  * @method FeatureProd findOneByFeatureId(int $feature_id) Return the first FeatureProd filtered by the feature_id column
  * @method FeatureProd findOneByFeatureAvId(int $feature_av_id) Return the first FeatureProd filtered by the feature_av_id column
- * @method FeatureProd findOneByDefaultUtility(string $default_utility) Return the first FeatureProd filtered by the default_utility column
+ * @method FeatureProd findOneByByDefault(string $by_default) Return the first FeatureProd filtered by the by_default column
  * @method FeatureProd findOneByPosition(int $position) Return the first FeatureProd filtered by the position column
  * @method FeatureProd findOneByCreatedAt(string $created_at) Return the first FeatureProd filtered by the created_at column
  * @method FeatureProd findOneByUpdatedAt(string $updated_at) Return the first FeatureProd filtered by the updated_at column
@@ -74,7 +74,7 @@ use Thelia\Model\Product;
  * @method array findByProductId(int $product_id) Return FeatureProd objects filtered by the product_id column
  * @method array findByFeatureId(int $feature_id) Return FeatureProd objects filtered by the feature_id column
  * @method array findByFeatureAvId(int $feature_av_id) Return FeatureProd objects filtered by the feature_av_id column
- * @method array findByDefaultUtility(string $default_utility) Return FeatureProd objects filtered by the default_utility column
+ * @method array findByByDefault(string $by_default) Return FeatureProd objects filtered by the by_default column
  * @method array findByPosition(int $position) Return FeatureProd objects filtered by the position column
  * @method array findByCreatedAt(string $created_at) Return FeatureProd objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return FeatureProd objects filtered by the updated_at column
@@ -167,7 +167,7 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FEATURE_ID`, `FEATURE_AV_ID`, `DEFAULT_UTILITY`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature_prod` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FEATURE_ID`, `FEATURE_AV_ID`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature_prod` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -413,32 +413,32 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the default_utility column
+     * Filter the query on the by_default column
      *
      * Example usage:
      * <code>
-     * $query->filterByDefaultUtility('fooValue');   // WHERE default_utility = 'fooValue'
-     * $query->filterByDefaultUtility('%fooValue%'); // WHERE default_utility LIKE '%fooValue%'
+     * $query->filterByByDefault('fooValue');   // WHERE by_default = 'fooValue'
+     * $query->filterByByDefault('%fooValue%'); // WHERE by_default LIKE '%fooValue%'
      * </code>
      *
-     * @param     string $defaultUtility The value to use as filter.
+     * @param     string $byDefault The value to use as filter.
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return FeatureProdQuery The current query, for fluid interface
      */
-    public function filterByDefaultUtility($defaultUtility = null, $comparison = null)
+    public function filterByByDefault($byDefault = null, $comparison = null)
     {
         if (null === $comparison) {
-            if (is_array($defaultUtility)) {
+            if (is_array($byDefault)) {
                 $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $defaultUtility)) {
-                $defaultUtility = str_replace('*', '%', $defaultUtility);
+            } elseif (preg_match('/[\%\*]/', $byDefault)) {
+                $byDefault = str_replace('*', '%', $byDefault);
                 $comparison = Criteria::LIKE;
             }
         }
 
-        return $this->addUsingAlias(FeatureProdPeer::DEFAULT_UTILITY, $defaultUtility, $comparison);
+        return $this->addUsingAlias(FeatureProdPeer::BY_DEFAULT, $byDefault, $comparison);
     }
 
     /**
@@ -569,43 +569,43 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related FeatureAv object
+     * Filter the query by a related Product object
      *
-     * @param   FeatureAv|PropelObjectCollection $featureAv The related object(s) to use as filter
+     * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureProdQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByFeatureAv($featureAv, $comparison = null)
+    public function filterByProduct($product, $comparison = null)
     {
-        if ($featureAv instanceof FeatureAv) {
+        if ($product instanceof Product) {
             return $this
-                ->addUsingAlias(FeatureProdPeer::FEATURE_AV_ID, $featureAv->getId(), $comparison);
-        } elseif ($featureAv instanceof PropelObjectCollection) {
+                ->addUsingAlias(FeatureProdPeer::PRODUCT_ID, $product->getId(), $comparison);
+        } elseif ($product instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(FeatureProdPeer::FEATURE_AV_ID, $featureAv->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(FeatureProdPeer::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByFeatureAv() only accepts arguments of type FeatureAv or PropelCollection');
+            throw new PropelException('filterByProduct() only accepts arguments of type Product or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the FeatureAv relation
+     * Adds a JOIN clause to the query using the Product relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return FeatureProdQuery The current query, for fluid interface
      */
-    public function joinFeatureAv($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('FeatureAv');
+        $relationMap = $tableMap->getRelation('Product');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -620,14 +620,14 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'FeatureAv');
+            $this->addJoinObject($join, 'Product');
         }
 
         return $this;
     }
 
     /**
-     * Use the FeatureAv relation FeatureAv object
+     * Use the Product relation Product object
      *
      * @see       useQuery()
      *
@@ -635,13 +635,13 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureAvQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
      */
-    public function useFeatureAvQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinFeatureAv($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'FeatureAv', '\Thelia\Model\FeatureAvQuery');
+            ->joinProduct($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Product', '\Thelia\Model\ProductQuery');
     }
 
     /**
@@ -721,43 +721,43 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related Product object
+     * Filter the query by a related FeatureAv object
      *
-     * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
+     * @param   FeatureAv|PropelObjectCollection $featureAv The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   FeatureProdQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByProduct($product, $comparison = null)
+    public function filterByFeatureAv($featureAv, $comparison = null)
     {
-        if ($product instanceof Product) {
+        if ($featureAv instanceof FeatureAv) {
             return $this
-                ->addUsingAlias(FeatureProdPeer::PRODUCT_ID, $product->getId(), $comparison);
-        } elseif ($product instanceof PropelObjectCollection) {
+                ->addUsingAlias(FeatureProdPeer::FEATURE_AV_ID, $featureAv->getId(), $comparison);
+        } elseif ($featureAv instanceof PropelObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(FeatureProdPeer::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(FeatureProdPeer::FEATURE_AV_ID, $featureAv->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByProduct() only accepts arguments of type Product or PropelCollection');
+            throw new PropelException('filterByFeatureAv() only accepts arguments of type FeatureAv or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Product relation
+     * Adds a JOIN clause to the query using the FeatureAv relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return FeatureProdQuery The current query, for fluid interface
      */
-    public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinFeatureAv($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Product');
+        $relationMap = $tableMap->getRelation('FeatureAv');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -772,14 +772,14 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Product');
+            $this->addJoinObject($join, 'FeatureAv');
         }
 
         return $this;
     }
 
     /**
-     * Use the Product relation Product object
+     * Use the FeatureAv relation FeatureAv object
      *
      * @see       useQuery()
      *
@@ -787,13 +787,13 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\FeatureAvQuery A secondary query class using the current class as primary query
      */
-    public function useProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useFeatureAvQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
-            ->joinProduct($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Product', '\Thelia\Model\ProductQuery');
+            ->joinFeatureAv($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeatureAv', '\Thelia\Model\FeatureAvQuery');
     }
 
     /**
@@ -812,4 +812,69 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
         return $this;
     }
 
+    // timestampable behavior
+
+    /**
+     * Filter by the latest updated
+     *
+     * @param      int $nbDays Maximum age of the latest update in days
+     *
+     * @return     FeatureProdQuery The current query, for fluid interface
+     */
+    public function recentlyUpdated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FeatureProdPeer::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by update date desc
+     *
+     * @return     FeatureProdQuery The current query, for fluid interface
+     */
+    public function lastUpdatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FeatureProdPeer::UPDATED_AT);
+    }
+
+    /**
+     * Order by update date asc
+     *
+     * @return     FeatureProdQuery The current query, for fluid interface
+     */
+    public function firstUpdatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FeatureProdPeer::UPDATED_AT);
+    }
+
+    /**
+     * Filter by the latest created
+     *
+     * @param      int $nbDays Maximum age of in days
+     *
+     * @return     FeatureProdQuery The current query, for fluid interface
+     */
+    public function recentlyCreated($nbDays = 7)
+    {
+        return $this->addUsingAlias(FeatureProdPeer::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+    }
+
+    /**
+     * Order by create date desc
+     *
+     * @return     FeatureProdQuery The current query, for fluid interface
+     */
+    public function lastCreatedFirst()
+    {
+        return $this->addDescendingOrderByColumn(FeatureProdPeer::CREATED_AT);
+    }
+
+    /**
+     * Order by create date asc
+     *
+     * @return     FeatureProdQuery The current query, for fluid interface
+     */
+    public function firstCreatedFirst()
+    {
+        return $this->addAscendingOrderByColumn(FeatureProdPeer::CREATED_AT);
+    }
 }

@@ -38,19 +38,25 @@ abstract class BaseContentFolderPeer
     const TM_CLASS = 'ContentFolderTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 2;
+    const NUM_COLUMNS = 4;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 2;
+    const NUM_HYDRATE_COLUMNS = 4;
 
     /** the column name for the CONTENT_ID field */
     const CONTENT_ID = 'content_folder.CONTENT_ID';
 
     /** the column name for the FOLDER_ID field */
     const FOLDER_ID = 'content_folder.FOLDER_ID';
+
+    /** the column name for the CREATED_AT field */
+    const CREATED_AT = 'content_folder.CREATED_AT';
+
+    /** the column name for the UPDATED_AT field */
+    const UPDATED_AT = 'content_folder.UPDATED_AT';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -71,12 +77,12 @@ abstract class BaseContentFolderPeer
      * e.g. ContentFolderPeer::$fieldNames[ContentFolderPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('ContentId', 'FolderId', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('contentId', 'folderId', ),
-        BasePeer::TYPE_COLNAME => array (ContentFolderPeer::CONTENT_ID, ContentFolderPeer::FOLDER_ID, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('CONTENT_ID', 'FOLDER_ID', ),
-        BasePeer::TYPE_FIELDNAME => array ('content_id', 'folder_id', ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('ContentId', 'FolderId', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('contentId', 'folderId', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (ContentFolderPeer::CONTENT_ID, ContentFolderPeer::FOLDER_ID, ContentFolderPeer::CREATED_AT, ContentFolderPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('CONTENT_ID', 'FOLDER_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('content_id', 'folder_id', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -86,12 +92,12 @@ abstract class BaseContentFolderPeer
      * e.g. ContentFolderPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('ContentId' => 0, 'FolderId' => 1, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('contentId' => 0, 'folderId' => 1, ),
-        BasePeer::TYPE_COLNAME => array (ContentFolderPeer::CONTENT_ID => 0, ContentFolderPeer::FOLDER_ID => 1, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('CONTENT_ID' => 0, 'FOLDER_ID' => 1, ),
-        BasePeer::TYPE_FIELDNAME => array ('content_id' => 0, 'folder_id' => 1, ),
-        BasePeer::TYPE_NUM => array (0, 1, )
+        BasePeer::TYPE_PHPNAME => array ('ContentId' => 0, 'FolderId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('contentId' => 0, 'folderId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
+        BasePeer::TYPE_COLNAME => array (ContentFolderPeer::CONTENT_ID => 0, ContentFolderPeer::FOLDER_ID => 1, ContentFolderPeer::CREATED_AT => 2, ContentFolderPeer::UPDATED_AT => 3, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('CONTENT_ID' => 0, 'FOLDER_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
+        BasePeer::TYPE_FIELDNAME => array ('content_id' => 0, 'folder_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
     );
 
     /**
@@ -167,9 +173,13 @@ abstract class BaseContentFolderPeer
         if (null === $alias) {
             $criteria->addSelectColumn(ContentFolderPeer::CONTENT_ID);
             $criteria->addSelectColumn(ContentFolderPeer::FOLDER_ID);
+            $criteria->addSelectColumn(ContentFolderPeer::CREATED_AT);
+            $criteria->addSelectColumn(ContentFolderPeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.CONTENT_ID');
             $criteria->addSelectColumn($alias . '.FOLDER_ID');
+            $criteria->addSelectColumn($alias . '.CREATED_AT');
+            $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
     }
 

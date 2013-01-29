@@ -54,8 +54,21 @@ class TaxTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('TaxDesc', 'Thelia\\Model\\TaxDesc', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'CASCADE', null, 'TaxDescs');
-        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'SET NULL', null, 'TaxRuleCountrys');
+        $this->addRelation('TaxDesc', 'Thelia\\Model\\TaxDesc', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'CASCADE', 'RESTRICT', 'TaxDescs');
+        $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'SET NULL', 'RESTRICT', 'TaxRuleCountrys');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // TaxTableMap

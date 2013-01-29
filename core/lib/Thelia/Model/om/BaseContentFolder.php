@@ -5,10 +5,12 @@ namespace Thelia\Model\om;
 use \BaseObject;
 use \BasePeer;
 use \Criteria;
+use \DateTime;
 use \Exception;
 use \PDO;
 use \Persistent;
 use \Propel;
+use \PropelDateTime;
 use \PropelException;
 use \PropelPDO;
 use Thelia\Model\Content;
@@ -60,6 +62,18 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     protected $folder_id;
 
     /**
+     * The value for the created_at field.
+     * @var        string
+     */
+    protected $created_at;
+
+    /**
+     * The value for the updated_at field.
+     * @var        string
+     */
+    protected $updated_at;
+
+    /**
      * @var        Content
      */
     protected $aContent;
@@ -101,6 +115,80 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     public function getFolderId()
     {
         return $this->folder_id;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getCreatedAt($format = 'Y-m-d H:i:s')
+    {
+        if ($this->created_at === null) {
+            return null;
+        }
+
+        if ($this->created_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->created_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [updated_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getUpdatedAt($format = 'Y-m-d H:i:s')
+    {
+        if ($this->updated_at === null) {
+            return null;
+        }
+
+        if ($this->updated_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->updated_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
     }
 
     /**
@@ -154,6 +242,52 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     } // setFolderId()
 
     /**
+     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return ContentFolder The current object (for fluent API support)
+     */
+    public function setCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->created_at !== null && $tmpDt = new DateTime($this->created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->created_at = $newDateAsString;
+                $this->modifiedColumns[] = ContentFolderPeer::CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setCreatedAt()
+
+    /**
+     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return ContentFolder The current object (for fluent API support)
+     */
+    public function setUpdatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->updated_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->updated_at !== null && $tmpDt = new DateTime($this->updated_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->updated_at = $newDateAsString;
+                $this->modifiedColumns[] = ContentFolderPeer::UPDATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setUpdatedAt()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -187,6 +321,8 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
 
             $this->content_id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->folder_id = ($row[$startcol + 1] !== null) ? (int) $row[$startcol + 1] : null;
+            $this->created_at = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
+            $this->updated_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -195,7 +331,7 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 2; // 2 = ContentFolderPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 4; // 4 = ContentFolderPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating ContentFolder object", $e);
@@ -337,8 +473,19 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
+                // timestampable behavior
+                if (!$this->isColumnModified(ContentFolderPeer::CREATED_AT)) {
+                    $this->setCreatedAt(time());
+                }
+                if (!$this->isColumnModified(ContentFolderPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
+                // timestampable behavior
+                if ($this->isModified() && !$this->isColumnModified(ContentFolderPeer::UPDATED_AT)) {
+                    $this->setUpdatedAt(time());
+                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -436,6 +583,12 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
         if ($this->isColumnModified(ContentFolderPeer::FOLDER_ID)) {
             $modifiedColumns[':p' . $index++]  = '`FOLDER_ID`';
         }
+        if ($this->isColumnModified(ContentFolderPeer::CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+        }
+        if ($this->isColumnModified(ContentFolderPeer::UPDATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `content_folder` (%s) VALUES (%s)',
@@ -452,6 +605,12 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
                         break;
                     case '`FOLDER_ID`':
                         $stmt->bindValue($identifier, $this->folder_id, PDO::PARAM_INT);
+                        break;
+                    case '`CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
+                        break;
+                    case '`UPDATED_AT`':
+                        $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -604,6 +763,12 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
             case 1:
                 return $this->getFolderId();
                 break;
+            case 2:
+                return $this->getCreatedAt();
+                break;
+            case 3:
+                return $this->getUpdatedAt();
+                break;
             default:
                 return null;
                 break;
@@ -635,6 +800,8 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getContentId(),
             $keys[1] => $this->getFolderId(),
+            $keys[2] => $this->getCreatedAt(),
+            $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aContent) {
@@ -683,6 +850,12 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
             case 1:
                 $this->setFolderId($value);
                 break;
+            case 2:
+                $this->setCreatedAt($value);
+                break;
+            case 3:
+                $this->setUpdatedAt($value);
+                break;
         } // switch()
     }
 
@@ -709,6 +882,8 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setContentId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setFolderId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
     }
 
     /**
@@ -722,6 +897,8 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
 
         if ($this->isColumnModified(ContentFolderPeer::CONTENT_ID)) $criteria->add(ContentFolderPeer::CONTENT_ID, $this->content_id);
         if ($this->isColumnModified(ContentFolderPeer::FOLDER_ID)) $criteria->add(ContentFolderPeer::FOLDER_ID, $this->folder_id);
+        if ($this->isColumnModified(ContentFolderPeer::CREATED_AT)) $criteria->add(ContentFolderPeer::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ContentFolderPeer::UPDATED_AT)) $criteria->add(ContentFolderPeer::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -794,6 +971,8 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     {
         $copyObj->setContentId($this->getContentId());
         $copyObj->setFolderId($this->getFolderId());
+        $copyObj->setCreatedAt($this->getCreatedAt());
+        $copyObj->setUpdatedAt($this->getUpdatedAt());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -960,6 +1139,8 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     {
         $this->content_id = null;
         $this->folder_id = null;
+        $this->created_at = null;
+        $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
@@ -1004,6 +1185,20 @@ abstract class BaseContentFolder extends BaseObject implements Persistent
     public function isAlreadyInSave()
     {
         return $this->alreadyInSave;
+    }
+
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ContentFolder The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = ContentFolderPeer::UPDATED_AT;
+
+        return $this;
     }
 
 }

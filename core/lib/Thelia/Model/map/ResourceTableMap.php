@@ -44,7 +44,7 @@ class ResourceTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 30, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', true, null, null);
+        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
@@ -54,8 +54,21 @@ class ResourceTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', null, 'GroupResources');
-        $this->addRelation('ResourceDesc', 'Thelia\\Model\\ResourceDesc', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', null, 'ResourceDescs');
+        $this->addRelation('ResourceDesc', 'Thelia\\Model\\ResourceDesc', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT', 'ResourceDescs');
+        $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT', 'GroupResources');
     } // buildRelations()
+
+    /**
+     *
+     * Gets the list of behaviors registered for this table
+     *
+     * @return array Associative array (name => parameters) of behaviors
+     */
+    public function getBehaviors()
+    {
+        return array(
+            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+        );
+    } // getBehaviors()
 
 } // ResourceTableMap

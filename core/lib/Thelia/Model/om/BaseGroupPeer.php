@@ -381,18 +381,18 @@ abstract class BaseGroupPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AdminGroupPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AdminGroupPeer::clearInstancePool();
         // Invalidate objects in GroupDescPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         GroupDescPeer::clearInstancePool();
-        // Invalidate objects in GroupModulePeer instance pool,
+        // Invalidate objects in AdminGroupPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        GroupModulePeer::clearInstancePool();
+        AdminGroupPeer::clearInstancePool();
         // Invalidate objects in GroupResourcePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         GroupResourcePeer::clearInstancePool();
+        // Invalidate objects in GroupModulePeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        GroupModulePeer::clearInstancePool();
     }
 
     /**
