@@ -18,8 +18,8 @@ use \PropelPDO;
 use Thelia\Model\GroupModule;
 use Thelia\Model\GroupModuleQuery;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleDesc;
-use Thelia\Model\ModuleDescQuery;
+use Thelia\Model\ModuleI18n;
+use Thelia\Model\ModuleI18nQuery;
 use Thelia\Model\ModulePeer;
 use Thelia\Model\ModuleQuery;
 
@@ -94,16 +94,16 @@ abstract class BaseModule extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|ModuleDesc[] Collection to store aggregation of ModuleDesc objects.
-     */
-    protected $collModuleDescs;
-    protected $collModuleDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|GroupModule[] Collection to store aggregation of GroupModule objects.
      */
     protected $collGroupModules;
     protected $collGroupModulesPartial;
+
+    /**
+     * @var        PropelObjectCollection|ModuleI18n[] Collection to store aggregation of ModuleI18n objects.
+     */
+    protected $collModuleI18ns;
+    protected $collModuleI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -119,17 +119,31 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $moduleDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[ModuleI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $groupModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $moduleI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -515,9 +529,9 @@ abstract class BaseModule extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collModuleDescs = null;
-
             $this->collGroupModules = null;
+
+            $this->collModuleI18ns = null;
 
         } // if (deep)
     }
@@ -654,23 +668,6 @@ abstract class BaseModule extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->moduleDescsScheduledForDeletion !== null) {
-                if (!$this->moduleDescsScheduledForDeletion->isEmpty()) {
-                    ModuleDescQuery::create()
-                        ->filterByPrimaryKeys($this->moduleDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->moduleDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collModuleDescs !== null) {
-                foreach ($this->collModuleDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->groupModulesScheduledForDeletion !== null) {
                 if (!$this->groupModulesScheduledForDeletion->isEmpty()) {
                     foreach ($this->groupModulesScheduledForDeletion as $groupModule) {
@@ -683,6 +680,23 @@ abstract class BaseModule extends BaseObject implements Persistent
 
             if ($this->collGroupModules !== null) {
                 foreach ($this->collGroupModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->moduleI18nsScheduledForDeletion !== null) {
+                if (!$this->moduleI18nsScheduledForDeletion->isEmpty()) {
+                    ModuleI18nQuery::create()
+                        ->filterByPrimaryKeys($this->moduleI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->moduleI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collModuleI18ns !== null) {
+                foreach ($this->collModuleI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -856,16 +870,16 @@ abstract class BaseModule extends BaseObject implements Persistent
             }
 
 
-                if ($this->collModuleDescs !== null) {
-                    foreach ($this->collModuleDescs as $referrerFK) {
+                if ($this->collGroupModules !== null) {
+                    foreach ($this->collGroupModules as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collGroupModules !== null) {
-                    foreach ($this->collGroupModules as $referrerFK) {
+                if ($this->collModuleI18ns !== null) {
+                    foreach ($this->collModuleI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -966,11 +980,11 @@ abstract class BaseModule extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collModuleDescs) {
-                $result['ModuleDescs'] = $this->collModuleDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collGroupModules) {
                 $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collModuleI18ns) {
+                $result['ModuleI18ns'] = $this->collModuleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1153,15 +1167,15 @@ abstract class BaseModule extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getModuleDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addModuleDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getGroupModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addGroupModule($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getModuleI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addModuleI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1226,218 +1240,11 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('ModuleDesc' == $relationName) {
-            $this->initModuleDescs();
-        }
         if ('GroupModule' == $relationName) {
             $this->initGroupModules();
         }
-    }
-
-    /**
-     * Clears out the collModuleDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addModuleDescs()
-     */
-    public function clearModuleDescs()
-    {
-        $this->collModuleDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collModuleDescsPartial = null;
-    }
-
-    /**
-     * reset is the collModuleDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialModuleDescs($v = true)
-    {
-        $this->collModuleDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collModuleDescs collection.
-     *
-     * By default this just sets the collModuleDescs collection to an empty array (like clearcollModuleDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initModuleDescs($overrideExisting = true)
-    {
-        if (null !== $this->collModuleDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collModuleDescs = new PropelObjectCollection();
-        $this->collModuleDescs->setModel('ModuleDesc');
-    }
-
-    /**
-     * Gets an array of ModuleDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Module is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ModuleDesc[] List of ModuleDesc objects
-     * @throws PropelException
-     */
-    public function getModuleDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collModuleDescsPartial && !$this->isNew();
-        if (null === $this->collModuleDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collModuleDescs) {
-                // return empty collection
-                $this->initModuleDescs();
-            } else {
-                $collModuleDescs = ModuleDescQuery::create(null, $criteria)
-                    ->filterByModule($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collModuleDescsPartial && count($collModuleDescs)) {
-                      $this->initModuleDescs(false);
-
-                      foreach($collModuleDescs as $obj) {
-                        if (false == $this->collModuleDescs->contains($obj)) {
-                          $this->collModuleDescs->append($obj);
-                        }
-                      }
-
-                      $this->collModuleDescsPartial = true;
-                    }
-
-                    return $collModuleDescs;
-                }
-
-                if($partial && $this->collModuleDescs) {
-                    foreach($this->collModuleDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collModuleDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collModuleDescs = $collModuleDescs;
-                $this->collModuleDescsPartial = false;
-            }
-        }
-
-        return $this->collModuleDescs;
-    }
-
-    /**
-     * Sets a collection of ModuleDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $moduleDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setModuleDescs(PropelCollection $moduleDescs, PropelPDO $con = null)
-    {
-        $this->moduleDescsScheduledForDeletion = $this->getModuleDescs(new Criteria(), $con)->diff($moduleDescs);
-
-        foreach ($this->moduleDescsScheduledForDeletion as $moduleDescRemoved) {
-            $moduleDescRemoved->setModule(null);
-        }
-
-        $this->collModuleDescs = null;
-        foreach ($moduleDescs as $moduleDesc) {
-            $this->addModuleDesc($moduleDesc);
-        }
-
-        $this->collModuleDescs = $moduleDescs;
-        $this->collModuleDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related ModuleDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related ModuleDesc objects.
-     * @throws PropelException
-     */
-    public function countModuleDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collModuleDescsPartial && !$this->isNew();
-        if (null === $this->collModuleDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collModuleDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getModuleDescs());
-                }
-                $query = ModuleDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByModule($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collModuleDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a ModuleDesc object to this object
-     * through the ModuleDesc foreign key attribute.
-     *
-     * @param    ModuleDesc $l ModuleDesc
-     * @return Module The current object (for fluent API support)
-     */
-    public function addModuleDesc(ModuleDesc $l)
-    {
-        if ($this->collModuleDescs === null) {
-            $this->initModuleDescs();
-            $this->collModuleDescsPartial = true;
-        }
-        if (!$this->collModuleDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddModuleDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	ModuleDesc $moduleDesc The moduleDesc object to add.
-     */
-    protected function doAddModuleDesc($moduleDesc)
-    {
-        $this->collModuleDescs[]= $moduleDesc;
-        $moduleDesc->setModule($this);
-    }
-
-    /**
-     * @param	ModuleDesc $moduleDesc The moduleDesc object to remove.
-     */
-    public function removeModuleDesc($moduleDesc)
-    {
-        if ($this->getModuleDescs()->contains($moduleDesc)) {
-            $this->collModuleDescs->remove($this->collModuleDescs->search($moduleDesc));
-            if (null === $this->moduleDescsScheduledForDeletion) {
-                $this->moduleDescsScheduledForDeletion = clone $this->collModuleDescs;
-                $this->moduleDescsScheduledForDeletion->clear();
-            }
-            $this->moduleDescsScheduledForDeletion[]= $moduleDesc;
-            $moduleDesc->setModule(null);
+        if ('ModuleI18n' == $relationName) {
+            $this->initModuleI18ns();
         }
     }
 
@@ -1674,6 +1481,217 @@ abstract class BaseModule extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collModuleI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addModuleI18ns()
+     */
+    public function clearModuleI18ns()
+    {
+        $this->collModuleI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collModuleI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collModuleI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialModuleI18ns($v = true)
+    {
+        $this->collModuleI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collModuleI18ns collection.
+     *
+     * By default this just sets the collModuleI18ns collection to an empty array (like clearcollModuleI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initModuleI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collModuleI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collModuleI18ns = new PropelObjectCollection();
+        $this->collModuleI18ns->setModel('ModuleI18n');
+    }
+
+    /**
+     * Gets an array of ModuleI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Module is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ModuleI18n[] List of ModuleI18n objects
+     * @throws PropelException
+     */
+    public function getModuleI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collModuleI18nsPartial && !$this->isNew();
+        if (null === $this->collModuleI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collModuleI18ns) {
+                // return empty collection
+                $this->initModuleI18ns();
+            } else {
+                $collModuleI18ns = ModuleI18nQuery::create(null, $criteria)
+                    ->filterByModule($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collModuleI18nsPartial && count($collModuleI18ns)) {
+                      $this->initModuleI18ns(false);
+
+                      foreach($collModuleI18ns as $obj) {
+                        if (false == $this->collModuleI18ns->contains($obj)) {
+                          $this->collModuleI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collModuleI18nsPartial = true;
+                    }
+
+                    return $collModuleI18ns;
+                }
+
+                if($partial && $this->collModuleI18ns) {
+                    foreach($this->collModuleI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collModuleI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collModuleI18ns = $collModuleI18ns;
+                $this->collModuleI18nsPartial = false;
+            }
+        }
+
+        return $this->collModuleI18ns;
+    }
+
+    /**
+     * Sets a collection of ModuleI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $moduleI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setModuleI18ns(PropelCollection $moduleI18ns, PropelPDO $con = null)
+    {
+        $this->moduleI18nsScheduledForDeletion = $this->getModuleI18ns(new Criteria(), $con)->diff($moduleI18ns);
+
+        foreach ($this->moduleI18nsScheduledForDeletion as $moduleI18nRemoved) {
+            $moduleI18nRemoved->setModule(null);
+        }
+
+        $this->collModuleI18ns = null;
+        foreach ($moduleI18ns as $moduleI18n) {
+            $this->addModuleI18n($moduleI18n);
+        }
+
+        $this->collModuleI18ns = $moduleI18ns;
+        $this->collModuleI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ModuleI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ModuleI18n objects.
+     * @throws PropelException
+     */
+    public function countModuleI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collModuleI18nsPartial && !$this->isNew();
+        if (null === $this->collModuleI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collModuleI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getModuleI18ns());
+                }
+                $query = ModuleI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByModule($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collModuleI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a ModuleI18n object to this object
+     * through the ModuleI18n foreign key attribute.
+     *
+     * @param    ModuleI18n $l ModuleI18n
+     * @return Module The current object (for fluent API support)
+     */
+    public function addModuleI18n(ModuleI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collModuleI18ns === null) {
+            $this->initModuleI18ns();
+            $this->collModuleI18nsPartial = true;
+        }
+        if (!$this->collModuleI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddModuleI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ModuleI18n $moduleI18n The moduleI18n object to add.
+     */
+    protected function doAddModuleI18n($moduleI18n)
+    {
+        $this->collModuleI18ns[]= $moduleI18n;
+        $moduleI18n->setModule($this);
+    }
+
+    /**
+     * @param	ModuleI18n $moduleI18n The moduleI18n object to remove.
+     */
+    public function removeModuleI18n($moduleI18n)
+    {
+        if ($this->getModuleI18ns()->contains($moduleI18n)) {
+            $this->collModuleI18ns->remove($this->collModuleI18ns->search($moduleI18n));
+            if (null === $this->moduleI18nsScheduledForDeletion) {
+                $this->moduleI18nsScheduledForDeletion = clone $this->collModuleI18ns;
+                $this->moduleI18nsScheduledForDeletion->clear();
+            }
+            $this->moduleI18nsScheduledForDeletion[]= $moduleI18n;
+            $moduleI18n->setModule(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1705,26 +1723,30 @@ abstract class BaseModule extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collModuleDescs) {
-                foreach ($this->collModuleDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collGroupModules) {
                 foreach ($this->collGroupModules as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collModuleI18ns) {
+                foreach ($this->collModuleI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collModuleDescs instanceof PropelCollection) {
-            $this->collModuleDescs->clearIterator();
-        }
-        $this->collModuleDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collGroupModules instanceof PropelCollection) {
             $this->collGroupModules->clearIterator();
         }
         $this->collGroupModules = null;
+        if ($this->collModuleI18ns instanceof PropelCollection) {
+            $this->collModuleI18ns->clearIterator();
+        }
+        $this->collModuleI18ns = null;
     }
 
     /**
@@ -1757,6 +1779,201 @@ abstract class BaseModule extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = ModulePeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Module The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ModuleI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collModuleI18ns) {
+                foreach ($this->collModuleI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new ModuleI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = ModuleI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addModuleI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Module The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            ModuleI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collModuleI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collModuleI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ModuleI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return ModuleI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return ModuleI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return ModuleI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return ModuleI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

@@ -16,8 +16,8 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Config;
-use Thelia\Model\ConfigDesc;
-use Thelia\Model\ConfigDescQuery;
+use Thelia\Model\ConfigI18n;
+use Thelia\Model\ConfigI18nQuery;
 use Thelia\Model\ConfigPeer;
 use Thelia\Model\ConfigQuery;
 
@@ -94,10 +94,10 @@ abstract class BaseConfig extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|ConfigDesc[] Collection to store aggregation of ConfigDesc objects.
+     * @var        PropelObjectCollection|ConfigI18n[] Collection to store aggregation of ConfigI18n objects.
      */
-    protected $collConfigDescs;
-    protected $collConfigDescsPartial;
+    protected $collConfigI18ns;
+    protected $collConfigI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -113,11 +113,25 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
+    /**
+     * Current locale
+     * @var        string
+     */
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[ConfigI18n]
+     */
+    protected $currentTranslations;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $configDescsScheduledForDeletion = null;
+    protected $configI18nsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -533,7 +547,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collConfigDescs = null;
+            $this->collConfigI18ns = null;
 
         } // if (deep)
     }
@@ -670,17 +684,17 @@ abstract class BaseConfig extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->configDescsScheduledForDeletion !== null) {
-                if (!$this->configDescsScheduledForDeletion->isEmpty()) {
-                    ConfigDescQuery::create()
-                        ->filterByPrimaryKeys($this->configDescsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->configI18nsScheduledForDeletion !== null) {
+                if (!$this->configI18nsScheduledForDeletion->isEmpty()) {
+                    ConfigI18nQuery::create()
+                        ->filterByPrimaryKeys($this->configI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->configDescsScheduledForDeletion = null;
+                    $this->configI18nsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collConfigDescs !== null) {
-                foreach ($this->collConfigDescs as $referrerFK) {
+            if ($this->collConfigI18ns !== null) {
+                foreach ($this->collConfigI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -865,8 +879,8 @@ abstract class BaseConfig extends BaseObject implements Persistent
             }
 
 
-                if ($this->collConfigDescs !== null) {
-                    foreach ($this->collConfigDescs as $referrerFK) {
+                if ($this->collConfigI18ns !== null) {
+                    foreach ($this->collConfigI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -967,8 +981,8 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collConfigDescs) {
-                $result['ConfigDescs'] = $this->collConfigDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collConfigI18ns) {
+                $result['ConfigI18ns'] = $this->collConfigI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1151,9 +1165,9 @@ abstract class BaseConfig extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getConfigDescs() as $relObj) {
+            foreach ($this->getConfigI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addConfigDesc($relObj->copy($deepCopy));
+                    $copyObj->addConfigI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1218,40 +1232,40 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('ConfigDesc' == $relationName) {
-            $this->initConfigDescs();
+        if ('ConfigI18n' == $relationName) {
+            $this->initConfigI18ns();
         }
     }
 
     /**
-     * Clears out the collConfigDescs collection
+     * Clears out the collConfigI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addConfigDescs()
+     * @see        addConfigI18ns()
      */
-    public function clearConfigDescs()
+    public function clearConfigI18ns()
     {
-        $this->collConfigDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collConfigDescsPartial = null;
+        $this->collConfigI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collConfigI18nsPartial = null;
     }
 
     /**
-     * reset is the collConfigDescs collection loaded partially
+     * reset is the collConfigI18ns collection loaded partially
      *
      * @return void
      */
-    public function resetPartialConfigDescs($v = true)
+    public function resetPartialConfigI18ns($v = true)
     {
-        $this->collConfigDescsPartial = $v;
+        $this->collConfigI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collConfigDescs collection.
+     * Initializes the collConfigI18ns collection.
      *
-     * By default this just sets the collConfigDescs collection to an empty array (like clearcollConfigDescs());
+     * By default this just sets the collConfigI18ns collection to an empty array (like clearcollConfigI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1260,17 +1274,17 @@ abstract class BaseConfig extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initConfigDescs($overrideExisting = true)
+    public function initConfigI18ns($overrideExisting = true)
     {
-        if (null !== $this->collConfigDescs && !$overrideExisting) {
+        if (null !== $this->collConfigI18ns && !$overrideExisting) {
             return;
         }
-        $this->collConfigDescs = new PropelObjectCollection();
-        $this->collConfigDescs->setModel('ConfigDesc');
+        $this->collConfigI18ns = new PropelObjectCollection();
+        $this->collConfigI18ns->setModel('ConfigI18n');
     }
 
     /**
-     * Gets an array of ConfigDesc objects which contain a foreign key that references this object.
+     * Gets an array of ConfigI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1280,98 +1294,98 @@ abstract class BaseConfig extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ConfigDesc[] List of ConfigDesc objects
+     * @return PropelObjectCollection|ConfigI18n[] List of ConfigI18n objects
      * @throws PropelException
      */
-    public function getConfigDescs($criteria = null, PropelPDO $con = null)
+    public function getConfigI18ns($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collConfigDescsPartial && !$this->isNew();
-        if (null === $this->collConfigDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collConfigDescs) {
+        $partial = $this->collConfigI18nsPartial && !$this->isNew();
+        if (null === $this->collConfigI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collConfigI18ns) {
                 // return empty collection
-                $this->initConfigDescs();
+                $this->initConfigI18ns();
             } else {
-                $collConfigDescs = ConfigDescQuery::create(null, $criteria)
+                $collConfigI18ns = ConfigI18nQuery::create(null, $criteria)
                     ->filterByConfig($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collConfigDescsPartial && count($collConfigDescs)) {
-                      $this->initConfigDescs(false);
+                    if (false !== $this->collConfigI18nsPartial && count($collConfigI18ns)) {
+                      $this->initConfigI18ns(false);
 
-                      foreach($collConfigDescs as $obj) {
-                        if (false == $this->collConfigDescs->contains($obj)) {
-                          $this->collConfigDescs->append($obj);
+                      foreach($collConfigI18ns as $obj) {
+                        if (false == $this->collConfigI18ns->contains($obj)) {
+                          $this->collConfigI18ns->append($obj);
                         }
                       }
 
-                      $this->collConfigDescsPartial = true;
+                      $this->collConfigI18nsPartial = true;
                     }
 
-                    return $collConfigDescs;
+                    return $collConfigI18ns;
                 }
 
-                if($partial && $this->collConfigDescs) {
-                    foreach($this->collConfigDescs as $obj) {
+                if($partial && $this->collConfigI18ns) {
+                    foreach($this->collConfigI18ns as $obj) {
                         if($obj->isNew()) {
-                            $collConfigDescs[] = $obj;
+                            $collConfigI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collConfigDescs = $collConfigDescs;
-                $this->collConfigDescsPartial = false;
+                $this->collConfigI18ns = $collConfigI18ns;
+                $this->collConfigI18nsPartial = false;
             }
         }
 
-        return $this->collConfigDescs;
+        return $this->collConfigI18ns;
     }
 
     /**
-     * Sets a collection of ConfigDesc objects related by a one-to-many relationship
+     * Sets a collection of ConfigI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $configDescs A Propel collection.
+     * @param PropelCollection $configI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setConfigDescs(PropelCollection $configDescs, PropelPDO $con = null)
+    public function setConfigI18ns(PropelCollection $configI18ns, PropelPDO $con = null)
     {
-        $this->configDescsScheduledForDeletion = $this->getConfigDescs(new Criteria(), $con)->diff($configDescs);
+        $this->configI18nsScheduledForDeletion = $this->getConfigI18ns(new Criteria(), $con)->diff($configI18ns);
 
-        foreach ($this->configDescsScheduledForDeletion as $configDescRemoved) {
-            $configDescRemoved->setConfig(null);
+        foreach ($this->configI18nsScheduledForDeletion as $configI18nRemoved) {
+            $configI18nRemoved->setConfig(null);
         }
 
-        $this->collConfigDescs = null;
-        foreach ($configDescs as $configDesc) {
-            $this->addConfigDesc($configDesc);
+        $this->collConfigI18ns = null;
+        foreach ($configI18ns as $configI18n) {
+            $this->addConfigI18n($configI18n);
         }
 
-        $this->collConfigDescs = $configDescs;
-        $this->collConfigDescsPartial = false;
+        $this->collConfigI18ns = $configI18ns;
+        $this->collConfigI18nsPartial = false;
     }
 
     /**
-     * Returns the number of related ConfigDesc objects.
+     * Returns the number of related ConfigI18n objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related ConfigDesc objects.
+     * @return int             Count of related ConfigI18n objects.
      * @throws PropelException
      */
-    public function countConfigDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countConfigI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collConfigDescsPartial && !$this->isNew();
-        if (null === $this->collConfigDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collConfigDescs) {
+        $partial = $this->collConfigI18nsPartial && !$this->isNew();
+        if (null === $this->collConfigI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collConfigI18ns) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getConfigDescs());
+                    return count($this->getConfigI18ns());
                 }
-                $query = ConfigDescQuery::create(null, $criteria);
+                $query = ConfigI18nQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1381,52 +1395,56 @@ abstract class BaseConfig extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collConfigDescs);
+            return count($this->collConfigI18ns);
         }
     }
 
     /**
-     * Method called to associate a ConfigDesc object to this object
-     * through the ConfigDesc foreign key attribute.
+     * Method called to associate a ConfigI18n object to this object
+     * through the ConfigI18n foreign key attribute.
      *
-     * @param    ConfigDesc $l ConfigDesc
+     * @param    ConfigI18n $l ConfigI18n
      * @return Config The current object (for fluent API support)
      */
-    public function addConfigDesc(ConfigDesc $l)
+    public function addConfigI18n(ConfigI18n $l)
     {
-        if ($this->collConfigDescs === null) {
-            $this->initConfigDescs();
-            $this->collConfigDescsPartial = true;
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
         }
-        if (!$this->collConfigDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddConfigDesc($l);
+        if ($this->collConfigI18ns === null) {
+            $this->initConfigI18ns();
+            $this->collConfigI18nsPartial = true;
+        }
+        if (!$this->collConfigI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddConfigI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	ConfigDesc $configDesc The configDesc object to add.
+     * @param	ConfigI18n $configI18n The configI18n object to add.
      */
-    protected function doAddConfigDesc($configDesc)
+    protected function doAddConfigI18n($configI18n)
     {
-        $this->collConfigDescs[]= $configDesc;
-        $configDesc->setConfig($this);
+        $this->collConfigI18ns[]= $configI18n;
+        $configI18n->setConfig($this);
     }
 
     /**
-     * @param	ConfigDesc $configDesc The configDesc object to remove.
+     * @param	ConfigI18n $configI18n The configI18n object to remove.
      */
-    public function removeConfigDesc($configDesc)
+    public function removeConfigI18n($configI18n)
     {
-        if ($this->getConfigDescs()->contains($configDesc)) {
-            $this->collConfigDescs->remove($this->collConfigDescs->search($configDesc));
-            if (null === $this->configDescsScheduledForDeletion) {
-                $this->configDescsScheduledForDeletion = clone $this->collConfigDescs;
-                $this->configDescsScheduledForDeletion->clear();
+        if ($this->getConfigI18ns()->contains($configI18n)) {
+            $this->collConfigI18ns->remove($this->collConfigI18ns->search($configI18n));
+            if (null === $this->configI18nsScheduledForDeletion) {
+                $this->configI18nsScheduledForDeletion = clone $this->collConfigI18ns;
+                $this->configI18nsScheduledForDeletion->clear();
             }
-            $this->configDescsScheduledForDeletion[]= $configDesc;
-            $configDesc->setConfig(null);
+            $this->configI18nsScheduledForDeletion[]= $configI18n;
+            $configI18n->setConfig(null);
         }
     }
 
@@ -1463,17 +1481,21 @@ abstract class BaseConfig extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collConfigDescs) {
-                foreach ($this->collConfigDescs as $o) {
+            if ($this->collConfigI18ns) {
+                foreach ($this->collConfigI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        if ($this->collConfigDescs instanceof PropelCollection) {
-            $this->collConfigDescs->clearIterator();
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
+        if ($this->collConfigI18ns instanceof PropelCollection) {
+            $this->collConfigI18ns->clearIterator();
         }
-        $this->collConfigDescs = null;
+        $this->collConfigI18ns = null;
     }
 
     /**
@@ -1506,6 +1528,201 @@ abstract class BaseConfig extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = ConfigPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Config The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ConfigI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collConfigI18ns) {
+                foreach ($this->collConfigI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new ConfigI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = ConfigI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addConfigI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Config The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            ConfigI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collConfigI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collConfigI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ConfigI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return ConfigI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return ConfigI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return ConfigI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return ConfigI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

@@ -16,7 +16,7 @@ use Thelia\Model\FeatureProdPeer;
 use Thelia\Model\ImagePeer;
 use Thelia\Model\Product;
 use Thelia\Model\ProductCategoryPeer;
-use Thelia\Model\ProductDescPeer;
+use Thelia\Model\ProductI18nPeer;
 use Thelia\Model\ProductPeer;
 use Thelia\Model\RewritingPeer;
 use Thelia\Model\StockPeer;
@@ -108,6 +108,13 @@ abstract class BaseProductPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -437,9 +444,6 @@ abstract class BaseProductPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ProductDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ProductDescPeer::clearInstancePool();
         // Invalidate objects in ProductCategoryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ProductCategoryPeer::clearInstancePool();
@@ -467,6 +471,9 @@ abstract class BaseProductPeer
         // Invalidate objects in RewritingPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         RewritingPeer::clearInstancePool();
+        // Invalidate objects in ProductI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ProductI18nPeer::clearInstancePool();
     }
 
     /**

@@ -55,10 +55,10 @@ class FeatureTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FeatureDesc', 'Thelia\\Model\\FeatureDesc', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureDescs');
         $this->addRelation('FeatureAv', 'Thelia\\Model\\FeatureAv', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureAvs');
         $this->addRelation('FeatureProd', 'Thelia\\Model\\FeatureProd', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureProds');
         $this->addRelation('FeatureCategory', 'Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategorys');
+        $this->addRelation('FeatureI18n', 'Thelia\\Model\\FeatureI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FeatureI18ns');
     } // buildRelations()
 
     /**
@@ -71,6 +71,7 @@ class FeatureTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

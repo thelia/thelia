@@ -14,8 +14,8 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Content;
 use Thelia\Model\ContentAssoc;
-use Thelia\Model\ContentDesc;
 use Thelia\Model\ContentFolder;
+use Thelia\Model\ContentI18n;
 use Thelia\Model\ContentPeer;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Document;
@@ -43,10 +43,6 @@ use Thelia\Model\Rewriting;
  * @method ContentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ContentQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ContentQuery leftJoinContentDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentDesc relation
- * @method ContentQuery rightJoinContentDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentDesc relation
- * @method ContentQuery innerJoinContentDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentDesc relation
- *
  * @method ContentQuery leftJoinContentAssoc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentAssoc relation
  * @method ContentQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
  * @method ContentQuery innerJoinContentAssoc($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentAssoc relation
@@ -66,6 +62,10 @@ use Thelia\Model\Rewriting;
  * @method ContentQuery leftJoinContentFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentFolder relation
  * @method ContentQuery rightJoinContentFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentFolder relation
  * @method ContentQuery innerJoinContentFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentFolder relation
+ *
+ * @method ContentQuery leftJoinContentI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentI18n relation
+ * @method ContentQuery rightJoinContentI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentI18n relation
+ * @method ContentQuery innerJoinContentI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentI18n relation
  *
  * @method Content findOne(PropelPDO $con = null) Return the first Content matching the query
  * @method Content findOneOrCreate(PropelPDO $con = null) Return the first Content matching the query, or a new Content object populated from the query conditions when no match is found
@@ -455,80 +455,6 @@ abstract class BaseContentQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ContentDesc object
-     *
-     * @param   ContentDesc|PropelObjectCollection $contentDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   ContentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByContentDesc($contentDesc, $comparison = null)
-    {
-        if ($contentDesc instanceof ContentDesc) {
-            return $this
-                ->addUsingAlias(ContentPeer::ID, $contentDesc->getContentId(), $comparison);
-        } elseif ($contentDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useContentDescQuery()
-                ->filterByPrimaryKeys($contentDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByContentDesc() only accepts arguments of type ContentDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the ContentDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ContentQuery The current query, for fluid interface
-     */
-    public function joinContentDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ContentDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'ContentDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the ContentDesc relation ContentDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ContentDescQuery A secondary query class using the current class as primary query
-     */
-    public function useContentDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinContentDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ContentDesc', '\Thelia\Model\ContentDescQuery');
-    }
-
-    /**
      * Filter the query by a related ContentAssoc object
      *
      * @param   ContentAssoc|PropelObjectCollection $contentAssoc  the related object to use as filter
@@ -899,6 +825,80 @@ abstract class BaseContentQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related ContentI18n object
+     *
+     * @param   ContentI18n|PropelObjectCollection $contentI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ContentQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByContentI18n($contentI18n, $comparison = null)
+    {
+        if ($contentI18n instanceof ContentI18n) {
+            return $this
+                ->addUsingAlias(ContentPeer::ID, $contentI18n->getId(), $comparison);
+        } elseif ($contentI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useContentI18nQuery()
+                ->filterByPrimaryKeys($contentI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByContentI18n() only accepts arguments of type ContentI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ContentI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ContentQuery The current query, for fluid interface
+     */
+    public function joinContentI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ContentI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ContentI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ContentI18n relation ContentI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ContentI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useContentI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinContentI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ContentI18n', '\Thelia\Model\ContentI18nQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Content $content Object to remove from the list of results
@@ -979,4 +979,61 @@ abstract class BaseContentQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(ContentPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ContentQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'ContentI18n';
+
+        return $this
+            ->joinContentI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ContentQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('ContentI18n');
+        $this->with['ContentI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ContentI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ContentI18n', 'Thelia\Model\ContentI18nQuery');
+    }
+
 }

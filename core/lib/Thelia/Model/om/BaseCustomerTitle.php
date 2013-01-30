@@ -20,8 +20,8 @@ use Thelia\Model\AddressQuery;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerQuery;
 use Thelia\Model\CustomerTitle;
-use Thelia\Model\CustomerTitleDesc;
-use Thelia\Model\CustomerTitleDescQuery;
+use Thelia\Model\CustomerTitleI18n;
+use Thelia\Model\CustomerTitleI18nQuery;
 use Thelia\Model\CustomerTitlePeer;
 use Thelia\Model\CustomerTitleQuery;
 
@@ -97,10 +97,10 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
     protected $collAddresssPartial;
 
     /**
-     * @var        PropelObjectCollection|CustomerTitleDesc[] Collection to store aggregation of CustomerTitleDesc objects.
+     * @var        PropelObjectCollection|CustomerTitleI18n[] Collection to store aggregation of CustomerTitleI18n objects.
      */
-    protected $collCustomerTitleDescs;
-    protected $collCustomerTitleDescsPartial;
+    protected $collCustomerTitleI18ns;
+    protected $collCustomerTitleI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -115,6 +115,20 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInValidation = false;
+
+    // i18n behavior
+
+    /**
+     * Current locale
+     * @var        string
+     */
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[CustomerTitleI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
@@ -132,7 +146,7 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $customerTitleDescsScheduledForDeletion = null;
+    protected $customerTitleI18nsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -483,7 +497,7 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
 
             $this->collAddresss = null;
 
-            $this->collCustomerTitleDescs = null;
+            $this->collCustomerTitleI18ns = null;
 
         } // if (deep)
     }
@@ -656,17 +670,17 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->customerTitleDescsScheduledForDeletion !== null) {
-                if (!$this->customerTitleDescsScheduledForDeletion->isEmpty()) {
-                    CustomerTitleDescQuery::create()
-                        ->filterByPrimaryKeys($this->customerTitleDescsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->customerTitleI18nsScheduledForDeletion !== null) {
+                if (!$this->customerTitleI18nsScheduledForDeletion->isEmpty()) {
+                    CustomerTitleI18nQuery::create()
+                        ->filterByPrimaryKeys($this->customerTitleI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->customerTitleDescsScheduledForDeletion = null;
+                    $this->customerTitleI18nsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collCustomerTitleDescs !== null) {
-                foreach ($this->collCustomerTitleDescs as $referrerFK) {
+            if ($this->collCustomerTitleI18ns !== null) {
+                foreach ($this->collCustomerTitleI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -855,8 +869,8 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collCustomerTitleDescs !== null) {
-                    foreach ($this->collCustomerTitleDescs as $referrerFK) {
+                if ($this->collCustomerTitleI18ns !== null) {
+                    foreach ($this->collCustomerTitleI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -955,8 +969,8 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
             if (null !== $this->collAddresss) {
                 $result['Addresss'] = $this->collAddresss->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collCustomerTitleDescs) {
-                $result['CustomerTitleDescs'] = $this->collCustomerTitleDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collCustomerTitleI18ns) {
+                $result['CustomerTitleI18ns'] = $this->collCustomerTitleI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1139,9 +1153,9 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
                 }
             }
 
-            foreach ($this->getCustomerTitleDescs() as $relObj) {
+            foreach ($this->getCustomerTitleI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCustomerTitleDesc($relObj->copy($deepCopy));
+                    $copyObj->addCustomerTitleI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1212,8 +1226,8 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
         if ('Address' == $relationName) {
             $this->initAddresss();
         }
-        if ('CustomerTitleDesc' == $relationName) {
-            $this->initCustomerTitleDescs();
+        if ('CustomerTitleI18n' == $relationName) {
+            $this->initCustomerTitleI18ns();
         }
     }
 
@@ -1657,34 +1671,34 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collCustomerTitleDescs collection
+     * Clears out the collCustomerTitleI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addCustomerTitleDescs()
+     * @see        addCustomerTitleI18ns()
      */
-    public function clearCustomerTitleDescs()
+    public function clearCustomerTitleI18ns()
     {
-        $this->collCustomerTitleDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collCustomerTitleDescsPartial = null;
+        $this->collCustomerTitleI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collCustomerTitleI18nsPartial = null;
     }
 
     /**
-     * reset is the collCustomerTitleDescs collection loaded partially
+     * reset is the collCustomerTitleI18ns collection loaded partially
      *
      * @return void
      */
-    public function resetPartialCustomerTitleDescs($v = true)
+    public function resetPartialCustomerTitleI18ns($v = true)
     {
-        $this->collCustomerTitleDescsPartial = $v;
+        $this->collCustomerTitleI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collCustomerTitleDescs collection.
+     * Initializes the collCustomerTitleI18ns collection.
      *
-     * By default this just sets the collCustomerTitleDescs collection to an empty array (like clearcollCustomerTitleDescs());
+     * By default this just sets the collCustomerTitleI18ns collection to an empty array (like clearcollCustomerTitleI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1693,17 +1707,17 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initCustomerTitleDescs($overrideExisting = true)
+    public function initCustomerTitleI18ns($overrideExisting = true)
     {
-        if (null !== $this->collCustomerTitleDescs && !$overrideExisting) {
+        if (null !== $this->collCustomerTitleI18ns && !$overrideExisting) {
             return;
         }
-        $this->collCustomerTitleDescs = new PropelObjectCollection();
-        $this->collCustomerTitleDescs->setModel('CustomerTitleDesc');
+        $this->collCustomerTitleI18ns = new PropelObjectCollection();
+        $this->collCustomerTitleI18ns->setModel('CustomerTitleI18n');
     }
 
     /**
-     * Gets an array of CustomerTitleDesc objects which contain a foreign key that references this object.
+     * Gets an array of CustomerTitleI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1713,98 +1727,98 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|CustomerTitleDesc[] List of CustomerTitleDesc objects
+     * @return PropelObjectCollection|CustomerTitleI18n[] List of CustomerTitleI18n objects
      * @throws PropelException
      */
-    public function getCustomerTitleDescs($criteria = null, PropelPDO $con = null)
+    public function getCustomerTitleI18ns($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collCustomerTitleDescsPartial && !$this->isNew();
-        if (null === $this->collCustomerTitleDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCustomerTitleDescs) {
+        $partial = $this->collCustomerTitleI18nsPartial && !$this->isNew();
+        if (null === $this->collCustomerTitleI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCustomerTitleI18ns) {
                 // return empty collection
-                $this->initCustomerTitleDescs();
+                $this->initCustomerTitleI18ns();
             } else {
-                $collCustomerTitleDescs = CustomerTitleDescQuery::create(null, $criteria)
+                $collCustomerTitleI18ns = CustomerTitleI18nQuery::create(null, $criteria)
                     ->filterByCustomerTitle($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collCustomerTitleDescsPartial && count($collCustomerTitleDescs)) {
-                      $this->initCustomerTitleDescs(false);
+                    if (false !== $this->collCustomerTitleI18nsPartial && count($collCustomerTitleI18ns)) {
+                      $this->initCustomerTitleI18ns(false);
 
-                      foreach($collCustomerTitleDescs as $obj) {
-                        if (false == $this->collCustomerTitleDescs->contains($obj)) {
-                          $this->collCustomerTitleDescs->append($obj);
+                      foreach($collCustomerTitleI18ns as $obj) {
+                        if (false == $this->collCustomerTitleI18ns->contains($obj)) {
+                          $this->collCustomerTitleI18ns->append($obj);
                         }
                       }
 
-                      $this->collCustomerTitleDescsPartial = true;
+                      $this->collCustomerTitleI18nsPartial = true;
                     }
 
-                    return $collCustomerTitleDescs;
+                    return $collCustomerTitleI18ns;
                 }
 
-                if($partial && $this->collCustomerTitleDescs) {
-                    foreach($this->collCustomerTitleDescs as $obj) {
+                if($partial && $this->collCustomerTitleI18ns) {
+                    foreach($this->collCustomerTitleI18ns as $obj) {
                         if($obj->isNew()) {
-                            $collCustomerTitleDescs[] = $obj;
+                            $collCustomerTitleI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collCustomerTitleDescs = $collCustomerTitleDescs;
-                $this->collCustomerTitleDescsPartial = false;
+                $this->collCustomerTitleI18ns = $collCustomerTitleI18ns;
+                $this->collCustomerTitleI18nsPartial = false;
             }
         }
 
-        return $this->collCustomerTitleDescs;
+        return $this->collCustomerTitleI18ns;
     }
 
     /**
-     * Sets a collection of CustomerTitleDesc objects related by a one-to-many relationship
+     * Sets a collection of CustomerTitleI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $customerTitleDescs A Propel collection.
+     * @param PropelCollection $customerTitleI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setCustomerTitleDescs(PropelCollection $customerTitleDescs, PropelPDO $con = null)
+    public function setCustomerTitleI18ns(PropelCollection $customerTitleI18ns, PropelPDO $con = null)
     {
-        $this->customerTitleDescsScheduledForDeletion = $this->getCustomerTitleDescs(new Criteria(), $con)->diff($customerTitleDescs);
+        $this->customerTitleI18nsScheduledForDeletion = $this->getCustomerTitleI18ns(new Criteria(), $con)->diff($customerTitleI18ns);
 
-        foreach ($this->customerTitleDescsScheduledForDeletion as $customerTitleDescRemoved) {
-            $customerTitleDescRemoved->setCustomerTitle(null);
+        foreach ($this->customerTitleI18nsScheduledForDeletion as $customerTitleI18nRemoved) {
+            $customerTitleI18nRemoved->setCustomerTitle(null);
         }
 
-        $this->collCustomerTitleDescs = null;
-        foreach ($customerTitleDescs as $customerTitleDesc) {
-            $this->addCustomerTitleDesc($customerTitleDesc);
+        $this->collCustomerTitleI18ns = null;
+        foreach ($customerTitleI18ns as $customerTitleI18n) {
+            $this->addCustomerTitleI18n($customerTitleI18n);
         }
 
-        $this->collCustomerTitleDescs = $customerTitleDescs;
-        $this->collCustomerTitleDescsPartial = false;
+        $this->collCustomerTitleI18ns = $customerTitleI18ns;
+        $this->collCustomerTitleI18nsPartial = false;
     }
 
     /**
-     * Returns the number of related CustomerTitleDesc objects.
+     * Returns the number of related CustomerTitleI18n objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related CustomerTitleDesc objects.
+     * @return int             Count of related CustomerTitleI18n objects.
      * @throws PropelException
      */
-    public function countCustomerTitleDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countCustomerTitleI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collCustomerTitleDescsPartial && !$this->isNew();
-        if (null === $this->collCustomerTitleDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCustomerTitleDescs) {
+        $partial = $this->collCustomerTitleI18nsPartial && !$this->isNew();
+        if (null === $this->collCustomerTitleI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCustomerTitleI18ns) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getCustomerTitleDescs());
+                    return count($this->getCustomerTitleI18ns());
                 }
-                $query = CustomerTitleDescQuery::create(null, $criteria);
+                $query = CustomerTitleI18nQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1814,52 +1828,56 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collCustomerTitleDescs);
+            return count($this->collCustomerTitleI18ns);
         }
     }
 
     /**
-     * Method called to associate a CustomerTitleDesc object to this object
-     * through the CustomerTitleDesc foreign key attribute.
+     * Method called to associate a CustomerTitleI18n object to this object
+     * through the CustomerTitleI18n foreign key attribute.
      *
-     * @param    CustomerTitleDesc $l CustomerTitleDesc
+     * @param    CustomerTitleI18n $l CustomerTitleI18n
      * @return CustomerTitle The current object (for fluent API support)
      */
-    public function addCustomerTitleDesc(CustomerTitleDesc $l)
+    public function addCustomerTitleI18n(CustomerTitleI18n $l)
     {
-        if ($this->collCustomerTitleDescs === null) {
-            $this->initCustomerTitleDescs();
-            $this->collCustomerTitleDescsPartial = true;
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
         }
-        if (!$this->collCustomerTitleDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddCustomerTitleDesc($l);
+        if ($this->collCustomerTitleI18ns === null) {
+            $this->initCustomerTitleI18ns();
+            $this->collCustomerTitleI18nsPartial = true;
+        }
+        if (!$this->collCustomerTitleI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCustomerTitleI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	CustomerTitleDesc $customerTitleDesc The customerTitleDesc object to add.
+     * @param	CustomerTitleI18n $customerTitleI18n The customerTitleI18n object to add.
      */
-    protected function doAddCustomerTitleDesc($customerTitleDesc)
+    protected function doAddCustomerTitleI18n($customerTitleI18n)
     {
-        $this->collCustomerTitleDescs[]= $customerTitleDesc;
-        $customerTitleDesc->setCustomerTitle($this);
+        $this->collCustomerTitleI18ns[]= $customerTitleI18n;
+        $customerTitleI18n->setCustomerTitle($this);
     }
 
     /**
-     * @param	CustomerTitleDesc $customerTitleDesc The customerTitleDesc object to remove.
+     * @param	CustomerTitleI18n $customerTitleI18n The customerTitleI18n object to remove.
      */
-    public function removeCustomerTitleDesc($customerTitleDesc)
+    public function removeCustomerTitleI18n($customerTitleI18n)
     {
-        if ($this->getCustomerTitleDescs()->contains($customerTitleDesc)) {
-            $this->collCustomerTitleDescs->remove($this->collCustomerTitleDescs->search($customerTitleDesc));
-            if (null === $this->customerTitleDescsScheduledForDeletion) {
-                $this->customerTitleDescsScheduledForDeletion = clone $this->collCustomerTitleDescs;
-                $this->customerTitleDescsScheduledForDeletion->clear();
+        if ($this->getCustomerTitleI18ns()->contains($customerTitleI18n)) {
+            $this->collCustomerTitleI18ns->remove($this->collCustomerTitleI18ns->search($customerTitleI18n));
+            if (null === $this->customerTitleI18nsScheduledForDeletion) {
+                $this->customerTitleI18nsScheduledForDeletion = clone $this->collCustomerTitleI18ns;
+                $this->customerTitleI18nsScheduledForDeletion->clear();
             }
-            $this->customerTitleDescsScheduledForDeletion[]= $customerTitleDesc;
-            $customerTitleDesc->setCustomerTitle(null);
+            $this->customerTitleI18nsScheduledForDeletion[]= $customerTitleI18n;
+            $customerTitleI18n->setCustomerTitle(null);
         }
     }
 
@@ -1904,12 +1922,16 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCustomerTitleDescs) {
-                foreach ($this->collCustomerTitleDescs as $o) {
+            if ($this->collCustomerTitleI18ns) {
+                foreach ($this->collCustomerTitleI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
+
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
 
         if ($this->collCustomers instanceof PropelCollection) {
             $this->collCustomers->clearIterator();
@@ -1919,10 +1941,10 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
             $this->collAddresss->clearIterator();
         }
         $this->collAddresss = null;
-        if ($this->collCustomerTitleDescs instanceof PropelCollection) {
-            $this->collCustomerTitleDescs->clearIterator();
+        if ($this->collCustomerTitleI18ns instanceof PropelCollection) {
+            $this->collCustomerTitleI18ns->clearIterator();
         }
-        $this->collCustomerTitleDescs = null;
+        $this->collCustomerTitleI18ns = null;
     }
 
     /**
@@ -1955,6 +1977,153 @@ abstract class BaseCustomerTitle extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = CustomerTitlePeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    CustomerTitle The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return CustomerTitleI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collCustomerTitleI18ns) {
+                foreach ($this->collCustomerTitleI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new CustomerTitleI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = CustomerTitleI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addCustomerTitleI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    CustomerTitle The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            CustomerTitleI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collCustomerTitleI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collCustomerTitleI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return CustomerTitleI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [short] column value.
+         *
+         * @return string
+         */
+        public function getShort()
+        {
+        return $this->getCurrentTranslation()->getShort();
+    }
+
+
+        /**
+         * Set the value of [short] column.
+         *
+         * @param string $v new value
+         * @return CustomerTitleI18n The current object (for fluent API support)
+         */
+        public function setShort($v)
+        {    $this->getCurrentTranslation()->setShort($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [long] column value.
+         *
+         * @return string
+         */
+        public function getLong()
+        {
+        return $this->getCurrentTranslation()->getLong();
+    }
+
+
+        /**
+         * Set the value of [long] column.
+         *
+         * @param string $v new value
+         * @return CustomerTitleI18n The current object (for fluent API support)
+         */
+        public function setLong($v)
+        {    $this->getCurrentTranslation()->setLong($v);
 
         return $this;
     }

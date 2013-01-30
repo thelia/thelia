@@ -22,8 +22,8 @@ use Thelia\Model\ContentQuery;
 use Thelia\Model\Folder;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Image;
-use Thelia\Model\ImageDesc;
-use Thelia\Model\ImageDescQuery;
+use Thelia\Model\ImageI18n;
+use Thelia\Model\ImageI18nQuery;
 use Thelia\Model\ImagePeer;
 use Thelia\Model\ImageQuery;
 use Thelia\Model\Product;
@@ -132,10 +132,10 @@ abstract class BaseImage extends BaseObject implements Persistent
     protected $aFolder;
 
     /**
-     * @var        PropelObjectCollection|ImageDesc[] Collection to store aggregation of ImageDesc objects.
+     * @var        PropelObjectCollection|ImageI18n[] Collection to store aggregation of ImageI18n objects.
      */
-    protected $collImageDescs;
-    protected $collImageDescsPartial;
+    protected $collImageI18ns;
+    protected $collImageI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -151,11 +151,25 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
+    /**
+     * Current locale
+     * @var        string
+     */
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[ImageI18n]
+     */
+    protected $currentTranslations;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $imageDescsScheduledForDeletion = null;
+    protected $imageI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -637,7 +651,7 @@ abstract class BaseImage extends BaseObject implements Persistent
             $this->aCategory = null;
             $this->aContent = null;
             $this->aFolder = null;
-            $this->collImageDescs = null;
+            $this->collImageI18ns = null;
 
         } // if (deep)
     }
@@ -807,18 +821,17 @@ abstract class BaseImage extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->imageDescsScheduledForDeletion !== null) {
-                if (!$this->imageDescsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->imageDescsScheduledForDeletion as $imageDesc) {
-                        // need to save related object because we set the relation to null
-                        $imageDesc->save($con);
-                    }
-                    $this->imageDescsScheduledForDeletion = null;
+            if ($this->imageI18nsScheduledForDeletion !== null) {
+                if (!$this->imageI18nsScheduledForDeletion->isEmpty()) {
+                    ImageI18nQuery::create()
+                        ->filterByPrimaryKeys($this->imageI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->imageI18nsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collImageDescs !== null) {
-                foreach ($this->collImageDescs as $referrerFK) {
+            if ($this->collImageI18ns !== null) {
+                foreach ($this->collImageI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1045,8 +1058,8 @@ abstract class BaseImage extends BaseObject implements Persistent
             }
 
 
-                if ($this->collImageDescs !== null) {
-                    foreach ($this->collImageDescs as $referrerFK) {
+                if ($this->collImageI18ns !== null) {
+                    foreach ($this->collImageI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1167,8 +1180,8 @@ abstract class BaseImage extends BaseObject implements Persistent
             if (null !== $this->aFolder) {
                 $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collImageDescs) {
-                $result['ImageDescs'] = $this->collImageDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collImageI18ns) {
+                $result['ImageI18ns'] = $this->collImageI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1363,9 +1376,9 @@ abstract class BaseImage extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getImageDescs() as $relObj) {
+            foreach ($this->getImageI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addImageDesc($relObj->copy($deepCopy));
+                    $copyObj->addImageI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1634,40 +1647,40 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('ImageDesc' == $relationName) {
-            $this->initImageDescs();
+        if ('ImageI18n' == $relationName) {
+            $this->initImageI18ns();
         }
     }
 
     /**
-     * Clears out the collImageDescs collection
+     * Clears out the collImageI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addImageDescs()
+     * @see        addImageI18ns()
      */
-    public function clearImageDescs()
+    public function clearImageI18ns()
     {
-        $this->collImageDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collImageDescsPartial = null;
+        $this->collImageI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collImageI18nsPartial = null;
     }
 
     /**
-     * reset is the collImageDescs collection loaded partially
+     * reset is the collImageI18ns collection loaded partially
      *
      * @return void
      */
-    public function resetPartialImageDescs($v = true)
+    public function resetPartialImageI18ns($v = true)
     {
-        $this->collImageDescsPartial = $v;
+        $this->collImageI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collImageDescs collection.
+     * Initializes the collImageI18ns collection.
      *
-     * By default this just sets the collImageDescs collection to an empty array (like clearcollImageDescs());
+     * By default this just sets the collImageI18ns collection to an empty array (like clearcollImageI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1676,17 +1689,17 @@ abstract class BaseImage extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initImageDescs($overrideExisting = true)
+    public function initImageI18ns($overrideExisting = true)
     {
-        if (null !== $this->collImageDescs && !$overrideExisting) {
+        if (null !== $this->collImageI18ns && !$overrideExisting) {
             return;
         }
-        $this->collImageDescs = new PropelObjectCollection();
-        $this->collImageDescs->setModel('ImageDesc');
+        $this->collImageI18ns = new PropelObjectCollection();
+        $this->collImageI18ns->setModel('ImageI18n');
     }
 
     /**
-     * Gets an array of ImageDesc objects which contain a foreign key that references this object.
+     * Gets an array of ImageI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1696,98 +1709,98 @@ abstract class BaseImage extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ImageDesc[] List of ImageDesc objects
+     * @return PropelObjectCollection|ImageI18n[] List of ImageI18n objects
      * @throws PropelException
      */
-    public function getImageDescs($criteria = null, PropelPDO $con = null)
+    public function getImageI18ns($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collImageDescsPartial && !$this->isNew();
-        if (null === $this->collImageDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collImageDescs) {
+        $partial = $this->collImageI18nsPartial && !$this->isNew();
+        if (null === $this->collImageI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collImageI18ns) {
                 // return empty collection
-                $this->initImageDescs();
+                $this->initImageI18ns();
             } else {
-                $collImageDescs = ImageDescQuery::create(null, $criteria)
+                $collImageI18ns = ImageI18nQuery::create(null, $criteria)
                     ->filterByImage($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collImageDescsPartial && count($collImageDescs)) {
-                      $this->initImageDescs(false);
+                    if (false !== $this->collImageI18nsPartial && count($collImageI18ns)) {
+                      $this->initImageI18ns(false);
 
-                      foreach($collImageDescs as $obj) {
-                        if (false == $this->collImageDescs->contains($obj)) {
-                          $this->collImageDescs->append($obj);
+                      foreach($collImageI18ns as $obj) {
+                        if (false == $this->collImageI18ns->contains($obj)) {
+                          $this->collImageI18ns->append($obj);
                         }
                       }
 
-                      $this->collImageDescsPartial = true;
+                      $this->collImageI18nsPartial = true;
                     }
 
-                    return $collImageDescs;
+                    return $collImageI18ns;
                 }
 
-                if($partial && $this->collImageDescs) {
-                    foreach($this->collImageDescs as $obj) {
+                if($partial && $this->collImageI18ns) {
+                    foreach($this->collImageI18ns as $obj) {
                         if($obj->isNew()) {
-                            $collImageDescs[] = $obj;
+                            $collImageI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collImageDescs = $collImageDescs;
-                $this->collImageDescsPartial = false;
+                $this->collImageI18ns = $collImageI18ns;
+                $this->collImageI18nsPartial = false;
             }
         }
 
-        return $this->collImageDescs;
+        return $this->collImageI18ns;
     }
 
     /**
-     * Sets a collection of ImageDesc objects related by a one-to-many relationship
+     * Sets a collection of ImageI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $imageDescs A Propel collection.
+     * @param PropelCollection $imageI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setImageDescs(PropelCollection $imageDescs, PropelPDO $con = null)
+    public function setImageI18ns(PropelCollection $imageI18ns, PropelPDO $con = null)
     {
-        $this->imageDescsScheduledForDeletion = $this->getImageDescs(new Criteria(), $con)->diff($imageDescs);
+        $this->imageI18nsScheduledForDeletion = $this->getImageI18ns(new Criteria(), $con)->diff($imageI18ns);
 
-        foreach ($this->imageDescsScheduledForDeletion as $imageDescRemoved) {
-            $imageDescRemoved->setImage(null);
+        foreach ($this->imageI18nsScheduledForDeletion as $imageI18nRemoved) {
+            $imageI18nRemoved->setImage(null);
         }
 
-        $this->collImageDescs = null;
-        foreach ($imageDescs as $imageDesc) {
-            $this->addImageDesc($imageDesc);
+        $this->collImageI18ns = null;
+        foreach ($imageI18ns as $imageI18n) {
+            $this->addImageI18n($imageI18n);
         }
 
-        $this->collImageDescs = $imageDescs;
-        $this->collImageDescsPartial = false;
+        $this->collImageI18ns = $imageI18ns;
+        $this->collImageI18nsPartial = false;
     }
 
     /**
-     * Returns the number of related ImageDesc objects.
+     * Returns the number of related ImageI18n objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related ImageDesc objects.
+     * @return int             Count of related ImageI18n objects.
      * @throws PropelException
      */
-    public function countImageDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countImageI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collImageDescsPartial && !$this->isNew();
-        if (null === $this->collImageDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collImageDescs) {
+        $partial = $this->collImageI18nsPartial && !$this->isNew();
+        if (null === $this->collImageI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collImageI18ns) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getImageDescs());
+                    return count($this->getImageI18ns());
                 }
-                $query = ImageDescQuery::create(null, $criteria);
+                $query = ImageI18nQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1797,52 +1810,56 @@ abstract class BaseImage extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collImageDescs);
+            return count($this->collImageI18ns);
         }
     }
 
     /**
-     * Method called to associate a ImageDesc object to this object
-     * through the ImageDesc foreign key attribute.
+     * Method called to associate a ImageI18n object to this object
+     * through the ImageI18n foreign key attribute.
      *
-     * @param    ImageDesc $l ImageDesc
+     * @param    ImageI18n $l ImageI18n
      * @return Image The current object (for fluent API support)
      */
-    public function addImageDesc(ImageDesc $l)
+    public function addImageI18n(ImageI18n $l)
     {
-        if ($this->collImageDescs === null) {
-            $this->initImageDescs();
-            $this->collImageDescsPartial = true;
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
         }
-        if (!$this->collImageDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddImageDesc($l);
+        if ($this->collImageI18ns === null) {
+            $this->initImageI18ns();
+            $this->collImageI18nsPartial = true;
+        }
+        if (!$this->collImageI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddImageI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	ImageDesc $imageDesc The imageDesc object to add.
+     * @param	ImageI18n $imageI18n The imageI18n object to add.
      */
-    protected function doAddImageDesc($imageDesc)
+    protected function doAddImageI18n($imageI18n)
     {
-        $this->collImageDescs[]= $imageDesc;
-        $imageDesc->setImage($this);
+        $this->collImageI18ns[]= $imageI18n;
+        $imageI18n->setImage($this);
     }
 
     /**
-     * @param	ImageDesc $imageDesc The imageDesc object to remove.
+     * @param	ImageI18n $imageI18n The imageI18n object to remove.
      */
-    public function removeImageDesc($imageDesc)
+    public function removeImageI18n($imageI18n)
     {
-        if ($this->getImageDescs()->contains($imageDesc)) {
-            $this->collImageDescs->remove($this->collImageDescs->search($imageDesc));
-            if (null === $this->imageDescsScheduledForDeletion) {
-                $this->imageDescsScheduledForDeletion = clone $this->collImageDescs;
-                $this->imageDescsScheduledForDeletion->clear();
+        if ($this->getImageI18ns()->contains($imageI18n)) {
+            $this->collImageI18ns->remove($this->collImageI18ns->search($imageI18n));
+            if (null === $this->imageI18nsScheduledForDeletion) {
+                $this->imageI18nsScheduledForDeletion = clone $this->collImageI18ns;
+                $this->imageI18nsScheduledForDeletion->clear();
             }
-            $this->imageDescsScheduledForDeletion[]= $imageDesc;
-            $imageDesc->setImage(null);
+            $this->imageI18nsScheduledForDeletion[]= $imageI18n;
+            $imageI18n->setImage(null);
         }
     }
 
@@ -1880,17 +1897,21 @@ abstract class BaseImage extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collImageDescs) {
-                foreach ($this->collImageDescs as $o) {
+            if ($this->collImageI18ns) {
+                foreach ($this->collImageI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        if ($this->collImageDescs instanceof PropelCollection) {
-            $this->collImageDescs->clearIterator();
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
+        if ($this->collImageI18ns instanceof PropelCollection) {
+            $this->collImageI18ns->clearIterator();
         }
-        $this->collImageDescs = null;
+        $this->collImageI18ns = null;
         $this->aProduct = null;
         $this->aCategory = null;
         $this->aContent = null;
@@ -1927,6 +1948,201 @@ abstract class BaseImage extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = ImagePeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Image The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ImageI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collImageI18ns) {
+                foreach ($this->collImageI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new ImageI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = ImageI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addImageI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Image The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            ImageI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collImageI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collImageI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ImageI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return ImageI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return ImageI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return ImageI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return ImageI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

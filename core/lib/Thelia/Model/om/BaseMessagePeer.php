@@ -10,7 +10,7 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use Thelia\Model\Message;
-use Thelia\Model\MessageDescPeer;
+use Thelia\Model\MessageI18nPeer;
 use Thelia\Model\MessagePeer;
 use Thelia\Model\map\MessageTableMap;
 
@@ -37,13 +37,13 @@ abstract class BaseMessagePeer
     const TM_CLASS = 'MessageTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 5;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 5;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the ID field */
     const ID = 'message.ID';
@@ -53,6 +53,9 @@ abstract class BaseMessagePeer
 
     /** the column name for the SECURED field */
     const SECURED = 'message.SECURED';
+
+    /** the column name for the REF field */
+    const REF = 'message.REF';
 
     /** the column name for the CREATED_AT field */
     const CREATED_AT = 'message.CREATED_AT';
@@ -72,6 +75,13 @@ abstract class BaseMessagePeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -79,12 +89,12 @@ abstract class BaseMessagePeer
      * e.g. MessagePeer::$fieldNames[MessagePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', 'Secured', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', 'secured', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (MessagePeer::ID, MessagePeer::CODE, MessagePeer::SECURED, MessagePeer::CREATED_AT, MessagePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', 'SECURED', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'code', 'secured', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', 'Secured', 'Ref', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', 'secured', 'ref', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (MessagePeer::ID, MessagePeer::CODE, MessagePeer::SECURED, MessagePeer::REF, MessagePeer::CREATED_AT, MessagePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', 'SECURED', 'REF', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'code', 'secured', 'ref', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -94,12 +104,12 @@ abstract class BaseMessagePeer
      * e.g. MessagePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, 'Secured' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, 'secured' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
-        BasePeer::TYPE_COLNAME => array (MessagePeer::ID => 0, MessagePeer::CODE => 1, MessagePeer::SECURED => 2, MessagePeer::CREATED_AT => 3, MessagePeer::UPDATED_AT => 4, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, 'SECURED' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, 'secured' => 2, 'created_at' => 3, 'updated_at' => 4, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, 'Secured' => 2, 'Ref' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, 'secured' => 2, 'ref' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (MessagePeer::ID => 0, MessagePeer::CODE => 1, MessagePeer::SECURED => 2, MessagePeer::REF => 3, MessagePeer::CREATED_AT => 4, MessagePeer::UPDATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, 'SECURED' => 2, 'REF' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, 'secured' => 2, 'ref' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -176,12 +186,14 @@ abstract class BaseMessagePeer
             $criteria->addSelectColumn(MessagePeer::ID);
             $criteria->addSelectColumn(MessagePeer::CODE);
             $criteria->addSelectColumn(MessagePeer::SECURED);
+            $criteria->addSelectColumn(MessagePeer::REF);
             $criteria->addSelectColumn(MessagePeer::CREATED_AT);
             $criteria->addSelectColumn(MessagePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
             $criteria->addSelectColumn($alias . '.SECURED');
+            $criteria->addSelectColumn($alias . '.REF');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -383,9 +395,9 @@ abstract class BaseMessagePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in MessageDescPeer instance pool,
+        // Invalidate objects in MessageI18nPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        MessageDescPeer::clearInstancePool();
+        MessageI18nPeer::clearInstancePool();
     }
 
     /**

@@ -58,8 +58,8 @@ class CountryTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Area', 'Thelia\\Model\\Area', RelationMap::MANY_TO_ONE, array('area_id' => 'id', ), 'SET NULL', 'RESTRICT');
-        $this->addRelation('CountryDesc', 'Thelia\\Model\\CountryDesc', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'CASCADE', 'RESTRICT', 'CountryDescs');
         $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'country_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleCountrys');
+        $this->addRelation('CountryI18n', 'Thelia\\Model\\CountryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CountryI18ns');
     } // buildRelations()
 
     /**
@@ -72,6 +72,7 @@ class CountryTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

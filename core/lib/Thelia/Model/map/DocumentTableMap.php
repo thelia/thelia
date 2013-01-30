@@ -63,7 +63,7 @@ class DocumentTableMap extends TableMap
         $this->addRelation('Category', 'Thelia\\Model\\Category', RelationMap::MANY_TO_ONE, array('category_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('Content', 'Thelia\\Model\\Content', RelationMap::MANY_TO_ONE, array('content_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('Folder', 'Thelia\\Model\\Folder', RelationMap::MANY_TO_ONE, array('folder_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('DocumentDesc', 'Thelia\\Model\\DocumentDesc', RelationMap::ONE_TO_MANY, array('id' => 'document_id', ), 'CASCADE', 'RESTRICT', 'DocumentDescs');
+        $this->addRelation('DocumentI18n', 'Thelia\\Model\\DocumentI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'DocumentI18ns');
     } // buildRelations()
 
     /**
@@ -76,6 +76,7 @@ class DocumentTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

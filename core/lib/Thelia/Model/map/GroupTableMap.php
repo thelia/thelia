@@ -54,10 +54,10 @@ class GroupTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('GroupDesc', 'Thelia\\Model\\GroupDesc', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', 'RESTRICT', 'GroupDescs');
         $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', 'RESTRICT', 'AdminGroups');
         $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', 'RESTRICT', 'GroupResources');
         $this->addRelation('GroupModule', 'Thelia\\Model\\GroupModule', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', 'CASCADE', 'GroupModules');
+        $this->addRelation('GroupI18n', 'Thelia\\Model\\GroupI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'GroupI18ns');
     } // buildRelations()
 
     /**
@@ -70,6 +70,7 @@ class GroupTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

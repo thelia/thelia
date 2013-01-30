@@ -18,8 +18,8 @@ use \PropelPDO;
 use Thelia\Model\Order;
 use Thelia\Model\OrderQuery;
 use Thelia\Model\OrderStatus;
-use Thelia\Model\OrderStatusDesc;
-use Thelia\Model\OrderStatusDescQuery;
+use Thelia\Model\OrderStatusI18n;
+use Thelia\Model\OrderStatusI18nQuery;
 use Thelia\Model\OrderStatusPeer;
 use Thelia\Model\OrderStatusQuery;
 
@@ -82,10 +82,10 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
     protected $collOrdersPartial;
 
     /**
-     * @var        PropelObjectCollection|OrderStatusDesc[] Collection to store aggregation of OrderStatusDesc objects.
+     * @var        PropelObjectCollection|OrderStatusI18n[] Collection to store aggregation of OrderStatusI18n objects.
      */
-    protected $collOrderStatusDescs;
-    protected $collOrderStatusDescsPartial;
+    protected $collOrderStatusI18ns;
+    protected $collOrderStatusI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -101,6 +101,20 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
+    /**
+     * Current locale
+     * @var        string
+     */
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[OrderStatusI18n]
+     */
+    protected $currentTranslations;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
@@ -111,7 +125,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $orderStatusDescsScheduledForDeletion = null;
+    protected $orderStatusI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -403,7 +417,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
             $this->collOrders = null;
 
-            $this->collOrderStatusDescs = null;
+            $this->collOrderStatusI18ns = null;
 
         } // if (deep)
     }
@@ -558,17 +572,17 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                 }
             }
 
-            if ($this->orderStatusDescsScheduledForDeletion !== null) {
-                if (!$this->orderStatusDescsScheduledForDeletion->isEmpty()) {
-                    OrderStatusDescQuery::create()
-                        ->filterByPrimaryKeys($this->orderStatusDescsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->orderStatusI18nsScheduledForDeletion !== null) {
+                if (!$this->orderStatusI18nsScheduledForDeletion->isEmpty()) {
+                    OrderStatusI18nQuery::create()
+                        ->filterByPrimaryKeys($this->orderStatusI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->orderStatusDescsScheduledForDeletion = null;
+                    $this->orderStatusI18nsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collOrderStatusDescs !== null) {
-                foreach ($this->collOrderStatusDescs as $referrerFK) {
+            if ($this->collOrderStatusI18ns !== null) {
+                foreach ($this->collOrderStatusI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -743,8 +757,8 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                     }
                 }
 
-                if ($this->collOrderStatusDescs !== null) {
-                    foreach ($this->collOrderStatusDescs as $referrerFK) {
+                if ($this->collOrderStatusI18ns !== null) {
+                    foreach ($this->collOrderStatusI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -836,8 +850,8 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             if (null !== $this->collOrders) {
                 $result['Orders'] = $this->collOrders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collOrderStatusDescs) {
-                $result['OrderStatusDescs'] = $this->collOrderStatusDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collOrderStatusI18ns) {
+                $result['OrderStatusI18ns'] = $this->collOrderStatusI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1008,9 +1022,9 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                 }
             }
 
-            foreach ($this->getOrderStatusDescs() as $relObj) {
+            foreach ($this->getOrderStatusI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addOrderStatusDesc($relObj->copy($deepCopy));
+                    $copyObj->addOrderStatusI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1078,8 +1092,8 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
         if ('Order' == $relationName) {
             $this->initOrders();
         }
-        if ('OrderStatusDesc' == $relationName) {
-            $this->initOrderStatusDescs();
+        if ('OrderStatusI18n' == $relationName) {
+            $this->initOrderStatusI18ns();
         }
     }
 
@@ -1391,34 +1405,34 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
     }
 
     /**
-     * Clears out the collOrderStatusDescs collection
+     * Clears out the collOrderStatusI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addOrderStatusDescs()
+     * @see        addOrderStatusI18ns()
      */
-    public function clearOrderStatusDescs()
+    public function clearOrderStatusI18ns()
     {
-        $this->collOrderStatusDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collOrderStatusDescsPartial = null;
+        $this->collOrderStatusI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collOrderStatusI18nsPartial = null;
     }
 
     /**
-     * reset is the collOrderStatusDescs collection loaded partially
+     * reset is the collOrderStatusI18ns collection loaded partially
      *
      * @return void
      */
-    public function resetPartialOrderStatusDescs($v = true)
+    public function resetPartialOrderStatusI18ns($v = true)
     {
-        $this->collOrderStatusDescsPartial = $v;
+        $this->collOrderStatusI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collOrderStatusDescs collection.
+     * Initializes the collOrderStatusI18ns collection.
      *
-     * By default this just sets the collOrderStatusDescs collection to an empty array (like clearcollOrderStatusDescs());
+     * By default this just sets the collOrderStatusI18ns collection to an empty array (like clearcollOrderStatusI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1427,17 +1441,17 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initOrderStatusDescs($overrideExisting = true)
+    public function initOrderStatusI18ns($overrideExisting = true)
     {
-        if (null !== $this->collOrderStatusDescs && !$overrideExisting) {
+        if (null !== $this->collOrderStatusI18ns && !$overrideExisting) {
             return;
         }
-        $this->collOrderStatusDescs = new PropelObjectCollection();
-        $this->collOrderStatusDescs->setModel('OrderStatusDesc');
+        $this->collOrderStatusI18ns = new PropelObjectCollection();
+        $this->collOrderStatusI18ns->setModel('OrderStatusI18n');
     }
 
     /**
-     * Gets an array of OrderStatusDesc objects which contain a foreign key that references this object.
+     * Gets an array of OrderStatusI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1447,98 +1461,98 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|OrderStatusDesc[] List of OrderStatusDesc objects
+     * @return PropelObjectCollection|OrderStatusI18n[] List of OrderStatusI18n objects
      * @throws PropelException
      */
-    public function getOrderStatusDescs($criteria = null, PropelPDO $con = null)
+    public function getOrderStatusI18ns($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collOrderStatusDescsPartial && !$this->isNew();
-        if (null === $this->collOrderStatusDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collOrderStatusDescs) {
+        $partial = $this->collOrderStatusI18nsPartial && !$this->isNew();
+        if (null === $this->collOrderStatusI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collOrderStatusI18ns) {
                 // return empty collection
-                $this->initOrderStatusDescs();
+                $this->initOrderStatusI18ns();
             } else {
-                $collOrderStatusDescs = OrderStatusDescQuery::create(null, $criteria)
+                $collOrderStatusI18ns = OrderStatusI18nQuery::create(null, $criteria)
                     ->filterByOrderStatus($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collOrderStatusDescsPartial && count($collOrderStatusDescs)) {
-                      $this->initOrderStatusDescs(false);
+                    if (false !== $this->collOrderStatusI18nsPartial && count($collOrderStatusI18ns)) {
+                      $this->initOrderStatusI18ns(false);
 
-                      foreach($collOrderStatusDescs as $obj) {
-                        if (false == $this->collOrderStatusDescs->contains($obj)) {
-                          $this->collOrderStatusDescs->append($obj);
+                      foreach($collOrderStatusI18ns as $obj) {
+                        if (false == $this->collOrderStatusI18ns->contains($obj)) {
+                          $this->collOrderStatusI18ns->append($obj);
                         }
                       }
 
-                      $this->collOrderStatusDescsPartial = true;
+                      $this->collOrderStatusI18nsPartial = true;
                     }
 
-                    return $collOrderStatusDescs;
+                    return $collOrderStatusI18ns;
                 }
 
-                if($partial && $this->collOrderStatusDescs) {
-                    foreach($this->collOrderStatusDescs as $obj) {
+                if($partial && $this->collOrderStatusI18ns) {
+                    foreach($this->collOrderStatusI18ns as $obj) {
                         if($obj->isNew()) {
-                            $collOrderStatusDescs[] = $obj;
+                            $collOrderStatusI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collOrderStatusDescs = $collOrderStatusDescs;
-                $this->collOrderStatusDescsPartial = false;
+                $this->collOrderStatusI18ns = $collOrderStatusI18ns;
+                $this->collOrderStatusI18nsPartial = false;
             }
         }
 
-        return $this->collOrderStatusDescs;
+        return $this->collOrderStatusI18ns;
     }
 
     /**
-     * Sets a collection of OrderStatusDesc objects related by a one-to-many relationship
+     * Sets a collection of OrderStatusI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $orderStatusDescs A Propel collection.
+     * @param PropelCollection $orderStatusI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setOrderStatusDescs(PropelCollection $orderStatusDescs, PropelPDO $con = null)
+    public function setOrderStatusI18ns(PropelCollection $orderStatusI18ns, PropelPDO $con = null)
     {
-        $this->orderStatusDescsScheduledForDeletion = $this->getOrderStatusDescs(new Criteria(), $con)->diff($orderStatusDescs);
+        $this->orderStatusI18nsScheduledForDeletion = $this->getOrderStatusI18ns(new Criteria(), $con)->diff($orderStatusI18ns);
 
-        foreach ($this->orderStatusDescsScheduledForDeletion as $orderStatusDescRemoved) {
-            $orderStatusDescRemoved->setOrderStatus(null);
+        foreach ($this->orderStatusI18nsScheduledForDeletion as $orderStatusI18nRemoved) {
+            $orderStatusI18nRemoved->setOrderStatus(null);
         }
 
-        $this->collOrderStatusDescs = null;
-        foreach ($orderStatusDescs as $orderStatusDesc) {
-            $this->addOrderStatusDesc($orderStatusDesc);
+        $this->collOrderStatusI18ns = null;
+        foreach ($orderStatusI18ns as $orderStatusI18n) {
+            $this->addOrderStatusI18n($orderStatusI18n);
         }
 
-        $this->collOrderStatusDescs = $orderStatusDescs;
-        $this->collOrderStatusDescsPartial = false;
+        $this->collOrderStatusI18ns = $orderStatusI18ns;
+        $this->collOrderStatusI18nsPartial = false;
     }
 
     /**
-     * Returns the number of related OrderStatusDesc objects.
+     * Returns the number of related OrderStatusI18n objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related OrderStatusDesc objects.
+     * @return int             Count of related OrderStatusI18n objects.
      * @throws PropelException
      */
-    public function countOrderStatusDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countOrderStatusI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collOrderStatusDescsPartial && !$this->isNew();
-        if (null === $this->collOrderStatusDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collOrderStatusDescs) {
+        $partial = $this->collOrderStatusI18nsPartial && !$this->isNew();
+        if (null === $this->collOrderStatusI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collOrderStatusI18ns) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getOrderStatusDescs());
+                    return count($this->getOrderStatusI18ns());
                 }
-                $query = OrderStatusDescQuery::create(null, $criteria);
+                $query = OrderStatusI18nQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1548,52 +1562,56 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collOrderStatusDescs);
+            return count($this->collOrderStatusI18ns);
         }
     }
 
     /**
-     * Method called to associate a OrderStatusDesc object to this object
-     * through the OrderStatusDesc foreign key attribute.
+     * Method called to associate a OrderStatusI18n object to this object
+     * through the OrderStatusI18n foreign key attribute.
      *
-     * @param    OrderStatusDesc $l OrderStatusDesc
+     * @param    OrderStatusI18n $l OrderStatusI18n
      * @return OrderStatus The current object (for fluent API support)
      */
-    public function addOrderStatusDesc(OrderStatusDesc $l)
+    public function addOrderStatusI18n(OrderStatusI18n $l)
     {
-        if ($this->collOrderStatusDescs === null) {
-            $this->initOrderStatusDescs();
-            $this->collOrderStatusDescsPartial = true;
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
         }
-        if (!$this->collOrderStatusDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddOrderStatusDesc($l);
+        if ($this->collOrderStatusI18ns === null) {
+            $this->initOrderStatusI18ns();
+            $this->collOrderStatusI18nsPartial = true;
+        }
+        if (!$this->collOrderStatusI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddOrderStatusI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	OrderStatusDesc $orderStatusDesc The orderStatusDesc object to add.
+     * @param	OrderStatusI18n $orderStatusI18n The orderStatusI18n object to add.
      */
-    protected function doAddOrderStatusDesc($orderStatusDesc)
+    protected function doAddOrderStatusI18n($orderStatusI18n)
     {
-        $this->collOrderStatusDescs[]= $orderStatusDesc;
-        $orderStatusDesc->setOrderStatus($this);
+        $this->collOrderStatusI18ns[]= $orderStatusI18n;
+        $orderStatusI18n->setOrderStatus($this);
     }
 
     /**
-     * @param	OrderStatusDesc $orderStatusDesc The orderStatusDesc object to remove.
+     * @param	OrderStatusI18n $orderStatusI18n The orderStatusI18n object to remove.
      */
-    public function removeOrderStatusDesc($orderStatusDesc)
+    public function removeOrderStatusI18n($orderStatusI18n)
     {
-        if ($this->getOrderStatusDescs()->contains($orderStatusDesc)) {
-            $this->collOrderStatusDescs->remove($this->collOrderStatusDescs->search($orderStatusDesc));
-            if (null === $this->orderStatusDescsScheduledForDeletion) {
-                $this->orderStatusDescsScheduledForDeletion = clone $this->collOrderStatusDescs;
-                $this->orderStatusDescsScheduledForDeletion->clear();
+        if ($this->getOrderStatusI18ns()->contains($orderStatusI18n)) {
+            $this->collOrderStatusI18ns->remove($this->collOrderStatusI18ns->search($orderStatusI18n));
+            if (null === $this->orderStatusI18nsScheduledForDeletion) {
+                $this->orderStatusI18nsScheduledForDeletion = clone $this->collOrderStatusI18ns;
+                $this->orderStatusI18nsScheduledForDeletion->clear();
             }
-            $this->orderStatusDescsScheduledForDeletion[]= $orderStatusDesc;
-            $orderStatusDesc->setOrderStatus(null);
+            $this->orderStatusI18nsScheduledForDeletion[]= $orderStatusI18n;
+            $orderStatusI18n->setOrderStatus(null);
         }
     }
 
@@ -1631,21 +1649,25 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collOrderStatusDescs) {
-                foreach ($this->collOrderStatusDescs as $o) {
+            if ($this->collOrderStatusI18ns) {
+                foreach ($this->collOrderStatusI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collOrders instanceof PropelCollection) {
             $this->collOrders->clearIterator();
         }
         $this->collOrders = null;
-        if ($this->collOrderStatusDescs instanceof PropelCollection) {
-            $this->collOrderStatusDescs->clearIterator();
+        if ($this->collOrderStatusI18ns instanceof PropelCollection) {
+            $this->collOrderStatusI18ns->clearIterator();
         }
-        $this->collOrderStatusDescs = null;
+        $this->collOrderStatusI18ns = null;
     }
 
     /**
@@ -1678,6 +1700,201 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = OrderStatusPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    OrderStatus The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return OrderStatusI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collOrderStatusI18ns) {
+                foreach ($this->collOrderStatusI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new OrderStatusI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = OrderStatusI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addOrderStatusI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    OrderStatus The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            OrderStatusI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collOrderStatusI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collOrderStatusI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return OrderStatusI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return OrderStatusI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return OrderStatusI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return OrderStatusI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return OrderStatusI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

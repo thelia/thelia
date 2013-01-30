@@ -14,7 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\AdminGroup;
 use Thelia\Model\Group;
-use Thelia\Model\GroupDesc;
+use Thelia\Model\GroupI18n;
 use Thelia\Model\GroupModule;
 use Thelia\Model\GroupPeer;
 use Thelia\Model\GroupQuery;
@@ -39,10 +39,6 @@ use Thelia\Model\GroupResource;
  * @method GroupQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method GroupQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method GroupQuery leftJoinGroupDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupDesc relation
- * @method GroupQuery rightJoinGroupDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupDesc relation
- * @method GroupQuery innerJoinGroupDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupDesc relation
- *
  * @method GroupQuery leftJoinAdminGroup($relationAlias = null) Adds a LEFT JOIN clause to the query using the AdminGroup relation
  * @method GroupQuery rightJoinAdminGroup($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AdminGroup relation
  * @method GroupQuery innerJoinAdminGroup($relationAlias = null) Adds a INNER JOIN clause to the query using the AdminGroup relation
@@ -54,6 +50,10 @@ use Thelia\Model\GroupResource;
  * @method GroupQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
  * @method GroupQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
  * @method GroupQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
+ *
+ * @method GroupQuery leftJoinGroupI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupI18n relation
+ * @method GroupQuery rightJoinGroupI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupI18n relation
+ * @method GroupQuery innerJoinGroupI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupI18n relation
  *
  * @method Group findOne(PropelPDO $con = null) Return the first Group matching the query
  * @method Group findOneOrCreate(PropelPDO $con = null) Return the first Group matching the query, or a new Group object populated from the query conditions when no match is found
@@ -388,80 +388,6 @@ abstract class BaseGroupQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related GroupDesc object
-     *
-     * @param   GroupDesc|PropelObjectCollection $groupDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   GroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByGroupDesc($groupDesc, $comparison = null)
-    {
-        if ($groupDesc instanceof GroupDesc) {
-            return $this
-                ->addUsingAlias(GroupPeer::ID, $groupDesc->getGroupId(), $comparison);
-        } elseif ($groupDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useGroupDescQuery()
-                ->filterByPrimaryKeys($groupDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByGroupDesc() only accepts arguments of type GroupDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the GroupDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return GroupQuery The current query, for fluid interface
-     */
-    public function joinGroupDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('GroupDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'GroupDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the GroupDesc relation GroupDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\GroupDescQuery A secondary query class using the current class as primary query
-     */
-    public function useGroupDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinGroupDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'GroupDesc', '\Thelia\Model\GroupDescQuery');
-    }
-
-    /**
      * Filter the query by a related AdminGroup object
      *
      * @param   AdminGroup|PropelObjectCollection $adminGroup  the related object to use as filter
@@ -684,6 +610,80 @@ abstract class BaseGroupQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related GroupI18n object
+     *
+     * @param   GroupI18n|PropelObjectCollection $groupI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   GroupQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByGroupI18n($groupI18n, $comparison = null)
+    {
+        if ($groupI18n instanceof GroupI18n) {
+            return $this
+                ->addUsingAlias(GroupPeer::ID, $groupI18n->getId(), $comparison);
+        } elseif ($groupI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useGroupI18nQuery()
+                ->filterByPrimaryKeys($groupI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByGroupI18n() only accepts arguments of type GroupI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the GroupI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return GroupQuery The current query, for fluid interface
+     */
+    public function joinGroupI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('GroupI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'GroupI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the GroupI18n relation GroupI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\GroupI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useGroupI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinGroupI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'GroupI18n', '\Thelia\Model\GroupI18nQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Group $group Object to remove from the list of results
@@ -764,4 +764,61 @@ abstract class BaseGroupQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(GroupPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    GroupQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'GroupI18n';
+
+        return $this
+            ->joinGroupI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    GroupQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('GroupI18n');
+        $this->with['GroupI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    GroupI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'GroupI18n', 'Thelia\Model\GroupI18nQuery');
+    }
+
 }

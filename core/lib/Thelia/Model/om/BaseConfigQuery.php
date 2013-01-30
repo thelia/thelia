@@ -13,7 +13,7 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Config;
-use Thelia\Model\ConfigDesc;
+use Thelia\Model\ConfigI18n;
 use Thelia\Model\ConfigPeer;
 use Thelia\Model\ConfigQuery;
 
@@ -42,9 +42,9 @@ use Thelia\Model\ConfigQuery;
  * @method ConfigQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ConfigQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ConfigQuery leftJoinConfigDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ConfigDesc relation
- * @method ConfigQuery rightJoinConfigDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ConfigDesc relation
- * @method ConfigQuery innerJoinConfigDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the ConfigDesc relation
+ * @method ConfigQuery leftJoinConfigI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ConfigI18n relation
+ * @method ConfigQuery rightJoinConfigI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ConfigI18n relation
+ * @method ConfigQuery innerJoinConfigI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ConfigI18n relation
  *
  * @method Config findOne(PropelPDO $con = null) Return the first Config matching the query
  * @method Config findOneOrCreate(PropelPDO $con = null) Return the first Config matching the query, or a new Config object populated from the query conditions when no match is found
@@ -496,41 +496,41 @@ abstract class BaseConfigQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ConfigDesc object
+     * Filter the query by a related ConfigI18n object
      *
-     * @param   ConfigDesc|PropelObjectCollection $configDesc  the related object to use as filter
+     * @param   ConfigI18n|PropelObjectCollection $configI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ConfigQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByConfigDesc($configDesc, $comparison = null)
+    public function filterByConfigI18n($configI18n, $comparison = null)
     {
-        if ($configDesc instanceof ConfigDesc) {
+        if ($configI18n instanceof ConfigI18n) {
             return $this
-                ->addUsingAlias(ConfigPeer::ID, $configDesc->getConfigId(), $comparison);
-        } elseif ($configDesc instanceof PropelObjectCollection) {
+                ->addUsingAlias(ConfigPeer::ID, $configI18n->getId(), $comparison);
+        } elseif ($configI18n instanceof PropelObjectCollection) {
             return $this
-                ->useConfigDescQuery()
-                ->filterByPrimaryKeys($configDesc->getPrimaryKeys())
+                ->useConfigI18nQuery()
+                ->filterByPrimaryKeys($configI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByConfigDesc() only accepts arguments of type ConfigDesc or PropelCollection');
+            throw new PropelException('filterByConfigI18n() only accepts arguments of type ConfigI18n or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ConfigDesc relation
+     * Adds a JOIN clause to the query using the ConfigI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ConfigQuery The current query, for fluid interface
      */
-    public function joinConfigDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinConfigI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ConfigDesc');
+        $relationMap = $tableMap->getRelation('ConfigI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -545,14 +545,14 @@ abstract class BaseConfigQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ConfigDesc');
+            $this->addJoinObject($join, 'ConfigI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the ConfigDesc relation ConfigDesc object
+     * Use the ConfigI18n relation ConfigI18n object
      *
      * @see       useQuery()
      *
@@ -560,13 +560,13 @@ abstract class BaseConfigQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ConfigDescQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ConfigI18nQuery A secondary query class using the current class as primary query
      */
-    public function useConfigDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useConfigI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinConfigDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ConfigDesc', '\Thelia\Model\ConfigDescQuery');
+            ->joinConfigI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ConfigI18n', '\Thelia\Model\ConfigI18nQuery');
     }
 
     /**
@@ -650,4 +650,61 @@ abstract class BaseConfigQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(ConfigPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ConfigQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'ConfigI18n';
+
+        return $this
+            ->joinConfigI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ConfigQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('ConfigI18n');
+        $this->with['ConfigI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ConfigI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ConfigI18n', 'Thelia\Model\ConfigI18nQuery');
+    }
+
 }

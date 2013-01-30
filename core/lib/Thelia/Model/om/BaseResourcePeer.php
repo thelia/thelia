@@ -11,7 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Thelia\Model\GroupResourcePeer;
 use Thelia\Model\Resource;
-use Thelia\Model\ResourceDescPeer;
+use Thelia\Model\ResourceI18nPeer;
 use Thelia\Model\ResourcePeer;
 use Thelia\Model\map\ResourceTableMap;
 
@@ -70,6 +70,13 @@ abstract class BaseResourcePeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -379,12 +386,12 @@ abstract class BaseResourcePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ResourceDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ResourceDescPeer::clearInstancePool();
         // Invalidate objects in GroupResourcePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         GroupResourcePeer::clearInstancePool();
+        // Invalidate objects in ResourceI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ResourceI18nPeer::clearInstancePool();
     }
 
     /**

@@ -11,7 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Thelia\Model\AreaPeer;
 use Thelia\Model\Country;
-use Thelia\Model\CountryDescPeer;
+use Thelia\Model\CountryI18nPeer;
 use Thelia\Model\CountryPeer;
 use Thelia\Model\TaxRuleCountryPeer;
 use Thelia\Model\map\CountryTableMap;
@@ -80,6 +80,13 @@ abstract class BaseCountryPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -395,12 +402,12 @@ abstract class BaseCountryPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in CountryDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CountryDescPeer::clearInstancePool();
         // Invalidate objects in TaxRuleCountryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         TaxRuleCountryPeer::clearInstancePool();
+        // Invalidate objects in CountryI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CountryI18nPeer::clearInstancePool();
     }
 
     /**

@@ -57,7 +57,7 @@ class CustomerTitleTableMap extends TableMap
     {
         $this->addRelation('Customer', 'Thelia\\Model\\Customer', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'SET NULL', 'RESTRICT', 'Customers');
         $this->addRelation('Address', 'Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'RESTRICT', 'RESTRICT', 'Addresss');
-        $this->addRelation('CustomerTitleDesc', 'Thelia\\Model\\CustomerTitleDesc', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'CASCADE', null, 'CustomerTitleDescs');
+        $this->addRelation('CustomerTitleI18n', 'Thelia\\Model\\CustomerTitleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CustomerTitleI18ns');
     } // buildRelations()
 
     /**
@@ -70,6 +70,7 @@ class CustomerTitleTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'short, long', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

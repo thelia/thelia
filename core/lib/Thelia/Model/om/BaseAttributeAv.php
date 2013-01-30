@@ -17,8 +17,8 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAv;
-use Thelia\Model\AttributeAvDesc;
-use Thelia\Model\AttributeAvDescQuery;
+use Thelia\Model\AttributeAvI18n;
+use Thelia\Model\AttributeAvI18nQuery;
 use Thelia\Model\AttributeAvPeer;
 use Thelia\Model\AttributeAvQuery;
 use Thelia\Model\AttributeCombination;
@@ -89,16 +89,16 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
     protected $aAttribute;
 
     /**
-     * @var        PropelObjectCollection|AttributeAvDesc[] Collection to store aggregation of AttributeAvDesc objects.
-     */
-    protected $collAttributeAvDescs;
-    protected $collAttributeAvDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|AttributeCombination[] Collection to store aggregation of AttributeCombination objects.
      */
     protected $collAttributeCombinations;
     protected $collAttributeCombinationsPartial;
+
+    /**
+     * @var        PropelObjectCollection|AttributeAvI18n[] Collection to store aggregation of AttributeAvI18n objects.
+     */
+    protected $collAttributeAvI18ns;
+    protected $collAttributeAvI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -114,17 +114,31 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $attributeAvDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[AttributeAvI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $attributeCombinationsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $attributeAvI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -454,9 +468,9 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aAttribute = null;
-            $this->collAttributeAvDescs = null;
-
             $this->collAttributeCombinations = null;
+
+            $this->collAttributeAvI18ns = null;
 
         } // if (deep)
     }
@@ -605,23 +619,6 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->attributeAvDescsScheduledForDeletion !== null) {
-                if (!$this->attributeAvDescsScheduledForDeletion->isEmpty()) {
-                    AttributeAvDescQuery::create()
-                        ->filterByPrimaryKeys($this->attributeAvDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->attributeAvDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collAttributeAvDescs !== null) {
-                foreach ($this->collAttributeAvDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->attributeCombinationsScheduledForDeletion !== null) {
                 if (!$this->attributeCombinationsScheduledForDeletion->isEmpty()) {
                     AttributeCombinationQuery::create()
@@ -633,6 +630,23 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
 
             if ($this->collAttributeCombinations !== null) {
                 foreach ($this->collAttributeCombinations as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->attributeAvI18nsScheduledForDeletion !== null) {
+                if (!$this->attributeAvI18nsScheduledForDeletion->isEmpty()) {
+                    AttributeAvI18nQuery::create()
+                        ->filterByPrimaryKeys($this->attributeAvI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->attributeAvI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collAttributeAvI18ns !== null) {
+                foreach ($this->collAttributeAvI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -817,16 +831,16 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
             }
 
 
-                if ($this->collAttributeAvDescs !== null) {
-                    foreach ($this->collAttributeAvDescs as $referrerFK) {
+                if ($this->collAttributeCombinations !== null) {
+                    foreach ($this->collAttributeCombinations as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collAttributeCombinations !== null) {
-                    foreach ($this->collAttributeCombinations as $referrerFK) {
+                if ($this->collAttributeAvI18ns !== null) {
+                    foreach ($this->collAttributeAvI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -922,11 +936,11 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
             if (null !== $this->aAttribute) {
                 $result['Attribute'] = $this->aAttribute->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collAttributeAvDescs) {
-                $result['AttributeAvDescs'] = $this->collAttributeAvDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collAttributeCombinations) {
                 $result['AttributeCombinations'] = $this->collAttributeCombinations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collAttributeAvI18ns) {
+                $result['AttributeAvI18ns'] = $this->collAttributeAvI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1097,15 +1111,15 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getAttributeAvDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addAttributeAvDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getAttributeCombinations() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addAttributeCombination($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getAttributeAvI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAttributeAvI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1221,218 +1235,11 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('AttributeAvDesc' == $relationName) {
-            $this->initAttributeAvDescs();
-        }
         if ('AttributeCombination' == $relationName) {
             $this->initAttributeCombinations();
         }
-    }
-
-    /**
-     * Clears out the collAttributeAvDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addAttributeAvDescs()
-     */
-    public function clearAttributeAvDescs()
-    {
-        $this->collAttributeAvDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collAttributeAvDescsPartial = null;
-    }
-
-    /**
-     * reset is the collAttributeAvDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialAttributeAvDescs($v = true)
-    {
-        $this->collAttributeAvDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collAttributeAvDescs collection.
-     *
-     * By default this just sets the collAttributeAvDescs collection to an empty array (like clearcollAttributeAvDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initAttributeAvDescs($overrideExisting = true)
-    {
-        if (null !== $this->collAttributeAvDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collAttributeAvDescs = new PropelObjectCollection();
-        $this->collAttributeAvDescs->setModel('AttributeAvDesc');
-    }
-
-    /**
-     * Gets an array of AttributeAvDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this AttributeAv is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|AttributeAvDesc[] List of AttributeAvDesc objects
-     * @throws PropelException
-     */
-    public function getAttributeAvDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collAttributeAvDescsPartial && !$this->isNew();
-        if (null === $this->collAttributeAvDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collAttributeAvDescs) {
-                // return empty collection
-                $this->initAttributeAvDescs();
-            } else {
-                $collAttributeAvDescs = AttributeAvDescQuery::create(null, $criteria)
-                    ->filterByAttributeAv($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collAttributeAvDescsPartial && count($collAttributeAvDescs)) {
-                      $this->initAttributeAvDescs(false);
-
-                      foreach($collAttributeAvDescs as $obj) {
-                        if (false == $this->collAttributeAvDescs->contains($obj)) {
-                          $this->collAttributeAvDescs->append($obj);
-                        }
-                      }
-
-                      $this->collAttributeAvDescsPartial = true;
-                    }
-
-                    return $collAttributeAvDescs;
-                }
-
-                if($partial && $this->collAttributeAvDescs) {
-                    foreach($this->collAttributeAvDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collAttributeAvDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collAttributeAvDescs = $collAttributeAvDescs;
-                $this->collAttributeAvDescsPartial = false;
-            }
-        }
-
-        return $this->collAttributeAvDescs;
-    }
-
-    /**
-     * Sets a collection of AttributeAvDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $attributeAvDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setAttributeAvDescs(PropelCollection $attributeAvDescs, PropelPDO $con = null)
-    {
-        $this->attributeAvDescsScheduledForDeletion = $this->getAttributeAvDescs(new Criteria(), $con)->diff($attributeAvDescs);
-
-        foreach ($this->attributeAvDescsScheduledForDeletion as $attributeAvDescRemoved) {
-            $attributeAvDescRemoved->setAttributeAv(null);
-        }
-
-        $this->collAttributeAvDescs = null;
-        foreach ($attributeAvDescs as $attributeAvDesc) {
-            $this->addAttributeAvDesc($attributeAvDesc);
-        }
-
-        $this->collAttributeAvDescs = $attributeAvDescs;
-        $this->collAttributeAvDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related AttributeAvDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related AttributeAvDesc objects.
-     * @throws PropelException
-     */
-    public function countAttributeAvDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collAttributeAvDescsPartial && !$this->isNew();
-        if (null === $this->collAttributeAvDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collAttributeAvDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAttributeAvDescs());
-                }
-                $query = AttributeAvDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAttributeAv($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collAttributeAvDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a AttributeAvDesc object to this object
-     * through the AttributeAvDesc foreign key attribute.
-     *
-     * @param    AttributeAvDesc $l AttributeAvDesc
-     * @return AttributeAv The current object (for fluent API support)
-     */
-    public function addAttributeAvDesc(AttributeAvDesc $l)
-    {
-        if ($this->collAttributeAvDescs === null) {
-            $this->initAttributeAvDescs();
-            $this->collAttributeAvDescsPartial = true;
-        }
-        if (!$this->collAttributeAvDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddAttributeAvDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	AttributeAvDesc $attributeAvDesc The attributeAvDesc object to add.
-     */
-    protected function doAddAttributeAvDesc($attributeAvDesc)
-    {
-        $this->collAttributeAvDescs[]= $attributeAvDesc;
-        $attributeAvDesc->setAttributeAv($this);
-    }
-
-    /**
-     * @param	AttributeAvDesc $attributeAvDesc The attributeAvDesc object to remove.
-     */
-    public function removeAttributeAvDesc($attributeAvDesc)
-    {
-        if ($this->getAttributeAvDescs()->contains($attributeAvDesc)) {
-            $this->collAttributeAvDescs->remove($this->collAttributeAvDescs->search($attributeAvDesc));
-            if (null === $this->attributeAvDescsScheduledForDeletion) {
-                $this->attributeAvDescsScheduledForDeletion = clone $this->collAttributeAvDescs;
-                $this->attributeAvDescsScheduledForDeletion->clear();
-            }
-            $this->attributeAvDescsScheduledForDeletion[]= $attributeAvDesc;
-            $attributeAvDesc->setAttributeAv(null);
+        if ('AttributeAvI18n' == $relationName) {
+            $this->initAttributeAvI18ns();
         }
     }
 
@@ -1694,6 +1501,217 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collAttributeAvI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAttributeAvI18ns()
+     */
+    public function clearAttributeAvI18ns()
+    {
+        $this->collAttributeAvI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collAttributeAvI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collAttributeAvI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialAttributeAvI18ns($v = true)
+    {
+        $this->collAttributeAvI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collAttributeAvI18ns collection.
+     *
+     * By default this just sets the collAttributeAvI18ns collection to an empty array (like clearcollAttributeAvI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAttributeAvI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collAttributeAvI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collAttributeAvI18ns = new PropelObjectCollection();
+        $this->collAttributeAvI18ns->setModel('AttributeAvI18n');
+    }
+
+    /**
+     * Gets an array of AttributeAvI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this AttributeAv is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|AttributeAvI18n[] List of AttributeAvI18n objects
+     * @throws PropelException
+     */
+    public function getAttributeAvI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collAttributeAvI18nsPartial && !$this->isNew();
+        if (null === $this->collAttributeAvI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAttributeAvI18ns) {
+                // return empty collection
+                $this->initAttributeAvI18ns();
+            } else {
+                $collAttributeAvI18ns = AttributeAvI18nQuery::create(null, $criteria)
+                    ->filterByAttributeAv($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collAttributeAvI18nsPartial && count($collAttributeAvI18ns)) {
+                      $this->initAttributeAvI18ns(false);
+
+                      foreach($collAttributeAvI18ns as $obj) {
+                        if (false == $this->collAttributeAvI18ns->contains($obj)) {
+                          $this->collAttributeAvI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collAttributeAvI18nsPartial = true;
+                    }
+
+                    return $collAttributeAvI18ns;
+                }
+
+                if($partial && $this->collAttributeAvI18ns) {
+                    foreach($this->collAttributeAvI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collAttributeAvI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAttributeAvI18ns = $collAttributeAvI18ns;
+                $this->collAttributeAvI18nsPartial = false;
+            }
+        }
+
+        return $this->collAttributeAvI18ns;
+    }
+
+    /**
+     * Sets a collection of AttributeAvI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $attributeAvI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setAttributeAvI18ns(PropelCollection $attributeAvI18ns, PropelPDO $con = null)
+    {
+        $this->attributeAvI18nsScheduledForDeletion = $this->getAttributeAvI18ns(new Criteria(), $con)->diff($attributeAvI18ns);
+
+        foreach ($this->attributeAvI18nsScheduledForDeletion as $attributeAvI18nRemoved) {
+            $attributeAvI18nRemoved->setAttributeAv(null);
+        }
+
+        $this->collAttributeAvI18ns = null;
+        foreach ($attributeAvI18ns as $attributeAvI18n) {
+            $this->addAttributeAvI18n($attributeAvI18n);
+        }
+
+        $this->collAttributeAvI18ns = $attributeAvI18ns;
+        $this->collAttributeAvI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related AttributeAvI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related AttributeAvI18n objects.
+     * @throws PropelException
+     */
+    public function countAttributeAvI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collAttributeAvI18nsPartial && !$this->isNew();
+        if (null === $this->collAttributeAvI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAttributeAvI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getAttributeAvI18ns());
+                }
+                $query = AttributeAvI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByAttributeAv($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAttributeAvI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a AttributeAvI18n object to this object
+     * through the AttributeAvI18n foreign key attribute.
+     *
+     * @param    AttributeAvI18n $l AttributeAvI18n
+     * @return AttributeAv The current object (for fluent API support)
+     */
+    public function addAttributeAvI18n(AttributeAvI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collAttributeAvI18ns === null) {
+            $this->initAttributeAvI18ns();
+            $this->collAttributeAvI18nsPartial = true;
+        }
+        if (!$this->collAttributeAvI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddAttributeAvI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	AttributeAvI18n $attributeAvI18n The attributeAvI18n object to add.
+     */
+    protected function doAddAttributeAvI18n($attributeAvI18n)
+    {
+        $this->collAttributeAvI18ns[]= $attributeAvI18n;
+        $attributeAvI18n->setAttributeAv($this);
+    }
+
+    /**
+     * @param	AttributeAvI18n $attributeAvI18n The attributeAvI18n object to remove.
+     */
+    public function removeAttributeAvI18n($attributeAvI18n)
+    {
+        if ($this->getAttributeAvI18ns()->contains($attributeAvI18n)) {
+            $this->collAttributeAvI18ns->remove($this->collAttributeAvI18ns->search($attributeAvI18n));
+            if (null === $this->attributeAvI18nsScheduledForDeletion) {
+                $this->attributeAvI18nsScheduledForDeletion = clone $this->collAttributeAvI18ns;
+                $this->attributeAvI18nsScheduledForDeletion->clear();
+            }
+            $this->attributeAvI18nsScheduledForDeletion[]= $attributeAvI18n;
+            $attributeAvI18n->setAttributeAv(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1723,26 +1741,30 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collAttributeAvDescs) {
-                foreach ($this->collAttributeAvDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collAttributeCombinations) {
                 foreach ($this->collAttributeCombinations as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collAttributeAvI18ns) {
+                foreach ($this->collAttributeAvI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collAttributeAvDescs instanceof PropelCollection) {
-            $this->collAttributeAvDescs->clearIterator();
-        }
-        $this->collAttributeAvDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collAttributeCombinations instanceof PropelCollection) {
             $this->collAttributeCombinations->clearIterator();
         }
         $this->collAttributeCombinations = null;
+        if ($this->collAttributeAvI18ns instanceof PropelCollection) {
+            $this->collAttributeAvI18ns->clearIterator();
+        }
+        $this->collAttributeAvI18ns = null;
         $this->aAttribute = null;
     }
 
@@ -1776,6 +1798,201 @@ abstract class BaseAttributeAv extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = AttributeAvPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    AttributeAv The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return AttributeAvI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collAttributeAvI18ns) {
+                foreach ($this->collAttributeAvI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new AttributeAvI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = AttributeAvI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addAttributeAvI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    AttributeAv The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            AttributeAvI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collAttributeAvI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collAttributeAvI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return AttributeAvI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return AttributeAvI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return AttributeAvI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return AttributeAvI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return AttributeAvI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

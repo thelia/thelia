@@ -28,8 +28,8 @@ use Thelia\Model\ImageQuery;
 use Thelia\Model\Product;
 use Thelia\Model\ProductCategory;
 use Thelia\Model\ProductCategoryQuery;
-use Thelia\Model\ProductDesc;
-use Thelia\Model\ProductDescQuery;
+use Thelia\Model\ProductI18n;
+use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductPeer;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\Rewriting;
@@ -161,12 +161,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $aTaxRule;
 
     /**
-     * @var        PropelObjectCollection|ProductDesc[] Collection to store aggregation of ProductDesc objects.
-     */
-    protected $collProductDescs;
-    protected $collProductDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|ProductCategory[] Collection to store aggregation of ProductCategory objects.
      */
     protected $collProductCategorys;
@@ -221,6 +215,12 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $collRewritingsPartial;
 
     /**
+     * @var        PropelObjectCollection|ProductI18n[] Collection to store aggregation of ProductI18n objects.
+     */
+    protected $collProductI18ns;
+    protected $collProductI18nsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -234,11 +234,19 @@ abstract class BaseProduct extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $productDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[ProductI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
@@ -293,6 +301,12 @@ abstract class BaseProduct extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $rewritingsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productI18nsScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -950,8 +964,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aTaxRule = null;
-            $this->collProductDescs = null;
-
             $this->collProductCategorys = null;
 
             $this->collFeatureProds = null;
@@ -969,6 +981,8 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $this->collAccessorysRelatedByAccessory = null;
 
             $this->collRewritings = null;
+
+            $this->collProductI18ns = null;
 
         } // if (deep)
     }
@@ -1115,23 +1129,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->productDescsScheduledForDeletion !== null) {
-                if (!$this->productDescsScheduledForDeletion->isEmpty()) {
-                    ProductDescQuery::create()
-                        ->filterByPrimaryKeys($this->productDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->productDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collProductDescs !== null) {
-                foreach ($this->collProductDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             if ($this->productCategorysScheduledForDeletion !== null) {
@@ -1285,6 +1282,23 @@ abstract class BaseProduct extends BaseObject implements Persistent
 
             if ($this->collRewritings !== null) {
                 foreach ($this->collRewritings as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productI18nsScheduledForDeletion !== null) {
+                if (!$this->productI18nsScheduledForDeletion->isEmpty()) {
+                    ProductI18nQuery::create()
+                        ->filterByPrimaryKeys($this->productI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collProductI18ns !== null) {
+                foreach ($this->collProductI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1523,14 +1537,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
             }
 
 
-                if ($this->collProductDescs !== null) {
-                    foreach ($this->collProductDescs as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collProductCategorys !== null) {
                     foreach ($this->collProductCategorys as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1597,6 +1603,14 @@ abstract class BaseProduct extends BaseObject implements Persistent
 
                 if ($this->collRewritings !== null) {
                     foreach ($this->collRewritings as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collProductI18ns !== null) {
+                    foreach ($this->collProductI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1728,9 +1742,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
             if (null !== $this->aTaxRule) {
                 $result['TaxRule'] = $this->aTaxRule->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collProductDescs) {
-                $result['ProductDescs'] = $this->collProductDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collProductCategorys) {
                 $result['ProductCategorys'] = $this->collProductCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1757,6 +1768,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
             }
             if (null !== $this->collRewritings) {
                 $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collProductI18ns) {
+                $result['ProductI18ns'] = $this->collProductI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1981,12 +1995,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getProductDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addProductDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getProductCategorys() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addProductCategory($relObj->copy($deepCopy));
@@ -2038,6 +2046,12 @@ abstract class BaseProduct extends BaseObject implements Persistent
             foreach ($this->getRewritings() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addRewriting($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getProductI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -2153,9 +2167,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('ProductDesc' == $relationName) {
-            $this->initProductDescs();
-        }
         if ('ProductCategory' == $relationName) {
             $this->initProductCategorys();
         }
@@ -2183,212 +2194,8 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if ('Rewriting' == $relationName) {
             $this->initRewritings();
         }
-    }
-
-    /**
-     * Clears out the collProductDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addProductDescs()
-     */
-    public function clearProductDescs()
-    {
-        $this->collProductDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collProductDescsPartial = null;
-    }
-
-    /**
-     * reset is the collProductDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialProductDescs($v = true)
-    {
-        $this->collProductDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collProductDescs collection.
-     *
-     * By default this just sets the collProductDescs collection to an empty array (like clearcollProductDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initProductDescs($overrideExisting = true)
-    {
-        if (null !== $this->collProductDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collProductDescs = new PropelObjectCollection();
-        $this->collProductDescs->setModel('ProductDesc');
-    }
-
-    /**
-     * Gets an array of ProductDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Product is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ProductDesc[] List of ProductDesc objects
-     * @throws PropelException
-     */
-    public function getProductDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collProductDescsPartial && !$this->isNew();
-        if (null === $this->collProductDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collProductDescs) {
-                // return empty collection
-                $this->initProductDescs();
-            } else {
-                $collProductDescs = ProductDescQuery::create(null, $criteria)
-                    ->filterByProduct($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collProductDescsPartial && count($collProductDescs)) {
-                      $this->initProductDescs(false);
-
-                      foreach($collProductDescs as $obj) {
-                        if (false == $this->collProductDescs->contains($obj)) {
-                          $this->collProductDescs->append($obj);
-                        }
-                      }
-
-                      $this->collProductDescsPartial = true;
-                    }
-
-                    return $collProductDescs;
-                }
-
-                if($partial && $this->collProductDescs) {
-                    foreach($this->collProductDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collProductDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collProductDescs = $collProductDescs;
-                $this->collProductDescsPartial = false;
-            }
-        }
-
-        return $this->collProductDescs;
-    }
-
-    /**
-     * Sets a collection of ProductDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $productDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setProductDescs(PropelCollection $productDescs, PropelPDO $con = null)
-    {
-        $this->productDescsScheduledForDeletion = $this->getProductDescs(new Criteria(), $con)->diff($productDescs);
-
-        foreach ($this->productDescsScheduledForDeletion as $productDescRemoved) {
-            $productDescRemoved->setProduct(null);
-        }
-
-        $this->collProductDescs = null;
-        foreach ($productDescs as $productDesc) {
-            $this->addProductDesc($productDesc);
-        }
-
-        $this->collProductDescs = $productDescs;
-        $this->collProductDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related ProductDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related ProductDesc objects.
-     * @throws PropelException
-     */
-    public function countProductDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collProductDescsPartial && !$this->isNew();
-        if (null === $this->collProductDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collProductDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getProductDescs());
-                }
-                $query = ProductDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByProduct($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collProductDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a ProductDesc object to this object
-     * through the ProductDesc foreign key attribute.
-     *
-     * @param    ProductDesc $l ProductDesc
-     * @return Product The current object (for fluent API support)
-     */
-    public function addProductDesc(ProductDesc $l)
-    {
-        if ($this->collProductDescs === null) {
-            $this->initProductDescs();
-            $this->collProductDescsPartial = true;
-        }
-        if (!$this->collProductDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddProductDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	ProductDesc $productDesc The productDesc object to add.
-     */
-    protected function doAddProductDesc($productDesc)
-    {
-        $this->collProductDescs[]= $productDesc;
-        $productDesc->setProduct($this);
-    }
-
-    /**
-     * @param	ProductDesc $productDesc The productDesc object to remove.
-     */
-    public function removeProductDesc($productDesc)
-    {
-        if ($this->getProductDescs()->contains($productDesc)) {
-            $this->collProductDescs->remove($this->collProductDescs->search($productDesc));
-            if (null === $this->productDescsScheduledForDeletion) {
-                $this->productDescsScheduledForDeletion = clone $this->collProductDescs;
-                $this->productDescsScheduledForDeletion->clear();
-            }
-            $this->productDescsScheduledForDeletion[]= $productDesc;
-            $productDesc->setProduct(null);
+        if ('ProductI18n' == $relationName) {
+            $this->initProductI18ns();
         }
     }
 
@@ -4631,6 +4438,217 @@ abstract class BaseProduct extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collProductI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductI18ns()
+     */
+    public function clearProductI18ns()
+    {
+        $this->collProductI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collProductI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collProductI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialProductI18ns($v = true)
+    {
+        $this->collProductI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductI18ns collection.
+     *
+     * By default this just sets the collProductI18ns collection to an empty array (like clearcollProductI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collProductI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collProductI18ns = new PropelObjectCollection();
+        $this->collProductI18ns->setModel('ProductI18n');
+    }
+
+    /**
+     * Gets an array of ProductI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ProductI18n[] List of ProductI18n objects
+     * @throws PropelException
+     */
+    public function getProductI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collProductI18nsPartial && !$this->isNew();
+        if (null === $this->collProductI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductI18ns) {
+                // return empty collection
+                $this->initProductI18ns();
+            } else {
+                $collProductI18ns = ProductI18nQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collProductI18nsPartial && count($collProductI18ns)) {
+                      $this->initProductI18ns(false);
+
+                      foreach($collProductI18ns as $obj) {
+                        if (false == $this->collProductI18ns->contains($obj)) {
+                          $this->collProductI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collProductI18nsPartial = true;
+                    }
+
+                    return $collProductI18ns;
+                }
+
+                if($partial && $this->collProductI18ns) {
+                    foreach($this->collProductI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collProductI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductI18ns = $collProductI18ns;
+                $this->collProductI18nsPartial = false;
+            }
+        }
+
+        return $this->collProductI18ns;
+    }
+
+    /**
+     * Sets a collection of ProductI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setProductI18ns(PropelCollection $productI18ns, PropelPDO $con = null)
+    {
+        $this->productI18nsScheduledForDeletion = $this->getProductI18ns(new Criteria(), $con)->diff($productI18ns);
+
+        foreach ($this->productI18nsScheduledForDeletion as $productI18nRemoved) {
+            $productI18nRemoved->setProduct(null);
+        }
+
+        $this->collProductI18ns = null;
+        foreach ($productI18ns as $productI18n) {
+            $this->addProductI18n($productI18n);
+        }
+
+        $this->collProductI18ns = $productI18ns;
+        $this->collProductI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ProductI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ProductI18n objects.
+     * @throws PropelException
+     */
+    public function countProductI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collProductI18nsPartial && !$this->isNew();
+        if (null === $this->collProductI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getProductI18ns());
+                }
+                $query = ProductI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a ProductI18n object to this object
+     * through the ProductI18n foreign key attribute.
+     *
+     * @param    ProductI18n $l ProductI18n
+     * @return Product The current object (for fluent API support)
+     */
+    public function addProductI18n(ProductI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collProductI18ns === null) {
+            $this->initProductI18ns();
+            $this->collProductI18nsPartial = true;
+        }
+        if (!$this->collProductI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddProductI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductI18n $productI18n The productI18n object to add.
+     */
+    protected function doAddProductI18n($productI18n)
+    {
+        $this->collProductI18ns[]= $productI18n;
+        $productI18n->setProduct($this);
+    }
+
+    /**
+     * @param	ProductI18n $productI18n The productI18n object to remove.
+     */
+    public function removeProductI18n($productI18n)
+    {
+        if ($this->getProductI18ns()->contains($productI18n)) {
+            $this->collProductI18ns->remove($this->collProductI18ns->search($productI18n));
+            if (null === $this->productI18nsScheduledForDeletion) {
+                $this->productI18nsScheduledForDeletion = clone $this->collProductI18ns;
+                $this->productI18nsScheduledForDeletion->clear();
+            }
+            $this->productI18nsScheduledForDeletion[]= $productI18n;
+            $productI18n->setProduct(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -4670,11 +4688,6 @@ abstract class BaseProduct extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collProductDescs) {
-                foreach ($this->collProductDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collProductCategorys) {
                 foreach ($this->collProductCategorys as $o) {
                     $o->clearAllReferences($deep);
@@ -4720,12 +4733,17 @@ abstract class BaseProduct extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collProductI18ns) {
+                foreach ($this->collProductI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collProductDescs instanceof PropelCollection) {
-            $this->collProductDescs->clearIterator();
-        }
-        $this->collProductDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collProductCategorys instanceof PropelCollection) {
             $this->collProductCategorys->clearIterator();
         }
@@ -4762,6 +4780,10 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $this->collRewritings->clearIterator();
         }
         $this->collRewritings = null;
+        if ($this->collProductI18ns instanceof PropelCollection) {
+            $this->collProductI18ns->clearIterator();
+        }
+        $this->collProductI18ns = null;
         $this->aTaxRule = null;
     }
 
@@ -4795,6 +4817,201 @@ abstract class BaseProduct extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = ProductPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Product The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ProductI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collProductI18ns) {
+                foreach ($this->collProductI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new ProductI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = ProductI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addProductI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Product The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            ProductI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collProductI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collProductI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ProductI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return ProductI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return ProductI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return ProductI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return ProductI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

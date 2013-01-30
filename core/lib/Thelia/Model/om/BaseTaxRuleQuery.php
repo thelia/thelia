@@ -15,7 +15,7 @@ use \PropelPDO;
 use Thelia\Model\Product;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleCountry;
-use Thelia\Model\TaxRuleDesc;
+use Thelia\Model\TaxRuleI18n;
 use Thelia\Model\TaxRulePeer;
 use Thelia\Model\TaxRuleQuery;
 
@@ -26,11 +26,15 @@ use Thelia\Model\TaxRuleQuery;
  *
  * @method TaxRuleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method TaxRuleQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method TaxRuleQuery orderByTitle($order = Criteria::ASC) Order by the title column
+ * @method TaxRuleQuery orderByDescription($order = Criteria::ASC) Order by the description column
  * @method TaxRuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method TaxRuleQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method TaxRuleQuery groupById() Group by the id column
  * @method TaxRuleQuery groupByCode() Group by the code column
+ * @method TaxRuleQuery groupByTitle() Group by the title column
+ * @method TaxRuleQuery groupByDescription() Group by the description column
  * @method TaxRuleQuery groupByCreatedAt() Group by the created_at column
  * @method TaxRuleQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -42,24 +46,28 @@ use Thelia\Model\TaxRuleQuery;
  * @method TaxRuleQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
  * @method TaxRuleQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
  *
- * @method TaxRuleQuery leftJoinTaxRuleDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRuleDesc relation
- * @method TaxRuleQuery rightJoinTaxRuleDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRuleDesc relation
- * @method TaxRuleQuery innerJoinTaxRuleDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRuleDesc relation
- *
  * @method TaxRuleQuery leftJoinTaxRuleCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRuleCountry relation
  * @method TaxRuleQuery rightJoinTaxRuleCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRuleCountry relation
  * @method TaxRuleQuery innerJoinTaxRuleCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRuleCountry relation
+ *
+ * @method TaxRuleQuery leftJoinTaxRuleI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRuleI18n relation
+ * @method TaxRuleQuery rightJoinTaxRuleI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRuleI18n relation
+ * @method TaxRuleQuery innerJoinTaxRuleI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRuleI18n relation
  *
  * @method TaxRule findOne(PropelPDO $con = null) Return the first TaxRule matching the query
  * @method TaxRule findOneOrCreate(PropelPDO $con = null) Return the first TaxRule matching the query, or a new TaxRule object populated from the query conditions when no match is found
  *
  * @method TaxRule findOneById(int $id) Return the first TaxRule filtered by the id column
  * @method TaxRule findOneByCode(string $code) Return the first TaxRule filtered by the code column
+ * @method TaxRule findOneByTitle(string $title) Return the first TaxRule filtered by the title column
+ * @method TaxRule findOneByDescription(string $description) Return the first TaxRule filtered by the description column
  * @method TaxRule findOneByCreatedAt(string $created_at) Return the first TaxRule filtered by the created_at column
  * @method TaxRule findOneByUpdatedAt(string $updated_at) Return the first TaxRule filtered by the updated_at column
  *
  * @method array findById(int $id) Return TaxRule objects filtered by the id column
  * @method array findByCode(string $code) Return TaxRule objects filtered by the code column
+ * @method array findByTitle(string $title) Return TaxRule objects filtered by the title column
+ * @method array findByDescription(string $description) Return TaxRule objects filtered by the description column
  * @method array findByCreatedAt(string $created_at) Return TaxRule objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return TaxRule objects filtered by the updated_at column
  *
@@ -151,7 +159,7 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `CREATED_AT`, `UPDATED_AT` FROM `tax_rule` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `TITLE`, `DESCRIPTION`, `CREATED_AT`, `UPDATED_AT` FROM `tax_rule` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -294,6 +302,64 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(TaxRulePeer::CODE, $code, $comparison);
+    }
+
+    /**
+     * Filter the query on the title column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTitle('fooValue');   // WHERE title = 'fooValue'
+     * $query->filterByTitle('%fooValue%'); // WHERE title LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $title The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TaxRuleQuery The current query, for fluid interface
+     */
+    public function filterByTitle($title = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($title)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $title)) {
+                $title = str_replace('*', '%', $title);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TaxRulePeer::TITLE, $title, $comparison);
+    }
+
+    /**
+     * Filter the query on the description column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDescription('fooValue');   // WHERE description = 'fooValue'
+     * $query->filterByDescription('%fooValue%'); // WHERE description LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $description The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return TaxRuleQuery The current query, for fluid interface
+     */
+    public function filterByDescription($description = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($description)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $description)) {
+                $description = str_replace('*', '%', $description);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(TaxRulePeer::DESCRIPTION, $description, $comparison);
     }
 
     /**
@@ -457,80 +523,6 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related TaxRuleDesc object
-     *
-     * @param   TaxRuleDesc|PropelObjectCollection $taxRuleDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   TaxRuleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByTaxRuleDesc($taxRuleDesc, $comparison = null)
-    {
-        if ($taxRuleDesc instanceof TaxRuleDesc) {
-            return $this
-                ->addUsingAlias(TaxRulePeer::ID, $taxRuleDesc->getTaxRuleId(), $comparison);
-        } elseif ($taxRuleDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useTaxRuleDescQuery()
-                ->filterByPrimaryKeys($taxRuleDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByTaxRuleDesc() only accepts arguments of type TaxRuleDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the TaxRuleDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return TaxRuleQuery The current query, for fluid interface
-     */
-    public function joinTaxRuleDesc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('TaxRuleDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'TaxRuleDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the TaxRuleDesc relation TaxRuleDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\TaxRuleDescQuery A secondary query class using the current class as primary query
-     */
-    public function useTaxRuleDescQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinTaxRuleDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'TaxRuleDesc', '\Thelia\Model\TaxRuleDescQuery');
-    }
-
-    /**
      * Filter the query by a related TaxRuleCountry object
      *
      * @param   TaxRuleCountry|PropelObjectCollection $taxRuleCountry  the related object to use as filter
@@ -602,6 +594,80 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
         return $this
             ->joinTaxRuleCountry($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'TaxRuleCountry', '\Thelia\Model\TaxRuleCountryQuery');
+    }
+
+    /**
+     * Filter the query by a related TaxRuleI18n object
+     *
+     * @param   TaxRuleI18n|PropelObjectCollection $taxRuleI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   TaxRuleQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByTaxRuleI18n($taxRuleI18n, $comparison = null)
+    {
+        if ($taxRuleI18n instanceof TaxRuleI18n) {
+            return $this
+                ->addUsingAlias(TaxRulePeer::ID, $taxRuleI18n->getId(), $comparison);
+        } elseif ($taxRuleI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useTaxRuleI18nQuery()
+                ->filterByPrimaryKeys($taxRuleI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByTaxRuleI18n() only accepts arguments of type TaxRuleI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the TaxRuleI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return TaxRuleQuery The current query, for fluid interface
+     */
+    public function joinTaxRuleI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('TaxRuleI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'TaxRuleI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the TaxRuleI18n relation TaxRuleI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\TaxRuleI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useTaxRuleI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinTaxRuleI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TaxRuleI18n', '\Thelia\Model\TaxRuleI18nQuery');
     }
 
     /**
@@ -685,4 +751,61 @@ abstract class BaseTaxRuleQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(TaxRulePeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    TaxRuleQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'TaxRuleI18n';
+
+        return $this
+            ->joinTaxRuleI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    TaxRuleQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('TaxRuleI18n');
+        $this->with['TaxRuleI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    TaxRuleI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'TaxRuleI18n', 'Thelia\Model\TaxRuleI18nQuery');
+    }
+
 }

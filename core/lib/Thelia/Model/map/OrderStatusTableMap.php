@@ -55,7 +55,7 @@ class OrderStatusTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Order', 'Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'status_id', ), 'SET NULL', 'RESTRICT', 'Orders');
-        $this->addRelation('OrderStatusDesc', 'Thelia\\Model\\OrderStatusDesc', RelationMap::ONE_TO_MANY, array('id' => 'status_id', ), 'CASCADE', 'RESTRICT', 'OrderStatusDescs');
+        $this->addRelation('OrderStatusI18n', 'Thelia\\Model\\OrderStatusI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'OrderStatusI18ns');
     } // buildRelations()
 
     /**
@@ -68,6 +68,7 @@ class OrderStatusTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

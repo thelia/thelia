@@ -18,8 +18,8 @@ use \PropelPDO;
 use Thelia\Model\AttributeCategory;
 use Thelia\Model\AttributeCategoryQuery;
 use Thelia\Model\Category;
-use Thelia\Model\CategoryDesc;
-use Thelia\Model\CategoryDescQuery;
+use Thelia\Model\CategoryI18n;
+use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryPeer;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentAssoc;
@@ -106,12 +106,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|CategoryDesc[] Collection to store aggregation of CategoryDesc objects.
-     */
-    protected $collCategoryDescs;
-    protected $collCategoryDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|ProductCategory[] Collection to store aggregation of ProductCategory objects.
      */
     protected $collProductCategorys;
@@ -154,6 +148,12 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $collRewritingsPartial;
 
     /**
+     * @var        PropelObjectCollection|CategoryI18n[] Collection to store aggregation of CategoryI18n objects.
+     */
+    protected $collCategoryI18ns;
+    protected $collCategoryI18nsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -167,11 +167,19 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $categoryDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[CategoryI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
@@ -214,6 +222,12 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $rewritingsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $categoryI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -599,8 +613,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collCategoryDescs = null;
-
             $this->collProductCategorys = null;
 
             $this->collFeatureCategorys = null;
@@ -614,6 +626,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->collDocuments = null;
 
             $this->collRewritings = null;
+
+            $this->collCategoryI18ns = null;
 
         } // if (deep)
     }
@@ -750,23 +764,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->categoryDescsScheduledForDeletion !== null) {
-                if (!$this->categoryDescsScheduledForDeletion->isEmpty()) {
-                    CategoryDescQuery::create()
-                        ->filterByPrimaryKeys($this->categoryDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->categoryDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collCategoryDescs !== null) {
-                foreach ($this->collCategoryDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->productCategorysScheduledForDeletion !== null) {
                 if (!$this->productCategorysScheduledForDeletion->isEmpty()) {
                     ProductCategoryQuery::create()
@@ -884,6 +881,23 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
             if ($this->collRewritings !== null) {
                 foreach ($this->collRewritings as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->categoryI18nsScheduledForDeletion !== null) {
+                if (!$this->categoryI18nsScheduledForDeletion->isEmpty()) {
+                    CategoryI18nQuery::create()
+                        ->filterByPrimaryKeys($this->categoryI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->categoryI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCategoryI18ns !== null) {
+                foreach ($this->collCategoryI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1068,14 +1082,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
             }
 
 
-                if ($this->collCategoryDescs !== null) {
-                    foreach ($this->collCategoryDescs as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collProductCategorys !== null) {
                     foreach ($this->collProductCategorys as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1126,6 +1132,14 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
                 if ($this->collRewritings !== null) {
                     foreach ($this->collRewritings as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collCategoryI18ns !== null) {
+                    foreach ($this->collCategoryI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1226,9 +1240,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collCategoryDescs) {
-                $result['CategoryDescs'] = $this->collCategoryDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collProductCategorys) {
                 $result['ProductCategorys'] = $this->collProductCategorys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1249,6 +1260,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
             }
             if (null !== $this->collRewritings) {
                 $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCategoryI18ns) {
+                $result['CategoryI18ns'] = $this->collCategoryI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1431,12 +1445,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getCategoryDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCategoryDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getProductCategorys() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addProductCategory($relObj->copy($deepCopy));
@@ -1476,6 +1484,12 @@ abstract class BaseCategory extends BaseObject implements Persistent
             foreach ($this->getRewritings() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addRewriting($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCategoryI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCategoryI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1540,9 +1554,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('CategoryDesc' == $relationName) {
-            $this->initCategoryDescs();
-        }
         if ('ProductCategory' == $relationName) {
             $this->initProductCategorys();
         }
@@ -1564,212 +1575,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
         if ('Rewriting' == $relationName) {
             $this->initRewritings();
         }
-    }
-
-    /**
-     * Clears out the collCategoryDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addCategoryDescs()
-     */
-    public function clearCategoryDescs()
-    {
-        $this->collCategoryDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collCategoryDescsPartial = null;
-    }
-
-    /**
-     * reset is the collCategoryDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialCategoryDescs($v = true)
-    {
-        $this->collCategoryDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collCategoryDescs collection.
-     *
-     * By default this just sets the collCategoryDescs collection to an empty array (like clearcollCategoryDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initCategoryDescs($overrideExisting = true)
-    {
-        if (null !== $this->collCategoryDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collCategoryDescs = new PropelObjectCollection();
-        $this->collCategoryDescs->setModel('CategoryDesc');
-    }
-
-    /**
-     * Gets an array of CategoryDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Category is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|CategoryDesc[] List of CategoryDesc objects
-     * @throws PropelException
-     */
-    public function getCategoryDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collCategoryDescsPartial && !$this->isNew();
-        if (null === $this->collCategoryDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCategoryDescs) {
-                // return empty collection
-                $this->initCategoryDescs();
-            } else {
-                $collCategoryDescs = CategoryDescQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collCategoryDescsPartial && count($collCategoryDescs)) {
-                      $this->initCategoryDescs(false);
-
-                      foreach($collCategoryDescs as $obj) {
-                        if (false == $this->collCategoryDescs->contains($obj)) {
-                          $this->collCategoryDescs->append($obj);
-                        }
-                      }
-
-                      $this->collCategoryDescsPartial = true;
-                    }
-
-                    return $collCategoryDescs;
-                }
-
-                if($partial && $this->collCategoryDescs) {
-                    foreach($this->collCategoryDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collCategoryDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCategoryDescs = $collCategoryDescs;
-                $this->collCategoryDescsPartial = false;
-            }
-        }
-
-        return $this->collCategoryDescs;
-    }
-
-    /**
-     * Sets a collection of CategoryDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $categoryDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setCategoryDescs(PropelCollection $categoryDescs, PropelPDO $con = null)
-    {
-        $this->categoryDescsScheduledForDeletion = $this->getCategoryDescs(new Criteria(), $con)->diff($categoryDescs);
-
-        foreach ($this->categoryDescsScheduledForDeletion as $categoryDescRemoved) {
-            $categoryDescRemoved->setCategory(null);
-        }
-
-        $this->collCategoryDescs = null;
-        foreach ($categoryDescs as $categoryDesc) {
-            $this->addCategoryDesc($categoryDesc);
-        }
-
-        $this->collCategoryDescs = $categoryDescs;
-        $this->collCategoryDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related CategoryDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related CategoryDesc objects.
-     * @throws PropelException
-     */
-    public function countCategoryDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collCategoryDescsPartial && !$this->isNew();
-        if (null === $this->collCategoryDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCategoryDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getCategoryDescs());
-                }
-                $query = CategoryDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCategory($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collCategoryDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a CategoryDesc object to this object
-     * through the CategoryDesc foreign key attribute.
-     *
-     * @param    CategoryDesc $l CategoryDesc
-     * @return Category The current object (for fluent API support)
-     */
-    public function addCategoryDesc(CategoryDesc $l)
-    {
-        if ($this->collCategoryDescs === null) {
-            $this->initCategoryDescs();
-            $this->collCategoryDescsPartial = true;
-        }
-        if (!$this->collCategoryDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddCategoryDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	CategoryDesc $categoryDesc The categoryDesc object to add.
-     */
-    protected function doAddCategoryDesc($categoryDesc)
-    {
-        $this->collCategoryDescs[]= $categoryDesc;
-        $categoryDesc->setCategory($this);
-    }
-
-    /**
-     * @param	CategoryDesc $categoryDesc The categoryDesc object to remove.
-     */
-    public function removeCategoryDesc($categoryDesc)
-    {
-        if ($this->getCategoryDescs()->contains($categoryDesc)) {
-            $this->collCategoryDescs->remove($this->collCategoryDescs->search($categoryDesc));
-            if (null === $this->categoryDescsScheduledForDeletion) {
-                $this->categoryDescsScheduledForDeletion = clone $this->collCategoryDescs;
-                $this->categoryDescsScheduledForDeletion->clear();
-            }
-            $this->categoryDescsScheduledForDeletion[]= $categoryDesc;
-            $categoryDesc->setCategory(null);
+        if ('CategoryI18n' == $relationName) {
+            $this->initCategoryI18ns();
         }
     }
 
@@ -3573,6 +3380,217 @@ abstract class BaseCategory extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCategoryI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCategoryI18ns()
+     */
+    public function clearCategoryI18ns()
+    {
+        $this->collCategoryI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collCategoryI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collCategoryI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCategoryI18ns($v = true)
+    {
+        $this->collCategoryI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCategoryI18ns collection.
+     *
+     * By default this just sets the collCategoryI18ns collection to an empty array (like clearcollCategoryI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCategoryI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collCategoryI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collCategoryI18ns = new PropelObjectCollection();
+        $this->collCategoryI18ns->setModel('CategoryI18n');
+    }
+
+    /**
+     * Gets an array of CategoryI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CategoryI18n[] List of CategoryI18n objects
+     * @throws PropelException
+     */
+    public function getCategoryI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryI18nsPartial && !$this->isNew();
+        if (null === $this->collCategoryI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryI18ns) {
+                // return empty collection
+                $this->initCategoryI18ns();
+            } else {
+                $collCategoryI18ns = CategoryI18nQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCategoryI18nsPartial && count($collCategoryI18ns)) {
+                      $this->initCategoryI18ns(false);
+
+                      foreach($collCategoryI18ns as $obj) {
+                        if (false == $this->collCategoryI18ns->contains($obj)) {
+                          $this->collCategoryI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collCategoryI18nsPartial = true;
+                    }
+
+                    return $collCategoryI18ns;
+                }
+
+                if($partial && $this->collCategoryI18ns) {
+                    foreach($this->collCategoryI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collCategoryI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCategoryI18ns = $collCategoryI18ns;
+                $this->collCategoryI18nsPartial = false;
+            }
+        }
+
+        return $this->collCategoryI18ns;
+    }
+
+    /**
+     * Sets a collection of CategoryI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $categoryI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCategoryI18ns(PropelCollection $categoryI18ns, PropelPDO $con = null)
+    {
+        $this->categoryI18nsScheduledForDeletion = $this->getCategoryI18ns(new Criteria(), $con)->diff($categoryI18ns);
+
+        foreach ($this->categoryI18nsScheduledForDeletion as $categoryI18nRemoved) {
+            $categoryI18nRemoved->setCategory(null);
+        }
+
+        $this->collCategoryI18ns = null;
+        foreach ($categoryI18ns as $categoryI18n) {
+            $this->addCategoryI18n($categoryI18n);
+        }
+
+        $this->collCategoryI18ns = $categoryI18ns;
+        $this->collCategoryI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related CategoryI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CategoryI18n objects.
+     * @throws PropelException
+     */
+    public function countCategoryI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryI18nsPartial && !$this->isNew();
+        if (null === $this->collCategoryI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCategoryI18ns());
+                }
+                $query = CategoryI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCategoryI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a CategoryI18n object to this object
+     * through the CategoryI18n foreign key attribute.
+     *
+     * @param    CategoryI18n $l CategoryI18n
+     * @return Category The current object (for fluent API support)
+     */
+    public function addCategoryI18n(CategoryI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collCategoryI18ns === null) {
+            $this->initCategoryI18ns();
+            $this->collCategoryI18nsPartial = true;
+        }
+        if (!$this->collCategoryI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CategoryI18n $categoryI18n The categoryI18n object to add.
+     */
+    protected function doAddCategoryI18n($categoryI18n)
+    {
+        $this->collCategoryI18ns[]= $categoryI18n;
+        $categoryI18n->setCategory($this);
+    }
+
+    /**
+     * @param	CategoryI18n $categoryI18n The categoryI18n object to remove.
+     */
+    public function removeCategoryI18n($categoryI18n)
+    {
+        if ($this->getCategoryI18ns()->contains($categoryI18n)) {
+            $this->collCategoryI18ns->remove($this->collCategoryI18ns->search($categoryI18n));
+            if (null === $this->categoryI18nsScheduledForDeletion) {
+                $this->categoryI18nsScheduledForDeletion = clone $this->collCategoryI18ns;
+                $this->categoryI18nsScheduledForDeletion->clear();
+            }
+            $this->categoryI18nsScheduledForDeletion[]= $categoryI18n;
+            $categoryI18n->setCategory(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -3604,11 +3622,6 @@ abstract class BaseCategory extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collCategoryDescs) {
-                foreach ($this->collCategoryDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collProductCategorys) {
                 foreach ($this->collProductCategorys as $o) {
                     $o->clearAllReferences($deep);
@@ -3644,12 +3657,17 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCategoryI18ns) {
+                foreach ($this->collCategoryI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collCategoryDescs instanceof PropelCollection) {
-            $this->collCategoryDescs->clearIterator();
-        }
-        $this->collCategoryDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collProductCategorys instanceof PropelCollection) {
             $this->collProductCategorys->clearIterator();
         }
@@ -3678,6 +3696,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->collRewritings->clearIterator();
         }
         $this->collRewritings = null;
+        if ($this->collCategoryI18ns instanceof PropelCollection) {
+            $this->collCategoryI18ns->clearIterator();
+        }
+        $this->collCategoryI18ns = null;
     }
 
     /**
@@ -3710,6 +3732,201 @@ abstract class BaseCategory extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = CategoryPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Category The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return CategoryI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collCategoryI18ns) {
+                foreach ($this->collCategoryI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new CategoryI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = CategoryI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addCategoryI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Category The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            CategoryI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collCategoryI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collCategoryI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return CategoryI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return CategoryI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return CategoryI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return CategoryI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return CategoryI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

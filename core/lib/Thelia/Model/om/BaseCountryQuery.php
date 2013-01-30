@@ -14,7 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Area;
 use Thelia\Model\Country;
-use Thelia\Model\CountryDesc;
+use Thelia\Model\CountryI18n;
 use Thelia\Model\CountryPeer;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\TaxRuleCountry;
@@ -48,13 +48,13 @@ use Thelia\Model\TaxRuleCountry;
  * @method CountryQuery rightJoinArea($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Area relation
  * @method CountryQuery innerJoinArea($relationAlias = null) Adds a INNER JOIN clause to the query using the Area relation
  *
- * @method CountryQuery leftJoinCountryDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the CountryDesc relation
- * @method CountryQuery rightJoinCountryDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CountryDesc relation
- * @method CountryQuery innerJoinCountryDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the CountryDesc relation
- *
  * @method CountryQuery leftJoinTaxRuleCountry($relationAlias = null) Adds a LEFT JOIN clause to the query using the TaxRuleCountry relation
  * @method CountryQuery rightJoinTaxRuleCountry($relationAlias = null) Adds a RIGHT JOIN clause to the query using the TaxRuleCountry relation
  * @method CountryQuery innerJoinTaxRuleCountry($relationAlias = null) Adds a INNER JOIN clause to the query using the TaxRuleCountry relation
+ *
+ * @method CountryQuery leftJoinCountryI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CountryI18n relation
+ * @method CountryQuery rightJoinCountryI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CountryI18n relation
+ * @method CountryQuery innerJoinCountryI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CountryI18n relation
  *
  * @method Country findOne(PropelPDO $con = null) Return the first Country matching the query
  * @method Country findOneOrCreate(PropelPDO $con = null) Return the first Country matching the query, or a new Country object populated from the query conditions when no match is found
@@ -572,80 +572,6 @@ abstract class BaseCountryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related CountryDesc object
-     *
-     * @param   CountryDesc|PropelObjectCollection $countryDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   CountryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByCountryDesc($countryDesc, $comparison = null)
-    {
-        if ($countryDesc instanceof CountryDesc) {
-            return $this
-                ->addUsingAlias(CountryPeer::ID, $countryDesc->getCountryId(), $comparison);
-        } elseif ($countryDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useCountryDescQuery()
-                ->filterByPrimaryKeys($countryDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCountryDesc() only accepts arguments of type CountryDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the CountryDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return CountryQuery The current query, for fluid interface
-     */
-    public function joinCountryDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CountryDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'CountryDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the CountryDesc relation CountryDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CountryDescQuery A secondary query class using the current class as primary query
-     */
-    public function useCountryDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCountryDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CountryDesc', '\Thelia\Model\CountryDescQuery');
-    }
-
-    /**
      * Filter the query by a related TaxRuleCountry object
      *
      * @param   TaxRuleCountry|PropelObjectCollection $taxRuleCountry  the related object to use as filter
@@ -717,6 +643,80 @@ abstract class BaseCountryQuery extends ModelCriteria
         return $this
             ->joinTaxRuleCountry($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'TaxRuleCountry', '\Thelia\Model\TaxRuleCountryQuery');
+    }
+
+    /**
+     * Filter the query by a related CountryI18n object
+     *
+     * @param   CountryI18n|PropelObjectCollection $countryI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CountryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCountryI18n($countryI18n, $comparison = null)
+    {
+        if ($countryI18n instanceof CountryI18n) {
+            return $this
+                ->addUsingAlias(CountryPeer::ID, $countryI18n->getId(), $comparison);
+        } elseif ($countryI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useCountryI18nQuery()
+                ->filterByPrimaryKeys($countryI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCountryI18n() only accepts arguments of type CountryI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CountryI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CountryQuery The current query, for fluid interface
+     */
+    public function joinCountryI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CountryI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CountryI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CountryI18n relation CountryI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CountryI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useCountryI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinCountryI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CountryI18n', '\Thelia\Model\CountryI18nQuery');
     }
 
     /**
@@ -800,4 +800,61 @@ abstract class BaseCountryQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(CountryPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CountryQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'CountryI18n';
+
+        return $this
+            ->joinCountryI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CountryQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('CountryI18n');
+        $this->with['CountryI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CountryI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CountryI18n', 'Thelia\Model\CountryI18nQuery');
+    }
+
 }

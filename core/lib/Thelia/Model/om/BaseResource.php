@@ -18,8 +18,8 @@ use \PropelPDO;
 use Thelia\Model\GroupResource;
 use Thelia\Model\GroupResourceQuery;
 use Thelia\Model\Resource;
-use Thelia\Model\ResourceDesc;
-use Thelia\Model\ResourceDescQuery;
+use Thelia\Model\ResourceI18n;
+use Thelia\Model\ResourceI18nQuery;
 use Thelia\Model\ResourcePeer;
 use Thelia\Model\ResourceQuery;
 
@@ -76,16 +76,16 @@ abstract class BaseResource extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|ResourceDesc[] Collection to store aggregation of ResourceDesc objects.
-     */
-    protected $collResourceDescs;
-    protected $collResourceDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|GroupResource[] Collection to store aggregation of GroupResource objects.
      */
     protected $collGroupResources;
     protected $collGroupResourcesPartial;
+
+    /**
+     * @var        PropelObjectCollection|ResourceI18n[] Collection to store aggregation of ResourceI18n objects.
+     */
+    protected $collResourceI18ns;
+    protected $collResourceI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -101,17 +101,31 @@ abstract class BaseResource extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $resourceDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[ResourceI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $groupResourcesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $resourceI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -401,9 +415,9 @@ abstract class BaseResource extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collResourceDescs = null;
-
             $this->collGroupResources = null;
+
+            $this->collResourceI18ns = null;
 
         } // if (deep)
     }
@@ -540,23 +554,6 @@ abstract class BaseResource extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->resourceDescsScheduledForDeletion !== null) {
-                if (!$this->resourceDescsScheduledForDeletion->isEmpty()) {
-                    ResourceDescQuery::create()
-                        ->filterByPrimaryKeys($this->resourceDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->resourceDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collResourceDescs !== null) {
-                foreach ($this->collResourceDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->groupResourcesScheduledForDeletion !== null) {
                 if (!$this->groupResourcesScheduledForDeletion->isEmpty()) {
                     GroupResourceQuery::create()
@@ -568,6 +565,23 @@ abstract class BaseResource extends BaseObject implements Persistent
 
             if ($this->collGroupResources !== null) {
                 foreach ($this->collGroupResources as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->resourceI18nsScheduledForDeletion !== null) {
+                if (!$this->resourceI18nsScheduledForDeletion->isEmpty()) {
+                    ResourceI18nQuery::create()
+                        ->filterByPrimaryKeys($this->resourceI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->resourceI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collResourceI18ns !== null) {
+                foreach ($this->collResourceI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -734,16 +748,16 @@ abstract class BaseResource extends BaseObject implements Persistent
             }
 
 
-                if ($this->collResourceDescs !== null) {
-                    foreach ($this->collResourceDescs as $referrerFK) {
+                if ($this->collGroupResources !== null) {
+                    foreach ($this->collGroupResources as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collGroupResources !== null) {
-                    foreach ($this->collGroupResources as $referrerFK) {
+                if ($this->collResourceI18ns !== null) {
+                    foreach ($this->collResourceI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -832,11 +846,11 @@ abstract class BaseResource extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collResourceDescs) {
-                $result['ResourceDescs'] = $this->collResourceDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collGroupResources) {
                 $result['GroupResources'] = $this->collGroupResources->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collResourceI18ns) {
+                $result['ResourceI18ns'] = $this->collResourceI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1001,15 +1015,15 @@ abstract class BaseResource extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getResourceDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addResourceDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getGroupResources() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addGroupResource($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getResourceI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addResourceI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1074,218 +1088,11 @@ abstract class BaseResource extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('ResourceDesc' == $relationName) {
-            $this->initResourceDescs();
-        }
         if ('GroupResource' == $relationName) {
             $this->initGroupResources();
         }
-    }
-
-    /**
-     * Clears out the collResourceDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addResourceDescs()
-     */
-    public function clearResourceDescs()
-    {
-        $this->collResourceDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collResourceDescsPartial = null;
-    }
-
-    /**
-     * reset is the collResourceDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialResourceDescs($v = true)
-    {
-        $this->collResourceDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collResourceDescs collection.
-     *
-     * By default this just sets the collResourceDescs collection to an empty array (like clearcollResourceDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initResourceDescs($overrideExisting = true)
-    {
-        if (null !== $this->collResourceDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collResourceDescs = new PropelObjectCollection();
-        $this->collResourceDescs->setModel('ResourceDesc');
-    }
-
-    /**
-     * Gets an array of ResourceDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Resource is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ResourceDesc[] List of ResourceDesc objects
-     * @throws PropelException
-     */
-    public function getResourceDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collResourceDescsPartial && !$this->isNew();
-        if (null === $this->collResourceDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collResourceDescs) {
-                // return empty collection
-                $this->initResourceDescs();
-            } else {
-                $collResourceDescs = ResourceDescQuery::create(null, $criteria)
-                    ->filterByResource($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collResourceDescsPartial && count($collResourceDescs)) {
-                      $this->initResourceDescs(false);
-
-                      foreach($collResourceDescs as $obj) {
-                        if (false == $this->collResourceDescs->contains($obj)) {
-                          $this->collResourceDescs->append($obj);
-                        }
-                      }
-
-                      $this->collResourceDescsPartial = true;
-                    }
-
-                    return $collResourceDescs;
-                }
-
-                if($partial && $this->collResourceDescs) {
-                    foreach($this->collResourceDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collResourceDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collResourceDescs = $collResourceDescs;
-                $this->collResourceDescsPartial = false;
-            }
-        }
-
-        return $this->collResourceDescs;
-    }
-
-    /**
-     * Sets a collection of ResourceDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $resourceDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setResourceDescs(PropelCollection $resourceDescs, PropelPDO $con = null)
-    {
-        $this->resourceDescsScheduledForDeletion = $this->getResourceDescs(new Criteria(), $con)->diff($resourceDescs);
-
-        foreach ($this->resourceDescsScheduledForDeletion as $resourceDescRemoved) {
-            $resourceDescRemoved->setResource(null);
-        }
-
-        $this->collResourceDescs = null;
-        foreach ($resourceDescs as $resourceDesc) {
-            $this->addResourceDesc($resourceDesc);
-        }
-
-        $this->collResourceDescs = $resourceDescs;
-        $this->collResourceDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related ResourceDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related ResourceDesc objects.
-     * @throws PropelException
-     */
-    public function countResourceDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collResourceDescsPartial && !$this->isNew();
-        if (null === $this->collResourceDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collResourceDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getResourceDescs());
-                }
-                $query = ResourceDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByResource($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collResourceDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a ResourceDesc object to this object
-     * through the ResourceDesc foreign key attribute.
-     *
-     * @param    ResourceDesc $l ResourceDesc
-     * @return Resource The current object (for fluent API support)
-     */
-    public function addResourceDesc(ResourceDesc $l)
-    {
-        if ($this->collResourceDescs === null) {
-            $this->initResourceDescs();
-            $this->collResourceDescsPartial = true;
-        }
-        if (!$this->collResourceDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddResourceDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	ResourceDesc $resourceDesc The resourceDesc object to add.
-     */
-    protected function doAddResourceDesc($resourceDesc)
-    {
-        $this->collResourceDescs[]= $resourceDesc;
-        $resourceDesc->setResource($this);
-    }
-
-    /**
-     * @param	ResourceDesc $resourceDesc The resourceDesc object to remove.
-     */
-    public function removeResourceDesc($resourceDesc)
-    {
-        if ($this->getResourceDescs()->contains($resourceDesc)) {
-            $this->collResourceDescs->remove($this->collResourceDescs->search($resourceDesc));
-            if (null === $this->resourceDescsScheduledForDeletion) {
-                $this->resourceDescsScheduledForDeletion = clone $this->collResourceDescs;
-                $this->resourceDescsScheduledForDeletion->clear();
-            }
-            $this->resourceDescsScheduledForDeletion[]= $resourceDesc;
-            $resourceDesc->setResource(null);
+        if ('ResourceI18n' == $relationName) {
+            $this->initResourceI18ns();
         }
     }
 
@@ -1522,6 +1329,217 @@ abstract class BaseResource extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collResourceI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addResourceI18ns()
+     */
+    public function clearResourceI18ns()
+    {
+        $this->collResourceI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collResourceI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collResourceI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialResourceI18ns($v = true)
+    {
+        $this->collResourceI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collResourceI18ns collection.
+     *
+     * By default this just sets the collResourceI18ns collection to an empty array (like clearcollResourceI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initResourceI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collResourceI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collResourceI18ns = new PropelObjectCollection();
+        $this->collResourceI18ns->setModel('ResourceI18n');
+    }
+
+    /**
+     * Gets an array of ResourceI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Resource is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ResourceI18n[] List of ResourceI18n objects
+     * @throws PropelException
+     */
+    public function getResourceI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collResourceI18nsPartial && !$this->isNew();
+        if (null === $this->collResourceI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collResourceI18ns) {
+                // return empty collection
+                $this->initResourceI18ns();
+            } else {
+                $collResourceI18ns = ResourceI18nQuery::create(null, $criteria)
+                    ->filterByResource($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collResourceI18nsPartial && count($collResourceI18ns)) {
+                      $this->initResourceI18ns(false);
+
+                      foreach($collResourceI18ns as $obj) {
+                        if (false == $this->collResourceI18ns->contains($obj)) {
+                          $this->collResourceI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collResourceI18nsPartial = true;
+                    }
+
+                    return $collResourceI18ns;
+                }
+
+                if($partial && $this->collResourceI18ns) {
+                    foreach($this->collResourceI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collResourceI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collResourceI18ns = $collResourceI18ns;
+                $this->collResourceI18nsPartial = false;
+            }
+        }
+
+        return $this->collResourceI18ns;
+    }
+
+    /**
+     * Sets a collection of ResourceI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $resourceI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setResourceI18ns(PropelCollection $resourceI18ns, PropelPDO $con = null)
+    {
+        $this->resourceI18nsScheduledForDeletion = $this->getResourceI18ns(new Criteria(), $con)->diff($resourceI18ns);
+
+        foreach ($this->resourceI18nsScheduledForDeletion as $resourceI18nRemoved) {
+            $resourceI18nRemoved->setResource(null);
+        }
+
+        $this->collResourceI18ns = null;
+        foreach ($resourceI18ns as $resourceI18n) {
+            $this->addResourceI18n($resourceI18n);
+        }
+
+        $this->collResourceI18ns = $resourceI18ns;
+        $this->collResourceI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ResourceI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ResourceI18n objects.
+     * @throws PropelException
+     */
+    public function countResourceI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collResourceI18nsPartial && !$this->isNew();
+        if (null === $this->collResourceI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collResourceI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getResourceI18ns());
+                }
+                $query = ResourceI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByResource($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collResourceI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a ResourceI18n object to this object
+     * through the ResourceI18n foreign key attribute.
+     *
+     * @param    ResourceI18n $l ResourceI18n
+     * @return Resource The current object (for fluent API support)
+     */
+    public function addResourceI18n(ResourceI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collResourceI18ns === null) {
+            $this->initResourceI18ns();
+            $this->collResourceI18nsPartial = true;
+        }
+        if (!$this->collResourceI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddResourceI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ResourceI18n $resourceI18n The resourceI18n object to add.
+     */
+    protected function doAddResourceI18n($resourceI18n)
+    {
+        $this->collResourceI18ns[]= $resourceI18n;
+        $resourceI18n->setResource($this);
+    }
+
+    /**
+     * @param	ResourceI18n $resourceI18n The resourceI18n object to remove.
+     */
+    public function removeResourceI18n($resourceI18n)
+    {
+        if ($this->getResourceI18ns()->contains($resourceI18n)) {
+            $this->collResourceI18ns->remove($this->collResourceI18ns->search($resourceI18n));
+            if (null === $this->resourceI18nsScheduledForDeletion) {
+                $this->resourceI18nsScheduledForDeletion = clone $this->collResourceI18ns;
+                $this->resourceI18nsScheduledForDeletion->clear();
+            }
+            $this->resourceI18nsScheduledForDeletion[]= $resourceI18n;
+            $resourceI18n->setResource(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1550,26 +1568,30 @@ abstract class BaseResource extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collResourceDescs) {
-                foreach ($this->collResourceDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collGroupResources) {
                 foreach ($this->collGroupResources as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collResourceI18ns) {
+                foreach ($this->collResourceI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collResourceDescs instanceof PropelCollection) {
-            $this->collResourceDescs->clearIterator();
-        }
-        $this->collResourceDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collGroupResources instanceof PropelCollection) {
             $this->collGroupResources->clearIterator();
         }
         $this->collGroupResources = null;
+        if ($this->collResourceI18ns instanceof PropelCollection) {
+            $this->collResourceI18ns->clearIterator();
+        }
+        $this->collResourceI18ns = null;
     }
 
     /**
@@ -1602,6 +1624,201 @@ abstract class BaseResource extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = ResourcePeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Resource The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ResourceI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collResourceI18ns) {
+                foreach ($this->collResourceI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new ResourceI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = ResourceI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addResourceI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Resource The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            ResourceI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collResourceI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collResourceI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ResourceI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return ResourceI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return ResourceI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return ResourceI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return ResourceI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

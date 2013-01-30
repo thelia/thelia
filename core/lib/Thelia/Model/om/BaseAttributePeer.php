@@ -13,7 +13,7 @@ use Thelia\Model\Attribute;
 use Thelia\Model\AttributeAvPeer;
 use Thelia\Model\AttributeCategoryPeer;
 use Thelia\Model\AttributeCombinationPeer;
-use Thelia\Model\AttributeDescPeer;
+use Thelia\Model\AttributeI18nPeer;
 use Thelia\Model\AttributePeer;
 use Thelia\Model\map\AttributeTableMap;
 
@@ -72,6 +72,13 @@ abstract class BaseAttributePeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -381,9 +388,6 @@ abstract class BaseAttributePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AttributeDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AttributeDescPeer::clearInstancePool();
         // Invalidate objects in AttributeAvPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         AttributeAvPeer::clearInstancePool();
@@ -393,6 +397,9 @@ abstract class BaseAttributePeer
         // Invalidate objects in AttributeCategoryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         AttributeCategoryPeer::clearInstancePool();
+        // Invalidate objects in AttributeI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttributeI18nPeer::clearInstancePool();
     }
 
     /**

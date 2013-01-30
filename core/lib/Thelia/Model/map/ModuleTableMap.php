@@ -57,8 +57,8 @@ class ModuleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ModuleDesc', 'Thelia\\Model\\ModuleDesc', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'ModuleDescs');
         $this->addRelation('GroupModule', 'Thelia\\Model\\GroupModule', RelationMap::ONE_TO_MANY, array('id' => 'module_id', ), 'CASCADE', 'RESTRICT', 'GroupModules');
+        $this->addRelation('ModuleI18n', 'Thelia\\Model\\ModuleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ModuleI18ns');
     } // buildRelations()
 
     /**
@@ -71,6 +71,7 @@ class ModuleTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

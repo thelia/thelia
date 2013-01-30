@@ -13,7 +13,7 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Message;
-use Thelia\Model\MessageDesc;
+use Thelia\Model\MessageI18n;
 use Thelia\Model\MessagePeer;
 use Thelia\Model\MessageQuery;
 
@@ -25,12 +25,14 @@ use Thelia\Model\MessageQuery;
  * @method MessageQuery orderById($order = Criteria::ASC) Order by the id column
  * @method MessageQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method MessageQuery orderBySecured($order = Criteria::ASC) Order by the secured column
+ * @method MessageQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method MessageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method MessageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method MessageQuery groupById() Group by the id column
  * @method MessageQuery groupByCode() Group by the code column
  * @method MessageQuery groupBySecured() Group by the secured column
+ * @method MessageQuery groupByRef() Group by the ref column
  * @method MessageQuery groupByCreatedAt() Group by the created_at column
  * @method MessageQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -38,9 +40,9 @@ use Thelia\Model\MessageQuery;
  * @method MessageQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method MessageQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method MessageQuery leftJoinMessageDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageDesc relation
- * @method MessageQuery rightJoinMessageDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageDesc relation
- * @method MessageQuery innerJoinMessageDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageDesc relation
+ * @method MessageQuery leftJoinMessageI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageI18n relation
+ * @method MessageQuery rightJoinMessageI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageI18n relation
+ * @method MessageQuery innerJoinMessageI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageI18n relation
  *
  * @method Message findOne(PropelPDO $con = null) Return the first Message matching the query
  * @method Message findOneOrCreate(PropelPDO $con = null) Return the first Message matching the query, or a new Message object populated from the query conditions when no match is found
@@ -48,12 +50,14 @@ use Thelia\Model\MessageQuery;
  * @method Message findOneById(int $id) Return the first Message filtered by the id column
  * @method Message findOneByCode(string $code) Return the first Message filtered by the code column
  * @method Message findOneBySecured(int $secured) Return the first Message filtered by the secured column
+ * @method Message findOneByRef(string $ref) Return the first Message filtered by the ref column
  * @method Message findOneByCreatedAt(string $created_at) Return the first Message filtered by the created_at column
  * @method Message findOneByUpdatedAt(string $updated_at) Return the first Message filtered by the updated_at column
  *
  * @method array findById(int $id) Return Message objects filtered by the id column
  * @method array findByCode(string $code) Return Message objects filtered by the code column
  * @method array findBySecured(int $secured) Return Message objects filtered by the secured column
+ * @method array findByRef(string $ref) Return Message objects filtered by the ref column
  * @method array findByCreatedAt(string $created_at) Return Message objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Message objects filtered by the updated_at column
  *
@@ -145,7 +149,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `SECURED`, `CREATED_AT`, `UPDATED_AT` FROM `message` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `SECURED`, `REF`, `CREATED_AT`, `UPDATED_AT` FROM `message` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -332,6 +336,35 @@ abstract class BaseMessageQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the ref column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByRef('fooValue');   // WHERE ref = 'fooValue'
+     * $query->filterByRef('%fooValue%'); // WHERE ref LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $ref The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return MessageQuery The current query, for fluid interface
+     */
+    public function filterByRef($ref = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($ref)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $ref)) {
+                $ref = str_replace('*', '%', $ref);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MessagePeer::REF, $ref, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -418,41 +451,41 @@ abstract class BaseMessageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related MessageDesc object
+     * Filter the query by a related MessageI18n object
      *
-     * @param   MessageDesc|PropelObjectCollection $messageDesc  the related object to use as filter
+     * @param   MessageI18n|PropelObjectCollection $messageI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   MessageQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByMessageDesc($messageDesc, $comparison = null)
+    public function filterByMessageI18n($messageI18n, $comparison = null)
     {
-        if ($messageDesc instanceof MessageDesc) {
+        if ($messageI18n instanceof MessageI18n) {
             return $this
-                ->addUsingAlias(MessagePeer::ID, $messageDesc->getMessageId(), $comparison);
-        } elseif ($messageDesc instanceof PropelObjectCollection) {
+                ->addUsingAlias(MessagePeer::ID, $messageI18n->getId(), $comparison);
+        } elseif ($messageI18n instanceof PropelObjectCollection) {
             return $this
-                ->useMessageDescQuery()
-                ->filterByPrimaryKeys($messageDesc->getPrimaryKeys())
+                ->useMessageI18nQuery()
+                ->filterByPrimaryKeys($messageI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByMessageDesc() only accepts arguments of type MessageDesc or PropelCollection');
+            throw new PropelException('filterByMessageI18n() only accepts arguments of type MessageI18n or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the MessageDesc relation
+     * Adds a JOIN clause to the query using the MessageI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return MessageQuery The current query, for fluid interface
      */
-    public function joinMessageDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinMessageI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('MessageDesc');
+        $relationMap = $tableMap->getRelation('MessageI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -467,14 +500,14 @@ abstract class BaseMessageQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'MessageDesc');
+            $this->addJoinObject($join, 'MessageI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the MessageDesc relation MessageDesc object
+     * Use the MessageI18n relation MessageI18n object
      *
      * @see       useQuery()
      *
@@ -482,13 +515,13 @@ abstract class BaseMessageQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\MessageDescQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\MessageI18nQuery A secondary query class using the current class as primary query
      */
-    public function useMessageDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useMessageI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinMessageDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'MessageDesc', '\Thelia\Model\MessageDescQuery');
+            ->joinMessageI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MessageI18n', '\Thelia\Model\MessageI18nQuery');
     }
 
     /**
@@ -572,4 +605,61 @@ abstract class BaseMessageQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(MessagePeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    MessageQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'MessageI18n';
+
+        return $this
+            ->joinMessageI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    MessageQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('MessageI18n');
+        $this->with['MessageI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    MessageI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MessageI18n', 'Thelia\Model\MessageI18nQuery');
+    }
+
 }

@@ -14,7 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\AttributeCategory;
 use Thelia\Model\Category;
-use Thelia\Model\CategoryDesc;
+use Thelia\Model\CategoryI18n;
 use Thelia\Model\CategoryPeer;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentAssoc;
@@ -49,10 +49,6 @@ use Thelia\Model\Rewriting;
  * @method CategoryQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method CategoryQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method CategoryQuery leftJoinCategoryDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryDesc relation
- * @method CategoryQuery rightJoinCategoryDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryDesc relation
- * @method CategoryQuery innerJoinCategoryDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryDesc relation
- *
  * @method CategoryQuery leftJoinProductCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductCategory relation
  * @method CategoryQuery rightJoinProductCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductCategory relation
  * @method CategoryQuery innerJoinProductCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductCategory relation
@@ -80,6 +76,10 @@ use Thelia\Model\Rewriting;
  * @method CategoryQuery leftJoinRewriting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Rewriting relation
  * @method CategoryQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
  * @method CategoryQuery innerJoinRewriting($relationAlias = null) Adds a INNER JOIN clause to the query using the Rewriting relation
+ *
+ * @method CategoryQuery leftJoinCategoryI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryI18n relation
+ * @method CategoryQuery rightJoinCategoryI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryI18n relation
+ * @method CategoryQuery innerJoinCategoryI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryI18n relation
  *
  * @method Category findOne(PropelPDO $con = null) Return the first Category matching the query
  * @method Category findOneOrCreate(PropelPDO $con = null) Return the first Category matching the query, or a new Category object populated from the query conditions when no match is found
@@ -540,80 +540,6 @@ abstract class BaseCategoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CategoryPeer::UPDATED_AT, $updatedAt, $comparison);
-    }
-
-    /**
-     * Filter the query by a related CategoryDesc object
-     *
-     * @param   CategoryDesc|PropelObjectCollection $categoryDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByCategoryDesc($categoryDesc, $comparison = null)
-    {
-        if ($categoryDesc instanceof CategoryDesc) {
-            return $this
-                ->addUsingAlias(CategoryPeer::ID, $categoryDesc->getCategoryId(), $comparison);
-        } elseif ($categoryDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useCategoryDescQuery()
-                ->filterByPrimaryKeys($categoryDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByCategoryDesc() only accepts arguments of type CategoryDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the CategoryDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return CategoryQuery The current query, for fluid interface
-     */
-    public function joinCategoryDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CategoryDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'CategoryDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the CategoryDesc relation CategoryDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CategoryDescQuery A secondary query class using the current class as primary query
-     */
-    public function useCategoryDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinCategoryDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CategoryDesc', '\Thelia\Model\CategoryDescQuery');
     }
 
     /**
@@ -1135,6 +1061,80 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related CategoryI18n object
+     *
+     * @param   CategoryI18n|PropelObjectCollection $categoryI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CategoryQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByCategoryI18n($categoryI18n, $comparison = null)
+    {
+        if ($categoryI18n instanceof CategoryI18n) {
+            return $this
+                ->addUsingAlias(CategoryPeer::ID, $categoryI18n->getId(), $comparison);
+        } elseif ($categoryI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useCategoryI18nQuery()
+                ->filterByPrimaryKeys($categoryI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCategoryI18n() only accepts arguments of type CategoryI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CategoryI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return CategoryQuery The current query, for fluid interface
+     */
+    public function joinCategoryI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CategoryI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CategoryI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CategoryI18n relation CategoryI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CategoryI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useCategoryI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinCategoryI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CategoryI18n', '\Thelia\Model\CategoryI18nQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Category $category Object to remove from the list of results
@@ -1215,4 +1215,61 @@ abstract class BaseCategoryQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(CategoryPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CategoryQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'CategoryI18n';
+
+        return $this
+            ->joinCategoryI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CategoryQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('CategoryI18n');
+        $this->with['CategoryI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CategoryI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CategoryI18n', 'Thelia\Model\CategoryI18nQuery');
+    }
+
 }

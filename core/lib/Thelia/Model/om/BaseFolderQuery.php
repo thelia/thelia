@@ -15,7 +15,7 @@ use \PropelPDO;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\Document;
 use Thelia\Model\Folder;
-use Thelia\Model\FolderDesc;
+use Thelia\Model\FolderI18n;
 use Thelia\Model\FolderPeer;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Image;
@@ -46,10 +46,6 @@ use Thelia\Model\Rewriting;
  * @method FolderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method FolderQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method FolderQuery leftJoinFolderDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the FolderDesc relation
- * @method FolderQuery rightJoinFolderDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FolderDesc relation
- * @method FolderQuery innerJoinFolderDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the FolderDesc relation
- *
  * @method FolderQuery leftJoinImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the Image relation
  * @method FolderQuery rightJoinImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Image relation
  * @method FolderQuery innerJoinImage($relationAlias = null) Adds a INNER JOIN clause to the query using the Image relation
@@ -65,6 +61,10 @@ use Thelia\Model\Rewriting;
  * @method FolderQuery leftJoinContentFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentFolder relation
  * @method FolderQuery rightJoinContentFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentFolder relation
  * @method FolderQuery innerJoinContentFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentFolder relation
+ *
+ * @method FolderQuery leftJoinFolderI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the FolderI18n relation
+ * @method FolderQuery rightJoinFolderI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FolderI18n relation
+ * @method FolderQuery innerJoinFolderI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the FolderI18n relation
  *
  * @method Folder findOne(PropelPDO $con = null) Return the first Folder matching the query
  * @method Folder findOneOrCreate(PropelPDO $con = null) Return the first Folder matching the query, or a new Folder object populated from the query conditions when no match is found
@@ -528,80 +528,6 @@ abstract class BaseFolderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related FolderDesc object
-     *
-     * @param   FolderDesc|PropelObjectCollection $folderDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   FolderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByFolderDesc($folderDesc, $comparison = null)
-    {
-        if ($folderDesc instanceof FolderDesc) {
-            return $this
-                ->addUsingAlias(FolderPeer::ID, $folderDesc->getFolderId(), $comparison);
-        } elseif ($folderDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useFolderDescQuery()
-                ->filterByPrimaryKeys($folderDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByFolderDesc() only accepts arguments of type FolderDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the FolderDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return FolderQuery The current query, for fluid interface
-     */
-    public function joinFolderDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('FolderDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'FolderDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the FolderDesc relation FolderDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\FolderDescQuery A secondary query class using the current class as primary query
-     */
-    public function useFolderDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinFolderDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'FolderDesc', '\Thelia\Model\FolderDescQuery');
-    }
-
-    /**
      * Filter the query by a related Image object
      *
      * @param   Image|PropelObjectCollection $image  the related object to use as filter
@@ -898,6 +824,80 @@ abstract class BaseFolderQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related FolderI18n object
+     *
+     * @param   FolderI18n|PropelObjectCollection $folderI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FolderQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFolderI18n($folderI18n, $comparison = null)
+    {
+        if ($folderI18n instanceof FolderI18n) {
+            return $this
+                ->addUsingAlias(FolderPeer::ID, $folderI18n->getId(), $comparison);
+        } elseif ($folderI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useFolderI18nQuery()
+                ->filterByPrimaryKeys($folderI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFolderI18n() only accepts arguments of type FolderI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FolderI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FolderQuery The current query, for fluid interface
+     */
+    public function joinFolderI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FolderI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FolderI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FolderI18n relation FolderI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\FolderI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useFolderI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinFolderI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FolderI18n', '\Thelia\Model\FolderI18nQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   Folder $folder Object to remove from the list of results
@@ -978,4 +978,61 @@ abstract class BaseFolderQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(FolderPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    FolderQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'FolderI18n';
+
+        return $this
+            ->joinFolderI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    FolderQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('FolderI18n');
+        $this->with['FolderI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    FolderI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FolderI18n', 'Thelia\Model\FolderI18nQuery');
+    }
+
 }

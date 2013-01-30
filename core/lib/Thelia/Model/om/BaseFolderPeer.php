@@ -12,7 +12,7 @@ use \PropelPDO;
 use Thelia\Model\ContentFolderPeer;
 use Thelia\Model\DocumentPeer;
 use Thelia\Model\Folder;
-use Thelia\Model\FolderDescPeer;
+use Thelia\Model\FolderI18nPeer;
 use Thelia\Model\FolderPeer;
 use Thelia\Model\ImagePeer;
 use Thelia\Model\RewritingPeer;
@@ -82,6 +82,13 @@ abstract class BaseFolderPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -397,9 +404,6 @@ abstract class BaseFolderPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FolderDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FolderDescPeer::clearInstancePool();
         // Invalidate objects in ImagePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ImagePeer::clearInstancePool();
@@ -412,6 +416,9 @@ abstract class BaseFolderPeer
         // Invalidate objects in ContentFolderPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ContentFolderPeer::clearInstancePool();
+        // Invalidate objects in FolderI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FolderI18nPeer::clearInstancePool();
     }
 
     /**

@@ -11,7 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Thelia\Model\GroupModulePeer;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleDescPeer;
+use Thelia\Model\ModuleI18nPeer;
 use Thelia\Model\ModulePeer;
 use Thelia\Model\map\ModuleTableMap;
 
@@ -79,6 +79,13 @@ abstract class BaseModulePeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -394,12 +401,12 @@ abstract class BaseModulePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ModuleDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ModuleDescPeer::clearInstancePool();
         // Invalidate objects in GroupModulePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         GroupModulePeer::clearInstancePool();
+        // Invalidate objects in ModuleI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        ModuleI18nPeer::clearInstancePool();
     }
 
     /**

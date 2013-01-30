@@ -16,8 +16,8 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Message;
-use Thelia\Model\MessageDesc;
-use Thelia\Model\MessageDescQuery;
+use Thelia\Model\MessageI18n;
+use Thelia\Model\MessageI18nQuery;
 use Thelia\Model\MessagePeer;
 use Thelia\Model\MessageQuery;
 
@@ -68,6 +68,12 @@ abstract class BaseMessage extends BaseObject implements Persistent
     protected $secured;
 
     /**
+     * The value for the ref field.
+     * @var        string
+     */
+    protected $ref;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -80,10 +86,10 @@ abstract class BaseMessage extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|MessageDesc[] Collection to store aggregation of MessageDesc objects.
+     * @var        PropelObjectCollection|MessageI18n[] Collection to store aggregation of MessageI18n objects.
      */
-    protected $collMessageDescs;
-    protected $collMessageDescsPartial;
+    protected $collMessageI18ns;
+    protected $collMessageI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -99,11 +105,25 @@ abstract class BaseMessage extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
+    /**
+     * Current locale
+     * @var        string
+     */
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[MessageI18n]
+     */
+    protected $currentTranslations;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $messageDescsScheduledForDeletion = null;
+    protected $messageI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -133,6 +153,16 @@ abstract class BaseMessage extends BaseObject implements Persistent
     public function getSecured()
     {
         return $this->secured;
+    }
+
+    /**
+     * Get the [ref] column value.
+     *
+     * @return string
+     */
+    public function getRef()
+    {
+        return $this->ref;
     }
 
     /**
@@ -273,6 +303,27 @@ abstract class BaseMessage extends BaseObject implements Persistent
     } // setSecured()
 
     /**
+     * Set the value of [ref] column.
+     *
+     * @param string $v new value
+     * @return Message The current object (for fluent API support)
+     */
+    public function setRef($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->ref !== $v) {
+            $this->ref = $v;
+            $this->modifiedColumns[] = MessagePeer::REF;
+        }
+
+
+        return $this;
+    } // setRef()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param mixed $v string, integer (timestamp), or DateTime value.
@@ -353,8 +404,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->code = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->secured = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
-            $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->ref = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -363,7 +415,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = MessagePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = MessagePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Message object", $e);
@@ -425,7 +477,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collMessageDescs = null;
+            $this->collMessageI18ns = null;
 
         } // if (deep)
     }
@@ -562,17 +614,17 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->messageDescsScheduledForDeletion !== null) {
-                if (!$this->messageDescsScheduledForDeletion->isEmpty()) {
-                    MessageDescQuery::create()
-                        ->filterByPrimaryKeys($this->messageDescsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->messageI18nsScheduledForDeletion !== null) {
+                if (!$this->messageI18nsScheduledForDeletion->isEmpty()) {
+                    MessageI18nQuery::create()
+                        ->filterByPrimaryKeys($this->messageI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->messageDescsScheduledForDeletion = null;
+                    $this->messageI18nsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collMessageDescs !== null) {
-                foreach ($this->collMessageDescs as $referrerFK) {
+            if ($this->collMessageI18ns !== null) {
+                foreach ($this->collMessageI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -614,6 +666,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if ($this->isColumnModified(MessagePeer::SECURED)) {
             $modifiedColumns[':p' . $index++]  = '`SECURED`';
         }
+        if ($this->isColumnModified(MessagePeer::REF)) {
+            $modifiedColumns[':p' . $index++]  = '`REF`';
+        }
         if ($this->isColumnModified(MessagePeer::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
         }
@@ -639,6 +694,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
                         break;
                     case '`SECURED`':
                         $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
+                        break;
+                    case '`REF`':
+                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
                     case '`CREATED_AT`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
@@ -745,8 +803,8 @@ abstract class BaseMessage extends BaseObject implements Persistent
             }
 
 
-                if ($this->collMessageDescs !== null) {
-                    foreach ($this->collMessageDescs as $referrerFK) {
+                if ($this->collMessageI18ns !== null) {
+                    foreach ($this->collMessageI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -798,9 +856,12 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 return $this->getSecured();
                 break;
             case 3:
-                return $this->getCreatedAt();
+                return $this->getRef();
                 break;
             case 4:
+                return $this->getCreatedAt();
+                break;
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -835,12 +896,13 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
             $keys[2] => $this->getSecured(),
-            $keys[3] => $this->getCreatedAt(),
-            $keys[4] => $this->getUpdatedAt(),
+            $keys[3] => $this->getRef(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collMessageDescs) {
-                $result['MessageDescs'] = $this->collMessageDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collMessageI18ns) {
+                $result['MessageI18ns'] = $this->collMessageI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -886,9 +948,12 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 $this->setSecured($value);
                 break;
             case 3:
-                $this->setCreatedAt($value);
+                $this->setRef($value);
                 break;
             case 4:
+                $this->setCreatedAt($value);
+                break;
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -918,8 +983,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSecured($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setRef($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -934,6 +1000,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if ($this->isColumnModified(MessagePeer::ID)) $criteria->add(MessagePeer::ID, $this->id);
         if ($this->isColumnModified(MessagePeer::CODE)) $criteria->add(MessagePeer::CODE, $this->code);
         if ($this->isColumnModified(MessagePeer::SECURED)) $criteria->add(MessagePeer::SECURED, $this->secured);
+        if ($this->isColumnModified(MessagePeer::REF)) $criteria->add(MessagePeer::REF, $this->ref);
         if ($this->isColumnModified(MessagePeer::CREATED_AT)) $criteria->add(MessagePeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(MessagePeer::UPDATED_AT)) $criteria->add(MessagePeer::UPDATED_AT, $this->updated_at);
 
@@ -1001,6 +1068,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
     {
         $copyObj->setCode($this->getCode());
         $copyObj->setSecured($this->getSecured());
+        $copyObj->setRef($this->getRef());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1011,9 +1079,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getMessageDescs() as $relObj) {
+            foreach ($this->getMessageI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addMessageDesc($relObj->copy($deepCopy));
+                    $copyObj->addMessageI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1078,40 +1146,40 @@ abstract class BaseMessage extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('MessageDesc' == $relationName) {
-            $this->initMessageDescs();
+        if ('MessageI18n' == $relationName) {
+            $this->initMessageI18ns();
         }
     }
 
     /**
-     * Clears out the collMessageDescs collection
+     * Clears out the collMessageI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addMessageDescs()
+     * @see        addMessageI18ns()
      */
-    public function clearMessageDescs()
+    public function clearMessageI18ns()
     {
-        $this->collMessageDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collMessageDescsPartial = null;
+        $this->collMessageI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collMessageI18nsPartial = null;
     }
 
     /**
-     * reset is the collMessageDescs collection loaded partially
+     * reset is the collMessageI18ns collection loaded partially
      *
      * @return void
      */
-    public function resetPartialMessageDescs($v = true)
+    public function resetPartialMessageI18ns($v = true)
     {
-        $this->collMessageDescsPartial = $v;
+        $this->collMessageI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collMessageDescs collection.
+     * Initializes the collMessageI18ns collection.
      *
-     * By default this just sets the collMessageDescs collection to an empty array (like clearcollMessageDescs());
+     * By default this just sets the collMessageI18ns collection to an empty array (like clearcollMessageI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1120,17 +1188,17 @@ abstract class BaseMessage extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initMessageDescs($overrideExisting = true)
+    public function initMessageI18ns($overrideExisting = true)
     {
-        if (null !== $this->collMessageDescs && !$overrideExisting) {
+        if (null !== $this->collMessageI18ns && !$overrideExisting) {
             return;
         }
-        $this->collMessageDescs = new PropelObjectCollection();
-        $this->collMessageDescs->setModel('MessageDesc');
+        $this->collMessageI18ns = new PropelObjectCollection();
+        $this->collMessageI18ns->setModel('MessageI18n');
     }
 
     /**
-     * Gets an array of MessageDesc objects which contain a foreign key that references this object.
+     * Gets an array of MessageI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1140,98 +1208,98 @@ abstract class BaseMessage extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|MessageDesc[] List of MessageDesc objects
+     * @return PropelObjectCollection|MessageI18n[] List of MessageI18n objects
      * @throws PropelException
      */
-    public function getMessageDescs($criteria = null, PropelPDO $con = null)
+    public function getMessageI18ns($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collMessageDescsPartial && !$this->isNew();
-        if (null === $this->collMessageDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collMessageDescs) {
+        $partial = $this->collMessageI18nsPartial && !$this->isNew();
+        if (null === $this->collMessageI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMessageI18ns) {
                 // return empty collection
-                $this->initMessageDescs();
+                $this->initMessageI18ns();
             } else {
-                $collMessageDescs = MessageDescQuery::create(null, $criteria)
+                $collMessageI18ns = MessageI18nQuery::create(null, $criteria)
                     ->filterByMessage($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collMessageDescsPartial && count($collMessageDescs)) {
-                      $this->initMessageDescs(false);
+                    if (false !== $this->collMessageI18nsPartial && count($collMessageI18ns)) {
+                      $this->initMessageI18ns(false);
 
-                      foreach($collMessageDescs as $obj) {
-                        if (false == $this->collMessageDescs->contains($obj)) {
-                          $this->collMessageDescs->append($obj);
+                      foreach($collMessageI18ns as $obj) {
+                        if (false == $this->collMessageI18ns->contains($obj)) {
+                          $this->collMessageI18ns->append($obj);
                         }
                       }
 
-                      $this->collMessageDescsPartial = true;
+                      $this->collMessageI18nsPartial = true;
                     }
 
-                    return $collMessageDescs;
+                    return $collMessageI18ns;
                 }
 
-                if($partial && $this->collMessageDescs) {
-                    foreach($this->collMessageDescs as $obj) {
+                if($partial && $this->collMessageI18ns) {
+                    foreach($this->collMessageI18ns as $obj) {
                         if($obj->isNew()) {
-                            $collMessageDescs[] = $obj;
+                            $collMessageI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collMessageDescs = $collMessageDescs;
-                $this->collMessageDescsPartial = false;
+                $this->collMessageI18ns = $collMessageI18ns;
+                $this->collMessageI18nsPartial = false;
             }
         }
 
-        return $this->collMessageDescs;
+        return $this->collMessageI18ns;
     }
 
     /**
-     * Sets a collection of MessageDesc objects related by a one-to-many relationship
+     * Sets a collection of MessageI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $messageDescs A Propel collection.
+     * @param PropelCollection $messageI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setMessageDescs(PropelCollection $messageDescs, PropelPDO $con = null)
+    public function setMessageI18ns(PropelCollection $messageI18ns, PropelPDO $con = null)
     {
-        $this->messageDescsScheduledForDeletion = $this->getMessageDescs(new Criteria(), $con)->diff($messageDescs);
+        $this->messageI18nsScheduledForDeletion = $this->getMessageI18ns(new Criteria(), $con)->diff($messageI18ns);
 
-        foreach ($this->messageDescsScheduledForDeletion as $messageDescRemoved) {
-            $messageDescRemoved->setMessage(null);
+        foreach ($this->messageI18nsScheduledForDeletion as $messageI18nRemoved) {
+            $messageI18nRemoved->setMessage(null);
         }
 
-        $this->collMessageDescs = null;
-        foreach ($messageDescs as $messageDesc) {
-            $this->addMessageDesc($messageDesc);
+        $this->collMessageI18ns = null;
+        foreach ($messageI18ns as $messageI18n) {
+            $this->addMessageI18n($messageI18n);
         }
 
-        $this->collMessageDescs = $messageDescs;
-        $this->collMessageDescsPartial = false;
+        $this->collMessageI18ns = $messageI18ns;
+        $this->collMessageI18nsPartial = false;
     }
 
     /**
-     * Returns the number of related MessageDesc objects.
+     * Returns the number of related MessageI18n objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related MessageDesc objects.
+     * @return int             Count of related MessageI18n objects.
      * @throws PropelException
      */
-    public function countMessageDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countMessageI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collMessageDescsPartial && !$this->isNew();
-        if (null === $this->collMessageDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collMessageDescs) {
+        $partial = $this->collMessageI18nsPartial && !$this->isNew();
+        if (null === $this->collMessageI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMessageI18ns) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getMessageDescs());
+                    return count($this->getMessageI18ns());
                 }
-                $query = MessageDescQuery::create(null, $criteria);
+                $query = MessageI18nQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1241,52 +1309,56 @@ abstract class BaseMessage extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collMessageDescs);
+            return count($this->collMessageI18ns);
         }
     }
 
     /**
-     * Method called to associate a MessageDesc object to this object
-     * through the MessageDesc foreign key attribute.
+     * Method called to associate a MessageI18n object to this object
+     * through the MessageI18n foreign key attribute.
      *
-     * @param    MessageDesc $l MessageDesc
+     * @param    MessageI18n $l MessageI18n
      * @return Message The current object (for fluent API support)
      */
-    public function addMessageDesc(MessageDesc $l)
+    public function addMessageI18n(MessageI18n $l)
     {
-        if ($this->collMessageDescs === null) {
-            $this->initMessageDescs();
-            $this->collMessageDescsPartial = true;
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
         }
-        if (!$this->collMessageDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddMessageDesc($l);
+        if ($this->collMessageI18ns === null) {
+            $this->initMessageI18ns();
+            $this->collMessageI18nsPartial = true;
+        }
+        if (!$this->collMessageI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddMessageI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	MessageDesc $messageDesc The messageDesc object to add.
+     * @param	MessageI18n $messageI18n The messageI18n object to add.
      */
-    protected function doAddMessageDesc($messageDesc)
+    protected function doAddMessageI18n($messageI18n)
     {
-        $this->collMessageDescs[]= $messageDesc;
-        $messageDesc->setMessage($this);
+        $this->collMessageI18ns[]= $messageI18n;
+        $messageI18n->setMessage($this);
     }
 
     /**
-     * @param	MessageDesc $messageDesc The messageDesc object to remove.
+     * @param	MessageI18n $messageI18n The messageI18n object to remove.
      */
-    public function removeMessageDesc($messageDesc)
+    public function removeMessageI18n($messageI18n)
     {
-        if ($this->getMessageDescs()->contains($messageDesc)) {
-            $this->collMessageDescs->remove($this->collMessageDescs->search($messageDesc));
-            if (null === $this->messageDescsScheduledForDeletion) {
-                $this->messageDescsScheduledForDeletion = clone $this->collMessageDescs;
-                $this->messageDescsScheduledForDeletion->clear();
+        if ($this->getMessageI18ns()->contains($messageI18n)) {
+            $this->collMessageI18ns->remove($this->collMessageI18ns->search($messageI18n));
+            if (null === $this->messageI18nsScheduledForDeletion) {
+                $this->messageI18nsScheduledForDeletion = clone $this->collMessageI18ns;
+                $this->messageI18nsScheduledForDeletion->clear();
             }
-            $this->messageDescsScheduledForDeletion[]= $messageDesc;
-            $messageDesc->setMessage(null);
+            $this->messageI18nsScheduledForDeletion[]= $messageI18n;
+            $messageI18n->setMessage(null);
         }
     }
 
@@ -1298,6 +1370,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
         $this->id = null;
         $this->code = null;
         $this->secured = null;
+        $this->ref = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1320,17 +1393,21 @@ abstract class BaseMessage extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collMessageDescs) {
-                foreach ($this->collMessageDescs as $o) {
+            if ($this->collMessageI18ns) {
+                foreach ($this->collMessageI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        if ($this->collMessageDescs instanceof PropelCollection) {
-            $this->collMessageDescs->clearIterator();
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
+        if ($this->collMessageI18ns instanceof PropelCollection) {
+            $this->collMessageI18ns->clearIterator();
         }
-        $this->collMessageDescs = null;
+        $this->collMessageI18ns = null;
     }
 
     /**
@@ -1363,6 +1440,177 @@ abstract class BaseMessage extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = MessagePeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Message The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return MessageI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collMessageI18ns) {
+                foreach ($this->collMessageI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new MessageI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = MessageI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addMessageI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Message The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            MessageI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collMessageI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collMessageI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return MessageI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return MessageI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return MessageI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description_html] column value.
+         *
+         * @return string
+         */
+        public function getDescriptionHtml()
+        {
+        return $this->getCurrentTranslation()->getDescriptionHtml();
+    }
+
+
+        /**
+         * Set the value of [description_html] column.
+         *
+         * @param string $v new value
+         * @return MessageI18n The current object (for fluent API support)
+         */
+        public function setDescriptionHtml($v)
+        {    $this->getCurrentTranslation()->setDescriptionHtml($v);
 
         return $this;
     }

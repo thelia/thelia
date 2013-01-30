@@ -20,8 +20,8 @@ use Thelia\Model\ContentFolderQuery;
 use Thelia\Model\Document;
 use Thelia\Model\DocumentQuery;
 use Thelia\Model\Folder;
-use Thelia\Model\FolderDesc;
-use Thelia\Model\FolderDescQuery;
+use Thelia\Model\FolderI18n;
+use Thelia\Model\FolderI18nQuery;
 use Thelia\Model\FolderPeer;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Image;
@@ -100,12 +100,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|FolderDesc[] Collection to store aggregation of FolderDesc objects.
-     */
-    protected $collFolderDescs;
-    protected $collFolderDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|Image[] Collection to store aggregation of Image objects.
      */
     protected $collImages;
@@ -130,6 +124,12 @@ abstract class BaseFolder extends BaseObject implements Persistent
     protected $collContentFoldersPartial;
 
     /**
+     * @var        PropelObjectCollection|FolderI18n[] Collection to store aggregation of FolderI18n objects.
+     */
+    protected $collFolderI18ns;
+    protected $collFolderI18nsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -143,11 +143,19 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $folderDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[FolderI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
@@ -172,6 +180,12 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $contentFoldersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $folderI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -557,8 +571,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collFolderDescs = null;
-
             $this->collImages = null;
 
             $this->collDocuments = null;
@@ -566,6 +578,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->collRewritings = null;
 
             $this->collContentFolders = null;
+
+            $this->collFolderI18ns = null;
 
         } // if (deep)
     }
@@ -702,23 +716,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->folderDescsScheduledForDeletion !== null) {
-                if (!$this->folderDescsScheduledForDeletion->isEmpty()) {
-                    FolderDescQuery::create()
-                        ->filterByPrimaryKeys($this->folderDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->folderDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collFolderDescs !== null) {
-                foreach ($this->collFolderDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->imagesScheduledForDeletion !== null) {
                 if (!$this->imagesScheduledForDeletion->isEmpty()) {
                     foreach ($this->imagesScheduledForDeletion as $image) {
@@ -784,6 +781,23 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collContentFolders !== null) {
                 foreach ($this->collContentFolders as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->folderI18nsScheduledForDeletion !== null) {
+                if (!$this->folderI18nsScheduledForDeletion->isEmpty()) {
+                    FolderI18nQuery::create()
+                        ->filterByPrimaryKeys($this->folderI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->folderI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFolderI18ns !== null) {
+                foreach ($this->collFolderI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -968,14 +982,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
             }
 
 
-                if ($this->collFolderDescs !== null) {
-                    foreach ($this->collFolderDescs as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collImages !== null) {
                     foreach ($this->collImages as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -1002,6 +1008,14 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
                 if ($this->collContentFolders !== null) {
                     foreach ($this->collContentFolders as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collFolderI18ns !== null) {
+                    foreach ($this->collFolderI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1102,9 +1116,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $keys[6] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collFolderDescs) {
-                $result['FolderDescs'] = $this->collFolderDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collImages) {
                 $result['Images'] = $this->collImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1116,6 +1127,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
             }
             if (null !== $this->collContentFolders) {
                 $result['ContentFolders'] = $this->collContentFolders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFolderI18ns) {
+                $result['FolderI18ns'] = $this->collFolderI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1298,12 +1312,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getFolderDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addFolderDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getImages() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addImage($relObj->copy($deepCopy));
@@ -1325,6 +1333,12 @@ abstract class BaseFolder extends BaseObject implements Persistent
             foreach ($this->getContentFolders() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addContentFolder($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFolderI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFolderI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1389,9 +1403,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('FolderDesc' == $relationName) {
-            $this->initFolderDescs();
-        }
         if ('Image' == $relationName) {
             $this->initImages();
         }
@@ -1404,212 +1415,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if ('ContentFolder' == $relationName) {
             $this->initContentFolders();
         }
-    }
-
-    /**
-     * Clears out the collFolderDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addFolderDescs()
-     */
-    public function clearFolderDescs()
-    {
-        $this->collFolderDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collFolderDescsPartial = null;
-    }
-
-    /**
-     * reset is the collFolderDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialFolderDescs($v = true)
-    {
-        $this->collFolderDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collFolderDescs collection.
-     *
-     * By default this just sets the collFolderDescs collection to an empty array (like clearcollFolderDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initFolderDescs($overrideExisting = true)
-    {
-        if (null !== $this->collFolderDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collFolderDescs = new PropelObjectCollection();
-        $this->collFolderDescs->setModel('FolderDesc');
-    }
-
-    /**
-     * Gets an array of FolderDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Folder is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|FolderDesc[] List of FolderDesc objects
-     * @throws PropelException
-     */
-    public function getFolderDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collFolderDescsPartial && !$this->isNew();
-        if (null === $this->collFolderDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collFolderDescs) {
-                // return empty collection
-                $this->initFolderDescs();
-            } else {
-                $collFolderDescs = FolderDescQuery::create(null, $criteria)
-                    ->filterByFolder($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collFolderDescsPartial && count($collFolderDescs)) {
-                      $this->initFolderDescs(false);
-
-                      foreach($collFolderDescs as $obj) {
-                        if (false == $this->collFolderDescs->contains($obj)) {
-                          $this->collFolderDescs->append($obj);
-                        }
-                      }
-
-                      $this->collFolderDescsPartial = true;
-                    }
-
-                    return $collFolderDescs;
-                }
-
-                if($partial && $this->collFolderDescs) {
-                    foreach($this->collFolderDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collFolderDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collFolderDescs = $collFolderDescs;
-                $this->collFolderDescsPartial = false;
-            }
-        }
-
-        return $this->collFolderDescs;
-    }
-
-    /**
-     * Sets a collection of FolderDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $folderDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setFolderDescs(PropelCollection $folderDescs, PropelPDO $con = null)
-    {
-        $this->folderDescsScheduledForDeletion = $this->getFolderDescs(new Criteria(), $con)->diff($folderDescs);
-
-        foreach ($this->folderDescsScheduledForDeletion as $folderDescRemoved) {
-            $folderDescRemoved->setFolder(null);
-        }
-
-        $this->collFolderDescs = null;
-        foreach ($folderDescs as $folderDesc) {
-            $this->addFolderDesc($folderDesc);
-        }
-
-        $this->collFolderDescs = $folderDescs;
-        $this->collFolderDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related FolderDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related FolderDesc objects.
-     * @throws PropelException
-     */
-    public function countFolderDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collFolderDescsPartial && !$this->isNew();
-        if (null === $this->collFolderDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collFolderDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getFolderDescs());
-                }
-                $query = FolderDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collFolderDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a FolderDesc object to this object
-     * through the FolderDesc foreign key attribute.
-     *
-     * @param    FolderDesc $l FolderDesc
-     * @return Folder The current object (for fluent API support)
-     */
-    public function addFolderDesc(FolderDesc $l)
-    {
-        if ($this->collFolderDescs === null) {
-            $this->initFolderDescs();
-            $this->collFolderDescsPartial = true;
-        }
-        if (!$this->collFolderDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddFolderDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	FolderDesc $folderDesc The folderDesc object to add.
-     */
-    protected function doAddFolderDesc($folderDesc)
-    {
-        $this->collFolderDescs[]= $folderDesc;
-        $folderDesc->setFolder($this);
-    }
-
-    /**
-     * @param	FolderDesc $folderDesc The folderDesc object to remove.
-     */
-    public function removeFolderDesc($folderDesc)
-    {
-        if ($this->getFolderDescs()->contains($folderDesc)) {
-            $this->collFolderDescs->remove($this->collFolderDescs->search($folderDesc));
-            if (null === $this->folderDescsScheduledForDeletion) {
-                $this->folderDescsScheduledForDeletion = clone $this->collFolderDescs;
-                $this->folderDescsScheduledForDeletion->clear();
-            }
-            $this->folderDescsScheduledForDeletion[]= $folderDesc;
-            $folderDesc->setFolder(null);
+        if ('FolderI18n' == $relationName) {
+            $this->initFolderI18ns();
         }
     }
 
@@ -2692,6 +2499,217 @@ abstract class BaseFolder extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collFolderI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFolderI18ns()
+     */
+    public function clearFolderI18ns()
+    {
+        $this->collFolderI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collFolderI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collFolderI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFolderI18ns($v = true)
+    {
+        $this->collFolderI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFolderI18ns collection.
+     *
+     * By default this just sets the collFolderI18ns collection to an empty array (like clearcollFolderI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFolderI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collFolderI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collFolderI18ns = new PropelObjectCollection();
+        $this->collFolderI18ns->setModel('FolderI18n');
+    }
+
+    /**
+     * Gets an array of FolderI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Folder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FolderI18n[] List of FolderI18n objects
+     * @throws PropelException
+     */
+    public function getFolderI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFolderI18nsPartial && !$this->isNew();
+        if (null === $this->collFolderI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFolderI18ns) {
+                // return empty collection
+                $this->initFolderI18ns();
+            } else {
+                $collFolderI18ns = FolderI18nQuery::create(null, $criteria)
+                    ->filterByFolder($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFolderI18nsPartial && count($collFolderI18ns)) {
+                      $this->initFolderI18ns(false);
+
+                      foreach($collFolderI18ns as $obj) {
+                        if (false == $this->collFolderI18ns->contains($obj)) {
+                          $this->collFolderI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collFolderI18nsPartial = true;
+                    }
+
+                    return $collFolderI18ns;
+                }
+
+                if($partial && $this->collFolderI18ns) {
+                    foreach($this->collFolderI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collFolderI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFolderI18ns = $collFolderI18ns;
+                $this->collFolderI18nsPartial = false;
+            }
+        }
+
+        return $this->collFolderI18ns;
+    }
+
+    /**
+     * Sets a collection of FolderI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $folderI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setFolderI18ns(PropelCollection $folderI18ns, PropelPDO $con = null)
+    {
+        $this->folderI18nsScheduledForDeletion = $this->getFolderI18ns(new Criteria(), $con)->diff($folderI18ns);
+
+        foreach ($this->folderI18nsScheduledForDeletion as $folderI18nRemoved) {
+            $folderI18nRemoved->setFolder(null);
+        }
+
+        $this->collFolderI18ns = null;
+        foreach ($folderI18ns as $folderI18n) {
+            $this->addFolderI18n($folderI18n);
+        }
+
+        $this->collFolderI18ns = $folderI18ns;
+        $this->collFolderI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related FolderI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FolderI18n objects.
+     * @throws PropelException
+     */
+    public function countFolderI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFolderI18nsPartial && !$this->isNew();
+        if (null === $this->collFolderI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFolderI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getFolderI18ns());
+                }
+                $query = FolderI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByFolder($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFolderI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a FolderI18n object to this object
+     * through the FolderI18n foreign key attribute.
+     *
+     * @param    FolderI18n $l FolderI18n
+     * @return Folder The current object (for fluent API support)
+     */
+    public function addFolderI18n(FolderI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collFolderI18ns === null) {
+            $this->initFolderI18ns();
+            $this->collFolderI18nsPartial = true;
+        }
+        if (!$this->collFolderI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddFolderI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FolderI18n $folderI18n The folderI18n object to add.
+     */
+    protected function doAddFolderI18n($folderI18n)
+    {
+        $this->collFolderI18ns[]= $folderI18n;
+        $folderI18n->setFolder($this);
+    }
+
+    /**
+     * @param	FolderI18n $folderI18n The folderI18n object to remove.
+     */
+    public function removeFolderI18n($folderI18n)
+    {
+        if ($this->getFolderI18ns()->contains($folderI18n)) {
+            $this->collFolderI18ns->remove($this->collFolderI18ns->search($folderI18n));
+            if (null === $this->folderI18nsScheduledForDeletion) {
+                $this->folderI18nsScheduledForDeletion = clone $this->collFolderI18ns;
+                $this->folderI18nsScheduledForDeletion->clear();
+            }
+            $this->folderI18nsScheduledForDeletion[]= $folderI18n;
+            $folderI18n->setFolder(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2723,11 +2741,6 @@ abstract class BaseFolder extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collFolderDescs) {
-                foreach ($this->collFolderDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collImages) {
                 foreach ($this->collImages as $o) {
                     $o->clearAllReferences($deep);
@@ -2748,12 +2761,17 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collFolderI18ns) {
+                foreach ($this->collFolderI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collFolderDescs instanceof PropelCollection) {
-            $this->collFolderDescs->clearIterator();
-        }
-        $this->collFolderDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collImages instanceof PropelCollection) {
             $this->collImages->clearIterator();
         }
@@ -2770,6 +2788,10 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->collContentFolders->clearIterator();
         }
         $this->collContentFolders = null;
+        if ($this->collFolderI18ns instanceof PropelCollection) {
+            $this->collFolderI18ns->clearIterator();
+        }
+        $this->collFolderI18ns = null;
     }
 
     /**
@@ -2802,6 +2824,201 @@ abstract class BaseFolder extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = FolderPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Folder The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return FolderI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collFolderI18ns) {
+                foreach ($this->collFolderI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new FolderI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = FolderI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addFolderI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Folder The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            FolderI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collFolderI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collFolderI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return FolderI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return FolderI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return FolderI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return FolderI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return FolderI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

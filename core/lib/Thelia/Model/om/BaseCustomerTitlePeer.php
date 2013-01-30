@@ -11,7 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Thelia\Model\CustomerPeer;
 use Thelia\Model\CustomerTitle;
-use Thelia\Model\CustomerTitleDescPeer;
+use Thelia\Model\CustomerTitleI18nPeer;
 use Thelia\Model\CustomerTitlePeer;
 use Thelia\Model\map\CustomerTitleTableMap;
 
@@ -73,6 +73,13 @@ abstract class BaseCustomerTitlePeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -387,9 +394,9 @@ abstract class BaseCustomerTitlePeer
         // Invalidate objects in CustomerPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CustomerPeer::clearInstancePool();
-        // Invalidate objects in CustomerTitleDescPeer instance pool,
+        // Invalidate objects in CustomerTitleI18nPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CustomerTitleDescPeer::clearInstancePool();
+        CustomerTitleI18nPeer::clearInstancePool();
     }
 
     /**

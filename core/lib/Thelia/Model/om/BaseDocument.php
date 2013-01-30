@@ -20,8 +20,8 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\Content;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Document;
-use Thelia\Model\DocumentDesc;
-use Thelia\Model\DocumentDescQuery;
+use Thelia\Model\DocumentI18n;
+use Thelia\Model\DocumentI18nQuery;
 use Thelia\Model\DocumentPeer;
 use Thelia\Model\DocumentQuery;
 use Thelia\Model\Folder;
@@ -132,10 +132,10 @@ abstract class BaseDocument extends BaseObject implements Persistent
     protected $aFolder;
 
     /**
-     * @var        PropelObjectCollection|DocumentDesc[] Collection to store aggregation of DocumentDesc objects.
+     * @var        PropelObjectCollection|DocumentI18n[] Collection to store aggregation of DocumentI18n objects.
      */
-    protected $collDocumentDescs;
-    protected $collDocumentDescsPartial;
+    protected $collDocumentI18ns;
+    protected $collDocumentI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -151,11 +151,25 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
+    /**
+     * Current locale
+     * @var        string
+     */
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[DocumentI18n]
+     */
+    protected $currentTranslations;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
-    protected $documentDescsScheduledForDeletion = null;
+    protected $documentI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -637,7 +651,7 @@ abstract class BaseDocument extends BaseObject implements Persistent
             $this->aCategory = null;
             $this->aContent = null;
             $this->aFolder = null;
-            $this->collDocumentDescs = null;
+            $this->collDocumentI18ns = null;
 
         } // if (deep)
     }
@@ -807,17 +821,17 @@ abstract class BaseDocument extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->documentDescsScheduledForDeletion !== null) {
-                if (!$this->documentDescsScheduledForDeletion->isEmpty()) {
-                    DocumentDescQuery::create()
-                        ->filterByPrimaryKeys($this->documentDescsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->documentI18nsScheduledForDeletion !== null) {
+                if (!$this->documentI18nsScheduledForDeletion->isEmpty()) {
+                    DocumentI18nQuery::create()
+                        ->filterByPrimaryKeys($this->documentI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->documentDescsScheduledForDeletion = null;
+                    $this->documentI18nsScheduledForDeletion = null;
                 }
             }
 
-            if ($this->collDocumentDescs !== null) {
-                foreach ($this->collDocumentDescs as $referrerFK) {
+            if ($this->collDocumentI18ns !== null) {
+                foreach ($this->collDocumentI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1044,8 +1058,8 @@ abstract class BaseDocument extends BaseObject implements Persistent
             }
 
 
-                if ($this->collDocumentDescs !== null) {
-                    foreach ($this->collDocumentDescs as $referrerFK) {
+                if ($this->collDocumentI18ns !== null) {
+                    foreach ($this->collDocumentI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1166,8 +1180,8 @@ abstract class BaseDocument extends BaseObject implements Persistent
             if (null !== $this->aFolder) {
                 $result['Folder'] = $this->aFolder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collDocumentDescs) {
-                $result['DocumentDescs'] = $this->collDocumentDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collDocumentI18ns) {
+                $result['DocumentI18ns'] = $this->collDocumentI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1362,9 +1376,9 @@ abstract class BaseDocument extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getDocumentDescs() as $relObj) {
+            foreach ($this->getDocumentI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addDocumentDesc($relObj->copy($deepCopy));
+                    $copyObj->addDocumentI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1633,40 +1647,40 @@ abstract class BaseDocument extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('DocumentDesc' == $relationName) {
-            $this->initDocumentDescs();
+        if ('DocumentI18n' == $relationName) {
+            $this->initDocumentI18ns();
         }
     }
 
     /**
-     * Clears out the collDocumentDescs collection
+     * Clears out the collDocumentI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addDocumentDescs()
+     * @see        addDocumentI18ns()
      */
-    public function clearDocumentDescs()
+    public function clearDocumentI18ns()
     {
-        $this->collDocumentDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collDocumentDescsPartial = null;
+        $this->collDocumentI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collDocumentI18nsPartial = null;
     }
 
     /**
-     * reset is the collDocumentDescs collection loaded partially
+     * reset is the collDocumentI18ns collection loaded partially
      *
      * @return void
      */
-    public function resetPartialDocumentDescs($v = true)
+    public function resetPartialDocumentI18ns($v = true)
     {
-        $this->collDocumentDescsPartial = $v;
+        $this->collDocumentI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collDocumentDescs collection.
+     * Initializes the collDocumentI18ns collection.
      *
-     * By default this just sets the collDocumentDescs collection to an empty array (like clearcollDocumentDescs());
+     * By default this just sets the collDocumentI18ns collection to an empty array (like clearcollDocumentI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1675,17 +1689,17 @@ abstract class BaseDocument extends BaseObject implements Persistent
      *
      * @return void
      */
-    public function initDocumentDescs($overrideExisting = true)
+    public function initDocumentI18ns($overrideExisting = true)
     {
-        if (null !== $this->collDocumentDescs && !$overrideExisting) {
+        if (null !== $this->collDocumentI18ns && !$overrideExisting) {
             return;
         }
-        $this->collDocumentDescs = new PropelObjectCollection();
-        $this->collDocumentDescs->setModel('DocumentDesc');
+        $this->collDocumentI18ns = new PropelObjectCollection();
+        $this->collDocumentI18ns->setModel('DocumentI18n');
     }
 
     /**
-     * Gets an array of DocumentDesc objects which contain a foreign key that references this object.
+     * Gets an array of DocumentI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1695,98 +1709,98 @@ abstract class BaseDocument extends BaseObject implements Persistent
      *
      * @param Criteria $criteria optional Criteria object to narrow the query
      * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|DocumentDesc[] List of DocumentDesc objects
+     * @return PropelObjectCollection|DocumentI18n[] List of DocumentI18n objects
      * @throws PropelException
      */
-    public function getDocumentDescs($criteria = null, PropelPDO $con = null)
+    public function getDocumentI18ns($criteria = null, PropelPDO $con = null)
     {
-        $partial = $this->collDocumentDescsPartial && !$this->isNew();
-        if (null === $this->collDocumentDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collDocumentDescs) {
+        $partial = $this->collDocumentI18nsPartial && !$this->isNew();
+        if (null === $this->collDocumentI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collDocumentI18ns) {
                 // return empty collection
-                $this->initDocumentDescs();
+                $this->initDocumentI18ns();
             } else {
-                $collDocumentDescs = DocumentDescQuery::create(null, $criteria)
+                $collDocumentI18ns = DocumentI18nQuery::create(null, $criteria)
                     ->filterByDocument($this)
                     ->find($con);
                 if (null !== $criteria) {
-                    if (false !== $this->collDocumentDescsPartial && count($collDocumentDescs)) {
-                      $this->initDocumentDescs(false);
+                    if (false !== $this->collDocumentI18nsPartial && count($collDocumentI18ns)) {
+                      $this->initDocumentI18ns(false);
 
-                      foreach($collDocumentDescs as $obj) {
-                        if (false == $this->collDocumentDescs->contains($obj)) {
-                          $this->collDocumentDescs->append($obj);
+                      foreach($collDocumentI18ns as $obj) {
+                        if (false == $this->collDocumentI18ns->contains($obj)) {
+                          $this->collDocumentI18ns->append($obj);
                         }
                       }
 
-                      $this->collDocumentDescsPartial = true;
+                      $this->collDocumentI18nsPartial = true;
                     }
 
-                    return $collDocumentDescs;
+                    return $collDocumentI18ns;
                 }
 
-                if($partial && $this->collDocumentDescs) {
-                    foreach($this->collDocumentDescs as $obj) {
+                if($partial && $this->collDocumentI18ns) {
+                    foreach($this->collDocumentI18ns as $obj) {
                         if($obj->isNew()) {
-                            $collDocumentDescs[] = $obj;
+                            $collDocumentI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collDocumentDescs = $collDocumentDescs;
-                $this->collDocumentDescsPartial = false;
+                $this->collDocumentI18ns = $collDocumentI18ns;
+                $this->collDocumentI18nsPartial = false;
             }
         }
 
-        return $this->collDocumentDescs;
+        return $this->collDocumentI18ns;
     }
 
     /**
-     * Sets a collection of DocumentDesc objects related by a one-to-many relationship
+     * Sets a collection of DocumentI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param PropelCollection $documentDescs A Propel collection.
+     * @param PropelCollection $documentI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
      */
-    public function setDocumentDescs(PropelCollection $documentDescs, PropelPDO $con = null)
+    public function setDocumentI18ns(PropelCollection $documentI18ns, PropelPDO $con = null)
     {
-        $this->documentDescsScheduledForDeletion = $this->getDocumentDescs(new Criteria(), $con)->diff($documentDescs);
+        $this->documentI18nsScheduledForDeletion = $this->getDocumentI18ns(new Criteria(), $con)->diff($documentI18ns);
 
-        foreach ($this->documentDescsScheduledForDeletion as $documentDescRemoved) {
-            $documentDescRemoved->setDocument(null);
+        foreach ($this->documentI18nsScheduledForDeletion as $documentI18nRemoved) {
+            $documentI18nRemoved->setDocument(null);
         }
 
-        $this->collDocumentDescs = null;
-        foreach ($documentDescs as $documentDesc) {
-            $this->addDocumentDesc($documentDesc);
+        $this->collDocumentI18ns = null;
+        foreach ($documentI18ns as $documentI18n) {
+            $this->addDocumentI18n($documentI18n);
         }
 
-        $this->collDocumentDescs = $documentDescs;
-        $this->collDocumentDescsPartial = false;
+        $this->collDocumentI18ns = $documentI18ns;
+        $this->collDocumentI18nsPartial = false;
     }
 
     /**
-     * Returns the number of related DocumentDesc objects.
+     * Returns the number of related DocumentI18n objects.
      *
      * @param Criteria $criteria
      * @param boolean $distinct
      * @param PropelPDO $con
-     * @return int             Count of related DocumentDesc objects.
+     * @return int             Count of related DocumentI18n objects.
      * @throws PropelException
      */
-    public function countDocumentDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    public function countDocumentI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
     {
-        $partial = $this->collDocumentDescsPartial && !$this->isNew();
-        if (null === $this->collDocumentDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collDocumentDescs) {
+        $partial = $this->collDocumentI18nsPartial && !$this->isNew();
+        if (null === $this->collDocumentI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collDocumentI18ns) {
                 return 0;
             } else {
                 if($partial && !$criteria) {
-                    return count($this->getDocumentDescs());
+                    return count($this->getDocumentI18ns());
                 }
-                $query = DocumentDescQuery::create(null, $criteria);
+                $query = DocumentI18nQuery::create(null, $criteria);
                 if ($distinct) {
                     $query->distinct();
                 }
@@ -1796,52 +1810,56 @@ abstract class BaseDocument extends BaseObject implements Persistent
                     ->count($con);
             }
         } else {
-            return count($this->collDocumentDescs);
+            return count($this->collDocumentI18ns);
         }
     }
 
     /**
-     * Method called to associate a DocumentDesc object to this object
-     * through the DocumentDesc foreign key attribute.
+     * Method called to associate a DocumentI18n object to this object
+     * through the DocumentI18n foreign key attribute.
      *
-     * @param    DocumentDesc $l DocumentDesc
+     * @param    DocumentI18n $l DocumentI18n
      * @return Document The current object (for fluent API support)
      */
-    public function addDocumentDesc(DocumentDesc $l)
+    public function addDocumentI18n(DocumentI18n $l)
     {
-        if ($this->collDocumentDescs === null) {
-            $this->initDocumentDescs();
-            $this->collDocumentDescsPartial = true;
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
         }
-        if (!$this->collDocumentDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddDocumentDesc($l);
+        if ($this->collDocumentI18ns === null) {
+            $this->initDocumentI18ns();
+            $this->collDocumentI18nsPartial = true;
+        }
+        if (!$this->collDocumentI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddDocumentI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param	DocumentDesc $documentDesc The documentDesc object to add.
+     * @param	DocumentI18n $documentI18n The documentI18n object to add.
      */
-    protected function doAddDocumentDesc($documentDesc)
+    protected function doAddDocumentI18n($documentI18n)
     {
-        $this->collDocumentDescs[]= $documentDesc;
-        $documentDesc->setDocument($this);
+        $this->collDocumentI18ns[]= $documentI18n;
+        $documentI18n->setDocument($this);
     }
 
     /**
-     * @param	DocumentDesc $documentDesc The documentDesc object to remove.
+     * @param	DocumentI18n $documentI18n The documentI18n object to remove.
      */
-    public function removeDocumentDesc($documentDesc)
+    public function removeDocumentI18n($documentI18n)
     {
-        if ($this->getDocumentDescs()->contains($documentDesc)) {
-            $this->collDocumentDescs->remove($this->collDocumentDescs->search($documentDesc));
-            if (null === $this->documentDescsScheduledForDeletion) {
-                $this->documentDescsScheduledForDeletion = clone $this->collDocumentDescs;
-                $this->documentDescsScheduledForDeletion->clear();
+        if ($this->getDocumentI18ns()->contains($documentI18n)) {
+            $this->collDocumentI18ns->remove($this->collDocumentI18ns->search($documentI18n));
+            if (null === $this->documentI18nsScheduledForDeletion) {
+                $this->documentI18nsScheduledForDeletion = clone $this->collDocumentI18ns;
+                $this->documentI18nsScheduledForDeletion->clear();
             }
-            $this->documentDescsScheduledForDeletion[]= $documentDesc;
-            $documentDesc->setDocument(null);
+            $this->documentI18nsScheduledForDeletion[]= $documentI18n;
+            $documentI18n->setDocument(null);
         }
     }
 
@@ -1879,17 +1897,21 @@ abstract class BaseDocument extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collDocumentDescs) {
-                foreach ($this->collDocumentDescs as $o) {
+            if ($this->collDocumentI18ns) {
+                foreach ($this->collDocumentI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
         } // if ($deep)
 
-        if ($this->collDocumentDescs instanceof PropelCollection) {
-            $this->collDocumentDescs->clearIterator();
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
+        if ($this->collDocumentI18ns instanceof PropelCollection) {
+            $this->collDocumentI18ns->clearIterator();
         }
-        $this->collDocumentDescs = null;
+        $this->collDocumentI18ns = null;
         $this->aProduct = null;
         $this->aCategory = null;
         $this->aContent = null;
@@ -1926,6 +1948,201 @@ abstract class BaseDocument extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = DocumentPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Document The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return DocumentI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collDocumentI18ns) {
+                foreach ($this->collDocumentI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new DocumentI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = DocumentI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addDocumentI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Document The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            DocumentI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collDocumentI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collDocumentI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return DocumentI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return DocumentI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return DocumentI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return DocumentI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return DocumentI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

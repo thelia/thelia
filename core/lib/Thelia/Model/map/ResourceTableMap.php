@@ -54,8 +54,8 @@ class ResourceTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ResourceDesc', 'Thelia\\Model\\ResourceDesc', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT', 'ResourceDescs');
         $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT', 'GroupResources');
+        $this->addRelation('ResourceI18n', 'Thelia\\Model\\ResourceI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ResourceI18ns');
     } // buildRelations()
 
     /**
@@ -68,6 +68,7 @@ class ResourceTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

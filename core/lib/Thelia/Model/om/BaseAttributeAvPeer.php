@@ -10,7 +10,7 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use Thelia\Model\AttributeAv;
-use Thelia\Model\AttributeAvDescPeer;
+use Thelia\Model\AttributeAvI18nPeer;
 use Thelia\Model\AttributeAvPeer;
 use Thelia\Model\AttributeCombinationPeer;
 use Thelia\Model\AttributePeer;
@@ -74,6 +74,13 @@ abstract class BaseAttributeAvPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -385,12 +392,12 @@ abstract class BaseAttributeAvPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in AttributeAvDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AttributeAvDescPeer::clearInstancePool();
         // Invalidate objects in AttributeCombinationPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         AttributeCombinationPeer::clearInstancePool();
+        // Invalidate objects in AttributeAvI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        AttributeAvI18nPeer::clearInstancePool();
     }
 
     /**

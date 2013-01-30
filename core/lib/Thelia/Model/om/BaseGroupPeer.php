@@ -11,7 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Thelia\Model\AdminGroupPeer;
 use Thelia\Model\Group;
-use Thelia\Model\GroupDescPeer;
+use Thelia\Model\GroupI18nPeer;
 use Thelia\Model\GroupModulePeer;
 use Thelia\Model\GroupPeer;
 use Thelia\Model\GroupResourcePeer;
@@ -72,6 +72,13 @@ abstract class BaseGroupPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -381,9 +388,6 @@ abstract class BaseGroupPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in GroupDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        GroupDescPeer::clearInstancePool();
         // Invalidate objects in AdminGroupPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         AdminGroupPeer::clearInstancePool();
@@ -393,6 +397,9 @@ abstract class BaseGroupPeer
         // Invalidate objects in GroupModulePeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         GroupModulePeer::clearInstancePool();
+        // Invalidate objects in GroupI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        GroupI18nPeer::clearInstancePool();
     }
 
     /**

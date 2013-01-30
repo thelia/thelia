@@ -15,7 +15,7 @@ use \PropelPDO;
 use Thelia\Model\Address;
 use Thelia\Model\Customer;
 use Thelia\Model\CustomerTitle;
-use Thelia\Model\CustomerTitleDesc;
+use Thelia\Model\CustomerTitleI18n;
 use Thelia\Model\CustomerTitlePeer;
 use Thelia\Model\CustomerTitleQuery;
 
@@ -48,9 +48,9 @@ use Thelia\Model\CustomerTitleQuery;
  * @method CustomerTitleQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
  * @method CustomerTitleQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
  *
- * @method CustomerTitleQuery leftJoinCustomerTitleDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitleDesc relation
- * @method CustomerTitleQuery rightJoinCustomerTitleDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitleDesc relation
- * @method CustomerTitleQuery innerJoinCustomerTitleDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitleDesc relation
+ * @method CustomerTitleQuery leftJoinCustomerTitleI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitleI18n relation
+ * @method CustomerTitleQuery rightJoinCustomerTitleI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitleI18n relation
+ * @method CustomerTitleQuery innerJoinCustomerTitleI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitleI18n relation
  *
  * @method CustomerTitle findOne(PropelPDO $con = null) Return the first CustomerTitle matching the query
  * @method CustomerTitle findOneOrCreate(PropelPDO $con = null) Return the first CustomerTitle matching the query, or a new CustomerTitle object populated from the query conditions when no match is found
@@ -576,41 +576,41 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related CustomerTitleDesc object
+     * Filter the query by a related CustomerTitleI18n object
      *
-     * @param   CustomerTitleDesc|PropelObjectCollection $customerTitleDesc  the related object to use as filter
+     * @param   CustomerTitleI18n|PropelObjectCollection $customerTitleI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   CustomerTitleQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByCustomerTitleDesc($customerTitleDesc, $comparison = null)
+    public function filterByCustomerTitleI18n($customerTitleI18n, $comparison = null)
     {
-        if ($customerTitleDesc instanceof CustomerTitleDesc) {
+        if ($customerTitleI18n instanceof CustomerTitleI18n) {
             return $this
-                ->addUsingAlias(CustomerTitlePeer::ID, $customerTitleDesc->getCustomerTitleId(), $comparison);
-        } elseif ($customerTitleDesc instanceof PropelObjectCollection) {
+                ->addUsingAlias(CustomerTitlePeer::ID, $customerTitleI18n->getId(), $comparison);
+        } elseif ($customerTitleI18n instanceof PropelObjectCollection) {
             return $this
-                ->useCustomerTitleDescQuery()
-                ->filterByPrimaryKeys($customerTitleDesc->getPrimaryKeys())
+                ->useCustomerTitleI18nQuery()
+                ->filterByPrimaryKeys($customerTitleI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByCustomerTitleDesc() only accepts arguments of type CustomerTitleDesc or PropelCollection');
+            throw new PropelException('filterByCustomerTitleI18n() only accepts arguments of type CustomerTitleI18n or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the CustomerTitleDesc relation
+     * Adds a JOIN clause to the query using the CustomerTitleI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return CustomerTitleQuery The current query, for fluid interface
      */
-    public function joinCustomerTitleDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinCustomerTitleI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('CustomerTitleDesc');
+        $relationMap = $tableMap->getRelation('CustomerTitleI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -625,14 +625,14 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'CustomerTitleDesc');
+            $this->addJoinObject($join, 'CustomerTitleI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the CustomerTitleDesc relation CustomerTitleDesc object
+     * Use the CustomerTitleI18n relation CustomerTitleI18n object
      *
      * @see       useQuery()
      *
@@ -640,13 +640,13 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CustomerTitleDescQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\CustomerTitleI18nQuery A secondary query class using the current class as primary query
      */
-    public function useCustomerTitleDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useCustomerTitleI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinCustomerTitleDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'CustomerTitleDesc', '\Thelia\Model\CustomerTitleDescQuery');
+            ->joinCustomerTitleI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerTitleI18n', '\Thelia\Model\CustomerTitleI18nQuery');
     }
 
     /**
@@ -730,4 +730,61 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(CustomerTitlePeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CustomerTitleQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'CustomerTitleI18n';
+
+        return $this
+            ->joinCustomerTitleI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CustomerTitleQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('CustomerTitleI18n');
+        $this->with['CustomerTitleI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    CustomerTitleI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerTitleI18n', 'Thelia\Model\CustomerTitleI18nQuery');
+    }
+
 }

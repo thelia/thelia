@@ -16,8 +16,8 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Tax;
-use Thelia\Model\TaxDesc;
-use Thelia\Model\TaxDescQuery;
+use Thelia\Model\TaxI18n;
+use Thelia\Model\TaxI18nQuery;
 use Thelia\Model\TaxPeer;
 use Thelia\Model\TaxQuery;
 use Thelia\Model\TaxRuleCountry;
@@ -76,16 +76,16 @@ abstract class BaseTax extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|TaxDesc[] Collection to store aggregation of TaxDesc objects.
-     */
-    protected $collTaxDescs;
-    protected $collTaxDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|TaxRuleCountry[] Collection to store aggregation of TaxRuleCountry objects.
      */
     protected $collTaxRuleCountrys;
     protected $collTaxRuleCountrysPartial;
+
+    /**
+     * @var        PropelObjectCollection|TaxI18n[] Collection to store aggregation of TaxI18n objects.
+     */
+    protected $collTaxI18ns;
+    protected $collTaxI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -101,17 +101,31 @@ abstract class BaseTax extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $taxDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[TaxI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $taxRuleCountrysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $taxI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -401,9 +415,9 @@ abstract class BaseTax extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collTaxDescs = null;
-
             $this->collTaxRuleCountrys = null;
+
+            $this->collTaxI18ns = null;
 
         } // if (deep)
     }
@@ -540,23 +554,6 @@ abstract class BaseTax extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->taxDescsScheduledForDeletion !== null) {
-                if (!$this->taxDescsScheduledForDeletion->isEmpty()) {
-                    TaxDescQuery::create()
-                        ->filterByPrimaryKeys($this->taxDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->taxDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collTaxDescs !== null) {
-                foreach ($this->collTaxDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->taxRuleCountrysScheduledForDeletion !== null) {
                 if (!$this->taxRuleCountrysScheduledForDeletion->isEmpty()) {
                     foreach ($this->taxRuleCountrysScheduledForDeletion as $taxRuleCountry) {
@@ -569,6 +566,23 @@ abstract class BaseTax extends BaseObject implements Persistent
 
             if ($this->collTaxRuleCountrys !== null) {
                 foreach ($this->collTaxRuleCountrys as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->taxI18nsScheduledForDeletion !== null) {
+                if (!$this->taxI18nsScheduledForDeletion->isEmpty()) {
+                    TaxI18nQuery::create()
+                        ->filterByPrimaryKeys($this->taxI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->taxI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collTaxI18ns !== null) {
+                foreach ($this->collTaxI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -735,16 +749,16 @@ abstract class BaseTax extends BaseObject implements Persistent
             }
 
 
-                if ($this->collTaxDescs !== null) {
-                    foreach ($this->collTaxDescs as $referrerFK) {
+                if ($this->collTaxRuleCountrys !== null) {
+                    foreach ($this->collTaxRuleCountrys as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collTaxRuleCountrys !== null) {
-                    foreach ($this->collTaxRuleCountrys as $referrerFK) {
+                if ($this->collTaxI18ns !== null) {
+                    foreach ($this->collTaxI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -833,11 +847,11 @@ abstract class BaseTax extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collTaxDescs) {
-                $result['TaxDescs'] = $this->collTaxDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collTaxRuleCountrys) {
                 $result['TaxRuleCountrys'] = $this->collTaxRuleCountrys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collTaxI18ns) {
+                $result['TaxI18ns'] = $this->collTaxI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1002,15 +1016,15 @@ abstract class BaseTax extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getTaxDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addTaxDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getTaxRuleCountrys() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTaxRuleCountry($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getTaxI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addTaxI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1075,218 +1089,11 @@ abstract class BaseTax extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('TaxDesc' == $relationName) {
-            $this->initTaxDescs();
-        }
         if ('TaxRuleCountry' == $relationName) {
             $this->initTaxRuleCountrys();
         }
-    }
-
-    /**
-     * Clears out the collTaxDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addTaxDescs()
-     */
-    public function clearTaxDescs()
-    {
-        $this->collTaxDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collTaxDescsPartial = null;
-    }
-
-    /**
-     * reset is the collTaxDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialTaxDescs($v = true)
-    {
-        $this->collTaxDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collTaxDescs collection.
-     *
-     * By default this just sets the collTaxDescs collection to an empty array (like clearcollTaxDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initTaxDescs($overrideExisting = true)
-    {
-        if (null !== $this->collTaxDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collTaxDescs = new PropelObjectCollection();
-        $this->collTaxDescs->setModel('TaxDesc');
-    }
-
-    /**
-     * Gets an array of TaxDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Tax is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|TaxDesc[] List of TaxDesc objects
-     * @throws PropelException
-     */
-    public function getTaxDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collTaxDescsPartial && !$this->isNew();
-        if (null === $this->collTaxDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collTaxDescs) {
-                // return empty collection
-                $this->initTaxDescs();
-            } else {
-                $collTaxDescs = TaxDescQuery::create(null, $criteria)
-                    ->filterByTax($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collTaxDescsPartial && count($collTaxDescs)) {
-                      $this->initTaxDescs(false);
-
-                      foreach($collTaxDescs as $obj) {
-                        if (false == $this->collTaxDescs->contains($obj)) {
-                          $this->collTaxDescs->append($obj);
-                        }
-                      }
-
-                      $this->collTaxDescsPartial = true;
-                    }
-
-                    return $collTaxDescs;
-                }
-
-                if($partial && $this->collTaxDescs) {
-                    foreach($this->collTaxDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collTaxDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collTaxDescs = $collTaxDescs;
-                $this->collTaxDescsPartial = false;
-            }
-        }
-
-        return $this->collTaxDescs;
-    }
-
-    /**
-     * Sets a collection of TaxDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $taxDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setTaxDescs(PropelCollection $taxDescs, PropelPDO $con = null)
-    {
-        $this->taxDescsScheduledForDeletion = $this->getTaxDescs(new Criteria(), $con)->diff($taxDescs);
-
-        foreach ($this->taxDescsScheduledForDeletion as $taxDescRemoved) {
-            $taxDescRemoved->setTax(null);
-        }
-
-        $this->collTaxDescs = null;
-        foreach ($taxDescs as $taxDesc) {
-            $this->addTaxDesc($taxDesc);
-        }
-
-        $this->collTaxDescs = $taxDescs;
-        $this->collTaxDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related TaxDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related TaxDesc objects.
-     * @throws PropelException
-     */
-    public function countTaxDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collTaxDescsPartial && !$this->isNew();
-        if (null === $this->collTaxDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collTaxDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTaxDescs());
-                }
-                $query = TaxDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByTax($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collTaxDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a TaxDesc object to this object
-     * through the TaxDesc foreign key attribute.
-     *
-     * @param    TaxDesc $l TaxDesc
-     * @return Tax The current object (for fluent API support)
-     */
-    public function addTaxDesc(TaxDesc $l)
-    {
-        if ($this->collTaxDescs === null) {
-            $this->initTaxDescs();
-            $this->collTaxDescsPartial = true;
-        }
-        if (!$this->collTaxDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddTaxDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	TaxDesc $taxDesc The taxDesc object to add.
-     */
-    protected function doAddTaxDesc($taxDesc)
-    {
-        $this->collTaxDescs[]= $taxDesc;
-        $taxDesc->setTax($this);
-    }
-
-    /**
-     * @param	TaxDesc $taxDesc The taxDesc object to remove.
-     */
-    public function removeTaxDesc($taxDesc)
-    {
-        if ($this->getTaxDescs()->contains($taxDesc)) {
-            $this->collTaxDescs->remove($this->collTaxDescs->search($taxDesc));
-            if (null === $this->taxDescsScheduledForDeletion) {
-                $this->taxDescsScheduledForDeletion = clone $this->collTaxDescs;
-                $this->taxDescsScheduledForDeletion->clear();
-            }
-            $this->taxDescsScheduledForDeletion[]= $taxDesc;
-            $taxDesc->setTax(null);
+        if ('TaxI18n' == $relationName) {
+            $this->initTaxI18ns();
         }
     }
 
@@ -1548,6 +1355,217 @@ abstract class BaseTax extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collTaxI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addTaxI18ns()
+     */
+    public function clearTaxI18ns()
+    {
+        $this->collTaxI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collTaxI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collTaxI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialTaxI18ns($v = true)
+    {
+        $this->collTaxI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collTaxI18ns collection.
+     *
+     * By default this just sets the collTaxI18ns collection to an empty array (like clearcollTaxI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initTaxI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collTaxI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collTaxI18ns = new PropelObjectCollection();
+        $this->collTaxI18ns->setModel('TaxI18n');
+    }
+
+    /**
+     * Gets an array of TaxI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Tax is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|TaxI18n[] List of TaxI18n objects
+     * @throws PropelException
+     */
+    public function getTaxI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collTaxI18nsPartial && !$this->isNew();
+        if (null === $this->collTaxI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collTaxI18ns) {
+                // return empty collection
+                $this->initTaxI18ns();
+            } else {
+                $collTaxI18ns = TaxI18nQuery::create(null, $criteria)
+                    ->filterByTax($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collTaxI18nsPartial && count($collTaxI18ns)) {
+                      $this->initTaxI18ns(false);
+
+                      foreach($collTaxI18ns as $obj) {
+                        if (false == $this->collTaxI18ns->contains($obj)) {
+                          $this->collTaxI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collTaxI18nsPartial = true;
+                    }
+
+                    return $collTaxI18ns;
+                }
+
+                if($partial && $this->collTaxI18ns) {
+                    foreach($this->collTaxI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collTaxI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collTaxI18ns = $collTaxI18ns;
+                $this->collTaxI18nsPartial = false;
+            }
+        }
+
+        return $this->collTaxI18ns;
+    }
+
+    /**
+     * Sets a collection of TaxI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $taxI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setTaxI18ns(PropelCollection $taxI18ns, PropelPDO $con = null)
+    {
+        $this->taxI18nsScheduledForDeletion = $this->getTaxI18ns(new Criteria(), $con)->diff($taxI18ns);
+
+        foreach ($this->taxI18nsScheduledForDeletion as $taxI18nRemoved) {
+            $taxI18nRemoved->setTax(null);
+        }
+
+        $this->collTaxI18ns = null;
+        foreach ($taxI18ns as $taxI18n) {
+            $this->addTaxI18n($taxI18n);
+        }
+
+        $this->collTaxI18ns = $taxI18ns;
+        $this->collTaxI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related TaxI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related TaxI18n objects.
+     * @throws PropelException
+     */
+    public function countTaxI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collTaxI18nsPartial && !$this->isNew();
+        if (null === $this->collTaxI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collTaxI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getTaxI18ns());
+                }
+                $query = TaxI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByTax($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collTaxI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a TaxI18n object to this object
+     * through the TaxI18n foreign key attribute.
+     *
+     * @param    TaxI18n $l TaxI18n
+     * @return Tax The current object (for fluent API support)
+     */
+    public function addTaxI18n(TaxI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collTaxI18ns === null) {
+            $this->initTaxI18ns();
+            $this->collTaxI18nsPartial = true;
+        }
+        if (!$this->collTaxI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddTaxI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	TaxI18n $taxI18n The taxI18n object to add.
+     */
+    protected function doAddTaxI18n($taxI18n)
+    {
+        $this->collTaxI18ns[]= $taxI18n;
+        $taxI18n->setTax($this);
+    }
+
+    /**
+     * @param	TaxI18n $taxI18n The taxI18n object to remove.
+     */
+    public function removeTaxI18n($taxI18n)
+    {
+        if ($this->getTaxI18ns()->contains($taxI18n)) {
+            $this->collTaxI18ns->remove($this->collTaxI18ns->search($taxI18n));
+            if (null === $this->taxI18nsScheduledForDeletion) {
+                $this->taxI18nsScheduledForDeletion = clone $this->collTaxI18ns;
+                $this->taxI18nsScheduledForDeletion->clear();
+            }
+            $this->taxI18nsScheduledForDeletion[]= $taxI18n;
+            $taxI18n->setTax(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1576,26 +1594,30 @@ abstract class BaseTax extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collTaxDescs) {
-                foreach ($this->collTaxDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collTaxRuleCountrys) {
                 foreach ($this->collTaxRuleCountrys as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collTaxI18ns) {
+                foreach ($this->collTaxI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collTaxDescs instanceof PropelCollection) {
-            $this->collTaxDescs->clearIterator();
-        }
-        $this->collTaxDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collTaxRuleCountrys instanceof PropelCollection) {
             $this->collTaxRuleCountrys->clearIterator();
         }
         $this->collTaxRuleCountrys = null;
+        if ($this->collTaxI18ns instanceof PropelCollection) {
+            $this->collTaxI18ns->clearIterator();
+        }
+        $this->collTaxI18ns = null;
     }
 
     /**
@@ -1628,6 +1650,153 @@ abstract class BaseTax extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = TaxPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Tax The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return TaxI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collTaxI18ns) {
+                foreach ($this->collTaxI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new TaxI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = TaxI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addTaxI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Tax The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            TaxI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collTaxI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collTaxI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return TaxI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return TaxI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return TaxI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
 
         return $this;
     }

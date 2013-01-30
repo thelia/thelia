@@ -44,6 +44,8 @@ class TaxRuleTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
+        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
+        $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
@@ -55,8 +57,8 @@ class TaxRuleTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'SET NULL', 'RESTRICT', 'Products');
-        $this->addRelation('TaxRuleDesc', 'Thelia\\Model\\TaxRuleDesc', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleDescs');
         $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_rule_id', ), 'CASCADE', 'RESTRICT', 'TaxRuleCountrys');
+        $this->addRelation('TaxRuleI18n', 'Thelia\\Model\\TaxRuleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'TaxRuleI18ns');
     } // buildRelations()
 
     /**
@@ -69,6 +71,7 @@ class TaxRuleTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => '', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

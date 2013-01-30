@@ -16,7 +16,7 @@ use Thelia\Model\Category;
 use Thelia\Model\Content;
 use Thelia\Model\Folder;
 use Thelia\Model\Image;
-use Thelia\Model\ImageDesc;
+use Thelia\Model\ImageI18n;
 use Thelia\Model\ImagePeer;
 use Thelia\Model\ImageQuery;
 use Thelia\Model\Product;
@@ -66,9 +66,9 @@ use Thelia\Model\Product;
  * @method ImageQuery rightJoinFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Folder relation
  * @method ImageQuery innerJoinFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the Folder relation
  *
- * @method ImageQuery leftJoinImageDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ImageDesc relation
- * @method ImageQuery rightJoinImageDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ImageDesc relation
- * @method ImageQuery innerJoinImageDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the ImageDesc relation
+ * @method ImageQuery leftJoinImageI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ImageI18n relation
+ * @method ImageQuery rightJoinImageI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ImageI18n relation
+ * @method ImageQuery innerJoinImageI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ImageI18n relation
  *
  * @method Image findOne(PropelPDO $con = null) Return the first Image matching the query
  * @method Image findOneOrCreate(PropelPDO $con = null) Return the first Image matching the query, or a new Image object populated from the query conditions when no match is found
@@ -930,41 +930,41 @@ abstract class BaseImageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ImageDesc object
+     * Filter the query by a related ImageI18n object
      *
-     * @param   ImageDesc|PropelObjectCollection $imageDesc  the related object to use as filter
+     * @param   ImageI18n|PropelObjectCollection $imageI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   ImageQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByImageDesc($imageDesc, $comparison = null)
+    public function filterByImageI18n($imageI18n, $comparison = null)
     {
-        if ($imageDesc instanceof ImageDesc) {
+        if ($imageI18n instanceof ImageI18n) {
             return $this
-                ->addUsingAlias(ImagePeer::ID, $imageDesc->getImageId(), $comparison);
-        } elseif ($imageDesc instanceof PropelObjectCollection) {
+                ->addUsingAlias(ImagePeer::ID, $imageI18n->getId(), $comparison);
+        } elseif ($imageI18n instanceof PropelObjectCollection) {
             return $this
-                ->useImageDescQuery()
-                ->filterByPrimaryKeys($imageDesc->getPrimaryKeys())
+                ->useImageI18nQuery()
+                ->filterByPrimaryKeys($imageI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByImageDesc() only accepts arguments of type ImageDesc or PropelCollection');
+            throw new PropelException('filterByImageI18n() only accepts arguments of type ImageI18n or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ImageDesc relation
+     * Adds a JOIN clause to the query using the ImageI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ImageQuery The current query, for fluid interface
      */
-    public function joinImageDesc($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinImageI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ImageDesc');
+        $relationMap = $tableMap->getRelation('ImageI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -979,14 +979,14 @@ abstract class BaseImageQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ImageDesc');
+            $this->addJoinObject($join, 'ImageI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the ImageDesc relation ImageDesc object
+     * Use the ImageI18n relation ImageI18n object
      *
      * @see       useQuery()
      *
@@ -994,13 +994,13 @@ abstract class BaseImageQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ImageDescQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ImageI18nQuery A secondary query class using the current class as primary query
      */
-    public function useImageDescQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useImageI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinImageDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ImageDesc', '\Thelia\Model\ImageDescQuery');
+            ->joinImageI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ImageI18n', '\Thelia\Model\ImageI18nQuery');
     }
 
     /**
@@ -1084,4 +1084,61 @@ abstract class BaseImageQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(ImagePeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ImageQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'ImageI18n';
+
+        return $this
+            ->joinImageI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ImageQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('ImageI18n');
+        $this->with['ImageI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ImageI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ImageI18n', 'Thelia\Model\ImageI18nQuery');
+    }
+
 }

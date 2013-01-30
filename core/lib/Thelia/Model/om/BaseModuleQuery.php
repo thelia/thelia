@@ -14,7 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\GroupModule;
 use Thelia\Model\Module;
-use Thelia\Model\ModuleDesc;
+use Thelia\Model\ModuleI18n;
 use Thelia\Model\ModulePeer;
 use Thelia\Model\ModuleQuery;
 
@@ -43,13 +43,13 @@ use Thelia\Model\ModuleQuery;
  * @method ModuleQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ModuleQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ModuleQuery leftJoinModuleDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleDesc relation
- * @method ModuleQuery rightJoinModuleDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleDesc relation
- * @method ModuleQuery innerJoinModuleDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleDesc relation
- *
  * @method ModuleQuery leftJoinGroupModule($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupModule relation
  * @method ModuleQuery rightJoinGroupModule($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupModule relation
  * @method ModuleQuery innerJoinGroupModule($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupModule relation
+ *
+ * @method ModuleQuery leftJoinModuleI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ModuleI18n relation
+ * @method ModuleQuery rightJoinModuleI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ModuleI18n relation
+ * @method ModuleQuery innerJoinModuleI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ModuleI18n relation
  *
  * @method Module findOne(PropelPDO $con = null) Return the first Module matching the query
  * @method Module findOneOrCreate(PropelPDO $con = null) Return the first Module matching the query, or a new Module object populated from the query conditions when no match is found
@@ -513,80 +513,6 @@ abstract class BaseModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ModuleDesc object
-     *
-     * @param   ModuleDesc|PropelObjectCollection $moduleDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   ModuleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByModuleDesc($moduleDesc, $comparison = null)
-    {
-        if ($moduleDesc instanceof ModuleDesc) {
-            return $this
-                ->addUsingAlias(ModulePeer::ID, $moduleDesc->getModuleId(), $comparison);
-        } elseif ($moduleDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useModuleDescQuery()
-                ->filterByPrimaryKeys($moduleDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByModuleDesc() only accepts arguments of type ModuleDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the ModuleDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ModuleQuery The current query, for fluid interface
-     */
-    public function joinModuleDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ModuleDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'ModuleDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the ModuleDesc relation ModuleDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ModuleDescQuery A secondary query class using the current class as primary query
-     */
-    public function useModuleDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinModuleDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ModuleDesc', '\Thelia\Model\ModuleDescQuery');
-    }
-
-    /**
      * Filter the query by a related GroupModule object
      *
      * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
@@ -658,6 +584,80 @@ abstract class BaseModuleQuery extends ModelCriteria
         return $this
             ->joinGroupModule($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'GroupModule', '\Thelia\Model\GroupModuleQuery');
+    }
+
+    /**
+     * Filter the query by a related ModuleI18n object
+     *
+     * @param   ModuleI18n|PropelObjectCollection $moduleI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ModuleQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByModuleI18n($moduleI18n, $comparison = null)
+    {
+        if ($moduleI18n instanceof ModuleI18n) {
+            return $this
+                ->addUsingAlias(ModulePeer::ID, $moduleI18n->getId(), $comparison);
+        } elseif ($moduleI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useModuleI18nQuery()
+                ->filterByPrimaryKeys($moduleI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByModuleI18n() only accepts arguments of type ModuleI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ModuleI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ModuleQuery The current query, for fluid interface
+     */
+    public function joinModuleI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ModuleI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ModuleI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ModuleI18n relation ModuleI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ModuleI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useModuleI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinModuleI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ModuleI18n', '\Thelia\Model\ModuleI18nQuery');
     }
 
     /**
@@ -741,4 +741,61 @@ abstract class BaseModuleQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(ModulePeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ModuleQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'ModuleI18n';
+
+        return $this
+            ->joinModuleI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ModuleQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('ModuleI18n');
+        $this->with['ModuleI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ModuleI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ModuleI18n', 'Thelia\Model\ModuleI18nQuery');
+    }
+
 }

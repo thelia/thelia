@@ -54,8 +54,8 @@ class TaxTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('TaxDesc', 'Thelia\\Model\\TaxDesc', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'CASCADE', 'RESTRICT', 'TaxDescs');
         $this->addRelation('TaxRuleCountry', 'Thelia\\Model\\TaxRuleCountry', RelationMap::ONE_TO_MANY, array('id' => 'tax_id', ), 'SET NULL', 'RESTRICT', 'TaxRuleCountrys');
+        $this->addRelation('TaxI18n', 'Thelia\\Model\\TaxI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'TaxI18ns');
     } // buildRelations()
 
     /**
@@ -68,6 +68,7 @@ class TaxTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

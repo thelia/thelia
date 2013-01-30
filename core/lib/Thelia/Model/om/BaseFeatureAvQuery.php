@@ -14,7 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureAv;
-use Thelia\Model\FeatureAvDesc;
+use Thelia\Model\FeatureAvI18n;
 use Thelia\Model\FeatureAvPeer;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureProd;
@@ -42,13 +42,13 @@ use Thelia\Model\FeatureProd;
  * @method FeatureAvQuery rightJoinFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Feature relation
  * @method FeatureAvQuery innerJoinFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the Feature relation
  *
- * @method FeatureAvQuery leftJoinFeatureAvDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureAvDesc relation
- * @method FeatureAvQuery rightJoinFeatureAvDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAvDesc relation
- * @method FeatureAvQuery innerJoinFeatureAvDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAvDesc relation
- *
  * @method FeatureAvQuery leftJoinFeatureProd($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureProd relation
  * @method FeatureAvQuery rightJoinFeatureProd($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureProd relation
  * @method FeatureAvQuery innerJoinFeatureProd($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureProd relation
+ *
+ * @method FeatureAvQuery leftJoinFeatureAvI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureAvI18n relation
+ * @method FeatureAvQuery rightJoinFeatureAvI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAvI18n relation
+ * @method FeatureAvQuery innerJoinFeatureAvI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAvI18n relation
  *
  * @method FeatureAv findOne(PropelPDO $con = null) Return the first FeatureAv matching the query
  * @method FeatureAv findOneOrCreate(PropelPDO $con = null) Return the first FeatureAv matching the query, or a new FeatureAv object populated from the query conditions when no match is found
@@ -473,80 +473,6 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related FeatureAvDesc object
-     *
-     * @param   FeatureAvDesc|PropelObjectCollection $featureAvDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   FeatureAvQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByFeatureAvDesc($featureAvDesc, $comparison = null)
-    {
-        if ($featureAvDesc instanceof FeatureAvDesc) {
-            return $this
-                ->addUsingAlias(FeatureAvPeer::ID, $featureAvDesc->getFeatureAvId(), $comparison);
-        } elseif ($featureAvDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useFeatureAvDescQuery()
-                ->filterByPrimaryKeys($featureAvDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByFeatureAvDesc() only accepts arguments of type FeatureAvDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the FeatureAvDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return FeatureAvQuery The current query, for fluid interface
-     */
-    public function joinFeatureAvDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('FeatureAvDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'FeatureAvDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the FeatureAvDesc relation FeatureAvDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\FeatureAvDescQuery A secondary query class using the current class as primary query
-     */
-    public function useFeatureAvDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinFeatureAvDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'FeatureAvDesc', '\Thelia\Model\FeatureAvDescQuery');
-    }
-
-    /**
      * Filter the query by a related FeatureProd object
      *
      * @param   FeatureProd|PropelObjectCollection $featureProd  the related object to use as filter
@@ -618,6 +544,80 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
         return $this
             ->joinFeatureProd($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'FeatureProd', '\Thelia\Model\FeatureProdQuery');
+    }
+
+    /**
+     * Filter the query by a related FeatureAvI18n object
+     *
+     * @param   FeatureAvI18n|PropelObjectCollection $featureAvI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FeatureAvQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByFeatureAvI18n($featureAvI18n, $comparison = null)
+    {
+        if ($featureAvI18n instanceof FeatureAvI18n) {
+            return $this
+                ->addUsingAlias(FeatureAvPeer::ID, $featureAvI18n->getId(), $comparison);
+        } elseif ($featureAvI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useFeatureAvI18nQuery()
+                ->filterByPrimaryKeys($featureAvI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFeatureAvI18n() only accepts arguments of type FeatureAvI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FeatureAvI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return FeatureAvQuery The current query, for fluid interface
+     */
+    public function joinFeatureAvI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FeatureAvI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FeatureAvI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FeatureAvI18n relation FeatureAvI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\FeatureAvI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useFeatureAvI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinFeatureAvI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeatureAvI18n', '\Thelia\Model\FeatureAvI18nQuery');
     }
 
     /**
@@ -701,4 +701,61 @@ abstract class BaseFeatureAvQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(FeatureAvPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    FeatureAvQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'FeatureAvI18n';
+
+        return $this
+            ->joinFeatureAvI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    FeatureAvQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('FeatureAvI18n');
+        $this->with['FeatureAvI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    FeatureAvI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeatureAvI18n', 'Thelia\Model\FeatureAvI18nQuery');
+    }
+
 }

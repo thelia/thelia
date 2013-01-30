@@ -11,7 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Thelia\Model\OrderPeer;
 use Thelia\Model\OrderStatus;
-use Thelia\Model\OrderStatusDescPeer;
+use Thelia\Model\OrderStatusI18nPeer;
 use Thelia\Model\OrderStatusPeer;
 use Thelia\Model\map\OrderStatusTableMap;
 
@@ -70,6 +70,13 @@ abstract class BaseOrderStatusPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -382,9 +389,9 @@ abstract class BaseOrderStatusPeer
         // Invalidate objects in OrderPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         OrderPeer::clearInstancePool();
-        // Invalidate objects in OrderStatusDescPeer instance pool,
+        // Invalidate objects in OrderStatusI18nPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        OrderStatusDescPeer::clearInstancePool();
+        OrderStatusI18nPeer::clearInstancePool();
     }
 
     /**

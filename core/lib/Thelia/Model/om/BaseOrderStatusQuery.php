@@ -14,7 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Order;
 use Thelia\Model\OrderStatus;
-use Thelia\Model\OrderStatusDesc;
+use Thelia\Model\OrderStatusI18n;
 use Thelia\Model\OrderStatusPeer;
 use Thelia\Model\OrderStatusQuery;
 
@@ -41,9 +41,9 @@ use Thelia\Model\OrderStatusQuery;
  * @method OrderStatusQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method OrderStatusQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
  *
- * @method OrderStatusQuery leftJoinOrderStatusDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderStatusDesc relation
- * @method OrderStatusQuery rightJoinOrderStatusDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderStatusDesc relation
- * @method OrderStatusQuery innerJoinOrderStatusDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderStatusDesc relation
+ * @method OrderStatusQuery leftJoinOrderStatusI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the OrderStatusI18n relation
+ * @method OrderStatusQuery rightJoinOrderStatusI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the OrderStatusI18n relation
+ * @method OrderStatusQuery innerJoinOrderStatusI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the OrderStatusI18n relation
  *
  * @method OrderStatus findOne(PropelPDO $con = null) Return the first OrderStatus matching the query
  * @method OrderStatus findOneOrCreate(PropelPDO $con = null) Return the first OrderStatus matching the query, or a new OrderStatus object populated from the query conditions when no match is found
@@ -452,41 +452,41 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related OrderStatusDesc object
+     * Filter the query by a related OrderStatusI18n object
      *
-     * @param   OrderStatusDesc|PropelObjectCollection $orderStatusDesc  the related object to use as filter
+     * @param   OrderStatusI18n|PropelObjectCollection $orderStatusI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   OrderStatusQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByOrderStatusDesc($orderStatusDesc, $comparison = null)
+    public function filterByOrderStatusI18n($orderStatusI18n, $comparison = null)
     {
-        if ($orderStatusDesc instanceof OrderStatusDesc) {
+        if ($orderStatusI18n instanceof OrderStatusI18n) {
             return $this
-                ->addUsingAlias(OrderStatusPeer::ID, $orderStatusDesc->getStatusId(), $comparison);
-        } elseif ($orderStatusDesc instanceof PropelObjectCollection) {
+                ->addUsingAlias(OrderStatusPeer::ID, $orderStatusI18n->getId(), $comparison);
+        } elseif ($orderStatusI18n instanceof PropelObjectCollection) {
             return $this
-                ->useOrderStatusDescQuery()
-                ->filterByPrimaryKeys($orderStatusDesc->getPrimaryKeys())
+                ->useOrderStatusI18nQuery()
+                ->filterByPrimaryKeys($orderStatusI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByOrderStatusDesc() only accepts arguments of type OrderStatusDesc or PropelCollection');
+            throw new PropelException('filterByOrderStatusI18n() only accepts arguments of type OrderStatusI18n or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the OrderStatusDesc relation
+     * Adds a JOIN clause to the query using the OrderStatusI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return OrderStatusQuery The current query, for fluid interface
      */
-    public function joinOrderStatusDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinOrderStatusI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('OrderStatusDesc');
+        $relationMap = $tableMap->getRelation('OrderStatusI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -501,14 +501,14 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'OrderStatusDesc');
+            $this->addJoinObject($join, 'OrderStatusI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the OrderStatusDesc relation OrderStatusDesc object
+     * Use the OrderStatusI18n relation OrderStatusI18n object
      *
      * @see       useQuery()
      *
@@ -516,13 +516,13 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\OrderStatusDescQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\OrderStatusI18nQuery A secondary query class using the current class as primary query
      */
-    public function useOrderStatusDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useOrderStatusI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinOrderStatusDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'OrderStatusDesc', '\Thelia\Model\OrderStatusDescQuery');
+            ->joinOrderStatusI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderStatusI18n', '\Thelia\Model\OrderStatusI18nQuery');
     }
 
     /**
@@ -606,4 +606,61 @@ abstract class BaseOrderStatusQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(OrderStatusPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    OrderStatusQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'OrderStatusI18n';
+
+        return $this
+            ->joinOrderStatusI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    OrderStatusQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('OrderStatusI18n');
+        $this->with['OrderStatusI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    OrderStatusI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'OrderStatusI18n', 'Thelia\Model\OrderStatusI18nQuery');
+    }
+
 }

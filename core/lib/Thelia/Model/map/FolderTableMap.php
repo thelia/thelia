@@ -57,11 +57,11 @@ class FolderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('FolderDesc', 'Thelia\\Model\\FolderDesc', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'FolderDescs');
         $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Images');
         $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Documents');
         $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
+        $this->addRelation('FolderI18n', 'Thelia\\Model\\FolderI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FolderI18ns');
     } // buildRelations()
 
     /**
@@ -74,6 +74,7 @@ class FolderTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

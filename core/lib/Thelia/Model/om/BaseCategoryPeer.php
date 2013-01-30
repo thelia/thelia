@@ -11,7 +11,7 @@ use \PropelException;
 use \PropelPDO;
 use Thelia\Model\AttributeCategoryPeer;
 use Thelia\Model\Category;
-use Thelia\Model\CategoryDescPeer;
+use Thelia\Model\CategoryI18nPeer;
 use Thelia\Model\CategoryPeer;
 use Thelia\Model\ContentAssocPeer;
 use Thelia\Model\DocumentPeer;
@@ -85,6 +85,13 @@ abstract class BaseCategoryPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -400,9 +407,6 @@ abstract class BaseCategoryPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in CategoryDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        CategoryDescPeer::clearInstancePool();
         // Invalidate objects in ProductCategoryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ProductCategoryPeer::clearInstancePool();
@@ -424,6 +428,9 @@ abstract class BaseCategoryPeer
         // Invalidate objects in RewritingPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         RewritingPeer::clearInstancePool();
+        // Invalidate objects in CategoryI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CategoryI18nPeer::clearInstancePool();
     }
 
     /**

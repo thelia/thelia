@@ -10,7 +10,7 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use Thelia\Model\Config;
-use Thelia\Model\ConfigDescPeer;
+use Thelia\Model\ConfigI18nPeer;
 use Thelia\Model\ConfigPeer;
 use Thelia\Model\map\ConfigTableMap;
 
@@ -78,6 +78,13 @@ abstract class BaseConfigPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -393,9 +400,9 @@ abstract class BaseConfigPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ConfigDescPeer instance pool,
+        // Invalidate objects in ConfigI18nPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ConfigDescPeer::clearInstancePool();
+        ConfigI18nPeer::clearInstancePool();
     }
 
     /**

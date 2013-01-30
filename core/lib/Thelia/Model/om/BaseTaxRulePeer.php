@@ -12,7 +12,7 @@ use \PropelPDO;
 use Thelia\Model\ProductPeer;
 use Thelia\Model\TaxRule;
 use Thelia\Model\TaxRuleCountryPeer;
-use Thelia\Model\TaxRuleDescPeer;
+use Thelia\Model\TaxRuleI18nPeer;
 use Thelia\Model\TaxRulePeer;
 use Thelia\Model\map\TaxRuleTableMap;
 
@@ -39,19 +39,25 @@ abstract class BaseTaxRulePeer
     const TM_CLASS = 'TaxRuleTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 6;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 6;
 
     /** the column name for the ID field */
     const ID = 'tax_rule.ID';
 
     /** the column name for the CODE field */
     const CODE = 'tax_rule.CODE';
+
+    /** the column name for the TITLE field */
+    const TITLE = 'tax_rule.TITLE';
+
+    /** the column name for the DESCRIPTION field */
+    const DESCRIPTION = 'tax_rule.DESCRIPTION';
 
     /** the column name for the CREATED_AT field */
     const CREATED_AT = 'tax_rule.CREATED_AT';
@@ -71,6 +77,13 @@ abstract class BaseTaxRulePeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -78,12 +91,12 @@ abstract class BaseTaxRulePeer
      * e.g. TaxRulePeer::$fieldNames[TaxRulePeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (TaxRulePeer::ID, TaxRulePeer::CODE, TaxRulePeer::CREATED_AT, TaxRulePeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'code', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Code', 'Title', 'Description', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'code', 'title', 'description', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (TaxRulePeer::ID, TaxRulePeer::CODE, TaxRulePeer::TITLE, TaxRulePeer::DESCRIPTION, TaxRulePeer::CREATED_AT, TaxRulePeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'CODE', 'TITLE', 'DESCRIPTION', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'code', 'title', 'description', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -93,12 +106,12 @@ abstract class BaseTaxRulePeer
      * e.g. TaxRulePeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        BasePeer::TYPE_COLNAME => array (TaxRulePeer::ID => 0, TaxRulePeer::CODE => 1, TaxRulePeer::CREATED_AT => 2, TaxRulePeer::UPDATED_AT => 3, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Code' => 1, 'Title' => 2, 'Description' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'code' => 1, 'title' => 2, 'description' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
+        BasePeer::TYPE_COLNAME => array (TaxRulePeer::ID => 0, TaxRulePeer::CODE => 1, TaxRulePeer::TITLE => 2, TaxRulePeer::DESCRIPTION => 3, TaxRulePeer::CREATED_AT => 4, TaxRulePeer::UPDATED_AT => 5, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'CODE' => 1, 'TITLE' => 2, 'DESCRIPTION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'code' => 1, 'title' => 2, 'description' => 3, 'created_at' => 4, 'updated_at' => 5, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, )
     );
 
     /**
@@ -174,11 +187,15 @@ abstract class BaseTaxRulePeer
         if (null === $alias) {
             $criteria->addSelectColumn(TaxRulePeer::ID);
             $criteria->addSelectColumn(TaxRulePeer::CODE);
+            $criteria->addSelectColumn(TaxRulePeer::TITLE);
+            $criteria->addSelectColumn(TaxRulePeer::DESCRIPTION);
             $criteria->addSelectColumn(TaxRulePeer::CREATED_AT);
             $criteria->addSelectColumn(TaxRulePeer::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.TITLE');
+            $criteria->addSelectColumn($alias . '.DESCRIPTION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -383,12 +400,12 @@ abstract class BaseTaxRulePeer
         // Invalidate objects in ProductPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         ProductPeer::clearInstancePool();
-        // Invalidate objects in TaxRuleDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        TaxRuleDescPeer::clearInstancePool();
         // Invalidate objects in TaxRuleCountryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         TaxRuleCountryPeer::clearInstancePool();
+        // Invalidate objects in TaxRuleI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        TaxRuleI18nPeer::clearInstancePool();
     }
 
     /**

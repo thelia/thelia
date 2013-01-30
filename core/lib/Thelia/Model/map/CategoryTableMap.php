@@ -57,7 +57,6 @@ class CategoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CategoryDesc', 'Thelia\\Model\\CategoryDesc', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryDescs');
         $this->addRelation('ProductCategory', 'Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'ProductCategorys');
         $this->addRelation('FeatureCategory', 'Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategorys');
         $this->addRelation('AttributeCategory', 'Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'AttributeCategorys');
@@ -65,6 +64,7 @@ class CategoryTableMap extends TableMap
         $this->addRelation('Image', 'Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'Images');
         $this->addRelation('Document', 'Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'Documents');
         $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
+        $this->addRelation('CategoryI18n', 'Thelia\\Model\\CategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryI18ns');
     } // buildRelations()
 
     /**
@@ -77,6 +77,7 @@ class CategoryTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

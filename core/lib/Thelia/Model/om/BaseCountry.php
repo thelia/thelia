@@ -18,8 +18,8 @@ use \PropelPDO;
 use Thelia\Model\Area;
 use Thelia\Model\AreaQuery;
 use Thelia\Model\Country;
-use Thelia\Model\CountryDesc;
-use Thelia\Model\CountryDescQuery;
+use Thelia\Model\CountryI18n;
+use Thelia\Model\CountryI18nQuery;
 use Thelia\Model\CountryPeer;
 use Thelia\Model\CountryQuery;
 use Thelia\Model\TaxRuleCountry;
@@ -101,16 +101,16 @@ abstract class BaseCountry extends BaseObject implements Persistent
     protected $aArea;
 
     /**
-     * @var        PropelObjectCollection|CountryDesc[] Collection to store aggregation of CountryDesc objects.
-     */
-    protected $collCountryDescs;
-    protected $collCountryDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|TaxRuleCountry[] Collection to store aggregation of TaxRuleCountry objects.
      */
     protected $collTaxRuleCountrys;
     protected $collTaxRuleCountrysPartial;
+
+    /**
+     * @var        PropelObjectCollection|CountryI18n[] Collection to store aggregation of CountryI18n objects.
+     */
+    protected $collCountryI18ns;
+    protected $collCountryI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -126,17 +126,31 @@ abstract class BaseCountry extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $countryDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[CountryI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $taxRuleCountrysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $countryI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -530,9 +544,9 @@ abstract class BaseCountry extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->aArea = null;
-            $this->collCountryDescs = null;
-
             $this->collTaxRuleCountrys = null;
+
+            $this->collCountryI18ns = null;
 
         } // if (deep)
     }
@@ -681,23 +695,6 @@ abstract class BaseCountry extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->countryDescsScheduledForDeletion !== null) {
-                if (!$this->countryDescsScheduledForDeletion->isEmpty()) {
-                    CountryDescQuery::create()
-                        ->filterByPrimaryKeys($this->countryDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->countryDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collCountryDescs !== null) {
-                foreach ($this->collCountryDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->taxRuleCountrysScheduledForDeletion !== null) {
                 if (!$this->taxRuleCountrysScheduledForDeletion->isEmpty()) {
                     foreach ($this->taxRuleCountrysScheduledForDeletion as $taxRuleCountry) {
@@ -710,6 +707,23 @@ abstract class BaseCountry extends BaseObject implements Persistent
 
             if ($this->collTaxRuleCountrys !== null) {
                 foreach ($this->collTaxRuleCountrys as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->countryI18nsScheduledForDeletion !== null) {
+                if (!$this->countryI18nsScheduledForDeletion->isEmpty()) {
+                    CountryI18nQuery::create()
+                        ->filterByPrimaryKeys($this->countryI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->countryI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCountryI18ns !== null) {
+                foreach ($this->collCountryI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -895,16 +909,16 @@ abstract class BaseCountry extends BaseObject implements Persistent
             }
 
 
-                if ($this->collCountryDescs !== null) {
-                    foreach ($this->collCountryDescs as $referrerFK) {
+                if ($this->collTaxRuleCountrys !== null) {
+                    foreach ($this->collTaxRuleCountrys as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
                     }
                 }
 
-                if ($this->collTaxRuleCountrys !== null) {
-                    foreach ($this->collTaxRuleCountrys as $referrerFK) {
+                if ($this->collCountryI18ns !== null) {
+                    foreach ($this->collCountryI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1008,11 +1022,11 @@ abstract class BaseCountry extends BaseObject implements Persistent
             if (null !== $this->aArea) {
                 $result['Area'] = $this->aArea->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collCountryDescs) {
-                $result['CountryDescs'] = $this->collCountryDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collTaxRuleCountrys) {
                 $result['TaxRuleCountrys'] = $this->collTaxRuleCountrys->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCountryI18ns) {
+                $result['CountryI18ns'] = $this->collCountryI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1195,15 +1209,15 @@ abstract class BaseCountry extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getCountryDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCountryDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getTaxRuleCountrys() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addTaxRuleCountry($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCountryI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCountryI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1319,218 +1333,11 @@ abstract class BaseCountry extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('CountryDesc' == $relationName) {
-            $this->initCountryDescs();
-        }
         if ('TaxRuleCountry' == $relationName) {
             $this->initTaxRuleCountrys();
         }
-    }
-
-    /**
-     * Clears out the collCountryDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addCountryDescs()
-     */
-    public function clearCountryDescs()
-    {
-        $this->collCountryDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collCountryDescsPartial = null;
-    }
-
-    /**
-     * reset is the collCountryDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialCountryDescs($v = true)
-    {
-        $this->collCountryDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collCountryDescs collection.
-     *
-     * By default this just sets the collCountryDescs collection to an empty array (like clearcollCountryDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initCountryDescs($overrideExisting = true)
-    {
-        if (null !== $this->collCountryDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collCountryDescs = new PropelObjectCollection();
-        $this->collCountryDescs->setModel('CountryDesc');
-    }
-
-    /**
-     * Gets an array of CountryDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Country is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|CountryDesc[] List of CountryDesc objects
-     * @throws PropelException
-     */
-    public function getCountryDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collCountryDescsPartial && !$this->isNew();
-        if (null === $this->collCountryDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCountryDescs) {
-                // return empty collection
-                $this->initCountryDescs();
-            } else {
-                $collCountryDescs = CountryDescQuery::create(null, $criteria)
-                    ->filterByCountry($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collCountryDescsPartial && count($collCountryDescs)) {
-                      $this->initCountryDescs(false);
-
-                      foreach($collCountryDescs as $obj) {
-                        if (false == $this->collCountryDescs->contains($obj)) {
-                          $this->collCountryDescs->append($obj);
-                        }
-                      }
-
-                      $this->collCountryDescsPartial = true;
-                    }
-
-                    return $collCountryDescs;
-                }
-
-                if($partial && $this->collCountryDescs) {
-                    foreach($this->collCountryDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collCountryDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCountryDescs = $collCountryDescs;
-                $this->collCountryDescsPartial = false;
-            }
-        }
-
-        return $this->collCountryDescs;
-    }
-
-    /**
-     * Sets a collection of CountryDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $countryDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setCountryDescs(PropelCollection $countryDescs, PropelPDO $con = null)
-    {
-        $this->countryDescsScheduledForDeletion = $this->getCountryDescs(new Criteria(), $con)->diff($countryDescs);
-
-        foreach ($this->countryDescsScheduledForDeletion as $countryDescRemoved) {
-            $countryDescRemoved->setCountry(null);
-        }
-
-        $this->collCountryDescs = null;
-        foreach ($countryDescs as $countryDesc) {
-            $this->addCountryDesc($countryDesc);
-        }
-
-        $this->collCountryDescs = $countryDescs;
-        $this->collCountryDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related CountryDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related CountryDesc objects.
-     * @throws PropelException
-     */
-    public function countCountryDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collCountryDescsPartial && !$this->isNew();
-        if (null === $this->collCountryDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCountryDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getCountryDescs());
-                }
-                $query = CountryDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCountry($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collCountryDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a CountryDesc object to this object
-     * through the CountryDesc foreign key attribute.
-     *
-     * @param    CountryDesc $l CountryDesc
-     * @return Country The current object (for fluent API support)
-     */
-    public function addCountryDesc(CountryDesc $l)
-    {
-        if ($this->collCountryDescs === null) {
-            $this->initCountryDescs();
-            $this->collCountryDescsPartial = true;
-        }
-        if (!$this->collCountryDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddCountryDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	CountryDesc $countryDesc The countryDesc object to add.
-     */
-    protected function doAddCountryDesc($countryDesc)
-    {
-        $this->collCountryDescs[]= $countryDesc;
-        $countryDesc->setCountry($this);
-    }
-
-    /**
-     * @param	CountryDesc $countryDesc The countryDesc object to remove.
-     */
-    public function removeCountryDesc($countryDesc)
-    {
-        if ($this->getCountryDescs()->contains($countryDesc)) {
-            $this->collCountryDescs->remove($this->collCountryDescs->search($countryDesc));
-            if (null === $this->countryDescsScheduledForDeletion) {
-                $this->countryDescsScheduledForDeletion = clone $this->collCountryDescs;
-                $this->countryDescsScheduledForDeletion->clear();
-            }
-            $this->countryDescsScheduledForDeletion[]= $countryDesc;
-            $countryDesc->setCountry(null);
+        if ('CountryI18n' == $relationName) {
+            $this->initCountryI18ns();
         }
     }
 
@@ -1792,6 +1599,217 @@ abstract class BaseCountry extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCountryI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCountryI18ns()
+     */
+    public function clearCountryI18ns()
+    {
+        $this->collCountryI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collCountryI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collCountryI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCountryI18ns($v = true)
+    {
+        $this->collCountryI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCountryI18ns collection.
+     *
+     * By default this just sets the collCountryI18ns collection to an empty array (like clearcollCountryI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCountryI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collCountryI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collCountryI18ns = new PropelObjectCollection();
+        $this->collCountryI18ns->setModel('CountryI18n');
+    }
+
+    /**
+     * Gets an array of CountryI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Country is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CountryI18n[] List of CountryI18n objects
+     * @throws PropelException
+     */
+    public function getCountryI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCountryI18nsPartial && !$this->isNew();
+        if (null === $this->collCountryI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCountryI18ns) {
+                // return empty collection
+                $this->initCountryI18ns();
+            } else {
+                $collCountryI18ns = CountryI18nQuery::create(null, $criteria)
+                    ->filterByCountry($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCountryI18nsPartial && count($collCountryI18ns)) {
+                      $this->initCountryI18ns(false);
+
+                      foreach($collCountryI18ns as $obj) {
+                        if (false == $this->collCountryI18ns->contains($obj)) {
+                          $this->collCountryI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collCountryI18nsPartial = true;
+                    }
+
+                    return $collCountryI18ns;
+                }
+
+                if($partial && $this->collCountryI18ns) {
+                    foreach($this->collCountryI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collCountryI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCountryI18ns = $collCountryI18ns;
+                $this->collCountryI18nsPartial = false;
+            }
+        }
+
+        return $this->collCountryI18ns;
+    }
+
+    /**
+     * Sets a collection of CountryI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $countryI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCountryI18ns(PropelCollection $countryI18ns, PropelPDO $con = null)
+    {
+        $this->countryI18nsScheduledForDeletion = $this->getCountryI18ns(new Criteria(), $con)->diff($countryI18ns);
+
+        foreach ($this->countryI18nsScheduledForDeletion as $countryI18nRemoved) {
+            $countryI18nRemoved->setCountry(null);
+        }
+
+        $this->collCountryI18ns = null;
+        foreach ($countryI18ns as $countryI18n) {
+            $this->addCountryI18n($countryI18n);
+        }
+
+        $this->collCountryI18ns = $countryI18ns;
+        $this->collCountryI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related CountryI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CountryI18n objects.
+     * @throws PropelException
+     */
+    public function countCountryI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCountryI18nsPartial && !$this->isNew();
+        if (null === $this->collCountryI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCountryI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCountryI18ns());
+                }
+                $query = CountryI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCountry($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCountryI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a CountryI18n object to this object
+     * through the CountryI18n foreign key attribute.
+     *
+     * @param    CountryI18n $l CountryI18n
+     * @return Country The current object (for fluent API support)
+     */
+    public function addCountryI18n(CountryI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collCountryI18ns === null) {
+            $this->initCountryI18ns();
+            $this->collCountryI18nsPartial = true;
+        }
+        if (!$this->collCountryI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCountryI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CountryI18n $countryI18n The countryI18n object to add.
+     */
+    protected function doAddCountryI18n($countryI18n)
+    {
+        $this->collCountryI18ns[]= $countryI18n;
+        $countryI18n->setCountry($this);
+    }
+
+    /**
+     * @param	CountryI18n $countryI18n The countryI18n object to remove.
+     */
+    public function removeCountryI18n($countryI18n)
+    {
+        if ($this->getCountryI18ns()->contains($countryI18n)) {
+            $this->collCountryI18ns->remove($this->collCountryI18ns->search($countryI18n));
+            if (null === $this->countryI18nsScheduledForDeletion) {
+                $this->countryI18nsScheduledForDeletion = clone $this->collCountryI18ns;
+                $this->countryI18nsScheduledForDeletion->clear();
+            }
+            $this->countryI18nsScheduledForDeletion[]= $countryI18n;
+            $countryI18n->setCountry(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1823,26 +1841,30 @@ abstract class BaseCountry extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collCountryDescs) {
-                foreach ($this->collCountryDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collTaxRuleCountrys) {
                 foreach ($this->collTaxRuleCountrys as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCountryI18ns) {
+                foreach ($this->collCountryI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collCountryDescs instanceof PropelCollection) {
-            $this->collCountryDescs->clearIterator();
-        }
-        $this->collCountryDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collTaxRuleCountrys instanceof PropelCollection) {
             $this->collTaxRuleCountrys->clearIterator();
         }
         $this->collTaxRuleCountrys = null;
+        if ($this->collCountryI18ns instanceof PropelCollection) {
+            $this->collCountryI18ns->clearIterator();
+        }
+        $this->collCountryI18ns = null;
         $this->aArea = null;
     }
 
@@ -1876,6 +1898,201 @@ abstract class BaseCountry extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = CountryPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Country The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return CountryI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collCountryI18ns) {
+                foreach ($this->collCountryI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new CountryI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = CountryI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addCountryI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Country The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            CountryI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collCountryI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collCountryI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return CountryI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return CountryI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return CountryI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return CountryI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return CountryI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

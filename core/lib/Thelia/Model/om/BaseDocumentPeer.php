@@ -12,7 +12,7 @@ use \PropelPDO;
 use Thelia\Model\CategoryPeer;
 use Thelia\Model\ContentPeer;
 use Thelia\Model\Document;
-use Thelia\Model\DocumentDescPeer;
+use Thelia\Model\DocumentI18nPeer;
 use Thelia\Model\DocumentPeer;
 use Thelia\Model\FolderPeer;
 use Thelia\Model\ProductPeer;
@@ -88,6 +88,13 @@ abstract class BaseDocumentPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -407,9 +414,9 @@ abstract class BaseDocumentPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in DocumentDescPeer instance pool,
+        // Invalidate objects in DocumentI18nPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        DocumentDescPeer::clearInstancePool();
+        DocumentI18nPeer::clearInstancePool();
     }
 
     /**

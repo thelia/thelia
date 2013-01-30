@@ -10,7 +10,7 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use Thelia\Model\FeatureAv;
-use Thelia\Model\FeatureAvDescPeer;
+use Thelia\Model\FeatureAvI18nPeer;
 use Thelia\Model\FeatureAvPeer;
 use Thelia\Model\FeaturePeer;
 use Thelia\Model\FeatureProdPeer;
@@ -71,6 +71,13 @@ abstract class BaseFeatureAvPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -380,12 +387,12 @@ abstract class BaseFeatureAvPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in FeatureAvDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FeatureAvDescPeer::clearInstancePool();
         // Invalidate objects in FeatureProdPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         FeatureProdPeer::clearInstancePool();
+        // Invalidate objects in FeatureAvI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        FeatureAvI18nPeer::clearInstancePool();
     }
 
     /**

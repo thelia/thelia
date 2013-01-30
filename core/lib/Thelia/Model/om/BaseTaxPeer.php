@@ -10,7 +10,7 @@ use \Propel;
 use \PropelException;
 use \PropelPDO;
 use Thelia\Model\Tax;
-use Thelia\Model\TaxDescPeer;
+use Thelia\Model\TaxI18nPeer;
 use Thelia\Model\TaxPeer;
 use Thelia\Model\TaxRuleCountryPeer;
 use Thelia\Model\map\TaxTableMap;
@@ -70,6 +70,13 @@ abstract class BaseTaxPeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -379,12 +386,12 @@ abstract class BaseTaxPeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in TaxDescPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        TaxDescPeer::clearInstancePool();
         // Invalidate objects in TaxRuleCountryPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         TaxRuleCountryPeer::clearInstancePool();
+        // Invalidate objects in TaxI18nPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        TaxI18nPeer::clearInstancePool();
     }
 
     /**

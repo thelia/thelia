@@ -13,7 +13,7 @@ use Thelia\Model\CategoryPeer;
 use Thelia\Model\ContentPeer;
 use Thelia\Model\FolderPeer;
 use Thelia\Model\Image;
-use Thelia\Model\ImageDescPeer;
+use Thelia\Model\ImageI18nPeer;
 use Thelia\Model\ImagePeer;
 use Thelia\Model\ProductPeer;
 use Thelia\Model\map\ImageTableMap;
@@ -88,6 +88,13 @@ abstract class BaseImagePeer
     public static $instances = array();
 
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations
+     * @var        string
+     */
+    const DEFAULT_LOCALE = 'en_EN';
     /**
      * holds an array of fieldnames
      *
@@ -407,9 +414,9 @@ abstract class BaseImagePeer
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ImageDescPeer instance pool,
+        // Invalidate objects in ImageI18nPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ImageDescPeer::clearInstancePool();
+        ImageI18nPeer::clearInstancePool();
     }
 
     /**

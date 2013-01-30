@@ -18,10 +18,10 @@ use \PropelPDO;
 use Thelia\Model\Content;
 use Thelia\Model\ContentAssoc;
 use Thelia\Model\ContentAssocQuery;
-use Thelia\Model\ContentDesc;
-use Thelia\Model\ContentDescQuery;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
+use Thelia\Model\ContentI18n;
+use Thelia\Model\ContentI18nQuery;
 use Thelia\Model\ContentPeer;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\Document;
@@ -90,12 +90,6 @@ abstract class BaseContent extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|ContentDesc[] Collection to store aggregation of ContentDesc objects.
-     */
-    protected $collContentDescs;
-    protected $collContentDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|ContentAssoc[] Collection to store aggregation of ContentAssoc objects.
      */
     protected $collContentAssocs;
@@ -126,6 +120,12 @@ abstract class BaseContent extends BaseObject implements Persistent
     protected $collContentFoldersPartial;
 
     /**
+     * @var        PropelObjectCollection|ContentI18n[] Collection to store aggregation of ContentI18n objects.
+     */
+    protected $collContentI18ns;
+    protected $collContentI18nsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -139,11 +139,19 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $contentDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[ContentI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
@@ -174,6 +182,12 @@ abstract class BaseContent extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $contentFoldersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $contentI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -495,8 +509,6 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collContentDescs = null;
-
             $this->collContentAssocs = null;
 
             $this->collImages = null;
@@ -506,6 +518,8 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->collRewritings = null;
 
             $this->collContentFolders = null;
+
+            $this->collContentI18ns = null;
 
         } // if (deep)
     }
@@ -642,23 +656,6 @@ abstract class BaseContent extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->contentDescsScheduledForDeletion !== null) {
-                if (!$this->contentDescsScheduledForDeletion->isEmpty()) {
-                    ContentDescQuery::create()
-                        ->filterByPrimaryKeys($this->contentDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collContentDescs !== null) {
-                foreach ($this->collContentDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->contentAssocsScheduledForDeletion !== null) {
                 if (!$this->contentAssocsScheduledForDeletion->isEmpty()) {
                     foreach ($this->contentAssocsScheduledForDeletion as $contentAssoc) {
@@ -742,6 +739,23 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collContentFolders !== null) {
                 foreach ($this->collContentFolders as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->contentI18nsScheduledForDeletion !== null) {
+                if (!$this->contentI18nsScheduledForDeletion->isEmpty()) {
+                    ContentI18nQuery::create()
+                        ->filterByPrimaryKeys($this->contentI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->contentI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collContentI18ns !== null) {
+                foreach ($this->collContentI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -914,14 +928,6 @@ abstract class BaseContent extends BaseObject implements Persistent
             }
 
 
-                if ($this->collContentDescs !== null) {
-                    foreach ($this->collContentDescs as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collContentAssocs !== null) {
                     foreach ($this->collContentAssocs as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -956,6 +962,14 @@ abstract class BaseContent extends BaseObject implements Persistent
 
                 if ($this->collContentFolders !== null) {
                     foreach ($this->collContentFolders as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collContentI18ns !== null) {
+                    foreach ($this->collContentI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -1048,9 +1062,6 @@ abstract class BaseContent extends BaseObject implements Persistent
             $keys[4] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collContentDescs) {
-                $result['ContentDescs'] = $this->collContentDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collContentAssocs) {
                 $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1065,6 +1076,9 @@ abstract class BaseContent extends BaseObject implements Persistent
             }
             if (null !== $this->collContentFolders) {
                 $result['ContentFolders'] = $this->collContentFolders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collContentI18ns) {
+                $result['ContentI18ns'] = $this->collContentI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1235,12 +1249,6 @@ abstract class BaseContent extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getContentDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addContentDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getContentAssocs() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addContentAssoc($relObj->copy($deepCopy));
@@ -1268,6 +1276,12 @@ abstract class BaseContent extends BaseObject implements Persistent
             foreach ($this->getContentFolders() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addContentFolder($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getContentI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addContentI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1332,9 +1346,6 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('ContentDesc' == $relationName) {
-            $this->initContentDescs();
-        }
         if ('ContentAssoc' == $relationName) {
             $this->initContentAssocs();
         }
@@ -1350,212 +1361,8 @@ abstract class BaseContent extends BaseObject implements Persistent
         if ('ContentFolder' == $relationName) {
             $this->initContentFolders();
         }
-    }
-
-    /**
-     * Clears out the collContentDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addContentDescs()
-     */
-    public function clearContentDescs()
-    {
-        $this->collContentDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collContentDescsPartial = null;
-    }
-
-    /**
-     * reset is the collContentDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialContentDescs($v = true)
-    {
-        $this->collContentDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collContentDescs collection.
-     *
-     * By default this just sets the collContentDescs collection to an empty array (like clearcollContentDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initContentDescs($overrideExisting = true)
-    {
-        if (null !== $this->collContentDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collContentDescs = new PropelObjectCollection();
-        $this->collContentDescs->setModel('ContentDesc');
-    }
-
-    /**
-     * Gets an array of ContentDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Content is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|ContentDesc[] List of ContentDesc objects
-     * @throws PropelException
-     */
-    public function getContentDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collContentDescsPartial && !$this->isNew();
-        if (null === $this->collContentDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collContentDescs) {
-                // return empty collection
-                $this->initContentDescs();
-            } else {
-                $collContentDescs = ContentDescQuery::create(null, $criteria)
-                    ->filterByContent($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collContentDescsPartial && count($collContentDescs)) {
-                      $this->initContentDescs(false);
-
-                      foreach($collContentDescs as $obj) {
-                        if (false == $this->collContentDescs->contains($obj)) {
-                          $this->collContentDescs->append($obj);
-                        }
-                      }
-
-                      $this->collContentDescsPartial = true;
-                    }
-
-                    return $collContentDescs;
-                }
-
-                if($partial && $this->collContentDescs) {
-                    foreach($this->collContentDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collContentDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collContentDescs = $collContentDescs;
-                $this->collContentDescsPartial = false;
-            }
-        }
-
-        return $this->collContentDescs;
-    }
-
-    /**
-     * Sets a collection of ContentDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $contentDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setContentDescs(PropelCollection $contentDescs, PropelPDO $con = null)
-    {
-        $this->contentDescsScheduledForDeletion = $this->getContentDescs(new Criteria(), $con)->diff($contentDescs);
-
-        foreach ($this->contentDescsScheduledForDeletion as $contentDescRemoved) {
-            $contentDescRemoved->setContent(null);
-        }
-
-        $this->collContentDescs = null;
-        foreach ($contentDescs as $contentDesc) {
-            $this->addContentDesc($contentDesc);
-        }
-
-        $this->collContentDescs = $contentDescs;
-        $this->collContentDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related ContentDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related ContentDesc objects.
-     * @throws PropelException
-     */
-    public function countContentDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collContentDescsPartial && !$this->isNew();
-        if (null === $this->collContentDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collContentDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getContentDescs());
-                }
-                $query = ContentDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collContentDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a ContentDesc object to this object
-     * through the ContentDesc foreign key attribute.
-     *
-     * @param    ContentDesc $l ContentDesc
-     * @return Content The current object (for fluent API support)
-     */
-    public function addContentDesc(ContentDesc $l)
-    {
-        if ($this->collContentDescs === null) {
-            $this->initContentDescs();
-            $this->collContentDescsPartial = true;
-        }
-        if (!$this->collContentDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddContentDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	ContentDesc $contentDesc The contentDesc object to add.
-     */
-    protected function doAddContentDesc($contentDesc)
-    {
-        $this->collContentDescs[]= $contentDesc;
-        $contentDesc->setContent($this);
-    }
-
-    /**
-     * @param	ContentDesc $contentDesc The contentDesc object to remove.
-     */
-    public function removeContentDesc($contentDesc)
-    {
-        if ($this->getContentDescs()->contains($contentDesc)) {
-            $this->collContentDescs->remove($this->collContentDescs->search($contentDesc));
-            if (null === $this->contentDescsScheduledForDeletion) {
-                $this->contentDescsScheduledForDeletion = clone $this->collContentDescs;
-                $this->contentDescsScheduledForDeletion->clear();
-            }
-            $this->contentDescsScheduledForDeletion[]= $contentDesc;
-            $contentDesc->setContent(null);
+        if ('ContentI18n' == $relationName) {
+            $this->initContentI18ns();
         }
     }
 
@@ -2895,6 +2702,217 @@ abstract class BaseContent extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collContentI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addContentI18ns()
+     */
+    public function clearContentI18ns()
+    {
+        $this->collContentI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collContentI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collContentI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialContentI18ns($v = true)
+    {
+        $this->collContentI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collContentI18ns collection.
+     *
+     * By default this just sets the collContentI18ns collection to an empty array (like clearcollContentI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initContentI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collContentI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collContentI18ns = new PropelObjectCollection();
+        $this->collContentI18ns->setModel('ContentI18n');
+    }
+
+    /**
+     * Gets an array of ContentI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Content is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ContentI18n[] List of ContentI18n objects
+     * @throws PropelException
+     */
+    public function getContentI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collContentI18nsPartial && !$this->isNew();
+        if (null === $this->collContentI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collContentI18ns) {
+                // return empty collection
+                $this->initContentI18ns();
+            } else {
+                $collContentI18ns = ContentI18nQuery::create(null, $criteria)
+                    ->filterByContent($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collContentI18nsPartial && count($collContentI18ns)) {
+                      $this->initContentI18ns(false);
+
+                      foreach($collContentI18ns as $obj) {
+                        if (false == $this->collContentI18ns->contains($obj)) {
+                          $this->collContentI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collContentI18nsPartial = true;
+                    }
+
+                    return $collContentI18ns;
+                }
+
+                if($partial && $this->collContentI18ns) {
+                    foreach($this->collContentI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collContentI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collContentI18ns = $collContentI18ns;
+                $this->collContentI18nsPartial = false;
+            }
+        }
+
+        return $this->collContentI18ns;
+    }
+
+    /**
+     * Sets a collection of ContentI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $contentI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setContentI18ns(PropelCollection $contentI18ns, PropelPDO $con = null)
+    {
+        $this->contentI18nsScheduledForDeletion = $this->getContentI18ns(new Criteria(), $con)->diff($contentI18ns);
+
+        foreach ($this->contentI18nsScheduledForDeletion as $contentI18nRemoved) {
+            $contentI18nRemoved->setContent(null);
+        }
+
+        $this->collContentI18ns = null;
+        foreach ($contentI18ns as $contentI18n) {
+            $this->addContentI18n($contentI18n);
+        }
+
+        $this->collContentI18ns = $contentI18ns;
+        $this->collContentI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ContentI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ContentI18n objects.
+     * @throws PropelException
+     */
+    public function countContentI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collContentI18nsPartial && !$this->isNew();
+        if (null === $this->collContentI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collContentI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getContentI18ns());
+                }
+                $query = ContentI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByContent($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collContentI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a ContentI18n object to this object
+     * through the ContentI18n foreign key attribute.
+     *
+     * @param    ContentI18n $l ContentI18n
+     * @return Content The current object (for fluent API support)
+     */
+    public function addContentI18n(ContentI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collContentI18ns === null) {
+            $this->initContentI18ns();
+            $this->collContentI18nsPartial = true;
+        }
+        if (!$this->collContentI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddContentI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ContentI18n $contentI18n The contentI18n object to add.
+     */
+    protected function doAddContentI18n($contentI18n)
+    {
+        $this->collContentI18ns[]= $contentI18n;
+        $contentI18n->setContent($this);
+    }
+
+    /**
+     * @param	ContentI18n $contentI18n The contentI18n object to remove.
+     */
+    public function removeContentI18n($contentI18n)
+    {
+        if ($this->getContentI18ns()->contains($contentI18n)) {
+            $this->collContentI18ns->remove($this->collContentI18ns->search($contentI18n));
+            if (null === $this->contentI18nsScheduledForDeletion) {
+                $this->contentI18nsScheduledForDeletion = clone $this->collContentI18ns;
+                $this->contentI18nsScheduledForDeletion->clear();
+            }
+            $this->contentI18nsScheduledForDeletion[]= $contentI18n;
+            $contentI18n->setContent(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2924,11 +2942,6 @@ abstract class BaseContent extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collContentDescs) {
-                foreach ($this->collContentDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collContentAssocs) {
                 foreach ($this->collContentAssocs as $o) {
                     $o->clearAllReferences($deep);
@@ -2954,12 +2967,17 @@ abstract class BaseContent extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collContentI18ns) {
+                foreach ($this->collContentI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collContentDescs instanceof PropelCollection) {
-            $this->collContentDescs->clearIterator();
-        }
-        $this->collContentDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collContentAssocs instanceof PropelCollection) {
             $this->collContentAssocs->clearIterator();
         }
@@ -2980,6 +2998,10 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->collContentFolders->clearIterator();
         }
         $this->collContentFolders = null;
+        if ($this->collContentI18ns instanceof PropelCollection) {
+            $this->collContentI18ns->clearIterator();
+        }
+        $this->collContentI18ns = null;
     }
 
     /**
@@ -3012,6 +3034,201 @@ abstract class BaseContent extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = ContentPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Content The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ContentI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collContentI18ns) {
+                foreach ($this->collContentI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new ContentI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = ContentI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addContentI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Content The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            ContentI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collContentI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collContentI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return ContentI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return ContentI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return ContentI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return ContentI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return ContentI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

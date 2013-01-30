@@ -18,8 +18,8 @@ use \PropelPDO;
 use Thelia\Model\AdminGroup;
 use Thelia\Model\AdminGroupQuery;
 use Thelia\Model\Group;
-use Thelia\Model\GroupDesc;
-use Thelia\Model\GroupDescQuery;
+use Thelia\Model\GroupI18n;
+use Thelia\Model\GroupI18nQuery;
 use Thelia\Model\GroupModule;
 use Thelia\Model\GroupModuleQuery;
 use Thelia\Model\GroupPeer;
@@ -80,12 +80,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
-     * @var        PropelObjectCollection|GroupDesc[] Collection to store aggregation of GroupDesc objects.
-     */
-    protected $collGroupDescs;
-    protected $collGroupDescsPartial;
-
-    /**
      * @var        PropelObjectCollection|AdminGroup[] Collection to store aggregation of AdminGroup objects.
      */
     protected $collAdminGroups;
@@ -104,6 +98,12 @@ abstract class BaseGroup extends BaseObject implements Persistent
     protected $collGroupModulesPartial;
 
     /**
+     * @var        PropelObjectCollection|GroupI18n[] Collection to store aggregation of GroupI18n objects.
+     */
+    protected $collGroupI18ns;
+    protected $collGroupI18nsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -117,11 +117,19 @@ abstract class BaseGroup extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    // i18n behavior
+
     /**
-     * An array of objects scheduled for deletion.
-     * @var		PropelObjectCollection
+     * Current locale
+     * @var        string
      */
-    protected $groupDescsScheduledForDeletion = null;
+    protected $currentLocale = 'en_EN';
+
+    /**
+     * Current translation objects
+     * @var        array[GroupI18n]
+     */
+    protected $currentTranslations;
 
     /**
      * An array of objects scheduled for deletion.
@@ -140,6 +148,12 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $groupModulesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupI18nsScheduledForDeletion = null;
 
     /**
      * Get the [id] column value.
@@ -429,13 +443,13 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collGroupDescs = null;
-
             $this->collAdminGroups = null;
 
             $this->collGroupResources = null;
 
             $this->collGroupModules = null;
+
+            $this->collGroupI18ns = null;
 
         } // if (deep)
     }
@@ -572,23 +586,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
-            if ($this->groupDescsScheduledForDeletion !== null) {
-                if (!$this->groupDescsScheduledForDeletion->isEmpty()) {
-                    GroupDescQuery::create()
-                        ->filterByPrimaryKeys($this->groupDescsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->groupDescsScheduledForDeletion = null;
-                }
-            }
-
-            if ($this->collGroupDescs !== null) {
-                foreach ($this->collGroupDescs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->adminGroupsScheduledForDeletion !== null) {
                 if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
                     foreach ($this->adminGroupsScheduledForDeletion as $adminGroup) {
@@ -635,6 +632,23 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
             if ($this->collGroupModules !== null) {
                 foreach ($this->collGroupModules as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->groupI18nsScheduledForDeletion !== null) {
+                if (!$this->groupI18nsScheduledForDeletion->isEmpty()) {
+                    GroupI18nQuery::create()
+                        ->filterByPrimaryKeys($this->groupI18nsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->groupI18nsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collGroupI18ns !== null) {
+                foreach ($this->collGroupI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted()) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -801,14 +815,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
             }
 
 
-                if ($this->collGroupDescs !== null) {
-                    foreach ($this->collGroupDescs as $referrerFK) {
-                        if (!$referrerFK->validate($columns)) {
-                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
-                        }
-                    }
-                }
-
                 if ($this->collAdminGroups !== null) {
                     foreach ($this->collAdminGroups as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
@@ -827,6 +833,14 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
                 if ($this->collGroupModules !== null) {
                     foreach ($this->collGroupModules as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
+                if ($this->collGroupI18ns !== null) {
+                    foreach ($this->collGroupI18ns as $referrerFK) {
                         if (!$referrerFK->validate($columns)) {
                             $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
                         }
@@ -915,9 +929,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $keys[3] => $this->getUpdatedAt(),
         );
         if ($includeForeignObjects) {
-            if (null !== $this->collGroupDescs) {
-                $result['GroupDescs'] = $this->collGroupDescs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collAdminGroups) {
                 $result['AdminGroups'] = $this->collAdminGroups->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -926,6 +937,9 @@ abstract class BaseGroup extends BaseObject implements Persistent
             }
             if (null !== $this->collGroupModules) {
                 $result['GroupModules'] = $this->collGroupModules->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collGroupI18ns) {
+                $result['GroupI18ns'] = $this->collGroupI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1090,12 +1104,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
             // store object hash to prevent cycle
             $this->startCopy = true;
 
-            foreach ($this->getGroupDescs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addGroupDesc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getAdminGroups() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addAdminGroup($relObj->copy($deepCopy));
@@ -1111,6 +1119,12 @@ abstract class BaseGroup extends BaseObject implements Persistent
             foreach ($this->getGroupModules() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addGroupModule($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getGroupI18ns() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addGroupI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1175,9 +1189,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
      */
     public function initRelation($relationName)
     {
-        if ('GroupDesc' == $relationName) {
-            $this->initGroupDescs();
-        }
         if ('AdminGroup' == $relationName) {
             $this->initAdminGroups();
         }
@@ -1187,212 +1198,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
         if ('GroupModule' == $relationName) {
             $this->initGroupModules();
         }
-    }
-
-    /**
-     * Clears out the collGroupDescs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addGroupDescs()
-     */
-    public function clearGroupDescs()
-    {
-        $this->collGroupDescs = null; // important to set this to null since that means it is uninitialized
-        $this->collGroupDescsPartial = null;
-    }
-
-    /**
-     * reset is the collGroupDescs collection loaded partially
-     *
-     * @return void
-     */
-    public function resetPartialGroupDescs($v = true)
-    {
-        $this->collGroupDescsPartial = $v;
-    }
-
-    /**
-     * Initializes the collGroupDescs collection.
-     *
-     * By default this just sets the collGroupDescs collection to an empty array (like clearcollGroupDescs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initGroupDescs($overrideExisting = true)
-    {
-        if (null !== $this->collGroupDescs && !$overrideExisting) {
-            return;
-        }
-        $this->collGroupDescs = new PropelObjectCollection();
-        $this->collGroupDescs->setModel('GroupDesc');
-    }
-
-    /**
-     * Gets an array of GroupDesc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this Group is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param Criteria $criteria optional Criteria object to narrow the query
-     * @param PropelPDO $con optional connection object
-     * @return PropelObjectCollection|GroupDesc[] List of GroupDesc objects
-     * @throws PropelException
-     */
-    public function getGroupDescs($criteria = null, PropelPDO $con = null)
-    {
-        $partial = $this->collGroupDescsPartial && !$this->isNew();
-        if (null === $this->collGroupDescs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collGroupDescs) {
-                // return empty collection
-                $this->initGroupDescs();
-            } else {
-                $collGroupDescs = GroupDescQuery::create(null, $criteria)
-                    ->filterByGroup($this)
-                    ->find($con);
-                if (null !== $criteria) {
-                    if (false !== $this->collGroupDescsPartial && count($collGroupDescs)) {
-                      $this->initGroupDescs(false);
-
-                      foreach($collGroupDescs as $obj) {
-                        if (false == $this->collGroupDescs->contains($obj)) {
-                          $this->collGroupDescs->append($obj);
-                        }
-                      }
-
-                      $this->collGroupDescsPartial = true;
-                    }
-
-                    return $collGroupDescs;
-                }
-
-                if($partial && $this->collGroupDescs) {
-                    foreach($this->collGroupDescs as $obj) {
-                        if($obj->isNew()) {
-                            $collGroupDescs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collGroupDescs = $collGroupDescs;
-                $this->collGroupDescsPartial = false;
-            }
-        }
-
-        return $this->collGroupDescs;
-    }
-
-    /**
-     * Sets a collection of GroupDesc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param PropelCollection $groupDescs A Propel collection.
-     * @param PropelPDO $con Optional connection object
-     */
-    public function setGroupDescs(PropelCollection $groupDescs, PropelPDO $con = null)
-    {
-        $this->groupDescsScheduledForDeletion = $this->getGroupDescs(new Criteria(), $con)->diff($groupDescs);
-
-        foreach ($this->groupDescsScheduledForDeletion as $groupDescRemoved) {
-            $groupDescRemoved->setGroup(null);
-        }
-
-        $this->collGroupDescs = null;
-        foreach ($groupDescs as $groupDesc) {
-            $this->addGroupDesc($groupDesc);
-        }
-
-        $this->collGroupDescs = $groupDescs;
-        $this->collGroupDescsPartial = false;
-    }
-
-    /**
-     * Returns the number of related GroupDesc objects.
-     *
-     * @param Criteria $criteria
-     * @param boolean $distinct
-     * @param PropelPDO $con
-     * @return int             Count of related GroupDesc objects.
-     * @throws PropelException
-     */
-    public function countGroupDescs(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
-    {
-        $partial = $this->collGroupDescsPartial && !$this->isNew();
-        if (null === $this->collGroupDescs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collGroupDescs) {
-                return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGroupDescs());
-                }
-                $query = GroupDescQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGroup($this)
-                    ->count($con);
-            }
-        } else {
-            return count($this->collGroupDescs);
-        }
-    }
-
-    /**
-     * Method called to associate a GroupDesc object to this object
-     * through the GroupDesc foreign key attribute.
-     *
-     * @param    GroupDesc $l GroupDesc
-     * @return Group The current object (for fluent API support)
-     */
-    public function addGroupDesc(GroupDesc $l)
-    {
-        if ($this->collGroupDescs === null) {
-            $this->initGroupDescs();
-            $this->collGroupDescsPartial = true;
-        }
-        if (!$this->collGroupDescs->contains($l)) { // only add it if the **same** object is not already associated
-            $this->doAddGroupDesc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param	GroupDesc $groupDesc The groupDesc object to add.
-     */
-    protected function doAddGroupDesc($groupDesc)
-    {
-        $this->collGroupDescs[]= $groupDesc;
-        $groupDesc->setGroup($this);
-    }
-
-    /**
-     * @param	GroupDesc $groupDesc The groupDesc object to remove.
-     */
-    public function removeGroupDesc($groupDesc)
-    {
-        if ($this->getGroupDescs()->contains($groupDesc)) {
-            $this->collGroupDescs->remove($this->collGroupDescs->search($groupDesc));
-            if (null === $this->groupDescsScheduledForDeletion) {
-                $this->groupDescsScheduledForDeletion = clone $this->collGroupDescs;
-                $this->groupDescsScheduledForDeletion->clear();
-            }
-            $this->groupDescsScheduledForDeletion[]= $groupDesc;
-            $groupDesc->setGroup(null);
+        if ('GroupI18n' == $relationName) {
+            $this->initGroupI18ns();
         }
     }
 
@@ -2093,6 +1900,217 @@ abstract class BaseGroup extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collGroupI18ns collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addGroupI18ns()
+     */
+    public function clearGroupI18ns()
+    {
+        $this->collGroupI18ns = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupI18nsPartial = null;
+    }
+
+    /**
+     * reset is the collGroupI18ns collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialGroupI18ns($v = true)
+    {
+        $this->collGroupI18nsPartial = $v;
+    }
+
+    /**
+     * Initializes the collGroupI18ns collection.
+     *
+     * By default this just sets the collGroupI18ns collection to an empty array (like clearcollGroupI18ns());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initGroupI18ns($overrideExisting = true)
+    {
+        if (null !== $this->collGroupI18ns && !$overrideExisting) {
+            return;
+        }
+        $this->collGroupI18ns = new PropelObjectCollection();
+        $this->collGroupI18ns->setModel('GroupI18n');
+    }
+
+    /**
+     * Gets an array of GroupI18n objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|GroupI18n[] List of GroupI18n objects
+     * @throws PropelException
+     */
+    public function getGroupI18ns($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupI18nsPartial && !$this->isNew();
+        if (null === $this->collGroupI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collGroupI18ns) {
+                // return empty collection
+                $this->initGroupI18ns();
+            } else {
+                $collGroupI18ns = GroupI18nQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collGroupI18nsPartial && count($collGroupI18ns)) {
+                      $this->initGroupI18ns(false);
+
+                      foreach($collGroupI18ns as $obj) {
+                        if (false == $this->collGroupI18ns->contains($obj)) {
+                          $this->collGroupI18ns->append($obj);
+                        }
+                      }
+
+                      $this->collGroupI18nsPartial = true;
+                    }
+
+                    return $collGroupI18ns;
+                }
+
+                if($partial && $this->collGroupI18ns) {
+                    foreach($this->collGroupI18ns as $obj) {
+                        if($obj->isNew()) {
+                            $collGroupI18ns[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collGroupI18ns = $collGroupI18ns;
+                $this->collGroupI18nsPartial = false;
+            }
+        }
+
+        return $this->collGroupI18ns;
+    }
+
+    /**
+     * Sets a collection of GroupI18n objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groupI18ns A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setGroupI18ns(PropelCollection $groupI18ns, PropelPDO $con = null)
+    {
+        $this->groupI18nsScheduledForDeletion = $this->getGroupI18ns(new Criteria(), $con)->diff($groupI18ns);
+
+        foreach ($this->groupI18nsScheduledForDeletion as $groupI18nRemoved) {
+            $groupI18nRemoved->setGroup(null);
+        }
+
+        $this->collGroupI18ns = null;
+        foreach ($groupI18ns as $groupI18n) {
+            $this->addGroupI18n($groupI18n);
+        }
+
+        $this->collGroupI18ns = $groupI18ns;
+        $this->collGroupI18nsPartial = false;
+    }
+
+    /**
+     * Returns the number of related GroupI18n objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related GroupI18n objects.
+     * @throws PropelException
+     */
+    public function countGroupI18ns(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collGroupI18nsPartial && !$this->isNew();
+        if (null === $this->collGroupI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collGroupI18ns) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getGroupI18ns());
+                }
+                $query = GroupI18nQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collGroupI18ns);
+        }
+    }
+
+    /**
+     * Method called to associate a GroupI18n object to this object
+     * through the GroupI18n foreign key attribute.
+     *
+     * @param    GroupI18n $l GroupI18n
+     * @return Group The current object (for fluent API support)
+     */
+    public function addGroupI18n(GroupI18n $l)
+    {
+        if ($l && $locale = $l->getLocale()) {
+            $this->setLocale($locale);
+            $this->currentTranslations[$locale] = $l;
+        }
+        if ($this->collGroupI18ns === null) {
+            $this->initGroupI18ns();
+            $this->collGroupI18nsPartial = true;
+        }
+        if (!$this->collGroupI18ns->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddGroupI18n($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	GroupI18n $groupI18n The groupI18n object to add.
+     */
+    protected function doAddGroupI18n($groupI18n)
+    {
+        $this->collGroupI18ns[]= $groupI18n;
+        $groupI18n->setGroup($this);
+    }
+
+    /**
+     * @param	GroupI18n $groupI18n The groupI18n object to remove.
+     */
+    public function removeGroupI18n($groupI18n)
+    {
+        if ($this->getGroupI18ns()->contains($groupI18n)) {
+            $this->collGroupI18ns->remove($this->collGroupI18ns->search($groupI18n));
+            if (null === $this->groupI18nsScheduledForDeletion) {
+                $this->groupI18nsScheduledForDeletion = clone $this->collGroupI18ns;
+                $this->groupI18nsScheduledForDeletion->clear();
+            }
+            $this->groupI18nsScheduledForDeletion[]= $groupI18n;
+            $groupI18n->setGroup(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2121,11 +2139,6 @@ abstract class BaseGroup extends BaseObject implements Persistent
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collGroupDescs) {
-                foreach ($this->collGroupDescs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collAdminGroups) {
                 foreach ($this->collAdminGroups as $o) {
                     $o->clearAllReferences($deep);
@@ -2141,12 +2154,17 @@ abstract class BaseGroup extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collGroupI18ns) {
+                foreach ($this->collGroupI18ns as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
-        if ($this->collGroupDescs instanceof PropelCollection) {
-            $this->collGroupDescs->clearIterator();
-        }
-        $this->collGroupDescs = null;
+        // i18n behavior
+        $this->currentLocale = 'en_EN';
+        $this->currentTranslations = null;
+
         if ($this->collAdminGroups instanceof PropelCollection) {
             $this->collAdminGroups->clearIterator();
         }
@@ -2159,6 +2177,10 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->collGroupModules->clearIterator();
         }
         $this->collGroupModules = null;
+        if ($this->collGroupI18ns instanceof PropelCollection) {
+            $this->collGroupI18ns->clearIterator();
+        }
+        $this->collGroupI18ns = null;
     }
 
     /**
@@ -2191,6 +2213,201 @@ abstract class BaseGroup extends BaseObject implements Persistent
     public function keepUpdateDateUnchanged()
     {
         $this->modifiedColumns[] = GroupPeer::UPDATED_AT;
+
+        return $this;
+    }
+
+    // i18n behavior
+
+    /**
+     * Sets the locale for translations
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     *
+     * @return    Group The current object (for fluent API support)
+     */
+    public function setLocale($locale = 'en_EN')
+    {
+        $this->currentLocale = $locale;
+
+        return $this;
+    }
+
+    /**
+     * Gets the locale for translations
+     *
+     * @return    string $locale Locale to use for the translation, e.g. 'fr_FR'
+     */
+    public function getLocale()
+    {
+        return $this->currentLocale;
+    }
+
+    /**
+     * Returns the current translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return GroupI18n */
+    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!isset($this->currentTranslations[$locale])) {
+            if (null !== $this->collGroupI18ns) {
+                foreach ($this->collGroupI18ns as $translation) {
+                    if ($translation->getLocale() == $locale) {
+                        $this->currentTranslations[$locale] = $translation;
+
+                        return $translation;
+                    }
+                }
+            }
+            if ($this->isNew()) {
+                $translation = new GroupI18n();
+                $translation->setLocale($locale);
+            } else {
+                $translation = GroupI18nQuery::create()
+                    ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                    ->findOneOrCreate($con);
+                $this->currentTranslations[$locale] = $translation;
+            }
+            $this->addGroupI18n($translation);
+        }
+
+        return $this->currentTranslations[$locale];
+    }
+
+    /**
+     * Remove the translation for a given locale
+     *
+     * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return    Group The current object (for fluent API support)
+     */
+    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    {
+        if (!$this->isNew()) {
+            GroupI18nQuery::create()
+                ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
+                ->delete($con);
+        }
+        if (isset($this->currentTranslations[$locale])) {
+            unset($this->currentTranslations[$locale]);
+        }
+        foreach ($this->collGroupI18ns as $key => $translation) {
+            if ($translation->getLocale() == $locale) {
+                unset($this->collGroupI18ns[$key]);
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Returns the current translation
+     *
+     * @param     PropelPDO $con an optional connection object
+     *
+     * @return GroupI18n */
+    public function getCurrentTranslation(PropelPDO $con = null)
+    {
+        return $this->getTranslation($this->getLocale(), $con);
+    }
+
+
+        /**
+         * Get the [title] column value.
+         *
+         * @return string
+         */
+        public function getTitle()
+        {
+        return $this->getCurrentTranslation()->getTitle();
+    }
+
+
+        /**
+         * Set the value of [title] column.
+         *
+         * @param string $v new value
+         * @return GroupI18n The current object (for fluent API support)
+         */
+        public function setTitle($v)
+        {    $this->getCurrentTranslation()->setTitle($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [description] column value.
+         *
+         * @return string
+         */
+        public function getDescription()
+        {
+        return $this->getCurrentTranslation()->getDescription();
+    }
+
+
+        /**
+         * Set the value of [description] column.
+         *
+         * @param string $v new value
+         * @return GroupI18n The current object (for fluent API support)
+         */
+        public function setDescription($v)
+        {    $this->getCurrentTranslation()->setDescription($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [chapo] column value.
+         *
+         * @return string
+         */
+        public function getChapo()
+        {
+        return $this->getCurrentTranslation()->getChapo();
+    }
+
+
+        /**
+         * Set the value of [chapo] column.
+         *
+         * @param string $v new value
+         * @return GroupI18n The current object (for fluent API support)
+         */
+        public function setChapo($v)
+        {    $this->getCurrentTranslation()->setChapo($v);
+
+        return $this;
+    }
+
+
+        /**
+         * Get the [postscriptum] column value.
+         *
+         * @return string
+         */
+        public function getPostscriptum()
+        {
+        return $this->getCurrentTranslation()->getPostscriptum();
+    }
+
+
+        /**
+         * Set the value of [postscriptum] column.
+         *
+         * @param string $v new value
+         * @return GroupI18n The current object (for fluent API support)
+         */
+        public function setPostscriptum($v)
+        {    $this->getCurrentTranslation()->setPostscriptum($v);
 
         return $this;
     }

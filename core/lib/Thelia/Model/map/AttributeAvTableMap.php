@@ -56,8 +56,8 @@ class AttributeAvTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('AttributeAvDesc', 'Thelia\\Model\\AttributeAvDesc', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT', 'AttributeAvDescs');
         $this->addRelation('AttributeCombination', 'Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'attribute_av_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
+        $this->addRelation('AttributeAvI18n', 'Thelia\\Model\\AttributeAvI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'AttributeAvI18ns');
     } // buildRelations()
 
     /**
@@ -70,6 +70,7 @@ class AttributeAvTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
 

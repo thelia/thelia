@@ -14,7 +14,7 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\GroupResource;
 use Thelia\Model\Resource;
-use Thelia\Model\ResourceDesc;
+use Thelia\Model\ResourceI18n;
 use Thelia\Model\ResourcePeer;
 use Thelia\Model\ResourceQuery;
 
@@ -37,13 +37,13 @@ use Thelia\Model\ResourceQuery;
  * @method ResourceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method ResourceQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method ResourceQuery leftJoinResourceDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ResourceDesc relation
- * @method ResourceQuery rightJoinResourceDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ResourceDesc relation
- * @method ResourceQuery innerJoinResourceDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the ResourceDesc relation
- *
  * @method ResourceQuery leftJoinGroupResource($relationAlias = null) Adds a LEFT JOIN clause to the query using the GroupResource relation
  * @method ResourceQuery rightJoinGroupResource($relationAlias = null) Adds a RIGHT JOIN clause to the query using the GroupResource relation
  * @method ResourceQuery innerJoinGroupResource($relationAlias = null) Adds a INNER JOIN clause to the query using the GroupResource relation
+ *
+ * @method ResourceQuery leftJoinResourceI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ResourceI18n relation
+ * @method ResourceQuery rightJoinResourceI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ResourceI18n relation
+ * @method ResourceQuery innerJoinResourceI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ResourceI18n relation
  *
  * @method Resource findOne(PropelPDO $con = null) Return the first Resource matching the query
  * @method Resource findOneOrCreate(PropelPDO $con = null) Return the first Resource matching the query, or a new Resource object populated from the query conditions when no match is found
@@ -378,80 +378,6 @@ abstract class BaseResourceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related ResourceDesc object
-     *
-     * @param   ResourceDesc|PropelObjectCollection $resourceDesc  the related object to use as filter
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return   ResourceQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
-     */
-    public function filterByResourceDesc($resourceDesc, $comparison = null)
-    {
-        if ($resourceDesc instanceof ResourceDesc) {
-            return $this
-                ->addUsingAlias(ResourcePeer::ID, $resourceDesc->getResourceId(), $comparison);
-        } elseif ($resourceDesc instanceof PropelObjectCollection) {
-            return $this
-                ->useResourceDescQuery()
-                ->filterByPrimaryKeys($resourceDesc->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByResourceDesc() only accepts arguments of type ResourceDesc or PropelCollection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the ResourceDesc relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ResourceQuery The current query, for fluid interface
-     */
-    public function joinResourceDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ResourceDesc');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'ResourceDesc');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the ResourceDesc relation ResourceDesc object
-     *
-     * @see       useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ResourceDescQuery A secondary query class using the current class as primary query
-     */
-    public function useResourceDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
-    {
-        return $this
-            ->joinResourceDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ResourceDesc', '\Thelia\Model\ResourceDescQuery');
-    }
-
-    /**
      * Filter the query by a related GroupResource object
      *
      * @param   GroupResource|PropelObjectCollection $groupResource  the related object to use as filter
@@ -523,6 +449,80 @@ abstract class BaseResourceQuery extends ModelCriteria
         return $this
             ->joinGroupResource($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'GroupResource', '\Thelia\Model\GroupResourceQuery');
+    }
+
+    /**
+     * Filter the query by a related ResourceI18n object
+     *
+     * @param   ResourceI18n|PropelObjectCollection $resourceI18n  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ResourceQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByResourceI18n($resourceI18n, $comparison = null)
+    {
+        if ($resourceI18n instanceof ResourceI18n) {
+            return $this
+                ->addUsingAlias(ResourcePeer::ID, $resourceI18n->getId(), $comparison);
+        } elseif ($resourceI18n instanceof PropelObjectCollection) {
+            return $this
+                ->useResourceI18nQuery()
+                ->filterByPrimaryKeys($resourceI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByResourceI18n() only accepts arguments of type ResourceI18n or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ResourceI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ResourceQuery The current query, for fluid interface
+     */
+    public function joinResourceI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ResourceI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ResourceI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ResourceI18n relation ResourceI18n object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ResourceI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useResourceI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinResourceI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ResourceI18n', '\Thelia\Model\ResourceI18nQuery');
     }
 
     /**
@@ -606,4 +606,61 @@ abstract class BaseResourceQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(ResourcePeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ResourceQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'ResourceI18n';
+
+        return $this
+            ->joinResourceI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ResourceQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('ResourceI18n');
+        $this->with['ResourceI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ResourceI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ResourceI18n', 'Thelia\Model\ResourceI18nQuery');
+    }
+
 }

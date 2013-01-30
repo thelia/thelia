@@ -15,7 +15,7 @@ use \PropelPDO;
 use Thelia\Model\Category;
 use Thelia\Model\Content;
 use Thelia\Model\Document;
-use Thelia\Model\DocumentDesc;
+use Thelia\Model\DocumentI18n;
 use Thelia\Model\DocumentPeer;
 use Thelia\Model\DocumentQuery;
 use Thelia\Model\Folder;
@@ -66,9 +66,9 @@ use Thelia\Model\Product;
  * @method DocumentQuery rightJoinFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Folder relation
  * @method DocumentQuery innerJoinFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the Folder relation
  *
- * @method DocumentQuery leftJoinDocumentDesc($relationAlias = null) Adds a LEFT JOIN clause to the query using the DocumentDesc relation
- * @method DocumentQuery rightJoinDocumentDesc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DocumentDesc relation
- * @method DocumentQuery innerJoinDocumentDesc($relationAlias = null) Adds a INNER JOIN clause to the query using the DocumentDesc relation
+ * @method DocumentQuery leftJoinDocumentI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the DocumentI18n relation
+ * @method DocumentQuery rightJoinDocumentI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the DocumentI18n relation
+ * @method DocumentQuery innerJoinDocumentI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the DocumentI18n relation
  *
  * @method Document findOne(PropelPDO $con = null) Return the first Document matching the query
  * @method Document findOneOrCreate(PropelPDO $con = null) Return the first Document matching the query, or a new Document object populated from the query conditions when no match is found
@@ -930,41 +930,41 @@ abstract class BaseDocumentQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related DocumentDesc object
+     * Filter the query by a related DocumentI18n object
      *
-     * @param   DocumentDesc|PropelObjectCollection $documentDesc  the related object to use as filter
+     * @param   DocumentI18n|PropelObjectCollection $documentI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return   DocumentQuery The current query, for fluid interface
      * @throws   PropelException - if the provided filter is invalid.
      */
-    public function filterByDocumentDesc($documentDesc, $comparison = null)
+    public function filterByDocumentI18n($documentI18n, $comparison = null)
     {
-        if ($documentDesc instanceof DocumentDesc) {
+        if ($documentI18n instanceof DocumentI18n) {
             return $this
-                ->addUsingAlias(DocumentPeer::ID, $documentDesc->getDocumentId(), $comparison);
-        } elseif ($documentDesc instanceof PropelObjectCollection) {
+                ->addUsingAlias(DocumentPeer::ID, $documentI18n->getId(), $comparison);
+        } elseif ($documentI18n instanceof PropelObjectCollection) {
             return $this
-                ->useDocumentDescQuery()
-                ->filterByPrimaryKeys($documentDesc->getPrimaryKeys())
+                ->useDocumentI18nQuery()
+                ->filterByPrimaryKeys($documentI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByDocumentDesc() only accepts arguments of type DocumentDesc or PropelCollection');
+            throw new PropelException('filterByDocumentI18n() only accepts arguments of type DocumentI18n or PropelCollection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the DocumentDesc relation
+     * Adds a JOIN clause to the query using the DocumentI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return DocumentQuery The current query, for fluid interface
      */
-    public function joinDocumentDesc($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinDocumentI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('DocumentDesc');
+        $relationMap = $tableMap->getRelation('DocumentI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -979,14 +979,14 @@ abstract class BaseDocumentQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'DocumentDesc');
+            $this->addJoinObject($join, 'DocumentI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the DocumentDesc relation DocumentDesc object
+     * Use the DocumentI18n relation DocumentI18n object
      *
      * @see       useQuery()
      *
@@ -994,13 +994,13 @@ abstract class BaseDocumentQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\DocumentDescQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\DocumentI18nQuery A secondary query class using the current class as primary query
      */
-    public function useDocumentDescQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useDocumentI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinDocumentDesc($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'DocumentDesc', '\Thelia\Model\DocumentDescQuery');
+            ->joinDocumentI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DocumentI18n', '\Thelia\Model\DocumentI18nQuery');
     }
 
     /**
@@ -1084,4 +1084,61 @@ abstract class BaseDocumentQuery extends ModelCriteria
     {
         return $this->addAscendingOrderByColumn(DocumentPeer::CREATED_AT);
     }
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    DocumentQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'DocumentI18n';
+
+        return $this
+            ->joinDocumentI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    DocumentQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('DocumentI18n');
+        $this->with['DocumentI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    DocumentI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'DocumentI18n', 'Thelia\Model\DocumentI18nQuery');
+    }
+
 }
