@@ -51,6 +51,9 @@ class Thelia extends Kernel
     
     protected function initPropel()
     {
+        if (file_exists(THELIA_ROOT . '/local/config/config_db.php') === false) {
+            return ;
+        }
         Propel::init(THELIA_CONF_DIR . "/config_thelia.php");
         
         if ($this->isDebug()) {
@@ -64,35 +67,16 @@ class Thelia extends Kernel
             $con->useDebug(true);
         }
     }
+
     /**
-     * Initializes the service container.
-     *
-     * @TODO cache container initialization
-     *
-     * The cached version of the service container is used when fresh, otherwise the
-     * container is built.
+     * 
+     * Load some configuration 
+     * Initialize all plugins
+     * 
      */
-//    protected function initializeContainer()
-//    {
-//        $class = $this->getContainerClass();
-//        $cache = new ConfigCache($this->getCacheDir().'/'.$class.'.php', $this->debug);
-//        $fresh = true;
-//        if (!$cache->isFresh()) {
-//            $container = $this->buildContainer();
-//            $this->dumpContainer($cache, $container, $class, $this->getContainerBaseClass());
-//
-//            $fresh = false;
-//        }
-//
-//        require_once $cache;
-//        
-//        $this->container = new $class();
-//
-//        if (!$fresh && $this->container->has('cache_warmer')) {
-//            $this->container->get('cache_warmer')->warmUp($this->container->getParameter('kernel.cache_dir'));
-//        }
-//
-//    }
+    public function loadConfiguration(){
+        
+    }
 
     /**
      * Gets the cache directory.
