@@ -13,6 +13,7 @@ use Thelia\Model\AttributeCategoryPeer;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryI18nPeer;
 use Thelia\Model\CategoryPeer;
+use Thelia\Model\CategoryVersionPeer;
 use Thelia\Model\ContentAssocPeer;
 use Thelia\Model\DocumentPeer;
 use Thelia\Model\FeatureCategoryPeer;
@@ -44,13 +45,13 @@ abstract class BaseCategoryPeer
     const TM_CLASS = 'CategoryTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 10;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /** the column name for the ID field */
     const ID = 'category.ID';
@@ -73,6 +74,15 @@ abstract class BaseCategoryPeer
     /** the column name for the UPDATED_AT field */
     const UPDATED_AT = 'category.UPDATED_AT';
 
+    /** the column name for the VERSION field */
+    const VERSION = 'category.VERSION';
+
+    /** the column name for the VERSION_CREATED_AT field */
+    const VERSION_CREATED_AT = 'category.VERSION_CREATED_AT';
+
+    /** the column name for the VERSION_CREATED_BY field */
+    const VERSION_CREATED_BY = 'category.VERSION_CREATED_BY';
+
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
@@ -92,6 +102,13 @@ abstract class BaseCategoryPeer
      * @var        string
      */
     const DEFAULT_LOCALE = 'en_EN';
+    // versionable behavior
+
+    /**
+     * Whether the versioning is enabled
+     */
+    static $isVersioningEnabled = true;
+
     /**
      * holds an array of fieldnames
      *
@@ -99,12 +116,12 @@ abstract class BaseCategoryPeer
      * e.g. CategoryPeer::$fieldNames[CategoryPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Parent', 'Link', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parent', 'link', 'visible', 'position', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID, CategoryPeer::PARENT, CategoryPeer::LINK, CategoryPeer::VISIBLE, CategoryPeer::POSITION, CategoryPeer::CREATED_AT, CategoryPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PARENT', 'LINK', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'parent', 'link', 'visible', 'position', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Parent', 'Link', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'parent', 'link', 'visible', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID, CategoryPeer::PARENT, CategoryPeer::LINK, CategoryPeer::VISIBLE, CategoryPeer::POSITION, CategoryPeer::CREATED_AT, CategoryPeer::UPDATED_AT, CategoryPeer::VERSION, CategoryPeer::VERSION_CREATED_AT, CategoryPeer::VERSION_CREATED_BY, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'PARENT', 'LINK', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'parent', 'link', 'visible', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -114,12 +131,12 @@ abstract class BaseCategoryPeer
      * e.g. CategoryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Parent' => 1, 'Link' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID => 0, CategoryPeer::PARENT => 1, CategoryPeer::LINK => 2, CategoryPeer::VISIBLE => 3, CategoryPeer::POSITION => 4, CategoryPeer::CREATED_AT => 5, CategoryPeer::UPDATED_AT => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PARENT' => 1, 'LINK' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Parent' => 1, 'Link' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Version' => 7, 'VersionCreatedAt' => 8, 'VersionCreatedBy' => 9, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'version' => 7, 'versionCreatedAt' => 8, 'versionCreatedBy' => 9, ),
+        BasePeer::TYPE_COLNAME => array (CategoryPeer::ID => 0, CategoryPeer::PARENT => 1, CategoryPeer::LINK => 2, CategoryPeer::VISIBLE => 3, CategoryPeer::POSITION => 4, CategoryPeer::CREATED_AT => 5, CategoryPeer::UPDATED_AT => 6, CategoryPeer::VERSION => 7, CategoryPeer::VERSION_CREATED_AT => 8, CategoryPeer::VERSION_CREATED_BY => 9, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'PARENT' => 1, 'LINK' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, 'VERSION' => 7, 'VERSION_CREATED_AT' => 8, 'VERSION_CREATED_BY' => 9, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, 'version' => 7, 'version_created_at' => 8, 'version_created_by' => 9, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -200,6 +217,9 @@ abstract class BaseCategoryPeer
             $criteria->addSelectColumn(CategoryPeer::POSITION);
             $criteria->addSelectColumn(CategoryPeer::CREATED_AT);
             $criteria->addSelectColumn(CategoryPeer::UPDATED_AT);
+            $criteria->addSelectColumn(CategoryPeer::VERSION);
+            $criteria->addSelectColumn(CategoryPeer::VERSION_CREATED_AT);
+            $criteria->addSelectColumn(CategoryPeer::VERSION_CREATED_BY);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PARENT');
@@ -208,6 +228,9 @@ abstract class BaseCategoryPeer
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.VERSION');
+            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
+            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
         }
     }
 
@@ -431,6 +454,9 @@ abstract class BaseCategoryPeer
         // Invalidate objects in CategoryI18nPeer instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
         CategoryI18nPeer::clearInstancePool();
+        // Invalidate objects in CategoryVersionPeer instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+        CategoryVersionPeer::clearInstancePool();
     }
 
     /**
@@ -822,6 +848,34 @@ abstract class BaseCategoryPeer
         }
 
         return $objs;
+    }
+
+    // versionable behavior
+
+    /**
+     * Checks whether versioning is enabled
+     *
+     * @return boolean
+     */
+    public static function isVersioningEnabled()
+    {
+        return self::$isVersioningEnabled;
+    }
+
+    /**
+     * Enables versioning
+     */
+    public static function enableVersioning()
+    {
+        self::$isVersioningEnabled = true;
+    }
+
+    /**
+     * Disables versioning
+     */
+    public static function disableVersioning()
+    {
+        self::$isVersioningEnabled = false;
     }
 
 } // BaseCategoryPeer

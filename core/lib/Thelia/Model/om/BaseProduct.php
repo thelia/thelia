@@ -32,6 +32,9 @@ use Thelia\Model\ProductI18n;
 use Thelia\Model\ProductI18nQuery;
 use Thelia\Model\ProductPeer;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductVersion;
+use Thelia\Model\ProductVersionPeer;
+use Thelia\Model\ProductVersionQuery;
 use Thelia\Model\Rewriting;
 use Thelia\Model\RewritingQuery;
 use Thelia\Model\Stock;
@@ -156,6 +159,25 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
+     * The value for the version field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $version;
+
+    /**
+     * The value for the version_created_at field.
+     * @var        string
+     */
+    protected $version_created_at;
+
+    /**
+     * The value for the version_created_by field.
+     * @var        string
+     */
+    protected $version_created_by;
+
+    /**
      * @var        TaxRule
      */
     protected $aTaxRule;
@@ -221,6 +243,12 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $collProductI18nsPartial;
 
     /**
+     * @var        PropelObjectCollection|ProductVersion[] Collection to store aggregation of ProductVersion objects.
+     */
+    protected $collProductVersions;
+    protected $collProductVersionsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -247,6 +275,14 @@ abstract class BaseProduct extends BaseObject implements Persistent
      * @var        array[ProductI18n]
      */
     protected $currentTranslations;
+
+    // versionable behavior
+
+
+    /**
+     * @var bool
+     */
+    protected $enforceVersion = false;
 
     /**
      * An array of objects scheduled for deletion.
@@ -309,6 +345,12 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $productI18nsScheduledForDeletion = null;
 
     /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productVersionsScheduledForDeletion = null;
+
+    /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
      * equivalent initialization method).
@@ -320,6 +362,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $this->promo = 0;
         $this->stock = 0;
         $this->visible = 0;
+        $this->version = 0;
     }
 
     /**
@@ -524,6 +567,63 @@ abstract class BaseProduct extends BaseObject implements Persistent
         } else {
             return $dt->format($format);
         }
+    }
+
+    /**
+     * Get the [version] column value.
+     *
+     * @return int
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [version_created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getVersionCreatedAt($format = 'Y-m-d H:i:s')
+    {
+        if ($this->version_created_at === null) {
+            return null;
+        }
+
+        if ($this->version_created_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->version_created_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [version_created_by] column value.
+     *
+     * @return string
+     */
+    public function getVersionCreatedBy()
+    {
+        return $this->version_created_by;
     }
 
     /**
@@ -829,6 +929,71 @@ abstract class BaseProduct extends BaseObject implements Persistent
     } // setUpdatedAt()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param int $v new value
+     * @return Product The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[] = ProductPeer::VERSION;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Product The current object (for fluent API support)
+     */
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->version_created_at !== null && $tmpDt = new DateTime($this->version_created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->version_created_at = $newDateAsString;
+                $this->modifiedColumns[] = ProductPeer::VERSION_CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     *
+     * @param string $v new value
+     * @return Product The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[] = ProductPeer::VERSION_CREATED_BY;
+        }
+
+
+        return $this;
+    } // setVersionCreatedBy()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -851,6 +1016,10 @@ abstract class BaseProduct extends BaseObject implements Persistent
             }
 
             if ($this->visible !== 0) {
+                return false;
+            }
+
+            if ($this->version !== 0) {
                 return false;
             }
 
@@ -890,6 +1059,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $this->position = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
             $this->created_at = ($row[$startcol + 12] !== null) ? (string) $row[$startcol + 12] : null;
             $this->updated_at = ($row[$startcol + 13] !== null) ? (string) $row[$startcol + 13] : null;
+            $this->version = ($row[$startcol + 14] !== null) ? (int) $row[$startcol + 14] : null;
+            $this->version_created_at = ($row[$startcol + 15] !== null) ? (string) $row[$startcol + 15] : null;
+            $this->version_created_by = ($row[$startcol + 16] !== null) ? (string) $row[$startcol + 16] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -898,7 +1070,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 14; // 14 = ProductPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 17; // 17 = ProductPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Product object", $e);
@@ -984,6 +1156,8 @@ abstract class BaseProduct extends BaseObject implements Persistent
 
             $this->collProductI18ns = null;
 
+            $this->collProductVersions = null;
+
         } // if (deep)
     }
 
@@ -1054,6 +1228,14 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // versionable behavior
+            if ($this->isVersioningNecessary()) {
+                $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
+                if (!$this->isColumnModified(ProductPeer::VERSION_CREATED_AT)) {
+                    $this->setVersionCreatedAt(time());
+                }
+                $createVersion = true; // for postSave hook
+            }
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -1078,6 +1260,10 @@ abstract class BaseProduct extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // versionable behavior
+                if (isset($createVersion)) {
+                    $this->addVersion($con);
+                }
                 ProductPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -1305,6 +1491,23 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->productVersionsScheduledForDeletion !== null) {
+                if (!$this->productVersionsScheduledForDeletion->isEmpty()) {
+                    ProductVersionQuery::create()
+                        ->filterByPrimaryKeys($this->productVersionsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productVersionsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collProductVersions !== null) {
+                foreach ($this->collProductVersions as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -1373,6 +1576,15 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if ($this->isColumnModified(ProductPeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
+        if ($this->isColumnModified(ProductPeer::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
+        if ($this->isColumnModified(ProductPeer::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+        }
+        if ($this->isColumnModified(ProductPeer::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `product` (%s) VALUES (%s)',
@@ -1425,6 +1637,15 @@ abstract class BaseProduct extends BaseObject implements Persistent
                         break;
                     case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
+                        break;
+                    case '`VERSION_CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_CREATED_BY`':
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1617,6 +1838,14 @@ abstract class BaseProduct extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collProductVersions !== null) {
+                    foreach ($this->collProductVersions as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1694,6 +1923,15 @@ abstract class BaseProduct extends BaseObject implements Persistent
             case 13:
                 return $this->getUpdatedAt();
                 break;
+            case 14:
+                return $this->getVersion();
+                break;
+            case 15:
+                return $this->getVersionCreatedAt();
+                break;
+            case 16:
+                return $this->getVersionCreatedBy();
+                break;
             default:
                 return null;
                 break;
@@ -1737,6 +1975,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $keys[11] => $this->getPosition(),
             $keys[12] => $this->getCreatedAt(),
             $keys[13] => $this->getUpdatedAt(),
+            $keys[14] => $this->getVersion(),
+            $keys[15] => $this->getVersionCreatedAt(),
+            $keys[16] => $this->getVersionCreatedBy(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->aTaxRule) {
@@ -1771,6 +2012,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
             }
             if (null !== $this->collProductI18ns) {
                 $result['ProductI18ns'] = $this->collProductI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collProductVersions) {
+                $result['ProductVersions'] = $this->collProductVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1848,6 +2092,15 @@ abstract class BaseProduct extends BaseObject implements Persistent
             case 13:
                 $this->setUpdatedAt($value);
                 break;
+            case 14:
+                $this->setVersion($value);
+                break;
+            case 15:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 16:
+                $this->setVersionCreatedBy($value);
+                break;
         } // switch()
     }
 
@@ -1886,6 +2139,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if (array_key_exists($keys[11], $arr)) $this->setPosition($arr[$keys[11]]);
         if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
+        if (array_key_exists($keys[14], $arr)) $this->setVersion($arr[$keys[14]]);
+        if (array_key_exists($keys[15], $arr)) $this->setVersionCreatedAt($arr[$keys[15]]);
+        if (array_key_exists($keys[16], $arr)) $this->setVersionCreatedBy($arr[$keys[16]]);
     }
 
     /**
@@ -1911,6 +2167,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if ($this->isColumnModified(ProductPeer::POSITION)) $criteria->add(ProductPeer::POSITION, $this->position);
         if ($this->isColumnModified(ProductPeer::CREATED_AT)) $criteria->add(ProductPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductPeer::UPDATED_AT)) $criteria->add(ProductPeer::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ProductPeer::VERSION)) $criteria->add(ProductPeer::VERSION, $this->version);
+        if ($this->isColumnModified(ProductPeer::VERSION_CREATED_AT)) $criteria->add(ProductPeer::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(ProductPeer::VERSION_CREATED_BY)) $criteria->add(ProductPeer::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -1987,6 +2246,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -2052,6 +2314,12 @@ abstract class BaseProduct extends BaseObject implements Persistent
             foreach ($this->getProductI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addProductI18n($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getProductVersions() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductVersion($relObj->copy($deepCopy));
                 }
             }
 
@@ -2196,6 +2464,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
         }
         if ('ProductI18n' == $relationName) {
             $this->initProductI18ns();
+        }
+        if ('ProductVersion' == $relationName) {
+            $this->initProductVersions();
         }
     }
 
@@ -4649,6 +4920,213 @@ abstract class BaseProduct extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collProductVersions collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductVersions()
+     */
+    public function clearProductVersions()
+    {
+        $this->collProductVersions = null; // important to set this to null since that means it is uninitialized
+        $this->collProductVersionsPartial = null;
+    }
+
+    /**
+     * reset is the collProductVersions collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialProductVersions($v = true)
+    {
+        $this->collProductVersionsPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductVersions collection.
+     *
+     * By default this just sets the collProductVersions collection to an empty array (like clearcollProductVersions());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductVersions($overrideExisting = true)
+    {
+        if (null !== $this->collProductVersions && !$overrideExisting) {
+            return;
+        }
+        $this->collProductVersions = new PropelObjectCollection();
+        $this->collProductVersions->setModel('ProductVersion');
+    }
+
+    /**
+     * Gets an array of ProductVersion objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ProductVersion[] List of ProductVersion objects
+     * @throws PropelException
+     */
+    public function getProductVersions($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collProductVersionsPartial && !$this->isNew();
+        if (null === $this->collProductVersions || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductVersions) {
+                // return empty collection
+                $this->initProductVersions();
+            } else {
+                $collProductVersions = ProductVersionQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collProductVersionsPartial && count($collProductVersions)) {
+                      $this->initProductVersions(false);
+
+                      foreach($collProductVersions as $obj) {
+                        if (false == $this->collProductVersions->contains($obj)) {
+                          $this->collProductVersions->append($obj);
+                        }
+                      }
+
+                      $this->collProductVersionsPartial = true;
+                    }
+
+                    return $collProductVersions;
+                }
+
+                if($partial && $this->collProductVersions) {
+                    foreach($this->collProductVersions as $obj) {
+                        if($obj->isNew()) {
+                            $collProductVersions[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductVersions = $collProductVersions;
+                $this->collProductVersionsPartial = false;
+            }
+        }
+
+        return $this->collProductVersions;
+    }
+
+    /**
+     * Sets a collection of ProductVersion objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productVersions A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setProductVersions(PropelCollection $productVersions, PropelPDO $con = null)
+    {
+        $this->productVersionsScheduledForDeletion = $this->getProductVersions(new Criteria(), $con)->diff($productVersions);
+
+        foreach ($this->productVersionsScheduledForDeletion as $productVersionRemoved) {
+            $productVersionRemoved->setProduct(null);
+        }
+
+        $this->collProductVersions = null;
+        foreach ($productVersions as $productVersion) {
+            $this->addProductVersion($productVersion);
+        }
+
+        $this->collProductVersions = $productVersions;
+        $this->collProductVersionsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ProductVersion objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ProductVersion objects.
+     * @throws PropelException
+     */
+    public function countProductVersions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collProductVersionsPartial && !$this->isNew();
+        if (null === $this->collProductVersions || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductVersions) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getProductVersions());
+                }
+                $query = ProductVersionQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductVersions);
+        }
+    }
+
+    /**
+     * Method called to associate a ProductVersion object to this object
+     * through the ProductVersion foreign key attribute.
+     *
+     * @param    ProductVersion $l ProductVersion
+     * @return Product The current object (for fluent API support)
+     */
+    public function addProductVersion(ProductVersion $l)
+    {
+        if ($this->collProductVersions === null) {
+            $this->initProductVersions();
+            $this->collProductVersionsPartial = true;
+        }
+        if (!$this->collProductVersions->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddProductVersion($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductVersion $productVersion The productVersion object to add.
+     */
+    protected function doAddProductVersion($productVersion)
+    {
+        $this->collProductVersions[]= $productVersion;
+        $productVersion->setProduct($this);
+    }
+
+    /**
+     * @param	ProductVersion $productVersion The productVersion object to remove.
+     */
+    public function removeProductVersion($productVersion)
+    {
+        if ($this->getProductVersions()->contains($productVersion)) {
+            $this->collProductVersions->remove($this->collProductVersions->search($productVersion));
+            if (null === $this->productVersionsScheduledForDeletion) {
+                $this->productVersionsScheduledForDeletion = clone $this->collProductVersions;
+                $this->productVersionsScheduledForDeletion->clear();
+            }
+            $this->productVersionsScheduledForDeletion[]= $productVersion;
+            $productVersion->setProduct(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -4667,6 +5145,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
+        $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
@@ -4738,6 +5219,11 @@ abstract class BaseProduct extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collProductVersions) {
+                foreach ($this->collProductVersions as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         // i18n behavior
@@ -4784,6 +5270,10 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $this->collProductI18ns->clearIterator();
         }
         $this->collProductI18ns = null;
+        if ($this->collProductVersions instanceof PropelCollection) {
+            $this->collProductVersions->clearIterator();
+        }
+        $this->collProductVersions = null;
         $this->aTaxRule = null;
     }
 
@@ -5016,4 +5506,311 @@ abstract class BaseProduct extends BaseObject implements Persistent
         return $this;
     }
 
+    // versionable behavior
+
+    /**
+     * Enforce a new Version of this object upon next save.
+     *
+     * @return Product
+     */
+    public function enforceVersioning()
+    {
+        $this->enforceVersion = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks whether the current state must be recorded as a version
+     *
+     * @param PropelPDO $con An optional PropelPDO connection to use.
+     *
+     * @return  boolean
+     */
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->alreadyInSave) {
+            return false;
+        }
+
+        if ($this->enforceVersion) {
+            return true;
+        }
+
+        if (ProductPeer::isVersioningEnabled() && ($this->isNew() || $this->isModified() || $this->isDeleted())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a version of the current object and saves it.
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  ProductVersion A version object
+     */
+    public function addVersion($con = null)
+    {
+        $this->enforceVersion = false;
+
+        $version = new ProductVersion();
+        $version->setId($this->getId());
+        $version->setTaxRuleId($this->getTaxRuleId());
+        $version->setRef($this->getRef());
+        $version->setPrice($this->getPrice());
+        $version->setPrice2($this->getPrice2());
+        $version->setEcotax($this->getEcotax());
+        $version->setNewness($this->getNewness());
+        $version->setPromo($this->getPromo());
+        $version->setStock($this->getStock());
+        $version->setVisible($this->getVisible());
+        $version->setWeight($this->getWeight());
+        $version->setPosition($this->getPosition());
+        $version->setCreatedAt($this->getCreatedAt());
+        $version->setUpdatedAt($this->getUpdatedAt());
+        $version->setVersion($this->getVersion());
+        $version->setVersionCreatedAt($this->getVersionCreatedAt());
+        $version->setVersionCreatedBy($this->getVersionCreatedBy());
+        $version->setProduct($this);
+        $version->save($con);
+
+        return $version;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  Product The current object (for fluent API support)
+     * @throws  PropelException - if no object with the given version can be found.
+     */
+    public function toVersion($versionNumber, $con = null)
+    {
+        $version = $this->getOneVersion($versionNumber, $con);
+        if (!$version) {
+            throw new PropelException(sprintf('No Product object found with version %d', $version));
+        }
+        $this->populateFromVersion($version, $con);
+
+        return $this;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   ProductVersion $version The version object to use
+     * @param   PropelPDO $con the connection to use
+     * @param   array $loadedObjects objects thats been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     *
+     * @return  Product The current object (for fluent API support)
+     */
+    public function populateFromVersion($version, $con = null, &$loadedObjects = array())
+    {
+
+        $loadedObjects['Product'][$version->getId()][$version->getVersion()] = $this;
+        $this->setId($version->getId());
+        $this->setTaxRuleId($version->getTaxRuleId());
+        $this->setRef($version->getRef());
+        $this->setPrice($version->getPrice());
+        $this->setPrice2($version->getPrice2());
+        $this->setEcotax($version->getEcotax());
+        $this->setNewness($version->getNewness());
+        $this->setPromo($version->getPromo());
+        $this->setStock($version->getStock());
+        $this->setVisible($version->getVisible());
+        $this->setWeight($version->getWeight());
+        $this->setPosition($version->getPosition());
+        $this->setCreatedAt($version->getCreatedAt());
+        $this->setUpdatedAt($version->getUpdatedAt());
+        $this->setVersion($version->getVersion());
+        $this->setVersionCreatedAt($version->getVersionCreatedAt());
+        $this->setVersionCreatedBy($version->getVersionCreatedBy());
+
+        return $this;
+    }
+
+    /**
+     * Gets the latest persisted version number for the current object
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  integer
+     */
+    public function getLastVersionNumber($con = null)
+    {
+        $v = ProductVersionQuery::create()
+            ->filterByProduct($this)
+            ->orderByVersion('desc')
+            ->findOne($con);
+        if (!$v) {
+            return 0;
+        }
+
+        return $v->getVersion();
+    }
+
+    /**
+     * Checks whether the current object is the latest one
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  boolean
+     */
+    public function isLastVersion($con = null)
+    {
+        return $this->getLastVersionNumber($con) == $this->getVersion();
+    }
+
+    /**
+     * Retrieves a version object for this entity and a version number
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  ProductVersion A version object
+     */
+    public function getOneVersion($versionNumber, $con = null)
+    {
+        return ProductVersionQuery::create()
+            ->filterByProduct($this)
+            ->filterByVersion($versionNumber)
+            ->findOne($con);
+    }
+
+    /**
+     * Gets all the versions of this object, in incremental order
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  PropelObjectCollection A list of ProductVersion objects
+     */
+    public function getAllVersions($con = null)
+    {
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(ProductVersionPeer::VERSION);
+
+        return $this->getProductVersions($criteria, $con);
+    }
+
+    /**
+     * Compares the current object with another of its version.
+     * <code>
+     * print_r($book->compareVersion(1));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $versionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->toArray();
+        $toVersion = $this->getOneVersion($versionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Compares two versions of the current object.
+     * <code>
+     * print_r($book->compareVersions(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $fromVersionNumber
+     * @param   integer   $toVersionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->getOneVersion($fromVersionNumber, $con)->toArray();
+        $toVersion = $this->getOneVersion($toVersionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Computes the diff between two versions.
+     * <code>
+     * print_r($this->computeDiff(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
+    {
+        $fromVersionNumber = $fromVersion['Version'];
+        $toVersionNumber = $toVersion['Version'];
+        $ignoredColumns = array_merge(array(
+            'Version',
+            'VersionCreatedAt',
+            'VersionCreatedBy',
+        ), $ignoredColumns);
+        $diff = array();
+        foreach ($fromVersion as $key => $value) {
+            if (in_array($key, $ignoredColumns)) {
+                continue;
+            }
+            if ($toVersion[$key] != $value) {
+                switch ($keys) {
+                    case 'versions':
+                        $diff[$fromVersionNumber][$key] = $value;
+                        $diff[$toVersionNumber][$key] = $toVersion[$key];
+                        break;
+                    default:
+                        $diff[$key] = array(
+                            $fromVersionNumber => $value,
+                            $toVersionNumber => $toVersion[$key],
+                        );
+                        break;
+                }
+            }
+        }
+
+        return $diff;
+    }
+    /**
+     * retrieve the last $number versions.
+     *
+     * @param integer $number the number of record to return.
+     * @param ProductVersionQuery|Criteria $criteria Additional criteria to filter.
+     * @param PropelPDO $con An optional connection to use.
+     *
+     * @return PropelCollection|ProductVersion[] List of ProductVersion objects
+     */
+    public function getLastVersions($number = 10, $criteria = null, PropelPDO $con = null)
+    {
+        $criteria = ProductVersionQuery::create(null, $criteria);
+        $criteria->addDescendingOrderByColumn(ProductVersionPeer::VERSION);
+        $criteria->limit($number);
+
+        return $this->getProductVersions($criteria, $con);
+    }
 }

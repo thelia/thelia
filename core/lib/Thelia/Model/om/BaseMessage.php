@@ -20,6 +20,9 @@ use Thelia\Model\MessageI18n;
 use Thelia\Model\MessageI18nQuery;
 use Thelia\Model\MessagePeer;
 use Thelia\Model\MessageQuery;
+use Thelia\Model\MessageVersion;
+use Thelia\Model\MessageVersionPeer;
+use Thelia\Model\MessageVersionQuery;
 
 /**
  * Base class that represents a row from the 'message' table.
@@ -86,10 +89,35 @@ abstract class BaseMessage extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
+     * The value for the version field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $version;
+
+    /**
+     * The value for the version_created_at field.
+     * @var        string
+     */
+    protected $version_created_at;
+
+    /**
+     * The value for the version_created_by field.
+     * @var        string
+     */
+    protected $version_created_by;
+
+    /**
      * @var        PropelObjectCollection|MessageI18n[] Collection to store aggregation of MessageI18n objects.
      */
     protected $collMessageI18ns;
     protected $collMessageI18nsPartial;
+
+    /**
+     * @var        PropelObjectCollection|MessageVersion[] Collection to store aggregation of MessageVersion objects.
+     */
+    protected $collMessageVersions;
+    protected $collMessageVersionsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -119,11 +147,46 @@ abstract class BaseMessage extends BaseObject implements Persistent
      */
     protected $currentTranslations;
 
+    // versionable behavior
+
+
+    /**
+     * @var bool
+     */
+    protected $enforceVersion = false;
+
     /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
     protected $messageI18nsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $messageVersionsScheduledForDeletion = null;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->version = 0;
+    }
+
+    /**
+     * Initializes internal state of BaseMessage object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+    }
 
     /**
      * Get the [id] column value.
@@ -237,6 +300,63 @@ abstract class BaseMessage extends BaseObject implements Persistent
         } else {
             return $dt->format($format);
         }
+    }
+
+    /**
+     * Get the [version] column value.
+     *
+     * @return int
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [version_created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getVersionCreatedAt($format = 'Y-m-d H:i:s')
+    {
+        if ($this->version_created_at === null) {
+            return null;
+        }
+
+        if ($this->version_created_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->version_created_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [version_created_by] column value.
+     *
+     * @return string
+     */
+    public function getVersionCreatedBy()
+    {
+        return $this->version_created_by;
     }
 
     /**
@@ -370,6 +490,71 @@ abstract class BaseMessage extends BaseObject implements Persistent
     } // setUpdatedAt()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param int $v new value
+     * @return Message The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[] = MessagePeer::VERSION;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Message The current object (for fluent API support)
+     */
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->version_created_at !== null && $tmpDt = new DateTime($this->version_created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->version_created_at = $newDateAsString;
+                $this->modifiedColumns[] = MessagePeer::VERSION_CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     *
+     * @param string $v new value
+     * @return Message The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[] = MessagePeer::VERSION_CREATED_BY;
+        }
+
+
+        return $this;
+    } // setVersionCreatedBy()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -379,6 +564,10 @@ abstract class BaseMessage extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->version !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -407,6 +596,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $this->ref = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->created_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
             $this->updated_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
+            $this->version = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
+            $this->version_created_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
+            $this->version_created_by = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -415,7 +607,7 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = MessagePeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = MessagePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Message object", $e);
@@ -478,6 +670,8 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if ($deep) {  // also de-associate any related objects?
 
             $this->collMessageI18ns = null;
+
+            $this->collMessageVersions = null;
 
         } // if (deep)
     }
@@ -549,6 +743,14 @@ abstract class BaseMessage extends BaseObject implements Persistent
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // versionable behavior
+            if ($this->isVersioningNecessary()) {
+                $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
+                if (!$this->isColumnModified(MessagePeer::VERSION_CREATED_AT)) {
+                    $this->setVersionCreatedAt(time());
+                }
+                $createVersion = true; // for postSave hook
+            }
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -573,6 +775,10 @@ abstract class BaseMessage extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // versionable behavior
+                if (isset($createVersion)) {
+                    $this->addVersion($con);
+                }
                 MessagePeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -631,6 +837,23 @@ abstract class BaseMessage extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->messageVersionsScheduledForDeletion !== null) {
+                if (!$this->messageVersionsScheduledForDeletion->isEmpty()) {
+                    MessageVersionQuery::create()
+                        ->filterByPrimaryKeys($this->messageVersionsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->messageVersionsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collMessageVersions !== null) {
+                foreach ($this->collMessageVersions as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -675,6 +898,15 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if ($this->isColumnModified(MessagePeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
+        if ($this->isColumnModified(MessagePeer::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
+        if ($this->isColumnModified(MessagePeer::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+        }
+        if ($this->isColumnModified(MessagePeer::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `message` (%s) VALUES (%s)',
@@ -703,6 +935,15 @@ abstract class BaseMessage extends BaseObject implements Persistent
                         break;
                     case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
+                        break;
+                    case '`VERSION_CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_CREATED_BY`':
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -811,6 +1052,14 @@ abstract class BaseMessage extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collMessageVersions !== null) {
+                    foreach ($this->collMessageVersions as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -864,6 +1113,15 @@ abstract class BaseMessage extends BaseObject implements Persistent
             case 5:
                 return $this->getUpdatedAt();
                 break;
+            case 6:
+                return $this->getVersion();
+                break;
+            case 7:
+                return $this->getVersionCreatedAt();
+                break;
+            case 8:
+                return $this->getVersionCreatedBy();
+                break;
             default:
                 return null;
                 break;
@@ -899,10 +1157,16 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $keys[3] => $this->getRef(),
             $keys[4] => $this->getCreatedAt(),
             $keys[5] => $this->getUpdatedAt(),
+            $keys[6] => $this->getVersion(),
+            $keys[7] => $this->getVersionCreatedAt(),
+            $keys[8] => $this->getVersionCreatedBy(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collMessageI18ns) {
                 $result['MessageI18ns'] = $this->collMessageI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collMessageVersions) {
+                $result['MessageVersions'] = $this->collMessageVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -956,6 +1220,15 @@ abstract class BaseMessage extends BaseObject implements Persistent
             case 5:
                 $this->setUpdatedAt($value);
                 break;
+            case 6:
+                $this->setVersion($value);
+                break;
+            case 7:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 8:
+                $this->setVersionCreatedBy($value);
+                break;
         } // switch()
     }
 
@@ -986,6 +1259,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if (array_key_exists($keys[3], $arr)) $this->setRef($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setVersion($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersionCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedBy($arr[$keys[8]]);
     }
 
     /**
@@ -1003,6 +1279,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
         if ($this->isColumnModified(MessagePeer::REF)) $criteria->add(MessagePeer::REF, $this->ref);
         if ($this->isColumnModified(MessagePeer::CREATED_AT)) $criteria->add(MessagePeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(MessagePeer::UPDATED_AT)) $criteria->add(MessagePeer::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(MessagePeer::VERSION)) $criteria->add(MessagePeer::VERSION, $this->version);
+        if ($this->isColumnModified(MessagePeer::VERSION_CREATED_AT)) $criteria->add(MessagePeer::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(MessagePeer::VERSION_CREATED_BY)) $criteria->add(MessagePeer::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -1071,6 +1350,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
         $copyObj->setRef($this->getRef());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1082,6 +1364,12 @@ abstract class BaseMessage extends BaseObject implements Persistent
             foreach ($this->getMessageI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addMessageI18n($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getMessageVersions() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addMessageVersion($relObj->copy($deepCopy));
                 }
             }
 
@@ -1148,6 +1436,9 @@ abstract class BaseMessage extends BaseObject implements Persistent
     {
         if ('MessageI18n' == $relationName) {
             $this->initMessageI18ns();
+        }
+        if ('MessageVersion' == $relationName) {
+            $this->initMessageVersions();
         }
     }
 
@@ -1363,6 +1654,213 @@ abstract class BaseMessage extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collMessageVersions collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addMessageVersions()
+     */
+    public function clearMessageVersions()
+    {
+        $this->collMessageVersions = null; // important to set this to null since that means it is uninitialized
+        $this->collMessageVersionsPartial = null;
+    }
+
+    /**
+     * reset is the collMessageVersions collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialMessageVersions($v = true)
+    {
+        $this->collMessageVersionsPartial = $v;
+    }
+
+    /**
+     * Initializes the collMessageVersions collection.
+     *
+     * By default this just sets the collMessageVersions collection to an empty array (like clearcollMessageVersions());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initMessageVersions($overrideExisting = true)
+    {
+        if (null !== $this->collMessageVersions && !$overrideExisting) {
+            return;
+        }
+        $this->collMessageVersions = new PropelObjectCollection();
+        $this->collMessageVersions->setModel('MessageVersion');
+    }
+
+    /**
+     * Gets an array of MessageVersion objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Message is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|MessageVersion[] List of MessageVersion objects
+     * @throws PropelException
+     */
+    public function getMessageVersions($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collMessageVersionsPartial && !$this->isNew();
+        if (null === $this->collMessageVersions || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collMessageVersions) {
+                // return empty collection
+                $this->initMessageVersions();
+            } else {
+                $collMessageVersions = MessageVersionQuery::create(null, $criteria)
+                    ->filterByMessage($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collMessageVersionsPartial && count($collMessageVersions)) {
+                      $this->initMessageVersions(false);
+
+                      foreach($collMessageVersions as $obj) {
+                        if (false == $this->collMessageVersions->contains($obj)) {
+                          $this->collMessageVersions->append($obj);
+                        }
+                      }
+
+                      $this->collMessageVersionsPartial = true;
+                    }
+
+                    return $collMessageVersions;
+                }
+
+                if($partial && $this->collMessageVersions) {
+                    foreach($this->collMessageVersions as $obj) {
+                        if($obj->isNew()) {
+                            $collMessageVersions[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collMessageVersions = $collMessageVersions;
+                $this->collMessageVersionsPartial = false;
+            }
+        }
+
+        return $this->collMessageVersions;
+    }
+
+    /**
+     * Sets a collection of MessageVersion objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $messageVersions A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setMessageVersions(PropelCollection $messageVersions, PropelPDO $con = null)
+    {
+        $this->messageVersionsScheduledForDeletion = $this->getMessageVersions(new Criteria(), $con)->diff($messageVersions);
+
+        foreach ($this->messageVersionsScheduledForDeletion as $messageVersionRemoved) {
+            $messageVersionRemoved->setMessage(null);
+        }
+
+        $this->collMessageVersions = null;
+        foreach ($messageVersions as $messageVersion) {
+            $this->addMessageVersion($messageVersion);
+        }
+
+        $this->collMessageVersions = $messageVersions;
+        $this->collMessageVersionsPartial = false;
+    }
+
+    /**
+     * Returns the number of related MessageVersion objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related MessageVersion objects.
+     * @throws PropelException
+     */
+    public function countMessageVersions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collMessageVersionsPartial && !$this->isNew();
+        if (null === $this->collMessageVersions || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collMessageVersions) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getMessageVersions());
+                }
+                $query = MessageVersionQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByMessage($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collMessageVersions);
+        }
+    }
+
+    /**
+     * Method called to associate a MessageVersion object to this object
+     * through the MessageVersion foreign key attribute.
+     *
+     * @param    MessageVersion $l MessageVersion
+     * @return Message The current object (for fluent API support)
+     */
+    public function addMessageVersion(MessageVersion $l)
+    {
+        if ($this->collMessageVersions === null) {
+            $this->initMessageVersions();
+            $this->collMessageVersionsPartial = true;
+        }
+        if (!$this->collMessageVersions->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddMessageVersion($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	MessageVersion $messageVersion The messageVersion object to add.
+     */
+    protected function doAddMessageVersion($messageVersion)
+    {
+        $this->collMessageVersions[]= $messageVersion;
+        $messageVersion->setMessage($this);
+    }
+
+    /**
+     * @param	MessageVersion $messageVersion The messageVersion object to remove.
+     */
+    public function removeMessageVersion($messageVersion)
+    {
+        if ($this->getMessageVersions()->contains($messageVersion)) {
+            $this->collMessageVersions->remove($this->collMessageVersions->search($messageVersion));
+            if (null === $this->messageVersionsScheduledForDeletion) {
+                $this->messageVersionsScheduledForDeletion = clone $this->collMessageVersions;
+                $this->messageVersionsScheduledForDeletion->clear();
+            }
+            $this->messageVersionsScheduledForDeletion[]= $messageVersion;
+            $messageVersion->setMessage(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1373,9 +1871,13 @@ abstract class BaseMessage extends BaseObject implements Persistent
         $this->ref = null;
         $this->created_at = null;
         $this->updated_at = null;
+        $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1398,6 +1900,11 @@ abstract class BaseMessage extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collMessageVersions) {
+                foreach ($this->collMessageVersions as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         // i18n behavior
@@ -1408,6 +1915,10 @@ abstract class BaseMessage extends BaseObject implements Persistent
             $this->collMessageI18ns->clearIterator();
         }
         $this->collMessageI18ns = null;
+        if ($this->collMessageVersions instanceof PropelCollection) {
+            $this->collMessageVersions->clearIterator();
+        }
+        $this->collMessageVersions = null;
     }
 
     /**
@@ -1615,4 +2126,295 @@ abstract class BaseMessage extends BaseObject implements Persistent
         return $this;
     }
 
+    // versionable behavior
+
+    /**
+     * Enforce a new Version of this object upon next save.
+     *
+     * @return Message
+     */
+    public function enforceVersioning()
+    {
+        $this->enforceVersion = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks whether the current state must be recorded as a version
+     *
+     * @param PropelPDO $con An optional PropelPDO connection to use.
+     *
+     * @return  boolean
+     */
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->alreadyInSave) {
+            return false;
+        }
+
+        if ($this->enforceVersion) {
+            return true;
+        }
+
+        if (MessagePeer::isVersioningEnabled() && ($this->isNew() || $this->isModified() || $this->isDeleted())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a version of the current object and saves it.
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  MessageVersion A version object
+     */
+    public function addVersion($con = null)
+    {
+        $this->enforceVersion = false;
+
+        $version = new MessageVersion();
+        $version->setId($this->getId());
+        $version->setCode($this->getCode());
+        $version->setSecured($this->getSecured());
+        $version->setRef($this->getRef());
+        $version->setCreatedAt($this->getCreatedAt());
+        $version->setUpdatedAt($this->getUpdatedAt());
+        $version->setVersion($this->getVersion());
+        $version->setVersionCreatedAt($this->getVersionCreatedAt());
+        $version->setVersionCreatedBy($this->getVersionCreatedBy());
+        $version->setMessage($this);
+        $version->save($con);
+
+        return $version;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  Message The current object (for fluent API support)
+     * @throws  PropelException - if no object with the given version can be found.
+     */
+    public function toVersion($versionNumber, $con = null)
+    {
+        $version = $this->getOneVersion($versionNumber, $con);
+        if (!$version) {
+            throw new PropelException(sprintf('No Message object found with version %d', $version));
+        }
+        $this->populateFromVersion($version, $con);
+
+        return $this;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   MessageVersion $version The version object to use
+     * @param   PropelPDO $con the connection to use
+     * @param   array $loadedObjects objects thats been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     *
+     * @return  Message The current object (for fluent API support)
+     */
+    public function populateFromVersion($version, $con = null, &$loadedObjects = array())
+    {
+
+        $loadedObjects['Message'][$version->getId()][$version->getVersion()] = $this;
+        $this->setId($version->getId());
+        $this->setCode($version->getCode());
+        $this->setSecured($version->getSecured());
+        $this->setRef($version->getRef());
+        $this->setCreatedAt($version->getCreatedAt());
+        $this->setUpdatedAt($version->getUpdatedAt());
+        $this->setVersion($version->getVersion());
+        $this->setVersionCreatedAt($version->getVersionCreatedAt());
+        $this->setVersionCreatedBy($version->getVersionCreatedBy());
+
+        return $this;
+    }
+
+    /**
+     * Gets the latest persisted version number for the current object
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  integer
+     */
+    public function getLastVersionNumber($con = null)
+    {
+        $v = MessageVersionQuery::create()
+            ->filterByMessage($this)
+            ->orderByVersion('desc')
+            ->findOne($con);
+        if (!$v) {
+            return 0;
+        }
+
+        return $v->getVersion();
+    }
+
+    /**
+     * Checks whether the current object is the latest one
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  boolean
+     */
+    public function isLastVersion($con = null)
+    {
+        return $this->getLastVersionNumber($con) == $this->getVersion();
+    }
+
+    /**
+     * Retrieves a version object for this entity and a version number
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  MessageVersion A version object
+     */
+    public function getOneVersion($versionNumber, $con = null)
+    {
+        return MessageVersionQuery::create()
+            ->filterByMessage($this)
+            ->filterByVersion($versionNumber)
+            ->findOne($con);
+    }
+
+    /**
+     * Gets all the versions of this object, in incremental order
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  PropelObjectCollection A list of MessageVersion objects
+     */
+    public function getAllVersions($con = null)
+    {
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(MessageVersionPeer::VERSION);
+
+        return $this->getMessageVersions($criteria, $con);
+    }
+
+    /**
+     * Compares the current object with another of its version.
+     * <code>
+     * print_r($book->compareVersion(1));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $versionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->toArray();
+        $toVersion = $this->getOneVersion($versionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Compares two versions of the current object.
+     * <code>
+     * print_r($book->compareVersions(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $fromVersionNumber
+     * @param   integer   $toVersionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->getOneVersion($fromVersionNumber, $con)->toArray();
+        $toVersion = $this->getOneVersion($toVersionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Computes the diff between two versions.
+     * <code>
+     * print_r($this->computeDiff(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
+    {
+        $fromVersionNumber = $fromVersion['Version'];
+        $toVersionNumber = $toVersion['Version'];
+        $ignoredColumns = array_merge(array(
+            'Version',
+            'VersionCreatedAt',
+            'VersionCreatedBy',
+        ), $ignoredColumns);
+        $diff = array();
+        foreach ($fromVersion as $key => $value) {
+            if (in_array($key, $ignoredColumns)) {
+                continue;
+            }
+            if ($toVersion[$key] != $value) {
+                switch ($keys) {
+                    case 'versions':
+                        $diff[$fromVersionNumber][$key] = $value;
+                        $diff[$toVersionNumber][$key] = $toVersion[$key];
+                        break;
+                    default:
+                        $diff[$key] = array(
+                            $fromVersionNumber => $value,
+                            $toVersionNumber => $toVersion[$key],
+                        );
+                        break;
+                }
+            }
+        }
+
+        return $diff;
+    }
+    /**
+     * retrieve the last $number versions.
+     *
+     * @param integer $number the number of record to return.
+     * @param MessageVersionQuery|Criteria $criteria Additional criteria to filter.
+     * @param PropelPDO $con An optional connection to use.
+     *
+     * @return PropelCollection|MessageVersion[] List of MessageVersion objects
+     */
+    public function getLastVersions($number = 10, $criteria = null, PropelPDO $con = null)
+    {
+        $criteria = MessageVersionQuery::create(null, $criteria);
+        $criteria->addDescendingOrderByColumn(MessageVersionPeer::VERSION);
+        $criteria->limit($number);
+
+        return $this->getMessageVersions($criteria, $con);
+    }
 }

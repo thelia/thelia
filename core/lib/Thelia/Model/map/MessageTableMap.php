@@ -48,6 +48,9 @@ class MessageTableMap extends TableMap
         $this->addColumn('REF', 'Ref', 'VARCHAR', false, 255, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
+        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 
@@ -57,6 +60,7 @@ class MessageTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('MessageI18n', 'Thelia\\Model\\MessageI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'MessageI18ns');
+        $this->addRelation('MessageVersion', 'Thelia\\Model\\MessageVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'MessageVersions');
     } // buildRelations()
 
     /**
@@ -70,6 +74,7 @@ class MessageTableMap extends TableMap
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
             'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, description_html', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
+            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
         );
     } // getBehaviors()
 

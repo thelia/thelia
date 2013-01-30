@@ -9,42 +9,32 @@ use \PDOStatement;
 use \Propel;
 use \PropelException;
 use \PropelPDO;
-use Thelia\Model\AccessoryPeer;
-use Thelia\Model\ContentAssocPeer;
-use Thelia\Model\DocumentPeer;
-use Thelia\Model\FeatureProdPeer;
-use Thelia\Model\ImagePeer;
-use Thelia\Model\Product;
-use Thelia\Model\ProductCategoryPeer;
-use Thelia\Model\ProductI18nPeer;
 use Thelia\Model\ProductPeer;
+use Thelia\Model\ProductVersion;
 use Thelia\Model\ProductVersionPeer;
-use Thelia\Model\RewritingPeer;
-use Thelia\Model\StockPeer;
-use Thelia\Model\TaxRulePeer;
-use Thelia\Model\map\ProductTableMap;
+use Thelia\Model\map\ProductVersionTableMap;
 
 /**
- * Base static class for performing query and update operations on the 'product' table.
+ * Base static class for performing query and update operations on the 'product_version' table.
  *
  *
  *
  * @package propel.generator.Thelia.Model.om
  */
-abstract class BaseProductPeer
+abstract class BaseProductVersionPeer
 {
 
     /** the default database name for this class */
     const DATABASE_NAME = 'thelia';
 
     /** the table name for this class */
-    const TABLE_NAME = 'product';
+    const TABLE_NAME = 'product_version';
 
     /** the related Propel class for this table */
-    const OM_CLASS = 'Thelia\\Model\\Product';
+    const OM_CLASS = 'Thelia\\Model\\ProductVersion';
 
     /** the related TableMap class for this table */
-    const TM_CLASS = 'ProductTableMap';
+    const TM_CLASS = 'ProductVersionTableMap';
 
     /** The total number of columns. */
     const NUM_COLUMNS = 17;
@@ -56,92 +46,78 @@ abstract class BaseProductPeer
     const NUM_HYDRATE_COLUMNS = 17;
 
     /** the column name for the ID field */
-    const ID = 'product.ID';
+    const ID = 'product_version.ID';
 
     /** the column name for the TAX_RULE_ID field */
-    const TAX_RULE_ID = 'product.TAX_RULE_ID';
+    const TAX_RULE_ID = 'product_version.TAX_RULE_ID';
 
     /** the column name for the REF field */
-    const REF = 'product.REF';
+    const REF = 'product_version.REF';
 
     /** the column name for the PRICE field */
-    const PRICE = 'product.PRICE';
+    const PRICE = 'product_version.PRICE';
 
     /** the column name for the PRICE2 field */
-    const PRICE2 = 'product.PRICE2';
+    const PRICE2 = 'product_version.PRICE2';
 
     /** the column name for the ECOTAX field */
-    const ECOTAX = 'product.ECOTAX';
+    const ECOTAX = 'product_version.ECOTAX';
 
     /** the column name for the NEWNESS field */
-    const NEWNESS = 'product.NEWNESS';
+    const NEWNESS = 'product_version.NEWNESS';
 
     /** the column name for the PROMO field */
-    const PROMO = 'product.PROMO';
+    const PROMO = 'product_version.PROMO';
 
     /** the column name for the STOCK field */
-    const STOCK = 'product.STOCK';
+    const STOCK = 'product_version.STOCK';
 
     /** the column name for the VISIBLE field */
-    const VISIBLE = 'product.VISIBLE';
+    const VISIBLE = 'product_version.VISIBLE';
 
     /** the column name for the WEIGHT field */
-    const WEIGHT = 'product.WEIGHT';
+    const WEIGHT = 'product_version.WEIGHT';
 
     /** the column name for the POSITION field */
-    const POSITION = 'product.POSITION';
+    const POSITION = 'product_version.POSITION';
 
     /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'product.CREATED_AT';
+    const CREATED_AT = 'product_version.CREATED_AT';
 
     /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'product.UPDATED_AT';
+    const UPDATED_AT = 'product_version.UPDATED_AT';
 
     /** the column name for the VERSION field */
-    const VERSION = 'product.VERSION';
+    const VERSION = 'product_version.VERSION';
 
     /** the column name for the VERSION_CREATED_AT field */
-    const VERSION_CREATED_AT = 'product.VERSION_CREATED_AT';
+    const VERSION_CREATED_AT = 'product_version.VERSION_CREATED_AT';
 
     /** the column name for the VERSION_CREATED_BY field */
-    const VERSION_CREATED_BY = 'product.VERSION_CREATED_BY';
+    const VERSION_CREATED_BY = 'product_version.VERSION_CREATED_BY';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
 
     /**
-     * An identiy map to hold any loaded instances of Product objects.
+     * An identiy map to hold any loaded instances of ProductVersion objects.
      * This must be public so that other peer classes can access this when hydrating from JOIN
      * queries.
-     * @var        array Product[]
+     * @var        array ProductVersion[]
      */
     public static $instances = array();
 
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations
-     * @var        string
-     */
-    const DEFAULT_LOCALE = 'en_EN';
-    // versionable behavior
-
-    /**
-     * Whether the versioning is enabled
-     */
-    static $isVersioningEnabled = true;
 
     /**
      * holds an array of fieldnames
      *
      * first dimension keys are the type constants
-     * e.g. ProductPeer::$fieldNames[ProductPeer::TYPE_PHPNAME][0] = 'Id'
+     * e.g. ProductVersionPeer::$fieldNames[ProductVersionPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
         BasePeer::TYPE_PHPNAME => array ('Id', 'TaxRuleId', 'Ref', 'Price', 'Price2', 'Ecotax', 'Newness', 'Promo', 'Stock', 'Visible', 'Weight', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
         BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'taxRuleId', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'stock', 'visible', 'weight', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        BasePeer::TYPE_COLNAME => array (ProductPeer::ID, ProductPeer::TAX_RULE_ID, ProductPeer::REF, ProductPeer::PRICE, ProductPeer::PRICE2, ProductPeer::ECOTAX, ProductPeer::NEWNESS, ProductPeer::PROMO, ProductPeer::STOCK, ProductPeer::VISIBLE, ProductPeer::WEIGHT, ProductPeer::POSITION, ProductPeer::CREATED_AT, ProductPeer::UPDATED_AT, ProductPeer::VERSION, ProductPeer::VERSION_CREATED_AT, ProductPeer::VERSION_CREATED_BY, ),
+        BasePeer::TYPE_COLNAME => array (ProductVersionPeer::ID, ProductVersionPeer::TAX_RULE_ID, ProductVersionPeer::REF, ProductVersionPeer::PRICE, ProductVersionPeer::PRICE2, ProductVersionPeer::ECOTAX, ProductVersionPeer::NEWNESS, ProductVersionPeer::PROMO, ProductVersionPeer::STOCK, ProductVersionPeer::VISIBLE, ProductVersionPeer::WEIGHT, ProductVersionPeer::POSITION, ProductVersionPeer::CREATED_AT, ProductVersionPeer::UPDATED_AT, ProductVersionPeer::VERSION, ProductVersionPeer::VERSION_CREATED_AT, ProductVersionPeer::VERSION_CREATED_BY, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAX_RULE_ID', 'REF', 'PRICE', 'PRICE2', 'ECOTAX', 'NEWNESS', 'PROMO', 'STOCK', 'VISIBLE', 'WEIGHT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
         BasePeer::TYPE_FIELDNAME => array ('id', 'tax_rule_id', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'stock', 'visible', 'weight', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
@@ -151,12 +127,12 @@ abstract class BaseProductPeer
      * holds an array of keys for quick access to the fieldnames array
      *
      * first dimension keys are the type constants
-     * e.g. ProductPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
+     * e.g. ProductVersionPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
         BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Price' => 3, 'Price2' => 4, 'Ecotax' => 5, 'Newness' => 6, 'Promo' => 7, 'Stock' => 8, 'Visible' => 9, 'Weight' => 10, 'Position' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'Version' => 14, 'VersionCreatedAt' => 15, 'VersionCreatedBy' => 16, ),
         BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'stock' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'version' => 14, 'versionCreatedAt' => 15, 'versionCreatedBy' => 16, ),
-        BasePeer::TYPE_COLNAME => array (ProductPeer::ID => 0, ProductPeer::TAX_RULE_ID => 1, ProductPeer::REF => 2, ProductPeer::PRICE => 3, ProductPeer::PRICE2 => 4, ProductPeer::ECOTAX => 5, ProductPeer::NEWNESS => 6, ProductPeer::PROMO => 7, ProductPeer::STOCK => 8, ProductPeer::VISIBLE => 9, ProductPeer::WEIGHT => 10, ProductPeer::POSITION => 11, ProductPeer::CREATED_AT => 12, ProductPeer::UPDATED_AT => 13, ProductPeer::VERSION => 14, ProductPeer::VERSION_CREATED_AT => 15, ProductPeer::VERSION_CREATED_BY => 16, ),
+        BasePeer::TYPE_COLNAME => array (ProductVersionPeer::ID => 0, ProductVersionPeer::TAX_RULE_ID => 1, ProductVersionPeer::REF => 2, ProductVersionPeer::PRICE => 3, ProductVersionPeer::PRICE2 => 4, ProductVersionPeer::ECOTAX => 5, ProductVersionPeer::NEWNESS => 6, ProductVersionPeer::PROMO => 7, ProductVersionPeer::STOCK => 8, ProductVersionPeer::VISIBLE => 9, ProductVersionPeer::WEIGHT => 10, ProductVersionPeer::POSITION => 11, ProductVersionPeer::CREATED_AT => 12, ProductVersionPeer::UPDATED_AT => 13, ProductVersionPeer::VERSION => 14, ProductVersionPeer::VERSION_CREATED_AT => 15, ProductVersionPeer::VERSION_CREATED_BY => 16, ),
         BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'PRICE' => 3, 'PRICE2' => 4, 'ECOTAX' => 5, 'NEWNESS' => 6, 'PROMO' => 7, 'STOCK' => 8, 'VISIBLE' => 9, 'WEIGHT' => 10, 'POSITION' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, 'VERSION' => 14, 'VERSION_CREATED_AT' => 15, 'VERSION_CREATED_BY' => 16, ),
         BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'stock' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'created_at' => 12, 'updated_at' => 13, 'version' => 14, 'version_created_at' => 15, 'version_created_by' => 16, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
@@ -174,10 +150,10 @@ abstract class BaseProductPeer
      */
     public static function translateFieldName($name, $fromType, $toType)
     {
-        $toNames = ProductPeer::getFieldNames($toType);
-        $key = isset(ProductPeer::$fieldKeys[$fromType][$name]) ? ProductPeer::$fieldKeys[$fromType][$name] : null;
+        $toNames = ProductVersionPeer::getFieldNames($toType);
+        $key = isset(ProductVersionPeer::$fieldKeys[$fromType][$name]) ? ProductVersionPeer::$fieldKeys[$fromType][$name] : null;
         if ($key === null) {
-            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(ProductPeer::$fieldKeys[$fromType], true));
+            throw new PropelException("'$name' could not be found in the field names of type '$fromType'. These are: " . print_r(ProductVersionPeer::$fieldKeys[$fromType], true));
         }
 
         return $toNames[$key];
@@ -194,11 +170,11 @@ abstract class BaseProductPeer
      */
     public static function getFieldNames($type = BasePeer::TYPE_PHPNAME)
     {
-        if (!array_key_exists($type, ProductPeer::$fieldNames)) {
+        if (!array_key_exists($type, ProductVersionPeer::$fieldNames)) {
             throw new PropelException('Method getFieldNames() expects the parameter $type to be one of the class constants BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME, BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM. ' . $type . ' was given.');
         }
 
-        return ProductPeer::$fieldNames[$type];
+        return ProductVersionPeer::$fieldNames[$type];
     }
 
     /**
@@ -210,12 +186,12 @@ abstract class BaseProductPeer
      *		$c->addJoin(TablePeer::alias("alias1", TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
      * </code>
      * @param      string $alias The alias for the current table.
-     * @param      string $column The column name for current table. (i.e. ProductPeer::COLUMN_NAME).
+     * @param      string $column The column name for current table. (i.e. ProductVersionPeer::COLUMN_NAME).
      * @return string
      */
     public static function alias($alias, $column)
     {
-        return str_replace(ProductPeer::TABLE_NAME.'.', $alias.'.', $column);
+        return str_replace(ProductVersionPeer::TABLE_NAME.'.', $alias.'.', $column);
     }
 
     /**
@@ -233,23 +209,23 @@ abstract class BaseProductPeer
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProductPeer::ID);
-            $criteria->addSelectColumn(ProductPeer::TAX_RULE_ID);
-            $criteria->addSelectColumn(ProductPeer::REF);
-            $criteria->addSelectColumn(ProductPeer::PRICE);
-            $criteria->addSelectColumn(ProductPeer::PRICE2);
-            $criteria->addSelectColumn(ProductPeer::ECOTAX);
-            $criteria->addSelectColumn(ProductPeer::NEWNESS);
-            $criteria->addSelectColumn(ProductPeer::PROMO);
-            $criteria->addSelectColumn(ProductPeer::STOCK);
-            $criteria->addSelectColumn(ProductPeer::VISIBLE);
-            $criteria->addSelectColumn(ProductPeer::WEIGHT);
-            $criteria->addSelectColumn(ProductPeer::POSITION);
-            $criteria->addSelectColumn(ProductPeer::CREATED_AT);
-            $criteria->addSelectColumn(ProductPeer::UPDATED_AT);
-            $criteria->addSelectColumn(ProductPeer::VERSION);
-            $criteria->addSelectColumn(ProductPeer::VERSION_CREATED_AT);
-            $criteria->addSelectColumn(ProductPeer::VERSION_CREATED_BY);
+            $criteria->addSelectColumn(ProductVersionPeer::ID);
+            $criteria->addSelectColumn(ProductVersionPeer::TAX_RULE_ID);
+            $criteria->addSelectColumn(ProductVersionPeer::REF);
+            $criteria->addSelectColumn(ProductVersionPeer::PRICE);
+            $criteria->addSelectColumn(ProductVersionPeer::PRICE2);
+            $criteria->addSelectColumn(ProductVersionPeer::ECOTAX);
+            $criteria->addSelectColumn(ProductVersionPeer::NEWNESS);
+            $criteria->addSelectColumn(ProductVersionPeer::PROMO);
+            $criteria->addSelectColumn(ProductVersionPeer::STOCK);
+            $criteria->addSelectColumn(ProductVersionPeer::VISIBLE);
+            $criteria->addSelectColumn(ProductVersionPeer::WEIGHT);
+            $criteria->addSelectColumn(ProductVersionPeer::POSITION);
+            $criteria->addSelectColumn(ProductVersionPeer::CREATED_AT);
+            $criteria->addSelectColumn(ProductVersionPeer::UPDATED_AT);
+            $criteria->addSelectColumn(ProductVersionPeer::VERSION);
+            $criteria->addSelectColumn(ProductVersionPeer::VERSION_CREATED_AT);
+            $criteria->addSelectColumn(ProductVersionPeer::VERSION_CREATED_BY);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.TAX_RULE_ID');
@@ -287,21 +263,21 @@ abstract class BaseProductPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ProductPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ProductVersionPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            ProductPeer::addSelectColumns($criteria);
+            ProductVersionPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
-        $criteria->setDbName(ProductPeer::DATABASE_NAME); // Set the correct dbName
+        $criteria->setDbName(ProductVersionPeer::DATABASE_NAME); // Set the correct dbName
 
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
         // BasePeer returns a PDOStatement
         $stmt = BasePeer::doCount($criteria, $con);
@@ -320,7 +296,7 @@ abstract class BaseProductPeer
      *
      * @param      Criteria $criteria object used to create the SELECT statement.
      * @param      PropelPDO $con
-     * @return                 Product
+     * @return                 ProductVersion
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -328,7 +304,7 @@ abstract class BaseProductPeer
     {
         $critcopy = clone $criteria;
         $critcopy->setLimit(1);
-        $objects = ProductPeer::doSelect($critcopy, $con);
+        $objects = ProductVersionPeer::doSelect($critcopy, $con);
         if ($objects) {
             return $objects[0];
         }
@@ -346,7 +322,7 @@ abstract class BaseProductPeer
      */
     public static function doSelect(Criteria $criteria, PropelPDO $con = null)
     {
-        return ProductPeer::populateObjects(ProductPeer::doSelectStmt($criteria, $con));
+        return ProductVersionPeer::populateObjects(ProductVersionPeer::doSelectStmt($criteria, $con));
     }
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
@@ -364,16 +340,16 @@ abstract class BaseProductPeer
     public static function doSelectStmt(Criteria $criteria, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
         if (!$criteria->hasSelectClause()) {
             $criteria = clone $criteria;
-            ProductPeer::addSelectColumns($criteria);
+            ProductVersionPeer::addSelectColumns($criteria);
         }
 
         // Set the correct dbName
-        $criteria->setDbName(ProductPeer::DATABASE_NAME);
+        $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
 
         // BasePeer returns a PDOStatement
         return BasePeer::doSelect($criteria, $con);
@@ -387,16 +363,16 @@ abstract class BaseProductPeer
      * to the cache in order to ensure that the same objects are always returned by doSelect*()
      * and retrieveByPK*() calls.
      *
-     * @param      Product $obj A Product object.
+     * @param      ProductVersion $obj A ProductVersion object.
      * @param      string $key (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
     public static function addInstanceToPool($obj, $key = null)
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = (string) $obj->getId();
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getVersion()));
             } // if key === null
-            ProductPeer::$instances[$key] = $obj;
+            ProductVersionPeer::$instances[$key] = $obj;
         }
     }
 
@@ -408,7 +384,7 @@ abstract class BaseProductPeer
      * methods in your stub classes -- you may need to explicitly remove objects
      * from the cache in order to prevent returning objects that no longer exist.
      *
-     * @param      mixed $value A Product object or a primary key value.
+     * @param      mixed $value A ProductVersion object or a primary key value.
      *
      * @return void
      * @throws PropelException - if the value is invalid.
@@ -416,17 +392,17 @@ abstract class BaseProductPeer
     public static function removeInstanceFromPool($value)
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
-            if (is_object($value) && $value instanceof Product) {
-                $key = (string) $value->getId();
-            } elseif (is_scalar($value)) {
+            if (is_object($value) && $value instanceof ProductVersion) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getVersion()));
+            } elseif (is_array($value) && count($value) === 2) {
                 // assume we've been passed a primary key
-                $key = (string) $value;
+                $key = serialize(array((string) $value[0], (string) $value[1]));
             } else {
-                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or Product object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or ProductVersion object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
             }
 
-            unset(ProductPeer::$instances[$key]);
+            unset(ProductVersionPeer::$instances[$key]);
         }
     } // removeInstanceFromPool()
 
@@ -437,14 +413,14 @@ abstract class BaseProductPeer
      * a multi-column primary key, a serialize()d version of the primary key will be returned.
      *
      * @param      string $key The key (@see getPrimaryKeyHash()) for this instance.
-     * @return   Product Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
+     * @return   ProductVersion Found object or null if 1) no instance exists for specified key or 2) instance pooling has been disabled.
      * @see        getPrimaryKeyHash()
      */
     public static function getInstanceFromPool($key)
     {
         if (Propel::isInstancePoolingEnabled()) {
-            if (isset(ProductPeer::$instances[$key])) {
-                return ProductPeer::$instances[$key];
+            if (isset(ProductVersionPeer::$instances[$key])) {
+                return ProductVersionPeer::$instances[$key];
             }
         }
 
@@ -458,48 +434,15 @@ abstract class BaseProductPeer
      */
     public static function clearInstancePool()
     {
-        ProductPeer::$instances = array();
+        ProductVersionPeer::$instances = array();
     }
 
     /**
-     * Method to invalidate the instance pool of all tables related to product
+     * Method to invalidate the instance pool of all tables related to product_version
      * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
     {
-        // Invalidate objects in ProductCategoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ProductCategoryPeer::clearInstancePool();
-        // Invalidate objects in FeatureProdPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        FeatureProdPeer::clearInstancePool();
-        // Invalidate objects in StockPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        StockPeer::clearInstancePool();
-        // Invalidate objects in ContentAssocPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ContentAssocPeer::clearInstancePool();
-        // Invalidate objects in ImagePeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ImagePeer::clearInstancePool();
-        // Invalidate objects in DocumentPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        DocumentPeer::clearInstancePool();
-        // Invalidate objects in AccessoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AccessoryPeer::clearInstancePool();
-        // Invalidate objects in AccessoryPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        AccessoryPeer::clearInstancePool();
-        // Invalidate objects in RewritingPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        RewritingPeer::clearInstancePool();
-        // Invalidate objects in ProductI18nPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ProductI18nPeer::clearInstancePool();
-        // Invalidate objects in ProductVersionPeer instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-        ProductVersionPeer::clearInstancePool();
     }
 
     /**
@@ -515,11 +458,11 @@ abstract class BaseProductPeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null) {
+        if ($row[$startcol] === null && $row[$startcol + 14] === null) {
             return null;
         }
 
-        return (string) $row[$startcol];
+        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 14]));
     }
 
     /**
@@ -534,7 +477,7 @@ abstract class BaseProductPeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol];
+        return array((int) $row[$startcol], (int) $row[$startcol + 14]);
     }
 
     /**
@@ -549,11 +492,11 @@ abstract class BaseProductPeer
         $results = array();
 
         // set the class once to avoid overhead in the loop
-        $cls = ProductPeer::getOMClass();
+        $cls = ProductVersionPeer::getOMClass();
         // populate the object(s)
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key = ProductPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj = ProductPeer::getInstanceFromPool($key))) {
+            $key = ProductVersionPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj = ProductVersionPeer::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -562,7 +505,7 @@ abstract class BaseProductPeer
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProductPeer::addInstanceToPool($obj, $key);
+                ProductVersionPeer::addInstanceToPool($obj, $key);
             } // if key exists
         }
         $stmt->closeCursor();
@@ -576,21 +519,21 @@ abstract class BaseProductPeer
      * @param      int $startcol The 0-based offset for reading from the resultset row.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
-     * @return array (Product object, last column rank)
+     * @return array (ProductVersion object, last column rank)
      */
     public static function populateObject($row, $startcol = 0)
     {
-        $key = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol);
-        if (null !== ($obj = ProductPeer::getInstanceFromPool($key))) {
+        $key = ProductVersionPeer::getPrimaryKeyHashFromRow($row, $startcol);
+        if (null !== ($obj = ProductVersionPeer::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $startcol, true); // rehydrate
-            $col = $startcol + ProductPeer::NUM_HYDRATE_COLUMNS;
+            $col = $startcol + ProductVersionPeer::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProductPeer::OM_CLASS;
+            $cls = ProductVersionPeer::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $startcol);
-            ProductPeer::addInstanceToPool($obj, $key);
+            ProductVersionPeer::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -598,7 +541,7 @@ abstract class BaseProductPeer
 
 
     /**
-     * Returns the number of rows matching criteria, joining the related TaxRule table
+     * Returns the number of rows matching criteria, joining the related Product table
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct Whether to select only distinct columns; deprecated: use Criteria->setDistinct() instead.
@@ -606,7 +549,7 @@ abstract class BaseProductPeer
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
      * @return int Number of matching rows.
      */
-    public static function doCountJoinTaxRule(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doCountJoinProduct(Criteria $criteria, $distinct = false, PropelPDO $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         // we're going to modify criteria, so copy it first
         $criteria = clone $criteria;
@@ -614,26 +557,26 @@ abstract class BaseProductPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ProductPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ProductVersionPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            ProductPeer::addSelectColumns($criteria);
+            ProductVersionPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(ProductPeer::DATABASE_NAME);
+        $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(ProductPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+        $criteria->addJoin(ProductVersionPeer::ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -649,61 +592,61 @@ abstract class BaseProductPeer
 
 
     /**
-     * Selects a collection of Product objects pre-filled with their TaxRule objects.
+     * Selects a collection of ProductVersion objects pre-filled with their Product objects.
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Product objects.
+     * @return array           Array of ProductVersion objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
-    public static function doSelectJoinTaxRule(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
+    public static function doSelectJoinProduct(Criteria $criteria, $con = null, $join_behavior = Criteria::LEFT_JOIN)
     {
         $criteria = clone $criteria;
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(ProductPeer::DATABASE_NAME);
+            $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
         }
 
+        ProductVersionPeer::addSelectColumns($criteria);
+        $startcol = ProductVersionPeer::NUM_HYDRATE_COLUMNS;
         ProductPeer::addSelectColumns($criteria);
-        $startcol = ProductPeer::NUM_HYDRATE_COLUMNS;
-        TaxRulePeer::addSelectColumns($criteria);
 
-        $criteria->addJoin(ProductPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+        $criteria->addJoin(ProductVersionPeer::ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = ProductPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = ProductPeer::getInstanceFromPool($key1))) {
+            $key1 = ProductVersionPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ProductVersionPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
 
-                $cls = ProductPeer::getOMClass();
+                $cls = ProductVersionPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                ProductPeer::addInstanceToPool($obj1, $key1);
+                ProductVersionPeer::addInstanceToPool($obj1, $key1);
             } // if $obj1 already loaded
 
-            $key2 = TaxRulePeer::getPrimaryKeyHashFromRow($row, $startcol);
+            $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol);
             if ($key2 !== null) {
-                $obj2 = TaxRulePeer::getInstanceFromPool($key2);
+                $obj2 = ProductPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = TaxRulePeer::getOMClass();
+                    $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol);
-                    TaxRulePeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 already loaded
 
-                // Add the $obj1 (Product) to $obj2 (TaxRule)
-                $obj2->addProduct($obj1);
+                // Add the $obj1 (ProductVersion) to $obj2 (Product)
+                $obj2->addProductVersion($obj1);
 
             } // if joined row was not null
 
@@ -732,26 +675,26 @@ abstract class BaseProductPeer
         // We need to set the primary table name, since in the case that there are no WHERE columns
         // it will be impossible for the BasePeer::createSelectSql() method to determine which
         // tables go into the FROM clause.
-        $criteria->setPrimaryTableName(ProductPeer::TABLE_NAME);
+        $criteria->setPrimaryTableName(ProductVersionPeer::TABLE_NAME);
 
         if ($distinct && !in_array(Criteria::DISTINCT, $criteria->getSelectModifiers())) {
             $criteria->setDistinct();
         }
 
         if (!$criteria->hasSelectClause()) {
-            ProductPeer::addSelectColumns($criteria);
+            ProductVersionPeer::addSelectColumns($criteria);
         }
 
         $criteria->clearOrderByColumns(); // ORDER BY won't ever affect the count
 
         // Set the correct dbName
-        $criteria->setDbName(ProductPeer::DATABASE_NAME);
+        $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
 
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
 
-        $criteria->addJoin(ProductPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+        $criteria->addJoin(ProductVersionPeer::ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doCount($criteria, $con);
 
@@ -766,12 +709,12 @@ abstract class BaseProductPeer
     }
 
     /**
-     * Selects a collection of Product objects pre-filled with all related objects.
+     * Selects a collection of ProductVersion objects pre-filled with all related objects.
      *
      * @param      Criteria  $criteria
      * @param      PropelPDO $con
      * @param      String    $join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN
-     * @return array           Array of Product objects.
+     * @return array           Array of ProductVersion objects.
      * @throws PropelException Any exceptions caught during processing will be
      *		 rethrown wrapped into a PropelException.
      */
@@ -781,50 +724,50 @@ abstract class BaseProductPeer
 
         // Set the correct dbName if it has not been overridden
         if ($criteria->getDbName() == Propel::getDefaultDB()) {
-            $criteria->setDbName(ProductPeer::DATABASE_NAME);
+            $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
         }
 
+        ProductVersionPeer::addSelectColumns($criteria);
+        $startcol2 = ProductVersionPeer::NUM_HYDRATE_COLUMNS;
+
         ProductPeer::addSelectColumns($criteria);
-        $startcol2 = ProductPeer::NUM_HYDRATE_COLUMNS;
+        $startcol3 = $startcol2 + ProductPeer::NUM_HYDRATE_COLUMNS;
 
-        TaxRulePeer::addSelectColumns($criteria);
-        $startcol3 = $startcol2 + TaxRulePeer::NUM_HYDRATE_COLUMNS;
-
-        $criteria->addJoin(ProductPeer::TAX_RULE_ID, TaxRulePeer::ID, $join_behavior);
+        $criteria->addJoin(ProductVersionPeer::ID, ProductPeer::ID, $join_behavior);
 
         $stmt = BasePeer::doSelect($criteria, $con);
         $results = array();
 
         while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
-            $key1 = ProductPeer::getPrimaryKeyHashFromRow($row, 0);
-            if (null !== ($obj1 = ProductPeer::getInstanceFromPool($key1))) {
+            $key1 = ProductVersionPeer::getPrimaryKeyHashFromRow($row, 0);
+            if (null !== ($obj1 = ProductVersionPeer::getInstanceFromPool($key1))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj1->hydrate($row, 0, true); // rehydrate
             } else {
-                $cls = ProductPeer::getOMClass();
+                $cls = ProductVersionPeer::getOMClass();
 
                 $obj1 = new $cls();
                 $obj1->hydrate($row);
-                ProductPeer::addInstanceToPool($obj1, $key1);
+                ProductVersionPeer::addInstanceToPool($obj1, $key1);
             } // if obj1 already loaded
 
-            // Add objects for joined TaxRule rows
+            // Add objects for joined Product rows
 
-            $key2 = TaxRulePeer::getPrimaryKeyHashFromRow($row, $startcol2);
+            $key2 = ProductPeer::getPrimaryKeyHashFromRow($row, $startcol2);
             if ($key2 !== null) {
-                $obj2 = TaxRulePeer::getInstanceFromPool($key2);
+                $obj2 = ProductPeer::getInstanceFromPool($key2);
                 if (!$obj2) {
 
-                    $cls = TaxRulePeer::getOMClass();
+                    $cls = ProductPeer::getOMClass();
 
                     $obj2 = new $cls();
                     $obj2->hydrate($row, $startcol2);
-                    TaxRulePeer::addInstanceToPool($obj2, $key2);
+                    ProductPeer::addInstanceToPool($obj2, $key2);
                 } // if obj2 loaded
 
-                // Add the $obj1 (Product) to the collection in $obj2 (TaxRule)
-                $obj2->addProduct($obj1);
+                // Add the $obj1 (ProductVersion) to the collection in $obj2 (Product)
+                $obj2->addProductVersion($obj1);
             } // if joined row not null
 
             $results[] = $obj1;
@@ -843,7 +786,7 @@ abstract class BaseProductPeer
      */
     public static function getTableMap()
     {
-        return Propel::getDatabaseMap(ProductPeer::DATABASE_NAME)->getTable(ProductPeer::TABLE_NAME);
+        return Propel::getDatabaseMap(ProductVersionPeer::DATABASE_NAME)->getTable(ProductVersionPeer::TABLE_NAME);
     }
 
     /**
@@ -851,9 +794,9 @@ abstract class BaseProductPeer
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getDatabaseMap(BaseProductPeer::DATABASE_NAME);
-      if (!$dbMap->hasTable(BaseProductPeer::TABLE_NAME)) {
-        $dbMap->addTableObject(new ProductTableMap());
+      $dbMap = Propel::getDatabaseMap(BaseProductVersionPeer::DATABASE_NAME);
+      if (!$dbMap->hasTable(BaseProductVersionPeer::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProductVersionTableMap());
       }
     }
 
@@ -865,13 +808,13 @@ abstract class BaseProductPeer
      */
     public static function getOMClass()
     {
-        return ProductPeer::OM_CLASS;
+        return ProductVersionPeer::OM_CLASS;
     }
 
     /**
-     * Performs an INSERT on the database, given a Product or Criteria object.
+     * Performs an INSERT on the database, given a ProductVersion or Criteria object.
      *
-     * @param      mixed $values Criteria or Product object containing data that is used to create the INSERT statement.
+     * @param      mixed $values Criteria or ProductVersion object containing data that is used to create the INSERT statement.
      * @param      PropelPDO $con the PropelPDO connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -880,22 +823,18 @@ abstract class BaseProductPeer
     public static function doInsert($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
         } else {
-            $criteria = $values->buildCriteria(); // build Criteria from Product object
-        }
-
-        if ($criteria->containsKey(ProductPeer::ID) && $criteria->keyContainsValue(ProductPeer::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductPeer::ID.')');
+            $criteria = $values->buildCriteria(); // build Criteria from ProductVersion object
         }
 
 
         // Set the correct dbName
-        $criteria->setDbName(ProductPeer::DATABASE_NAME);
+        $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
 
         try {
             // use transaction because $criteria could contain info
@@ -912,9 +851,9 @@ abstract class BaseProductPeer
     }
 
     /**
-     * Performs an UPDATE on the database, given a Product or Criteria object.
+     * Performs an UPDATE on the database, given a ProductVersion or Criteria object.
      *
-     * @param      mixed $values Criteria or Product object containing data that is used to create the UPDATE statement.
+     * @param      mixed $values Criteria or ProductVersion object containing data that is used to create the UPDATE statement.
      * @param      PropelPDO $con The connection to use (specify PropelPDO connection object to exert more control over transactions).
      * @return int             The number of affected rows (if supported by underlying database driver).
      * @throws PropelException Any exceptions caught during processing will be
@@ -923,35 +862,43 @@ abstract class BaseProductPeer
     public static function doUpdate($values, PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
-        $selectCriteria = new Criteria(ProductPeer::DATABASE_NAME);
+        $selectCriteria = new Criteria(ProductVersionPeer::DATABASE_NAME);
 
         if ($values instanceof Criteria) {
             $criteria = clone $values; // rename for clarity
 
-            $comparison = $criteria->getComparison(ProductPeer::ID);
-            $value = $criteria->remove(ProductPeer::ID);
+            $comparison = $criteria->getComparison(ProductVersionPeer::ID);
+            $value = $criteria->remove(ProductVersionPeer::ID);
             if ($value) {
-                $selectCriteria->add(ProductPeer::ID, $value, $comparison);
+                $selectCriteria->add(ProductVersionPeer::ID, $value, $comparison);
             } else {
-                $selectCriteria->setPrimaryTableName(ProductPeer::TABLE_NAME);
+                $selectCriteria->setPrimaryTableName(ProductVersionPeer::TABLE_NAME);
             }
 
-        } else { // $values is Product object
+            $comparison = $criteria->getComparison(ProductVersionPeer::VERSION);
+            $value = $criteria->remove(ProductVersionPeer::VERSION);
+            if ($value) {
+                $selectCriteria->add(ProductVersionPeer::VERSION, $value, $comparison);
+            } else {
+                $selectCriteria->setPrimaryTableName(ProductVersionPeer::TABLE_NAME);
+            }
+
+        } else { // $values is ProductVersion object
             $criteria = $values->buildCriteria(); // gets full criteria
             $selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
         }
 
         // set the correct dbName
-        $criteria->setDbName(ProductPeer::DATABASE_NAME);
+        $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
 
         return BasePeer::doUpdate($selectCriteria, $criteria, $con);
     }
 
     /**
-     * Deletes all rows from the product table.
+     * Deletes all rows from the product_version table.
      *
      * @param      PropelPDO $con the connection to use
      * @return int             The number of affected rows (if supported by underlying database driver).
@@ -960,19 +907,19 @@ abstract class BaseProductPeer
     public static function doDeleteAll(PropelPDO $con = null)
     {
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
             // use transaction because $criteria could contain info
             // for more than one table or we could emulating ON DELETE CASCADE, etc.
             $con->beginTransaction();
-            $affectedRows += BasePeer::doDeleteAll(ProductPeer::TABLE_NAME, $con, ProductPeer::DATABASE_NAME);
+            $affectedRows += BasePeer::doDeleteAll(ProductVersionPeer::TABLE_NAME, $con, ProductVersionPeer::DATABASE_NAME);
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            ProductPeer::clearInstancePool();
-            ProductPeer::clearRelatedInstancePool();
+            ProductVersionPeer::clearInstancePool();
+            ProductVersionPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -983,9 +930,9 @@ abstract class BaseProductPeer
     }
 
     /**
-     * Performs a DELETE on the database, given a Product or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ProductVersion or Criteria object OR a primary key value.
      *
-     * @param      mixed $values Criteria or Product object or primary key or array of primary keys
+     * @param      mixed $values Criteria or ProductVersion object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param      PropelPDO $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -996,32 +943,40 @@ abstract class BaseProductPeer
      public static function doDelete($values, PropelPDO $con = null)
      {
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_WRITE);
         }
 
         if ($values instanceof Criteria) {
             // invalidate the cache for all objects of this type, since we have no
             // way of knowing (without running a query) what objects should be invalidated
             // from the cache based on this Criteria.
-            ProductPeer::clearInstancePool();
+            ProductVersionPeer::clearInstancePool();
             // rename for clarity
             $criteria = clone $values;
-        } elseif ($values instanceof Product) { // it's a model object
+        } elseif ($values instanceof ProductVersion) { // it's a model object
             // invalidate the cache for this single object
-            ProductPeer::removeInstanceFromPool($values);
+            ProductVersionPeer::removeInstanceFromPool($values);
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProductPeer::DATABASE_NAME);
-            $criteria->add(ProductPeer::ID, (array) $values, Criteria::IN);
-            // invalidate the cache for this object(s)
-            foreach ((array) $values as $singleval) {
-                ProductPeer::removeInstanceFromPool($singleval);
+            $criteria = new Criteria(ProductVersionPeer::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(ProductVersionPeer::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(ProductVersionPeer::VERSION, $value[1]));
+                $criteria->addOr($criterion);
+                // we can invalidate the cache for this single PK
+                ProductVersionPeer::removeInstanceFromPool($value);
             }
         }
 
         // Set the correct dbName
-        $criteria->setDbName(ProductPeer::DATABASE_NAME);
+        $criteria->setDbName(ProductVersionPeer::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -1031,7 +986,7 @@ abstract class BaseProductPeer
             $con->beginTransaction();
 
             $affectedRows += BasePeer::doDelete($criteria, $con);
-            ProductPeer::clearRelatedInstancePool();
+            ProductVersionPeer::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -1042,13 +997,13 @@ abstract class BaseProductPeer
     }
 
     /**
-     * Validates all modified columns of given Product object.
+     * Validates all modified columns of given ProductVersion object.
      * If parameter $columns is either a single column name or an array of column names
      * than only those columns are validated.
      *
      * NOTICE: This does not apply to primary or foreign keys for now.
      *
-     * @param      Product $obj The object to validate.
+     * @param      ProductVersion $obj The object to validate.
      * @param      mixed $cols Column name or array of column names.
      *
      * @return mixed TRUE if all columns are valid or the error message of the first invalid column.
@@ -1058,8 +1013,8 @@ abstract class BaseProductPeer
         $columns = array();
 
         if ($cols) {
-            $dbMap = Propel::getDatabaseMap(ProductPeer::DATABASE_NAME);
-            $tableMap = $dbMap->getTable(ProductPeer::TABLE_NAME);
+            $dbMap = Propel::getDatabaseMap(ProductVersionPeer::DATABASE_NAME);
+            $tableMap = $dbMap->getTable(ProductVersionPeer::TABLE_NAME);
 
             if (! is_array($cols)) {
                 $cols = array($cols);
@@ -1075,93 +1030,35 @@ abstract class BaseProductPeer
 
         }
 
-        return BasePeer::doValidate(ProductPeer::DATABASE_NAME, ProductPeer::TABLE_NAME, $columns);
+        return BasePeer::doValidate(ProductVersionPeer::DATABASE_NAME, ProductVersionPeer::TABLE_NAME, $columns);
     }
 
     /**
-     * Retrieve a single object by pkey.
-     *
-     * @param      int $pk the primary key.
-     * @param      PropelPDO $con the connection to use
-     * @return Product
+     * Retrieve object using using composite pkey values.
+     * @param   int $id
+     * @param   int $version
+     * @param      PropelPDO $con
+     * @return   ProductVersion
      */
-    public static function retrieveByPK($pk, PropelPDO $con = null)
-    {
-
-        if (null !== ($obj = ProductPeer::getInstanceFromPool((string) $pk))) {
-            return $obj;
+    public static function retrieveByPK($id, $version, PropelPDO $con = null) {
+        $_instancePoolKey = serialize(array((string) $id, (string) $version));
+         if (null !== ($obj = ProductVersionPeer::getInstanceFromPool($_instancePoolKey))) {
+             return $obj;
         }
 
         if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
+            $con = Propel::getConnection(ProductVersionPeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
+        $criteria = new Criteria(ProductVersionPeer::DATABASE_NAME);
+        $criteria->add(ProductVersionPeer::ID, $id);
+        $criteria->add(ProductVersionPeer::VERSION, $version);
+        $v = ProductVersionPeer::doSelect($criteria, $con);
 
-        $criteria = new Criteria(ProductPeer::DATABASE_NAME);
-        $criteria->add(ProductPeer::ID, $pk);
-
-        $v = ProductPeer::doSelect($criteria, $con);
-
-        return !empty($v) > 0 ? $v[0] : null;
+        return !empty($v) ? $v[0] : null;
     }
-
-    /**
-     * Retrieve multiple objects by pkey.
-     *
-     * @param      array $pks List of primary keys
-     * @param      PropelPDO $con the connection to use
-     * @return Product[]
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function retrieveByPKs($pks, PropelPDO $con = null)
-    {
-        if ($con === null) {
-            $con = Propel::getConnection(ProductPeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $objs = null;
-        if (empty($pks)) {
-            $objs = array();
-        } else {
-            $criteria = new Criteria(ProductPeer::DATABASE_NAME);
-            $criteria->add(ProductPeer::ID, $pks, Criteria::IN);
-            $objs = ProductPeer::doSelect($criteria, $con);
-        }
-
-        return $objs;
-    }
-
-    // versionable behavior
-
-    /**
-     * Checks whether versioning is enabled
-     *
-     * @return boolean
-     */
-    public static function isVersioningEnabled()
-    {
-        return self::$isVersioningEnabled;
-    }
-
-    /**
-     * Enables versioning
-     */
-    public static function enableVersioning()
-    {
-        self::$isVersioningEnabled = true;
-    }
-
-    /**
-     * Disables versioning
-     */
-    public static function disableVersioning()
-    {
-        self::$isVersioningEnabled = false;
-    }
-
-} // BaseProductPeer
+} // BaseProductVersionPeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-BaseProductPeer::buildTableMap();
+BaseProductVersionPeer::buildTableMap();
 

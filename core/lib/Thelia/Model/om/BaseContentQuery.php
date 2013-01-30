@@ -18,6 +18,7 @@ use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentI18n;
 use Thelia\Model\ContentPeer;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\ContentVersion;
 use Thelia\Model\Document;
 use Thelia\Model\Image;
 use Thelia\Model\Rewriting;
@@ -32,12 +33,18 @@ use Thelia\Model\Rewriting;
  * @method ContentQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method ContentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method ContentQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method ContentQuery orderByVersion($order = Criteria::ASC) Order by the version column
+ * @method ContentQuery orderByVersionCreatedAt($order = Criteria::ASC) Order by the version_created_at column
+ * @method ContentQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
  *
  * @method ContentQuery groupById() Group by the id column
  * @method ContentQuery groupByVisible() Group by the visible column
  * @method ContentQuery groupByPosition() Group by the position column
  * @method ContentQuery groupByCreatedAt() Group by the created_at column
  * @method ContentQuery groupByUpdatedAt() Group by the updated_at column
+ * @method ContentQuery groupByVersion() Group by the version column
+ * @method ContentQuery groupByVersionCreatedAt() Group by the version_created_at column
+ * @method ContentQuery groupByVersionCreatedBy() Group by the version_created_by column
  *
  * @method ContentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method ContentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -67,6 +74,10 @@ use Thelia\Model\Rewriting;
  * @method ContentQuery rightJoinContentI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentI18n relation
  * @method ContentQuery innerJoinContentI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentI18n relation
  *
+ * @method ContentQuery leftJoinContentVersion($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentVersion relation
+ * @method ContentQuery rightJoinContentVersion($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentVersion relation
+ * @method ContentQuery innerJoinContentVersion($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentVersion relation
+ *
  * @method Content findOne(PropelPDO $con = null) Return the first Content matching the query
  * @method Content findOneOrCreate(PropelPDO $con = null) Return the first Content matching the query, or a new Content object populated from the query conditions when no match is found
  *
@@ -75,12 +86,18 @@ use Thelia\Model\Rewriting;
  * @method Content findOneByPosition(int $position) Return the first Content filtered by the position column
  * @method Content findOneByCreatedAt(string $created_at) Return the first Content filtered by the created_at column
  * @method Content findOneByUpdatedAt(string $updated_at) Return the first Content filtered by the updated_at column
+ * @method Content findOneByVersion(int $version) Return the first Content filtered by the version column
+ * @method Content findOneByVersionCreatedAt(string $version_created_at) Return the first Content filtered by the version_created_at column
+ * @method Content findOneByVersionCreatedBy(string $version_created_by) Return the first Content filtered by the version_created_by column
  *
  * @method array findById(int $id) Return Content objects filtered by the id column
  * @method array findByVisible(int $visible) Return Content objects filtered by the visible column
  * @method array findByPosition(int $position) Return Content objects filtered by the position column
  * @method array findByCreatedAt(string $created_at) Return Content objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Content objects filtered by the updated_at column
+ * @method array findByVersion(int $version) Return Content objects filtered by the version column
+ * @method array findByVersionCreatedAt(string $version_created_at) Return Content objects filtered by the version_created_at column
+ * @method array findByVersionCreatedBy(string $version_created_by) Return Content objects filtered by the version_created_by column
  *
  * @package    propel.generator.Thelia.Model.om
  */
@@ -170,7 +187,7 @@ abstract class BaseContentQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `content` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `content` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -452,6 +469,119 @@ abstract class BaseContentQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ContentPeer::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the version column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersion(1234); // WHERE version = 1234
+     * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
+     * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+     * </code>
+     *
+     * @param     mixed $version The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ContentQuery The current query, for fluid interface
+     */
+    public function filterByVersion($version = null, $comparison = null)
+    {
+        if (is_array($version)) {
+            $useMinMax = false;
+            if (isset($version['min'])) {
+                $this->addUsingAlias(ContentPeer::VERSION, $version['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($version['max'])) {
+                $this->addUsingAlias(ContentPeer::VERSION, $version['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContentPeer::VERSION, $version, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedAt('2011-03-14'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt('now'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt(array('max' => 'yesterday')); // WHERE version_created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $versionCreatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ContentQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedAt($versionCreatedAt = null, $comparison = null)
+    {
+        if (is_array($versionCreatedAt)) {
+            $useMinMax = false;
+            if (isset($versionCreatedAt['min'])) {
+                $this->addUsingAlias(ContentPeer::VERSION_CREATED_AT, $versionCreatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($versionCreatedAt['max'])) {
+                $this->addUsingAlias(ContentPeer::VERSION_CREATED_AT, $versionCreatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(ContentPeer::VERSION_CREATED_AT, $versionCreatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_by column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedBy('fooValue');   // WHERE version_created_by = 'fooValue'
+     * $query->filterByVersionCreatedBy('%fooValue%'); // WHERE version_created_by LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $versionCreatedBy The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ContentQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedBy($versionCreatedBy = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($versionCreatedBy)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $versionCreatedBy)) {
+                $versionCreatedBy = str_replace('*', '%', $versionCreatedBy);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(ContentPeer::VERSION_CREATED_BY, $versionCreatedBy, $comparison);
     }
 
     /**
@@ -896,6 +1026,80 @@ abstract class BaseContentQuery extends ModelCriteria
         return $this
             ->joinContentI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ContentI18n', '\Thelia\Model\ContentI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related ContentVersion object
+     *
+     * @param   ContentVersion|PropelObjectCollection $contentVersion  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ContentQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByContentVersion($contentVersion, $comparison = null)
+    {
+        if ($contentVersion instanceof ContentVersion) {
+            return $this
+                ->addUsingAlias(ContentPeer::ID, $contentVersion->getId(), $comparison);
+        } elseif ($contentVersion instanceof PropelObjectCollection) {
+            return $this
+                ->useContentVersionQuery()
+                ->filterByPrimaryKeys($contentVersion->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByContentVersion() only accepts arguments of type ContentVersion or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ContentVersion relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ContentQuery The current query, for fluid interface
+     */
+    public function joinContentVersion($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ContentVersion');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ContentVersion');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ContentVersion relation ContentVersion object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ContentVersionQuery A secondary query class using the current class as primary query
+     */
+    public function useContentVersionQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinContentVersion($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ContentVersion', '\Thelia\Model\ContentVersionQuery');
     }
 
     /**

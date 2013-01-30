@@ -22,6 +22,9 @@ use Thelia\Model\CategoryI18n;
 use Thelia\Model\CategoryI18nQuery;
 use Thelia\Model\CategoryPeer;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\CategoryVersion;
+use Thelia\Model\CategoryVersionPeer;
+use Thelia\Model\CategoryVersionQuery;
 use Thelia\Model\ContentAssoc;
 use Thelia\Model\ContentAssocQuery;
 use Thelia\Model\Document;
@@ -106,6 +109,25 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
+     * The value for the version field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $version;
+
+    /**
+     * The value for the version_created_at field.
+     * @var        string
+     */
+    protected $version_created_at;
+
+    /**
+     * The value for the version_created_by field.
+     * @var        string
+     */
+    protected $version_created_by;
+
+    /**
      * @var        PropelObjectCollection|ProductCategory[] Collection to store aggregation of ProductCategory objects.
      */
     protected $collProductCategorys;
@@ -154,6 +176,12 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $collCategoryI18nsPartial;
 
     /**
+     * @var        PropelObjectCollection|CategoryVersion[] Collection to store aggregation of CategoryVersion objects.
+     */
+    protected $collCategoryVersions;
+    protected $collCategoryVersionsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -180,6 +208,14 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @var        array[CategoryI18n]
      */
     protected $currentTranslations;
+
+    // versionable behavior
+
+
+    /**
+     * @var bool
+     */
+    protected $enforceVersion = false;
 
     /**
      * An array of objects scheduled for deletion.
@@ -228,6 +264,33 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $categoryI18nsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $categoryVersionsScheduledForDeletion = null;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->version = 0;
+    }
+
+    /**
+     * Initializes internal state of BaseCategory object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+    }
 
     /**
      * Get the [id] column value.
@@ -351,6 +414,63 @@ abstract class BaseCategory extends BaseObject implements Persistent
         } else {
             return $dt->format($format);
         }
+    }
+
+    /**
+     * Get the [version] column value.
+     *
+     * @return int
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [version_created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getVersionCreatedAt($format = 'Y-m-d H:i:s')
+    {
+        if ($this->version_created_at === null) {
+            return null;
+        }
+
+        if ($this->version_created_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->version_created_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [version_created_by] column value.
+     *
+     * @return string
+     */
+    public function getVersionCreatedBy()
+    {
+        return $this->version_created_by;
     }
 
     /**
@@ -505,6 +625,71 @@ abstract class BaseCategory extends BaseObject implements Persistent
     } // setUpdatedAt()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param int $v new value
+     * @return Category The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[] = CategoryPeer::VERSION;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Category The current object (for fluent API support)
+     */
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->version_created_at !== null && $tmpDt = new DateTime($this->version_created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->version_created_at = $newDateAsString;
+                $this->modifiedColumns[] = CategoryPeer::VERSION_CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     *
+     * @param string $v new value
+     * @return Category The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[] = CategoryPeer::VERSION_CREATED_BY;
+        }
+
+
+        return $this;
+    } // setVersionCreatedBy()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -514,6 +699,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->version !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -543,6 +732,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->position = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->version = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->version_created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->version_created_by = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -551,7 +743,7 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = CategoryPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = CategoryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Category object", $e);
@@ -629,6 +821,8 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
             $this->collCategoryI18ns = null;
 
+            $this->collCategoryVersions = null;
+
         } // if (deep)
     }
 
@@ -699,6 +893,14 @@ abstract class BaseCategory extends BaseObject implements Persistent
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // versionable behavior
+            if ($this->isVersioningNecessary()) {
+                $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
+                if (!$this->isColumnModified(CategoryPeer::VERSION_CREATED_AT)) {
+                    $this->setVersionCreatedAt(time());
+                }
+                $createVersion = true; // for postSave hook
+            }
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -723,6 +925,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // versionable behavior
+                if (isset($createVersion)) {
+                    $this->addVersion($con);
+                }
                 CategoryPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -904,6 +1110,23 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->categoryVersionsScheduledForDeletion !== null) {
+                if (!$this->categoryVersionsScheduledForDeletion->isEmpty()) {
+                    CategoryVersionQuery::create()
+                        ->filterByPrimaryKeys($this->categoryVersionsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->categoryVersionsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collCategoryVersions !== null) {
+                foreach ($this->collCategoryVersions as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -951,6 +1174,15 @@ abstract class BaseCategory extends BaseObject implements Persistent
         if ($this->isColumnModified(CategoryPeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
+        if ($this->isColumnModified(CategoryPeer::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
+        if ($this->isColumnModified(CategoryPeer::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+        }
+        if ($this->isColumnModified(CategoryPeer::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `category` (%s) VALUES (%s)',
@@ -982,6 +1214,15 @@ abstract class BaseCategory extends BaseObject implements Persistent
                         break;
                     case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
+                        break;
+                    case '`VERSION_CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_CREATED_BY`':
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1146,6 +1387,14 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collCategoryVersions !== null) {
+                    foreach ($this->collCategoryVersions as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1202,6 +1451,15 @@ abstract class BaseCategory extends BaseObject implements Persistent
             case 6:
                 return $this->getUpdatedAt();
                 break;
+            case 7:
+                return $this->getVersion();
+                break;
+            case 8:
+                return $this->getVersionCreatedAt();
+                break;
+            case 9:
+                return $this->getVersionCreatedBy();
+                break;
             default:
                 return null;
                 break;
@@ -1238,6 +1496,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $keys[4] => $this->getPosition(),
             $keys[5] => $this->getCreatedAt(),
             $keys[6] => $this->getUpdatedAt(),
+            $keys[7] => $this->getVersion(),
+            $keys[8] => $this->getVersionCreatedAt(),
+            $keys[9] => $this->getVersionCreatedBy(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collProductCategorys) {
@@ -1263,6 +1524,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
             }
             if (null !== $this->collCategoryI18ns) {
                 $result['CategoryI18ns'] = $this->collCategoryI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCategoryVersions) {
+                $result['CategoryVersions'] = $this->collCategoryVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1319,6 +1583,15 @@ abstract class BaseCategory extends BaseObject implements Persistent
             case 6:
                 $this->setUpdatedAt($value);
                 break;
+            case 7:
+                $this->setVersion($value);
+                break;
+            case 8:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 9:
+                $this->setVersionCreatedBy($value);
+                break;
         } // switch()
     }
 
@@ -1350,6 +1623,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
         if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersion($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setVersionCreatedBy($arr[$keys[9]]);
     }
 
     /**
@@ -1368,6 +1644,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
         if ($this->isColumnModified(CategoryPeer::POSITION)) $criteria->add(CategoryPeer::POSITION, $this->position);
         if ($this->isColumnModified(CategoryPeer::CREATED_AT)) $criteria->add(CategoryPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CategoryPeer::UPDATED_AT)) $criteria->add(CategoryPeer::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CategoryPeer::VERSION)) $criteria->add(CategoryPeer::VERSION, $this->version);
+        if ($this->isColumnModified(CategoryPeer::VERSION_CREATED_AT)) $criteria->add(CategoryPeer::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(CategoryPeer::VERSION_CREATED_BY)) $criteria->add(CategoryPeer::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -1437,6 +1716,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1490,6 +1772,12 @@ abstract class BaseCategory extends BaseObject implements Persistent
             foreach ($this->getCategoryI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCategoryI18n($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCategoryVersions() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCategoryVersion($relObj->copy($deepCopy));
                 }
             }
 
@@ -1577,6 +1865,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
         }
         if ('CategoryI18n' == $relationName) {
             $this->initCategoryI18ns();
+        }
+        if ('CategoryVersion' == $relationName) {
+            $this->initCategoryVersions();
         }
     }
 
@@ -3591,6 +3882,213 @@ abstract class BaseCategory extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCategoryVersions collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCategoryVersions()
+     */
+    public function clearCategoryVersions()
+    {
+        $this->collCategoryVersions = null; // important to set this to null since that means it is uninitialized
+        $this->collCategoryVersionsPartial = null;
+    }
+
+    /**
+     * reset is the collCategoryVersions collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialCategoryVersions($v = true)
+    {
+        $this->collCategoryVersionsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCategoryVersions collection.
+     *
+     * By default this just sets the collCategoryVersions collection to an empty array (like clearcollCategoryVersions());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCategoryVersions($overrideExisting = true)
+    {
+        if (null !== $this->collCategoryVersions && !$overrideExisting) {
+            return;
+        }
+        $this->collCategoryVersions = new PropelObjectCollection();
+        $this->collCategoryVersions->setModel('CategoryVersion');
+    }
+
+    /**
+     * Gets an array of CategoryVersion objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|CategoryVersion[] List of CategoryVersion objects
+     * @throws PropelException
+     */
+    public function getCategoryVersions($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryVersionsPartial && !$this->isNew();
+        if (null === $this->collCategoryVersions || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryVersions) {
+                // return empty collection
+                $this->initCategoryVersions();
+            } else {
+                $collCategoryVersions = CategoryVersionQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collCategoryVersionsPartial && count($collCategoryVersions)) {
+                      $this->initCategoryVersions(false);
+
+                      foreach($collCategoryVersions as $obj) {
+                        if (false == $this->collCategoryVersions->contains($obj)) {
+                          $this->collCategoryVersions->append($obj);
+                        }
+                      }
+
+                      $this->collCategoryVersionsPartial = true;
+                    }
+
+                    return $collCategoryVersions;
+                }
+
+                if($partial && $this->collCategoryVersions) {
+                    foreach($this->collCategoryVersions as $obj) {
+                        if($obj->isNew()) {
+                            $collCategoryVersions[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCategoryVersions = $collCategoryVersions;
+                $this->collCategoryVersionsPartial = false;
+            }
+        }
+
+        return $this->collCategoryVersions;
+    }
+
+    /**
+     * Sets a collection of CategoryVersion objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $categoryVersions A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setCategoryVersions(PropelCollection $categoryVersions, PropelPDO $con = null)
+    {
+        $this->categoryVersionsScheduledForDeletion = $this->getCategoryVersions(new Criteria(), $con)->diff($categoryVersions);
+
+        foreach ($this->categoryVersionsScheduledForDeletion as $categoryVersionRemoved) {
+            $categoryVersionRemoved->setCategory(null);
+        }
+
+        $this->collCategoryVersions = null;
+        foreach ($categoryVersions as $categoryVersion) {
+            $this->addCategoryVersion($categoryVersion);
+        }
+
+        $this->collCategoryVersions = $categoryVersions;
+        $this->collCategoryVersionsPartial = false;
+    }
+
+    /**
+     * Returns the number of related CategoryVersion objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related CategoryVersion objects.
+     * @throws PropelException
+     */
+    public function countCategoryVersions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collCategoryVersionsPartial && !$this->isNew();
+        if (null === $this->collCategoryVersions || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryVersions) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getCategoryVersions());
+                }
+                $query = CategoryVersionQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCategoryVersions);
+        }
+    }
+
+    /**
+     * Method called to associate a CategoryVersion object to this object
+     * through the CategoryVersion foreign key attribute.
+     *
+     * @param    CategoryVersion $l CategoryVersion
+     * @return Category The current object (for fluent API support)
+     */
+    public function addCategoryVersion(CategoryVersion $l)
+    {
+        if ($this->collCategoryVersions === null) {
+            $this->initCategoryVersions();
+            $this->collCategoryVersionsPartial = true;
+        }
+        if (!$this->collCategoryVersions->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryVersion($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	CategoryVersion $categoryVersion The categoryVersion object to add.
+     */
+    protected function doAddCategoryVersion($categoryVersion)
+    {
+        $this->collCategoryVersions[]= $categoryVersion;
+        $categoryVersion->setCategory($this);
+    }
+
+    /**
+     * @param	CategoryVersion $categoryVersion The categoryVersion object to remove.
+     */
+    public function removeCategoryVersion($categoryVersion)
+    {
+        if ($this->getCategoryVersions()->contains($categoryVersion)) {
+            $this->collCategoryVersions->remove($this->collCategoryVersions->search($categoryVersion));
+            if (null === $this->categoryVersionsScheduledForDeletion) {
+                $this->categoryVersionsScheduledForDeletion = clone $this->collCategoryVersions;
+                $this->categoryVersionsScheduledForDeletion->clear();
+            }
+            $this->categoryVersionsScheduledForDeletion[]= $categoryVersion;
+            $categoryVersion->setCategory(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -3602,9 +4100,13 @@ abstract class BaseCategory extends BaseObject implements Persistent
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
+        $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -3662,6 +4164,11 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCategoryVersions) {
+                foreach ($this->collCategoryVersions as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         // i18n behavior
@@ -3700,6 +4207,10 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->collCategoryI18ns->clearIterator();
         }
         $this->collCategoryI18ns = null;
+        if ($this->collCategoryVersions instanceof PropelCollection) {
+            $this->collCategoryVersions->clearIterator();
+        }
+        $this->collCategoryVersions = null;
     }
 
     /**
@@ -3931,4 +4442,297 @@ abstract class BaseCategory extends BaseObject implements Persistent
         return $this;
     }
 
+    // versionable behavior
+
+    /**
+     * Enforce a new Version of this object upon next save.
+     *
+     * @return Category
+     */
+    public function enforceVersioning()
+    {
+        $this->enforceVersion = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks whether the current state must be recorded as a version
+     *
+     * @param PropelPDO $con An optional PropelPDO connection to use.
+     *
+     * @return  boolean
+     */
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->alreadyInSave) {
+            return false;
+        }
+
+        if ($this->enforceVersion) {
+            return true;
+        }
+
+        if (CategoryPeer::isVersioningEnabled() && ($this->isNew() || $this->isModified() || $this->isDeleted())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a version of the current object and saves it.
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  CategoryVersion A version object
+     */
+    public function addVersion($con = null)
+    {
+        $this->enforceVersion = false;
+
+        $version = new CategoryVersion();
+        $version->setId($this->getId());
+        $version->setParent($this->getParent());
+        $version->setLink($this->getLink());
+        $version->setVisible($this->getVisible());
+        $version->setPosition($this->getPosition());
+        $version->setCreatedAt($this->getCreatedAt());
+        $version->setUpdatedAt($this->getUpdatedAt());
+        $version->setVersion($this->getVersion());
+        $version->setVersionCreatedAt($this->getVersionCreatedAt());
+        $version->setVersionCreatedBy($this->getVersionCreatedBy());
+        $version->setCategory($this);
+        $version->save($con);
+
+        return $version;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  Category The current object (for fluent API support)
+     * @throws  PropelException - if no object with the given version can be found.
+     */
+    public function toVersion($versionNumber, $con = null)
+    {
+        $version = $this->getOneVersion($versionNumber, $con);
+        if (!$version) {
+            throw new PropelException(sprintf('No Category object found with version %d', $version));
+        }
+        $this->populateFromVersion($version, $con);
+
+        return $this;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   CategoryVersion $version The version object to use
+     * @param   PropelPDO $con the connection to use
+     * @param   array $loadedObjects objects thats been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     *
+     * @return  Category The current object (for fluent API support)
+     */
+    public function populateFromVersion($version, $con = null, &$loadedObjects = array())
+    {
+
+        $loadedObjects['Category'][$version->getId()][$version->getVersion()] = $this;
+        $this->setId($version->getId());
+        $this->setParent($version->getParent());
+        $this->setLink($version->getLink());
+        $this->setVisible($version->getVisible());
+        $this->setPosition($version->getPosition());
+        $this->setCreatedAt($version->getCreatedAt());
+        $this->setUpdatedAt($version->getUpdatedAt());
+        $this->setVersion($version->getVersion());
+        $this->setVersionCreatedAt($version->getVersionCreatedAt());
+        $this->setVersionCreatedBy($version->getVersionCreatedBy());
+
+        return $this;
+    }
+
+    /**
+     * Gets the latest persisted version number for the current object
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  integer
+     */
+    public function getLastVersionNumber($con = null)
+    {
+        $v = CategoryVersionQuery::create()
+            ->filterByCategory($this)
+            ->orderByVersion('desc')
+            ->findOne($con);
+        if (!$v) {
+            return 0;
+        }
+
+        return $v->getVersion();
+    }
+
+    /**
+     * Checks whether the current object is the latest one
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  boolean
+     */
+    public function isLastVersion($con = null)
+    {
+        return $this->getLastVersionNumber($con) == $this->getVersion();
+    }
+
+    /**
+     * Retrieves a version object for this entity and a version number
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  CategoryVersion A version object
+     */
+    public function getOneVersion($versionNumber, $con = null)
+    {
+        return CategoryVersionQuery::create()
+            ->filterByCategory($this)
+            ->filterByVersion($versionNumber)
+            ->findOne($con);
+    }
+
+    /**
+     * Gets all the versions of this object, in incremental order
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  PropelObjectCollection A list of CategoryVersion objects
+     */
+    public function getAllVersions($con = null)
+    {
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(CategoryVersionPeer::VERSION);
+
+        return $this->getCategoryVersions($criteria, $con);
+    }
+
+    /**
+     * Compares the current object with another of its version.
+     * <code>
+     * print_r($book->compareVersion(1));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $versionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->toArray();
+        $toVersion = $this->getOneVersion($versionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Compares two versions of the current object.
+     * <code>
+     * print_r($book->compareVersions(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $fromVersionNumber
+     * @param   integer   $toVersionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->getOneVersion($fromVersionNumber, $con)->toArray();
+        $toVersion = $this->getOneVersion($toVersionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Computes the diff between two versions.
+     * <code>
+     * print_r($this->computeDiff(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
+    {
+        $fromVersionNumber = $fromVersion['Version'];
+        $toVersionNumber = $toVersion['Version'];
+        $ignoredColumns = array_merge(array(
+            'Version',
+            'VersionCreatedAt',
+            'VersionCreatedBy',
+        ), $ignoredColumns);
+        $diff = array();
+        foreach ($fromVersion as $key => $value) {
+            if (in_array($key, $ignoredColumns)) {
+                continue;
+            }
+            if ($toVersion[$key] != $value) {
+                switch ($keys) {
+                    case 'versions':
+                        $diff[$fromVersionNumber][$key] = $value;
+                        $diff[$toVersionNumber][$key] = $toVersion[$key];
+                        break;
+                    default:
+                        $diff[$key] = array(
+                            $fromVersionNumber => $value,
+                            $toVersionNumber => $toVersion[$key],
+                        );
+                        break;
+                }
+            }
+        }
+
+        return $diff;
+    }
+    /**
+     * retrieve the last $number versions.
+     *
+     * @param integer $number the number of record to return.
+     * @param CategoryVersionQuery|Criteria $criteria Additional criteria to filter.
+     * @param PropelPDO $con An optional connection to use.
+     *
+     * @return PropelCollection|CategoryVersion[] List of CategoryVersion objects
+     */
+    public function getLastVersions($number = 10, $criteria = null, PropelPDO $con = null)
+    {
+        $criteria = CategoryVersionQuery::create(null, $criteria);
+        $criteria->addDescendingOrderByColumn(CategoryVersionPeer::VERSION);
+        $criteria->limit($number);
+
+        return $this->getCategoryVersions($criteria, $con);
+    }
 }

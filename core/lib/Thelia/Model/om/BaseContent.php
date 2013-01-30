@@ -24,6 +24,9 @@ use Thelia\Model\ContentI18n;
 use Thelia\Model\ContentI18nQuery;
 use Thelia\Model\ContentPeer;
 use Thelia\Model\ContentQuery;
+use Thelia\Model\ContentVersion;
+use Thelia\Model\ContentVersionPeer;
+use Thelia\Model\ContentVersionQuery;
 use Thelia\Model\Document;
 use Thelia\Model\DocumentQuery;
 use Thelia\Model\Image;
@@ -90,6 +93,25 @@ abstract class BaseContent extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
+     * The value for the version field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $version;
+
+    /**
+     * The value for the version_created_at field.
+     * @var        string
+     */
+    protected $version_created_at;
+
+    /**
+     * The value for the version_created_by field.
+     * @var        string
+     */
+    protected $version_created_by;
+
+    /**
      * @var        PropelObjectCollection|ContentAssoc[] Collection to store aggregation of ContentAssoc objects.
      */
     protected $collContentAssocs;
@@ -126,6 +148,12 @@ abstract class BaseContent extends BaseObject implements Persistent
     protected $collContentI18nsPartial;
 
     /**
+     * @var        PropelObjectCollection|ContentVersion[] Collection to store aggregation of ContentVersion objects.
+     */
+    protected $collContentVersions;
+    protected $collContentVersionsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -152,6 +180,14 @@ abstract class BaseContent extends BaseObject implements Persistent
      * @var        array[ContentI18n]
      */
     protected $currentTranslations;
+
+    // versionable behavior
+
+
+    /**
+     * @var bool
+     */
+    protected $enforceVersion = false;
 
     /**
      * An array of objects scheduled for deletion.
@@ -188,6 +224,33 @@ abstract class BaseContent extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $contentI18nsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $contentVersionsScheduledForDeletion = null;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->version = 0;
+    }
+
+    /**
+     * Initializes internal state of BaseContent object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+    }
 
     /**
      * Get the [id] column value.
@@ -291,6 +354,63 @@ abstract class BaseContent extends BaseObject implements Persistent
         } else {
             return $dt->format($format);
         }
+    }
+
+    /**
+     * Get the [version] column value.
+     *
+     * @return int
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [version_created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getVersionCreatedAt($format = 'Y-m-d H:i:s')
+    {
+        if ($this->version_created_at === null) {
+            return null;
+        }
+
+        if ($this->version_created_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->version_created_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [version_created_by] column value.
+     *
+     * @return string
+     */
+    public function getVersionCreatedBy()
+    {
+        return $this->version_created_by;
     }
 
     /**
@@ -403,6 +523,71 @@ abstract class BaseContent extends BaseObject implements Persistent
     } // setUpdatedAt()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param int $v new value
+     * @return Content The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[] = ContentPeer::VERSION;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Content The current object (for fluent API support)
+     */
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->version_created_at !== null && $tmpDt = new DateTime($this->version_created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->version_created_at = $newDateAsString;
+                $this->modifiedColumns[] = ContentPeer::VERSION_CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     *
+     * @param string $v new value
+     * @return Content The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[] = ContentPeer::VERSION_CREATED_BY;
+        }
+
+
+        return $this;
+    } // setVersionCreatedBy()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -412,6 +597,10 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->version !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -439,6 +628,9 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->position = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->created_at = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
             $this->updated_at = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->version = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->version_created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->version_created_by = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -447,7 +639,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 5; // 5 = ContentPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = ContentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Content object", $e);
@@ -521,6 +713,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             $this->collContentI18ns = null;
 
+            $this->collContentVersions = null;
+
         } // if (deep)
     }
 
@@ -591,6 +785,14 @@ abstract class BaseContent extends BaseObject implements Persistent
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // versionable behavior
+            if ($this->isVersioningNecessary()) {
+                $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
+                if (!$this->isColumnModified(ContentPeer::VERSION_CREATED_AT)) {
+                    $this->setVersionCreatedAt(time());
+                }
+                $createVersion = true; // for postSave hook
+            }
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -615,6 +817,10 @@ abstract class BaseContent extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // versionable behavior
+                if (isset($createVersion)) {
+                    $this->addVersion($con);
+                }
                 ContentPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -762,6 +968,23 @@ abstract class BaseContent extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->contentVersionsScheduledForDeletion !== null) {
+                if (!$this->contentVersionsScheduledForDeletion->isEmpty()) {
+                    ContentVersionQuery::create()
+                        ->filterByPrimaryKeys($this->contentVersionsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->contentVersionsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collContentVersions !== null) {
+                foreach ($this->collContentVersions as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -803,6 +1026,15 @@ abstract class BaseContent extends BaseObject implements Persistent
         if ($this->isColumnModified(ContentPeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
+        if ($this->isColumnModified(ContentPeer::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
+        if ($this->isColumnModified(ContentPeer::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+        }
+        if ($this->isColumnModified(ContentPeer::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `content` (%s) VALUES (%s)',
@@ -828,6 +1060,15 @@ abstract class BaseContent extends BaseObject implements Persistent
                         break;
                     case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
+                        break;
+                    case '`VERSION_CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_CREATED_BY`':
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -976,6 +1217,14 @@ abstract class BaseContent extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collContentVersions !== null) {
+                    foreach ($this->collContentVersions as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1026,6 +1275,15 @@ abstract class BaseContent extends BaseObject implements Persistent
             case 4:
                 return $this->getUpdatedAt();
                 break;
+            case 5:
+                return $this->getVersion();
+                break;
+            case 6:
+                return $this->getVersionCreatedAt();
+                break;
+            case 7:
+                return $this->getVersionCreatedBy();
+                break;
             default:
                 return null;
                 break;
@@ -1060,6 +1318,9 @@ abstract class BaseContent extends BaseObject implements Persistent
             $keys[2] => $this->getPosition(),
             $keys[3] => $this->getCreatedAt(),
             $keys[4] => $this->getUpdatedAt(),
+            $keys[5] => $this->getVersion(),
+            $keys[6] => $this->getVersionCreatedAt(),
+            $keys[7] => $this->getVersionCreatedBy(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collContentAssocs) {
@@ -1079,6 +1340,9 @@ abstract class BaseContent extends BaseObject implements Persistent
             }
             if (null !== $this->collContentI18ns) {
                 $result['ContentI18ns'] = $this->collContentI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collContentVersions) {
+                $result['ContentVersions'] = $this->collContentVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1129,6 +1393,15 @@ abstract class BaseContent extends BaseObject implements Persistent
             case 4:
                 $this->setUpdatedAt($value);
                 break;
+            case 5:
+                $this->setVersion($value);
+                break;
+            case 6:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 7:
+                $this->setVersionCreatedBy($value);
+                break;
         } // switch()
     }
 
@@ -1158,6 +1431,9 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (array_key_exists($keys[2], $arr)) $this->setPosition($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setVersion($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setVersionCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersionCreatedBy($arr[$keys[7]]);
     }
 
     /**
@@ -1174,6 +1450,9 @@ abstract class BaseContent extends BaseObject implements Persistent
         if ($this->isColumnModified(ContentPeer::POSITION)) $criteria->add(ContentPeer::POSITION, $this->position);
         if ($this->isColumnModified(ContentPeer::CREATED_AT)) $criteria->add(ContentPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ContentPeer::UPDATED_AT)) $criteria->add(ContentPeer::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ContentPeer::VERSION)) $criteria->add(ContentPeer::VERSION, $this->version);
+        if ($this->isColumnModified(ContentPeer::VERSION_CREATED_AT)) $criteria->add(ContentPeer::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(ContentPeer::VERSION_CREATED_BY)) $criteria->add(ContentPeer::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -1241,6 +1520,9 @@ abstract class BaseContent extends BaseObject implements Persistent
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1282,6 +1564,12 @@ abstract class BaseContent extends BaseObject implements Persistent
             foreach ($this->getContentI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addContentI18n($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getContentVersions() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addContentVersion($relObj->copy($deepCopy));
                 }
             }
 
@@ -1363,6 +1651,9 @@ abstract class BaseContent extends BaseObject implements Persistent
         }
         if ('ContentI18n' == $relationName) {
             $this->initContentI18ns();
+        }
+        if ('ContentVersion' == $relationName) {
+            $this->initContentVersions();
         }
     }
 
@@ -2913,6 +3204,213 @@ abstract class BaseContent extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collContentVersions collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addContentVersions()
+     */
+    public function clearContentVersions()
+    {
+        $this->collContentVersions = null; // important to set this to null since that means it is uninitialized
+        $this->collContentVersionsPartial = null;
+    }
+
+    /**
+     * reset is the collContentVersions collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialContentVersions($v = true)
+    {
+        $this->collContentVersionsPartial = $v;
+    }
+
+    /**
+     * Initializes the collContentVersions collection.
+     *
+     * By default this just sets the collContentVersions collection to an empty array (like clearcollContentVersions());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initContentVersions($overrideExisting = true)
+    {
+        if (null !== $this->collContentVersions && !$overrideExisting) {
+            return;
+        }
+        $this->collContentVersions = new PropelObjectCollection();
+        $this->collContentVersions->setModel('ContentVersion');
+    }
+
+    /**
+     * Gets an array of ContentVersion objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Content is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|ContentVersion[] List of ContentVersion objects
+     * @throws PropelException
+     */
+    public function getContentVersions($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collContentVersionsPartial && !$this->isNew();
+        if (null === $this->collContentVersions || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collContentVersions) {
+                // return empty collection
+                $this->initContentVersions();
+            } else {
+                $collContentVersions = ContentVersionQuery::create(null, $criteria)
+                    ->filterByContent($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collContentVersionsPartial && count($collContentVersions)) {
+                      $this->initContentVersions(false);
+
+                      foreach($collContentVersions as $obj) {
+                        if (false == $this->collContentVersions->contains($obj)) {
+                          $this->collContentVersions->append($obj);
+                        }
+                      }
+
+                      $this->collContentVersionsPartial = true;
+                    }
+
+                    return $collContentVersions;
+                }
+
+                if($partial && $this->collContentVersions) {
+                    foreach($this->collContentVersions as $obj) {
+                        if($obj->isNew()) {
+                            $collContentVersions[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collContentVersions = $collContentVersions;
+                $this->collContentVersionsPartial = false;
+            }
+        }
+
+        return $this->collContentVersions;
+    }
+
+    /**
+     * Sets a collection of ContentVersion objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $contentVersions A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setContentVersions(PropelCollection $contentVersions, PropelPDO $con = null)
+    {
+        $this->contentVersionsScheduledForDeletion = $this->getContentVersions(new Criteria(), $con)->diff($contentVersions);
+
+        foreach ($this->contentVersionsScheduledForDeletion as $contentVersionRemoved) {
+            $contentVersionRemoved->setContent(null);
+        }
+
+        $this->collContentVersions = null;
+        foreach ($contentVersions as $contentVersion) {
+            $this->addContentVersion($contentVersion);
+        }
+
+        $this->collContentVersions = $contentVersions;
+        $this->collContentVersionsPartial = false;
+    }
+
+    /**
+     * Returns the number of related ContentVersion objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related ContentVersion objects.
+     * @throws PropelException
+     */
+    public function countContentVersions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collContentVersionsPartial && !$this->isNew();
+        if (null === $this->collContentVersions || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collContentVersions) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getContentVersions());
+                }
+                $query = ContentVersionQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByContent($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collContentVersions);
+        }
+    }
+
+    /**
+     * Method called to associate a ContentVersion object to this object
+     * through the ContentVersion foreign key attribute.
+     *
+     * @param    ContentVersion $l ContentVersion
+     * @return Content The current object (for fluent API support)
+     */
+    public function addContentVersion(ContentVersion $l)
+    {
+        if ($this->collContentVersions === null) {
+            $this->initContentVersions();
+            $this->collContentVersionsPartial = true;
+        }
+        if (!$this->collContentVersions->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddContentVersion($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ContentVersion $contentVersion The contentVersion object to add.
+     */
+    protected function doAddContentVersion($contentVersion)
+    {
+        $this->collContentVersions[]= $contentVersion;
+        $contentVersion->setContent($this);
+    }
+
+    /**
+     * @param	ContentVersion $contentVersion The contentVersion object to remove.
+     */
+    public function removeContentVersion($contentVersion)
+    {
+        if ($this->getContentVersions()->contains($contentVersion)) {
+            $this->collContentVersions->remove($this->collContentVersions->search($contentVersion));
+            if (null === $this->contentVersionsScheduledForDeletion) {
+                $this->contentVersionsScheduledForDeletion = clone $this->collContentVersions;
+                $this->contentVersionsScheduledForDeletion->clear();
+            }
+            $this->contentVersionsScheduledForDeletion[]= $contentVersion;
+            $contentVersion->setContent(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2922,9 +3420,13 @@ abstract class BaseContent extends BaseObject implements Persistent
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
+        $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -2972,6 +3474,11 @@ abstract class BaseContent extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collContentVersions) {
+                foreach ($this->collContentVersions as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         // i18n behavior
@@ -3002,6 +3509,10 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->collContentI18ns->clearIterator();
         }
         $this->collContentI18ns = null;
+        if ($this->collContentVersions instanceof PropelCollection) {
+            $this->collContentVersions->clearIterator();
+        }
+        $this->collContentVersions = null;
     }
 
     /**
@@ -3233,4 +3744,293 @@ abstract class BaseContent extends BaseObject implements Persistent
         return $this;
     }
 
+    // versionable behavior
+
+    /**
+     * Enforce a new Version of this object upon next save.
+     *
+     * @return Content
+     */
+    public function enforceVersioning()
+    {
+        $this->enforceVersion = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks whether the current state must be recorded as a version
+     *
+     * @param PropelPDO $con An optional PropelPDO connection to use.
+     *
+     * @return  boolean
+     */
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->alreadyInSave) {
+            return false;
+        }
+
+        if ($this->enforceVersion) {
+            return true;
+        }
+
+        if (ContentPeer::isVersioningEnabled() && ($this->isNew() || $this->isModified() || $this->isDeleted())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a version of the current object and saves it.
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  ContentVersion A version object
+     */
+    public function addVersion($con = null)
+    {
+        $this->enforceVersion = false;
+
+        $version = new ContentVersion();
+        $version->setId($this->getId());
+        $version->setVisible($this->getVisible());
+        $version->setPosition($this->getPosition());
+        $version->setCreatedAt($this->getCreatedAt());
+        $version->setUpdatedAt($this->getUpdatedAt());
+        $version->setVersion($this->getVersion());
+        $version->setVersionCreatedAt($this->getVersionCreatedAt());
+        $version->setVersionCreatedBy($this->getVersionCreatedBy());
+        $version->setContent($this);
+        $version->save($con);
+
+        return $version;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  Content The current object (for fluent API support)
+     * @throws  PropelException - if no object with the given version can be found.
+     */
+    public function toVersion($versionNumber, $con = null)
+    {
+        $version = $this->getOneVersion($versionNumber, $con);
+        if (!$version) {
+            throw new PropelException(sprintf('No Content object found with version %d', $version));
+        }
+        $this->populateFromVersion($version, $con);
+
+        return $this;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   ContentVersion $version The version object to use
+     * @param   PropelPDO $con the connection to use
+     * @param   array $loadedObjects objects thats been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     *
+     * @return  Content The current object (for fluent API support)
+     */
+    public function populateFromVersion($version, $con = null, &$loadedObjects = array())
+    {
+
+        $loadedObjects['Content'][$version->getId()][$version->getVersion()] = $this;
+        $this->setId($version->getId());
+        $this->setVisible($version->getVisible());
+        $this->setPosition($version->getPosition());
+        $this->setCreatedAt($version->getCreatedAt());
+        $this->setUpdatedAt($version->getUpdatedAt());
+        $this->setVersion($version->getVersion());
+        $this->setVersionCreatedAt($version->getVersionCreatedAt());
+        $this->setVersionCreatedBy($version->getVersionCreatedBy());
+
+        return $this;
+    }
+
+    /**
+     * Gets the latest persisted version number for the current object
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  integer
+     */
+    public function getLastVersionNumber($con = null)
+    {
+        $v = ContentVersionQuery::create()
+            ->filterByContent($this)
+            ->orderByVersion('desc')
+            ->findOne($con);
+        if (!$v) {
+            return 0;
+        }
+
+        return $v->getVersion();
+    }
+
+    /**
+     * Checks whether the current object is the latest one
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  boolean
+     */
+    public function isLastVersion($con = null)
+    {
+        return $this->getLastVersionNumber($con) == $this->getVersion();
+    }
+
+    /**
+     * Retrieves a version object for this entity and a version number
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  ContentVersion A version object
+     */
+    public function getOneVersion($versionNumber, $con = null)
+    {
+        return ContentVersionQuery::create()
+            ->filterByContent($this)
+            ->filterByVersion($versionNumber)
+            ->findOne($con);
+    }
+
+    /**
+     * Gets all the versions of this object, in incremental order
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  PropelObjectCollection A list of ContentVersion objects
+     */
+    public function getAllVersions($con = null)
+    {
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(ContentVersionPeer::VERSION);
+
+        return $this->getContentVersions($criteria, $con);
+    }
+
+    /**
+     * Compares the current object with another of its version.
+     * <code>
+     * print_r($book->compareVersion(1));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $versionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->toArray();
+        $toVersion = $this->getOneVersion($versionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Compares two versions of the current object.
+     * <code>
+     * print_r($book->compareVersions(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $fromVersionNumber
+     * @param   integer   $toVersionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->getOneVersion($fromVersionNumber, $con)->toArray();
+        $toVersion = $this->getOneVersion($toVersionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Computes the diff between two versions.
+     * <code>
+     * print_r($this->computeDiff(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
+    {
+        $fromVersionNumber = $fromVersion['Version'];
+        $toVersionNumber = $toVersion['Version'];
+        $ignoredColumns = array_merge(array(
+            'Version',
+            'VersionCreatedAt',
+            'VersionCreatedBy',
+        ), $ignoredColumns);
+        $diff = array();
+        foreach ($fromVersion as $key => $value) {
+            if (in_array($key, $ignoredColumns)) {
+                continue;
+            }
+            if ($toVersion[$key] != $value) {
+                switch ($keys) {
+                    case 'versions':
+                        $diff[$fromVersionNumber][$key] = $value;
+                        $diff[$toVersionNumber][$key] = $toVersion[$key];
+                        break;
+                    default:
+                        $diff[$key] = array(
+                            $fromVersionNumber => $value,
+                            $toVersionNumber => $toVersion[$key],
+                        );
+                        break;
+                }
+            }
+        }
+
+        return $diff;
+    }
+    /**
+     * retrieve the last $number versions.
+     *
+     * @param integer $number the number of record to return.
+     * @param ContentVersionQuery|Criteria $criteria Additional criteria to filter.
+     * @param PropelPDO $con An optional connection to use.
+     *
+     * @return PropelCollection|ContentVersion[] List of ContentVersion objects
+     */
+    public function getLastVersions($number = 10, $criteria = null, PropelPDO $con = null)
+    {
+        $criteria = ContentVersionQuery::create(null, $criteria);
+        $criteria->addDescendingOrderByColumn(ContentVersionPeer::VERSION);
+        $criteria->limit($number);
+
+        return $this->getContentVersions($criteria, $con);
+    }
 }

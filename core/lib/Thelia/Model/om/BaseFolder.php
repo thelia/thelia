@@ -24,6 +24,9 @@ use Thelia\Model\FolderI18n;
 use Thelia\Model\FolderI18nQuery;
 use Thelia\Model\FolderPeer;
 use Thelia\Model\FolderQuery;
+use Thelia\Model\FolderVersion;
+use Thelia\Model\FolderVersionPeer;
+use Thelia\Model\FolderVersionQuery;
 use Thelia\Model\Image;
 use Thelia\Model\ImageQuery;
 use Thelia\Model\Rewriting;
@@ -100,6 +103,25 @@ abstract class BaseFolder extends BaseObject implements Persistent
     protected $updated_at;
 
     /**
+     * The value for the version field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $version;
+
+    /**
+     * The value for the version_created_at field.
+     * @var        string
+     */
+    protected $version_created_at;
+
+    /**
+     * The value for the version_created_by field.
+     * @var        string
+     */
+    protected $version_created_by;
+
+    /**
      * @var        PropelObjectCollection|Image[] Collection to store aggregation of Image objects.
      */
     protected $collImages;
@@ -130,6 +152,12 @@ abstract class BaseFolder extends BaseObject implements Persistent
     protected $collFolderI18nsPartial;
 
     /**
+     * @var        PropelObjectCollection|FolderVersion[] Collection to store aggregation of FolderVersion objects.
+     */
+    protected $collFolderVersions;
+    protected $collFolderVersionsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -156,6 +184,14 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * @var        array[FolderI18n]
      */
     protected $currentTranslations;
+
+    // versionable behavior
+
+
+    /**
+     * @var bool
+     */
+    protected $enforceVersion = false;
 
     /**
      * An array of objects scheduled for deletion.
@@ -186,6 +222,33 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * @var		PropelObjectCollection
      */
     protected $folderI18nsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $folderVersionsScheduledForDeletion = null;
+
+    /**
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see        __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->version = 0;
+    }
+
+    /**
+     * Initializes internal state of BaseFolder object.
+     * @see        applyDefaults()
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->applyDefaultValues();
+    }
 
     /**
      * Get the [id] column value.
@@ -309,6 +372,63 @@ abstract class BaseFolder extends BaseObject implements Persistent
         } else {
             return $dt->format($format);
         }
+    }
+
+    /**
+     * Get the [version] column value.
+     *
+     * @return int
+     */
+    public function getVersion()
+    {
+        return $this->version;
+    }
+
+    /**
+     * Get the [optionally formatted] temporal [version_created_at] column value.
+     *
+     *
+     * @param string $format The date/time format string (either date()-style or strftime()-style).
+     *				 If format is null, then the raw DateTime object will be returned.
+     * @return mixed Formatted date/time value as string or DateTime object (if format is null), null if column is null, and 0 if column value is 0000-00-00 00:00:00
+     * @throws PropelException - if unable to parse/validate the date/time value.
+     */
+    public function getVersionCreatedAt($format = 'Y-m-d H:i:s')
+    {
+        if ($this->version_created_at === null) {
+            return null;
+        }
+
+        if ($this->version_created_at === '0000-00-00 00:00:00') {
+            // while technically this is not a default value of null,
+            // this seems to be closest in meaning.
+            return null;
+        } else {
+            try {
+                $dt = new DateTime($this->version_created_at);
+            } catch (Exception $x) {
+                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
+            }
+        }
+
+        if ($format === null) {
+            // Because propel.useDateTimeClass is true, we return a DateTime object.
+            return $dt;
+        } elseif (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        } else {
+            return $dt->format($format);
+        }
+    }
+
+    /**
+     * Get the [version_created_by] column value.
+     *
+     * @return string
+     */
+    public function getVersionCreatedBy()
+    {
+        return $this->version_created_by;
     }
 
     /**
@@ -463,6 +583,71 @@ abstract class BaseFolder extends BaseObject implements Persistent
     } // setUpdatedAt()
 
     /**
+     * Set the value of [version] column.
+     *
+     * @param int $v new value
+     * @return Folder The current object (for fluent API support)
+     */
+    public function setVersion($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->version !== $v) {
+            $this->version = $v;
+            $this->modifiedColumns[] = FolderPeer::VERSION;
+        }
+
+
+        return $this;
+    } // setVersion()
+
+    /**
+     * Sets the value of [version_created_at] column to a normalized version of the date/time value specified.
+     *
+     * @param mixed $v string, integer (timestamp), or DateTime value.
+     *               Empty strings are treated as null.
+     * @return Folder The current object (for fluent API support)
+     */
+    public function setVersionCreatedAt($v)
+    {
+        $dt = PropelDateTime::newInstance($v, null, 'DateTime');
+        if ($this->version_created_at !== null || $dt !== null) {
+            $currentDateAsString = ($this->version_created_at !== null && $tmpDt = new DateTime($this->version_created_at)) ? $tmpDt->format('Y-m-d H:i:s') : null;
+            $newDateAsString = $dt ? $dt->format('Y-m-d H:i:s') : null;
+            if ($currentDateAsString !== $newDateAsString) {
+                $this->version_created_at = $newDateAsString;
+                $this->modifiedColumns[] = FolderPeer::VERSION_CREATED_AT;
+            }
+        } // if either are not null
+
+
+        return $this;
+    } // setVersionCreatedAt()
+
+    /**
+     * Set the value of [version_created_by] column.
+     *
+     * @param string $v new value
+     * @return Folder The current object (for fluent API support)
+     */
+    public function setVersionCreatedBy($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->version_created_by !== $v) {
+            $this->version_created_by = $v;
+            $this->modifiedColumns[] = FolderPeer::VERSION_CREATED_BY;
+        }
+
+
+        return $this;
+    } // setVersionCreatedBy()
+
+    /**
      * Indicates whether the columns in this object are only set to default values.
      *
      * This method can be used in conjunction with isModified() to indicate whether an object is both
@@ -472,6 +657,10 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->version !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return true
         return true;
     } // hasOnlyDefaultValues()
@@ -501,6 +690,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->position = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
             $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->version = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
+            $this->version_created_at = ($row[$startcol + 8] !== null) ? (string) $row[$startcol + 8] : null;
+            $this->version_created_by = ($row[$startcol + 9] !== null) ? (string) $row[$startcol + 9] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -509,7 +701,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = FolderPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = FolderPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Folder object", $e);
@@ -581,6 +773,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             $this->collFolderI18ns = null;
 
+            $this->collFolderVersions = null;
+
         } // if (deep)
     }
 
@@ -651,6 +845,14 @@ abstract class BaseFolder extends BaseObject implements Persistent
         $isInsert = $this->isNew();
         try {
             $ret = $this->preSave($con);
+            // versionable behavior
+            if ($this->isVersioningNecessary()) {
+                $this->setVersion($this->isNew() ? 1 : $this->getLastVersionNumber($con) + 1);
+                if (!$this->isColumnModified(FolderPeer::VERSION_CREATED_AT)) {
+                    $this->setVersionCreatedAt(time());
+                }
+                $createVersion = true; // for postSave hook
+            }
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
@@ -675,6 +877,10 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
+                // versionable behavior
+                if (isset($createVersion)) {
+                    $this->addVersion($con);
+                }
                 FolderPeer::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
@@ -804,6 +1010,23 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 }
             }
 
+            if ($this->folderVersionsScheduledForDeletion !== null) {
+                if (!$this->folderVersionsScheduledForDeletion->isEmpty()) {
+                    FolderVersionQuery::create()
+                        ->filterByPrimaryKeys($this->folderVersionsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->folderVersionsScheduledForDeletion = null;
+                }
+            }
+
+            if ($this->collFolderVersions !== null) {
+                foreach ($this->collFolderVersions as $referrerFK) {
+                    if (!$referrerFK->isDeleted()) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -851,6 +1074,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if ($this->isColumnModified(FolderPeer::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
         }
+        if ($this->isColumnModified(FolderPeer::VERSION)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+        }
+        if ($this->isColumnModified(FolderPeer::VERSION_CREATED_AT)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+        }
+        if ($this->isColumnModified(FolderPeer::VERSION_CREATED_BY)) {
+            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+        }
 
         $sql = sprintf(
             'INSERT INTO `folder` (%s) VALUES (%s)',
@@ -882,6 +1114,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
                         break;
                     case '`UPDATED_AT`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION`':
+                        $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
+                        break;
+                    case '`VERSION_CREATED_AT`':
+                        $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
+                        break;
+                    case '`VERSION_CREATED_BY`':
+                        $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1022,6 +1263,14 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     }
                 }
 
+                if ($this->collFolderVersions !== null) {
+                    foreach ($this->collFolderVersions as $referrerFK) {
+                        if (!$referrerFK->validate($columns)) {
+                            $failureMap = array_merge($failureMap, $referrerFK->getValidationFailures());
+                        }
+                    }
+                }
+
 
             $this->alreadyInValidation = false;
         }
@@ -1078,6 +1327,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
             case 6:
                 return $this->getUpdatedAt();
                 break;
+            case 7:
+                return $this->getVersion();
+                break;
+            case 8:
+                return $this->getVersionCreatedAt();
+                break;
+            case 9:
+                return $this->getVersionCreatedBy();
+                break;
             default:
                 return null;
                 break;
@@ -1114,6 +1372,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $keys[4] => $this->getPosition(),
             $keys[5] => $this->getCreatedAt(),
             $keys[6] => $this->getUpdatedAt(),
+            $keys[7] => $this->getVersion(),
+            $keys[8] => $this->getVersionCreatedAt(),
+            $keys[9] => $this->getVersionCreatedBy(),
         );
         if ($includeForeignObjects) {
             if (null !== $this->collImages) {
@@ -1130,6 +1391,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
             }
             if (null !== $this->collFolderI18ns) {
                 $result['FolderI18ns'] = $this->collFolderI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFolderVersions) {
+                $result['FolderVersions'] = $this->collFolderVersions->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1186,6 +1450,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
             case 6:
                 $this->setUpdatedAt($value);
                 break;
+            case 7:
+                $this->setVersion($value);
+                break;
+            case 8:
+                $this->setVersionCreatedAt($value);
+                break;
+            case 9:
+                $this->setVersionCreatedBy($value);
+                break;
         } // switch()
     }
 
@@ -1217,6 +1490,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersion($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setVersionCreatedBy($arr[$keys[9]]);
     }
 
     /**
@@ -1235,6 +1511,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if ($this->isColumnModified(FolderPeer::POSITION)) $criteria->add(FolderPeer::POSITION, $this->position);
         if ($this->isColumnModified(FolderPeer::CREATED_AT)) $criteria->add(FolderPeer::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(FolderPeer::UPDATED_AT)) $criteria->add(FolderPeer::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(FolderPeer::VERSION)) $criteria->add(FolderPeer::VERSION, $this->version);
+        if ($this->isColumnModified(FolderPeer::VERSION_CREATED_AT)) $criteria->add(FolderPeer::VERSION_CREATED_AT, $this->version_created_at);
+        if ($this->isColumnModified(FolderPeer::VERSION_CREATED_BY)) $criteria->add(FolderPeer::VERSION_CREATED_BY, $this->version_created_by);
 
         return $criteria;
     }
@@ -1304,6 +1583,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setVersion($this->getVersion());
+        $copyObj->setVersionCreatedAt($this->getVersionCreatedAt());
+        $copyObj->setVersionCreatedBy($this->getVersionCreatedBy());
 
         if ($deepCopy && !$this->startCopy) {
             // important: temporarily setNew(false) because this affects the behavior of
@@ -1339,6 +1621,12 @@ abstract class BaseFolder extends BaseObject implements Persistent
             foreach ($this->getFolderI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addFolderI18n($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFolderVersions() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFolderVersion($relObj->copy($deepCopy));
                 }
             }
 
@@ -1417,6 +1705,9 @@ abstract class BaseFolder extends BaseObject implements Persistent
         }
         if ('FolderI18n' == $relationName) {
             $this->initFolderI18ns();
+        }
+        if ('FolderVersion' == $relationName) {
+            $this->initFolderVersions();
         }
     }
 
@@ -2710,6 +3001,213 @@ abstract class BaseFolder extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collFolderVersions collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFolderVersions()
+     */
+    public function clearFolderVersions()
+    {
+        $this->collFolderVersions = null; // important to set this to null since that means it is uninitialized
+        $this->collFolderVersionsPartial = null;
+    }
+
+    /**
+     * reset is the collFolderVersions collection loaded partially
+     *
+     * @return void
+     */
+    public function resetPartialFolderVersions($v = true)
+    {
+        $this->collFolderVersionsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFolderVersions collection.
+     *
+     * By default this just sets the collFolderVersions collection to an empty array (like clearcollFolderVersions());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFolderVersions($overrideExisting = true)
+    {
+        if (null !== $this->collFolderVersions && !$overrideExisting) {
+            return;
+        }
+        $this->collFolderVersions = new PropelObjectCollection();
+        $this->collFolderVersions->setModel('FolderVersion');
+    }
+
+    /**
+     * Gets an array of FolderVersion objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Folder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria optional Criteria object to narrow the query
+     * @param PropelPDO $con optional connection object
+     * @return PropelObjectCollection|FolderVersion[] List of FolderVersion objects
+     * @throws PropelException
+     */
+    public function getFolderVersions($criteria = null, PropelPDO $con = null)
+    {
+        $partial = $this->collFolderVersionsPartial && !$this->isNew();
+        if (null === $this->collFolderVersions || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFolderVersions) {
+                // return empty collection
+                $this->initFolderVersions();
+            } else {
+                $collFolderVersions = FolderVersionQuery::create(null, $criteria)
+                    ->filterByFolder($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    if (false !== $this->collFolderVersionsPartial && count($collFolderVersions)) {
+                      $this->initFolderVersions(false);
+
+                      foreach($collFolderVersions as $obj) {
+                        if (false == $this->collFolderVersions->contains($obj)) {
+                          $this->collFolderVersions->append($obj);
+                        }
+                      }
+
+                      $this->collFolderVersionsPartial = true;
+                    }
+
+                    return $collFolderVersions;
+                }
+
+                if($partial && $this->collFolderVersions) {
+                    foreach($this->collFolderVersions as $obj) {
+                        if($obj->isNew()) {
+                            $collFolderVersions[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFolderVersions = $collFolderVersions;
+                $this->collFolderVersionsPartial = false;
+            }
+        }
+
+        return $this->collFolderVersions;
+    }
+
+    /**
+     * Sets a collection of FolderVersion objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $folderVersions A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     */
+    public function setFolderVersions(PropelCollection $folderVersions, PropelPDO $con = null)
+    {
+        $this->folderVersionsScheduledForDeletion = $this->getFolderVersions(new Criteria(), $con)->diff($folderVersions);
+
+        foreach ($this->folderVersionsScheduledForDeletion as $folderVersionRemoved) {
+            $folderVersionRemoved->setFolder(null);
+        }
+
+        $this->collFolderVersions = null;
+        foreach ($folderVersions as $folderVersion) {
+            $this->addFolderVersion($folderVersion);
+        }
+
+        $this->collFolderVersions = $folderVersions;
+        $this->collFolderVersionsPartial = false;
+    }
+
+    /**
+     * Returns the number of related FolderVersion objects.
+     *
+     * @param Criteria $criteria
+     * @param boolean $distinct
+     * @param PropelPDO $con
+     * @return int             Count of related FolderVersion objects.
+     * @throws PropelException
+     */
+    public function countFolderVersions(Criteria $criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        $partial = $this->collFolderVersionsPartial && !$this->isNew();
+        if (null === $this->collFolderVersions || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFolderVersions) {
+                return 0;
+            } else {
+                if($partial && !$criteria) {
+                    return count($this->getFolderVersions());
+                }
+                $query = FolderVersionQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByFolder($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFolderVersions);
+        }
+    }
+
+    /**
+     * Method called to associate a FolderVersion object to this object
+     * through the FolderVersion foreign key attribute.
+     *
+     * @param    FolderVersion $l FolderVersion
+     * @return Folder The current object (for fluent API support)
+     */
+    public function addFolderVersion(FolderVersion $l)
+    {
+        if ($this->collFolderVersions === null) {
+            $this->initFolderVersions();
+            $this->collFolderVersionsPartial = true;
+        }
+        if (!$this->collFolderVersions->contains($l)) { // only add it if the **same** object is not already associated
+            $this->doAddFolderVersion($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	FolderVersion $folderVersion The folderVersion object to add.
+     */
+    protected function doAddFolderVersion($folderVersion)
+    {
+        $this->collFolderVersions[]= $folderVersion;
+        $folderVersion->setFolder($this);
+    }
+
+    /**
+     * @param	FolderVersion $folderVersion The folderVersion object to remove.
+     */
+    public function removeFolderVersion($folderVersion)
+    {
+        if ($this->getFolderVersions()->contains($folderVersion)) {
+            $this->collFolderVersions->remove($this->collFolderVersions->search($folderVersion));
+            if (null === $this->folderVersionsScheduledForDeletion) {
+                $this->folderVersionsScheduledForDeletion = clone $this->collFolderVersions;
+                $this->folderVersionsScheduledForDeletion->clear();
+            }
+            $this->folderVersionsScheduledForDeletion[]= $folderVersion;
+            $folderVersion->setFolder(null);
+        }
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2721,9 +3219,13 @@ abstract class BaseFolder extends BaseObject implements Persistent
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
+        $this->version = null;
+        $this->version_created_at = null;
+        $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -2766,6 +3268,11 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collFolderVersions) {
+                foreach ($this->collFolderVersions as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         // i18n behavior
@@ -2792,6 +3299,10 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->collFolderI18ns->clearIterator();
         }
         $this->collFolderI18ns = null;
+        if ($this->collFolderVersions instanceof PropelCollection) {
+            $this->collFolderVersions->clearIterator();
+        }
+        $this->collFolderVersions = null;
     }
 
     /**
@@ -3023,4 +3534,297 @@ abstract class BaseFolder extends BaseObject implements Persistent
         return $this;
     }
 
+    // versionable behavior
+
+    /**
+     * Enforce a new Version of this object upon next save.
+     *
+     * @return Folder
+     */
+    public function enforceVersioning()
+    {
+        $this->enforceVersion = true;
+
+        return $this;
+    }
+
+    /**
+     * Checks whether the current state must be recorded as a version
+     *
+     * @param PropelPDO $con An optional PropelPDO connection to use.
+     *
+     * @return  boolean
+     */
+    public function isVersioningNecessary($con = null)
+    {
+        if ($this->alreadyInSave) {
+            return false;
+        }
+
+        if ($this->enforceVersion) {
+            return true;
+        }
+
+        if (FolderPeer::isVersioningEnabled() && ($this->isNew() || $this->isModified() || $this->isDeleted())) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Creates a version of the current object and saves it.
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  FolderVersion A version object
+     */
+    public function addVersion($con = null)
+    {
+        $this->enforceVersion = false;
+
+        $version = new FolderVersion();
+        $version->setId($this->getId());
+        $version->setParent($this->getParent());
+        $version->setLink($this->getLink());
+        $version->setVisible($this->getVisible());
+        $version->setPosition($this->getPosition());
+        $version->setCreatedAt($this->getCreatedAt());
+        $version->setUpdatedAt($this->getUpdatedAt());
+        $version->setVersion($this->getVersion());
+        $version->setVersionCreatedAt($this->getVersionCreatedAt());
+        $version->setVersionCreatedBy($this->getVersionCreatedBy());
+        $version->setFolder($this);
+        $version->save($con);
+
+        return $version;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  Folder The current object (for fluent API support)
+     * @throws  PropelException - if no object with the given version can be found.
+     */
+    public function toVersion($versionNumber, $con = null)
+    {
+        $version = $this->getOneVersion($versionNumber, $con);
+        if (!$version) {
+            throw new PropelException(sprintf('No Folder object found with version %d', $version));
+        }
+        $this->populateFromVersion($version, $con);
+
+        return $this;
+    }
+
+    /**
+     * Sets the properties of the curent object to the value they had at a specific version
+     *
+     * @param   FolderVersion $version The version object to use
+     * @param   PropelPDO $con the connection to use
+     * @param   array $loadedObjects objects thats been loaded in a chain of populateFromVersion calls on referrer or fk objects.
+     *
+     * @return  Folder The current object (for fluent API support)
+     */
+    public function populateFromVersion($version, $con = null, &$loadedObjects = array())
+    {
+
+        $loadedObjects['Folder'][$version->getId()][$version->getVersion()] = $this;
+        $this->setId($version->getId());
+        $this->setParent($version->getParent());
+        $this->setLink($version->getLink());
+        $this->setVisible($version->getVisible());
+        $this->setPosition($version->getPosition());
+        $this->setCreatedAt($version->getCreatedAt());
+        $this->setUpdatedAt($version->getUpdatedAt());
+        $this->setVersion($version->getVersion());
+        $this->setVersionCreatedAt($version->getVersionCreatedAt());
+        $this->setVersionCreatedBy($version->getVersionCreatedBy());
+
+        return $this;
+    }
+
+    /**
+     * Gets the latest persisted version number for the current object
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  integer
+     */
+    public function getLastVersionNumber($con = null)
+    {
+        $v = FolderVersionQuery::create()
+            ->filterByFolder($this)
+            ->orderByVersion('desc')
+            ->findOne($con);
+        if (!$v) {
+            return 0;
+        }
+
+        return $v->getVersion();
+    }
+
+    /**
+     * Checks whether the current object is the latest one
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  boolean
+     */
+    public function isLastVersion($con = null)
+    {
+        return $this->getLastVersionNumber($con) == $this->getVersion();
+    }
+
+    /**
+     * Retrieves a version object for this entity and a version number
+     *
+     * @param   integer $versionNumber The version number to read
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  FolderVersion A version object
+     */
+    public function getOneVersion($versionNumber, $con = null)
+    {
+        return FolderVersionQuery::create()
+            ->filterByFolder($this)
+            ->filterByVersion($versionNumber)
+            ->findOne($con);
+    }
+
+    /**
+     * Gets all the versions of this object, in incremental order
+     *
+     * @param   PropelPDO $con the connection to use
+     *
+     * @return  PropelObjectCollection A list of FolderVersion objects
+     */
+    public function getAllVersions($con = null)
+    {
+        $criteria = new Criteria();
+        $criteria->addAscendingOrderByColumn(FolderVersionPeer::VERSION);
+
+        return $this->getFolderVersions($criteria, $con);
+    }
+
+    /**
+     * Compares the current object with another of its version.
+     * <code>
+     * print_r($book->compareVersion(1));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $versionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersion($versionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->toArray();
+        $toVersion = $this->getOneVersion($versionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Compares two versions of the current object.
+     * <code>
+     * print_r($book->compareVersions(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   integer   $fromVersionNumber
+     * @param   integer   $toVersionNumber
+     * @param   string    $keys Main key used for the result diff (versions|columns)
+     * @param   PropelPDO $con the connection to use
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    public function compareVersions($fromVersionNumber, $toVersionNumber, $keys = 'columns', $con = null, $ignoredColumns = array())
+    {
+        $fromVersion = $this->getOneVersion($fromVersionNumber, $con)->toArray();
+        $toVersion = $this->getOneVersion($toVersionNumber, $con)->toArray();
+
+        return $this->computeDiff($fromVersion, $toVersion, $keys, $ignoredColumns);
+    }
+
+    /**
+     * Computes the diff between two versions.
+     * <code>
+     * print_r($this->computeDiff(1, 2));
+     * => array(
+     *   '1' => array('Title' => 'Book title at version 1'),
+     *   '2' => array('Title' => 'Book title at version 2')
+     * );
+     * </code>
+     *
+     * @param   array     $fromVersion     An array representing the original version.
+     * @param   array     $toVersion       An array representing the destination version.
+     * @param   string    $keys            Main key used for the result diff (versions|columns).
+     * @param   array     $ignoredColumns  The columns to exclude from the diff.
+     *
+     * @return  array A list of differences
+     */
+    protected function computeDiff($fromVersion, $toVersion, $keys = 'columns', $ignoredColumns = array())
+    {
+        $fromVersionNumber = $fromVersion['Version'];
+        $toVersionNumber = $toVersion['Version'];
+        $ignoredColumns = array_merge(array(
+            'Version',
+            'VersionCreatedAt',
+            'VersionCreatedBy',
+        ), $ignoredColumns);
+        $diff = array();
+        foreach ($fromVersion as $key => $value) {
+            if (in_array($key, $ignoredColumns)) {
+                continue;
+            }
+            if ($toVersion[$key] != $value) {
+                switch ($keys) {
+                    case 'versions':
+                        $diff[$fromVersionNumber][$key] = $value;
+                        $diff[$toVersionNumber][$key] = $toVersion[$key];
+                        break;
+                    default:
+                        $diff[$key] = array(
+                            $fromVersionNumber => $value,
+                            $toVersionNumber => $toVersion[$key],
+                        );
+                        break;
+                }
+            }
+        }
+
+        return $diff;
+    }
+    /**
+     * retrieve the last $number versions.
+     *
+     * @param integer $number the number of record to return.
+     * @param FolderVersionQuery|Criteria $criteria Additional criteria to filter.
+     * @param PropelPDO $con An optional connection to use.
+     *
+     * @return PropelCollection|FolderVersion[] List of FolderVersion objects
+     */
+    public function getLastVersions($number = 10, $criteria = null, PropelPDO $con = null)
+    {
+        $criteria = FolderVersionQuery::create(null, $criteria);
+        $criteria->addDescendingOrderByColumn(FolderVersionPeer::VERSION);
+        $criteria->limit($number);
+
+        return $this->getFolderVersions($criteria, $con);
+    }
 }

@@ -47,6 +47,9 @@ class ContentTableMap extends TableMap
         $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
+        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 
@@ -61,6 +64,7 @@ class ContentTableMap extends TableMap
         $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'content_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
         $this->addRelation('ContentI18n', 'Thelia\\Model\\ContentI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ContentI18ns');
+        $this->addRelation('ContentVersion', 'Thelia\\Model\\ContentVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ContentVersions');
     } // buildRelations()
 
     /**
@@ -74,6 +78,7 @@ class ContentTableMap extends TableMap
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
             'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
+            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
         );
     } // getBehaviors()
 

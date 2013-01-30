@@ -16,6 +16,7 @@ use Thelia\Model\Message;
 use Thelia\Model\MessageI18n;
 use Thelia\Model\MessagePeer;
 use Thelia\Model\MessageQuery;
+use Thelia\Model\MessageVersion;
 
 /**
  * Base class that represents a query for the 'message' table.
@@ -28,6 +29,9 @@ use Thelia\Model\MessageQuery;
  * @method MessageQuery orderByRef($order = Criteria::ASC) Order by the ref column
  * @method MessageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method MessageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method MessageQuery orderByVersion($order = Criteria::ASC) Order by the version column
+ * @method MessageQuery orderByVersionCreatedAt($order = Criteria::ASC) Order by the version_created_at column
+ * @method MessageQuery orderByVersionCreatedBy($order = Criteria::ASC) Order by the version_created_by column
  *
  * @method MessageQuery groupById() Group by the id column
  * @method MessageQuery groupByCode() Group by the code column
@@ -35,6 +39,9 @@ use Thelia\Model\MessageQuery;
  * @method MessageQuery groupByRef() Group by the ref column
  * @method MessageQuery groupByCreatedAt() Group by the created_at column
  * @method MessageQuery groupByUpdatedAt() Group by the updated_at column
+ * @method MessageQuery groupByVersion() Group by the version column
+ * @method MessageQuery groupByVersionCreatedAt() Group by the version_created_at column
+ * @method MessageQuery groupByVersionCreatedBy() Group by the version_created_by column
  *
  * @method MessageQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
  * @method MessageQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
@@ -43,6 +50,10 @@ use Thelia\Model\MessageQuery;
  * @method MessageQuery leftJoinMessageI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageI18n relation
  * @method MessageQuery rightJoinMessageI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageI18n relation
  * @method MessageQuery innerJoinMessageI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageI18n relation
+ *
+ * @method MessageQuery leftJoinMessageVersion($relationAlias = null) Adds a LEFT JOIN clause to the query using the MessageVersion relation
+ * @method MessageQuery rightJoinMessageVersion($relationAlias = null) Adds a RIGHT JOIN clause to the query using the MessageVersion relation
+ * @method MessageQuery innerJoinMessageVersion($relationAlias = null) Adds a INNER JOIN clause to the query using the MessageVersion relation
  *
  * @method Message findOne(PropelPDO $con = null) Return the first Message matching the query
  * @method Message findOneOrCreate(PropelPDO $con = null) Return the first Message matching the query, or a new Message object populated from the query conditions when no match is found
@@ -53,6 +64,9 @@ use Thelia\Model\MessageQuery;
  * @method Message findOneByRef(string $ref) Return the first Message filtered by the ref column
  * @method Message findOneByCreatedAt(string $created_at) Return the first Message filtered by the created_at column
  * @method Message findOneByUpdatedAt(string $updated_at) Return the first Message filtered by the updated_at column
+ * @method Message findOneByVersion(int $version) Return the first Message filtered by the version column
+ * @method Message findOneByVersionCreatedAt(string $version_created_at) Return the first Message filtered by the version_created_at column
+ * @method Message findOneByVersionCreatedBy(string $version_created_by) Return the first Message filtered by the version_created_by column
  *
  * @method array findById(int $id) Return Message objects filtered by the id column
  * @method array findByCode(string $code) Return Message objects filtered by the code column
@@ -60,6 +74,9 @@ use Thelia\Model\MessageQuery;
  * @method array findByRef(string $ref) Return Message objects filtered by the ref column
  * @method array findByCreatedAt(string $created_at) Return Message objects filtered by the created_at column
  * @method array findByUpdatedAt(string $updated_at) Return Message objects filtered by the updated_at column
+ * @method array findByVersion(int $version) Return Message objects filtered by the version column
+ * @method array findByVersionCreatedAt(string $version_created_at) Return Message objects filtered by the version_created_at column
+ * @method array findByVersionCreatedBy(string $version_created_by) Return Message objects filtered by the version_created_by column
  *
  * @package    propel.generator.Thelia.Model.om
  */
@@ -149,7 +166,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `SECURED`, `REF`, `CREATED_AT`, `UPDATED_AT` FROM `message` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `CODE`, `SECURED`, `REF`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `message` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -451,6 +468,119 @@ abstract class BaseMessageQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the version column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersion(1234); // WHERE version = 1234
+     * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
+     * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+     * </code>
+     *
+     * @param     mixed $version The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return MessageQuery The current query, for fluid interface
+     */
+    public function filterByVersion($version = null, $comparison = null)
+    {
+        if (is_array($version)) {
+            $useMinMax = false;
+            if (isset($version['min'])) {
+                $this->addUsingAlias(MessagePeer::VERSION, $version['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($version['max'])) {
+                $this->addUsingAlias(MessagePeer::VERSION, $version['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MessagePeer::VERSION, $version, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_at column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedAt('2011-03-14'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt('now'); // WHERE version_created_at = '2011-03-14'
+     * $query->filterByVersionCreatedAt(array('max' => 'yesterday')); // WHERE version_created_at > '2011-03-13'
+     * </code>
+     *
+     * @param     mixed $versionCreatedAt The value to use as filter.
+     *              Values can be integers (unix timestamps), DateTime objects, or strings.
+     *              Empty strings are treated as NULL.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return MessageQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedAt($versionCreatedAt = null, $comparison = null)
+    {
+        if (is_array($versionCreatedAt)) {
+            $useMinMax = false;
+            if (isset($versionCreatedAt['min'])) {
+                $this->addUsingAlias(MessagePeer::VERSION_CREATED_AT, $versionCreatedAt['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($versionCreatedAt['max'])) {
+                $this->addUsingAlias(MessagePeer::VERSION_CREATED_AT, $versionCreatedAt['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(MessagePeer::VERSION_CREATED_AT, $versionCreatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query on the version_created_by column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByVersionCreatedBy('fooValue');   // WHERE version_created_by = 'fooValue'
+     * $query->filterByVersionCreatedBy('%fooValue%'); // WHERE version_created_by LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $versionCreatedBy The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return MessageQuery The current query, for fluid interface
+     */
+    public function filterByVersionCreatedBy($versionCreatedBy = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($versionCreatedBy)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $versionCreatedBy)) {
+                $versionCreatedBy = str_replace('*', '%', $versionCreatedBy);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(MessagePeer::VERSION_CREATED_BY, $versionCreatedBy, $comparison);
+    }
+
+    /**
      * Filter the query by a related MessageI18n object
      *
      * @param   MessageI18n|PropelObjectCollection $messageI18n  the related object to use as filter
@@ -522,6 +652,80 @@ abstract class BaseMessageQuery extends ModelCriteria
         return $this
             ->joinMessageI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'MessageI18n', '\Thelia\Model\MessageI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related MessageVersion object
+     *
+     * @param   MessageVersion|PropelObjectCollection $messageVersion  the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   MessageQuery The current query, for fluid interface
+     * @throws   PropelException - if the provided filter is invalid.
+     */
+    public function filterByMessageVersion($messageVersion, $comparison = null)
+    {
+        if ($messageVersion instanceof MessageVersion) {
+            return $this
+                ->addUsingAlias(MessagePeer::ID, $messageVersion->getId(), $comparison);
+        } elseif ($messageVersion instanceof PropelObjectCollection) {
+            return $this
+                ->useMessageVersionQuery()
+                ->filterByPrimaryKeys($messageVersion->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByMessageVersion() only accepts arguments of type MessageVersion or PropelCollection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the MessageVersion relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return MessageQuery The current query, for fluid interface
+     */
+    public function joinMessageVersion($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('MessageVersion');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'MessageVersion');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the MessageVersion relation MessageVersion object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\MessageVersionQuery A secondary query class using the current class as primary query
+     */
+    public function useMessageVersionQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinMessageVersion($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'MessageVersion', '\Thelia\Model\MessageVersionQuery');
     }
 
     /**
