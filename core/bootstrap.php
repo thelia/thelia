@@ -8,7 +8,7 @@
 define('THELIA_ROOT', __DIR__ .'/../');
 define('THELIA_CONF_DIR', THELIA_ROOT . '/local/config');
 define('THELIA_PLUGIN_DIR', THELIA_ROOT . '/local/plugins');
-$loader = require __DIR__ . '/autoload.php';
+$loader = require __DIR__ . "/vendor/autoload.php";
 
 
 

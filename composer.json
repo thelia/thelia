@@ -1,0 +1,35 @@
+{
+    "description" : "Thelia is an ecommerce CMS.",
+    "licence" : "GPL-3.0+",
+    "homepage" : "http://thelia.net",
+    "support" : {
+        "forum" : "http://thelia.net/forum",
+        "wiki" : "http://thelia.net/wiki"
+    },
+    "require":{
+        "symfony/http-kernel" : "2.1.*",
+        "symfony/routing" : "2.1.*",
+        "symfony/config" : "2.1.*",
+        "symfony/dependency-injection" : "2.1.*",
+        "symfony/console" : "2.1.*",
+        "symfony/event-dispatcher" : "2.1.*",
+        "symfony-cmf/routing" : "1.0.*@dev",
+        "propel/propel1" : "1.6.*",
+        "psr/log" : "dev-master"
+    },
+    "minimum-stability": "stable",
+    "config" : {
+        "vendor-dir" : "core/vendor",
+        "bin-dir" : "bin"
+    },
+    "autoload": {
+        "psr-0": { 
+            "": "local/plugins/",
+            "Thelia" : "core/lib/"
+        }
+    },
+    "scripts" : {
+        "post-update-cmd": "composer dump-autoload -o",
+        "post-install-cmd": "composer dump-autoload -o"
+    }
+}

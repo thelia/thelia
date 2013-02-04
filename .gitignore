@@ -6,3 +6,4 @@ local/config/runtime-conf.xml
 propel-gen
 cache/*
 log/*
+bin/*
