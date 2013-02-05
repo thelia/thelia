@@ -58,8 +58,11 @@ class TheliaBundle extends Bundle
         $container->register('matcher.default','Thelia\Routing\Matcher\DefaultMatcher')
                 ->addArgument(new Reference('controller.default'));
 
-        $container->register('matcher','Thelia\Routing\Matcher\TheliaMatcherCollection')
+        $container->register('matcher.action', 'Thelia\Routing\Matcher\ActionMatcher');
+
+        $container->register('matcher','Thelia\Routing\TheliaMatcherCollection')
                 ->addMethodCall('add', array(new Reference('matcher.default'), -255))
+                ->addMethodCall('add', array(new Reference('matcher.action'), -200))
                 //->addMethodCall('add','a matcher class (instance or class name)
 
         ;
@@ -73,7 +76,7 @@ class TheliaBundle extends Bundle
          * RouterListener implements EventSubscriberInterface and listen for kernel.request event
          */
         $container->register('listener.router', 'Symfony\Component\HttpKernel\EventListener\RouterListener')
-            ->setArguments(array(new Reference('matcher')))
+                ->addArgument(new Reference('matcher'))
         ;
 
         /**

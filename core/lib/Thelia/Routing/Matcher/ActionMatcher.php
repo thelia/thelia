@@ -20,34 +20,28 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
+
 namespace Thelia\Routing\Matcher;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
-use Thelia\Controller\NullControllerInterface;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
-/**
- * Default matcher when no action is needed and there is no result for urlmatcher
- *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class DefaultMatcher implements RequestMatcherInterface
+class ActionMatcher implements RequestMatcherInterface
 {
-    protected $controller;
-
-    public function __construct(NullControllerInterface $controller)
-    {
-        $this->controller = $controller;
-    }
-
     public function matchRequest(Request $request)
     {
-        $objectInformation = new \ReflectionObject($this->controller);
-
-        $parameter = array(
-          '_controller' => $objectInformation->getName().'::noAction'
-        );
-
-        return $parameter;
+        if (false !== $action = $request->get("action")) {
+            
+            //search corresponding action
+            
+        }
+        
+        throw new ResourceNotFoundException("No action parameter found");
+    }
+    
+    protected function findActionParam(Request $request)
+    {
+        
     }
 }
