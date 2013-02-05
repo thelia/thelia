@@ -7,3 +7,4 @@ propel-gen
 cache/*
 log/*
 bin/*
+composer.lock
