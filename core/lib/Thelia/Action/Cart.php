@@ -20,36 +20,45 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller;
 
-use Thelia\Controller\NullControllerInterface;
+namespace Thelia\Action;
+
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Action\BaseAction;
 
-/**
- *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
- */
-
-class DefaultController implements NullControllerInterface
+class Cart extends BaseAction
 {
     /**
-     *
-     * set the default value for thelia
-     *
-     * In this case there is no action so we have to verify if some needed params are not missing
-     *
+     * 
+     * add an article to cart
+     * 
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    public function noAction(Request $request)
+    public function addCart(Request $request)
     {
-        if ($request->query->has('view') === false) {
-            $fond = "index";
-            if ($request->request->has('view')) {
-                $fond = $request->request->get('view');
-            }
-            $request->query->set('view', $fond);
-        }
+        var_dump($this->getDispatcher()); exit;
+    }
+    
+    /**
+     * 
+     * Delete specify article present into cart
+     * 
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     */
+    public function deleteArticle(Request $request)
+    {
+        
+    }
+    
+    /**
+     * 
+     * Modify article's quantity
+     * 
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     */
+    public function modifyArticle(Request $request)
+    {
+        
     }
 }
+

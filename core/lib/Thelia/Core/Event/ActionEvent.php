@@ -20,36 +20,85 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller;
 
-use Thelia\Controller\NullControllerInterface;
+namespace Thelia\Core\Event;
+
+use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
-
 /**
- *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
+ * 
+ * Class thrown on Thelia.action event
+ * 
+ * call setAction if action match yours
+ * 
  */
-
-class DefaultController implements NullControllerInterface
+class ActionEvent extends Event
 {
+    
     /**
      *
-     * set the default value for thelia
-     *
-     * In this case there is no action so we have to verify if some needed params are not missing
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @var Symfony\Component\HttpFoundation\Request
      */
-    public function noAction(Request $request)
-    {
-        if ($request->query->has('view') === false) {
-            $fond = "index";
-            if ($request->request->has('view')) {
-                $fond = $request->request->get('view');
-            }
-            $request->query->set('view', $fond);
-        }
+    protected $request;
+    
+    /**
+     *
+     * @var string
+     */
+    protected $action;
+    
+    /**
+     *
+     * @var string
+     */
+    protected $controller;
+    
+    /**
+     * 
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param string $action
+     */
+    public function __construct(Request $request, $action) {
+        $this->request = $request;
+        $this->action = $action;
     }
+    
+    /**
+     * 
+     * @return string
+     */
+    public function getAction()
+    {
+        return $this->action;
+    }
+    
+    /**
+     * 
+     * @return \Symfony\Component\HttpFoundation\Request
+     */
+    public function getRequest()
+    {
+        return $this->request;
+    }
+    
+    /**
+     * 
+     * @param string $controller
+     */
+    public function setController($controller)
+    {
+        $this->controller = $controller;
+    }
+    
+    public function getController()
+    {
+        return $this->controller;
+    }
+    
+    public function hasController()
+    {
+        return null !== $this->controller;
+    }
+    
+    
 }

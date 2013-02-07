@@ -20,36 +20,24 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller;
 
-use Thelia\Controller\NullControllerInterface;
-use Symfony\Component\HttpFoundation\Request;
+namespace Thelia\Core\Event;
 
 /**
- *
- * Must be the last controller call. It fixes default values
- *
- * @author Manuel Raynaud <mraynadu@openstudio.fr>
+ * 
+ * Class containing all Thelia events name using in Thelia Core
+ * 
+ * 
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class DefaultController implements NullControllerInterface
+final class TheliaEvents
 {
+    
     /**
-     *
-     * set the default value for thelia
-     *
-     * In this case there is no action so we have to verify if some needed params are not missing
-     *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * ACTION event
+     * 
+     * Send if no action are already present in Thelia action process ( see Thelia\Routing\Matcher\ActionMatcher)
      */
-    public function noAction(Request $request)
-    {
-        if ($request->query->has('view') === false) {
-            $fond = "index";
-            if ($request->request->has('view')) {
-                $fond = $request->request->get('view');
-            }
-            $request->query->set('view', $fond);
-        }
-    }
+    const ACTION = "thelia.action";
 }

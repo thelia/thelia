@@ -101,6 +101,11 @@ class TheliaBundle extends Bundle
                 ->addMethodCall('addSubscriber', array(new Reference('listener.router')))
                 ->addMethodCall('addSubscriber', array(new Reference('thelia.listener.view')))
         ;
+        
+        
+        // TODO : save listener from plugins
+        
+        $container->getDefinition('matcher.action')->addMethodCall("setDispatcher", array(new Reference('dispatcher')));
 
         $container->register('http_kernel','Thelia\Core\TheliaHttpKernel')
             ->addArgument(new Reference('dispatcher'))

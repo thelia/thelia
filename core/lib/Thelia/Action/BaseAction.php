@@ -21,73 +21,38 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Routing\Matcher;
+namespace Thelia\Action;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\TheliaEvents;
-use Thelia\Action\Cart;
-
 /**
- * Matcher using action param in get or post method to perform actions. For exemple index.php?action=addCart will find the good controller that can perform this action.
+ * 
  * 
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class ActionMatcher implements RequestMatcherInterface
+class BaseAction 
 {
     /**
      *
-     * @var Symfony\Component\EventDispatcher\EventDispatcherInterface 
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
     
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
+    /**
+     * 
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
+    public function __construct(EventDispatcherInterface $dispatcher) {
         $this->dispatcher = $dispatcher;
     }
     
-    public function matchRequest(Request $request)
+    /**
+     * 
+     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    public function getDispatcher()
     {
-        if (false !== $action = $request->get("action")) {
-            //search corresponding action
-            return $this->dispatchAction($request, $action);
-        }
-        
-        throw new ResourceNotFoundException("No action parameter found");
-    }
-    
-    protected function dispatchAction(Request $request, $action)
-    {
-        $controller = null;
-        switch ($action) {
-            case 'addProduct':
-                $controller = array(
-                    new Cart($this->dispatcher),
-                    "addCart"
-                );
-                break;
-            default : 
-                $event = new ActionEvent($request, $action);
-                $event->setDispatcher($this->dispatcher);
-                $this->dispatcher->dispatch(TheliaEvents::ACTION, $event);
-                if ($event->hasController()) {
-                    $controller = $event->getController();
-                }
-                break;
-        }
-        
-        if ($controller) {
-            return array(
-                '_controller' => $controller
-            );
-        }
-        
-        throw new ResourceNotFoundException("No action parameter found");
-        
+        return $this->dispatcher;
     }
 }
