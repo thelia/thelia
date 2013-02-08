@@ -73,7 +73,6 @@ class ActionMatcher implements RequestMatcherInterface
                 break;
             default : 
                 $event = new ActionEvent($request, $action);
-                $event->setDispatcher($this->dispatcher);
                 $this->dispatcher->dispatch(TheliaEvents::ACTION, $event);
                 if ($event->hasController()) {
                     $controller = $event->getController();

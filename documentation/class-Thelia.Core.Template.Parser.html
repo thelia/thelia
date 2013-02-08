@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Core\Template\Parser | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Core.Template.html">Template</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Thelia.Core.Template.Parser.html">Parser</a></li>
+			</ul>
+
+			<h3>Interfaces</h3>
+			<ul>
+				<li><a href="class-Thelia.Core.Template.ParserInterface.html">ParserInterface</a></li>
+			</ul>
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Core.Template.html" title="Summary of Thelia\Core\Template"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Parser</h1>
+
+
+	<div class="description">
+	
+<p>Master class of Thelia's parser. The loop mechanism depends of this
+parser</p>
+
+<p>From this class all the parser is lunch</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>Thelia\Core\Template\Parser</span></b>			
+			 implements 
+				<a href="class-Thelia.Core.Template.ParserInterface.html"><span>Thelia\Core\Template\ParserInterface</span></a>
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Core.html">Core</a>\<a href="namespace-Thelia.Core.Template.html">Template</a><br />
+		
+
+				<b>Author:</b>
+				Manuel Raynaud &lt;<a
+href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&gt;<br />
+		<b>Located at</b> <a href="source-class-Thelia.Core.Template.Parser.html#31-118" title="Go to source code">core/lib/Thelia/Core/Template/Parser.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#57-66" title="Go to source code">__construct</a>( <span>Symfony\Component\DependencyInjection\ContainerInterface <var>$container</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$container</var></dt>
+					<dd><code>type</code><br>$container public function __construct(ContainerBuilder $container)</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getContent" id="_getContent">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getContent">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#68-81" title="Go to source code">getContent</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>This method must return a Symfony\Component\HttpFoudation\Response instance
+or the content of the response</p>
+
+
+
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Thelia.Core.Template.ParserInterface.html#_getContent">Thelia\Core\Template\ParserInterface::getContent()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setContent" id="_setContent">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setContent">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#83-92" title="Go to source code">setContent</a>( <span>string|Symfony\Component\HttpFoundation\Response <var>$content</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>set $content with the body of the response or the Response object
+directly</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$content</var></dt>
+					<dd><code>string|Symfony\Component\HttpFoundation\Response</code><br>$content</dd>
+				</dl></div>
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Thelia.Core.Template.ParserInterface.html#_setContent">Thelia\Core\Template\ParserInterface::setContent()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getStatus" id="_getStatus">
+
+		<td class="attributes"><code>
+			 public 
+			type
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getStatus">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#94-101" title="Go to source code">getStatus</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>type</code><br>the status of the response<br />
+				</div>
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Thelia.Core.Template.ParserInterface.html#_getStatus">Thelia\Core\Template\ParserInterface::getStatus()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setStatus" id="_setStatus">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setStatus">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#103-112" title="Go to source code">setStatus</a>( <span>integer <var>$status</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>status HTTP of the response</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$status</var></dt>
+					<dd><code>integer</code><br>$status</dd>
+				</dl></div>
+
+
+
+
+
+				<h4>Implementation of</h4>
+				<div class="list"><code><a href="class-Thelia.Core.Template.ParserInterface.html#_setStatus">Thelia\Core\Template\ParserInterface::setStatus()</a></code></div>
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="loadParser" id="_loadParser">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_loadParser">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#114-116" title="Go to source code">loadParser</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+	<table class="summary" id="constants">
+	<caption>Constants summary</caption>
+	<tr data-order="PREFIXE" id="PREFIXE">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Core.Template.Parser.html#42" title="Go to source code"><b>PREFIXE</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'prx'</span></code></td>
+		<td class="description"><div>
+			<a href="#PREFIXE" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="SHOW_TIME" id="SHOW_TIME">
+
+		<td class="attributes"><code>boolean</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Core.Template.Parser.html#44" title="Go to source code"><b>SHOW_TIME</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-keyword1">true</span></code></td>
+		<td class="description"><div>
+			<a href="#SHOW_TIME" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="ALLOW_DEBUG" id="ALLOW_DEBUG">
+
+		<td class="attributes"><code>boolean</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Core.Template.Parser.html#45" title="Go to source code"><b>ALLOW_DEBUG</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-keyword1">true</span></code></td>
+		<td class="description"><div>
+			<a href="#ALLOW_DEBUG" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="USE_CACHE" id="USE_CACHE">
+
+		<td class="attributes"><code>boolean</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Core.Template.Parser.html#46" title="Go to source code"><b>USE_CACHE</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-keyword1">true</span></code></td>
+		<td class="description"><div>
+			<a href="#USE_CACHE" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="container" id="$container">
+		<td class="attributes"><code>
+			protected  
+			Symfony\Component\DependencyInjection\ContainerInterface
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Core.Template.Parser.html#48-52" title="Go to source code"><var>$container</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$container" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="content" id="$content">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Core.Template.Parser.html#54" title="Go to source code"><var>$content</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$content" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="status" id="$status">
+		<td class="attributes"><code>
+			protected  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Core.Template.Parser.html#55" title="Go to source code"><var>$status</var></a>
+		</td>
+		<td class="value"><code><span class="php-num">200</span></code></td>
+		<td class="description"><div>
+			<a href="#$status" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

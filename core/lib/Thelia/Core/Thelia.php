@@ -74,7 +74,8 @@ class Thelia extends Kernel
      * Initialize all plugins
      * 
      */
-    public function loadConfiguration(){
+    public function loadConfiguration()
+    {
         
     }
 

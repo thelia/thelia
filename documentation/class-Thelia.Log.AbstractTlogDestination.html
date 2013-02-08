@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Log\AbstractTlogDestination | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Template.html">Template</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Thelia.Log.AbstractTlogDestination.html">AbstractTlogDestination</a></li>
+				<li><a href="class-Thelia.Log.Tlog.html">Tlog</a></li>
+				<li><a href="class-Thelia.Log.TlogDestinationConfig.html">TlogDestinationConfig</a></li>
+			</ul>
+
+			<h3>Interfaces</h3>
+			<ul>
+				<li><a href="class-Thelia.Log.TlogInterface.html">TlogInterface</a></li>
+			</ul>
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Log.html" title="Summary of Thelia\Log"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class AbstractTlogDestination</h1>
+
+
+
+
+
+	<div>
+		<h4>Direct known subclasses</h4>
+			<a href="class-Thelia.Log.Destination.TlogDestinationFile.html">Thelia\Log\Destination\TlogDestinationFile</a>, 
+			<a href="class-Thelia.Log.Destination.TlogDestinationHtml.html">Thelia\Log\Destination\TlogDestinationHtml</a>, 
+			<a href="class-Thelia.Log.Destination.TlogDestinationNull.html">Thelia\Log\Destination\TlogDestinationNull</a>, 
+			<a href="class-Thelia.Log.Destination.TlogDestinationText.html">Thelia\Log\Destination\TlogDestinationText</a>
+	</div>
+
+
+
+
+
+
+	<div class="info">
+		<b>Abstract</b><br />
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Log.html">Log</a><br />
+		
+
+		<b>Located at</b> <a href="source-class-Thelia.Log.AbstractTlogDestination.html#26-121" title="Go to source code">core/lib/Thelia/Log/AbstractTlogDestination.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#37-47" title="Go to source code">__construct</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setConfig" id="_setConfig">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setConfig">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#50-63" title="Go to source code">setConfig</a>( <span>mixed <var>$name</var></span>, <span>mixed <var>$value</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getConfig" id="_getConfig">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getConfig">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#66-75" title="Go to source code">getConfig</a>( <span>mixed <var>$name</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getConfigs" id="_getConfigs">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getConfigs">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#77-80" title="Go to source code">getConfigs</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="SetBackOfficeMode" id="_SetBackOfficeMode">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_SetBackOfficeMode">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#82-85" title="Go to source code">SetBackOfficeMode</a>( <span>mixed <var>$bool</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="add" id="_add">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_add">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#88-91" title="Go to source code">add</a>( <span>mixed <var>$string</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="InsertAfterBody" id="_InsertAfterBody">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_InsertAfterBody">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#93-102" title="Go to source code">InsertAfterBody</a>( <span>mixed <var>&amp; $res</var></span>, <span>mixed <var>$logdata</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="configure" id="_configure">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_configure">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#107-110" title="Go to source code">configure</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="write" id="_write">
+
+		<td class="attributes"><code>
+			abstract public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_write">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#114" title="Go to source code">write</a>( <span>mixed <var>&amp; $res</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getTitle" id="_getTitle">
+
+		<td class="attributes"><code>
+			abstract public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getTitle">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#117" title="Go to source code">getTitle</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getDescription" id="_getDescription">
+
+		<td class="attributes"><code>
+			abstract public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getDescription">#</a>
+		<code><a href="source-class-Thelia.Log.AbstractTlogDestination.html#120" title="Go to source code">getDescription</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="_configs" id="$_configs">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.AbstractTlogDestination.html#29" title="Go to source code"><var>$_configs</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$_configs" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="_logs" id="$_logs">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.AbstractTlogDestination.html#32" title="Go to source code"><var>$_logs</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$_logs" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="flag_back_office" id="$flag_back_office">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.AbstractTlogDestination.html#35" title="Go to source code"><var>$flag_back_office</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$flag_back_office" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

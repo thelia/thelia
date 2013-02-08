@@ -31,7 +31,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class BaseAction 
+abstract class BaseAction 
 {
     /**
      *
@@ -43,7 +43,8 @@ class BaseAction
      * 
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      */
-    public function __construct(EventDispatcherInterface $dispatcher) {
+    public function __construct(EventDispatcherInterface $dispatcher) 
+    {
         $this->dispatcher = $dispatcher;
     }
     

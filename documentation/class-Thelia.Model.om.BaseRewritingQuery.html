@@ -1,0 +1,4244 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Model\om\BaseRewritingQuery | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Template.html">Template</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Thelia.Model.om.BaseAccessory.html">BaseAccessory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAccessoryPeer.html">BaseAccessoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAccessoryQuery.html">BaseAccessoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddress.html">BaseAddress</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddressPeer.html">BaseAddressPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddressQuery.html">BaseAddressQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdmin.html">BaseAdmin</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroup.html">BaseAdminGroup</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroupPeer.html">BaseAdminGroupPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroupQuery.html">BaseAdminGroupQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLog.html">BaseAdminLog</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLogPeer.html">BaseAdminLogPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLogQuery.html">BaseAdminLogQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminPeer.html">BaseAdminPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminQuery.html">BaseAdminQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseArea.html">BaseArea</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAreaPeer.html">BaseAreaPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAreaQuery.html">BaseAreaQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttribute.html">BaseAttribute</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAv.html">BaseAttributeAv</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDesc.html">BaseAttributeAvDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescPeer.html">BaseAttributeAvDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescQuery.html">BaseAttributeAvDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18n.html">BaseAttributeAvI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nPeer.html">BaseAttributeAvI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nQuery.html">BaseAttributeAvI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvPeer.html">BaseAttributeAvPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvQuery.html">BaseAttributeAvQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategory.html">BaseAttributeCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategoryPeer.html">BaseAttributeCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategoryQuery.html">BaseAttributeCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombination.html">BaseAttributeCombination</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationPeer.html">BaseAttributeCombinationPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationQuery.html">BaseAttributeCombinationQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDesc.html">BaseAttributeDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDescPeer.html">BaseAttributeDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDescQuery.html">BaseAttributeDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18n.html">BaseAttributeI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18nPeer.html">BaseAttributeI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18nQuery.html">BaseAttributeI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributePeer.html">BaseAttributePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeQuery.html">BaseAttributeQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategory.html">BaseCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDesc.html">BaseCategoryDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDescPeer.html">BaseCategoryDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDescQuery.html">BaseCategoryDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18n.html">BaseCategoryI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18nPeer.html">BaseCategoryI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18nQuery.html">BaseCategoryI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryPeer.html">BaseCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryQuery.html">BaseCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersion.html">BaseCategoryVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersionPeer.html">BaseCategoryVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersionQuery.html">BaseCategoryVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombination.html">BaseCombination</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombinationPeer.html">BaseCombinationPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombinationQuery.html">BaseCombinationQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfig.html">BaseConfig</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDesc.html">BaseConfigDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDescPeer.html">BaseConfigDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDescQuery.html">BaseConfigDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18n.html">BaseConfigI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18nPeer.html">BaseConfigI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18nQuery.html">BaseConfigI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigPeer.html">BaseConfigPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigQuery.html">BaseConfigQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContent.html">BaseContent</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssoc.html">BaseContentAssoc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssocPeer.html">BaseContentAssocPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssocQuery.html">BaseContentAssocQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDesc.html">BaseContentDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDescPeer.html">BaseContentDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDescQuery.html">BaseContentDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolder.html">BaseContentFolder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolderPeer.html">BaseContentFolderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolderQuery.html">BaseContentFolderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18n.html">BaseContentI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18nPeer.html">BaseContentI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18nQuery.html">BaseContentI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentPeer.html">BaseContentPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentQuery.html">BaseContentQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersion.html">BaseContentVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersionPeer.html">BaseContentVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersionQuery.html">BaseContentVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountry.html">BaseCountry</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDesc.html">BaseCountryDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDescPeer.html">BaseCountryDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDescQuery.html">BaseCountryDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18n.html">BaseCountryI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18nPeer.html">BaseCountryI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18nQuery.html">BaseCountryI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryPeer.html">BaseCountryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryQuery.html">BaseCountryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCoupon.html">BaseCoupon</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrder.html">BaseCouponOrder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrderPeer.html">BaseCouponOrderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrderQuery.html">BaseCouponOrderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponPeer.html">BaseCouponPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponQuery.html">BaseCouponQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRule.html">BaseCouponRule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRulePeer.html">BaseCouponRulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRuleQuery.html">BaseCouponRuleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrency.html">BaseCurrency</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrencyPeer.html">BaseCurrencyPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrencyQuery.html">BaseCurrencyQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomer.html">BaseCustomer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerPeer.html">BaseCustomerPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerQuery.html">BaseCustomerQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitle.html">BaseCustomerTitle</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDesc.html">BaseCustomerTitleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescPeer.html">BaseCustomerTitleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html">BaseCustomerTitleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18n.html">BaseCustomerTitleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nPeer.html">BaseCustomerTitleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nQuery.html">BaseCustomerTitleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitlePeer.html">BaseCustomerTitlePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleQuery.html">BaseCustomerTitleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzone.html">BaseDelivzone</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzonePeer.html">BaseDelivzonePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzoneQuery.html">BaseDelivzoneQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocument.html">BaseDocument</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDesc.html">BaseDocumentDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDescPeer.html">BaseDocumentDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDescQuery.html">BaseDocumentDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18n.html">BaseDocumentI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18nPeer.html">BaseDocumentI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18nQuery.html">BaseDocumentI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentPeer.html">BaseDocumentPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentQuery.html">BaseDocumentQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeature.html">BaseFeature</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAv.html">BaseFeatureAv</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDesc.html">BaseFeatureAvDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescPeer.html">BaseFeatureAvDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescQuery.html">BaseFeatureAvDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18n.html">BaseFeatureAvI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nPeer.html">BaseFeatureAvI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nQuery.html">BaseFeatureAvI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvPeer.html">BaseFeatureAvPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvQuery.html">BaseFeatureAvQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategory.html">BaseFeatureCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryPeer.html">BaseFeatureCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryQuery.html">BaseFeatureCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDesc.html">BaseFeatureDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDescPeer.html">BaseFeatureDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDescQuery.html">BaseFeatureDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18n.html">BaseFeatureI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18nPeer.html">BaseFeatureI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18nQuery.html">BaseFeatureI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeaturePeer.html">BaseFeaturePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProd.html">BaseFeatureProd</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProdPeer.html">BaseFeatureProdPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProdQuery.html">BaseFeatureProdQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureQuery.html">BaseFeatureQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolder.html">BaseFolder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDesc.html">BaseFolderDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDescPeer.html">BaseFolderDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDescQuery.html">BaseFolderDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18n.html">BaseFolderI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18nPeer.html">BaseFolderI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18nQuery.html">BaseFolderI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderPeer.html">BaseFolderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderQuery.html">BaseFolderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersion.html">BaseFolderVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersionPeer.html">BaseFolderVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersionQuery.html">BaseFolderVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroup.html">BaseGroup</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDesc.html">BaseGroupDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDescPeer.html">BaseGroupDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDescQuery.html">BaseGroupDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18n.html">BaseGroupI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18nPeer.html">BaseGroupI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18nQuery.html">BaseGroupI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModule.html">BaseGroupModule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModulePeer.html">BaseGroupModulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModuleQuery.html">BaseGroupModuleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupPeer.html">BaseGroupPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupQuery.html">BaseGroupQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResource.html">BaseGroupResource</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResourcePeer.html">BaseGroupResourcePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResourceQuery.html">BaseGroupResourceQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImage.html">BaseImage</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDesc.html">BaseImageDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDescPeer.html">BaseImageDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDescQuery.html">BaseImageDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18n.html">BaseImageI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18nPeer.html">BaseImageI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18nQuery.html">BaseImageI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImagePeer.html">BaseImagePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageQuery.html">BaseImageQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLang.html">BaseLang</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLangPeer.html">BaseLangPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLangQuery.html">BaseLangQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessage.html">BaseMessage</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDesc.html">BaseMessageDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDescPeer.html">BaseMessageDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDescQuery.html">BaseMessageDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18n.html">BaseMessageI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18nPeer.html">BaseMessageI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18nQuery.html">BaseMessageI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessagePeer.html">BaseMessagePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageQuery.html">BaseMessageQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersion.html">BaseMessageVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersionPeer.html">BaseMessageVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersionQuery.html">BaseMessageVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDesc.html">BaseModuleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDescPeer.html">BaseModuleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDescQuery.html">BaseModuleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18n.html">BaseModuleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18nPeer.html">BaseModuleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18nQuery.html">BaseModuleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModulePeer.html">BaseModulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrder.html">BaseOrder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddress.html">BaseOrderAddress</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddressPeer.html">BaseOrderAddressPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddressQuery.html">BaseOrderAddressQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeature.html">BaseOrderFeature</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeaturePeer.html">BaseOrderFeaturePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeatureQuery.html">BaseOrderFeatureQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderPeer.html">BaseOrderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProduct.html">BaseOrderProduct</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProductPeer.html">BaseOrderProductPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProductQuery.html">BaseOrderProductQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderQuery.html">BaseOrderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatus.html">BaseOrderStatus</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDesc.html">BaseOrderStatusDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescPeer.html">BaseOrderStatusDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescQuery.html">BaseOrderStatusDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18n.html">BaseOrderStatusI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nPeer.html">BaseOrderStatusI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nQuery.html">BaseOrderStatusI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusPeer.html">BaseOrderStatusPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusQuery.html">BaseOrderStatusQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProduct.html">BaseProduct</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategory.html">BaseProductCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategoryPeer.html">BaseProductCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategoryQuery.html">BaseProductCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDesc.html">BaseProductDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDescPeer.html">BaseProductDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDescQuery.html">BaseProductDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18n.html">BaseProductI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18nPeer.html">BaseProductI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18nQuery.html">BaseProductI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductPeer.html">BaseProductPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductQuery.html">BaseProductQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersion.html">BaseProductVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersionPeer.html">BaseProductVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersionQuery.html">BaseProductVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResource.html">BaseResource</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDesc.html">BaseResourceDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDescPeer.html">BaseResourceDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDescQuery.html">BaseResourceDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18n.html">BaseResourceI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18nPeer.html">BaseResourceI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18nQuery.html">BaseResourceI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourcePeer.html">BaseResourcePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceQuery.html">BaseResourceQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewriting.html">BaseRewriting</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewritingPeer.html">BaseRewritingPeer</a></li>
+				<li class="active"><a href="class-Thelia.Model.om.BaseRewritingQuery.html">BaseRewritingQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStock.html">BaseStock</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStockPeer.html">BaseStockPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStockQuery.html">BaseStockQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTax.html">BaseTax</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDesc.html">BaseTaxDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDescPeer.html">BaseTaxDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDescQuery.html">BaseTaxDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18n.html">BaseTaxI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18nPeer.html">BaseTaxI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18nQuery.html">BaseTaxI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxPeer.html">BaseTaxPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxQuery.html">BaseTaxQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRule.html">BaseTaxRule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountry.html">BaseTaxRuleCountry</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountryPeer.html">BaseTaxRuleCountryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountryQuery.html">BaseTaxRuleCountryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDesc.html">BaseTaxRuleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescPeer.html">BaseTaxRuleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescQuery.html">BaseTaxRuleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18n.html">BaseTaxRuleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nPeer.html">BaseTaxRuleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nQuery.html">BaseTaxRuleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRulePeer.html">BaseTaxRulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleQuery.html">BaseTaxRuleQuery</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Model.om.html" title="Summary of Thelia\Model\om"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class BaseRewritingQuery</h1>
+
+
+	<div class="description">
+	
+<p>Base class that represents a query for the 'rewriting' table.</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+ModelCriteria
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
+<b><span>Thelia\Model\om\BaseRewritingQuery</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+	<div>
+		<h4>Direct known subclasses</h4>
+			<a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a>
+	</div>
+
+
+
+
+
+
+	<div class="info">
+		<b>Abstract</b><br />
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
+		<b>Package:</b> propel\generator\Thelia\Model\om<br />
+
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#23-963" title="Go to source code">core/lib/Thelia/Model/om/BaseRewritingQuery.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#91-101" title="Go to source code">__construct</a>( <span>string <var>$dbName</var> = <span class="php-quote">'thelia'</span></span>, <span>string <var>$modelName</var> = <span class="php-quote">'Thelia\\Model\\Rewriting'</span></span>, <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Initializes internal state of BaseRewritingQuery object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Initializes internal state of BaseRewritingQuery object.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$dbName</var></dt>
+					<dd><code>string</code><br>$dbName The dabase name</dd>
+					<dt><var>$modelName</var></dt>
+					<dd><code>string</code><br>$modelName The phpName of a model, e.g. 'Book'</dd>
+					<dt><var>$modelAlias</var></dt>
+					<dd><code>string</code><br>$modelAlias The alias for the model in this query, e.g. 'b'</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="create" id="_create">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_create">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#103-125" title="Go to source code">create</a>( <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span>, <span><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>|Criteria <var>$criteria</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns a new RewritingQuery object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns a new RewritingQuery object.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$modelAlias</var></dt>
+					<dd><code>string</code><br>$modelAlias The alias of a model in the query</dd>
+					<dt><var>$criteria</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>|Criteria</code><br>$criteria Optional Criteria to build the query from</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPk" id="_findPk">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>|<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a>[]</code>|mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPk">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#127-161" title="Go to source code">findPk</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Find object by primary key. Propel uses the instance pool to skip the
+database if the object exists. Go fast if the query is untouched.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find object by primary key. Propel uses the instance pool to skip the
+database if the object exists. Go fast if the query is untouched.</p>
+
+<pre>
+<span class="php-var">$obj</span>  = <span
+class="php-var">$c</span>-&gt;findPk(<span class="php-num">12</span>, <span
+class="php-var">$con</span>);
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con an optional connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>|<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a>[]</code>|mixed</code><br>the result, formatted by the current formatter<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPkSimple" id="_findPkSimple">
+
+		<td class="attributes"><code>
+			 protected 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPkSimple">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#163-193" title="Go to source code">findPkSimple</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Find object by primary key using raw SQL to go fast. Bypass doSelect() and
+the object formatter by using generated code.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find object by primary key using raw SQL to go fast. Bypass doSelect() and
+the object formatter by using generated code.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con A connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br>A model object, or null if the key is not found<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPkComplex" id="_findPkComplex">
+
+		<td class="attributes"><code>
+			 protected 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>|<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a>[]</code>|mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPkComplex">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#195-212" title="Go to source code">findPkComplex</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Find object by primary key.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find object by primary key.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con A connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>|<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a>[]</code>|mixed</code><br>the result, formatted by the current formatter<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPks" id="_findPks">
+
+		<td class="attributes"><code>
+			 public 
+			PropelObjectCollection|<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a>[]</code>|mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPks">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#214-236" title="Go to source code">findPks</a>( <span>array <var>$keys</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Find objects by primary key</p>
+
+<pre>
+<span class="php-var">$objs</span> = <span
+class="php-var">$c</span>-&gt;findPks(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">56</span>, <span class="php-num">832</span>), <span
+class="php-var">$con</span>);
+</pre>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find objects by primary key</p>
+
+<pre>
+<span class="php-var">$objs</span> = <span
+class="php-var">$c</span>-&gt;findPks(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">56</span>, <span class="php-num">832</span>), <span
+class="php-var">$con</span>);
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$keys</var></dt>
+					<dd><code>array</code><br>$keys Primary keys to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con an optional connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>PropelObjectCollection|<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a>[]</code>|mixed</code><br>the list of results, formatted by the current formatter<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByPrimaryKey" id="_filterByPrimaryKey">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByPrimaryKey">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#238-249" title="Go to source code">filterByPrimaryKey</a>( <span>mixed <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by primary key</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by primary key</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByPrimaryKeys" id="_filterByPrimaryKeys">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByPrimaryKeys">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#251-262" title="Go to source code">filterByPrimaryKeys</a>( <span>array <var>$keys</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a list of primary keys</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a list of primary keys</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$keys</var></dt>
+					<dd><code>array</code><br>$keys The list of primary key to use for the query</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterById" id="_filterById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#264-289" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the id column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterById(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE id = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE id IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>mixed</code><br>$id The value to use as filter. Use scalar values for equality. Use array values
+for in_array() equivalent. Use associative array('min' =&gt; $minValue, 'max'
+=&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByUrl" id="_filterByUrl">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByUrl">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#291-318" title="Go to source code">filterByUrl</a>( <span>string <var>$url</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the url column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the url column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByUrl(<span
+class="php-quote">'fooValue'</span>);   <span
+class="php-comment">// WHERE url = 'fooValue'</span>
+<span
+class="php-var">$query</span>-&gt;filterByUrl(<span
+class="php-quote">'%fooValue%'</span>); <span
+class="php-comment">// WHERE url LIKE '%fooValue%'</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$url</var></dt>
+					<dd><code>string</code><br>$url The value to use as filter. Accepts wildcards (* and % trigger a LIKE)</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByProductId" id="_filterByProductId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByProductId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#320-361" title="Go to source code">filterByProductId</a>( <span>mixed <var>$productId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the product_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the product_id column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByProductId(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE product_id = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterByProductId(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE product_id IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterByProductId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE product_id &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$productId</var></dt>
+					<dd><code>mixed</code><br>$productId The value to use as filter. Use scalar values for equality. Use array
+values for in_array() equivalent. Use associative array('min' =&gt; $minValue,
+'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Thelia.Model.om.BaseRewritingQuery.html#_filterByProduct">Thelia\Model\om\BaseRewritingQuery::filterByProduct()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByCategoryId" id="_filterByCategoryId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByCategoryId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#363-404" title="Go to source code">filterByCategoryId</a>( <span>mixed <var>$categoryId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the category_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the category_id column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByCategoryId(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE category_id = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterByCategoryId(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE category_id IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterByCategoryId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE category_id &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$categoryId</var></dt>
+					<dd><code>mixed</code><br>$categoryId The value to use as filter. Use scalar values for equality. Use
+array values for in_array() equivalent. Use associative array('min' =&gt;
+$minValue, 'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Thelia.Model.om.BaseRewritingQuery.html#_filterByCategory">Thelia\Model\om\BaseRewritingQuery::filterByCategory()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByFolderId" id="_filterByFolderId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByFolderId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#406-447" title="Go to source code">filterByFolderId</a>( <span>mixed <var>$folderId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the folder_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the folder_id column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByFolderId(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE folder_id = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterByFolderId(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE folder_id IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterByFolderId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE folder_id &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$folderId</var></dt>
+					<dd><code>mixed</code><br>$folderId The value to use as filter. Use scalar values for equality. Use array
+values for in_array() equivalent. Use associative array('min' =&gt; $minValue,
+'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Thelia.Model.om.BaseRewritingQuery.html#_filterByFolder">Thelia\Model\om\BaseRewritingQuery::filterByFolder()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByContentId" id="_filterByContentId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByContentId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#449-490" title="Go to source code">filterByContentId</a>( <span>mixed <var>$contentId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the content_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the content_id column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByContentId(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE content_id = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterByContentId(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE content_id IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterByContentId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE content_id &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$contentId</var></dt>
+					<dd><code>mixed</code><br>$contentId The value to use as filter. Use scalar values for equality. Use array
+values for in_array() equivalent. Use associative array('min' =&gt; $minValue,
+'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Thelia.Model.om.BaseRewritingQuery.html#_filterByContent">Thelia\Model\om\BaseRewritingQuery::filterByContent()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByCreatedAt" id="_filterByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#492-533" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the created_at column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByCreatedAt(<span
+class="php-quote">'2011-03-14'</span>); <span
+class="php-comment">// WHERE created_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByCreatedAt(<span
+class="php-quote">'now'</span>); <span
+class="php-comment">// WHERE created_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByCreatedAt(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span
+class="php-quote">'yesterday'</span>)); <span
+class="php-comment">// WHERE created_at &gt; '2011-03-13'</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$createdAt</var></dt>
+					<dd><code>mixed</code><br>$createdAt The value to use as filter. Values can be integers (unix timestamps),
+DateTime objects, or strings. Empty strings are treated as NULL. Use scalar
+values for equality. Use array values for in_array() equivalent. Use associative
+array('min' =&gt; $minValue, 'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByUpdatedAt" id="_filterByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#535-576" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the updated_at column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByUpdatedAt(<span
+class="php-quote">'2011-03-14'</span>); <span
+class="php-comment">// WHERE updated_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByUpdatedAt(<span
+class="php-quote">'now'</span>); <span
+class="php-comment">// WHERE updated_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByUpdatedAt(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span
+class="php-quote">'yesterday'</span>)); <span
+class="php-comment">// WHERE updated_at &gt; '2011-03-13'</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$updatedAt</var></dt>
+					<dd><code>mixed</code><br>$updatedAt The value to use as filter. Values can be integers (unix timestamps),
+DateTime objects, or strings. Empty strings are treated as NULL. Use scalar
+values for equality. Use array values for in_array() equivalent. Use associative
+array('min' =&gt; $minValue, 'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByProduct" id="_filterByProduct">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByProduct">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#578-602" title="Go to source code">filterByProduct</a>( <span><code><a href="class-Thelia.Model.Product.html">Thelia\Model\Product</a></code>|PropelObjectCollection <var>$product</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related Product object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related Product object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$product</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.Product.html">Thelia\Model\Product</a></code>|PropelObjectCollection</code><br>$product The related object(s) to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinProduct" id="_joinProduct">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinProduct">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#604-634" title="Go to source code">joinProduct</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the Product relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the Product relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useProductQuery" id="_useProductQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.ProductQuery.html">Thelia\Model\ProductQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useProductQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#636-652" title="Go to source code">useProductQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the Product relation Product object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the Product relation Product object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.ProductQuery.html">Thelia\Model\ProductQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByCategory" id="_filterByCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#654-678" title="Go to source code">filterByCategory</a>( <span><code><a href="class-Thelia.Model.Category.html">Thelia\Model\Category</a></code>|PropelObjectCollection <var>$category</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related Category object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related Category object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$category</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.Category.html">Thelia\Model\Category</a></code>|PropelObjectCollection</code><br>$category The related object(s) to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinCategory" id="_joinCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#680-710" title="Go to source code">joinCategory</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the Category relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the Category relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useCategoryQuery" id="_useCategoryQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.CategoryQuery.html">Thelia\Model\CategoryQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useCategoryQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#712-728" title="Go to source code">useCategoryQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the Category relation Category object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the Category relation Category object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.CategoryQuery.html">Thelia\Model\CategoryQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByFolder" id="_filterByFolder">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByFolder">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#730-754" title="Go to source code">filterByFolder</a>( <span><code><a href="class-Thelia.Model.Folder.html">Thelia\Model\Folder</a></code>|PropelObjectCollection <var>$folder</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related Folder object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related Folder object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$folder</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.Folder.html">Thelia\Model\Folder</a></code>|PropelObjectCollection</code><br>$folder The related object(s) to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinFolder" id="_joinFolder">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinFolder">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#756-786" title="Go to source code">joinFolder</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the Folder relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the Folder relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useFolderQuery" id="_useFolderQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FolderQuery.html">Thelia\Model\FolderQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useFolderQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#788-804" title="Go to source code">useFolderQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the Folder relation Folder object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the Folder relation Folder object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FolderQuery.html">Thelia\Model\FolderQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByContent" id="_filterByContent">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByContent">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#806-830" title="Go to source code">filterByContent</a>( <span><code><a href="class-Thelia.Model.Content.html">Thelia\Model\Content</a></code>|PropelObjectCollection <var>$content</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related Content object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related Content object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$content</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.Content.html">Thelia\Model\Content</a></code>|PropelObjectCollection</code><br>$content The related object(s) to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinContent" id="_joinContent">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinContent">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#832-862" title="Go to source code">joinContent</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the Content relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the Content relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useContentQuery" id="_useContentQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.ContentQuery.html">Thelia\Model\ContentQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useContentQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#864-880" title="Go to source code">useContentQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the Content relation Content object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the Content relation Content object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.ContentQuery.html">Thelia\Model\ContentQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prune" id="_prune">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prune">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#882-896" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code> <var>$rewriting</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Exclude object from result</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Exclude object from result</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$rewriting</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br>$rewriting Object to remove from the list of results</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="recentlyUpdated" id="_recentlyUpdated">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_recentlyUpdated">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#900-910" title="Go to source code">recentlyUpdated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter by the latest updated</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter by the latest updated</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$nbDays</var></dt>
+					<dd><code>integer</code><br>$nbDays Maximum age of the latest update in days</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="lastUpdatedFirst" id="_lastUpdatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_lastUpdatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#912-920" title="Go to source code">lastUpdatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by update date desc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by update date desc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="firstUpdatedFirst" id="_firstUpdatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_firstUpdatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#922-930" title="Go to source code">firstUpdatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by update date asc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by update date asc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="recentlyCreated" id="_recentlyCreated">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_recentlyCreated">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#932-942" title="Go to source code">recentlyCreated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter by the latest created</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter by the latest created</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$nbDays</var></dt>
+					<dd><code>integer</code><br>$nbDays Maximum age of in days</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="lastCreatedFirst" id="_lastCreatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_lastCreatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#944-952" title="Go to source code">lastCreatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by create date desc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by create date desc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="firstCreatedFirst" id="_firstCreatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_firstCreatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#954-962" title="Go to source code">firstCreatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by create date asc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by create date asc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Magic methods summary</caption>
+	<tr data-order="orderById" id="m_orderById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#28" title="Go to source code">orderById</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByUrl" id="m_orderByUrl">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByUrl">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#29" title="Go to source code">orderByUrl</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the url column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the url column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByProductId" id="m_orderByProductId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByProductId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#30" title="Go to source code">orderByProductId</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the product_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the product_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByCategoryId" id="m_orderByCategoryId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByCategoryId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#31" title="Go to source code">orderByCategoryId</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the category_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the category_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByFolderId" id="m_orderByFolderId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByFolderId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#32" title="Go to source code">orderByFolderId</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the folder_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the folder_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByContentId" id="m_orderByContentId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByContentId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#33" title="Go to source code">orderByContentId</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the content_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the content_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByCreatedAt" id="m_orderByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#34" title="Go to source code">orderByCreatedAt</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the created_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByUpdatedAt" id="m_orderByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#35" title="Go to source code">orderByUpdatedAt</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the updated_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupById" id="m_groupById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#37" title="Go to source code">groupById</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the id column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByUrl" id="m_groupByUrl">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByUrl">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#38" title="Go to source code">groupByUrl</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the url column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the url column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByProductId" id="m_groupByProductId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByProductId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#39" title="Go to source code">groupByProductId</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the product_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the product_id column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByCategoryId" id="m_groupByCategoryId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByCategoryId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#40" title="Go to source code">groupByCategoryId</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the category_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the category_id column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByFolderId" id="m_groupByFolderId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByFolderId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#41" title="Go to source code">groupByFolderId</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the folder_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the folder_id column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByContentId" id="m_groupByContentId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByContentId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#42" title="Go to source code">groupByContentId</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the content_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the content_id column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByCreatedAt" id="m_groupByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#43" title="Go to source code">groupByCreatedAt</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the created_at column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByUpdatedAt" id="m_groupByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#44" title="Go to source code">groupByUpdatedAt</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the updated_at column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoin" id="m_leftJoin">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoin">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#46" title="Go to source code">leftJoin</a>( <span>mixed <var>$relation</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relation</var></dt>
+					<dd><code>mixed</code><br>$relation</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoin" id="m_rightJoin">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoin">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#47" title="Go to source code">rightJoin</a>( <span>mixed <var>$relation</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relation</var></dt>
+					<dd><code>mixed</code><br>$relation</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoin" id="m_innerJoin">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoin">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#48" title="Go to source code">innerJoin</a>( <span>mixed <var>$relation</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relation</var></dt>
+					<dd><code>mixed</code><br>$relation</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinProduct" id="m_leftJoinProduct">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinProduct">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#50" title="Go to source code">leftJoinProduct</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the Product relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the Product relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinProduct" id="m_rightJoinProduct">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinProduct">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#51" title="Go to source code">rightJoinProduct</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Product relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Product relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinProduct" id="m_innerJoinProduct">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinProduct">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#52" title="Go to source code">innerJoinProduct</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the Product relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the Product relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinCategory" id="m_leftJoinCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#54" title="Go to source code">leftJoinCategory</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the Category relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the Category relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinCategory" id="m_rightJoinCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#55" title="Go to source code">rightJoinCategory</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Category relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Category relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinCategory" id="m_innerJoinCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#56" title="Go to source code">innerJoinCategory</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the Category relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the Category relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinFolder" id="m_leftJoinFolder">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinFolder">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#58" title="Go to source code">leftJoinFolder</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the Folder relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the Folder relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinFolder" id="m_rightJoinFolder">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinFolder">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#59" title="Go to source code">rightJoinFolder</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Folder relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Folder relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinFolder" id="m_innerJoinFolder">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinFolder">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#60" title="Go to source code">innerJoinFolder</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the Folder relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the Folder relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinContent" id="m_leftJoinContent">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinContent">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#62" title="Go to source code">leftJoinContent</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the Content relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the Content relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinContent" id="m_rightJoinContent">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinContent">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#63" title="Go to source code">rightJoinContent</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Content relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the Content relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinContent" id="m_innerJoinContent">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinContent">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#64" title="Go to source code">innerJoinContent</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the Content relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the Content relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.RewritingQuery.html">Thelia\Model\RewritingQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOne" id="m_findOne">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOne">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#66" title="Go to source code">findOne</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting matching the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting matching the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneOrCreate" id="m_findOneOrCreate">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneOrCreate">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#67" title="Go to source code">findOneOrCreate</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting matching the query, or a new Rewriting object
+populated from the query conditions when no match is found</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting matching the query, or a new Rewriting object
+populated from the query conditions when no match is found</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneById" id="m_findOneById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#69" title="Go to source code">findOneById</a>( <span>integer <var>$id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByUrl" id="m_findOneByUrl">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByUrl">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#70" title="Go to source code">findOneByUrl</a>( <span>string <var>$url</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the url column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the url column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$url</var></dt>
+					<dd><code>string</code><br>$url</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByProductId" id="m_findOneByProductId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByProductId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#71" title="Go to source code">findOneByProductId</a>( <span>integer <var>$product_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the product_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the product_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$product_id</var></dt>
+					<dd><code>integer</code><br>$product_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByCategoryId" id="m_findOneByCategoryId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByCategoryId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#72" title="Go to source code">findOneByCategoryId</a>( <span>integer <var>$category_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the category_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the category_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$category_id</var></dt>
+					<dd><code>integer</code><br>$category_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByFolderId" id="m_findOneByFolderId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByFolderId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#73" title="Go to source code">findOneByFolderId</a>( <span>integer <var>$folder_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the folder_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the folder_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$folder_id</var></dt>
+					<dd><code>integer</code><br>$folder_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByContentId" id="m_findOneByContentId">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByContentId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#74" title="Go to source code">findOneByContentId</a>( <span>integer <var>$content_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the content_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the content_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$content_id</var></dt>
+					<dd><code>integer</code><br>$content_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByCreatedAt" id="m_findOneByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#75" title="Go to source code">findOneByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the created_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$created_at</var></dt>
+					<dd><code>string</code><br>$created_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByUpdatedAt" id="m_findOneByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#76" title="Go to source code">findOneByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Rewriting filtered by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Rewriting filtered by the updated_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$updated_at</var></dt>
+					<dd><code>string</code><br>$updated_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Rewriting.html">Thelia\Model\Rewriting</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findById" id="m_findById">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#78" title="Go to source code">findById</a>( <span>integer <var>$id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByUrl" id="m_findByUrl">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByUrl">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#79" title="Go to source code">findByUrl</a>( <span>string <var>$url</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the url column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the url column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$url</var></dt>
+					<dd><code>string</code><br>$url</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByProductId" id="m_findByProductId">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByProductId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#80" title="Go to source code">findByProductId</a>( <span>integer <var>$product_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the product_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the product_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$product_id</var></dt>
+					<dd><code>integer</code><br>$product_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByCategoryId" id="m_findByCategoryId">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByCategoryId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#81" title="Go to source code">findByCategoryId</a>( <span>integer <var>$category_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the category_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the category_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$category_id</var></dt>
+					<dd><code>integer</code><br>$category_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByFolderId" id="m_findByFolderId">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByFolderId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#82" title="Go to source code">findByFolderId</a>( <span>integer <var>$folder_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the folder_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the folder_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$folder_id</var></dt>
+					<dd><code>integer</code><br>$folder_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByContentId" id="m_findByContentId">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByContentId">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#83" title="Go to source code">findByContentId</a>( <span>integer <var>$content_id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the content_id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the content_id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$content_id</var></dt>
+					<dd><code>integer</code><br>$content_id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByCreatedAt" id="m_findByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#84" title="Go to source code">findByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the created_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$created_at</var></dt>
+					<dd><code>string</code><br>$created_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByUpdatedAt" id="m_findByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseRewritingQuery.html#85" title="Go to source code">findByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Rewriting objects filtered by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Rewriting objects filtered by the updated_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$updated_at</var></dt>
+					<dd><code>string</code><br>$updated_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

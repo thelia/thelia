@@ -1,0 +1,2935 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Model\om\BaseTaxRuleCountryPeer | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Template.html">Template</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Thelia.Model.om.BaseAccessory.html">BaseAccessory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAccessoryPeer.html">BaseAccessoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAccessoryQuery.html">BaseAccessoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddress.html">BaseAddress</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddressPeer.html">BaseAddressPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddressQuery.html">BaseAddressQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdmin.html">BaseAdmin</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroup.html">BaseAdminGroup</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroupPeer.html">BaseAdminGroupPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroupQuery.html">BaseAdminGroupQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLog.html">BaseAdminLog</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLogPeer.html">BaseAdminLogPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLogQuery.html">BaseAdminLogQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminPeer.html">BaseAdminPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminQuery.html">BaseAdminQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseArea.html">BaseArea</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAreaPeer.html">BaseAreaPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAreaQuery.html">BaseAreaQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttribute.html">BaseAttribute</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAv.html">BaseAttributeAv</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDesc.html">BaseAttributeAvDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescPeer.html">BaseAttributeAvDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescQuery.html">BaseAttributeAvDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18n.html">BaseAttributeAvI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nPeer.html">BaseAttributeAvI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nQuery.html">BaseAttributeAvI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvPeer.html">BaseAttributeAvPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvQuery.html">BaseAttributeAvQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategory.html">BaseAttributeCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategoryPeer.html">BaseAttributeCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategoryQuery.html">BaseAttributeCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombination.html">BaseAttributeCombination</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationPeer.html">BaseAttributeCombinationPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationQuery.html">BaseAttributeCombinationQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDesc.html">BaseAttributeDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDescPeer.html">BaseAttributeDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDescQuery.html">BaseAttributeDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18n.html">BaseAttributeI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18nPeer.html">BaseAttributeI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18nQuery.html">BaseAttributeI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributePeer.html">BaseAttributePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeQuery.html">BaseAttributeQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategory.html">BaseCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDesc.html">BaseCategoryDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDescPeer.html">BaseCategoryDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDescQuery.html">BaseCategoryDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18n.html">BaseCategoryI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18nPeer.html">BaseCategoryI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18nQuery.html">BaseCategoryI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryPeer.html">BaseCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryQuery.html">BaseCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersion.html">BaseCategoryVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersionPeer.html">BaseCategoryVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersionQuery.html">BaseCategoryVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombination.html">BaseCombination</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombinationPeer.html">BaseCombinationPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombinationQuery.html">BaseCombinationQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfig.html">BaseConfig</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDesc.html">BaseConfigDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDescPeer.html">BaseConfigDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDescQuery.html">BaseConfigDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18n.html">BaseConfigI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18nPeer.html">BaseConfigI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18nQuery.html">BaseConfigI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigPeer.html">BaseConfigPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigQuery.html">BaseConfigQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContent.html">BaseContent</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssoc.html">BaseContentAssoc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssocPeer.html">BaseContentAssocPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssocQuery.html">BaseContentAssocQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDesc.html">BaseContentDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDescPeer.html">BaseContentDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDescQuery.html">BaseContentDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolder.html">BaseContentFolder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolderPeer.html">BaseContentFolderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolderQuery.html">BaseContentFolderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18n.html">BaseContentI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18nPeer.html">BaseContentI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18nQuery.html">BaseContentI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentPeer.html">BaseContentPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentQuery.html">BaseContentQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersion.html">BaseContentVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersionPeer.html">BaseContentVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersionQuery.html">BaseContentVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountry.html">BaseCountry</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDesc.html">BaseCountryDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDescPeer.html">BaseCountryDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDescQuery.html">BaseCountryDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18n.html">BaseCountryI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18nPeer.html">BaseCountryI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18nQuery.html">BaseCountryI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryPeer.html">BaseCountryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryQuery.html">BaseCountryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCoupon.html">BaseCoupon</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrder.html">BaseCouponOrder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrderPeer.html">BaseCouponOrderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrderQuery.html">BaseCouponOrderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponPeer.html">BaseCouponPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponQuery.html">BaseCouponQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRule.html">BaseCouponRule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRulePeer.html">BaseCouponRulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRuleQuery.html">BaseCouponRuleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrency.html">BaseCurrency</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrencyPeer.html">BaseCurrencyPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrencyQuery.html">BaseCurrencyQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomer.html">BaseCustomer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerPeer.html">BaseCustomerPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerQuery.html">BaseCustomerQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitle.html">BaseCustomerTitle</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDesc.html">BaseCustomerTitleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescPeer.html">BaseCustomerTitleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html">BaseCustomerTitleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18n.html">BaseCustomerTitleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nPeer.html">BaseCustomerTitleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nQuery.html">BaseCustomerTitleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitlePeer.html">BaseCustomerTitlePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleQuery.html">BaseCustomerTitleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzone.html">BaseDelivzone</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzonePeer.html">BaseDelivzonePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzoneQuery.html">BaseDelivzoneQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocument.html">BaseDocument</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDesc.html">BaseDocumentDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDescPeer.html">BaseDocumentDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDescQuery.html">BaseDocumentDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18n.html">BaseDocumentI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18nPeer.html">BaseDocumentI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18nQuery.html">BaseDocumentI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentPeer.html">BaseDocumentPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentQuery.html">BaseDocumentQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeature.html">BaseFeature</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAv.html">BaseFeatureAv</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDesc.html">BaseFeatureAvDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescPeer.html">BaseFeatureAvDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescQuery.html">BaseFeatureAvDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18n.html">BaseFeatureAvI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nPeer.html">BaseFeatureAvI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nQuery.html">BaseFeatureAvI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvPeer.html">BaseFeatureAvPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvQuery.html">BaseFeatureAvQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategory.html">BaseFeatureCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryPeer.html">BaseFeatureCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryQuery.html">BaseFeatureCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDesc.html">BaseFeatureDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDescPeer.html">BaseFeatureDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDescQuery.html">BaseFeatureDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18n.html">BaseFeatureI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18nPeer.html">BaseFeatureI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18nQuery.html">BaseFeatureI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeaturePeer.html">BaseFeaturePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProd.html">BaseFeatureProd</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProdPeer.html">BaseFeatureProdPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProdQuery.html">BaseFeatureProdQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureQuery.html">BaseFeatureQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolder.html">BaseFolder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDesc.html">BaseFolderDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDescPeer.html">BaseFolderDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDescQuery.html">BaseFolderDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18n.html">BaseFolderI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18nPeer.html">BaseFolderI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18nQuery.html">BaseFolderI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderPeer.html">BaseFolderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderQuery.html">BaseFolderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersion.html">BaseFolderVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersionPeer.html">BaseFolderVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersionQuery.html">BaseFolderVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroup.html">BaseGroup</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDesc.html">BaseGroupDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDescPeer.html">BaseGroupDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDescQuery.html">BaseGroupDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18n.html">BaseGroupI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18nPeer.html">BaseGroupI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18nQuery.html">BaseGroupI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModule.html">BaseGroupModule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModulePeer.html">BaseGroupModulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModuleQuery.html">BaseGroupModuleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupPeer.html">BaseGroupPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupQuery.html">BaseGroupQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResource.html">BaseGroupResource</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResourcePeer.html">BaseGroupResourcePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResourceQuery.html">BaseGroupResourceQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImage.html">BaseImage</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDesc.html">BaseImageDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDescPeer.html">BaseImageDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDescQuery.html">BaseImageDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18n.html">BaseImageI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18nPeer.html">BaseImageI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18nQuery.html">BaseImageI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImagePeer.html">BaseImagePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageQuery.html">BaseImageQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLang.html">BaseLang</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLangPeer.html">BaseLangPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLangQuery.html">BaseLangQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessage.html">BaseMessage</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDesc.html">BaseMessageDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDescPeer.html">BaseMessageDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDescQuery.html">BaseMessageDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18n.html">BaseMessageI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18nPeer.html">BaseMessageI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18nQuery.html">BaseMessageI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessagePeer.html">BaseMessagePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageQuery.html">BaseMessageQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersion.html">BaseMessageVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersionPeer.html">BaseMessageVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersionQuery.html">BaseMessageVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDesc.html">BaseModuleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDescPeer.html">BaseModuleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDescQuery.html">BaseModuleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18n.html">BaseModuleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18nPeer.html">BaseModuleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18nQuery.html">BaseModuleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModulePeer.html">BaseModulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrder.html">BaseOrder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddress.html">BaseOrderAddress</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddressPeer.html">BaseOrderAddressPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddressQuery.html">BaseOrderAddressQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeature.html">BaseOrderFeature</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeaturePeer.html">BaseOrderFeaturePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeatureQuery.html">BaseOrderFeatureQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderPeer.html">BaseOrderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProduct.html">BaseOrderProduct</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProductPeer.html">BaseOrderProductPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProductQuery.html">BaseOrderProductQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderQuery.html">BaseOrderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatus.html">BaseOrderStatus</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDesc.html">BaseOrderStatusDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescPeer.html">BaseOrderStatusDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescQuery.html">BaseOrderStatusDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18n.html">BaseOrderStatusI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nPeer.html">BaseOrderStatusI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nQuery.html">BaseOrderStatusI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusPeer.html">BaseOrderStatusPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusQuery.html">BaseOrderStatusQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProduct.html">BaseProduct</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategory.html">BaseProductCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategoryPeer.html">BaseProductCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategoryQuery.html">BaseProductCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDesc.html">BaseProductDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDescPeer.html">BaseProductDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDescQuery.html">BaseProductDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18n.html">BaseProductI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18nPeer.html">BaseProductI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18nQuery.html">BaseProductI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductPeer.html">BaseProductPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductQuery.html">BaseProductQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersion.html">BaseProductVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersionPeer.html">BaseProductVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersionQuery.html">BaseProductVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResource.html">BaseResource</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDesc.html">BaseResourceDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDescPeer.html">BaseResourceDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDescQuery.html">BaseResourceDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18n.html">BaseResourceI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18nPeer.html">BaseResourceI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18nQuery.html">BaseResourceI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourcePeer.html">BaseResourcePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceQuery.html">BaseResourceQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewriting.html">BaseRewriting</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewritingPeer.html">BaseRewritingPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewritingQuery.html">BaseRewritingQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStock.html">BaseStock</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStockPeer.html">BaseStockPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStockQuery.html">BaseStockQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTax.html">BaseTax</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDesc.html">BaseTaxDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDescPeer.html">BaseTaxDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDescQuery.html">BaseTaxDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18n.html">BaseTaxI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18nPeer.html">BaseTaxI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18nQuery.html">BaseTaxI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxPeer.html">BaseTaxPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxQuery.html">BaseTaxQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRule.html">BaseTaxRule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountry.html">BaseTaxRuleCountry</a></li>
+				<li class="active"><a href="class-Thelia.Model.om.BaseTaxRuleCountryPeer.html">BaseTaxRuleCountryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountryQuery.html">BaseTaxRuleCountryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDesc.html">BaseTaxRuleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescPeer.html">BaseTaxRuleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescQuery.html">BaseTaxRuleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18n.html">BaseTaxRuleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nPeer.html">BaseTaxRuleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nQuery.html">BaseTaxRuleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRulePeer.html">BaseTaxRulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleQuery.html">BaseTaxRuleQuery</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Model.om.html" title="Summary of Thelia\Model\om"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class BaseTaxRuleCountryPeer</h1>
+
+
+	<div class="description">
+	
+<p>Base static class for performing query and update operations on the
+'tax_rule_country' table.</p>
+
+	</div>
+
+
+
+	<div>
+		<h4>Direct known subclasses</h4>
+			<a href="class-Thelia.Model.TaxRuleCountryPeer.html">Thelia\Model\TaxRuleCountryPeer</a>
+	</div>
+
+
+
+
+
+
+	<div class="info">
+		<b>Abstract</b><br />
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
+		<b>Package:</b> propel\generator\Thelia\Model\om<br />
+
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#19-1764" title="Go to source code">core/lib/Thelia/Model/om/BaseTaxRuleCountryPeer.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="translateFieldName" id="_translateFieldName">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_translateFieldName">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#113-132" title="Go to source code">translateFieldName</a>( <span>string <var>$name</var></span>, <span>string <var>$fromType</var></span>, <span>string <var>$toType</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Translates a fieldname to another type</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Translates a fieldname to another type</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$name</var></dt>
+					<dd><code>string</code><br>$name field name</dd>
+					<dt><var>$fromType</var></dt>
+					<dd><code>string</code><br>$fromType One of the class type constants BasePeer::TYPE_PHPNAME,
+BasePeer::TYPE_STUDLYPHPNAME BasePeer::TYPE_COLNAME, BasePeer::TYPE_FIELDNAME,
+BasePeer::TYPE_NUM</dd>
+					<dt><var>$toType</var></dt>
+					<dd><code>string</code><br>$toType One of the class type constants</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>translated name of the field.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the specified name could not be found in the fieldname mappings.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getFieldNames" id="_getFieldNames">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getFieldNames">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#134-150" title="Go to source code">getFieldNames</a>( <span>string <var>$type</var> = Thelia\Model\om\BasePeer::TYPE_PHPNAME</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns an array of field names.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns an array of field names.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$type</var></dt>
+					<dd><code>string</code><br>$type The type of fieldnames to return: One of the class type constants
+BasePeer::TYPE_PHPNAME, BasePeer::TYPE_STUDLYPHPNAME BasePeer::TYPE_COLNAME,
+BasePeer::TYPE_FIELDNAME, BasePeer::TYPE_NUM</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>A list of field names<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the type is not valid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="alias" id="_alias">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_alias">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#152-167" title="Go to source code">alias</a>( <span>string <var>$alias</var></span>, <span>string <var>$column</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Convenience method which changes table.column to alias.column.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Convenience method which changes table.column to alias.column.</p>
+
+<p>Using this method you can maintain SQL abstraction while using column
+aliases.</p>
+
+<pre>
+<span class="php-var">$c</span>-&gt;addAlias(<span
+class="php-quote">&quot;alias1&quot;</span>, TablePeer::TABLE_NAME);
+<span
+class="php-var">$c</span>-&gt;addJoin(TablePeer::alias(<span
+class="php-quote">&quot;alias1&quot;</span>, TablePeer::PRIMARY_KEY_COLUMN), TablePeer::PRIMARY_KEY_COLUMN);
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$alias</var></dt>
+					<dd><code>string</code><br>$alias The alias for the current table.</dd>
+					<dt><var>$column</var></dt>
+					<dd><code>string</code><br>$column The column name for current table. (i.e.
+TaxRuleCountryPeer::COLUMN_NAME).</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addSelectColumns" id="_addSelectColumns">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addSelectColumns">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#169-200" title="Go to source code">addSelectColumns</a>( <span>Criteria <var>$criteria</var></span>, <span>string <var>$alias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Add all the columns needed to create a new object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Add all the columns needed to create a new object.</p>
+
+<p>Note: any columns that were marked with lazyLoad="true" in the XML schema
+will not be added to the select list and only loaded on demand.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria object containing the columns to add.</dd>
+					<dt><var>$alias</var></dt>
+					<dd><code>string</code><br>$alias optional table alias</dd>
+				</dl></div>
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCount" id="_doCount">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCount">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#202-245" title="Go to source code">doCount</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectOne" id="_doSelectOne">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectOne">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#246-265" title="Go to source code">doSelectOne</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Selects one object from the DB.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects one object from the DB.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria object used to create the SELECT statement.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code></code><br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelect" id="_doSelect">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelect">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#266-278" title="Go to source code">doSelect</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Selects several row from the DB.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects several row from the DB.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria The Criteria object used to build the SELECT statement.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of selected Objects<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectStmt" id="_doSelectStmt">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-PDOStatement.html">PDOStatement</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectStmt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#279-308" title="Go to source code">doSelectStmt</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Prepares the Criteria object and uses the parent doSelect() method to execute
+a PDOStatement.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Prepares the Criteria object and uses the parent doSelect() method to execute
+a PDOStatement.</p>
+
+<p>Use this method directly if you want to work with an executed statement
+durirectly (for example to perform your own object hydration).</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria The Criteria object used to build the SELECT statement.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con The connection to use</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-PDOStatement.html">PDOStatement</a></code></code><br>The executed PDOStatement object.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+				<h4>See</h4>
+				<div class="list">
+						BasePeer::doSelect()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addInstanceToPool" id="_addInstanceToPool">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addInstanceToPool">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#309-329" title="Go to source code">addInstanceToPool</a>( <span><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code> <var>$obj</var></span>, <span>string <var>$key</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds an object to the instance pool.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds an object to the instance pool.</p>
+
+<p>Propel keeps cached copies of objects in an instance pool when they are
+retrieved from the database. In some cases -- especially when you override
+doSelect*() methods in your stub classes -- you may need to explicitly add
+objects to the cache in order to ensure that the same objects are always
+returned by doSelect*() and retrieveByPK*() calls.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$obj</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code></code><br>$obj A TaxRuleCountry object.</dd>
+					<dt><var>$key</var></dt>
+					<dd><code>string</code><br>$key (optional) key to use for instance map (for performance boost if key was
+already calculated externally).</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="removeInstanceFromPool" id="_removeInstanceFromPool">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_removeInstanceFromPool">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#331-359" title="Go to source code">removeInstanceFromPool</a>( <span>mixed <var>$value</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Removes an object from the instance pool.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Removes an object from the instance pool.</p>
+
+<p>Propel keeps cached copies of objects in an instance pool when they are
+retrieved from the database. In some cases -- especially when you override
+doDelete methods in your stub classes -- you may need to explicitly remove
+objects from the cache in order to prevent returning objects that no longer
+exist.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$value</var></dt>
+					<dd><code>mixed</code><br>$value A TaxRuleCountry object or a primary key value.</dd>
+				</dl></div>
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the value is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getInstanceFromPool" id="_getInstanceFromPool">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getInstanceFromPool">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#361-380" title="Go to source code">getInstanceFromPool</a>( <span>string <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Retrieves a string version of the primary key from the DB resultset row that
+can be used to uniquely identify a row in this table.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Retrieves a string version of the primary key from the DB resultset row that
+can be used to uniquely identify a row in this table.</p>
+
+<p>For tables with a single-column primary key, that simple pkey value will be
+returned. For tables with a multi-column primary key, a serialize()d version of
+the primary key will be returned.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>string</code><br>$key The key (@see getPrimaryKeyHash()) for this instance.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code></code><br>Found object or null if 1) no instance exists for specified key or 2) instance
+pooling has been disabled.<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						getPrimaryKeyHash()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="clearInstancePool" id="_clearInstancePool">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_clearInstancePool">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#382-390" title="Go to source code">clearInstancePool</a>( )</code>
+
+		<div class="description short">
+			
+<p>Clear the instance pool.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Clear the instance pool.</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="clearRelatedInstancePool" id="_clearRelatedInstancePool">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_clearRelatedInstancePool">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#392-398" title="Go to source code">clearRelatedInstancePool</a>( )</code>
+
+		<div class="description short">
+			
+<p>Method to invalidate the instance pool of all tables related to
+tax_rule_country by a foreign key with ON DELETE CASCADE</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Method to invalidate the instance pool of all tables related to
+tax_rule_country by a foreign key with ON DELETE CASCADE</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getPrimaryKeyHashFromRow" id="_getPrimaryKeyHashFromRow">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getPrimaryKeyHashFromRow">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#400-418" title="Go to source code">getPrimaryKeyHashFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Retrieves a string version of the primary key from the DB resultset row that
+can be used to uniquely identify a row in this table.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Retrieves a string version of the primary key from the DB resultset row that
+can be used to uniquely identify a row in this table.</p>
+
+<p>For tables with a single-column primary key, that simple pkey value will be
+returned. For tables with a multi-column primary key, a serialize()d version of
+the primary key will be returned.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$row</var></dt>
+					<dd><code>array</code><br>$row PropelPDO resultset row.</dd>
+					<dt><var>$startcol</var></dt>
+					<dd><code>integer</code><br>$startcol The 0-based offset for reading from the resultset row.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>A string version of PK or null if the components of primary key in result array
+are all null.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getPrimaryKeyFromRow" id="_getPrimaryKeyFromRow">
+
+		<td class="attributes"><code>
+			 public static
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getPrimaryKeyFromRow">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#420-433" title="Go to source code">getPrimaryKeyFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Retrieves the primary key from the DB resultset row For tables with a
+single-column primary key, that simple pkey value will be returned. For tables
+with a multi-column primary key, an array of the primary key columns will be
+returned.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Retrieves the primary key from the DB resultset row For tables with a
+single-column primary key, that simple pkey value will be returned. For tables
+with a multi-column primary key, an array of the primary key columns will be
+returned.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$row</var></dt>
+					<dd><code>array</code><br>$row PropelPDO resultset row.</dd>
+					<dt><var>$startcol</var></dt>
+					<dd><code>integer</code><br>$startcol The 0-based offset for reading from the resultset row.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>The primary key of the row<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="populateObjects" id="_populateObjects">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_populateObjects">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#435-466" title="Go to source code">populateObjects</a>( <span><code><a href="class-PDOStatement.html">PDOStatement</a></code> <var>$stmt</var></span> )</code>
+
+		<div class="description short">
+			
+<p>The returned array will contain objects of the default type or objects that
+inherit from the default.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>The returned array will contain objects of the default type or objects that
+inherit from the default.</p>
+
+
+
+
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="populateObject" id="_populateObject">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_populateObject">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#467-492" title="Go to source code">populateObject</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Populates an object of the default type or an object that inherit from the
+default.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Populates an object of the default type or an object that inherit from the
+default.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$row</var></dt>
+					<dd><code>array</code><br>$row PropelPDO resultset row.</dd>
+					<dt><var>$startcol</var></dt>
+					<dd><code>integer</code><br>$startcol The 0-based offset for reading from the resultset row.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>(TaxRuleCountry object, last column rank)<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCountJoinTax" id="_doCountJoinTax">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCountJoinTax">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#495-543" title="Go to source code">doCountJoinTax</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria, joining the related Tax
+table</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria, joining the related Tax
+table</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCountJoinTaxRule" id="_doCountJoinTaxRule">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCountJoinTaxRule">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#546-594" title="Go to source code">doCountJoinTaxRule</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria, joining the related TaxRule
+table</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria, joining the related TaxRule
+table</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCountJoinCountry" id="_doCountJoinCountry">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCountJoinCountry">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#597-645" title="Go to source code">doCountJoinCountry</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria, joining the related Country
+table</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria, joining the related Country
+table</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectJoinTax" id="_doSelectJoinTax">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectJoinTax">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#648-712" title="Go to source code">doSelectJoinTax</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with their Tax
+objects.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with their Tax
+objects.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of TaxRuleCountry objects.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectJoinTaxRule" id="_doSelectJoinTaxRule">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectJoinTaxRule">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#715-779" title="Go to source code">doSelectJoinTaxRule</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with their TaxRule
+objects.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with their TaxRule
+objects.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of TaxRuleCountry objects.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectJoinCountry" id="_doSelectJoinCountry">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectJoinCountry">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#782-846" title="Go to source code">doSelectJoinCountry</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with their Country
+objects.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with their Country
+objects.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of TaxRuleCountry objects.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCountJoinAll" id="_doCountJoinAll">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCountJoinAll">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#849-901" title="Go to source code">doCountJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria, joining all related tables</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria, joining all related tables</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectJoinAll" id="_doSelectJoinAll">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectJoinAll">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#903-1016" title="Go to source code">doSelectJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of TaxRuleCountry objects.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCountJoinAllExceptTax" id="_doCountJoinAllExceptTax">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCountJoinAllExceptTax">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1019-1069" title="Go to source code">doCountJoinAllExceptTax</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria, joining the related Tax
+table</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria, joining the related Tax
+table</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCountJoinAllExceptTaxRule" id="_doCountJoinAllExceptTaxRule">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCountJoinAllExceptTaxRule">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1072-1122" title="Go to source code">doCountJoinAllExceptTaxRule</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria, joining the related TaxRule
+table</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria, joining the related TaxRule
+table</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doCountJoinAllExceptCountry" id="_doCountJoinAllExceptCountry">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doCountJoinAllExceptCountry">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1125-1175" title="Go to source code">doCountJoinAllExceptCountry</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Returns the number of rows matching criteria, joining the related Country
+table</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the number of rows matching criteria, joining the related Country
+table</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$distinct</var></dt>
+					<dd><code>boolean</code><br>$distinct Whether to select only distinct columns; deprecated: use
+Criteria-&gt;setDistinct() instead.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>Number of matching rows.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectJoinAllExceptTax" id="_doSelectJoinAllExceptTax">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectJoinAllExceptTax">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1178-1273" title="Go to source code">doSelectJoinAllExceptTax</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects except Tax.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects except Tax.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of TaxRuleCountry objects.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectJoinAllExceptTaxRule" id="_doSelectJoinAllExceptTaxRule">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectJoinAllExceptTaxRule">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1276-1371" title="Go to source code">doSelectJoinAllExceptTaxRule</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects except TaxRule.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects except TaxRule.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of TaxRuleCountry objects.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doSelectJoinAllExceptCountry" id="_doSelectJoinAllExceptCountry">
+
+		<td class="attributes"><code>
+			 public static
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doSelectJoinAllExceptCountry">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1374-1469" title="Go to source code">doSelectJoinAllExceptCountry</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects except Country.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Selects a collection of TaxRuleCountry objects pre-filled with all related
+objects except Country.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$criteria</var></dt>
+					<dd><code>Criteria</code><br>$criteria</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+					<dt><var>$join_behavior</var></dt>
+					<dd><code>String</code><br>$join_behavior the type of joins to use, defaults to Criteria::LEFT_JOIN</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of TaxRuleCountry objects.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getTableMap" id="_getTableMap">
+
+		<td class="attributes"><code>
+			 public static
+			TableMap
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getTableMap">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1471-1481" title="Go to source code">getTableMap</a>( )</code>
+
+		<div class="description short">
+			
+<p>Returns the TableMap related to this peer. This method is not needed for
+general use but a specific application could have a need.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns the TableMap related to this peer. This method is not needed for
+general use but a specific application could have a need.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>TableMap</code><br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="buildTableMap" id="_buildTableMap">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_buildTableMap">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1483-1492" title="Go to source code">buildTableMap</a>( )</code>
+
+		<div class="description short">
+			
+<p>Add a TableMap instance to the database for this peer class.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Add a TableMap instance to the database for this peer class.</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getOMClass" id="_getOMClass">
+
+		<td class="attributes"><code>
+			 public static
+			string
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getOMClass">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1494-1503" title="Go to source code">getOMClass</a>( )</code>
+
+		<div class="description short">
+			
+<p>The class that the Peer will make instances of.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>The class that the Peer will make instances of.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>string</code><br>ClassName<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doInsert" id="_doInsert">
+
+		<td class="attributes"><code>
+			 public static
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doInsert">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1505-1542" title="Go to source code">doInsert</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Performs an INSERT on the database, given a TaxRuleCountry or Criteria
+object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Performs an INSERT on the database, given a TaxRuleCountry or Criteria
+object.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$values</var></dt>
+					<dd><code>mixed</code><br>$values Criteria or TaxRuleCountry object containing data that is used to create
+the INSERT statement.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con the PropelPDO connection to use</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>The new primary key.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doUpdate" id="_doUpdate">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doUpdate">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1544-1581" title="Go to source code">doUpdate</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Performs an UPDATE on the database, given a TaxRuleCountry or Criteria
+object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Performs an UPDATE on the database, given a TaxRuleCountry or Criteria
+object.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$values</var></dt>
+					<dd><code>mixed</code><br>$values Criteria or TaxRuleCountry object containing data that is used to create
+the UPDATE statement.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con The connection to use (specify PropelPDO connection object to exert more
+control over transactions).</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>The number of affected rows (if supported by underlying database driver).<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doDeleteAll" id="_doDeleteAll">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doDeleteAll">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1583-1613" title="Go to source code">doDeleteAll</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Deletes all rows from the tax_rule_country table.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Deletes all rows from the tax_rule_country table.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con the connection to use</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>The number of affected rows (if supported by underlying database driver).<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doDelete" id="_doDelete">
+
+		<td class="attributes"><code>
+			 public static
+			integer
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doDelete">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1615-1672" title="Go to source code">doDelete</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Performs a DELETE on the database, given a TaxRuleCountry or Criteria object
+OR a primary key value.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Performs a DELETE on the database, given a TaxRuleCountry or Criteria object
+OR a primary key value.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$values</var></dt>
+					<dd><code>mixed</code><br>$values Criteria or TaxRuleCountry object or primary key or array of primary
+keys which is used to create the DELETE statement</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con the connection to use</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>integer</code><br>The number of affected rows (if supported by underlying database driver). This
+includes CASCADE-related rows if supported by native driver or if emulated using
+Propel.<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="doValidate" id="_doValidate">
+
+		<td class="attributes"><code>
+			 public static
+			mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_doValidate">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1674-1709" title="Go to source code">doValidate</a>( <span><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code> <var>$obj</var></span>, <span>mixed <var>$cols</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Validates all modified columns of given TaxRuleCountry object. If parameter
+$columns is either a single column name or an array of column names than only
+those columns are validated.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Validates all modified columns of given TaxRuleCountry object. If parameter
+$columns is either a single column name or an array of column names than only
+those columns are validated.</p>
+
+<p>NOTICE: This does not apply to primary or foreign keys for now.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$obj</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code></code><br>$obj The object to validate.</dd>
+					<dt><var>$cols</var></dt>
+					<dd><code>mixed</code><br>$cols Column name or array of column names.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>mixed</code><br>TRUE if all columns are valid or the error message of the first invalid column.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="retrieveByPK" id="_retrieveByPK">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_retrieveByPK">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1711-1735" title="Go to source code">retrieveByPK</a>( <span>integer <var>$pk</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Retrieve a single object by pkey.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Retrieve a single object by pkey.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$pk</var></dt>
+					<dd><code>integer</code><br>$pk the primary key.</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con the connection to use</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="retrieveByPKs" id="_retrieveByPKs">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a>[]</code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_retrieveByPKs">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#1737-1762" title="Go to source code">retrieveByPKs</a>( <span>array <var>$pks</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Retrieve multiple objects by pkey.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Retrieve multiple objects by pkey.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$pks</var></dt>
+					<dd><code>array</code><br>$pks List of primary keys</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con the connection to use</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.TaxRuleCountry.html">Thelia\Model\TaxRuleCountry</a>[]</code></code><br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>Any exceptions caught during processing will be rethrown wrapped into a
+PropelException.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+	<table class="summary" id="constants">
+	<caption>Constants summary</caption>
+	<tr data-order="DATABASE_NAME" id="DATABASE_NAME">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#29-30" title="Go to source code"><b>DATABASE_NAME</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'thelia'</span></code></td>
+		<td class="description"><div>
+			<a href="#DATABASE_NAME" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the default database name for this class</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the default database name for this class</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="TABLE_NAME" id="TABLE_NAME">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#32-33" title="Go to source code"><b>TABLE_NAME</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country'</span></code></td>
+		<td class="description"><div>
+			<a href="#TABLE_NAME" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the table name for this class</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the table name for this class</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="OM_CLASS" id="OM_CLASS">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#35-36" title="Go to source code"><b>OM_CLASS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'Thelia\\Model\\TaxRuleCountry'</span></code></td>
+		<td class="description"><div>
+			<a href="#OM_CLASS" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the related Propel class for this table</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the related Propel class for this table</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="TM_CLASS" id="TM_CLASS">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#38-39" title="Go to source code"><b>TM_CLASS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'TaxRuleCountryTableMap'</span></code></td>
+		<td class="description"><div>
+			<a href="#TM_CLASS" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the related TableMap class for this table</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the related TableMap class for this table</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="NUM_COLUMNS" id="NUM_COLUMNS">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#41-42" title="Go to source code"><b>NUM_COLUMNS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">7</span></code></td>
+		<td class="description"><div>
+			<a href="#NUM_COLUMNS" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>The total number of columns.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>The total number of columns.</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="NUM_LAZY_LOAD_COLUMNS" id="NUM_LAZY_LOAD_COLUMNS">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#44-45" title="Go to source code"><b>NUM_LAZY_LOAD_COLUMNS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">0</span></code></td>
+		<td class="description"><div>
+			<a href="#NUM_LAZY_LOAD_COLUMNS" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>The number of lazy-loaded columns.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>The number of lazy-loaded columns.</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="NUM_HYDRATE_COLUMNS" id="NUM_HYDRATE_COLUMNS">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#47-48" title="Go to source code"><b>NUM_HYDRATE_COLUMNS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">7</span></code></td>
+		<td class="description"><div>
+			<a href="#NUM_HYDRATE_COLUMNS" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="ID" id="ID">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#50-51" title="Go to source code"><b>ID</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country.ID'</span></code></td>
+		<td class="description"><div>
+			<a href="#ID" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the column name for the ID field</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the column name for the ID field</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="TAX_RULE_ID" id="TAX_RULE_ID">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#53-54" title="Go to source code"><b>TAX_RULE_ID</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country.TAX_RULE_ID'</span></code></td>
+		<td class="description"><div>
+			<a href="#TAX_RULE_ID" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the column name for the TAX_RULE_ID field</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the column name for the TAX_RULE_ID field</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="COUNTRY_ID" id="COUNTRY_ID">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#56-57" title="Go to source code"><b>COUNTRY_ID</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country.COUNTRY_ID'</span></code></td>
+		<td class="description"><div>
+			<a href="#COUNTRY_ID" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the column name for the COUNTRY_ID field</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the column name for the COUNTRY_ID field</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="TAX_ID" id="TAX_ID">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#59-60" title="Go to source code"><b>TAX_ID</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country.TAX_ID'</span></code></td>
+		<td class="description"><div>
+			<a href="#TAX_ID" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the column name for the TAX_ID field</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the column name for the TAX_ID field</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="NONE" id="NONE">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#62-63" title="Go to source code"><b>NONE</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country.NONE'</span></code></td>
+		<td class="description"><div>
+			<a href="#NONE" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the column name for the NONE field</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the column name for the NONE field</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="CREATED_AT" id="CREATED_AT">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#65-66" title="Go to source code"><b>CREATED_AT</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country.CREATED_AT'</span></code></td>
+		<td class="description"><div>
+			<a href="#CREATED_AT" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the column name for the CREATED_AT field</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the column name for the CREATED_AT field</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="UPDATED_AT" id="UPDATED_AT">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#68-69" title="Go to source code"><b>UPDATED_AT</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'tax_rule_country.UPDATED_AT'</span></code></td>
+		<td class="description"><div>
+			<a href="#UPDATED_AT" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>the column name for the UPDATED_AT field</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>the column name for the UPDATED_AT field</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEFAULT_STRING_FORMAT" id="DEFAULT_STRING_FORMAT">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#71-72" title="Go to source code"><b>DEFAULT_STRING_FORMAT</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">'YAML'</span></code></td>
+		<td class="description"><div>
+			<a href="#DEFAULT_STRING_FORMAT" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>The default string format for model objects of the related table *</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>The default string format for model objects of the related table *</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="instances" id="$instances">
+		<td class="attributes"><code>
+			public static 
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#74-80" title="Go to source code"><var>$instances</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$instances" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>An identiy map to hold any loaded instances of TaxRuleCountry objects. This
+must be public so that other peer classes can access this when hydrating from
+JOIN queries.</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>An identiy map to hold any loaded instances of TaxRuleCountry objects. This
+must be public so that other peer classes can access this when hydrating from
+JOIN queries.</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="fieldNames" id="$fieldNames">
+		<td class="attributes"><code>
+			protected static 
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#83-96" title="Go to source code"><var>$fieldNames</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> (
+    BasePeer::TYPE_PHPNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'Id'</span>, <span class="php-quote">'TaxRuleId'</span>, <span class="php-quote">'CountryId'</span>, <span class="php-quote">'TaxId'</span>, <span class="php-quote">'None'</span>, <span class="php-quote">'CreatedAt'</span>, <span class="php-quote">'UpdatedAt'</span>, ),
+    BasePeer::TYPE_STUDLYPHPNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'id'</span>, <span class="php-quote">'taxRuleId'</span>, <span class="php-quote">'countryId'</span>, <span class="php-quote">'taxId'</span>, <span class="php-quote">'none'</span>, <span class="php-quote">'createdAt'</span>, <span class="php-quote">'updatedAt'</span>, ),
+    BasePeer::TYPE_COLNAME =&gt; <span class="php-keyword1">array</span> (TaxRuleCountryPeer::ID, TaxRuleCountryPeer::TAX_RULE_ID, TaxRuleCountryPeer::COUNTRY_ID, TaxRuleCountryPeer::TAX_ID, TaxRuleCountryPeer::NONE, TaxRuleCountryPeer::CREATED_AT, TaxRuleCountryPeer::UPDATED_AT, ),
+    BasePeer::TYPE_RAW_COLNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'ID'</span>, <span class="php-quote">'TAX_RULE_ID'</span>, <span class="php-quote">'COUNTRY_ID'</span>, <span class="php-quote">'TAX_ID'</span>, <span class="php-quote">'NONE'</span>, <span class="php-quote">'CREATED_AT'</span>, <span class="php-quote">'UPDATED_AT'</span>, ),
+    BasePeer::TYPE_FIELDNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'id'</span>, <span class="php-quote">'tax_rule_id'</span>, <span class="php-quote">'country_id'</span>, <span class="php-quote">'tax_id'</span>, <span class="php-quote">'none'</span>, <span class="php-quote">'created_at'</span>, <span class="php-quote">'updated_at'</span>, ),
+    BasePeer::TYPE_NUM =&gt; <span class="php-keyword1">array</span> (<span class="php-num">0</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>, <span class="php-num">4</span>, <span class="php-num">5</span>, <span class="php-num">6</span>, )
+)</code></td>
+		<td class="description"><div>
+			<a href="#$fieldNames" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>holds an array of fieldnames</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>holds an array of fieldnames</p>
+
+<p>first dimension keys are the type constants e.g.
+TaxRuleCountryPeer::$fieldNames[TaxRuleCountryPeer::TYPE_PHPNAME][0] = 'Id'</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="fieldKeys" id="$fieldKeys">
+		<td class="attributes"><code>
+			protected static 
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Model.om.BaseTaxRuleCountryPeer.html#98-111" title="Go to source code"><var>$fieldKeys</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span> (
+    BasePeer::TYPE_PHPNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'Id'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'TaxRuleId'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'CountryId'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'TaxId'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'None'</span> =&gt; <span class="php-num">4</span>, <span class="php-quote">'CreatedAt'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'UpdatedAt'</span> =&gt; <span class="php-num">6</span>, ),
+    BasePeer::TYPE_STUDLYPHPNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'id'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'taxRuleId'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'countryId'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'taxId'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'none'</span> =&gt; <span class="php-num">4</span>, <span class="php-quote">'createdAt'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'updatedAt'</span> =&gt; <span class="php-num">6</span>, ),
+    BasePeer::TYPE_COLNAME =&gt; <span class="php-keyword1">array</span> (TaxRuleCountryPeer::ID =&gt; <span class="php-num">0</span>, TaxRuleCountryPeer::TAX_RULE_ID =&gt; <span class="php-num">1</span>, TaxRuleCountryPeer::COUNTRY_ID =&gt; <span class="php-num">2</span>, TaxRuleCountryPeer::TAX_ID =&gt; <span class="php-num">3</span>, TaxRuleCountryPeer::NONE =&gt; <span class="php-num">4</span>, TaxRuleCountryPeer::CREATED_AT =&gt; <span class="php-num">5</span>, TaxRuleCountryPeer::UPDATED_AT =&gt; <span class="php-num">6</span>, ),
+    BasePeer::TYPE_RAW_COLNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'ID'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'TAX_RULE_ID'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'COUNTRY_ID'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'TAX_ID'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'NONE'</span> =&gt; <span class="php-num">4</span>, <span class="php-quote">'CREATED_AT'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'UPDATED_AT'</span> =&gt; <span class="php-num">6</span>, ),
+    BasePeer::TYPE_FIELDNAME =&gt; <span class="php-keyword1">array</span> (<span class="php-quote">'id'</span> =&gt; <span class="php-num">0</span>, <span class="php-quote">'tax_rule_id'</span> =&gt; <span class="php-num">1</span>, <span class="php-quote">'country_id'</span> =&gt; <span class="php-num">2</span>, <span class="php-quote">'tax_id'</span> =&gt; <span class="php-num">3</span>, <span class="php-quote">'none'</span> =&gt; <span class="php-num">4</span>, <span class="php-quote">'created_at'</span> =&gt; <span class="php-num">5</span>, <span class="php-quote">'updated_at'</span> =&gt; <span class="php-num">6</span>, ),
+    BasePeer::TYPE_NUM =&gt; <span class="php-keyword1">array</span> (<span class="php-num">0</span>, <span class="php-num">1</span>, <span class="php-num">2</span>, <span class="php-num">3</span>, <span class="php-num">4</span>, <span class="php-num">5</span>, <span class="php-num">6</span>, )
+)</code></td>
+		<td class="description"><div>
+			<a href="#$fieldKeys" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>holds an array of keys for quick access to the fieldnames array</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>holds an array of keys for quick access to the fieldnames array</p>
+
+<p>first dimension keys are the type constants e.g.
+TaxRuleCountryPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

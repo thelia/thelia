@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Routing\TheliaMatcherCollection | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Template.html">Template</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Thelia.Routing.TheliaMatcherCollection.html">TheliaMatcherCollection</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Routing.html" title="Summary of Thelia\Routing"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class TheliaMatcherCollection</h1>
+
+
+	<div class="description">
+	
+<p>Collection of Matcher.</p>
+
+<p>Matcher resolve request into controller::method exemple of Matcher :
+UrlMatcher of HttpKernel component (but it implements UrlMatcherInterface and
+not RequestMatcherInterface.</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>Thelia\Routing\TheliaMatcherCollection</span></b>			
+			 implements 
+<span>Symfony\Component\Routing\Matcher\RequestMatcherInterface</span>, 
+			
+<span>Symfony\Component\Routing\RequestContextAwareInterface</span>
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Routing.html">Routing</a><br />
+		
+
+				<b>Author:</b>
+				Manuel Raynaud &lt;<a
+href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&gt;<br />
+		<b>Located at</b> <a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#33-173" title="Go to source code">core/lib/Thelia/Routing/TheliaMatcherCollection.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#50-58" title="Go to source code">__construct</a>( )</code>
+
+		<div class="description short">
+			
+<p>Constructor</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Constructor</p>
+
+<p>Check if this constructor is needed (is RequestContext needed ? )</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="add" id="_add">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_add">#</a>
+		<code><a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#60-82" title="Go to source code">add</a>( <span>Symfony\Component\Routing\Matcher\RequestMatcherInterface <var>$matcher</var></span>, <span>integer <var>$priority</var> = <span class="php-num">0</span></span> )</code>
+
+		<div class="description short">
+			
+<p>allow to add a matcher routing class to the matchers collection matcher must
+implement RequestMatcherInterface</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>allow to add a matcher routing class to the matchers collection matcher must
+implement RequestMatcherInterface</p>
+
+<p>priority can be fixed with $priority parameter</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$matcher</var></dt>
+					<dd><code>Symfony\Component\Routing\Matcher\RequestMatcherInterface</code><br>$matcher</dd>
+					<dt><var>$priority</var></dt>
+					<dd><code>integer</code><br>$priority set the priority of the added matcher</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getSortedMatchers" id="_getSortedMatchers">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getSortedMatchers">#</a>
+		<code><a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#84-97" title="Go to source code">getSortedMatchers</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Sort Matchers by priority</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of matchers sorted by priority.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="sortMatchers" id="_sortMatchers">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_sortMatchers">#</a>
+		<code><a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#99-115" title="Go to source code">sortMatchers</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Sort the matcher by priority</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>Array of matchers sorted by priority.<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="matchRequest" id="_matchRequest">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_matchRequest">#</a>
+		<code><a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#117-149" title="Go to source code">matchRequest</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Tries to match a request with a set of routes.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Tries to match a request with a set of routes.</p>
+
+<p>If the matcher can not find information, it must throw one of the exceptions
+documented below.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$request</var></dt>
+					<dd><code>Symfony\Component\HttpFoundation\Request</code><br>$request The request to match</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br>An array of parameters<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>Symfony\Component\Routing\Exception\ResourceNotFoundException</code><br>If no matching resource could be found<br />
+					<code>Symfony\Component\Routing\Exception\MethodNotAllowedException</code><br>If a matching resource was found but the request method is not allowed<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setContext" id="_setContext">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setContext">#</a>
+		<code><a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#151-161" title="Go to source code">setContext</a>( <span>Symfony\Component\Routing\RequestContext <var>$context</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Sets the request context.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Sets the request context.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$context</var></dt>
+					<dd><code>Symfony\Component\Routing\RequestContext</code><br>$context The context</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getContext" id="_getContext">
+
+		<td class="attributes"><code>
+			 public 
+			Symfony\Component\Routing\RequestContext
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getContext">#</a>
+		<code><a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#163-172" title="Go to source code">getContext</a>( )</code>
+
+		<div class="description short">
+			
+<p>Gets the request context.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Gets the request context.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>Symfony\Component\Routing\RequestContext</code><br>The context<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="context" id="$context">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#44" title="Go to source code"><var>$context</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$context" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="matchers" id="$matchers">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#45" title="Go to source code"><var>$matchers</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$matchers" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="defaultMatcher" id="$defaultMatcher">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#46" title="Go to source code"><var>$defaultMatcher</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$defaultMatcher" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="sortedMatchers" id="$sortedMatchers">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Routing.TheliaMatcherCollection.html#48" title="Go to source code"><var>$sortedMatchers</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$sortedMatchers" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

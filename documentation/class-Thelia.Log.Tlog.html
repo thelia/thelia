@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Log\Tlog | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Template.html">Template</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Thelia.Log.AbstractTlogDestination.html">AbstractTlogDestination</a></li>
+				<li class="active"><a href="class-Thelia.Log.Tlog.html">Tlog</a></li>
+				<li><a href="class-Thelia.Log.TlogDestinationConfig.html">TlogDestinationConfig</a></li>
+			</ul>
+
+			<h3>Interfaces</h3>
+			<ul>
+				<li><a href="class-Thelia.Log.TlogInterface.html">TlogInterface</a></li>
+			</ul>
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Log.html" title="Summary of Thelia\Log"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class Tlog</h1>
+
+
+	<div class="description">
+	
+<p>Thelia Logger</p>
+
+<p>Allow to define different level and output.</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+<b><span>Thelia\Log\Tlog</span></b>			
+			 implements 
+<span>Psr\Log\LoggerInterface</span>
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Log.html">Log</a><br />
+		
+
+				<b>Author:</b>
+				Franck Allimant &lt;<a
+href="mailto:franck&#64;cqfdev.fr">franck&#64;<!---->cqfdev.fr</a>&gt;<br />
+				<b>Author:</b>
+				Manuel Raynaud &lt;<a
+href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&gt;<br />
+		<b>Located at</b> <a href="source-class-Thelia.Log.Tlog.html#28-705" title="Go to source code">core/lib/Thelia/Log/Tlog.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="getInstance" id="_getInstance">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Thelia.Log.Tlog.html">Thelia\Log\Tlog</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getInstance">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#108-123" title="Go to source code">getInstance</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Log.Tlog.html">Thelia\Log\Tlog</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="init" id="_init">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_init">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#125-146" title="Go to source code">init</a>( )</code>
+
+		<div class="description short">
+			
+<p>initialize default configuration</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>initialize default configuration</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setDestinations" id="_setDestinations">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setDestinations">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#151-164" title="Go to source code">setDestinations</a>( <span>string <var>$destinations</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$destinations</var></dt>
+					<dd><code>string</code><br>$destinations</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setLevel" id="_setLevel">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setLevel">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#166-175" title="Go to source code">setLevel</a>( <span>integer <var>$level</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>change the debug level. Use Tlog constant : \Thelia\Log\Tlog::DEBUG set level
+to Debug</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$level</var></dt>
+					<dd><code>integer</code><br>$level</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setPrefix" id="_setPrefix">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setPrefix">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#177-180" title="Go to source code">setPrefix</a>( <span>mixed <var>$prefixe</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setFiles" id="_setFiles">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setFiles">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#182-187" title="Go to source code">setFiles</a>( <span>mixed <var>$files</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setIp" id="_setIp">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setIp">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#189-193" title="Go to source code">setIp</a>( <span>mixed <var>$ips</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setShowRedirect" id="_setShowRedirect">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setShowRedirect">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#195-198" title="Go to source code">setShowRedirect</a>( <span>mixed <var>$bool</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setConfig" id="_setConfig">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setConfig">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#201-206" title="Go to source code">setConfig</a>( <span>mixed <var>$destination</var></span>, <span>mixed <var>$param</var></span>, <span>mixed <var>$valeur</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="getConfig" id="_getConfig">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getConfig">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#209-216" title="Go to source code">getConfig</a>( <span>mixed <var>$destination</var></span>, <span>mixed <var>$param</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="debug" id="_debug">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_debug">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#221-231" title="Go to source code">debug</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Detailed debug information.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Detailed debug information.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addDebug" id="_addDebug">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addDebug">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#233-247" title="Go to source code">addDebug</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of debug method. With this method you can put all parameter you
+want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addDebug($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="info" id="_info">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_info">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#249-261" title="Go to source code">info</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Interesting events.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Interesting events.</p>
+
+<p>Example: User logs in, SQL logs.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addInfo" id="_addInfo">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addInfo">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#263-277" title="Go to source code">addInfo</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of info method. With this method you can put all parameter you want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addInfo($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="notice" id="_notice">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_notice">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#279-289" title="Go to source code">notice</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Normal but significant events.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Normal but significant events.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addNotice" id="_addNotice">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addNotice">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#291-305" title="Go to source code">addNotice</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of notice method. With this method you can put all parameter you
+want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addNotice($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="warning" id="_warning">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_warning">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#307-320" title="Go to source code">warning</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Exceptional occurrences that are not errors.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Exceptional occurrences that are not errors.</p>
+
+<p>Example: Use of deprecated APIs, poor use of an API, undesirable things that
+are not necessarily wrong.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addWarning" id="_addWarning">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addWarning">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#322-336" title="Go to source code">addWarning</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of warning method. With this method you can put all parameter you
+want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addWarning($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="error" id="_error">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_error">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#338-349" title="Go to source code">error</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Runtime errors that do not require immediate action but should typically be
+logged and monitored.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Runtime errors that do not require immediate action but should typically be
+logged and monitored.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addError" id="_addError">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addError">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#351-365" title="Go to source code">addError</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of error method. With this method you can put all parameter you
+want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addError($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="err" id="_err">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_err">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#367-374" title="Go to source code">err</a>( <span>mixed <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Thelia.Log.Tlog.html#_error">Thelia\Log\Tlog::error()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="critical" id="_critical">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_critical">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#376-388" title="Go to source code">critical</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Critical conditions.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Critical conditions.</p>
+
+<p>Example: Application component unavailable, unexpected exception.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addCritical" id="_addCritical">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addCritical">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#390-404" title="Go to source code">addCritical</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of critical method. With this method you can put all parameter you
+want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addCritical($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="crit" id="_crit">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_crit">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#406-413" title="Go to source code">crit</a>( <span>mixed <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Thelia.Log.Tlog.html#_critical">Thelia\Log\Tlog::critical()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="alert" id="_alert">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_alert">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#415-428" title="Go to source code">alert</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Action must be taken immediately.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Action must be taken immediately.</p>
+
+<p>Example: Entire website down, database unavailable, etc. This should trigger
+the SMS alerts and wake you up.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addAlert" id="_addAlert">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addAlert">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#430-444" title="Go to source code">addAlert</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of alert method. With this method you can put all parameter you
+want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addAlert($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="emergency" id="_emergency">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_emergency">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#446-456" title="Go to source code">emergency</a>( <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>System is unusable.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>System is unusable.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="addEmergency" id="_addEmergency">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_addEmergency">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#458-472" title="Go to source code">addEmergency</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of emergency method. With this method you can put all parameter you
+want</p>
+
+<p>ex : Tlog::getInstance()-&gt;addEmergency($arg1, $arg2, $arg3);</p>
+
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="log" id="_log">
+
+		<td class="attributes"><code>
+			 public 
+			null
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_log">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#474-487" title="Go to source code">log</a>( <span>mixed <var>$level</var></span>, <span>string <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+<p>Logs with an arbitrary level.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Logs with an arbitrary level.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$level</var></dt>
+					<dd><code>mixed</code><br>$level</dd>
+					<dt><var>$message</var></dt>
+					<dd><code>string</code><br>$message</dd>
+					<dt><var>$context</var></dt>
+					<dd><code>array</code><br>$context</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>null</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="SetBackOfficeMode" id="_SetBackOfficeMode">
+
+		<td class="attributes"><code>
+			 public static
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_SetBackOfficeMode">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#492-497" title="Go to source code">SetBackOfficeMode</a>( <span>mixed <var>$booleen</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="write" id="_write">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_write">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#499-516" title="Go to source code">write</a>( <span>string <var>&amp; $res</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>final end method. Write log for each destination handler</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$res</var></dt>
+					<dd><code>string</code><br>$res</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="writeOnExit" id="_writeOnExit">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_writeOnExit">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#518-532" title="Go to source code">writeOnExit</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+				<h4>See</h4>
+				<div class="list">
+						<code><code><a href="class-Thelia.Log.Tlog.html#_write">Thelia\Log\Tlog::write()</a></code></code><br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="showRedirect" id="_showRedirect">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_showRedirect">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#534-550" title="Go to source code">showRedirect</a>( <span>mixed <var>$url</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="isActivated" id="_isActivated">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_isActivated">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#552-573" title="Go to source code">isActivated</a>( <span>integer <var>$level</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>check if level is activated and control if current file is activated</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$level</var></dt>
+					<dd><code>integer</code><br>$level</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="isActivedFile" id="_isActivedFile">
+
+		<td class="attributes"><code>
+			 public 
+			boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_isActivedFile">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#575-585" title="Go to source code">isActivedFile</a>( <span>string <var>$file</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>check if $file is in authorized files</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$file</var></dt>
+					<dd><code>string</code><br>$file</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>boolean</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="interpolate" id="_interpolate">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_interpolate">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#633-643" title="Go to source code">interpolate</a>( <span>mixed <var>$message</var></span>, <span>array <var>$context</var> = <span class="php-keyword1">array</span>()</span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="loadDestinations" id="_loadDestinations">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_loadDestinations">#</a>
+		<code><a href="source-class-Thelia.Log.Tlog.html#686-704" title="Go to source code">loadDestinations</a>( <span>type <var>&amp; $destinations</var></span>, <span>array <var>$actives</var> = <span class="php-keyword1">NULL</span></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$destinations</var></dt>
+					<dd><code>type</code><br>$destinations</dd>
+					<dt><var>$actives</var></dt>
+					<dd><code>array</code><br>$actives array containing classes instanceof AbstractTlogDestination</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+	<table class="summary" id="constants">
+	<caption>Constants summary</caption>
+	<tr data-order="VAR_LEVEL" id="VAR_LEVEL">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#40" title="Go to source code"><b>VAR_LEVEL</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;tlog_level&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#VAR_LEVEL" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="VAR_DESTINATIONS" id="VAR_DESTINATIONS">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#41" title="Go to source code"><b>VAR_DESTINATIONS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;tlog_destinations&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#VAR_DESTINATIONS" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="VAR_PREFIXE" id="VAR_PREFIXE">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#42" title="Go to source code"><b>VAR_PREFIXE</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;tlog_prefix&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#VAR_PREFIXE" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="VAR_FILES" id="VAR_FILES">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#43" title="Go to source code"><b>VAR_FILES</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;tlog_files&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#VAR_FILES" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="VAR_IP" id="VAR_IP">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#44" title="Go to source code"><b>VAR_IP</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;tlog_ip&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#VAR_IP" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="VAR_SHOW_REDIRECT" id="VAR_SHOW_REDIRECT">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#45" title="Go to source code"><b>VAR_SHOW_REDIRECT</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;tlog_show_redirect&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#VAR_SHOW_REDIRECT" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEBUG" id="DEBUG">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#48" title="Go to source code"><b>DEBUG</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">100</span></code></td>
+		<td class="description"><div>
+			<a href="#DEBUG" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="INFO" id="INFO">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#49" title="Go to source code"><b>INFO</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">200</span></code></td>
+		<td class="description"><div>
+			<a href="#INFO" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="NOTICE" id="NOTICE">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#50" title="Go to source code"><b>NOTICE</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">300</span></code></td>
+		<td class="description"><div>
+			<a href="#NOTICE" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="WARNING" id="WARNING">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#51" title="Go to source code"><b>WARNING</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">400</span></code></td>
+		<td class="description"><div>
+			<a href="#WARNING" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="ERROR" id="ERROR">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#52" title="Go to source code"><b>ERROR</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">500</span></code></td>
+		<td class="description"><div>
+			<a href="#ERROR" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="CRITICAL" id="CRITICAL">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#53" title="Go to source code"><b>CRITICAL</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">600</span></code></td>
+		<td class="description"><div>
+			<a href="#CRITICAL" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="ALERT" id="ALERT">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#54" title="Go to source code"><b>ALERT</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">700</span></code></td>
+		<td class="description"><div>
+			<a href="#ALERT" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="EMERGENCY" id="EMERGENCY">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#55" title="Go to source code"><b>EMERGENCY</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">800</span></code></td>
+		<td class="description"><div>
+			<a href="#EMERGENCY" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="MUET" id="MUET">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#56" title="Go to source code"><b>MUET</b></a>
+		</code></td>
+		<td class="value"><code>PHP_INT_MAX</code></td>
+		<td class="description"><div>
+			<a href="#MUET" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEFAULT_LEVEL" id="DEFAULT_LEVEL">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#70" title="Go to source code"><b>DEFAULT_LEVEL</b></a>
+		</code></td>
+		<td class="value"><code><code><a href="class-Thelia.Log.Tlog.html#DEBUG">Thelia\Log\Tlog::<b>DEBUG</b></a></code></code></td>
+		<td class="description"><div>
+			<a href="#DEFAULT_LEVEL" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEFAUT_DESTINATIONS" id="DEFAUT_DESTINATIONS">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#71" title="Go to source code"><b>DEFAUT_DESTINATIONS</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;Thelia\Log\Destination\TlogDestinationFile&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#DEFAUT_DESTINATIONS" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEFAUT_PREFIXE" id="DEFAUT_PREFIXE">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#72" title="Go to source code"><b>DEFAUT_PREFIXE</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;#NUM: #NIVEAU [#FICHIER:#FONCTION()] {#LIGNE} #DATE #HEURE: &quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#DEFAUT_PREFIXE" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEFAUT_FILES" id="DEFAUT_FILES">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#73" title="Go to source code"><b>DEFAUT_FILES</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;*&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#DEFAUT_FILES" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEFAUT_IP" id="DEFAUT_IP">
+
+		<td class="attributes"><code>string</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#74" title="Go to source code"><b>DEFAUT_IP</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-quote">&quot;&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#DEFAUT_IP" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="DEFAUT_SHOW_REDIRECT" id="DEFAUT_SHOW_REDIRECT">
+
+		<td class="attributes"><code>integer</code></td>
+		<td class="name"><code>
+				<a href="source-class-Thelia.Log.Tlog.html#75" title="Go to source code"><b>DEFAUT_SHOW_REDIRECT</b></a>
+		</code></td>
+		<td class="value"><code><span class="php-num">0</span></code></td>
+		<td class="description"><div>
+			<a href="#DEFAUT_SHOW_REDIRECT" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="levels" id="$levels">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#58-67" title="Go to source code"><var>$levels</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>(
+    <span class="php-num">100</span> =&gt; <span class="php-quote">&quot;DEBUG&quot;</span>,
+    <span class="php-num">200</span> =&gt; <span class="php-quote">&quot;INFO&quot;</span>,
+    <span class="php-num">300</span> =&gt; <span class="php-quote">&quot;NOTICE&quot;</span>,
+    <span class="php-num">400</span> =&gt; <span class="php-quote">&quot;WARNING&quot;</span>,
+    <span class="php-num">500</span> =&gt; <span class="php-quote">&quot;ERROR&quot;</span>,
+    <span class="php-num">600</span> =&gt; <span class="php-quote">&quot;CRITICAL&quot;</span>,
+    <span class="php-num">700</span> =&gt; <span class="php-quote">&quot;ALERT&quot;</span>,
+    <span class="php-num">800</span> =&gt; <span class="php-quote">&quot;EMERGENCY&quot;</span>
+)</code></td>
+		<td class="description"><div>
+			<a href="#$levels" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="destinations" id="$destinations">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#83-87" title="Go to source code"><var>$destinations</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$destinations" class="anchor">#</a>
+
+			<div class="description short">
+				
+<p>containing class of destination handler</p>
+
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>containing class of destination handler</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="mode_back_office" id="$mode_back_office">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#89" title="Go to source code"><var>$mode_back_office</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$mode_back_office" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="level" id="$level">
+		<td class="attributes"><code>
+			protected  
+			integer
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#90" title="Go to source code"><var>$level</var></a>
+		</td>
+		<td class="value"><code><code><a href="class-Thelia.Log.Tlog.html#MUET">Thelia\Log\Tlog::<b>MUET</b></a></code></code></td>
+		<td class="description"><div>
+			<a href="#$level" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="prefixe" id="$prefixe">
+		<td class="attributes"><code>
+			protected  
+			string
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#91" title="Go to source code"><var>$prefixe</var></a>
+		</td>
+		<td class="value"><code><span class="php-quote">&quot;&quot;</span></code></td>
+		<td class="description"><div>
+			<a href="#$prefixe" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="files" id="$files">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#92" title="Go to source code"><var>$files</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$files" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="all_files" id="$all_files">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#93" title="Go to source code"><var>$all_files</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$all_files" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="show_redirect" id="$show_redirect">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#94" title="Go to source code"><var>$show_redirect</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$show_redirect" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="done" id="$done">
+		<td class="attributes"><code>
+			protected static 
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#98" title="Go to source code"><var>$done</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$done" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="dir_destinations" id="$dir_destinations">
+		<td class="attributes"><code>
+			public  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Log.Tlog.html#101" title="Go to source code"><var>$dir_destinations</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
+		<td class="description"><div>
+			<a href="#$dir_destinations" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,3697 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Model\om\BaseFeatureQuery | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li><a href="namespace-PHP.html">PHP</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Template.html">Template</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li class="active"><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+							</ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li><a href="class-Thelia.Model.om.BaseAccessory.html">BaseAccessory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAccessoryPeer.html">BaseAccessoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAccessoryQuery.html">BaseAccessoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddress.html">BaseAddress</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddressPeer.html">BaseAddressPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAddressQuery.html">BaseAddressQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdmin.html">BaseAdmin</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroup.html">BaseAdminGroup</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroupPeer.html">BaseAdminGroupPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminGroupQuery.html">BaseAdminGroupQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLog.html">BaseAdminLog</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLogPeer.html">BaseAdminLogPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminLogQuery.html">BaseAdminLogQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminPeer.html">BaseAdminPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAdminQuery.html">BaseAdminQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseArea.html">BaseArea</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAreaPeer.html">BaseAreaPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAreaQuery.html">BaseAreaQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttribute.html">BaseAttribute</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAv.html">BaseAttributeAv</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDesc.html">BaseAttributeAvDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescPeer.html">BaseAttributeAvDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescQuery.html">BaseAttributeAvDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18n.html">BaseAttributeAvI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nPeer.html">BaseAttributeAvI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nQuery.html">BaseAttributeAvI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvPeer.html">BaseAttributeAvPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeAvQuery.html">BaseAttributeAvQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategory.html">BaseAttributeCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategoryPeer.html">BaseAttributeCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCategoryQuery.html">BaseAttributeCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombination.html">BaseAttributeCombination</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationPeer.html">BaseAttributeCombinationPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationQuery.html">BaseAttributeCombinationQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDesc.html">BaseAttributeDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDescPeer.html">BaseAttributeDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeDescQuery.html">BaseAttributeDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18n.html">BaseAttributeI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18nPeer.html">BaseAttributeI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeI18nQuery.html">BaseAttributeI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributePeer.html">BaseAttributePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseAttributeQuery.html">BaseAttributeQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategory.html">BaseCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDesc.html">BaseCategoryDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDescPeer.html">BaseCategoryDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryDescQuery.html">BaseCategoryDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18n.html">BaseCategoryI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18nPeer.html">BaseCategoryI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryI18nQuery.html">BaseCategoryI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryPeer.html">BaseCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryQuery.html">BaseCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersion.html">BaseCategoryVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersionPeer.html">BaseCategoryVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCategoryVersionQuery.html">BaseCategoryVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombination.html">BaseCombination</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombinationPeer.html">BaseCombinationPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCombinationQuery.html">BaseCombinationQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfig.html">BaseConfig</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDesc.html">BaseConfigDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDescPeer.html">BaseConfigDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigDescQuery.html">BaseConfigDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18n.html">BaseConfigI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18nPeer.html">BaseConfigI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigI18nQuery.html">BaseConfigI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigPeer.html">BaseConfigPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseConfigQuery.html">BaseConfigQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContent.html">BaseContent</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssoc.html">BaseContentAssoc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssocPeer.html">BaseContentAssocPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentAssocQuery.html">BaseContentAssocQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDesc.html">BaseContentDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDescPeer.html">BaseContentDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentDescQuery.html">BaseContentDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolder.html">BaseContentFolder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolderPeer.html">BaseContentFolderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentFolderQuery.html">BaseContentFolderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18n.html">BaseContentI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18nPeer.html">BaseContentI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentI18nQuery.html">BaseContentI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentPeer.html">BaseContentPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentQuery.html">BaseContentQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersion.html">BaseContentVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersionPeer.html">BaseContentVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseContentVersionQuery.html">BaseContentVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountry.html">BaseCountry</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDesc.html">BaseCountryDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDescPeer.html">BaseCountryDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryDescQuery.html">BaseCountryDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18n.html">BaseCountryI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18nPeer.html">BaseCountryI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryI18nQuery.html">BaseCountryI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryPeer.html">BaseCountryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCountryQuery.html">BaseCountryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCoupon.html">BaseCoupon</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrder.html">BaseCouponOrder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrderPeer.html">BaseCouponOrderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponOrderQuery.html">BaseCouponOrderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponPeer.html">BaseCouponPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponQuery.html">BaseCouponQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRule.html">BaseCouponRule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRulePeer.html">BaseCouponRulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCouponRuleQuery.html">BaseCouponRuleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrency.html">BaseCurrency</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrencyPeer.html">BaseCurrencyPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCurrencyQuery.html">BaseCurrencyQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomer.html">BaseCustomer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerPeer.html">BaseCustomerPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerQuery.html">BaseCustomerQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitle.html">BaseCustomerTitle</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDesc.html">BaseCustomerTitleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescPeer.html">BaseCustomerTitleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html">BaseCustomerTitleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18n.html">BaseCustomerTitleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nPeer.html">BaseCustomerTitleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nQuery.html">BaseCustomerTitleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitlePeer.html">BaseCustomerTitlePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseCustomerTitleQuery.html">BaseCustomerTitleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzone.html">BaseDelivzone</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzonePeer.html">BaseDelivzonePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDelivzoneQuery.html">BaseDelivzoneQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocument.html">BaseDocument</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDesc.html">BaseDocumentDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDescPeer.html">BaseDocumentDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentDescQuery.html">BaseDocumentDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18n.html">BaseDocumentI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18nPeer.html">BaseDocumentI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentI18nQuery.html">BaseDocumentI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentPeer.html">BaseDocumentPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseDocumentQuery.html">BaseDocumentQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeature.html">BaseFeature</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAv.html">BaseFeatureAv</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDesc.html">BaseFeatureAvDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescPeer.html">BaseFeatureAvDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescQuery.html">BaseFeatureAvDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18n.html">BaseFeatureAvI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nPeer.html">BaseFeatureAvI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nQuery.html">BaseFeatureAvI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvPeer.html">BaseFeatureAvPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureAvQuery.html">BaseFeatureAvQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategory.html">BaseFeatureCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryPeer.html">BaseFeatureCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryQuery.html">BaseFeatureCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDesc.html">BaseFeatureDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDescPeer.html">BaseFeatureDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureDescQuery.html">BaseFeatureDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18n.html">BaseFeatureI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18nPeer.html">BaseFeatureI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureI18nQuery.html">BaseFeatureI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeaturePeer.html">BaseFeaturePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProd.html">BaseFeatureProd</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProdPeer.html">BaseFeatureProdPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFeatureProdQuery.html">BaseFeatureProdQuery</a></li>
+				<li class="active"><a href="class-Thelia.Model.om.BaseFeatureQuery.html">BaseFeatureQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolder.html">BaseFolder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDesc.html">BaseFolderDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDescPeer.html">BaseFolderDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderDescQuery.html">BaseFolderDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18n.html">BaseFolderI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18nPeer.html">BaseFolderI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderI18nQuery.html">BaseFolderI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderPeer.html">BaseFolderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderQuery.html">BaseFolderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersion.html">BaseFolderVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersionPeer.html">BaseFolderVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseFolderVersionQuery.html">BaseFolderVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroup.html">BaseGroup</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDesc.html">BaseGroupDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDescPeer.html">BaseGroupDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupDescQuery.html">BaseGroupDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18n.html">BaseGroupI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18nPeer.html">BaseGroupI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupI18nQuery.html">BaseGroupI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModule.html">BaseGroupModule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModulePeer.html">BaseGroupModulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupModuleQuery.html">BaseGroupModuleQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupPeer.html">BaseGroupPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupQuery.html">BaseGroupQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResource.html">BaseGroupResource</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResourcePeer.html">BaseGroupResourcePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseGroupResourceQuery.html">BaseGroupResourceQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImage.html">BaseImage</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDesc.html">BaseImageDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDescPeer.html">BaseImageDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageDescQuery.html">BaseImageDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18n.html">BaseImageI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18nPeer.html">BaseImageI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageI18nQuery.html">BaseImageI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImagePeer.html">BaseImagePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseImageQuery.html">BaseImageQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLang.html">BaseLang</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLangPeer.html">BaseLangPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseLangQuery.html">BaseLangQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessage.html">BaseMessage</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDesc.html">BaseMessageDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDescPeer.html">BaseMessageDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageDescQuery.html">BaseMessageDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18n.html">BaseMessageI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18nPeer.html">BaseMessageI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageI18nQuery.html">BaseMessageI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessagePeer.html">BaseMessagePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageQuery.html">BaseMessageQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersion.html">BaseMessageVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersionPeer.html">BaseMessageVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseMessageVersionQuery.html">BaseMessageVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDesc.html">BaseModuleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDescPeer.html">BaseModuleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleDescQuery.html">BaseModuleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18n.html">BaseModuleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18nPeer.html">BaseModuleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleI18nQuery.html">BaseModuleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModulePeer.html">BaseModulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrder.html">BaseOrder</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddress.html">BaseOrderAddress</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddressPeer.html">BaseOrderAddressPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderAddressQuery.html">BaseOrderAddressQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeature.html">BaseOrderFeature</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeaturePeer.html">BaseOrderFeaturePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderFeatureQuery.html">BaseOrderFeatureQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderPeer.html">BaseOrderPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProduct.html">BaseOrderProduct</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProductPeer.html">BaseOrderProductPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderProductQuery.html">BaseOrderProductQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderQuery.html">BaseOrderQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatus.html">BaseOrderStatus</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDesc.html">BaseOrderStatusDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescPeer.html">BaseOrderStatusDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescQuery.html">BaseOrderStatusDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18n.html">BaseOrderStatusI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nPeer.html">BaseOrderStatusI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nQuery.html">BaseOrderStatusI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusPeer.html">BaseOrderStatusPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseOrderStatusQuery.html">BaseOrderStatusQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProduct.html">BaseProduct</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategory.html">BaseProductCategory</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategoryPeer.html">BaseProductCategoryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductCategoryQuery.html">BaseProductCategoryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDesc.html">BaseProductDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDescPeer.html">BaseProductDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductDescQuery.html">BaseProductDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18n.html">BaseProductI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18nPeer.html">BaseProductI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductI18nQuery.html">BaseProductI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductPeer.html">BaseProductPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductQuery.html">BaseProductQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersion.html">BaseProductVersion</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersionPeer.html">BaseProductVersionPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseProductVersionQuery.html">BaseProductVersionQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResource.html">BaseResource</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDesc.html">BaseResourceDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDescPeer.html">BaseResourceDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceDescQuery.html">BaseResourceDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18n.html">BaseResourceI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18nPeer.html">BaseResourceI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceI18nQuery.html">BaseResourceI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourcePeer.html">BaseResourcePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseResourceQuery.html">BaseResourceQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewriting.html">BaseRewriting</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewritingPeer.html">BaseRewritingPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseRewritingQuery.html">BaseRewritingQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStock.html">BaseStock</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStockPeer.html">BaseStockPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseStockQuery.html">BaseStockQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTax.html">BaseTax</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDesc.html">BaseTaxDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDescPeer.html">BaseTaxDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxDescQuery.html">BaseTaxDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18n.html">BaseTaxI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18nPeer.html">BaseTaxI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxI18nQuery.html">BaseTaxI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxPeer.html">BaseTaxPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxQuery.html">BaseTaxQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRule.html">BaseTaxRule</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountry.html">BaseTaxRuleCountry</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountryPeer.html">BaseTaxRuleCountryPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountryQuery.html">BaseTaxRuleCountryQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDesc.html">BaseTaxRuleDesc</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescPeer.html">BaseTaxRuleDescPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescQuery.html">BaseTaxRuleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18n.html">BaseTaxRuleI18n</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nPeer.html">BaseTaxRuleI18nPeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nQuery.html">BaseTaxRuleI18nQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRulePeer.html">BaseTaxRulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseTaxRuleQuery.html">BaseTaxRuleQuery</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Model.om.html" title="Summary of Thelia\Model\om"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class BaseFeatureQuery</h1>
+
+
+	<div class="description">
+	
+<p>Base class that represents a query for the 'feature' table.</p>
+
+	</div>
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+ModelCriteria
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
+<b><span>Thelia\Model\om\BaseFeatureQuery</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+	<div>
+		<h4>Direct known subclasses</h4>
+			<a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a>
+	</div>
+
+
+
+
+
+
+	<div class="info">
+		<b>Abstract</b><br />
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
+		<b>Package:</b> propel\generator\Thelia\Model\om<br />
+
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#23-881" title="Go to source code">core/lib/Thelia/Model/om/BaseFeatureQuery.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="__construct" id="___construct">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#79-89" title="Go to source code">__construct</a>( <span>string <var>$dbName</var> = <span class="php-quote">'thelia'</span></span>, <span>string <var>$modelName</var> = <span class="php-quote">'Thelia\\Model\\Feature'</span></span>, <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Initializes internal state of BaseFeatureQuery object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Initializes internal state of BaseFeatureQuery object.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$dbName</var></dt>
+					<dd><code>string</code><br>$dbName The dabase name</dd>
+					<dt><var>$modelName</var></dt>
+					<dd><code>string</code><br>$modelName The phpName of a model, e.g. 'Book'</dd>
+					<dt><var>$modelAlias</var></dt>
+					<dd><code>string</code><br>$modelAlias The alias for the model in this query, e.g. 'b'</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="create" id="_create">
+
+		<td class="attributes"><code>
+			 public static
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_create">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#91-113" title="Go to source code">create</a>( <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span>, <span><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>|Criteria <var>$criteria</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns a new FeatureQuery object.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns a new FeatureQuery object.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$modelAlias</var></dt>
+					<dd><code>string</code><br>$modelAlias The alias of a model in the query</dd>
+					<dt><var>$criteria</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>|Criteria</code><br>$criteria Optional Criteria to build the query from</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPk" id="_findPk">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>|<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a>[]</code>|mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPk">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#115-149" title="Go to source code">findPk</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Find object by primary key. Propel uses the instance pool to skip the
+database if the object exists. Go fast if the query is untouched.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find object by primary key. Propel uses the instance pool to skip the
+database if the object exists. Go fast if the query is untouched.</p>
+
+<pre>
+<span class="php-var">$obj</span>  = <span
+class="php-var">$c</span>-&gt;findPk(<span class="php-num">12</span>, <span
+class="php-var">$con</span>);
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con an optional connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>|<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a>[]</code>|mixed</code><br>the result, formatted by the current formatter<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPkSimple" id="_findPkSimple">
+
+		<td class="attributes"><code>
+			 protected 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPkSimple">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#151-181" title="Go to source code">findPkSimple</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Find object by primary key using raw SQL to go fast. Bypass doSelect() and
+the object formatter by using generated code.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find object by primary key using raw SQL to go fast. Bypass doSelect() and
+the object formatter by using generated code.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con A connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br>A model object, or null if the key is not found<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPkComplex" id="_findPkComplex">
+
+		<td class="attributes"><code>
+			 protected 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>|<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a>[]</code>|mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPkComplex">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#183-200" title="Go to source code">findPkComplex</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Find object by primary key.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find object by primary key.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con A connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>|<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a>[]</code>|mixed</code><br>the result, formatted by the current formatter<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findPks" id="_findPks">
+
+		<td class="attributes"><code>
+			 public 
+			PropelObjectCollection|<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a>[]</code>|mixed
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findPks">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#202-224" title="Go to source code">findPks</a>( <span>array <var>$keys</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Find objects by primary key</p>
+
+<pre>
+<span class="php-var">$objs</span> = <span
+class="php-var">$c</span>-&gt;findPks(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">56</span>, <span class="php-num">832</span>), <span
+class="php-var">$con</span>);
+</pre>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Find objects by primary key</p>
+
+<pre>
+<span class="php-var">$objs</span> = <span
+class="php-var">$c</span>-&gt;findPks(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">56</span>, <span class="php-num">832</span>), <span
+class="php-var">$con</span>);
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$keys</var></dt>
+					<dd><code>array</code><br>$keys Primary keys to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con an optional connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>PropelObjectCollection|<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a>[]</code>|mixed</code><br>the list of results, formatted by the current formatter<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByPrimaryKey" id="_filterByPrimaryKey">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByPrimaryKey">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#226-237" title="Go to source code">filterByPrimaryKey</a>( <span>mixed <var>$key</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by primary key</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by primary key</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByPrimaryKeys" id="_filterByPrimaryKeys">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByPrimaryKeys">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#239-250" title="Go to source code">filterByPrimaryKeys</a>( <span>array <var>$keys</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a list of primary keys</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a list of primary keys</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$keys</var></dt>
+					<dd><code>array</code><br>$keys The list of primary key to use for the query</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterById" id="_filterById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#252-277" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the id column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterById(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE id = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE id IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>mixed</code><br>$id The value to use as filter. Use scalar values for equality. Use array values
+for in_array() equivalent. Use associative array('min' =&gt; $minValue, 'max'
+=&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByVisible" id="_filterByVisible">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByVisible">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#279-318" title="Go to source code">filterByVisible</a>( <span>mixed <var>$visible</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the visible column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the visible column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByVisible(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE visible = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterByVisible(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE visible IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterByVisible(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE visible &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$visible</var></dt>
+					<dd><code>mixed</code><br>$visible The value to use as filter. Use scalar values for equality. Use array
+values for in_array() equivalent. Use associative array('min' =&gt; $minValue,
+'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByPosition" id="_filterByPosition">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByPosition">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#320-359" title="Go to source code">filterByPosition</a>( <span>mixed <var>$position</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the position column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the position column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByPosition(<span
+class="php-num">1234</span>); <span
+class="php-comment">// WHERE position = 1234</span>
+<span
+class="php-var">$query</span>-&gt;filterByPosition(<span
+class="php-keyword1">array</span>(<span class="php-num">12</span>, <span
+class="php-num">34</span>)); <span
+class="php-comment">// WHERE position IN (12, 34)</span>
+<span
+class="php-var">$query</span>-&gt;filterByPosition(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE position &gt; 12</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$position</var></dt>
+					<dd><code>mixed</code><br>$position The value to use as filter. Use scalar values for equality. Use array
+values for in_array() equivalent. Use associative array('min' =&gt; $minValue,
+'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByCreatedAt" id="_filterByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#361-402" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the created_at column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByCreatedAt(<span
+class="php-quote">'2011-03-14'</span>); <span
+class="php-comment">// WHERE created_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByCreatedAt(<span
+class="php-quote">'now'</span>); <span
+class="php-comment">// WHERE created_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByCreatedAt(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span
+class="php-quote">'yesterday'</span>)); <span
+class="php-comment">// WHERE created_at &gt; '2011-03-13'</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$createdAt</var></dt>
+					<dd><code>mixed</code><br>$createdAt The value to use as filter. Values can be integers (unix timestamps),
+DateTime objects, or strings. Empty strings are treated as NULL. Use scalar
+values for equality. Use array values for in_array() equivalent. Use associative
+array('min' =&gt; $minValue, 'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByUpdatedAt" id="_filterByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#404-445" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query on the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query on the updated_at column</p>
+
+<p>Example usage:</p>
+
+<pre>
+<span class="php-var">$query</span>-&gt;filterByUpdatedAt(<span
+class="php-quote">'2011-03-14'</span>); <span
+class="php-comment">// WHERE updated_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByUpdatedAt(<span
+class="php-quote">'now'</span>); <span
+class="php-comment">// WHERE updated_at = '2011-03-14'</span>
+<span
+class="php-var">$query</span>-&gt;filterByUpdatedAt(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span
+class="php-quote">'yesterday'</span>)); <span
+class="php-comment">// WHERE updated_at &gt; '2011-03-13'</span>
+</pre>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$updatedAt</var></dt>
+					<dd><code>mixed</code><br>$updatedAt The value to use as filter. Values can be integers (unix timestamps),
+DateTime objects, or strings. Empty strings are treated as NULL. Use scalar
+values for equality. Use array values for in_array() equivalent. Use associative
+array('min' =&gt; $minValue, 'max' =&gt; $maxValue) for intervals.</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByFeatureAv" id="_filterByFeatureAv">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByFeatureAv">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#447-469" title="Go to source code">filterByFeatureAv</a>( <span><code><a href="class-Thelia.Model.FeatureAv.html">Thelia\Model\FeatureAv</a></code>|PropelObjectCollection <var>$featureAv</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related FeatureAv object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related FeatureAv object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$featureAv</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.FeatureAv.html">Thelia\Model\FeatureAv</a></code>|PropelObjectCollection</code><br>$featureAv the related object to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinFeatureAv" id="_joinFeatureAv">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinFeatureAv">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#471-501" title="Go to source code">joinFeatureAv</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the FeatureAv relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the FeatureAv relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useFeatureAvQuery" id="_useFeatureAvQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureAvQuery.html">Thelia\Model\FeatureAvQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useFeatureAvQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#503-519" title="Go to source code">useFeatureAvQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the FeatureAv relation FeatureAv object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the FeatureAv relation FeatureAv object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureAvQuery.html">Thelia\Model\FeatureAvQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByFeatureProd" id="_filterByFeatureProd">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByFeatureProd">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#521-543" title="Go to source code">filterByFeatureProd</a>( <span><code><a href="class-Thelia.Model.FeatureProd.html">Thelia\Model\FeatureProd</a></code>|PropelObjectCollection <var>$featureProd</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related FeatureProd object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related FeatureProd object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$featureProd</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.FeatureProd.html">Thelia\Model\FeatureProd</a></code>|PropelObjectCollection</code><br>$featureProd the related object to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinFeatureProd" id="_joinFeatureProd">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinFeatureProd">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#545-575" title="Go to source code">joinFeatureProd</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the FeatureProd relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the FeatureProd relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useFeatureProdQuery" id="_useFeatureProdQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureProdQuery.html">Thelia\Model\FeatureProdQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useFeatureProdQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#577-593" title="Go to source code">useFeatureProdQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the FeatureProd relation FeatureProd object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the FeatureProd relation FeatureProd object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureProdQuery.html">Thelia\Model\FeatureProdQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByFeatureCategory" id="_filterByFeatureCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByFeatureCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#595-617" title="Go to source code">filterByFeatureCategory</a>( <span><code><a href="class-Thelia.Model.FeatureCategory.html">Thelia\Model\FeatureCategory</a></code>|PropelObjectCollection <var>$featureCategory</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related FeatureCategory object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related FeatureCategory object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$featureCategory</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.FeatureCategory.html">Thelia\Model\FeatureCategory</a></code>|PropelObjectCollection</code><br>$featureCategory the related object to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinFeatureCategory" id="_joinFeatureCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinFeatureCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#619-649" title="Go to source code">joinFeatureCategory</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the FeatureCategory relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the FeatureCategory relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useFeatureCategoryQuery" id="_useFeatureCategoryQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureCategoryQuery.html">Thelia\Model\FeatureCategoryQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useFeatureCategoryQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#651-667" title="Go to source code">useFeatureCategoryQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the FeatureCategory relation FeatureCategory object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the FeatureCategory relation FeatureCategory object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureCategoryQuery.html">Thelia\Model\FeatureCategoryQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="filterByFeatureI18n" id="_filterByFeatureI18n">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_filterByFeatureI18n">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#669-691" title="Go to source code">filterByFeatureI18n</a>( <span><code><a href="class-Thelia.Model.FeatureI18n.html">Thelia\Model\FeatureI18n</a></code>|PropelObjectCollection <var>$featureI18n</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter the query by a related FeatureI18n object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter the query by a related FeatureI18n object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$featureI18n</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.FeatureI18n.html">Thelia\Model\FeatureI18n</a></code>|PropelObjectCollection</code><br>$featureI18n the related object to use as filter</dd>
+					<dt><var>$comparison</var></dt>
+					<dd><code>string</code><br>$comparison Operator to use for the column comparison, defaults to
+Criteria::EQUAL</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br>- if the provided filter is invalid.<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinFeatureI18n" id="_joinFeatureI18n">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinFeatureI18n">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#693-723" title="Go to source code">joinFeatureI18n</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the FeatureI18n relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the FeatureI18n relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useFeatureI18nQuery" id="_useFeatureI18nQuery">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureI18nQuery.html">Thelia\Model\FeatureI18nQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useFeatureI18nQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#725-741" title="Go to source code">useFeatureI18nQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Use the FeatureI18n relation FeatureI18n object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the FeatureI18n relation FeatureI18n object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation, to be used as main alias in the
+secondary query</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureI18nQuery.html">Thelia\Model\FeatureI18nQuery</a></code></code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="prune" id="_prune">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_prune">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#743-757" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code> <var>$feature</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Exclude object from result</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Exclude object from result</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$feature</var></dt>
+					<dd><code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br>$feature Object to remove from the list of results</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="recentlyUpdated" id="_recentlyUpdated">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_recentlyUpdated">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#761-771" title="Go to source code">recentlyUpdated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter by the latest updated</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter by the latest updated</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$nbDays</var></dt>
+					<dd><code>integer</code><br>$nbDays Maximum age of the latest update in days</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="lastUpdatedFirst" id="_lastUpdatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_lastUpdatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#773-781" title="Go to source code">lastUpdatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by update date desc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by update date desc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="firstUpdatedFirst" id="_firstUpdatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_firstUpdatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#783-791" title="Go to source code">firstUpdatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by update date asc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by update date asc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="recentlyCreated" id="_recentlyCreated">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_recentlyCreated">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#793-803" title="Go to source code">recentlyCreated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Filter by the latest created</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Filter by the latest created</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$nbDays</var></dt>
+					<dd><code>integer</code><br>$nbDays Maximum age of in days</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="lastCreatedFirst" id="_lastCreatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_lastCreatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#805-813" title="Go to source code">lastCreatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by create date desc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by create date desc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="firstCreatedFirst" id="_firstCreatedFirst">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_firstCreatedFirst">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#815-823" title="Go to source code">firstCreatedFirst</a>( )</code>
+
+		<div class="description short">
+			
+<p>Order by create date asc</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by create date asc</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinI18n" id="_joinI18n">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinI18n">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#826-842" title="Go to source code">joinI18n</a>( <span>string <var>$locale</var> = <span class="php-quote">'en_EN'</span></span>, <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query using the i18n relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query using the i18n relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$locale</var></dt>
+					<dd><code>string</code><br>$locale Locale to use for the join condition, e.g. 'fr_FR'</dd>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'.
+Defaults to left join.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="joinWithI18n" id="_joinWithI18n">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_joinWithI18n">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#844-861" title="Go to source code">joinWithI18n</a>( <span>string <var>$locale</var> = <span class="php-quote">'en_EN'</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a JOIN clause to the query and hydrates the related I18n object.
+Shortcut for $c-&gt;joinI18n($locale)-&gt;with()</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a JOIN clause to the query and hydrates the related I18n object.
+Shortcut for $c-&gt;joinI18n($locale)-&gt;with()</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$locale</var></dt>
+					<dd><code>string</code><br>$locale Locale to use for the join condition, e.g. 'fr_FR'</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'.
+Defaults to left join.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br>The current query, for fluid interface<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="useI18nQuery" id="_useI18nQuery">
+
+		<td class="attributes"><code>
+			 public 
+			FeatureI18nQuery
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_useI18nQuery">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#863-879" title="Go to source code">useI18nQuery</a>( <span>string <var>$locale</var> = <span class="php-quote">'en_EN'</span></span>, <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+
+		<div class="description short">
+			
+<p>Use the I18n relation query object</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Use the I18n relation query object</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$locale</var></dt>
+					<dd><code>string</code><br>$locale Locale to use for the join condition, e.g. 'fr_FR'</dd>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>string</code><br>$relationAlias optional alias for the relation</dd>
+					<dt><var>$joinType</var></dt>
+					<dd><code>string</code><br>$joinType Accepted values are null, 'left join', 'right join', 'inner join'.
+Defaults to left join.</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>FeatureI18nQuery</code><br>A secondary query class using the current class as primary query<br />
+				</div>
+
+
+				<h4>See</h4>
+				<div class="list">
+						useQuery()<br />
+				</div>
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Magic methods summary</caption>
+	<tr data-order="orderById" id="m_orderById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#28" title="Go to source code">orderById</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByVisible" id="m_orderByVisible">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByVisible">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#29" title="Go to source code">orderByVisible</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the visible column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the visible column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByPosition" id="m_orderByPosition">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByPosition">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#30" title="Go to source code">orderByPosition</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the position column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the position column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByCreatedAt" id="m_orderByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#31" title="Go to source code">orderByCreatedAt</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the created_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="orderByUpdatedAt" id="m_orderByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_orderByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#32" title="Go to source code">orderByUpdatedAt</a>( <span>mixed <var>$order</var> = Thelia\Model\om\Criteria::ASC</span> )</code>
+
+		<div class="description short">
+			
+<p>Order by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Order by the updated_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$order</var></dt>
+					<dd><code>mixed</code><br>$order</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupById" id="m_groupById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#34" title="Go to source code">groupById</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the id column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByVisible" id="m_groupByVisible">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByVisible">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#35" title="Go to source code">groupByVisible</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the visible column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the visible column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByPosition" id="m_groupByPosition">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByPosition">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#36" title="Go to source code">groupByPosition</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the position column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the position column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByCreatedAt" id="m_groupByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#37" title="Go to source code">groupByCreatedAt</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the created_at column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="groupByUpdatedAt" id="m_groupByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_groupByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#38" title="Go to source code">groupByUpdatedAt</a>( )</code>
+
+		<div class="description short">
+			
+<p>Group by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Group by the updated_at column</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoin" id="m_leftJoin">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoin">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#40" title="Go to source code">leftJoin</a>( <span>mixed <var>$relation</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relation</var></dt>
+					<dd><code>mixed</code><br>$relation</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoin" id="m_rightJoin">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoin">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#41" title="Go to source code">rightJoin</a>( <span>mixed <var>$relation</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relation</var></dt>
+					<dd><code>mixed</code><br>$relation</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoin" id="m_innerJoin">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoin">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#42" title="Go to source code">innerJoin</a>( <span>mixed <var>$relation</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relation</var></dt>
+					<dd><code>mixed</code><br>$relation</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinFeatureAv" id="m_leftJoinFeatureAv">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinFeatureAv">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#44" title="Go to source code">leftJoinFeatureAv</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureAv relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureAv relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinFeatureAv" id="m_rightJoinFeatureAv">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinFeatureAv">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#45" title="Go to source code">rightJoinFeatureAv</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureAv relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureAv relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinFeatureAv" id="m_innerJoinFeatureAv">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinFeatureAv">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#46" title="Go to source code">innerJoinFeatureAv</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureAv relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureAv relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinFeatureProd" id="m_leftJoinFeatureProd">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinFeatureProd">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#48" title="Go to source code">leftJoinFeatureProd</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureProd relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureProd relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinFeatureProd" id="m_rightJoinFeatureProd">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinFeatureProd">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#49" title="Go to source code">rightJoinFeatureProd</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureProd relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureProd relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinFeatureProd" id="m_innerJoinFeatureProd">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinFeatureProd">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#50" title="Go to source code">innerJoinFeatureProd</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureProd relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureProd relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinFeatureCategory" id="m_leftJoinFeatureCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinFeatureCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#52" title="Go to source code">leftJoinFeatureCategory</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureCategory relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureCategory relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinFeatureCategory" id="m_rightJoinFeatureCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinFeatureCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#53" title="Go to source code">rightJoinFeatureCategory</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureCategory relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureCategory relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinFeatureCategory" id="m_innerJoinFeatureCategory">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinFeatureCategory">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#54" title="Go to source code">innerJoinFeatureCategory</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureCategory relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureCategory relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="leftJoinFeatureI18n" id="m_leftJoinFeatureI18n">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_leftJoinFeatureI18n">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#56" title="Go to source code">leftJoinFeatureI18n</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureI18n relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a LEFT JOIN clause to the query using the FeatureI18n relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="rightJoinFeatureI18n" id="m_rightJoinFeatureI18n">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_rightJoinFeatureI18n">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#57" title="Go to source code">rightJoinFeatureI18n</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureI18n relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a RIGHT JOIN clause to the query using the FeatureI18n relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="innerJoinFeatureI18n" id="m_innerJoinFeatureI18n">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_innerJoinFeatureI18n">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#58" title="Go to source code">innerJoinFeatureI18n</a>( <span>mixed <var>$relationAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureI18n relation</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Adds a INNER JOIN clause to the query using the FeatureI18n relation</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$relationAlias</var></dt>
+					<dd><code>mixed</code><br>$relationAlias</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.FeatureQuery.html">Thelia\Model\FeatureQuery</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOne" id="m_findOne">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOne">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#60" title="Go to source code">findOne</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Feature matching the query</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Feature matching the query</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneOrCreate" id="m_findOneOrCreate">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneOrCreate">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#61" title="Go to source code">findOneOrCreate</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Feature matching the query, or a new Feature object
+populated from the query conditions when no match is found</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Feature matching the query, or a new Feature object
+populated from the query conditions when no match is found</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneById" id="m_findOneById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#63" title="Go to source code">findOneById</a>( <span>integer <var>$id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Feature filtered by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Feature filtered by the id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByVisible" id="m_findOneByVisible">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByVisible">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#64" title="Go to source code">findOneByVisible</a>( <span>integer <var>$visible</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Feature filtered by the visible column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Feature filtered by the visible column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$visible</var></dt>
+					<dd><code>integer</code><br>$visible</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByPosition" id="m_findOneByPosition">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByPosition">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#65" title="Go to source code">findOneByPosition</a>( <span>integer <var>$position</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Feature filtered by the position column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Feature filtered by the position column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$position</var></dt>
+					<dd><code>integer</code><br>$position</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByCreatedAt" id="m_findOneByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#66" title="Go to source code">findOneByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Feature filtered by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Feature filtered by the created_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$created_at</var></dt>
+					<dd><code>string</code><br>$created_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findOneByUpdatedAt" id="m_findOneByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findOneByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#67" title="Go to source code">findOneByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return the first Feature filtered by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return the first Feature filtered by the updated_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$updated_at</var></dt>
+					<dd><code>string</code><br>$updated_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.Feature.html">Thelia\Model\Feature</a></code></code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findById" id="m_findById">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#69" title="Go to source code">findById</a>( <span>integer <var>$id</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Feature objects filtered by the id column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Feature objects filtered by the id column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>integer</code><br>$id</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByVisible" id="m_findByVisible">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByVisible">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#70" title="Go to source code">findByVisible</a>( <span>integer <var>$visible</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Feature objects filtered by the visible column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Feature objects filtered by the visible column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$visible</var></dt>
+					<dd><code>integer</code><br>$visible</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByPosition" id="m_findByPosition">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByPosition">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#71" title="Go to source code">findByPosition</a>( <span>integer <var>$position</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Feature objects filtered by the position column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Feature objects filtered by the position column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$position</var></dt>
+					<dd><code>integer</code><br>$position</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByCreatedAt" id="m_findByCreatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByCreatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#72" title="Go to source code">findByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Feature objects filtered by the created_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Feature objects filtered by the created_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$created_at</var></dt>
+					<dd><code>string</code><br>$created_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findByUpdatedAt" id="m_findByUpdatedAt">
+
+		<td class="attributes"><code>
+			 public 
+			array
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#m_findByUpdatedAt">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseFeatureQuery.html#73" title="Go to source code">findByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
+
+		<div class="description short">
+			
+<p>Return Feature objects filtered by the updated_at column</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Return Feature objects filtered by the updated_at column</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$updated_at</var></dt>
+					<dd><code>string</code><br>$updated_at</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array</code><br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>
