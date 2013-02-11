@@ -36,13 +36,13 @@ abstract class BaseLangPeer
     const TM_CLASS = 'LangTableMap';
 
     /** The total number of columns. */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /** The number of lazy-loaded columns. */
     const NUM_LAZY_LOAD_COLUMNS = 0;
 
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /** the column name for the ID field */
     const ID = 'lang.ID';
@@ -52,6 +52,9 @@ abstract class BaseLangPeer
 
     /** the column name for the CODE field */
     const CODE = 'lang.CODE';
+
+    /** the column name for the LOCALE field */
+    const LOCALE = 'lang.LOCALE';
 
     /** the column name for the URL field */
     const URL = 'lang.URL';
@@ -84,12 +87,12 @@ abstract class BaseLangPeer
      * e.g. LangPeer::$fieldNames[LangPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'Code', 'Url', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'code', 'url', 'byDefault', 'createdAt', 'updatedAt', ),
-        BasePeer::TYPE_COLNAME => array (LangPeer::ID, LangPeer::TITLE, LangPeer::CODE, LangPeer::URL, LangPeer::BY_DEFAULT, LangPeer::CREATED_AT, LangPeer::UPDATED_AT, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CODE', 'URL', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'code', 'url', 'by_default', 'created_at', 'updated_at', ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id', 'Title', 'Code', 'Locale', 'Url', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'title', 'code', 'locale', 'url', 'byDefault', 'createdAt', 'updatedAt', ),
+        BasePeer::TYPE_COLNAME => array (LangPeer::ID, LangPeer::TITLE, LangPeer::CODE, LangPeer::LOCALE, LangPeer::URL, LangPeer::BY_DEFAULT, LangPeer::CREATED_AT, LangPeer::UPDATED_AT, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TITLE', 'CODE', 'LOCALE', 'URL', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'title', 'code', 'locale', 'url', 'by_default', 'created_at', 'updated_at', ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -99,12 +102,12 @@ abstract class BaseLangPeer
      * e.g. LangPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'Code' => 2, 'Url' => 3, 'ByDefault' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'code' => 2, 'url' => 3, 'byDefault' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        BasePeer::TYPE_COLNAME => array (LangPeer::ID => 0, LangPeer::TITLE => 1, LangPeer::CODE => 2, LangPeer::URL => 3, LangPeer::BY_DEFAULT => 4, LangPeer::CREATED_AT => 5, LangPeer::UPDATED_AT => 6, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CODE' => 2, 'URL' => 3, 'BY_DEFAULT' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'code' => 2, 'url' => 3, 'by_default' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, )
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'Title' => 1, 'Code' => 2, 'Locale' => 3, 'Url' => 4, 'ByDefault' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'title' => 1, 'code' => 2, 'locale' => 3, 'url' => 4, 'byDefault' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        BasePeer::TYPE_COLNAME => array (LangPeer::ID => 0, LangPeer::TITLE => 1, LangPeer::CODE => 2, LangPeer::LOCALE => 3, LangPeer::URL => 4, LangPeer::BY_DEFAULT => 5, LangPeer::CREATED_AT => 6, LangPeer::UPDATED_AT => 7, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TITLE' => 1, 'CODE' => 2, 'LOCALE' => 3, 'URL' => 4, 'BY_DEFAULT' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'title' => 1, 'code' => 2, 'locale' => 3, 'url' => 4, 'by_default' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -181,6 +184,7 @@ abstract class BaseLangPeer
             $criteria->addSelectColumn(LangPeer::ID);
             $criteria->addSelectColumn(LangPeer::TITLE);
             $criteria->addSelectColumn(LangPeer::CODE);
+            $criteria->addSelectColumn(LangPeer::LOCALE);
             $criteria->addSelectColumn(LangPeer::URL);
             $criteria->addSelectColumn(LangPeer::BY_DEFAULT);
             $criteria->addSelectColumn(LangPeer::CREATED_AT);
@@ -189,6 +193,7 @@ abstract class BaseLangPeer
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.TITLE');
             $criteria->addSelectColumn($alias . '.CODE');
+            $criteria->addSelectColumn($alias . '.LOCALE');
             $criteria->addSelectColumn($alias . '.URL');
             $criteria->addSelectColumn($alias . '.BY_DEFAULT');
             $criteria->addSelectColumn($alias . '.CREATED_AT');

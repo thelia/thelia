@@ -22,6 +22,7 @@ use Thelia\Model\LangQuery;
  * @method LangQuery orderById($order = Criteria::ASC) Order by the id column
  * @method LangQuery orderByTitle($order = Criteria::ASC) Order by the title column
  * @method LangQuery orderByCode($order = Criteria::ASC) Order by the code column
+ * @method LangQuery orderByLocale($order = Criteria::ASC) Order by the locale column
  * @method LangQuery orderByUrl($order = Criteria::ASC) Order by the url column
  * @method LangQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
  * @method LangQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -30,6 +31,7 @@ use Thelia\Model\LangQuery;
  * @method LangQuery groupById() Group by the id column
  * @method LangQuery groupByTitle() Group by the title column
  * @method LangQuery groupByCode() Group by the code column
+ * @method LangQuery groupByLocale() Group by the locale column
  * @method LangQuery groupByUrl() Group by the url column
  * @method LangQuery groupByByDefault() Group by the by_default column
  * @method LangQuery groupByCreatedAt() Group by the created_at column
@@ -45,6 +47,7 @@ use Thelia\Model\LangQuery;
  * @method Lang findOneById(int $id) Return the first Lang filtered by the id column
  * @method Lang findOneByTitle(string $title) Return the first Lang filtered by the title column
  * @method Lang findOneByCode(string $code) Return the first Lang filtered by the code column
+ * @method Lang findOneByLocale(string $locale) Return the first Lang filtered by the locale column
  * @method Lang findOneByUrl(string $url) Return the first Lang filtered by the url column
  * @method Lang findOneByByDefault(int $by_default) Return the first Lang filtered by the by_default column
  * @method Lang findOneByCreatedAt(string $created_at) Return the first Lang filtered by the created_at column
@@ -53,6 +56,7 @@ use Thelia\Model\LangQuery;
  * @method array findById(int $id) Return Lang objects filtered by the id column
  * @method array findByTitle(string $title) Return Lang objects filtered by the title column
  * @method array findByCode(string $code) Return Lang objects filtered by the code column
+ * @method array findByLocale(string $locale) Return Lang objects filtered by the locale column
  * @method array findByUrl(string $url) Return Lang objects filtered by the url column
  * @method array findByByDefault(int $by_default) Return Lang objects filtered by the by_default column
  * @method array findByCreatedAt(string $created_at) Return Lang objects filtered by the created_at column
@@ -146,7 +150,7 @@ abstract class BaseLangQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `URL`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
+        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `LOCALE`, `URL`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -318,6 +322,35 @@ abstract class BaseLangQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(LangPeer::CODE, $code, $comparison);
+    }
+
+    /**
+     * Filter the query on the locale column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLocale('fooValue');   // WHERE locale = 'fooValue'
+     * $query->filterByLocale('%fooValue%'); // WHERE locale LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $locale The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return LangQuery The current query, for fluid interface
+     */
+    public function filterByLocale($locale = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($locale)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $locale)) {
+                $locale = str_replace('*', '%', $locale);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(LangPeer::LOCALE, $locale, $comparison);
     }
 
     /**

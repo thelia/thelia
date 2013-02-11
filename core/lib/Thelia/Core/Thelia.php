@@ -76,7 +76,19 @@ class Thelia extends Kernel
      */
     public function loadConfiguration()
     {
+        $request = $this->getContainer()->get('request');
+    }
+    
+    /**
+     * 
+     * boot parent kernel and after current kernel
+     * 
+     */
+    public function boot()
+    {
+        parent::boot();
         
+        $this->loadConfiguration();
     }
 
     /**

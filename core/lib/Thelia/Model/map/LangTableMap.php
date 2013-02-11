@@ -45,6 +45,7 @@ class LangTableMap extends TableMap
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 100, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 10, null);
+        $this->addColumn('LOCALE', 'Locale', 'VARCHAR', false, 45, null);
         $this->addColumn('URL', 'Url', 'VARCHAR', false, 255, null);
         $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);

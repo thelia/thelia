@@ -404,6 +404,7 @@
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="title" size="100" type="VARCHAR" />
     <column name="code" size="10" type="VARCHAR" />
+    <column name="locale" size="45" type="VARCHAR" />
     <column name="url" size="255" type="VARCHAR" />
     <column name="by_default" type="TINYINT" />
     <behavior name="timestampable" />

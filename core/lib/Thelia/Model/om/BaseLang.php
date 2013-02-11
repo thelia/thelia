@@ -64,6 +64,12 @@ abstract class BaseLang extends BaseObject implements Persistent
     protected $code;
 
     /**
+     * The value for the locale field.
+     * @var        string
+     */
+    protected $locale;
+
+    /**
      * The value for the url field.
      * @var        string
      */
@@ -129,6 +135,16 @@ abstract class BaseLang extends BaseObject implements Persistent
     public function getCode()
     {
         return $this->code;
+    }
+
+    /**
+     * Get the [locale] column value.
+     *
+     * @return string
+     */
+    public function getLocale()
+    {
+        return $this->locale;
     }
 
     /**
@@ -289,6 +305,27 @@ abstract class BaseLang extends BaseObject implements Persistent
     } // setCode()
 
     /**
+     * Set the value of [locale] column.
+     *
+     * @param string $v new value
+     * @return Lang The current object (for fluent API support)
+     */
+    public function setLocale($v)
+    {
+        if ($v !== null) {
+            $v = (string) $v;
+        }
+
+        if ($this->locale !== $v) {
+            $this->locale = $v;
+            $this->modifiedColumns[] = LangPeer::LOCALE;
+        }
+
+
+        return $this;
+    } // setLocale()
+
+    /**
      * Set the value of [url] column.
      *
      * @param string $v new value
@@ -411,10 +448,11 @@ abstract class BaseLang extends BaseObject implements Persistent
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->title = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
             $this->code = ($row[$startcol + 2] !== null) ? (string) $row[$startcol + 2] : null;
-            $this->url = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
-            $this->by_default = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
-            $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
-            $this->updated_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->locale = ($row[$startcol + 3] !== null) ? (string) $row[$startcol + 3] : null;
+            $this->url = ($row[$startcol + 4] !== null) ? (string) $row[$startcol + 4] : null;
+            $this->by_default = ($row[$startcol + 5] !== null) ? (int) $row[$startcol + 5] : null;
+            $this->created_at = ($row[$startcol + 6] !== null) ? (string) $row[$startcol + 6] : null;
+            $this->updated_at = ($row[$startcol + 7] !== null) ? (string) $row[$startcol + 7] : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -423,7 +461,7 @@ abstract class BaseLang extends BaseObject implements Persistent
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = LangPeer::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = LangPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating Lang object", $e);
@@ -655,6 +693,9 @@ abstract class BaseLang extends BaseObject implements Persistent
         if ($this->isColumnModified(LangPeer::CODE)) {
             $modifiedColumns[':p' . $index++]  = '`CODE`';
         }
+        if ($this->isColumnModified(LangPeer::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
+        }
         if ($this->isColumnModified(LangPeer::URL)) {
             $modifiedColumns[':p' . $index++]  = '`URL`';
         }
@@ -686,6 +727,9 @@ abstract class BaseLang extends BaseObject implements Persistent
                         break;
                     case '`CODE`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
+                        break;
+                    case '`LOCALE`':
+                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
                     case '`URL`':
                         $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
@@ -843,15 +887,18 @@ abstract class BaseLang extends BaseObject implements Persistent
                 return $this->getCode();
                 break;
             case 3:
-                return $this->getUrl();
+                return $this->getLocale();
                 break;
             case 4:
-                return $this->getByDefault();
+                return $this->getUrl();
                 break;
             case 5:
-                return $this->getCreatedAt();
+                return $this->getByDefault();
                 break;
             case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -885,10 +932,11 @@ abstract class BaseLang extends BaseObject implements Persistent
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTitle(),
             $keys[2] => $this->getCode(),
-            $keys[3] => $this->getUrl(),
-            $keys[4] => $this->getByDefault(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[3] => $this->getLocale(),
+            $keys[4] => $this->getUrl(),
+            $keys[5] => $this->getByDefault(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
 
         return $result;
@@ -933,15 +981,18 @@ abstract class BaseLang extends BaseObject implements Persistent
                 $this->setCode($value);
                 break;
             case 3:
-                $this->setUrl($value);
+                $this->setLocale($value);
                 break;
             case 4:
-                $this->setByDefault($value);
+                $this->setUrl($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
+                $this->setByDefault($value);
                 break;
             case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -971,10 +1022,11 @@ abstract class BaseLang extends BaseObject implements Persistent
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTitle($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setCode($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUrl($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setByDefault($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[3], $arr)) $this->setLocale($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUrl($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setByDefault($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -989,6 +1041,7 @@ abstract class BaseLang extends BaseObject implements Persistent
         if ($this->isColumnModified(LangPeer::ID)) $criteria->add(LangPeer::ID, $this->id);
         if ($this->isColumnModified(LangPeer::TITLE)) $criteria->add(LangPeer::TITLE, $this->title);
         if ($this->isColumnModified(LangPeer::CODE)) $criteria->add(LangPeer::CODE, $this->code);
+        if ($this->isColumnModified(LangPeer::LOCALE)) $criteria->add(LangPeer::LOCALE, $this->locale);
         if ($this->isColumnModified(LangPeer::URL)) $criteria->add(LangPeer::URL, $this->url);
         if ($this->isColumnModified(LangPeer::BY_DEFAULT)) $criteria->add(LangPeer::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(LangPeer::CREATED_AT)) $criteria->add(LangPeer::CREATED_AT, $this->created_at);
@@ -1058,6 +1111,7 @@ abstract class BaseLang extends BaseObject implements Persistent
     {
         $copyObj->setTitle($this->getTitle());
         $copyObj->setCode($this->getCode());
+        $copyObj->setLocale($this->getLocale());
         $copyObj->setUrl($this->getUrl());
         $copyObj->setByDefault($this->getByDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -1116,6 +1170,7 @@ abstract class BaseLang extends BaseObject implements Persistent
         $this->id = null;
         $this->title = null;
         $this->code = null;
+        $this->locale = null;
         $this->url = null;
         $this->by_default = null;
         $this->created_at = null;
