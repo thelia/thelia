@@ -36,7 +36,7 @@ class Cart extends BaseAction
      */
     public function addCart(Request $request)
     {
-        var_dump($this->getDispatcher()); exit;
+        
     }
     
     /**

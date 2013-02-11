@@ -34,8 +34,11 @@ namespace Thelia\Core;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+
+
 use Thelia\Core\Bundle;
 use Thelia\Log\Tlog;
+
 use Propel;
 use PropelConfiguration;
 
@@ -76,8 +79,18 @@ class Thelia extends Kernel
      */
     public function loadConfiguration()
     {
-        $request = $this->getContainer()->get('request');
+
     }
+    
+    /**
+     * 
+     * initialize session in Request object
+     * 
+     * All param must be change in Config table
+     * 
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     */
+    
     
     /**
      * 
@@ -86,6 +99,9 @@ class Thelia extends Kernel
      */
     public function boot()
     {
+        
+        
+        
         parent::boot();
         
         $this->loadConfiguration();

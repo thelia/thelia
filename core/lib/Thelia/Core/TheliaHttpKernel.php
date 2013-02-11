@@ -28,6 +28,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ControllerResolverInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\HttpFoundation\Session;
+
+use Thelia\Model;
 
 /**
  *
@@ -63,7 +66,7 @@ class TheliaHttpKernel extends HttpKernel
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
         //$request->headers->set('X-Php-Ob-Level', ob_get_level());
-
+        $request = $this->initSession($request);
         $this->container->enterScope('request');
         $this->container->set('request', $request, 'request');
 
@@ -78,5 +81,33 @@ class TheliaHttpKernel extends HttpKernel
         $this->container->leaveScope('request');
 
         return $response;
+    }
+    
+    protected function initSession(Request $request)
+    {
+        
+        $storage = new Session\Storage\NativeSessionStorage();
+        
+        if (Model\ConfigQuery::read("session_config.default")) {
+            $storage->setSaveHandler(new Session\Storage\Handler\NativeFileSessionHandler(Model\ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')));
+        } else {
+            $handlerString = Model\ConfigQuery::read("session_config.handlers");
+            
+            $handler = new $handlerString;
+            
+            $storage->setSaveHandler($handler);
+        }
+        
+        if (Model\ConfigQuery::read("session_config.config", null)) {
+           $storage->setOptions(json_decode(Model\ConfigQuery::read("session_config.config"))); 
+        }
+        
+        
+        $session = new Session\Session($storage);
+        $session->start();
+        
+        $request->setSession($session);
+        
+        return $request;
     }
 }

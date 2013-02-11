@@ -18,7 +18,7 @@ use Thelia\Model\om\BaseConfigQuery;
  */
 class ConfigQuery extends BaseConfigQuery
 {
-    public static function read($search, $default)
+    public static function read($search, $default = null)
     {
         $value = self::create()->findOneByName($search);
         
