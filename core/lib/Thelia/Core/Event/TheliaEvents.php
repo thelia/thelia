@@ -40,4 +40,11 @@ final class TheliaEvents
      * Send if no action are already present in Thelia action process ( see Thelia\Routing\Matcher\ActionMatcher)
      */
     const ACTION = "thelia.action";
+    
+    /**
+     * INCLUDE event
+     * 
+     * Send before starting thelia inclusion
+     */
+    const INCLUSION = "thelia.include";
 }

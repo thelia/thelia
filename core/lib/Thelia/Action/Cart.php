@@ -29,36 +29,35 @@ use Thelia\Action\BaseAction;
 class Cart extends BaseAction
 {
     /**
-     * 
+     *
      * add an article to cart
-     * 
+     *
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
     public function addCart(Request $request)
     {
-        
+
     }
-    
+
     /**
-     * 
+     *
      * Delete specify article present into cart
-     * 
+     *
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
     public function deleteArticle(Request $request)
     {
-        
+
     }
-    
+
     /**
-     * 
+     *
      * Modify article's quantity
-     * 
+     *
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
     public function modifyArticle(Request $request)
     {
-        
+
     }
 }
-

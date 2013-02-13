@@ -44,12 +44,13 @@ class DefaultController implements NullControllerInterface
      */
     public function noAction(Request $request)
     {
-        if ($request->query->has('view') === false) {
-            $fond = "index";
+        if (! $view = $request->query->get('view')) {
+            $view = "index";
             if ($request->request->has('view')) {
-                $fond = $request->request->get('view');
+                $view = $request->request->get('view');
             }
-            $request->query->set('view', $fond);
         }
+        
+        $request->attributes->set('_view', $view);
     }
 }

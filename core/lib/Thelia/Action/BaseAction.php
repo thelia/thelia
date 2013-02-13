@@ -26,30 +26,30 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * 
- * 
+ *
+ *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-abstract class BaseAction 
+abstract class BaseAction
 {
     /**
      *
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
-    
+
     /**
-     * 
+     *
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      */
-    public function __construct(EventDispatcherInterface $dispatcher) 
+    public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
-    
+
     /**
-     * 
+     *
      * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     public function getDispatcher()

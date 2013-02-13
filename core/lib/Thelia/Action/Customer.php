@@ -27,19 +27,19 @@ use Symfony\Component\HttpFoundation\Request;
 
 class Customer
 {
-    
+
     public function create(Request $request)
     {
-        
+
     }
-    
+
     public function modify(Request $request)
     {
-        
+
     }
-    
+
     public function modifyPassword(Request $request)
     {
-        
+
     }
 }

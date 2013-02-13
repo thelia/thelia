@@ -25,7 +25,10 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 
 /**
@@ -39,15 +42,19 @@ use Thelia\Core\Template\ParserInterface;
 
 class ViewListener implements EventSubscriberInterface
 {
-    private $parser;
+    /**
+     *
+     * @var Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    private $container;
 
     /**
      *
      * @param \Thelia\Core\Template\ParserInterface $parser
      */
-    public function __construct(ParserInterface $parser)
+    public function __construct(ContainerInterface $container)
     {
-        $this->parser = $parser;
+        $this->container = $container;
     }
 
     /**
@@ -60,13 +67,41 @@ class ViewListener implements EventSubscriberInterface
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        $content = $this->parser->getContent();
+        $parser = $this->container->get('parser');
+        try {
+            $content = $parser->getContent();
 
-        if ($content instanceof Response) {
-            $event->setResponse($content);
-        } else {
-            $event->setResponse(new Response($content, $this->parser->getStatus() ?: 200));
+            if ($content instanceof Response) {
+                $event->setResponse($content);
+            } else {
+                $event->setResponse(new Response($content, $parser->getStatus() ?: 200));
+            }
+        } catch(ResourceNotFoundException $e) {
+            $event->setResponse(new Response($e->getMessage(), 404));
         }
+        
+    }
+    
+    public function beforeKernelView(GetResponseForControllerResultEvent $event)
+    {
+        $request = $this->container->get('request');
+        
+        if (!$view = $request->attributes->get('_view')) {
+            $request->attributes->set('_view', $this->findView($request));
+        }
+        
+    }
+    
+    public function findView(Request $request)
+    {
+        if (! $view = $request->query->get('view')) {
+            $view = "index";
+            if ($request->request->has('view')) {
+                $view = $request->request->get('view');
+            }
+        }
+        
+        return $view;
     }
 
 
@@ -79,7 +114,10 @@ class ViewListener implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::VIEW => array('onKernelView'),
+            KernelEvents::VIEW =>array(
+                array('onKernelView', 0),
+                array('beforeKernelView', 5)
+            ) 
         );
     }
 }

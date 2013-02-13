@@ -34,7 +34,7 @@ use Thelia\Action\Cart;
 
 /**
  * Matcher using action param in get or post method to perform actions. For exemple index.php?action=addCart will find the good controller that can perform this action.
- * 
+ *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
@@ -42,25 +42,25 @@ class ActionMatcher implements RequestMatcherInterface
 {
     /**
      *
-     * @var Symfony\Component\EventDispatcher\EventDispatcherInterface 
+     * @var Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
-    
+
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
     }
-    
+
     public function matchRequest(Request $request)
     {
         if (false !== $action = $request->get("action")) {
             //search corresponding action
             return $this->dispatchAction($request, $action);
         }
-        
+
         throw new ResourceNotFoundException("No action parameter found");
     }
-    
+
     protected function dispatchAction(Request $request, $action)
     {
         $controller = null;
@@ -71,7 +71,7 @@ class ActionMatcher implements RequestMatcherInterface
                     "addCart"
                 );
                 break;
-            default : 
+            default :
                 $event = new ActionEvent($request, $action);
                 $this->dispatcher->dispatch(TheliaEvents::ACTION, $event);
                 if ($event->hasController()) {
@@ -79,14 +79,14 @@ class ActionMatcher implements RequestMatcherInterface
                 }
                 break;
         }
-        
+
         if ($controller) {
             return array(
                 '_controller' => $controller
             );
         }
-        
+
         throw new ResourceNotFoundException("No action parameter found");
-        
+
     }
 }

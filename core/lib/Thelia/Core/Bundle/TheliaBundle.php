@@ -91,7 +91,7 @@ class TheliaBundle extends Bundle
          */
 
         $container->register('thelia.listener.view','Thelia\Core\EventListener\ViewListener')
-                ->addArgument(new Reference('parser'))
+                ->addArgument(new Reference('service_container'))
         ;
 
 

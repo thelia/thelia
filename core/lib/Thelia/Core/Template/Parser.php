@@ -25,6 +25,8 @@ namespace Thelia\Core\Template;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 /**
  *
@@ -44,15 +46,18 @@ class Parser implements ParserInterface
     const SHOW_TIME = true;
     const ALLOW_DEBUG = true;
     const USE_CACHE = true;
+    
 
     /**
      *
      * @var Symfony\Component\DependencyInjection\ContainerInterface
      */
     protected $container;
-
+    
     protected $content;
     protected $status = 200;
+    
+    protected $template = "default";
 
     /**
      *
@@ -63,6 +68,24 @@ class Parser implements ParserInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+    
+    /**
+     * 
+     * @return Symfony\Component\HttpFoundation\Request
+     */
+    public function getRequest()
+    {
+        return $this->container->get('request');
+    }
+    
+    /**
+     * 
+     * @return Symfony\Component\EventDispatcher\EventDispatcher
+     */
+    public function getDispatcher()
+    {
+        return $this->container->get('dispatcher');
     }
 
     /**
@@ -75,7 +98,6 @@ class Parser implements ParserInterface
        $this->loadParser();
        
        echo \Thelia\Model\ConfigQuery::read("alfred", "dupont");
-       \Thelia\Log\Tlog::getInstance()->debug("tutu");
        
        return $this->content;
     }
@@ -111,8 +133,25 @@ class Parser implements ParserInterface
         $this->status = $status;
     }
 
+    /**
+     * Main parser function, load the parser
+     */
     public function loadParser()
     {
+        $content = $this->openFile($this->getRequest());
     }
+    
+    public function openFile(Request $request)
+    {
+        $file = $request->attributes->get('_view');
+        $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file . ".html";
+        if (file_exists($fileName)) {
+            $content = file_get_contents($fileName);
+        } else {
+            throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+        }
+    }
+    
+
 
 }
