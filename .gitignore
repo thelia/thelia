@@ -7,3 +7,4 @@ cache/*
 log/*
 bin/*
 composer.lock
+local/session/*
