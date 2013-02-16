@@ -7,7 +7,7 @@
  */
 $env = "test";
 define('THELIA_ROOT', __DIR__ .'/../../../../');
-$loader = require __DIR__ . '/../../../autoload.php';
+$loader = require __DIR__ . '/../../../vendor/autoload.php';
 
 require THELIA_ROOT . '/local/config/config_db.php';
 

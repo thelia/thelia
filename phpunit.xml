@@ -2,6 +2,9 @@
 
 <phpunit 
     colors="true"
+    convertErrorsToExceptions= "true"
+    convertNoticesToExceptions= "true"
+    convertWarningsToExceptions= "true"
     bootstrap="core/lib/Thelia/Tests/bootstrap.php"
     verbose="true"
     backupGlobals="false"
@@ -11,4 +14,14 @@
 	        <directory>core/lib/Thelia/Tests</directory>
 	    </testsuite>
     </testsuites>
+    <filter>
+        <whitelist>
+            <directory>core/lib</directory>
+            <exclude>
+                <directory>core/lib/Thelia/Model/map</directory>
+                <directory>core/lib/Thelia/Model/om</directory>
+                <directory>core/lib/Thelia/Tests</directory>
+            </exclude>
+        </whitelist>
+    </filter>
 </phpunit>

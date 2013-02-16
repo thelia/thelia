@@ -8,3 +8,4 @@ log/*
 bin/*
 composer.lock
 local/session/*
+coverage
