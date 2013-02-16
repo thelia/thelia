@@ -32,7 +32,11 @@ class TlogTest extends \PHPUnit_Framework_TestCase
     protected $regex = "/(\\d)(:)(\\s+)(%s)(\\s+)(\\[.*?\\])(\\s+)(\\{.*?\\})(\\s+)((?:2|1)\\d{3}(?:-|\\/)(?:(?:0[1-9])|(?:1[0-2]))(?:-|\\/)(?:(?:0[1-9])|(?:[1-2][0-9])|(?:3[0-1]))(?:T|\\s)(?:(?:[0-1][0-9])|(?:2[0-3])):(?:[0-5][0-9]):(?:[0-5][0-9]))(.)(\\s+)(%s)([\n])/is";
 
     public static function setUpBeforeClass()
-    {        
+    {   
+        if (!\Propel::isInit()){
+            \Propel::init(THELIA_ROOT . "/local/config/config_thelia.php");
+        }
+        
         self::$logger = Tlog::getInstance();
         
         self::$logger->setDestinations("Thelia\Log\Destination\TlogDestinationText");
