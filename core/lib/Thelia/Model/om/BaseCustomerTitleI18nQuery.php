@@ -73,7 +73,7 @@ abstract class BaseCustomerTitleI18nQuery extends ModelCriteria
      * Returns a new CustomerTitleI18nQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CustomerTitleI18nQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CustomerTitleI18nQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CustomerTitleI18nQuery
      */
@@ -137,12 +137,12 @@ abstract class BaseCustomerTitleI18nQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   CustomerTitleI18n A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 CustomerTitleI18n A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `LOCALE`, `SHORT`, `LONG` FROM `customer_title_i18n` WHERE `ID` = :p0 AND `LOCALE` = :p1';
+        $sql = 'SELECT `id`, `locale`, `short`, `long` FROM `customer_title_i18n` WHERE `id` = :p0 AND `locale` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -250,7 +250,8 @@ abstract class BaseCustomerTitleI18nQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @see       filterByCustomerTitle()
@@ -265,8 +266,22 @@ abstract class BaseCustomerTitleI18nQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CustomerTitleI18nPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CustomerTitleI18nPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CustomerTitleI18nPeer::ID, $id, $comparison);
@@ -365,8 +380,8 @@ abstract class BaseCustomerTitleI18nQuery extends ModelCriteria
      * @param   CustomerTitle|PropelObjectCollection $customerTitle The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CustomerTitleI18nQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CustomerTitleI18nQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCustomerTitle($customerTitle, $comparison = null)
     {

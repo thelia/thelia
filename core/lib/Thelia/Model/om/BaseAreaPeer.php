@@ -46,20 +46,20 @@ abstract class BaseAreaPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'area.ID';
+    /** the column name for the id field */
+    const ID = 'area.id';
 
-    /** the column name for the NAME field */
-    const NAME = 'area.NAME';
+    /** the column name for the name field */
+    const NAME = 'area.name';
 
-    /** the column name for the UNIT field */
-    const UNIT = 'area.UNIT';
+    /** the column name for the unit field */
+    const UNIT = 'area.unit';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'area.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'area.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'area.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'area.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -180,11 +180,11 @@ abstract class BaseAreaPeer
             $criteria->addSelectColumn(AreaPeer::CREATED_AT);
             $criteria->addSelectColumn(AreaPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.NAME');
-            $criteria->addSelectColumn($alias . '.UNIT');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.unit');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -268,7 +268,7 @@ abstract class BaseAreaPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -373,8 +373,15 @@ abstract class BaseAreaPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AreaPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AreaPeer::$instances = array();
     }
 
@@ -515,7 +522,7 @@ abstract class BaseAreaPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AreaPeer::OM_CLASS;
     }

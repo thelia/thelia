@@ -100,7 +100,6 @@ use Thelia\Model\OrderStatus;
  * @method Order findOne(PropelPDO $con = null) Return the first Order matching the query
  * @method Order findOneOrCreate(PropelPDO $con = null) Return the first Order matching the query, or a new Order object populated from the query conditions when no match is found
  *
- * @method Order findOneById(int $id) Return the first Order filtered by the id column
  * @method Order findOneByRef(string $ref) Return the first Order filtered by the ref column
  * @method Order findOneByCustomerId(int $customer_id) Return the first Order filtered by the customer_id column
  * @method Order findOneByAddressInvoice(int $address_invoice) Return the first Order filtered by the address_invoice column
@@ -158,7 +157,7 @@ abstract class BaseOrderQuery extends ModelCriteria
      * Returns a new OrderQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     OrderQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   OrderQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return OrderQuery
      */
@@ -215,18 +214,32 @@ abstract class BaseOrderQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Order A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Order A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Order A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_ID`, `ADDRESS_INVOICE`, `ADDRESS_DELIVERY`, `INVOICE_DATE`, `CURRENCY_ID`, `CURRENCY_RATE`, `TRANSACTION`, `DELIVERY_NUM`, `INVOICE`, `POSTAGE`, `PAYMENT`, `CARRIER`, `STATUS_ID`, `LANG`, `CREATED_AT`, `UPDATED_AT` FROM `order` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `ref`, `customer_id`, `address_invoice`, `address_delivery`, `invoice_date`, `currency_id`, `currency_rate`, `transaction`, `delivery_num`, `invoice`, `postage`, `payment`, `carrier`, `status_id`, `lang`, `created_at`, `updated_at` FROM `order` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -322,7 +335,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -335,8 +349,22 @@ abstract class BaseOrderQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(OrderPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(OrderPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(OrderPeer::ID, $id, $comparison);
@@ -378,7 +406,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterByCustomerId(1234); // WHERE customer_id = 1234
      * $query->filterByCustomerId(array(12, 34)); // WHERE customer_id IN (12, 34)
-     * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id > 12
+     * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id >= 12
+     * $query->filterByCustomerId(array('max' => 12)); // WHERE customer_id <= 12
      * </code>
      *
      * @see       filterByCustomer()
@@ -421,7 +450,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterByAddressInvoice(1234); // WHERE address_invoice = 1234
      * $query->filterByAddressInvoice(array(12, 34)); // WHERE address_invoice IN (12, 34)
-     * $query->filterByAddressInvoice(array('min' => 12)); // WHERE address_invoice > 12
+     * $query->filterByAddressInvoice(array('min' => 12)); // WHERE address_invoice >= 12
+     * $query->filterByAddressInvoice(array('max' => 12)); // WHERE address_invoice <= 12
      * </code>
      *
      * @see       filterByOrderAddressRelatedByAddressInvoice()
@@ -464,7 +494,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterByAddressDelivery(1234); // WHERE address_delivery = 1234
      * $query->filterByAddressDelivery(array(12, 34)); // WHERE address_delivery IN (12, 34)
-     * $query->filterByAddressDelivery(array('min' => 12)); // WHERE address_delivery > 12
+     * $query->filterByAddressDelivery(array('min' => 12)); // WHERE address_delivery >= 12
+     * $query->filterByAddressDelivery(array('max' => 12)); // WHERE address_delivery <= 12
      * </code>
      *
      * @see       filterByOrderAddressRelatedByAddressDelivery()
@@ -550,7 +581,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterByCurrencyId(1234); // WHERE currency_id = 1234
      * $query->filterByCurrencyId(array(12, 34)); // WHERE currency_id IN (12, 34)
-     * $query->filterByCurrencyId(array('min' => 12)); // WHERE currency_id > 12
+     * $query->filterByCurrencyId(array('min' => 12)); // WHERE currency_id >= 12
+     * $query->filterByCurrencyId(array('max' => 12)); // WHERE currency_id <= 12
      * </code>
      *
      * @see       filterByCurrency()
@@ -593,7 +625,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterByCurrencyRate(1234); // WHERE currency_rate = 1234
      * $query->filterByCurrencyRate(array(12, 34)); // WHERE currency_rate IN (12, 34)
-     * $query->filterByCurrencyRate(array('min' => 12)); // WHERE currency_rate > 12
+     * $query->filterByCurrencyRate(array('min' => 12)); // WHERE currency_rate >= 12
+     * $query->filterByCurrencyRate(array('max' => 12)); // WHERE currency_rate <= 12
      * </code>
      *
      * @param     mixed $currencyRate The value to use as filter.
@@ -721,7 +754,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterByPostage(1234); // WHERE postage = 1234
      * $query->filterByPostage(array(12, 34)); // WHERE postage IN (12, 34)
-     * $query->filterByPostage(array('min' => 12)); // WHERE postage > 12
+     * $query->filterByPostage(array('min' => 12)); // WHERE postage >= 12
+     * $query->filterByPostage(array('max' => 12)); // WHERE postage <= 12
      * </code>
      *
      * @param     mixed $postage The value to use as filter.
@@ -820,7 +854,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * <code>
      * $query->filterByStatusId(1234); // WHERE status_id = 1234
      * $query->filterByStatusId(array(12, 34)); // WHERE status_id IN (12, 34)
-     * $query->filterByStatusId(array('min' => 12)); // WHERE status_id > 12
+     * $query->filterByStatusId(array('min' => 12)); // WHERE status_id >= 12
+     * $query->filterByStatusId(array('max' => 12)); // WHERE status_id <= 12
      * </code>
      *
      * @see       filterByOrderStatus()
@@ -977,8 +1012,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param   Currency|PropelObjectCollection $currency The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCurrency($currency, $comparison = null)
     {
@@ -1053,8 +1088,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param   Customer|PropelObjectCollection $customer The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCustomer($customer, $comparison = null)
     {
@@ -1129,8 +1164,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param   OrderAddress|PropelObjectCollection $orderAddress The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrderAddressRelatedByAddressInvoice($orderAddress, $comparison = null)
     {
@@ -1205,8 +1240,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param   OrderAddress|PropelObjectCollection $orderAddress The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrderAddressRelatedByAddressDelivery($orderAddress, $comparison = null)
     {
@@ -1281,8 +1316,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param   OrderStatus|PropelObjectCollection $orderStatus The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrderStatus($orderStatus, $comparison = null)
     {
@@ -1357,8 +1392,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param   OrderProduct|PropelObjectCollection $orderProduct  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrderProduct($orderProduct, $comparison = null)
     {
@@ -1431,8 +1466,8 @@ abstract class BaseOrderQuery extends ModelCriteria
      * @param   CouponOrder|PropelObjectCollection $couponOrder  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCouponOrder($couponOrder, $comparison = null)
     {

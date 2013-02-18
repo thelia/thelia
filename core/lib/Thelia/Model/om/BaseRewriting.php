@@ -136,6 +136,12 @@ abstract class BaseRewriting extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -214,22 +220,25 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -251,22 +260,25 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -277,7 +289,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -298,7 +310,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      */
     public function setUrl($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -319,7 +331,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      */
     public function setProductId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -344,7 +356,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      */
     public function setCategoryId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -369,7 +381,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      */
     public function setFolderId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -394,7 +406,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      */
     public function setContentId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -504,7 +516,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 8; // 8 = RewritingPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -774,28 +786,28 @@ abstract class BaseRewriting extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(RewritingPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(RewritingPeer::URL)) {
-            $modifiedColumns[':p' . $index++]  = '`URL`';
+            $modifiedColumns[':p' . $index++]  = '`url`';
         }
         if ($this->isColumnModified(RewritingPeer::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_ID`';
+            $modifiedColumns[':p' . $index++]  = '`product_id`';
         }
         if ($this->isColumnModified(RewritingPeer::CATEGORY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CATEGORY_ID`';
+            $modifiedColumns[':p' . $index++]  = '`category_id`';
         }
         if ($this->isColumnModified(RewritingPeer::FOLDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`FOLDER_ID`';
+            $modifiedColumns[':p' . $index++]  = '`folder_id`';
         }
         if ($this->isColumnModified(RewritingPeer::CONTENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CONTENT_ID`';
+            $modifiedColumns[':p' . $index++]  = '`content_id`';
         }
         if ($this->isColumnModified(RewritingPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(RewritingPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -808,28 +820,28 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`URL`':
+                    case '`url`':
                         $stmt->bindValue($identifier, $this->url, PDO::PARAM_STR);
                         break;
-                    case '`PRODUCT_ID`':
+                    case '`product_id`':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case '`CATEGORY_ID`':
+                    case '`category_id`':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
                         break;
-                    case '`FOLDER_ID`':
+                    case '`folder_id`':
                         $stmt->bindValue($identifier, $this->folder_id, PDO::PARAM_INT);
                         break;
-                    case '`CONTENT_ID`':
+                    case '`content_id`':
                         $stmt->bindValue($identifier, $this->content_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -893,11 +905,11 @@ abstract class BaseRewriting extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1333,12 +1345,13 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      * Get the associated Product object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Product The associated Product object.
      * @throws PropelException
      */
-    public function getProduct(PropelPDO $con = null)
+    public function getProduct(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aProduct === null && ($this->product_id !== null)) {
+        if ($this->aProduct === null && ($this->product_id !== null) && $doQuery) {
             $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1384,12 +1397,13 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      * Get the associated Category object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Category The associated Category object.
      * @throws PropelException
      */
-    public function getCategory(PropelPDO $con = null)
+    public function getCategory(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aCategory === null && ($this->category_id !== null)) {
+        if ($this->aCategory === null && ($this->category_id !== null) && $doQuery) {
             $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1435,12 +1449,13 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      * Get the associated Folder object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Folder The associated Folder object.
      * @throws PropelException
      */
-    public function getFolder(PropelPDO $con = null)
+    public function getFolder(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aFolder === null && ($this->folder_id !== null)) {
+        if ($this->aFolder === null && ($this->folder_id !== null) && $doQuery) {
             $this->aFolder = FolderQuery::create()->findPk($this->folder_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1486,12 +1501,13 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      * Get the associated Content object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Content The associated Content object.
      * @throws PropelException
      */
-    public function getContent(PropelPDO $con = null)
+    public function getContent(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aContent === null && ($this->content_id !== null)) {
+        if ($this->aContent === null && ($this->content_id !== null) && $doQuery) {
             $this->aContent = ContentQuery::create()->findPk($this->content_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1520,6 +1536,7 @@ abstract class BaseRewriting extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1537,7 +1554,22 @@ abstract class BaseRewriting extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aProduct instanceof Persistent) {
+              $this->aProduct->clearAllReferences($deep);
+            }
+            if ($this->aCategory instanceof Persistent) {
+              $this->aCategory->clearAllReferences($deep);
+            }
+            if ($this->aFolder instanceof Persistent) {
+              $this->aFolder->clearAllReferences($deep);
+            }
+            if ($this->aContent instanceof Persistent) {
+              $this->aContent->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aProduct = null;

@@ -55,7 +55,6 @@ use Thelia\Model\CouponRule;
  * @method Coupon findOne(PropelPDO $con = null) Return the first Coupon matching the query
  * @method Coupon findOneOrCreate(PropelPDO $con = null) Return the first Coupon matching the query, or a new Coupon object populated from the query conditions when no match is found
  *
- * @method Coupon findOneById(int $id) Return the first Coupon filtered by the id column
  * @method Coupon findOneByCode(string $code) Return the first Coupon filtered by the code column
  * @method Coupon findOneByAction(string $action) Return the first Coupon filtered by the action column
  * @method Coupon findOneByValue(double $value) Return the first Coupon filtered by the value column
@@ -97,7 +96,7 @@ abstract class BaseCouponQuery extends ModelCriteria
      * Returns a new CouponQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CouponQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CouponQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CouponQuery
      */
@@ -154,18 +153,32 @@ abstract class BaseCouponQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Coupon A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Coupon A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Coupon A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `ACTION`, `VALUE`, `USED`, `AVAILABLE_SINCE`, `DATE_LIMIT`, `ACTIVATE`, `CREATED_AT`, `UPDATED_AT` FROM `coupon` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `code`, `action`, `value`, `used`, `available_since`, `date_limit`, `activate`, `created_at`, `updated_at` FROM `coupon` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -261,7 +274,8 @@ abstract class BaseCouponQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -274,8 +288,22 @@ abstract class BaseCouponQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CouponPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CouponPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CouponPeer::ID, $id, $comparison);
@@ -346,7 +374,8 @@ abstract class BaseCouponQuery extends ModelCriteria
      * <code>
      * $query->filterByValue(1234); // WHERE value = 1234
      * $query->filterByValue(array(12, 34)); // WHERE value IN (12, 34)
-     * $query->filterByValue(array('min' => 12)); // WHERE value > 12
+     * $query->filterByValue(array('min' => 12)); // WHERE value >= 12
+     * $query->filterByValue(array('max' => 12)); // WHERE value <= 12
      * </code>
      *
      * @param     mixed $value The value to use as filter.
@@ -387,7 +416,8 @@ abstract class BaseCouponQuery extends ModelCriteria
      * <code>
      * $query->filterByUsed(1234); // WHERE used = 1234
      * $query->filterByUsed(array(12, 34)); // WHERE used IN (12, 34)
-     * $query->filterByUsed(array('min' => 12)); // WHERE used > 12
+     * $query->filterByUsed(array('min' => 12)); // WHERE used >= 12
+     * $query->filterByUsed(array('max' => 12)); // WHERE used <= 12
      * </code>
      *
      * @param     mixed $used The value to use as filter.
@@ -514,7 +544,8 @@ abstract class BaseCouponQuery extends ModelCriteria
      * <code>
      * $query->filterByActivate(1234); // WHERE activate = 1234
      * $query->filterByActivate(array(12, 34)); // WHERE activate IN (12, 34)
-     * $query->filterByActivate(array('min' => 12)); // WHERE activate > 12
+     * $query->filterByActivate(array('min' => 12)); // WHERE activate >= 12
+     * $query->filterByActivate(array('max' => 12)); // WHERE activate <= 12
      * </code>
      *
      * @param     mixed $activate The value to use as filter.
@@ -640,8 +671,8 @@ abstract class BaseCouponQuery extends ModelCriteria
      * @param   CouponRule|PropelObjectCollection $couponRule  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CouponQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CouponQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCouponRule($couponRule, $comparison = null)
     {

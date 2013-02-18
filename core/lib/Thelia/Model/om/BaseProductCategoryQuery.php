@@ -78,7 +78,7 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * Returns a new ProductCategoryQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     ProductCategoryQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   ProductCategoryQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return ProductCategoryQuery
      */
@@ -142,12 +142,12 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   ProductCategory A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 ProductCategory A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `PRODUCT_ID`, `CATEGORY_ID`, `CREATED_AT`, `UPDATED_AT` FROM `product_category` WHERE `PRODUCT_ID` = :p0 AND `CATEGORY_ID` = :p1';
+        $sql = 'SELECT `product_id`, `category_id`, `created_at`, `updated_at` FROM `product_category` WHERE `product_id` = :p0 AND `category_id` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -255,7 +255,8 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByProductId(1234); // WHERE product_id = 1234
      * $query->filterByProductId(array(12, 34)); // WHERE product_id IN (12, 34)
-     * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
+     * $query->filterByProductId(array('min' => 12)); // WHERE product_id >= 12
+     * $query->filterByProductId(array('max' => 12)); // WHERE product_id <= 12
      * </code>
      *
      * @see       filterByProduct()
@@ -270,8 +271,22 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      */
     public function filterByProductId($productId = null, $comparison = null)
     {
-        if (is_array($productId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($productId)) {
+            $useMinMax = false;
+            if (isset($productId['min'])) {
+                $this->addUsingAlias(ProductCategoryPeer::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($productId['max'])) {
+                $this->addUsingAlias(ProductCategoryPeer::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ProductCategoryPeer::PRODUCT_ID, $productId, $comparison);
@@ -284,7 +299,8 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByCategoryId(1234); // WHERE category_id = 1234
      * $query->filterByCategoryId(array(12, 34)); // WHERE category_id IN (12, 34)
-     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
+     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id >= 12
+     * $query->filterByCategoryId(array('max' => 12)); // WHERE category_id <= 12
      * </code>
      *
      * @see       filterByCategory()
@@ -299,8 +315,22 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      */
     public function filterByCategoryId($categoryId = null, $comparison = null)
     {
-        if (is_array($categoryId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($categoryId)) {
+            $useMinMax = false;
+            if (isset($categoryId['min'])) {
+                $this->addUsingAlias(ProductCategoryPeer::CATEGORY_ID, $categoryId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($categoryId['max'])) {
+                $this->addUsingAlias(ProductCategoryPeer::CATEGORY_ID, $categoryId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ProductCategoryPeer::CATEGORY_ID, $categoryId, $comparison);
@@ -398,8 +428,8 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ProductCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ProductCategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProduct($product, $comparison = null)
     {
@@ -474,8 +504,8 @@ abstract class BaseProductCategoryQuery extends ModelCriteria
      * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ProductCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ProductCategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCategory($category, $comparison = null)
     {

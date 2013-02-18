@@ -167,13 +167,19 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -301,22 +307,25 @@ abstract class BaseContent extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -338,22 +347,25 @@ abstract class BaseContent extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -385,22 +397,25 @@ abstract class BaseContent extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->version_created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->version_created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -421,7 +436,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -442,7 +457,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function setVisible($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -463,7 +478,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function setPosition($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -530,7 +545,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function setVersion($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -574,7 +589,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function setVersionCreatedBy($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -638,7 +653,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 8; // 8 = ContentPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -874,7 +889,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collContentAssocs !== null) {
                 foreach ($this->collContentAssocs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -892,7 +907,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collImages !== null) {
                 foreach ($this->collImages as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -910,7 +925,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collDocuments !== null) {
                 foreach ($this->collDocuments as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -928,7 +943,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collRewritings !== null) {
                 foreach ($this->collRewritings as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -945,7 +960,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collContentFolders !== null) {
                 foreach ($this->collContentFolders as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -962,7 +977,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collContentI18ns !== null) {
                 foreach ($this->collContentI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -979,7 +994,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
             if ($this->collContentVersions !== null) {
                 foreach ($this->collContentVersions as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -1012,28 +1027,28 @@ abstract class BaseContent extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ContentPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(ContentPeer::VISIBLE)) {
-            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
+            $modifiedColumns[':p' . $index++]  = '`visible`';
         }
         if ($this->isColumnModified(ContentPeer::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = '`position`';
         }
         if ($this->isColumnModified(ContentPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(ContentPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
         if ($this->isColumnModified(ContentPeer::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+            $modifiedColumns[':p' . $index++]  = '`version`';
         }
         if ($this->isColumnModified(ContentPeer::VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`version_created_at`';
         }
         if ($this->isColumnModified(ContentPeer::VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+            $modifiedColumns[':p' . $index++]  = '`version_created_by`';
         }
 
         $sql = sprintf(
@@ -1046,28 +1061,28 @@ abstract class BaseContent extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`VISIBLE`':
+                    case '`visible`':
                         $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case '`position`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
-                    case '`VERSION`':
+                    case '`version`':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
-                    case '`VERSION_CREATED_AT`':
+                    case '`version_created_at`':
                         $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
                         break;
-                    case '`VERSION_CREATED_BY`':
+                    case '`version_created_by`':
                         $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
@@ -1138,11 +1153,11 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1663,13 +1678,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Content The current object (for fluent API support)
      * @see        addContentAssocs()
      */
     public function clearContentAssocs()
     {
         $this->collContentAssocs = null; // important to set this to null since that means it is uninitialized
         $this->collContentAssocsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1741,6 +1758,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                       $this->collContentAssocsPartial = true;
                     }
 
+                    $collContentAssocs->getInternalIterator()->rewind();
                     return $collContentAssocs;
                 }
 
@@ -1768,12 +1786,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @param PropelCollection $contentAssocs A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Content The current object (for fluent API support)
      */
     public function setContentAssocs(PropelCollection $contentAssocs, PropelPDO $con = null)
     {
-        $this->contentAssocsScheduledForDeletion = $this->getContentAssocs(new Criteria(), $con)->diff($contentAssocs);
+        $contentAssocsToDelete = $this->getContentAssocs(new Criteria(), $con)->diff($contentAssocs);
 
-        foreach ($this->contentAssocsScheduledForDeletion as $contentAssocRemoved) {
+        $this->contentAssocsScheduledForDeletion = unserialize(serialize($contentAssocsToDelete));
+
+        foreach ($contentAssocsToDelete as $contentAssocRemoved) {
             $contentAssocRemoved->setContent(null);
         }
 
@@ -1784,6 +1805,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         $this->collContentAssocs = $contentAssocs;
         $this->collContentAssocsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1801,22 +1824,22 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (null === $this->collContentAssocs || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collContentAssocs) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getContentAssocs());
-                }
-                $query = ContentAssocQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collContentAssocs);
+
+            if($partial && !$criteria) {
+                return count($this->getContentAssocs());
+            }
+            $query = ContentAssocQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
         }
+
+        return count($this->collContentAssocs);
     }
 
     /**
@@ -1832,7 +1855,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->initContentAssocs();
             $this->collContentAssocsPartial = true;
         }
-        if (!$this->collContentAssocs->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collContentAssocs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddContentAssoc($l);
         }
 
@@ -1850,6 +1873,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
     /**
      * @param	ContentAssoc $contentAssoc The contentAssoc object to remove.
+     * @return Content The current object (for fluent API support)
      */
     public function removeContentAssoc($contentAssoc)
     {
@@ -1862,6 +1886,8 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->contentAssocsScheduledForDeletion[]= $contentAssoc;
             $contentAssoc->setContent(null);
         }
+
+        return $this;
     }
 
 
@@ -1920,13 +1946,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Content The current object (for fluent API support)
      * @see        addImages()
      */
     public function clearImages()
     {
         $this->collImages = null; // important to set this to null since that means it is uninitialized
         $this->collImagesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1998,6 +2026,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                       $this->collImagesPartial = true;
                     }
 
+                    $collImages->getInternalIterator()->rewind();
                     return $collImages;
                 }
 
@@ -2025,12 +2054,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @param PropelCollection $images A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Content The current object (for fluent API support)
      */
     public function setImages(PropelCollection $images, PropelPDO $con = null)
     {
-        $this->imagesScheduledForDeletion = $this->getImages(new Criteria(), $con)->diff($images);
+        $imagesToDelete = $this->getImages(new Criteria(), $con)->diff($images);
 
-        foreach ($this->imagesScheduledForDeletion as $imageRemoved) {
+        $this->imagesScheduledForDeletion = unserialize(serialize($imagesToDelete));
+
+        foreach ($imagesToDelete as $imageRemoved) {
             $imageRemoved->setContent(null);
         }
 
@@ -2041,6 +2073,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         $this->collImages = $images;
         $this->collImagesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2058,22 +2092,22 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (null === $this->collImages || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collImages) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getImages());
-                }
-                $query = ImageQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collImages);
+
+            if($partial && !$criteria) {
+                return count($this->getImages());
+            }
+            $query = ImageQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
         }
+
+        return count($this->collImages);
     }
 
     /**
@@ -2089,7 +2123,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->initImages();
             $this->collImagesPartial = true;
         }
-        if (!$this->collImages->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddImage($l);
         }
 
@@ -2107,6 +2141,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
     /**
      * @param	Image $image The image object to remove.
+     * @return Content The current object (for fluent API support)
      */
     public function removeImage($image)
     {
@@ -2119,6 +2154,8 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->imagesScheduledForDeletion[]= $image;
             $image->setContent(null);
         }
+
+        return $this;
     }
 
 
@@ -2202,13 +2239,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Content The current object (for fluent API support)
      * @see        addDocuments()
      */
     public function clearDocuments()
     {
         $this->collDocuments = null; // important to set this to null since that means it is uninitialized
         $this->collDocumentsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -2280,6 +2319,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                       $this->collDocumentsPartial = true;
                     }
 
+                    $collDocuments->getInternalIterator()->rewind();
                     return $collDocuments;
                 }
 
@@ -2307,12 +2347,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @param PropelCollection $documents A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Content The current object (for fluent API support)
      */
     public function setDocuments(PropelCollection $documents, PropelPDO $con = null)
     {
-        $this->documentsScheduledForDeletion = $this->getDocuments(new Criteria(), $con)->diff($documents);
+        $documentsToDelete = $this->getDocuments(new Criteria(), $con)->diff($documents);
 
-        foreach ($this->documentsScheduledForDeletion as $documentRemoved) {
+        $this->documentsScheduledForDeletion = unserialize(serialize($documentsToDelete));
+
+        foreach ($documentsToDelete as $documentRemoved) {
             $documentRemoved->setContent(null);
         }
 
@@ -2323,6 +2366,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         $this->collDocuments = $documents;
         $this->collDocumentsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2340,22 +2385,22 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (null === $this->collDocuments || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collDocuments) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getDocuments());
-                }
-                $query = DocumentQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collDocuments);
+
+            if($partial && !$criteria) {
+                return count($this->getDocuments());
+            }
+            $query = DocumentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
         }
+
+        return count($this->collDocuments);
     }
 
     /**
@@ -2371,7 +2416,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->initDocuments();
             $this->collDocumentsPartial = true;
         }
-        if (!$this->collDocuments->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collDocuments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddDocument($l);
         }
 
@@ -2389,6 +2434,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
     /**
      * @param	Document $document The document object to remove.
+     * @return Content The current object (for fluent API support)
      */
     public function removeDocument($document)
     {
@@ -2401,6 +2447,8 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->documentsScheduledForDeletion[]= $document;
             $document->setContent(null);
         }
+
+        return $this;
     }
 
 
@@ -2484,13 +2532,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Content The current object (for fluent API support)
      * @see        addRewritings()
      */
     public function clearRewritings()
     {
         $this->collRewritings = null; // important to set this to null since that means it is uninitialized
         $this->collRewritingsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -2562,6 +2612,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                       $this->collRewritingsPartial = true;
                     }
 
+                    $collRewritings->getInternalIterator()->rewind();
                     return $collRewritings;
                 }
 
@@ -2589,12 +2640,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @param PropelCollection $rewritings A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Content The current object (for fluent API support)
      */
     public function setRewritings(PropelCollection $rewritings, PropelPDO $con = null)
     {
-        $this->rewritingsScheduledForDeletion = $this->getRewritings(new Criteria(), $con)->diff($rewritings);
+        $rewritingsToDelete = $this->getRewritings(new Criteria(), $con)->diff($rewritings);
 
-        foreach ($this->rewritingsScheduledForDeletion as $rewritingRemoved) {
+        $this->rewritingsScheduledForDeletion = unserialize(serialize($rewritingsToDelete));
+
+        foreach ($rewritingsToDelete as $rewritingRemoved) {
             $rewritingRemoved->setContent(null);
         }
 
@@ -2605,6 +2659,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         $this->collRewritings = $rewritings;
         $this->collRewritingsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2622,22 +2678,22 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (null === $this->collRewritings || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collRewritings) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getRewritings());
-                }
-                $query = RewritingQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collRewritings);
+
+            if($partial && !$criteria) {
+                return count($this->getRewritings());
+            }
+            $query = RewritingQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
         }
+
+        return count($this->collRewritings);
     }
 
     /**
@@ -2653,7 +2709,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->initRewritings();
             $this->collRewritingsPartial = true;
         }
-        if (!$this->collRewritings->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collRewritings->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddRewriting($l);
         }
 
@@ -2671,6 +2727,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
     /**
      * @param	Rewriting $rewriting The rewriting object to remove.
+     * @return Content The current object (for fluent API support)
      */
     public function removeRewriting($rewriting)
     {
@@ -2683,6 +2740,8 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->rewritingsScheduledForDeletion[]= $rewriting;
             $rewriting->setContent(null);
         }
+
+        return $this;
     }
 
 
@@ -2766,13 +2825,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Content The current object (for fluent API support)
      * @see        addContentFolders()
      */
     public function clearContentFolders()
     {
         $this->collContentFolders = null; // important to set this to null since that means it is uninitialized
         $this->collContentFoldersPartial = null;
+
+        return $this;
     }
 
     /**
@@ -2844,6 +2905,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                       $this->collContentFoldersPartial = true;
                     }
 
+                    $collContentFolders->getInternalIterator()->rewind();
                     return $collContentFolders;
                 }
 
@@ -2871,12 +2933,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @param PropelCollection $contentFolders A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Content The current object (for fluent API support)
      */
     public function setContentFolders(PropelCollection $contentFolders, PropelPDO $con = null)
     {
-        $this->contentFoldersScheduledForDeletion = $this->getContentFolders(new Criteria(), $con)->diff($contentFolders);
+        $contentFoldersToDelete = $this->getContentFolders(new Criteria(), $con)->diff($contentFolders);
 
-        foreach ($this->contentFoldersScheduledForDeletion as $contentFolderRemoved) {
+        $this->contentFoldersScheduledForDeletion = unserialize(serialize($contentFoldersToDelete));
+
+        foreach ($contentFoldersToDelete as $contentFolderRemoved) {
             $contentFolderRemoved->setContent(null);
         }
 
@@ -2887,6 +2952,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         $this->collContentFolders = $contentFolders;
         $this->collContentFoldersPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2904,22 +2971,22 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (null === $this->collContentFolders || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collContentFolders) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getContentFolders());
-                }
-                $query = ContentFolderQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collContentFolders);
+
+            if($partial && !$criteria) {
+                return count($this->getContentFolders());
+            }
+            $query = ContentFolderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
         }
+
+        return count($this->collContentFolders);
     }
 
     /**
@@ -2935,7 +3002,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->initContentFolders();
             $this->collContentFoldersPartial = true;
         }
-        if (!$this->collContentFolders->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collContentFolders->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddContentFolder($l);
         }
 
@@ -2953,6 +3020,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
     /**
      * @param	ContentFolder $contentFolder The contentFolder object to remove.
+     * @return Content The current object (for fluent API support)
      */
     public function removeContentFolder($contentFolder)
     {
@@ -2962,9 +3030,11 @@ abstract class BaseContent extends BaseObject implements Persistent
                 $this->contentFoldersScheduledForDeletion = clone $this->collContentFolders;
                 $this->contentFoldersScheduledForDeletion->clear();
             }
-            $this->contentFoldersScheduledForDeletion[]= $contentFolder;
+            $this->contentFoldersScheduledForDeletion[]= clone $contentFolder;
             $contentFolder->setContent(null);
         }
+
+        return $this;
     }
 
 
@@ -2998,13 +3068,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Content The current object (for fluent API support)
      * @see        addContentI18ns()
      */
     public function clearContentI18ns()
     {
         $this->collContentI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collContentI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -3076,6 +3148,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                       $this->collContentI18nsPartial = true;
                     }
 
+                    $collContentI18ns->getInternalIterator()->rewind();
                     return $collContentI18ns;
                 }
 
@@ -3103,12 +3176,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @param PropelCollection $contentI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Content The current object (for fluent API support)
      */
     public function setContentI18ns(PropelCollection $contentI18ns, PropelPDO $con = null)
     {
-        $this->contentI18nsScheduledForDeletion = $this->getContentI18ns(new Criteria(), $con)->diff($contentI18ns);
+        $contentI18nsToDelete = $this->getContentI18ns(new Criteria(), $con)->diff($contentI18ns);
 
-        foreach ($this->contentI18nsScheduledForDeletion as $contentI18nRemoved) {
+        $this->contentI18nsScheduledForDeletion = unserialize(serialize($contentI18nsToDelete));
+
+        foreach ($contentI18nsToDelete as $contentI18nRemoved) {
             $contentI18nRemoved->setContent(null);
         }
 
@@ -3119,6 +3195,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         $this->collContentI18ns = $contentI18ns;
         $this->collContentI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -3136,22 +3214,22 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (null === $this->collContentI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collContentI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getContentI18ns());
-                }
-                $query = ContentI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collContentI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getContentI18ns());
+            }
+            $query = ContentI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
         }
+
+        return count($this->collContentI18ns);
     }
 
     /**
@@ -3171,7 +3249,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->initContentI18ns();
             $this->collContentI18nsPartial = true;
         }
-        if (!$this->collContentI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collContentI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddContentI18n($l);
         }
 
@@ -3189,6 +3267,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
     /**
      * @param	ContentI18n $contentI18n The contentI18n object to remove.
+     * @return Content The current object (for fluent API support)
      */
     public function removeContentI18n($contentI18n)
     {
@@ -3198,9 +3277,11 @@ abstract class BaseContent extends BaseObject implements Persistent
                 $this->contentI18nsScheduledForDeletion = clone $this->collContentI18ns;
                 $this->contentI18nsScheduledForDeletion->clear();
             }
-            $this->contentI18nsScheduledForDeletion[]= $contentI18n;
+            $this->contentI18nsScheduledForDeletion[]= clone $contentI18n;
             $contentI18n->setContent(null);
         }
+
+        return $this;
     }
 
     /**
@@ -3209,13 +3290,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Content The current object (for fluent API support)
      * @see        addContentVersions()
      */
     public function clearContentVersions()
     {
         $this->collContentVersions = null; // important to set this to null since that means it is uninitialized
         $this->collContentVersionsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -3287,6 +3370,7 @@ abstract class BaseContent extends BaseObject implements Persistent
                       $this->collContentVersionsPartial = true;
                     }
 
+                    $collContentVersions->getInternalIterator()->rewind();
                     return $collContentVersions;
                 }
 
@@ -3314,12 +3398,15 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @param PropelCollection $contentVersions A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Content The current object (for fluent API support)
      */
     public function setContentVersions(PropelCollection $contentVersions, PropelPDO $con = null)
     {
-        $this->contentVersionsScheduledForDeletion = $this->getContentVersions(new Criteria(), $con)->diff($contentVersions);
+        $contentVersionsToDelete = $this->getContentVersions(new Criteria(), $con)->diff($contentVersions);
 
-        foreach ($this->contentVersionsScheduledForDeletion as $contentVersionRemoved) {
+        $this->contentVersionsScheduledForDeletion = unserialize(serialize($contentVersionsToDelete));
+
+        foreach ($contentVersionsToDelete as $contentVersionRemoved) {
             $contentVersionRemoved->setContent(null);
         }
 
@@ -3330,6 +3417,8 @@ abstract class BaseContent extends BaseObject implements Persistent
 
         $this->collContentVersions = $contentVersions;
         $this->collContentVersionsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -3347,22 +3436,22 @@ abstract class BaseContent extends BaseObject implements Persistent
         if (null === $this->collContentVersions || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collContentVersions) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getContentVersions());
-                }
-                $query = ContentVersionQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByContent($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collContentVersions);
+
+            if($partial && !$criteria) {
+                return count($this->getContentVersions());
+            }
+            $query = ContentVersionQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
         }
+
+        return count($this->collContentVersions);
     }
 
     /**
@@ -3378,7 +3467,7 @@ abstract class BaseContent extends BaseObject implements Persistent
             $this->initContentVersions();
             $this->collContentVersionsPartial = true;
         }
-        if (!$this->collContentVersions->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collContentVersions->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddContentVersion($l);
         }
 
@@ -3396,6 +3485,7 @@ abstract class BaseContent extends BaseObject implements Persistent
 
     /**
      * @param	ContentVersion $contentVersion The contentVersion object to remove.
+     * @return Content The current object (for fluent API support)
      */
     public function removeContentVersion($contentVersion)
     {
@@ -3405,9 +3495,11 @@ abstract class BaseContent extends BaseObject implements Persistent
                 $this->contentVersionsScheduledForDeletion = clone $this->collContentVersions;
                 $this->contentVersionsScheduledForDeletion->clear();
             }
-            $this->contentVersionsScheduledForDeletion[]= $contentVersion;
+            $this->contentVersionsScheduledForDeletion[]= clone $contentVersion;
             $contentVersion->setContent(null);
         }
+
+        return $this;
     }
 
     /**
@@ -3425,6 +3517,7 @@ abstract class BaseContent extends BaseObject implements Persistent
         $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -3443,7 +3536,8 @@ abstract class BaseContent extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collContentAssocs) {
                 foreach ($this->collContentAssocs as $o) {
                     $o->clearAllReferences($deep);
@@ -3479,10 +3573,12 @@ abstract class BaseContent extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collContentAssocs instanceof PropelCollection) {
@@ -3558,7 +3654,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @return    Content The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -3582,7 +3678,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return ContentI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collContentI18ns) {
@@ -3617,7 +3713,7 @@ abstract class BaseContent extends BaseObject implements Persistent
      *
      * @return    Content The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             ContentI18nQuery::create()

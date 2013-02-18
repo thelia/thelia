@@ -61,7 +61,6 @@ use Thelia\Model\Product;
  * @method FeatureProd findOne(PropelPDO $con = null) Return the first FeatureProd matching the query
  * @method FeatureProd findOneOrCreate(PropelPDO $con = null) Return the first FeatureProd matching the query, or a new FeatureProd object populated from the query conditions when no match is found
  *
- * @method FeatureProd findOneById(int $id) Return the first FeatureProd filtered by the id column
  * @method FeatureProd findOneByProductId(int $product_id) Return the first FeatureProd filtered by the product_id column
  * @method FeatureProd findOneByFeatureId(int $feature_id) Return the first FeatureProd filtered by the feature_id column
  * @method FeatureProd findOneByFeatureAvId(int $feature_av_id) Return the first FeatureProd filtered by the feature_av_id column
@@ -99,7 +98,7 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * Returns a new FeatureProdQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     FeatureProdQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   FeatureProdQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return FeatureProdQuery
      */
@@ -156,18 +155,32 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 FeatureProd A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   FeatureProd A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 FeatureProd A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `FEATURE_ID`, `FEATURE_AV_ID`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature_prod` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `product_id`, `feature_id`, `feature_av_id`, `by_default`, `position`, `created_at`, `updated_at` FROM `feature_prod` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -263,7 +276,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -276,8 +290,22 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(FeatureProdPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(FeatureProdPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(FeatureProdPeer::ID, $id, $comparison);
@@ -290,7 +318,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * <code>
      * $query->filterByProductId(1234); // WHERE product_id = 1234
      * $query->filterByProductId(array(12, 34)); // WHERE product_id IN (12, 34)
-     * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
+     * $query->filterByProductId(array('min' => 12)); // WHERE product_id >= 12
+     * $query->filterByProductId(array('max' => 12)); // WHERE product_id <= 12
      * </code>
      *
      * @see       filterByProduct()
@@ -333,7 +362,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * <code>
      * $query->filterByFeatureId(1234); // WHERE feature_id = 1234
      * $query->filterByFeatureId(array(12, 34)); // WHERE feature_id IN (12, 34)
-     * $query->filterByFeatureId(array('min' => 12)); // WHERE feature_id > 12
+     * $query->filterByFeatureId(array('min' => 12)); // WHERE feature_id >= 12
+     * $query->filterByFeatureId(array('max' => 12)); // WHERE feature_id <= 12
      * </code>
      *
      * @see       filterByFeature()
@@ -376,7 +406,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * <code>
      * $query->filterByFeatureAvId(1234); // WHERE feature_av_id = 1234
      * $query->filterByFeatureAvId(array(12, 34)); // WHERE feature_av_id IN (12, 34)
-     * $query->filterByFeatureAvId(array('min' => 12)); // WHERE feature_av_id > 12
+     * $query->filterByFeatureAvId(array('min' => 12)); // WHERE feature_av_id >= 12
+     * $query->filterByFeatureAvId(array('max' => 12)); // WHERE feature_av_id <= 12
      * </code>
      *
      * @see       filterByFeatureAv()
@@ -448,7 +479,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -574,8 +606,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureProdQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureProdQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProduct($product, $comparison = null)
     {
@@ -650,8 +682,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * @param   Feature|PropelObjectCollection $feature The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureProdQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureProdQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeature($feature, $comparison = null)
     {
@@ -726,8 +758,8 @@ abstract class BaseFeatureProdQuery extends ModelCriteria
      * @param   FeatureAv|PropelObjectCollection $featureAv The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureProdQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureProdQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeatureAv($featureAv, $comparison = null)
     {

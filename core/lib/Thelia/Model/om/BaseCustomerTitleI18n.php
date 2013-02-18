@@ -53,7 +53,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
 
     /**
      * The value for the locale field.
-     * Note: this column has a database default value of: 'en_EN'
+     * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
     protected $locale;
@@ -90,6 +90,12 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
      * equivalent initialization method).
@@ -97,7 +103,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_EN';
+        $this->locale = 'en_US';
     }
 
     /**
@@ -158,7 +164,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -183,7 +189,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      */
     public function setLocale($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -204,7 +210,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      */
     public function setShort($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -225,7 +231,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      */
     public function setLong($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -248,7 +254,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_EN') {
+            if ($this->locale !== 'en_US') {
                 return false;
             }
 
@@ -285,7 +291,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 4; // 4 = CustomerTitleI18nPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -511,16 +517,16 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CustomerTitleI18nPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(CustomerTitleI18nPeer::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
+            $modifiedColumns[':p' . $index++]  = '`locale`';
         }
         if ($this->isColumnModified(CustomerTitleI18nPeer::SHORT)) {
-            $modifiedColumns[':p' . $index++]  = '`SHORT`';
+            $modifiedColumns[':p' . $index++]  = '`short`';
         }
         if ($this->isColumnModified(CustomerTitleI18nPeer::LONG)) {
-            $modifiedColumns[':p' . $index++]  = '`LONG`';
+            $modifiedColumns[':p' . $index++]  = '`long`';
         }
 
         $sql = sprintf(
@@ -533,16 +539,16 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`LOCALE`':
+                    case '`locale`':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case '`SHORT`':
+                    case '`short`':
                         $stmt->bindValue($identifier, $this->short, PDO::PARAM_STR);
                         break;
-                    case '`LONG`':
+                    case '`long`':
                         $stmt->bindValue($identifier, $this->long, PDO::PARAM_STR);
                         break;
                 }
@@ -606,11 +612,11 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -986,12 +992,13 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      * Get the associated CustomerTitle object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return CustomerTitle The associated CustomerTitle object.
      * @throws PropelException
      */
-    public function getCustomerTitle(PropelPDO $con = null)
+    public function getCustomerTitle(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aCustomerTitle === null && ($this->id !== null)) {
+        if ($this->aCustomerTitle === null && ($this->id !== null) && $doQuery) {
             $this->aCustomerTitle = CustomerTitleQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1016,6 +1023,7 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
         $this->long = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -1034,7 +1042,13 @@ abstract class BaseCustomerTitleI18n extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aCustomerTitle instanceof Persistent) {
+              $this->aCustomerTitle->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aCustomerTitle = null;

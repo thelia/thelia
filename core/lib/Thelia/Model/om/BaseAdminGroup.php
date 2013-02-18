@@ -104,6 +104,12 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -152,22 +158,25 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -189,22 +198,25 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -215,7 +227,7 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -236,7 +248,7 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      */
     public function setGroupId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -261,7 +273,7 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      */
     public function setAdminId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -368,7 +380,7 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 5; // 5 = AdminGroupPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -620,19 +632,19 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AdminGroupPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(AdminGroupPeer::GROUP_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`GROUP_ID`';
+            $modifiedColumns[':p' . $index++]  = '`group_id`';
         }
         if ($this->isColumnModified(AdminGroupPeer::ADMIN_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ADMIN_ID`';
+            $modifiedColumns[':p' . $index++]  = '`admin_id`';
         }
         if ($this->isColumnModified(AdminGroupPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(AdminGroupPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -645,19 +657,19 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`GROUP_ID`':
+                    case '`group_id`':
                         $stmt->bindValue($identifier, $this->group_id, PDO::PARAM_INT);
                         break;
-                    case '`ADMIN_ID`':
+                    case '`admin_id`':
                         $stmt->bindValue($identifier, $this->admin_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -728,11 +740,11 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1120,12 +1132,13 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      * Get the associated Group object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Group The associated Group object.
      * @throws PropelException
      */
-    public function getGroup(PropelPDO $con = null)
+    public function getGroup(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aGroup === null && ($this->group_id !== null)) {
+        if ($this->aGroup === null && ($this->group_id !== null) && $doQuery) {
             $this->aGroup = GroupQuery::create()->findPk($this->group_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1171,12 +1184,13 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      * Get the associated Admin object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Admin The associated Admin object.
      * @throws PropelException
      */
-    public function getAdmin(PropelPDO $con = null)
+    public function getAdmin(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aAdmin === null && ($this->admin_id !== null)) {
+        if ($this->aAdmin === null && ($this->admin_id !== null) && $doQuery) {
             $this->aAdmin = AdminQuery::create()->findPk($this->admin_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1202,6 +1216,7 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1219,7 +1234,16 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aGroup instanceof Persistent) {
+              $this->aGroup->clearAllReferences($deep);
+            }
+            if ($this->aAdmin instanceof Persistent) {
+              $this->aAdmin->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aGroup = null;

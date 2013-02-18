@@ -42,16 +42,16 @@ class CouponTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
-        $this->addColumn('ACTION', 'Action', 'VARCHAR', true, 255, null);
-        $this->addColumn('VALUE', 'Value', 'FLOAT', true, null, null);
-        $this->addColumn('USED', 'Used', 'TINYINT', false, null, null);
-        $this->addColumn('AVAILABLE_SINCE', 'AvailableSince', 'TIMESTAMP', false, null, null);
-        $this->addColumn('DATE_LIMIT', 'DateLimit', 'TIMESTAMP', false, null, null);
-        $this->addColumn('ACTIVATE', 'Activate', 'TINYINT', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('code', 'Code', 'VARCHAR', true, 45, null);
+        $this->addColumn('action', 'Action', 'VARCHAR', true, 255, null);
+        $this->addColumn('value', 'Value', 'FLOAT', true, null, null);
+        $this->addColumn('used', 'Used', 'TINYINT', false, null, null);
+        $this->addColumn('available_since', 'AvailableSince', 'TIMESTAMP', false, null, null);
+        $this->addColumn('date_limit', 'DateLimit', 'TIMESTAMP', false, null, null);
+        $this->addColumn('activate', 'Activate', 'TINYINT', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -72,7 +72,11 @@ class CouponTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

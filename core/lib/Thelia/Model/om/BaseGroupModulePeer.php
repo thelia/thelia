@@ -46,23 +46,23 @@ abstract class BaseGroupModulePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 6;
 
-    /** the column name for the ID field */
-    const ID = 'group_module.ID';
+    /** the column name for the id field */
+    const ID = 'group_module.id';
 
-    /** the column name for the GROUP_ID field */
-    const GROUP_ID = 'group_module.GROUP_ID';
+    /** the column name for the group_id field */
+    const GROUP_ID = 'group_module.group_id';
 
-    /** the column name for the MODULE_ID field */
-    const MODULE_ID = 'group_module.MODULE_ID';
+    /** the column name for the module_id field */
+    const MODULE_ID = 'group_module.module_id';
 
-    /** the column name for the ACCESS field */
-    const ACCESS = 'group_module.ACCESS';
+    /** the column name for the access field */
+    const ACCESS = 'group_module.access';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'group_module.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'group_module.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'group_module.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'group_module.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -184,12 +184,12 @@ abstract class BaseGroupModulePeer
             $criteria->addSelectColumn(GroupModulePeer::CREATED_AT);
             $criteria->addSelectColumn(GroupModulePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.GROUP_ID');
-            $criteria->addSelectColumn($alias . '.MODULE_ID');
-            $criteria->addSelectColumn($alias . '.ACCESS');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.group_id');
+            $criteria->addSelectColumn($alias . '.module_id');
+            $criteria->addSelectColumn($alias . '.access');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -273,7 +273,7 @@ abstract class BaseGroupModulePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -378,8 +378,15 @@ abstract class BaseGroupModulePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (GroupModulePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         GroupModulePeer::$instances = array();
     }
 
@@ -1145,7 +1152,7 @@ abstract class BaseGroupModulePeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return GroupModulePeer::OM_CLASS;
     }

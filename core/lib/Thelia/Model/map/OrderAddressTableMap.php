@@ -42,20 +42,20 @@ class OrderAddressTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', false, null, null);
-        $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
-        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
-        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
-        $this->addColumn('ADDRESS1', 'Address1', 'VARCHAR', true, 255, null);
-        $this->addColumn('ADDRESS2', 'Address2', 'VARCHAR', false, 255, null);
-        $this->addColumn('ADDRESS3', 'Address3', 'VARCHAR', false, 255, null);
-        $this->addColumn('ZIPCODE', 'Zipcode', 'VARCHAR', true, 10, null);
-        $this->addColumn('CITY', 'City', 'VARCHAR', true, 255, null);
-        $this->addColumn('PHONE', 'Phone', 'VARCHAR', false, 20, null);
-        $this->addColumn('COUNTRY_ID', 'CountryId', 'INTEGER', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('customer_title_id', 'CustomerTitleId', 'INTEGER', false, null, null);
+        $this->addColumn('company', 'Company', 'VARCHAR', false, 255, null);
+        $this->addColumn('firstname', 'Firstname', 'VARCHAR', true, 255, null);
+        $this->addColumn('lastname', 'Lastname', 'VARCHAR', true, 255, null);
+        $this->addColumn('address1', 'Address1', 'VARCHAR', true, 255, null);
+        $this->addColumn('address2', 'Address2', 'VARCHAR', false, 255, null);
+        $this->addColumn('address3', 'Address3', 'VARCHAR', false, 255, null);
+        $this->addColumn('zipcode', 'Zipcode', 'VARCHAR', true, 10, null);
+        $this->addColumn('city', 'City', 'VARCHAR', true, 255, null);
+        $this->addColumn('phone', 'Phone', 'VARCHAR', false, 20, null);
+        $this->addColumn('country_id', 'CountryId', 'INTEGER', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -77,7 +77,11 @@ class OrderAddressTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

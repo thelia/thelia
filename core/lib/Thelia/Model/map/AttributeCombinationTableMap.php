@@ -42,12 +42,12 @@ class AttributeCombinationTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignPrimaryKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER' , 'attribute', 'ID', true, null, null);
-        $this->addForeignPrimaryKey('COMBINATION_ID', 'CombinationId', 'INTEGER' , 'combination', 'ID', true, null, null);
-        $this->addForeignPrimaryKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER' , 'attribute_av', 'ID', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('attribute_id', 'AttributeId', 'INTEGER' , 'attribute', 'id', true, null, null);
+        $this->addForeignPrimaryKey('combination_id', 'CombinationId', 'INTEGER' , 'combination', 'id', true, null, null);
+        $this->addForeignPrimaryKey('attribute_av_id', 'AttributeAvId', 'INTEGER' , 'attribute_av', 'id', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -70,7 +70,11 @@ class AttributeCombinationTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

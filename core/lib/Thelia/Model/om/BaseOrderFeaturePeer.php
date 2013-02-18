@@ -45,23 +45,23 @@ abstract class BaseOrderFeaturePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 6;
 
-    /** the column name for the ID field */
-    const ID = 'order_feature.ID';
+    /** the column name for the id field */
+    const ID = 'order_feature.id';
 
-    /** the column name for the ORDER_PRODUCT_ID field */
-    const ORDER_PRODUCT_ID = 'order_feature.ORDER_PRODUCT_ID';
+    /** the column name for the order_product_id field */
+    const ORDER_PRODUCT_ID = 'order_feature.order_product_id';
 
-    /** the column name for the FEATURE_DESC field */
-    const FEATURE_DESC = 'order_feature.FEATURE_DESC';
+    /** the column name for the feature_desc field */
+    const FEATURE_DESC = 'order_feature.feature_desc';
 
-    /** the column name for the FEATURE_AV_DESC field */
-    const FEATURE_AV_DESC = 'order_feature.FEATURE_AV_DESC';
+    /** the column name for the feature_av_desc field */
+    const FEATURE_AV_DESC = 'order_feature.feature_av_desc';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'order_feature.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'order_feature.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'order_feature.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'order_feature.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -183,12 +183,12 @@ abstract class BaseOrderFeaturePeer
             $criteria->addSelectColumn(OrderFeaturePeer::CREATED_AT);
             $criteria->addSelectColumn(OrderFeaturePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ORDER_PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.FEATURE_DESC');
-            $criteria->addSelectColumn($alias . '.FEATURE_AV_DESC');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.order_product_id');
+            $criteria->addSelectColumn($alias . '.feature_desc');
+            $criteria->addSelectColumn($alias . '.feature_av_desc');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -272,7 +272,7 @@ abstract class BaseOrderFeaturePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -377,8 +377,15 @@ abstract class BaseOrderFeaturePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (OrderFeaturePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         OrderFeaturePeer::$instances = array();
     }
 
@@ -751,7 +758,7 @@ abstract class BaseOrderFeaturePeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return OrderFeaturePeer::OM_CLASS;
     }

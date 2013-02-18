@@ -44,7 +44,6 @@ use Thelia\Model\LangQuery;
  * @method Lang findOne(PropelPDO $con = null) Return the first Lang matching the query
  * @method Lang findOneOrCreate(PropelPDO $con = null) Return the first Lang matching the query, or a new Lang object populated from the query conditions when no match is found
  *
- * @method Lang findOneById(int $id) Return the first Lang filtered by the id column
  * @method Lang findOneByTitle(string $title) Return the first Lang filtered by the title column
  * @method Lang findOneByCode(string $code) Return the first Lang filtered by the code column
  * @method Lang findOneByLocale(string $locale) Return the first Lang filtered by the locale column
@@ -82,7 +81,7 @@ abstract class BaseLangQuery extends ModelCriteria
      * Returns a new LangQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     LangQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   LangQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return LangQuery
      */
@@ -139,18 +138,32 @@ abstract class BaseLangQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Lang A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Lang A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Lang A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE`, `CODE`, `LOCALE`, `URL`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `lang` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `title`, `code`, `locale`, `url`, `by_default`, `created_at`, `updated_at` FROM `lang` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -246,7 +259,8 @@ abstract class BaseLangQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -259,8 +273,22 @@ abstract class BaseLangQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(LangPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(LangPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(LangPeer::ID, $id, $comparison);
@@ -389,7 +417,8 @@ abstract class BaseLangQuery extends ModelCriteria
      * <code>
      * $query->filterByByDefault(1234); // WHERE by_default = 1234
      * $query->filterByByDefault(array(12, 34)); // WHERE by_default IN (12, 34)
-     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default > 12
+     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default >= 12
+     * $query->filterByByDefault(array('max' => 12)); // WHERE by_default <= 12
      * </code>
      *
      * @param     mixed $byDefault The value to use as filter.

@@ -123,6 +123,12 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -191,22 +197,25 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -228,22 +237,25 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -254,7 +266,7 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -275,7 +287,7 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      */
     public function setTaxRuleId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -300,7 +312,7 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      */
     public function setCountryId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -325,7 +337,7 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      */
     public function setTaxId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -350,7 +362,7 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      */
     public function setNone($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -455,7 +467,7 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 7; // 7 = TaxRuleCountryPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -714,25 +726,25 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TaxRuleCountryPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(TaxRuleCountryPeer::TAX_RULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_RULE_ID`';
+            $modifiedColumns[':p' . $index++]  = '`tax_rule_id`';
         }
         if ($this->isColumnModified(TaxRuleCountryPeer::COUNTRY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+            $modifiedColumns[':p' . $index++]  = '`country_id`';
         }
         if ($this->isColumnModified(TaxRuleCountryPeer::TAX_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_ID`';
+            $modifiedColumns[':p' . $index++]  = '`tax_id`';
         }
         if ($this->isColumnModified(TaxRuleCountryPeer::NONE)) {
-            $modifiedColumns[':p' . $index++]  = '`NONE`';
+            $modifiedColumns[':p' . $index++]  = '`none`';
         }
         if ($this->isColumnModified(TaxRuleCountryPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(TaxRuleCountryPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -745,25 +757,25 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`TAX_RULE_ID`':
+                    case '`tax_rule_id`':
                         $stmt->bindValue($identifier, $this->tax_rule_id, PDO::PARAM_INT);
                         break;
-                    case '`COUNTRY_ID`':
+                    case '`country_id`':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
                         break;
-                    case '`TAX_ID`':
+                    case '`tax_id`':
                         $stmt->bindValue($identifier, $this->tax_id, PDO::PARAM_INT);
                         break;
-                    case '`NONE`':
+                    case '`none`':
                         $stmt->bindValue($identifier, $this->none, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -827,11 +839,11 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1248,12 +1260,13 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      * Get the associated Tax object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Tax The associated Tax object.
      * @throws PropelException
      */
-    public function getTax(PropelPDO $con = null)
+    public function getTax(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aTax === null && ($this->tax_id !== null)) {
+        if ($this->aTax === null && ($this->tax_id !== null) && $doQuery) {
             $this->aTax = TaxQuery::create()->findPk($this->tax_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1299,12 +1312,13 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      * Get the associated TaxRule object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return TaxRule The associated TaxRule object.
      * @throws PropelException
      */
-    public function getTaxRule(PropelPDO $con = null)
+    public function getTaxRule(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aTaxRule === null && ($this->tax_rule_id !== null)) {
+        if ($this->aTaxRule === null && ($this->tax_rule_id !== null) && $doQuery) {
             $this->aTaxRule = TaxRuleQuery::create()->findPk($this->tax_rule_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1350,12 +1364,13 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      * Get the associated Country object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Country The associated Country object.
      * @throws PropelException
      */
-    public function getCountry(PropelPDO $con = null)
+    public function getCountry(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aCountry === null && ($this->country_id !== null)) {
+        if ($this->aCountry === null && ($this->country_id !== null) && $doQuery) {
             $this->aCountry = CountryQuery::create()->findPk($this->country_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1383,6 +1398,7 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1400,7 +1416,19 @@ abstract class BaseTaxRuleCountry extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aTax instanceof Persistent) {
+              $this->aTax->clearAllReferences($deep);
+            }
+            if ($this->aTaxRule instanceof Persistent) {
+              $this->aTaxRule->clearAllReferences($deep);
+            }
+            if ($this->aCountry instanceof Persistent) {
+              $this->aCountry->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aTax = null;

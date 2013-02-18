@@ -42,8 +42,8 @@ class TaxRuleI18nTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'tax_rule', 'ID', true, null, null);
-        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'tax_rule', 'id', true, null, null);
+        $this->addPrimaryKey('locale', 'Locale', 'VARCHAR', true, 5, 'en_US');
         // validators
     } // initialize()
 

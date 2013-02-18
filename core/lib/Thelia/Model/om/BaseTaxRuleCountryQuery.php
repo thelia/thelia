@@ -59,7 +59,6 @@ use Thelia\Model\TaxRuleCountryQuery;
  * @method TaxRuleCountry findOne(PropelPDO $con = null) Return the first TaxRuleCountry matching the query
  * @method TaxRuleCountry findOneOrCreate(PropelPDO $con = null) Return the first TaxRuleCountry matching the query, or a new TaxRuleCountry object populated from the query conditions when no match is found
  *
- * @method TaxRuleCountry findOneById(int $id) Return the first TaxRuleCountry filtered by the id column
  * @method TaxRuleCountry findOneByTaxRuleId(int $tax_rule_id) Return the first TaxRuleCountry filtered by the tax_rule_id column
  * @method TaxRuleCountry findOneByCountryId(int $country_id) Return the first TaxRuleCountry filtered by the country_id column
  * @method TaxRuleCountry findOneByTaxId(int $tax_id) Return the first TaxRuleCountry filtered by the tax_id column
@@ -95,7 +94,7 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * Returns a new TaxRuleCountryQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     TaxRuleCountryQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   TaxRuleCountryQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return TaxRuleCountryQuery
      */
@@ -152,18 +151,32 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 TaxRuleCountry A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   TaxRuleCountry A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 TaxRuleCountry A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `COUNTRY_ID`, `TAX_ID`, `NONE`, `CREATED_AT`, `UPDATED_AT` FROM `tax_rule_country` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `tax_rule_id`, `country_id`, `tax_id`, `none`, `created_at`, `updated_at` FROM `tax_rule_country` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -259,7 +272,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -272,8 +286,22 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(TaxRuleCountryPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(TaxRuleCountryPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(TaxRuleCountryPeer::ID, $id, $comparison);
@@ -286,7 +314,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * <code>
      * $query->filterByTaxRuleId(1234); // WHERE tax_rule_id = 1234
      * $query->filterByTaxRuleId(array(12, 34)); // WHERE tax_rule_id IN (12, 34)
-     * $query->filterByTaxRuleId(array('min' => 12)); // WHERE tax_rule_id > 12
+     * $query->filterByTaxRuleId(array('min' => 12)); // WHERE tax_rule_id >= 12
+     * $query->filterByTaxRuleId(array('max' => 12)); // WHERE tax_rule_id <= 12
      * </code>
      *
      * @see       filterByTaxRule()
@@ -329,7 +358,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * <code>
      * $query->filterByCountryId(1234); // WHERE country_id = 1234
      * $query->filterByCountryId(array(12, 34)); // WHERE country_id IN (12, 34)
-     * $query->filterByCountryId(array('min' => 12)); // WHERE country_id > 12
+     * $query->filterByCountryId(array('min' => 12)); // WHERE country_id >= 12
+     * $query->filterByCountryId(array('max' => 12)); // WHERE country_id <= 12
      * </code>
      *
      * @see       filterByCountry()
@@ -372,7 +402,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * <code>
      * $query->filterByTaxId(1234); // WHERE tax_id = 1234
      * $query->filterByTaxId(array(12, 34)); // WHERE tax_id IN (12, 34)
-     * $query->filterByTaxId(array('min' => 12)); // WHERE tax_id > 12
+     * $query->filterByTaxId(array('min' => 12)); // WHERE tax_id >= 12
+     * $query->filterByTaxId(array('max' => 12)); // WHERE tax_id <= 12
      * </code>
      *
      * @see       filterByTax()
@@ -415,7 +446,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * <code>
      * $query->filterByNone(1234); // WHERE none = 1234
      * $query->filterByNone(array(12, 34)); // WHERE none IN (12, 34)
-     * $query->filterByNone(array('min' => 12)); // WHERE none > 12
+     * $query->filterByNone(array('min' => 12)); // WHERE none >= 12
+     * $query->filterByNone(array('max' => 12)); // WHERE none <= 12
      * </code>
      *
      * @param     mixed $none The value to use as filter.
@@ -541,8 +573,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * @param   Tax|PropelObjectCollection $tax The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaxRuleCountryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaxRuleCountryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTax($tax, $comparison = null)
     {
@@ -617,8 +649,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * @param   TaxRule|PropelObjectCollection $taxRule The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaxRuleCountryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaxRuleCountryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTaxRule($taxRule, $comparison = null)
     {
@@ -693,8 +725,8 @@ abstract class BaseTaxRuleCountryQuery extends ModelCriteria
      * @param   Country|PropelObjectCollection $country The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaxRuleCountryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaxRuleCountryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCountry($country, $comparison = null)
     {

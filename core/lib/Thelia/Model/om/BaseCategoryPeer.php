@@ -53,35 +53,35 @@ abstract class BaseCategoryPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 10;
 
-    /** the column name for the ID field */
-    const ID = 'category.ID';
+    /** the column name for the id field */
+    const ID = 'category.id';
 
-    /** the column name for the PARENT field */
-    const PARENT = 'category.PARENT';
+    /** the column name for the parent field */
+    const PARENT = 'category.parent';
 
-    /** the column name for the LINK field */
-    const LINK = 'category.LINK';
+    /** the column name for the link field */
+    const LINK = 'category.link';
 
-    /** the column name for the VISIBLE field */
-    const VISIBLE = 'category.VISIBLE';
+    /** the column name for the visible field */
+    const VISIBLE = 'category.visible';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'category.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'category.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'category.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'category.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'category.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'category.updated_at';
 
-    /** the column name for the VERSION field */
-    const VERSION = 'category.VERSION';
+    /** the column name for the version field */
+    const VERSION = 'category.version';
 
-    /** the column name for the VERSION_CREATED_AT field */
-    const VERSION_CREATED_AT = 'category.VERSION_CREATED_AT';
+    /** the column name for the version_created_at field */
+    const VERSION_CREATED_AT = 'category.version_created_at';
 
-    /** the column name for the VERSION_CREATED_BY field */
-    const VERSION_CREATED_BY = 'category.VERSION_CREATED_BY';
+    /** the column name for the version_created_by field */
+    const VERSION_CREATED_BY = 'category.version_created_by';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -101,7 +101,7 @@ abstract class BaseCategoryPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     // versionable behavior
 
     /**
@@ -221,16 +221,16 @@ abstract class BaseCategoryPeer
             $criteria->addSelectColumn(CategoryPeer::VERSION_CREATED_AT);
             $criteria->addSelectColumn(CategoryPeer::VERSION_CREATED_BY);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.PARENT');
-            $criteria->addSelectColumn($alias . '.LINK');
-            $criteria->addSelectColumn($alias . '.VISIBLE');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.parent');
+            $criteria->addSelectColumn($alias . '.link');
+            $criteria->addSelectColumn($alias . '.visible');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.version');
+            $criteria->addSelectColumn($alias . '.version_created_at');
+            $criteria->addSelectColumn($alias . '.version_created_by');
         }
     }
 
@@ -314,7 +314,7 @@ abstract class BaseCategoryPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -419,8 +419,15 @@ abstract class BaseCategoryPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CategoryPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CategoryPeer::$instances = array();
     }
 
@@ -582,7 +589,7 @@ abstract class BaseCategoryPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return CategoryPeer::OM_CLASS;
     }

@@ -93,7 +93,7 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      * Returns a new MessageVersionQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     MessageVersionQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   MessageVersionQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return MessageVersionQuery
      */
@@ -157,12 +157,12 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   MessageVersion A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 MessageVersion A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `SECURED`, `REF`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `message_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `id`, `code`, `secured`, `ref`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `message_version` WHERE `id` = :p0 AND `version` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -270,7 +270,8 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @see       filterByMessage()
@@ -285,8 +286,22 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(MessageVersionPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(MessageVersionPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessageVersionPeer::ID, $id, $comparison);
@@ -328,7 +343,8 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      * <code>
      * $query->filterBySecured(1234); // WHERE secured = 1234
      * $query->filterBySecured(array(12, 34)); // WHERE secured IN (12, 34)
-     * $query->filterBySecured(array('min' => 12)); // WHERE secured > 12
+     * $query->filterBySecured(array('min' => 12)); // WHERE secured >= 12
+     * $query->filterBySecured(array('max' => 12)); // WHERE secured <= 12
      * </code>
      *
      * @param     mixed $secured The value to use as filter.
@@ -484,7 +500,8 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByVersion(1234); // WHERE version = 1234
      * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
-     * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+     * $query->filterByVersion(array('min' => 12)); // WHERE version >= 12
+     * $query->filterByVersion(array('max' => 12)); // WHERE version <= 12
      * </code>
      *
      * @param     mixed $version The value to use as filter.
@@ -497,8 +514,22 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      */
     public function filterByVersion($version = null, $comparison = null)
     {
-        if (is_array($version) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($version)) {
+            $useMinMax = false;
+            if (isset($version['min'])) {
+                $this->addUsingAlias(MessageVersionPeer::VERSION, $version['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($version['max'])) {
+                $this->addUsingAlias(MessageVersionPeer::VERSION, $version['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessageVersionPeer::VERSION, $version, $comparison);
@@ -582,8 +613,8 @@ abstract class BaseMessageVersionQuery extends ModelCriteria
      * @param   Message|PropelObjectCollection $message The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageVersionQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageVersionQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMessage($message, $comparison = null)
     {

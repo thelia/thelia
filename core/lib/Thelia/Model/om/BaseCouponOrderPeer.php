@@ -45,23 +45,23 @@ abstract class BaseCouponOrderPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 6;
 
-    /** the column name for the ID field */
-    const ID = 'coupon_order.ID';
+    /** the column name for the id field */
+    const ID = 'coupon_order.id';
 
-    /** the column name for the ORDER_ID field */
-    const ORDER_ID = 'coupon_order.ORDER_ID';
+    /** the column name for the order_id field */
+    const ORDER_ID = 'coupon_order.order_id';
 
-    /** the column name for the CODE field */
-    const CODE = 'coupon_order.CODE';
+    /** the column name for the code field */
+    const CODE = 'coupon_order.code';
 
-    /** the column name for the VALUE field */
-    const VALUE = 'coupon_order.VALUE';
+    /** the column name for the value field */
+    const VALUE = 'coupon_order.value';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'coupon_order.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'coupon_order.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'coupon_order.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'coupon_order.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -183,12 +183,12 @@ abstract class BaseCouponOrderPeer
             $criteria->addSelectColumn(CouponOrderPeer::CREATED_AT);
             $criteria->addSelectColumn(CouponOrderPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ORDER_ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.VALUE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.order_id');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '.value');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -272,7 +272,7 @@ abstract class BaseCouponOrderPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -377,8 +377,15 @@ abstract class BaseCouponOrderPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CouponOrderPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CouponOrderPeer::$instances = array();
     }
 
@@ -751,7 +758,7 @@ abstract class BaseCouponOrderPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return CouponOrderPeer::OM_CLASS;
     }

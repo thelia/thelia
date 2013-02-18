@@ -45,23 +45,23 @@ abstract class BaseAccessoryPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 6;
 
-    /** the column name for the ID field */
-    const ID = 'accessory.ID';
+    /** the column name for the id field */
+    const ID = 'accessory.id';
 
-    /** the column name for the PRODUCT_ID field */
-    const PRODUCT_ID = 'accessory.PRODUCT_ID';
+    /** the column name for the product_id field */
+    const PRODUCT_ID = 'accessory.product_id';
 
-    /** the column name for the ACCESSORY field */
-    const ACCESSORY = 'accessory.ACCESSORY';
+    /** the column name for the accessory field */
+    const ACCESSORY = 'accessory.accessory';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'accessory.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'accessory.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'accessory.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'accessory.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'accessory.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'accessory.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -183,12 +183,12 @@ abstract class BaseAccessoryPeer
             $criteria->addSelectColumn(AccessoryPeer::CREATED_AT);
             $criteria->addSelectColumn(AccessoryPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.ACCESSORY');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.product_id');
+            $criteria->addSelectColumn($alias . '.accessory');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -272,7 +272,7 @@ abstract class BaseAccessoryPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -377,8 +377,15 @@ abstract class BaseAccessoryPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AccessoryPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AccessoryPeer::$instances = array();
     }
 
@@ -1092,7 +1099,7 @@ abstract class BaseAccessoryPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AccessoryPeer::OM_CLASS;
     }

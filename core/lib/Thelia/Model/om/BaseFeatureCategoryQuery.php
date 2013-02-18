@@ -50,7 +50,6 @@ use Thelia\Model\FeatureCategoryQuery;
  * @method FeatureCategory findOne(PropelPDO $con = null) Return the first FeatureCategory matching the query
  * @method FeatureCategory findOneOrCreate(PropelPDO $con = null) Return the first FeatureCategory matching the query, or a new FeatureCategory object populated from the query conditions when no match is found
  *
- * @method FeatureCategory findOneById(int $id) Return the first FeatureCategory filtered by the id column
  * @method FeatureCategory findOneByFeatureId(int $feature_id) Return the first FeatureCategory filtered by the feature_id column
  * @method FeatureCategory findOneByCategoryId(int $category_id) Return the first FeatureCategory filtered by the category_id column
  * @method FeatureCategory findOneByCreatedAt(string $created_at) Return the first FeatureCategory filtered by the created_at column
@@ -82,7 +81,7 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * Returns a new FeatureCategoryQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     FeatureCategoryQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   FeatureCategoryQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return FeatureCategoryQuery
      */
@@ -139,18 +138,32 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 FeatureCategory A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   FeatureCategory A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 FeatureCategory A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `FEATURE_ID`, `CATEGORY_ID`, `CREATED_AT`, `UPDATED_AT` FROM `feature_category` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `feature_id`, `category_id`, `created_at`, `updated_at` FROM `feature_category` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -246,7 +259,8 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -259,8 +273,22 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(FeatureCategoryPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(FeatureCategoryPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(FeatureCategoryPeer::ID, $id, $comparison);
@@ -273,7 +301,8 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByFeatureId(1234); // WHERE feature_id = 1234
      * $query->filterByFeatureId(array(12, 34)); // WHERE feature_id IN (12, 34)
-     * $query->filterByFeatureId(array('min' => 12)); // WHERE feature_id > 12
+     * $query->filterByFeatureId(array('min' => 12)); // WHERE feature_id >= 12
+     * $query->filterByFeatureId(array('max' => 12)); // WHERE feature_id <= 12
      * </code>
      *
      * @see       filterByFeature()
@@ -316,7 +345,8 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByCategoryId(1234); // WHERE category_id = 1234
      * $query->filterByCategoryId(array(12, 34)); // WHERE category_id IN (12, 34)
-     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
+     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id >= 12
+     * $query->filterByCategoryId(array('max' => 12)); // WHERE category_id <= 12
      * </code>
      *
      * @see       filterByCategory()
@@ -444,8 +474,8 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureCategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCategory($category, $comparison = null)
     {
@@ -520,8 +550,8 @@ abstract class BaseFeatureCategoryQuery extends ModelCriteria
      * @param   Feature|PropelObjectCollection $feature The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureCategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureCategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeature($feature, $comparison = null)
     {

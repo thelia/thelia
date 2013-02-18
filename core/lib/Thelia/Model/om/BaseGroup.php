@@ -117,13 +117,19 @@ abstract class BaseGroup extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -194,22 +200,25 @@ abstract class BaseGroup extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -231,22 +240,25 @@ abstract class BaseGroup extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -257,7 +269,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -278,7 +290,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
      */
     public function setCode($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -380,7 +392,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 4; // 4 = GroupPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -598,7 +610,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
             if ($this->collAdminGroups !== null) {
                 foreach ($this->collAdminGroups as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -615,7 +627,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
             if ($this->collGroupResources !== null) {
                 foreach ($this->collGroupResources as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -632,7 +644,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
             if ($this->collGroupModules !== null) {
                 foreach ($this->collGroupModules as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -649,7 +661,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
             if ($this->collGroupI18ns !== null) {
                 foreach ($this->collGroupI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -682,16 +694,16 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(GroupPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(GroupPeer::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = '`code`';
         }
         if ($this->isColumnModified(GroupPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(GroupPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -704,16 +716,16 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`code`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -784,11 +796,11 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1209,13 +1221,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Group The current object (for fluent API support)
      * @see        addAdminGroups()
      */
     public function clearAdminGroups()
     {
         $this->collAdminGroups = null; // important to set this to null since that means it is uninitialized
         $this->collAdminGroupsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1287,6 +1301,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
                       $this->collAdminGroupsPartial = true;
                     }
 
+                    $collAdminGroups->getInternalIterator()->rewind();
                     return $collAdminGroups;
                 }
 
@@ -1314,12 +1329,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @param PropelCollection $adminGroups A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Group The current object (for fluent API support)
      */
     public function setAdminGroups(PropelCollection $adminGroups, PropelPDO $con = null)
     {
-        $this->adminGroupsScheduledForDeletion = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
+        $adminGroupsToDelete = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
 
-        foreach ($this->adminGroupsScheduledForDeletion as $adminGroupRemoved) {
+        $this->adminGroupsScheduledForDeletion = unserialize(serialize($adminGroupsToDelete));
+
+        foreach ($adminGroupsToDelete as $adminGroupRemoved) {
             $adminGroupRemoved->setGroup(null);
         }
 
@@ -1330,6 +1348,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
         $this->collAdminGroups = $adminGroups;
         $this->collAdminGroupsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1347,22 +1367,22 @@ abstract class BaseGroup extends BaseObject implements Persistent
         if (null === $this->collAdminGroups || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAdminGroups) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAdminGroups());
-                }
-                $query = AdminGroupQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGroup($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAdminGroups);
+
+            if($partial && !$criteria) {
+                return count($this->getAdminGroups());
+            }
+            $query = AdminGroupQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGroup($this)
+                ->count($con);
         }
+
+        return count($this->collAdminGroups);
     }
 
     /**
@@ -1378,7 +1398,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->initAdminGroups();
             $this->collAdminGroupsPartial = true;
         }
-        if (!$this->collAdminGroups->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collAdminGroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddAdminGroup($l);
         }
 
@@ -1396,6 +1416,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
     /**
      * @param	AdminGroup $adminGroup The adminGroup object to remove.
+     * @return Group The current object (for fluent API support)
      */
     public function removeAdminGroup($adminGroup)
     {
@@ -1408,6 +1429,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->adminGroupsScheduledForDeletion[]= $adminGroup;
             $adminGroup->setGroup(null);
         }
+
+        return $this;
     }
 
 
@@ -1441,13 +1464,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Group The current object (for fluent API support)
      * @see        addGroupResources()
      */
     public function clearGroupResources()
     {
         $this->collGroupResources = null; // important to set this to null since that means it is uninitialized
         $this->collGroupResourcesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1519,6 +1544,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
                       $this->collGroupResourcesPartial = true;
                     }
 
+                    $collGroupResources->getInternalIterator()->rewind();
                     return $collGroupResources;
                 }
 
@@ -1546,12 +1572,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @param PropelCollection $groupResources A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Group The current object (for fluent API support)
      */
     public function setGroupResources(PropelCollection $groupResources, PropelPDO $con = null)
     {
-        $this->groupResourcesScheduledForDeletion = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
+        $groupResourcesToDelete = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
 
-        foreach ($this->groupResourcesScheduledForDeletion as $groupResourceRemoved) {
+        $this->groupResourcesScheduledForDeletion = unserialize(serialize($groupResourcesToDelete));
+
+        foreach ($groupResourcesToDelete as $groupResourceRemoved) {
             $groupResourceRemoved->setGroup(null);
         }
 
@@ -1562,6 +1591,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
         $this->collGroupResources = $groupResources;
         $this->collGroupResourcesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1579,22 +1610,22 @@ abstract class BaseGroup extends BaseObject implements Persistent
         if (null === $this->collGroupResources || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collGroupResources) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGroupResources());
-                }
-                $query = GroupResourceQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGroup($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collGroupResources);
+
+            if($partial && !$criteria) {
+                return count($this->getGroupResources());
+            }
+            $query = GroupResourceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGroup($this)
+                ->count($con);
         }
+
+        return count($this->collGroupResources);
     }
 
     /**
@@ -1610,7 +1641,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->initGroupResources();
             $this->collGroupResourcesPartial = true;
         }
-        if (!$this->collGroupResources->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collGroupResources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddGroupResource($l);
         }
 
@@ -1628,6 +1659,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
     /**
      * @param	GroupResource $groupResource The groupResource object to remove.
+     * @return Group The current object (for fluent API support)
      */
     public function removeGroupResource($groupResource)
     {
@@ -1637,9 +1669,11 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 $this->groupResourcesScheduledForDeletion = clone $this->collGroupResources;
                 $this->groupResourcesScheduledForDeletion->clear();
             }
-            $this->groupResourcesScheduledForDeletion[]= $groupResource;
+            $this->groupResourcesScheduledForDeletion[]= clone $groupResource;
             $groupResource->setGroup(null);
         }
+
+        return $this;
     }
 
 
@@ -1673,13 +1707,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Group The current object (for fluent API support)
      * @see        addGroupModules()
      */
     public function clearGroupModules()
     {
         $this->collGroupModules = null; // important to set this to null since that means it is uninitialized
         $this->collGroupModulesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1751,6 +1787,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
                       $this->collGroupModulesPartial = true;
                     }
 
+                    $collGroupModules->getInternalIterator()->rewind();
                     return $collGroupModules;
                 }
 
@@ -1778,12 +1815,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @param PropelCollection $groupModules A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Group The current object (for fluent API support)
      */
     public function setGroupModules(PropelCollection $groupModules, PropelPDO $con = null)
     {
-        $this->groupModulesScheduledForDeletion = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
+        $groupModulesToDelete = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
 
-        foreach ($this->groupModulesScheduledForDeletion as $groupModuleRemoved) {
+        $this->groupModulesScheduledForDeletion = unserialize(serialize($groupModulesToDelete));
+
+        foreach ($groupModulesToDelete as $groupModuleRemoved) {
             $groupModuleRemoved->setGroup(null);
         }
 
@@ -1794,6 +1834,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
         $this->collGroupModules = $groupModules;
         $this->collGroupModulesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1811,22 +1853,22 @@ abstract class BaseGroup extends BaseObject implements Persistent
         if (null === $this->collGroupModules || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collGroupModules) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGroupModules());
-                }
-                $query = GroupModuleQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGroup($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collGroupModules);
+
+            if($partial && !$criteria) {
+                return count($this->getGroupModules());
+            }
+            $query = GroupModuleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGroup($this)
+                ->count($con);
         }
+
+        return count($this->collGroupModules);
     }
 
     /**
@@ -1842,7 +1884,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->initGroupModules();
             $this->collGroupModulesPartial = true;
         }
-        if (!$this->collGroupModules->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collGroupModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddGroupModule($l);
         }
 
@@ -1860,6 +1902,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
     /**
      * @param	GroupModule $groupModule The groupModule object to remove.
+     * @return Group The current object (for fluent API support)
      */
     public function removeGroupModule($groupModule)
     {
@@ -1869,9 +1912,11 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 $this->groupModulesScheduledForDeletion = clone $this->collGroupModules;
                 $this->groupModulesScheduledForDeletion->clear();
             }
-            $this->groupModulesScheduledForDeletion[]= $groupModule;
+            $this->groupModulesScheduledForDeletion[]= clone $groupModule;
             $groupModule->setGroup(null);
         }
+
+        return $this;
     }
 
 
@@ -1905,13 +1950,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Group The current object (for fluent API support)
      * @see        addGroupI18ns()
      */
     public function clearGroupI18ns()
     {
         $this->collGroupI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collGroupI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1983,6 +2030,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
                       $this->collGroupI18nsPartial = true;
                     }
 
+                    $collGroupI18ns->getInternalIterator()->rewind();
                     return $collGroupI18ns;
                 }
 
@@ -2010,12 +2058,15 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @param PropelCollection $groupI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Group The current object (for fluent API support)
      */
     public function setGroupI18ns(PropelCollection $groupI18ns, PropelPDO $con = null)
     {
-        $this->groupI18nsScheduledForDeletion = $this->getGroupI18ns(new Criteria(), $con)->diff($groupI18ns);
+        $groupI18nsToDelete = $this->getGroupI18ns(new Criteria(), $con)->diff($groupI18ns);
 
-        foreach ($this->groupI18nsScheduledForDeletion as $groupI18nRemoved) {
+        $this->groupI18nsScheduledForDeletion = unserialize(serialize($groupI18nsToDelete));
+
+        foreach ($groupI18nsToDelete as $groupI18nRemoved) {
             $groupI18nRemoved->setGroup(null);
         }
 
@@ -2026,6 +2077,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
         $this->collGroupI18ns = $groupI18ns;
         $this->collGroupI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2043,22 +2096,22 @@ abstract class BaseGroup extends BaseObject implements Persistent
         if (null === $this->collGroupI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collGroupI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGroupI18ns());
-                }
-                $query = GroupI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByGroup($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collGroupI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getGroupI18ns());
+            }
+            $query = GroupI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByGroup($this)
+                ->count($con);
         }
+
+        return count($this->collGroupI18ns);
     }
 
     /**
@@ -2078,7 +2131,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->initGroupI18ns();
             $this->collGroupI18nsPartial = true;
         }
-        if (!$this->collGroupI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collGroupI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddGroupI18n($l);
         }
 
@@ -2096,6 +2149,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
     /**
      * @param	GroupI18n $groupI18n The groupI18n object to remove.
+     * @return Group The current object (for fluent API support)
      */
     public function removeGroupI18n($groupI18n)
     {
@@ -2105,9 +2159,11 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 $this->groupI18nsScheduledForDeletion = clone $this->collGroupI18ns;
                 $this->groupI18nsScheduledForDeletion->clear();
             }
-            $this->groupI18nsScheduledForDeletion[]= $groupI18n;
+            $this->groupI18nsScheduledForDeletion[]= clone $groupI18n;
             $groupI18n->setGroup(null);
         }
+
+        return $this;
     }
 
     /**
@@ -2121,6 +2177,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -2138,7 +2195,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collAdminGroups) {
                 foreach ($this->collAdminGroups as $o) {
                     $o->clearAllReferences($deep);
@@ -2159,10 +2217,12 @@ abstract class BaseGroup extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collAdminGroups instanceof PropelCollection) {
@@ -2226,7 +2286,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @return    Group The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -2250,7 +2310,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return GroupI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collGroupI18ns) {
@@ -2285,7 +2345,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
      *
      * @return    Group The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             GroupI18nQuery::create()

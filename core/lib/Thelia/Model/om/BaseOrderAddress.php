@@ -160,6 +160,12 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -310,22 +316,25 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -347,22 +356,25 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -373,7 +385,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -394,7 +406,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setCustomerTitleId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -415,7 +427,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setCompany($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -436,7 +448,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setFirstname($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -457,7 +469,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setLastname($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -478,7 +490,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setAddress1($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -499,7 +511,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setAddress2($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -520,7 +532,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setAddress3($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -541,7 +553,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setZipcode($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -562,7 +574,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setCity($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -583,7 +595,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setPhone($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -604,7 +616,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function setCountryId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -716,7 +728,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 14; // 14 = OrderAddressPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -930,7 +942,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
 
             if ($this->collOrdersRelatedByAddressInvoice !== null) {
                 foreach ($this->collOrdersRelatedByAddressInvoice as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -948,7 +960,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
 
             if ($this->collOrdersRelatedByAddressDelivery !== null) {
                 foreach ($this->collOrdersRelatedByAddressDelivery as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -981,46 +993,46 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderAddressPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(OrderAddressPeer::CUSTOMER_TITLE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CUSTOMER_TITLE_ID`';
+            $modifiedColumns[':p' . $index++]  = '`customer_title_id`';
         }
         if ($this->isColumnModified(OrderAddressPeer::COMPANY)) {
-            $modifiedColumns[':p' . $index++]  = '`COMPANY`';
+            $modifiedColumns[':p' . $index++]  = '`company`';
         }
         if ($this->isColumnModified(OrderAddressPeer::FIRSTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`FIRSTNAME`';
+            $modifiedColumns[':p' . $index++]  = '`firstname`';
         }
         if ($this->isColumnModified(OrderAddressPeer::LASTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`LASTNAME`';
+            $modifiedColumns[':p' . $index++]  = '`lastname`';
         }
         if ($this->isColumnModified(OrderAddressPeer::ADDRESS1)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS1`';
+            $modifiedColumns[':p' . $index++]  = '`address1`';
         }
         if ($this->isColumnModified(OrderAddressPeer::ADDRESS2)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS2`';
+            $modifiedColumns[':p' . $index++]  = '`address2`';
         }
         if ($this->isColumnModified(OrderAddressPeer::ADDRESS3)) {
-            $modifiedColumns[':p' . $index++]  = '`ADDRESS3`';
+            $modifiedColumns[':p' . $index++]  = '`address3`';
         }
         if ($this->isColumnModified(OrderAddressPeer::ZIPCODE)) {
-            $modifiedColumns[':p' . $index++]  = '`ZIPCODE`';
+            $modifiedColumns[':p' . $index++]  = '`zipcode`';
         }
         if ($this->isColumnModified(OrderAddressPeer::CITY)) {
-            $modifiedColumns[':p' . $index++]  = '`CITY`';
+            $modifiedColumns[':p' . $index++]  = '`city`';
         }
         if ($this->isColumnModified(OrderAddressPeer::PHONE)) {
-            $modifiedColumns[':p' . $index++]  = '`PHONE`';
+            $modifiedColumns[':p' . $index++]  = '`phone`';
         }
         if ($this->isColumnModified(OrderAddressPeer::COUNTRY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`COUNTRY_ID`';
+            $modifiedColumns[':p' . $index++]  = '`country_id`';
         }
         if ($this->isColumnModified(OrderAddressPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(OrderAddressPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -1033,46 +1045,46 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CUSTOMER_TITLE_ID`':
+                    case '`customer_title_id`':
                         $stmt->bindValue($identifier, $this->customer_title_id, PDO::PARAM_INT);
                         break;
-                    case '`COMPANY`':
+                    case '`company`':
                         $stmt->bindValue($identifier, $this->company, PDO::PARAM_STR);
                         break;
-                    case '`FIRSTNAME`':
+                    case '`firstname`':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case '`LASTNAME`':
+                    case '`lastname`':
                         $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS1`':
+                    case '`address1`':
                         $stmt->bindValue($identifier, $this->address1, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS2`':
+                    case '`address2`':
                         $stmt->bindValue($identifier, $this->address2, PDO::PARAM_STR);
                         break;
-                    case '`ADDRESS3`':
+                    case '`address3`':
                         $stmt->bindValue($identifier, $this->address3, PDO::PARAM_STR);
                         break;
-                    case '`ZIPCODE`':
+                    case '`zipcode`':
                         $stmt->bindValue($identifier, $this->zipcode, PDO::PARAM_STR);
                         break;
-                    case '`CITY`':
+                    case '`city`':
                         $stmt->bindValue($identifier, $this->city, PDO::PARAM_STR);
                         break;
-                    case '`PHONE`':
+                    case '`phone`':
                         $stmt->bindValue($identifier, $this->phone, PDO::PARAM_STR);
                         break;
-                    case '`COUNTRY_ID`':
+                    case '`country_id`':
                         $stmt->bindValue($identifier, $this->country_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -1143,11 +1155,11 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1628,13 +1640,15 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return OrderAddress The current object (for fluent API support)
      * @see        addOrdersRelatedByAddressInvoice()
      */
     public function clearOrdersRelatedByAddressInvoice()
     {
         $this->collOrdersRelatedByAddressInvoice = null; // important to set this to null since that means it is uninitialized
         $this->collOrdersRelatedByAddressInvoicePartial = null;
+
+        return $this;
     }
 
     /**
@@ -1706,6 +1720,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
                       $this->collOrdersRelatedByAddressInvoicePartial = true;
                     }
 
+                    $collOrdersRelatedByAddressInvoice->getInternalIterator()->rewind();
                     return $collOrdersRelatedByAddressInvoice;
                 }
 
@@ -1733,12 +1748,15 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      *
      * @param PropelCollection $ordersRelatedByAddressInvoice A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return OrderAddress The current object (for fluent API support)
      */
     public function setOrdersRelatedByAddressInvoice(PropelCollection $ordersRelatedByAddressInvoice, PropelPDO $con = null)
     {
-        $this->ordersRelatedByAddressInvoiceScheduledForDeletion = $this->getOrdersRelatedByAddressInvoice(new Criteria(), $con)->diff($ordersRelatedByAddressInvoice);
+        $ordersRelatedByAddressInvoiceToDelete = $this->getOrdersRelatedByAddressInvoice(new Criteria(), $con)->diff($ordersRelatedByAddressInvoice);
 
-        foreach ($this->ordersRelatedByAddressInvoiceScheduledForDeletion as $orderRelatedByAddressInvoiceRemoved) {
+        $this->ordersRelatedByAddressInvoiceScheduledForDeletion = unserialize(serialize($ordersRelatedByAddressInvoiceToDelete));
+
+        foreach ($ordersRelatedByAddressInvoiceToDelete as $orderRelatedByAddressInvoiceRemoved) {
             $orderRelatedByAddressInvoiceRemoved->setOrderAddressRelatedByAddressInvoice(null);
         }
 
@@ -1749,6 +1767,8 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
 
         $this->collOrdersRelatedByAddressInvoice = $ordersRelatedByAddressInvoice;
         $this->collOrdersRelatedByAddressInvoicePartial = false;
+
+        return $this;
     }
 
     /**
@@ -1766,22 +1786,22 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
         if (null === $this->collOrdersRelatedByAddressInvoice || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collOrdersRelatedByAddressInvoice) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getOrdersRelatedByAddressInvoice());
-                }
-                $query = OrderQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByOrderAddressRelatedByAddressInvoice($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collOrdersRelatedByAddressInvoice);
+
+            if($partial && !$criteria) {
+                return count($this->getOrdersRelatedByAddressInvoice());
+            }
+            $query = OrderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByOrderAddressRelatedByAddressInvoice($this)
+                ->count($con);
         }
+
+        return count($this->collOrdersRelatedByAddressInvoice);
     }
 
     /**
@@ -1797,7 +1817,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             $this->initOrdersRelatedByAddressInvoice();
             $this->collOrdersRelatedByAddressInvoicePartial = true;
         }
-        if (!$this->collOrdersRelatedByAddressInvoice->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collOrdersRelatedByAddressInvoice->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddOrderRelatedByAddressInvoice($l);
         }
 
@@ -1815,6 +1835,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
 
     /**
      * @param	OrderRelatedByAddressInvoice $orderRelatedByAddressInvoice The orderRelatedByAddressInvoice object to remove.
+     * @return OrderAddress The current object (for fluent API support)
      */
     public function removeOrderRelatedByAddressInvoice($orderRelatedByAddressInvoice)
     {
@@ -1827,6 +1848,8 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             $this->ordersRelatedByAddressInvoiceScheduledForDeletion[]= $orderRelatedByAddressInvoice;
             $orderRelatedByAddressInvoice->setOrderAddressRelatedByAddressInvoice(null);
         }
+
+        return $this;
     }
 
 
@@ -1910,13 +1933,15 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return OrderAddress The current object (for fluent API support)
      * @see        addOrdersRelatedByAddressDelivery()
      */
     public function clearOrdersRelatedByAddressDelivery()
     {
         $this->collOrdersRelatedByAddressDelivery = null; // important to set this to null since that means it is uninitialized
         $this->collOrdersRelatedByAddressDeliveryPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1988,6 +2013,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
                       $this->collOrdersRelatedByAddressDeliveryPartial = true;
                     }
 
+                    $collOrdersRelatedByAddressDelivery->getInternalIterator()->rewind();
                     return $collOrdersRelatedByAddressDelivery;
                 }
 
@@ -2015,12 +2041,15 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      *
      * @param PropelCollection $ordersRelatedByAddressDelivery A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return OrderAddress The current object (for fluent API support)
      */
     public function setOrdersRelatedByAddressDelivery(PropelCollection $ordersRelatedByAddressDelivery, PropelPDO $con = null)
     {
-        $this->ordersRelatedByAddressDeliveryScheduledForDeletion = $this->getOrdersRelatedByAddressDelivery(new Criteria(), $con)->diff($ordersRelatedByAddressDelivery);
+        $ordersRelatedByAddressDeliveryToDelete = $this->getOrdersRelatedByAddressDelivery(new Criteria(), $con)->diff($ordersRelatedByAddressDelivery);
 
-        foreach ($this->ordersRelatedByAddressDeliveryScheduledForDeletion as $orderRelatedByAddressDeliveryRemoved) {
+        $this->ordersRelatedByAddressDeliveryScheduledForDeletion = unserialize(serialize($ordersRelatedByAddressDeliveryToDelete));
+
+        foreach ($ordersRelatedByAddressDeliveryToDelete as $orderRelatedByAddressDeliveryRemoved) {
             $orderRelatedByAddressDeliveryRemoved->setOrderAddressRelatedByAddressDelivery(null);
         }
 
@@ -2031,6 +2060,8 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
 
         $this->collOrdersRelatedByAddressDelivery = $ordersRelatedByAddressDelivery;
         $this->collOrdersRelatedByAddressDeliveryPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2048,22 +2079,22 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
         if (null === $this->collOrdersRelatedByAddressDelivery || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collOrdersRelatedByAddressDelivery) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getOrdersRelatedByAddressDelivery());
-                }
-                $query = OrderQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByOrderAddressRelatedByAddressDelivery($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collOrdersRelatedByAddressDelivery);
+
+            if($partial && !$criteria) {
+                return count($this->getOrdersRelatedByAddressDelivery());
+            }
+            $query = OrderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByOrderAddressRelatedByAddressDelivery($this)
+                ->count($con);
         }
+
+        return count($this->collOrdersRelatedByAddressDelivery);
     }
 
     /**
@@ -2079,7 +2110,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             $this->initOrdersRelatedByAddressDelivery();
             $this->collOrdersRelatedByAddressDeliveryPartial = true;
         }
-        if (!$this->collOrdersRelatedByAddressDelivery->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collOrdersRelatedByAddressDelivery->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddOrderRelatedByAddressDelivery($l);
         }
 
@@ -2097,6 +2128,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
 
     /**
      * @param	OrderRelatedByAddressDelivery $orderRelatedByAddressDelivery The orderRelatedByAddressDelivery object to remove.
+     * @return OrderAddress The current object (for fluent API support)
      */
     public function removeOrderRelatedByAddressDelivery($orderRelatedByAddressDelivery)
     {
@@ -2109,6 +2141,8 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
             $this->ordersRelatedByAddressDeliveryScheduledForDeletion[]= $orderRelatedByAddressDelivery;
             $orderRelatedByAddressDelivery->setOrderAddressRelatedByAddressDelivery(null);
         }
+
+        return $this;
     }
 
 
@@ -2207,6 +2241,7 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -2224,7 +2259,8 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collOrdersRelatedByAddressInvoice) {
                 foreach ($this->collOrdersRelatedByAddressInvoice as $o) {
                     $o->clearAllReferences($deep);
@@ -2235,6 +2271,8 @@ abstract class BaseOrderAddress extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collOrdersRelatedByAddressInvoice instanceof PropelCollection) {

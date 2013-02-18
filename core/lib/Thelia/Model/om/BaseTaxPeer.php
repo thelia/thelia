@@ -46,17 +46,17 @@ abstract class BaseTaxPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
-    /** the column name for the ID field */
-    const ID = 'tax.ID';
+    /** the column name for the id field */
+    const ID = 'tax.id';
 
-    /** the column name for the RATE field */
-    const RATE = 'tax.RATE';
+    /** the column name for the rate field */
+    const RATE = 'tax.rate';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'tax.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'tax.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'tax.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'tax.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -76,7 +76,7 @@ abstract class BaseTaxPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     /**
      * holds an array of fieldnames
      *
@@ -183,10 +183,10 @@ abstract class BaseTaxPeer
             $criteria->addSelectColumn(TaxPeer::CREATED_AT);
             $criteria->addSelectColumn(TaxPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.RATE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.rate');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -270,7 +270,7 @@ abstract class BaseTaxPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -375,8 +375,15 @@ abstract class BaseTaxPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (TaxPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         TaxPeer::$instances = array();
     }
 
@@ -517,7 +524,7 @@ abstract class BaseTaxPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return TaxPeer::OM_CLASS;
     }

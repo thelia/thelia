@@ -50,59 +50,59 @@ abstract class BaseOrderPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 18;
 
-    /** the column name for the ID field */
-    const ID = 'order.ID';
+    /** the column name for the id field */
+    const ID = 'order.id';
 
-    /** the column name for the REF field */
-    const REF = 'order.REF';
+    /** the column name for the ref field */
+    const REF = 'order.ref';
 
-    /** the column name for the CUSTOMER_ID field */
-    const CUSTOMER_ID = 'order.CUSTOMER_ID';
+    /** the column name for the customer_id field */
+    const CUSTOMER_ID = 'order.customer_id';
 
-    /** the column name for the ADDRESS_INVOICE field */
-    const ADDRESS_INVOICE = 'order.ADDRESS_INVOICE';
+    /** the column name for the address_invoice field */
+    const ADDRESS_INVOICE = 'order.address_invoice';
 
-    /** the column name for the ADDRESS_DELIVERY field */
-    const ADDRESS_DELIVERY = 'order.ADDRESS_DELIVERY';
+    /** the column name for the address_delivery field */
+    const ADDRESS_DELIVERY = 'order.address_delivery';
 
-    /** the column name for the INVOICE_DATE field */
-    const INVOICE_DATE = 'order.INVOICE_DATE';
+    /** the column name for the invoice_date field */
+    const INVOICE_DATE = 'order.invoice_date';
 
-    /** the column name for the CURRENCY_ID field */
-    const CURRENCY_ID = 'order.CURRENCY_ID';
+    /** the column name for the currency_id field */
+    const CURRENCY_ID = 'order.currency_id';
 
-    /** the column name for the CURRENCY_RATE field */
-    const CURRENCY_RATE = 'order.CURRENCY_RATE';
+    /** the column name for the currency_rate field */
+    const CURRENCY_RATE = 'order.currency_rate';
 
-    /** the column name for the TRANSACTION field */
-    const TRANSACTION = 'order.TRANSACTION';
+    /** the column name for the transaction field */
+    const TRANSACTION = 'order.transaction';
 
-    /** the column name for the DELIVERY_NUM field */
-    const DELIVERY_NUM = 'order.DELIVERY_NUM';
+    /** the column name for the delivery_num field */
+    const DELIVERY_NUM = 'order.delivery_num';
 
-    /** the column name for the INVOICE field */
-    const INVOICE = 'order.INVOICE';
+    /** the column name for the invoice field */
+    const INVOICE = 'order.invoice';
 
-    /** the column name for the POSTAGE field */
-    const POSTAGE = 'order.POSTAGE';
+    /** the column name for the postage field */
+    const POSTAGE = 'order.postage';
 
-    /** the column name for the PAYMENT field */
-    const PAYMENT = 'order.PAYMENT';
+    /** the column name for the payment field */
+    const PAYMENT = 'order.payment';
 
-    /** the column name for the CARRIER field */
-    const CARRIER = 'order.CARRIER';
+    /** the column name for the carrier field */
+    const CARRIER = 'order.carrier';
 
-    /** the column name for the STATUS_ID field */
-    const STATUS_ID = 'order.STATUS_ID';
+    /** the column name for the status_id field */
+    const STATUS_ID = 'order.status_id';
 
-    /** the column name for the LANG field */
-    const LANG = 'order.LANG';
+    /** the column name for the lang field */
+    const LANG = 'order.lang';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'order.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'order.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'order.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'order.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -236,24 +236,24 @@ abstract class BaseOrderPeer
             $criteria->addSelectColumn(OrderPeer::CREATED_AT);
             $criteria->addSelectColumn(OrderPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.CUSTOMER_ID');
-            $criteria->addSelectColumn($alias . '.ADDRESS_INVOICE');
-            $criteria->addSelectColumn($alias . '.ADDRESS_DELIVERY');
-            $criteria->addSelectColumn($alias . '.INVOICE_DATE');
-            $criteria->addSelectColumn($alias . '.CURRENCY_ID');
-            $criteria->addSelectColumn($alias . '.CURRENCY_RATE');
-            $criteria->addSelectColumn($alias . '.TRANSACTION');
-            $criteria->addSelectColumn($alias . '.DELIVERY_NUM');
-            $criteria->addSelectColumn($alias . '.INVOICE');
-            $criteria->addSelectColumn($alias . '.POSTAGE');
-            $criteria->addSelectColumn($alias . '.PAYMENT');
-            $criteria->addSelectColumn($alias . '.CARRIER');
-            $criteria->addSelectColumn($alias . '.STATUS_ID');
-            $criteria->addSelectColumn($alias . '.LANG');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.ref');
+            $criteria->addSelectColumn($alias . '.customer_id');
+            $criteria->addSelectColumn($alias . '.address_invoice');
+            $criteria->addSelectColumn($alias . '.address_delivery');
+            $criteria->addSelectColumn($alias . '.invoice_date');
+            $criteria->addSelectColumn($alias . '.currency_id');
+            $criteria->addSelectColumn($alias . '.currency_rate');
+            $criteria->addSelectColumn($alias . '.transaction');
+            $criteria->addSelectColumn($alias . '.delivery_num');
+            $criteria->addSelectColumn($alias . '.invoice');
+            $criteria->addSelectColumn($alias . '.postage');
+            $criteria->addSelectColumn($alias . '.payment');
+            $criteria->addSelectColumn($alias . '.carrier');
+            $criteria->addSelectColumn($alias . '.status_id');
+            $criteria->addSelectColumn($alias . '.lang');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -337,7 +337,7 @@ abstract class BaseOrderPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -442,8 +442,15 @@ abstract class BaseOrderPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (OrderPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         OrderPeer::$instances = array();
     }
 
@@ -2357,7 +2364,7 @@ abstract class BaseOrderPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return OrderPeer::OM_CLASS;
     }

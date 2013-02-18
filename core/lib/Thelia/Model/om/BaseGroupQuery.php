@@ -58,7 +58,6 @@ use Thelia\Model\GroupResource;
  * @method Group findOne(PropelPDO $con = null) Return the first Group matching the query
  * @method Group findOneOrCreate(PropelPDO $con = null) Return the first Group matching the query, or a new Group object populated from the query conditions when no match is found
  *
- * @method Group findOneById(int $id) Return the first Group filtered by the id column
  * @method Group findOneByCode(string $code) Return the first Group filtered by the code column
  * @method Group findOneByCreatedAt(string $created_at) Return the first Group filtered by the created_at column
  * @method Group findOneByUpdatedAt(string $updated_at) Return the first Group filtered by the updated_at column
@@ -88,7 +87,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      * Returns a new GroupQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     GroupQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   GroupQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return GroupQuery
      */
@@ -145,18 +144,32 @@ abstract class BaseGroupQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Group A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Group A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Group A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `CREATED_AT`, `UPDATED_AT` FROM `group` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `code`, `created_at`, `updated_at` FROM `group` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -252,7 +265,8 @@ abstract class BaseGroupQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -265,8 +279,22 @@ abstract class BaseGroupQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(GroupPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(GroupPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(GroupPeer::ID, $id, $comparison);
@@ -393,8 +421,8 @@ abstract class BaseGroupQuery extends ModelCriteria
      * @param   AdminGroup|PropelObjectCollection $adminGroup  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAdminGroup($adminGroup, $comparison = null)
     {
@@ -467,8 +495,8 @@ abstract class BaseGroupQuery extends ModelCriteria
      * @param   GroupResource|PropelObjectCollection $groupResource  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGroupResource($groupResource, $comparison = null)
     {
@@ -541,8 +569,8 @@ abstract class BaseGroupQuery extends ModelCriteria
      * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGroupModule($groupModule, $comparison = null)
     {
@@ -615,8 +643,8 @@ abstract class BaseGroupQuery extends ModelCriteria
      * @param   GroupI18n|PropelObjectCollection $groupI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGroupI18n($groupI18n, $comparison = null)
     {
@@ -775,7 +803,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      *
      * @return    GroupQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'GroupI18n';
 
@@ -793,7 +821,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      *
      * @return    GroupQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -814,7 +842,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      *
      * @return    GroupI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

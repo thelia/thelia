@@ -53,7 +53,6 @@ use Thelia\Model\AdminQuery;
  * @method Admin findOne(PropelPDO $con = null) Return the first Admin matching the query
  * @method Admin findOneOrCreate(PropelPDO $con = null) Return the first Admin matching the query, or a new Admin object populated from the query conditions when no match is found
  *
- * @method Admin findOneById(int $id) Return the first Admin filtered by the id column
  * @method Admin findOneByFirstname(string $firstname) Return the first Admin filtered by the firstname column
  * @method Admin findOneByLastname(string $lastname) Return the first Admin filtered by the lastname column
  * @method Admin findOneByLogin(string $login) Return the first Admin filtered by the login column
@@ -93,7 +92,7 @@ abstract class BaseAdminQuery extends ModelCriteria
      * Returns a new AdminQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AdminQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AdminQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AdminQuery
      */
@@ -150,18 +149,32 @@ abstract class BaseAdminQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Admin A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Admin A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Admin A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `FIRSTNAME`, `LASTNAME`, `LOGIN`, `PASSWORD`, `ALGO`, `SALT`, `CREATED_AT`, `UPDATED_AT` FROM `admin` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `firstname`, `lastname`, `login`, `password`, `algo`, `salt`, `created_at`, `updated_at` FROM `admin` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -257,7 +270,8 @@ abstract class BaseAdminQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -270,8 +284,22 @@ abstract class BaseAdminQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(AdminPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(AdminPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AdminPeer::ID, $id, $comparison);
@@ -543,8 +571,8 @@ abstract class BaseAdminQuery extends ModelCriteria
      * @param   AdminGroup|PropelObjectCollection $adminGroup  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AdminQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AdminQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAdminGroup($adminGroup, $comparison = null)
     {

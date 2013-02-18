@@ -45,11 +45,11 @@ abstract class BaseTaxRuleI18nPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 2;
 
-    /** the column name for the ID field */
-    const ID = 'tax_rule_i18n.ID';
+    /** the column name for the id field */
+    const ID = 'tax_rule_i18n.id';
 
-    /** the column name for the LOCALE field */
-    const LOCALE = 'tax_rule_i18n.LOCALE';
+    /** the column name for the locale field */
+    const LOCALE = 'tax_rule_i18n.locale';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -167,8 +167,8 @@ abstract class BaseTaxRuleI18nPeer
             $criteria->addSelectColumn(TaxRuleI18nPeer::ID);
             $criteria->addSelectColumn(TaxRuleI18nPeer::LOCALE);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.LOCALE');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.locale');
         }
     }
 
@@ -252,7 +252,7 @@ abstract class BaseTaxRuleI18nPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -357,8 +357,15 @@ abstract class BaseTaxRuleI18nPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (TaxRuleI18nPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         TaxRuleI18nPeer::$instances = array();
     }
 
@@ -731,7 +738,7 @@ abstract class BaseTaxRuleI18nPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return TaxRuleI18nPeer::OM_CLASS;
     }

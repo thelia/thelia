@@ -44,29 +44,29 @@ abstract class BaseAdminLogPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 8;
 
-    /** the column name for the ID field */
-    const ID = 'admin_log.ID';
+    /** the column name for the id field */
+    const ID = 'admin_log.id';
 
-    /** the column name for the ADMIN_LOGIN field */
-    const ADMIN_LOGIN = 'admin_log.ADMIN_LOGIN';
+    /** the column name for the admin_login field */
+    const ADMIN_LOGIN = 'admin_log.admin_login';
 
-    /** the column name for the ADMIN_FIRSTNAME field */
-    const ADMIN_FIRSTNAME = 'admin_log.ADMIN_FIRSTNAME';
+    /** the column name for the admin_firstname field */
+    const ADMIN_FIRSTNAME = 'admin_log.admin_firstname';
 
-    /** the column name for the ADMIN_LASTNAME field */
-    const ADMIN_LASTNAME = 'admin_log.ADMIN_LASTNAME';
+    /** the column name for the admin_lastname field */
+    const ADMIN_LASTNAME = 'admin_log.admin_lastname';
 
-    /** the column name for the ACTION field */
-    const ACTION = 'admin_log.ACTION';
+    /** the column name for the action field */
+    const ACTION = 'admin_log.action';
 
-    /** the column name for the REQUEST field */
-    const REQUEST = 'admin_log.REQUEST';
+    /** the column name for the request field */
+    const REQUEST = 'admin_log.request';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'admin_log.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'admin_log.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'admin_log.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'admin_log.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -190,14 +190,14 @@ abstract class BaseAdminLogPeer
             $criteria->addSelectColumn(AdminLogPeer::CREATED_AT);
             $criteria->addSelectColumn(AdminLogPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ADMIN_LOGIN');
-            $criteria->addSelectColumn($alias . '.ADMIN_FIRSTNAME');
-            $criteria->addSelectColumn($alias . '.ADMIN_LASTNAME');
-            $criteria->addSelectColumn($alias . '.ACTION');
-            $criteria->addSelectColumn($alias . '.REQUEST');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.admin_login');
+            $criteria->addSelectColumn($alias . '.admin_firstname');
+            $criteria->addSelectColumn($alias . '.admin_lastname');
+            $criteria->addSelectColumn($alias . '.action');
+            $criteria->addSelectColumn($alias . '.request');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -281,7 +281,7 @@ abstract class BaseAdminLogPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -386,8 +386,15 @@ abstract class BaseAdminLogPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AdminLogPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AdminLogPeer::$instances = array();
     }
 
@@ -522,7 +529,7 @@ abstract class BaseAdminLogPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AdminLogPeer::OM_CLASS;
     }

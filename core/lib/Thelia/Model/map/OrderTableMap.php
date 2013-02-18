@@ -42,24 +42,24 @@ class OrderTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 45, null);
-        $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', true, null, null);
-        $this->addForeignKey('ADDRESS_INVOICE', 'AddressInvoice', 'INTEGER', 'order_address', 'ID', false, null, null);
-        $this->addForeignKey('ADDRESS_DELIVERY', 'AddressDelivery', 'INTEGER', 'order_address', 'ID', false, null, null);
-        $this->addColumn('INVOICE_DATE', 'InvoiceDate', 'DATE', false, null, null);
-        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', false, null, null);
-        $this->addColumn('CURRENCY_RATE', 'CurrencyRate', 'FLOAT', true, null, null);
-        $this->addColumn('TRANSACTION', 'Transaction', 'VARCHAR', false, 100, null);
-        $this->addColumn('DELIVERY_NUM', 'DeliveryNum', 'VARCHAR', false, 100, null);
-        $this->addColumn('INVOICE', 'Invoice', 'VARCHAR', false, 100, null);
-        $this->addColumn('POSTAGE', 'Postage', 'FLOAT', false, null, null);
-        $this->addColumn('PAYMENT', 'Payment', 'VARCHAR', true, 45, null);
-        $this->addColumn('CARRIER', 'Carrier', 'VARCHAR', true, 45, null);
-        $this->addForeignKey('STATUS_ID', 'StatusId', 'INTEGER', 'order_status', 'ID', false, null, null);
-        $this->addColumn('LANG', 'Lang', 'VARCHAR', true, 10, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', false, 45, null);
+        $this->addForeignKey('customer_id', 'CustomerId', 'INTEGER', 'customer', 'id', true, null, null);
+        $this->addForeignKey('address_invoice', 'AddressInvoice', 'INTEGER', 'order_address', 'id', false, null, null);
+        $this->addForeignKey('address_delivery', 'AddressDelivery', 'INTEGER', 'order_address', 'id', false, null, null);
+        $this->addColumn('invoice_date', 'InvoiceDate', 'DATE', false, null, null);
+        $this->addForeignKey('currency_id', 'CurrencyId', 'INTEGER', 'currency', 'id', false, null, null);
+        $this->addColumn('currency_rate', 'CurrencyRate', 'FLOAT', true, null, null);
+        $this->addColumn('transaction', 'Transaction', 'VARCHAR', false, 100, null);
+        $this->addColumn('delivery_num', 'DeliveryNum', 'VARCHAR', false, 100, null);
+        $this->addColumn('invoice', 'Invoice', 'VARCHAR', false, 100, null);
+        $this->addColumn('postage', 'Postage', 'FLOAT', false, null, null);
+        $this->addColumn('payment', 'Payment', 'VARCHAR', true, 45, null);
+        $this->addColumn('carrier', 'Carrier', 'VARCHAR', true, 45, null);
+        $this->addForeignKey('status_id', 'StatusId', 'INTEGER', 'order_status', 'id', false, null, null);
+        $this->addColumn('lang', 'Lang', 'VARCHAR', true, 10, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -86,7 +86,11 @@ class OrderTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

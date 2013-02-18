@@ -47,26 +47,26 @@ abstract class BaseCountryPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the ID field */
-    const ID = 'country.ID';
+    /** the column name for the id field */
+    const ID = 'country.id';
 
-    /** the column name for the AREA_ID field */
-    const AREA_ID = 'country.AREA_ID';
+    /** the column name for the area_id field */
+    const AREA_ID = 'country.area_id';
 
-    /** the column name for the ISOCODE field */
-    const ISOCODE = 'country.ISOCODE';
+    /** the column name for the isocode field */
+    const ISOCODE = 'country.isocode';
 
-    /** the column name for the ISOALPHA2 field */
-    const ISOALPHA2 = 'country.ISOALPHA2';
+    /** the column name for the isoalpha2 field */
+    const ISOALPHA2 = 'country.isoalpha2';
 
-    /** the column name for the ISOALPHA3 field */
-    const ISOALPHA3 = 'country.ISOALPHA3';
+    /** the column name for the isoalpha3 field */
+    const ISOALPHA3 = 'country.isoalpha3';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'country.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'country.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'country.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'country.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -86,7 +86,7 @@ abstract class BaseCountryPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     /**
      * holds an array of fieldnames
      *
@@ -196,13 +196,13 @@ abstract class BaseCountryPeer
             $criteria->addSelectColumn(CountryPeer::CREATED_AT);
             $criteria->addSelectColumn(CountryPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.AREA_ID');
-            $criteria->addSelectColumn($alias . '.ISOCODE');
-            $criteria->addSelectColumn($alias . '.ISOALPHA2');
-            $criteria->addSelectColumn($alias . '.ISOALPHA3');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.area_id');
+            $criteria->addSelectColumn($alias . '.isocode');
+            $criteria->addSelectColumn($alias . '.isoalpha2');
+            $criteria->addSelectColumn($alias . '.isoalpha3');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -286,7 +286,7 @@ abstract class BaseCountryPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -391,8 +391,15 @@ abstract class BaseCountryPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CountryPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CountryPeer::$instances = array();
     }
 
@@ -771,7 +778,7 @@ abstract class BaseCountryPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return CountryPeer::OM_CLASS;
     }

@@ -55,56 +55,56 @@ abstract class BaseProductPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 17;
 
-    /** the column name for the ID field */
-    const ID = 'product.ID';
+    /** the column name for the id field */
+    const ID = 'product.id';
 
-    /** the column name for the TAX_RULE_ID field */
-    const TAX_RULE_ID = 'product.TAX_RULE_ID';
+    /** the column name for the tax_rule_id field */
+    const TAX_RULE_ID = 'product.tax_rule_id';
 
-    /** the column name for the REF field */
-    const REF = 'product.REF';
+    /** the column name for the ref field */
+    const REF = 'product.ref';
 
-    /** the column name for the PRICE field */
-    const PRICE = 'product.PRICE';
+    /** the column name for the price field */
+    const PRICE = 'product.price';
 
-    /** the column name for the PRICE2 field */
-    const PRICE2 = 'product.PRICE2';
+    /** the column name for the price2 field */
+    const PRICE2 = 'product.price2';
 
-    /** the column name for the ECOTAX field */
-    const ECOTAX = 'product.ECOTAX';
+    /** the column name for the ecotax field */
+    const ECOTAX = 'product.ecotax';
 
-    /** the column name for the NEWNESS field */
-    const NEWNESS = 'product.NEWNESS';
+    /** the column name for the newness field */
+    const NEWNESS = 'product.newness';
 
-    /** the column name for the PROMO field */
-    const PROMO = 'product.PROMO';
+    /** the column name for the promo field */
+    const PROMO = 'product.promo';
 
-    /** the column name for the STOCK field */
-    const STOCK = 'product.STOCK';
+    /** the column name for the stock field */
+    const STOCK = 'product.stock';
 
-    /** the column name for the VISIBLE field */
-    const VISIBLE = 'product.VISIBLE';
+    /** the column name for the visible field */
+    const VISIBLE = 'product.visible';
 
-    /** the column name for the WEIGHT field */
-    const WEIGHT = 'product.WEIGHT';
+    /** the column name for the weight field */
+    const WEIGHT = 'product.weight';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'product.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'product.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'product.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'product.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'product.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'product.updated_at';
 
-    /** the column name for the VERSION field */
-    const VERSION = 'product.VERSION';
+    /** the column name for the version field */
+    const VERSION = 'product.version';
 
-    /** the column name for the VERSION_CREATED_AT field */
-    const VERSION_CREATED_AT = 'product.VERSION_CREATED_AT';
+    /** the column name for the version_created_at field */
+    const VERSION_CREATED_AT = 'product.version_created_at';
 
-    /** the column name for the VERSION_CREATED_BY field */
-    const VERSION_CREATED_BY = 'product.VERSION_CREATED_BY';
+    /** the column name for the version_created_by field */
+    const VERSION_CREATED_BY = 'product.version_created_by';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -124,7 +124,7 @@ abstract class BaseProductPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     // versionable behavior
 
     /**
@@ -251,23 +251,23 @@ abstract class BaseProductPeer
             $criteria->addSelectColumn(ProductPeer::VERSION_CREATED_AT);
             $criteria->addSelectColumn(ProductPeer::VERSION_CREATED_BY);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.TAX_RULE_ID');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.PRICE');
-            $criteria->addSelectColumn($alias . '.PRICE2');
-            $criteria->addSelectColumn($alias . '.ECOTAX');
-            $criteria->addSelectColumn($alias . '.NEWNESS');
-            $criteria->addSelectColumn($alias . '.PROMO');
-            $criteria->addSelectColumn($alias . '.STOCK');
-            $criteria->addSelectColumn($alias . '.VISIBLE');
-            $criteria->addSelectColumn($alias . '.WEIGHT');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.tax_rule_id');
+            $criteria->addSelectColumn($alias . '.ref');
+            $criteria->addSelectColumn($alias . '.price');
+            $criteria->addSelectColumn($alias . '.price2');
+            $criteria->addSelectColumn($alias . '.ecotax');
+            $criteria->addSelectColumn($alias . '.newness');
+            $criteria->addSelectColumn($alias . '.promo');
+            $criteria->addSelectColumn($alias . '.stock');
+            $criteria->addSelectColumn($alias . '.visible');
+            $criteria->addSelectColumn($alias . '.weight');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.version');
+            $criteria->addSelectColumn($alias . '.version_created_at');
+            $criteria->addSelectColumn($alias . '.version_created_by');
         }
     }
 
@@ -351,7 +351,7 @@ abstract class BaseProductPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -456,8 +456,15 @@ abstract class BaseProductPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (ProductPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         ProductPeer::$instances = array();
     }
 
@@ -863,7 +870,7 @@ abstract class BaseProductPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return ProductPeer::OM_CLASS;
     }

@@ -101,13 +101,19 @@ abstract class BaseResource extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -166,22 +172,25 @@ abstract class BaseResource extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -203,22 +212,25 @@ abstract class BaseResource extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -229,7 +241,7 @@ abstract class BaseResource extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -250,7 +262,7 @@ abstract class BaseResource extends BaseObject implements Persistent
      */
     public function setCode($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -352,7 +364,7 @@ abstract class BaseResource extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 4; // 4 = ResourcePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -565,7 +577,7 @@ abstract class BaseResource extends BaseObject implements Persistent
 
             if ($this->collGroupResources !== null) {
                 foreach ($this->collGroupResources as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -582,7 +594,7 @@ abstract class BaseResource extends BaseObject implements Persistent
 
             if ($this->collResourceI18ns !== null) {
                 foreach ($this->collResourceI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -615,16 +627,16 @@ abstract class BaseResource extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ResourcePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(ResourcePeer::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = '`code`';
         }
         if ($this->isColumnModified(ResourcePeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(ResourcePeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -637,16 +649,16 @@ abstract class BaseResource extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`code`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -717,11 +729,11 @@ abstract class BaseResource extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1102,13 +1114,15 @@ abstract class BaseResource extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Resource The current object (for fluent API support)
      * @see        addGroupResources()
      */
     public function clearGroupResources()
     {
         $this->collGroupResources = null; // important to set this to null since that means it is uninitialized
         $this->collGroupResourcesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1180,6 +1194,7 @@ abstract class BaseResource extends BaseObject implements Persistent
                       $this->collGroupResourcesPartial = true;
                     }
 
+                    $collGroupResources->getInternalIterator()->rewind();
                     return $collGroupResources;
                 }
 
@@ -1207,12 +1222,15 @@ abstract class BaseResource extends BaseObject implements Persistent
      *
      * @param PropelCollection $groupResources A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Resource The current object (for fluent API support)
      */
     public function setGroupResources(PropelCollection $groupResources, PropelPDO $con = null)
     {
-        $this->groupResourcesScheduledForDeletion = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
+        $groupResourcesToDelete = $this->getGroupResources(new Criteria(), $con)->diff($groupResources);
 
-        foreach ($this->groupResourcesScheduledForDeletion as $groupResourceRemoved) {
+        $this->groupResourcesScheduledForDeletion = unserialize(serialize($groupResourcesToDelete));
+
+        foreach ($groupResourcesToDelete as $groupResourceRemoved) {
             $groupResourceRemoved->setResource(null);
         }
 
@@ -1223,6 +1241,8 @@ abstract class BaseResource extends BaseObject implements Persistent
 
         $this->collGroupResources = $groupResources;
         $this->collGroupResourcesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1240,22 +1260,22 @@ abstract class BaseResource extends BaseObject implements Persistent
         if (null === $this->collGroupResources || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collGroupResources) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGroupResources());
-                }
-                $query = GroupResourceQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByResource($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collGroupResources);
+
+            if($partial && !$criteria) {
+                return count($this->getGroupResources());
+            }
+            $query = GroupResourceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByResource($this)
+                ->count($con);
         }
+
+        return count($this->collGroupResources);
     }
 
     /**
@@ -1271,7 +1291,7 @@ abstract class BaseResource extends BaseObject implements Persistent
             $this->initGroupResources();
             $this->collGroupResourcesPartial = true;
         }
-        if (!$this->collGroupResources->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collGroupResources->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddGroupResource($l);
         }
 
@@ -1289,6 +1309,7 @@ abstract class BaseResource extends BaseObject implements Persistent
 
     /**
      * @param	GroupResource $groupResource The groupResource object to remove.
+     * @return Resource The current object (for fluent API support)
      */
     public function removeGroupResource($groupResource)
     {
@@ -1298,9 +1319,11 @@ abstract class BaseResource extends BaseObject implements Persistent
                 $this->groupResourcesScheduledForDeletion = clone $this->collGroupResources;
                 $this->groupResourcesScheduledForDeletion->clear();
             }
-            $this->groupResourcesScheduledForDeletion[]= $groupResource;
+            $this->groupResourcesScheduledForDeletion[]= clone $groupResource;
             $groupResource->setResource(null);
         }
+
+        return $this;
     }
 
 
@@ -1334,13 +1357,15 @@ abstract class BaseResource extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Resource The current object (for fluent API support)
      * @see        addResourceI18ns()
      */
     public function clearResourceI18ns()
     {
         $this->collResourceI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collResourceI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1412,6 +1437,7 @@ abstract class BaseResource extends BaseObject implements Persistent
                       $this->collResourceI18nsPartial = true;
                     }
 
+                    $collResourceI18ns->getInternalIterator()->rewind();
                     return $collResourceI18ns;
                 }
 
@@ -1439,12 +1465,15 @@ abstract class BaseResource extends BaseObject implements Persistent
      *
      * @param PropelCollection $resourceI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Resource The current object (for fluent API support)
      */
     public function setResourceI18ns(PropelCollection $resourceI18ns, PropelPDO $con = null)
     {
-        $this->resourceI18nsScheduledForDeletion = $this->getResourceI18ns(new Criteria(), $con)->diff($resourceI18ns);
+        $resourceI18nsToDelete = $this->getResourceI18ns(new Criteria(), $con)->diff($resourceI18ns);
 
-        foreach ($this->resourceI18nsScheduledForDeletion as $resourceI18nRemoved) {
+        $this->resourceI18nsScheduledForDeletion = unserialize(serialize($resourceI18nsToDelete));
+
+        foreach ($resourceI18nsToDelete as $resourceI18nRemoved) {
             $resourceI18nRemoved->setResource(null);
         }
 
@@ -1455,6 +1484,8 @@ abstract class BaseResource extends BaseObject implements Persistent
 
         $this->collResourceI18ns = $resourceI18ns;
         $this->collResourceI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1472,22 +1503,22 @@ abstract class BaseResource extends BaseObject implements Persistent
         if (null === $this->collResourceI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collResourceI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getResourceI18ns());
-                }
-                $query = ResourceI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByResource($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collResourceI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getResourceI18ns());
+            }
+            $query = ResourceI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByResource($this)
+                ->count($con);
         }
+
+        return count($this->collResourceI18ns);
     }
 
     /**
@@ -1507,7 +1538,7 @@ abstract class BaseResource extends BaseObject implements Persistent
             $this->initResourceI18ns();
             $this->collResourceI18nsPartial = true;
         }
-        if (!$this->collResourceI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collResourceI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddResourceI18n($l);
         }
 
@@ -1525,6 +1556,7 @@ abstract class BaseResource extends BaseObject implements Persistent
 
     /**
      * @param	ResourceI18n $resourceI18n The resourceI18n object to remove.
+     * @return Resource The current object (for fluent API support)
      */
     public function removeResourceI18n($resourceI18n)
     {
@@ -1534,9 +1566,11 @@ abstract class BaseResource extends BaseObject implements Persistent
                 $this->resourceI18nsScheduledForDeletion = clone $this->collResourceI18ns;
                 $this->resourceI18nsScheduledForDeletion->clear();
             }
-            $this->resourceI18nsScheduledForDeletion[]= $resourceI18n;
+            $this->resourceI18nsScheduledForDeletion[]= clone $resourceI18n;
             $resourceI18n->setResource(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1550,6 +1584,7 @@ abstract class BaseResource extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1567,7 +1602,8 @@ abstract class BaseResource extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collGroupResources) {
                 foreach ($this->collGroupResources as $o) {
                     $o->clearAllReferences($deep);
@@ -1578,10 +1614,12 @@ abstract class BaseResource extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collGroupResources instanceof PropelCollection) {
@@ -1637,7 +1675,7 @@ abstract class BaseResource extends BaseObject implements Persistent
      *
      * @return    Resource The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -1661,7 +1699,7 @@ abstract class BaseResource extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return ResourceI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collResourceI18ns) {
@@ -1696,7 +1734,7 @@ abstract class BaseResource extends BaseObject implements Persistent
      *
      * @return    Resource The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             ResourceI18nQuery::create()

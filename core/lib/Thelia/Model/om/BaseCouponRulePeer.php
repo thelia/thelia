@@ -45,26 +45,26 @@ abstract class BaseCouponRulePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the ID field */
-    const ID = 'coupon_rule.ID';
+    /** the column name for the id field */
+    const ID = 'coupon_rule.id';
 
-    /** the column name for the COUPON_ID field */
-    const COUPON_ID = 'coupon_rule.COUPON_ID';
+    /** the column name for the coupon_id field */
+    const COUPON_ID = 'coupon_rule.coupon_id';
 
-    /** the column name for the CONTROLLER field */
-    const CONTROLLER = 'coupon_rule.CONTROLLER';
+    /** the column name for the controller field */
+    const CONTROLLER = 'coupon_rule.controller';
 
-    /** the column name for the OPERATION field */
-    const OPERATION = 'coupon_rule.OPERATION';
+    /** the column name for the operation field */
+    const OPERATION = 'coupon_rule.operation';
 
-    /** the column name for the VALUE field */
-    const VALUE = 'coupon_rule.VALUE';
+    /** the column name for the value field */
+    const VALUE = 'coupon_rule.value';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'coupon_rule.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'coupon_rule.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'coupon_rule.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'coupon_rule.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -187,13 +187,13 @@ abstract class BaseCouponRulePeer
             $criteria->addSelectColumn(CouponRulePeer::CREATED_AT);
             $criteria->addSelectColumn(CouponRulePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.COUPON_ID');
-            $criteria->addSelectColumn($alias . '.CONTROLLER');
-            $criteria->addSelectColumn($alias . '.OPERATION');
-            $criteria->addSelectColumn($alias . '.VALUE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.coupon_id');
+            $criteria->addSelectColumn($alias . '.controller');
+            $criteria->addSelectColumn($alias . '.operation');
+            $criteria->addSelectColumn($alias . '.value');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -277,7 +277,7 @@ abstract class BaseCouponRulePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -382,8 +382,15 @@ abstract class BaseCouponRulePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CouponRulePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CouponRulePeer::$instances = array();
     }
 
@@ -756,7 +763,7 @@ abstract class BaseCouponRulePeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return CouponRulePeer::OM_CLASS;
     }

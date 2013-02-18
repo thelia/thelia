@@ -174,6 +174,12 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
      * equivalent initialization method).
@@ -337,22 +343,25 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -374,22 +383,25 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -421,22 +433,25 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->version_created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->version_created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -457,7 +472,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -482,7 +497,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setTaxRuleId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -503,7 +518,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setRef($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -524,7 +539,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setPrice($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -545,7 +560,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setPrice2($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -566,7 +581,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setEcotax($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -587,7 +602,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setNewness($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -608,7 +623,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setPromo($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -629,7 +644,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setStock($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -650,7 +665,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setVisible($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -671,7 +686,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setWeight($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -692,7 +707,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setPosition($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -759,7 +774,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setVersion($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -803,7 +818,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function setVersionCreatedBy($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -892,7 +907,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 17; // 17 = ProductVersionPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -1118,55 +1133,55 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ProductVersionPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(ProductVersionPeer::TAX_RULE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX_RULE_ID`';
+            $modifiedColumns[':p' . $index++]  = '`tax_rule_id`';
         }
         if ($this->isColumnModified(ProductVersionPeer::REF)) {
-            $modifiedColumns[':p' . $index++]  = '`REF`';
+            $modifiedColumns[':p' . $index++]  = '`ref`';
         }
         if ($this->isColumnModified(ProductVersionPeer::PRICE)) {
-            $modifiedColumns[':p' . $index++]  = '`PRICE`';
+            $modifiedColumns[':p' . $index++]  = '`price`';
         }
         if ($this->isColumnModified(ProductVersionPeer::PRICE2)) {
-            $modifiedColumns[':p' . $index++]  = '`PRICE2`';
+            $modifiedColumns[':p' . $index++]  = '`price2`';
         }
         if ($this->isColumnModified(ProductVersionPeer::ECOTAX)) {
-            $modifiedColumns[':p' . $index++]  = '`ECOTAX`';
+            $modifiedColumns[':p' . $index++]  = '`ecotax`';
         }
         if ($this->isColumnModified(ProductVersionPeer::NEWNESS)) {
-            $modifiedColumns[':p' . $index++]  = '`NEWNESS`';
+            $modifiedColumns[':p' . $index++]  = '`newness`';
         }
         if ($this->isColumnModified(ProductVersionPeer::PROMO)) {
-            $modifiedColumns[':p' . $index++]  = '`PROMO`';
+            $modifiedColumns[':p' . $index++]  = '`promo`';
         }
         if ($this->isColumnModified(ProductVersionPeer::STOCK)) {
-            $modifiedColumns[':p' . $index++]  = '`STOCK`';
+            $modifiedColumns[':p' . $index++]  = '`stock`';
         }
         if ($this->isColumnModified(ProductVersionPeer::VISIBLE)) {
-            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
+            $modifiedColumns[':p' . $index++]  = '`visible`';
         }
         if ($this->isColumnModified(ProductVersionPeer::WEIGHT)) {
-            $modifiedColumns[':p' . $index++]  = '`WEIGHT`';
+            $modifiedColumns[':p' . $index++]  = '`weight`';
         }
         if ($this->isColumnModified(ProductVersionPeer::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = '`position`';
         }
         if ($this->isColumnModified(ProductVersionPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(ProductVersionPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
         if ($this->isColumnModified(ProductVersionPeer::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+            $modifiedColumns[':p' . $index++]  = '`version`';
         }
         if ($this->isColumnModified(ProductVersionPeer::VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`version_created_at`';
         }
         if ($this->isColumnModified(ProductVersionPeer::VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+            $modifiedColumns[':p' . $index++]  = '`version_created_by`';
         }
 
         $sql = sprintf(
@@ -1179,55 +1194,55 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`TAX_RULE_ID`':
+                    case '`tax_rule_id`':
                         $stmt->bindValue($identifier, $this->tax_rule_id, PDO::PARAM_INT);
                         break;
-                    case '`REF`':
+                    case '`ref`':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case '`PRICE`':
+                    case '`price`':
                         $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
                         break;
-                    case '`PRICE2`':
+                    case '`price2`':
                         $stmt->bindValue($identifier, $this->price2, PDO::PARAM_STR);
                         break;
-                    case '`ECOTAX`':
+                    case '`ecotax`':
                         $stmt->bindValue($identifier, $this->ecotax, PDO::PARAM_STR);
                         break;
-                    case '`NEWNESS`':
+                    case '`newness`':
                         $stmt->bindValue($identifier, $this->newness, PDO::PARAM_INT);
                         break;
-                    case '`PROMO`':
+                    case '`promo`':
                         $stmt->bindValue($identifier, $this->promo, PDO::PARAM_INT);
                         break;
-                    case '`STOCK`':
+                    case '`stock`':
                         $stmt->bindValue($identifier, $this->stock, PDO::PARAM_INT);
                         break;
-                    case '`VISIBLE`':
+                    case '`visible`':
                         $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
-                    case '`WEIGHT`':
+                    case '`weight`':
                         $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
                         break;
-                    case '`POSITION`':
+                    case '`position`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
-                    case '`VERSION`':
+                    case '`version`':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
-                    case '`VERSION_CREATED_AT`':
+                    case '`version_created_at`':
                         $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
                         break;
-                    case '`VERSION_CREATED_BY`':
+                    case '`version_created_by`':
                         $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
@@ -1291,11 +1306,11 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1801,12 +1816,13 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      * Get the associated Product object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Product The associated Product object.
      * @throws PropelException
      */
-    public function getProduct(PropelPDO $con = null)
+    public function getProduct(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aProduct === null && ($this->id !== null)) {
+        if ($this->aProduct === null && ($this->id !== null) && $doQuery) {
             $this->aProduct = ProductQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1844,6 +1860,7 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
         $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -1862,7 +1879,13 @@ abstract class BaseProductVersion extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aProduct instanceof Persistent) {
+              $this->aProduct->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aProduct = null;

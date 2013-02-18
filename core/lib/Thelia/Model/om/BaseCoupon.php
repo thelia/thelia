@@ -130,6 +130,12 @@ abstract class BaseCoupon extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -204,22 +210,25 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->available_since);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->available_since, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->available_since);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->available_since, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -241,22 +250,25 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->date_limit);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->date_limit, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->date_limit);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->date_limit, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -288,22 +300,25 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -325,22 +340,25 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -351,7 +369,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -372,7 +390,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      */
     public function setCode($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -393,7 +411,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      */
     public function setAction($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -414,7 +432,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      */
     public function setValue($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -435,7 +453,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      */
     public function setUsed($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -502,7 +520,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      */
     public function setActivate($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -610,7 +628,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 10; // 10 = CouponPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -821,7 +839,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
 
             if ($this->collCouponRules !== null) {
                 foreach ($this->collCouponRules as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -854,34 +872,34 @@ abstract class BaseCoupon extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(CouponPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(CouponPeer::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = '`code`';
         }
         if ($this->isColumnModified(CouponPeer::ACTION)) {
-            $modifiedColumns[':p' . $index++]  = '`ACTION`';
+            $modifiedColumns[':p' . $index++]  = '`action`';
         }
         if ($this->isColumnModified(CouponPeer::VALUE)) {
-            $modifiedColumns[':p' . $index++]  = '`VALUE`';
+            $modifiedColumns[':p' . $index++]  = '`value`';
         }
         if ($this->isColumnModified(CouponPeer::USED)) {
-            $modifiedColumns[':p' . $index++]  = '`USED`';
+            $modifiedColumns[':p' . $index++]  = '`used`';
         }
         if ($this->isColumnModified(CouponPeer::AVAILABLE_SINCE)) {
-            $modifiedColumns[':p' . $index++]  = '`AVAILABLE_SINCE`';
+            $modifiedColumns[':p' . $index++]  = '`available_since`';
         }
         if ($this->isColumnModified(CouponPeer::DATE_LIMIT)) {
-            $modifiedColumns[':p' . $index++]  = '`DATE_LIMIT`';
+            $modifiedColumns[':p' . $index++]  = '`date_limit`';
         }
         if ($this->isColumnModified(CouponPeer::ACTIVATE)) {
-            $modifiedColumns[':p' . $index++]  = '`ACTIVATE`';
+            $modifiedColumns[':p' . $index++]  = '`activate`';
         }
         if ($this->isColumnModified(CouponPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(CouponPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -894,34 +912,34 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`code`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`ACTION`':
+                    case '`action`':
                         $stmt->bindValue($identifier, $this->action, PDO::PARAM_STR);
                         break;
-                    case '`VALUE`':
+                    case '`value`':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
-                    case '`USED`':
+                    case '`used`':
                         $stmt->bindValue($identifier, $this->used, PDO::PARAM_INT);
                         break;
-                    case '`AVAILABLE_SINCE`':
+                    case '`available_since`':
                         $stmt->bindValue($identifier, $this->available_since, PDO::PARAM_STR);
                         break;
-                    case '`DATE_LIMIT`':
+                    case '`date_limit`':
                         $stmt->bindValue($identifier, $this->date_limit, PDO::PARAM_STR);
                         break;
-                    case '`ACTIVATE`':
+                    case '`activate`':
                         $stmt->bindValue($identifier, $this->activate, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -992,11 +1010,11 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1417,13 +1435,15 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Coupon The current object (for fluent API support)
      * @see        addCouponRules()
      */
     public function clearCouponRules()
     {
         $this->collCouponRules = null; // important to set this to null since that means it is uninitialized
         $this->collCouponRulesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1495,6 +1515,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
                       $this->collCouponRulesPartial = true;
                     }
 
+                    $collCouponRules->getInternalIterator()->rewind();
                     return $collCouponRules;
                 }
 
@@ -1522,12 +1543,15 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      *
      * @param PropelCollection $couponRules A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Coupon The current object (for fluent API support)
      */
     public function setCouponRules(PropelCollection $couponRules, PropelPDO $con = null)
     {
-        $this->couponRulesScheduledForDeletion = $this->getCouponRules(new Criteria(), $con)->diff($couponRules);
+        $couponRulesToDelete = $this->getCouponRules(new Criteria(), $con)->diff($couponRules);
 
-        foreach ($this->couponRulesScheduledForDeletion as $couponRuleRemoved) {
+        $this->couponRulesScheduledForDeletion = unserialize(serialize($couponRulesToDelete));
+
+        foreach ($couponRulesToDelete as $couponRuleRemoved) {
             $couponRuleRemoved->setCoupon(null);
         }
 
@@ -1538,6 +1562,8 @@ abstract class BaseCoupon extends BaseObject implements Persistent
 
         $this->collCouponRules = $couponRules;
         $this->collCouponRulesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1555,22 +1581,22 @@ abstract class BaseCoupon extends BaseObject implements Persistent
         if (null === $this->collCouponRules || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collCouponRules) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getCouponRules());
-                }
-                $query = CouponRuleQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByCoupon($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collCouponRules);
+
+            if($partial && !$criteria) {
+                return count($this->getCouponRules());
+            }
+            $query = CouponRuleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCoupon($this)
+                ->count($con);
         }
+
+        return count($this->collCouponRules);
     }
 
     /**
@@ -1586,7 +1612,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
             $this->initCouponRules();
             $this->collCouponRulesPartial = true;
         }
-        if (!$this->collCouponRules->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collCouponRules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddCouponRule($l);
         }
 
@@ -1604,6 +1630,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
 
     /**
      * @param	CouponRule $couponRule The couponRule object to remove.
+     * @return Coupon The current object (for fluent API support)
      */
     public function removeCouponRule($couponRule)
     {
@@ -1613,9 +1640,11 @@ abstract class BaseCoupon extends BaseObject implements Persistent
                 $this->couponRulesScheduledForDeletion = clone $this->collCouponRules;
                 $this->couponRulesScheduledForDeletion->clear();
             }
-            $this->couponRulesScheduledForDeletion[]= $couponRule;
+            $this->couponRulesScheduledForDeletion[]= clone $couponRule;
             $couponRule->setCoupon(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1635,6 +1664,7 @@ abstract class BaseCoupon extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1652,12 +1682,15 @@ abstract class BaseCoupon extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collCouponRules) {
                 foreach ($this->collCouponRules as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collCouponRules instanceof PropelCollection) {

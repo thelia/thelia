@@ -59,7 +59,6 @@ use Thelia\Model\Product;
  * @method ContentAssoc findOne(PropelPDO $con = null) Return the first ContentAssoc matching the query
  * @method ContentAssoc findOneOrCreate(PropelPDO $con = null) Return the first ContentAssoc matching the query, or a new ContentAssoc object populated from the query conditions when no match is found
  *
- * @method ContentAssoc findOneById(int $id) Return the first ContentAssoc filtered by the id column
  * @method ContentAssoc findOneByCategoryId(int $category_id) Return the first ContentAssoc filtered by the category_id column
  * @method ContentAssoc findOneByProductId(int $product_id) Return the first ContentAssoc filtered by the product_id column
  * @method ContentAssoc findOneByContentId(int $content_id) Return the first ContentAssoc filtered by the content_id column
@@ -95,7 +94,7 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * Returns a new ContentAssocQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     ContentAssocQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   ContentAssocQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return ContentAssocQuery
      */
@@ -152,18 +151,32 @@ abstract class BaseContentAssocQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 ContentAssoc A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   ContentAssoc A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 ContentAssoc A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CATEGORY_ID`, `PRODUCT_ID`, `CONTENT_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `content_assoc` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `category_id`, `product_id`, `content_id`, `position`, `created_at`, `updated_at` FROM `content_assoc` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -259,7 +272,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -272,8 +286,22 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(ContentAssocPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(ContentAssocPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ContentAssocPeer::ID, $id, $comparison);
@@ -286,7 +314,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * <code>
      * $query->filterByCategoryId(1234); // WHERE category_id = 1234
      * $query->filterByCategoryId(array(12, 34)); // WHERE category_id IN (12, 34)
-     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
+     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id >= 12
+     * $query->filterByCategoryId(array('max' => 12)); // WHERE category_id <= 12
      * </code>
      *
      * @see       filterByCategory()
@@ -329,7 +358,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * <code>
      * $query->filterByProductId(1234); // WHERE product_id = 1234
      * $query->filterByProductId(array(12, 34)); // WHERE product_id IN (12, 34)
-     * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
+     * $query->filterByProductId(array('min' => 12)); // WHERE product_id >= 12
+     * $query->filterByProductId(array('max' => 12)); // WHERE product_id <= 12
      * </code>
      *
      * @see       filterByProduct()
@@ -372,7 +402,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * <code>
      * $query->filterByContentId(1234); // WHERE content_id = 1234
      * $query->filterByContentId(array(12, 34)); // WHERE content_id IN (12, 34)
-     * $query->filterByContentId(array('min' => 12)); // WHERE content_id > 12
+     * $query->filterByContentId(array('min' => 12)); // WHERE content_id >= 12
+     * $query->filterByContentId(array('max' => 12)); // WHERE content_id <= 12
      * </code>
      *
      * @see       filterByContent()
@@ -415,7 +446,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -541,8 +573,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ContentAssocQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ContentAssocQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCategory($category, $comparison = null)
     {
@@ -617,8 +649,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ContentAssocQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ContentAssocQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProduct($product, $comparison = null)
     {
@@ -693,8 +725,8 @@ abstract class BaseContentAssocQuery extends ModelCriteria
      * @param   Content|PropelObjectCollection $content The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ContentAssocQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ContentAssocQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByContent($content, $comparison = null)
     {

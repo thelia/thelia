@@ -117,6 +117,12 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Get the [id] column value.
      *
      * @return int
@@ -175,22 +181,25 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -212,22 +221,25 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -238,7 +250,7 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -259,7 +271,7 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      */
     public function setAttributeId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -284,7 +296,7 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      */
     public function setCombinationId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -309,7 +321,7 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      */
     public function setAttributeAvId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -417,7 +429,7 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 6; // 6 = AttributeCombinationPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -680,22 +692,22 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AttributeCombinationPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(AttributeCombinationPeer::ATTRIBUTE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_ID`';
+            $modifiedColumns[':p' . $index++]  = '`attribute_id`';
         }
         if ($this->isColumnModified(AttributeCombinationPeer::COMBINATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`COMBINATION_ID`';
+            $modifiedColumns[':p' . $index++]  = '`combination_id`';
         }
         if ($this->isColumnModified(AttributeCombinationPeer::ATTRIBUTE_AV_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ATTRIBUTE_AV_ID`';
+            $modifiedColumns[':p' . $index++]  = '`attribute_av_id`';
         }
         if ($this->isColumnModified(AttributeCombinationPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(AttributeCombinationPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -708,22 +720,22 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ATTRIBUTE_ID`':
+                    case '`attribute_id`':
                         $stmt->bindValue($identifier, $this->attribute_id, PDO::PARAM_INT);
                         break;
-                    case '`COMBINATION_ID`':
+                    case '`combination_id`':
                         $stmt->bindValue($identifier, $this->combination_id, PDO::PARAM_INT);
                         break;
-                    case '`ATTRIBUTE_AV_ID`':
+                    case '`attribute_av_id`':
                         $stmt->bindValue($identifier, $this->attribute_av_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -794,11 +806,11 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1218,12 +1230,13 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      * Get the associated Attribute object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Attribute The associated Attribute object.
      * @throws PropelException
      */
-    public function getAttribute(PropelPDO $con = null)
+    public function getAttribute(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aAttribute === null && ($this->attribute_id !== null)) {
+        if ($this->aAttribute === null && ($this->attribute_id !== null) && $doQuery) {
             $this->aAttribute = AttributeQuery::create()->findPk($this->attribute_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1269,12 +1282,13 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      * Get the associated AttributeAv object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return AttributeAv The associated AttributeAv object.
      * @throws PropelException
      */
-    public function getAttributeAv(PropelPDO $con = null)
+    public function getAttributeAv(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aAttributeAv === null && ($this->attribute_av_id !== null)) {
+        if ($this->aAttributeAv === null && ($this->attribute_av_id !== null) && $doQuery) {
             $this->aAttributeAv = AttributeAvQuery::create()->findPk($this->attribute_av_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1320,12 +1334,13 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      * Get the associated Combination object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Combination The associated Combination object.
      * @throws PropelException
      */
-    public function getCombination(PropelPDO $con = null)
+    public function getCombination(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aCombination === null && ($this->combination_id !== null)) {
+        if ($this->aCombination === null && ($this->combination_id !== null) && $doQuery) {
             $this->aCombination = CombinationQuery::create()->findPk($this->combination_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1352,6 +1367,7 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1369,7 +1385,19 @@ abstract class BaseAttributeCombination extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aAttribute instanceof Persistent) {
+              $this->aAttribute->clearAllReferences($deep);
+            }
+            if ($this->aAttributeAv instanceof Persistent) {
+              $this->aAttributeAv->clearAllReferences($deep);
+            }
+            if ($this->aCombination instanceof Persistent) {
+              $this->aCombination->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aAttribute = null;

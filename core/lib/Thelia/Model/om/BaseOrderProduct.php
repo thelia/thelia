@@ -149,6 +149,12 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -273,22 +279,25 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -310,22 +319,25 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -336,7 +348,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -357,7 +369,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setOrderId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -382,7 +394,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setProductRef($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -403,7 +415,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setTitle($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -424,7 +436,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setDescription($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -445,7 +457,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setChapo($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -466,7 +478,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setQuantity($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -487,7 +499,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setPrice($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -508,7 +520,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setTax($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (double) $v;
         }
 
@@ -529,7 +541,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function setParent($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -639,7 +651,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 12; // 12 = OrderProductPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -866,7 +878,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
 
             if ($this->collOrderFeatures !== null) {
                 foreach ($this->collOrderFeatures as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -899,40 +911,40 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderProductPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(OrderProductPeer::ORDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ORDER_ID`';
+            $modifiedColumns[':p' . $index++]  = '`order_id`';
         }
         if ($this->isColumnModified(OrderProductPeer::PRODUCT_REF)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_REF`';
+            $modifiedColumns[':p' . $index++]  = '`product_ref`';
         }
         if ($this->isColumnModified(OrderProductPeer::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE`';
+            $modifiedColumns[':p' . $index++]  = '`title`';
         }
         if ($this->isColumnModified(OrderProductPeer::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = '`description`';
         }
         if ($this->isColumnModified(OrderProductPeer::CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = '`CHAPO`';
+            $modifiedColumns[':p' . $index++]  = '`chapo`';
         }
         if ($this->isColumnModified(OrderProductPeer::QUANTITY)) {
-            $modifiedColumns[':p' . $index++]  = '`QUANTITY`';
+            $modifiedColumns[':p' . $index++]  = '`quantity`';
         }
         if ($this->isColumnModified(OrderProductPeer::PRICE)) {
-            $modifiedColumns[':p' . $index++]  = '`PRICE`';
+            $modifiedColumns[':p' . $index++]  = '`price`';
         }
         if ($this->isColumnModified(OrderProductPeer::TAX)) {
-            $modifiedColumns[':p' . $index++]  = '`TAX`';
+            $modifiedColumns[':p' . $index++]  = '`tax`';
         }
         if ($this->isColumnModified(OrderProductPeer::PARENT)) {
-            $modifiedColumns[':p' . $index++]  = '`PARENT`';
+            $modifiedColumns[':p' . $index++]  = '`parent`';
         }
         if ($this->isColumnModified(OrderProductPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(OrderProductPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -945,40 +957,40 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`ORDER_ID`':
+                    case '`order_id`':
                         $stmt->bindValue($identifier, $this->order_id, PDO::PARAM_INT);
                         break;
-                    case '`PRODUCT_REF`':
+                    case '`product_ref`':
                         $stmt->bindValue($identifier, $this->product_ref, PDO::PARAM_STR);
                         break;
-                    case '`TITLE`':
+                    case '`title`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`DESCRIPTION`':
+                    case '`description`':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case '`CHAPO`':
+                    case '`chapo`':
                         $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
                         break;
-                    case '`QUANTITY`':
+                    case '`quantity`':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
                         break;
-                    case '`PRICE`':
+                    case '`price`':
                         $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
                         break;
-                    case '`TAX`':
+                    case '`tax`':
                         $stmt->bindValue($identifier, $this->tax, PDO::PARAM_STR);
                         break;
-                    case '`PARENT`':
+                    case '`parent`':
                         $stmt->bindValue($identifier, $this->parent, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -1049,11 +1061,11 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1519,12 +1531,13 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      * Get the associated Order object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Order The associated Order object.
      * @throws PropelException
      */
-    public function getOrder(PropelPDO $con = null)
+    public function getOrder(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aOrder === null && ($this->order_id !== null)) {
+        if ($this->aOrder === null && ($this->order_id !== null) && $doQuery) {
             $this->aOrder = OrderQuery::create()->findPk($this->order_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1560,13 +1573,15 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return OrderProduct The current object (for fluent API support)
      * @see        addOrderFeatures()
      */
     public function clearOrderFeatures()
     {
         $this->collOrderFeatures = null; // important to set this to null since that means it is uninitialized
         $this->collOrderFeaturesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1638,6 +1653,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
                       $this->collOrderFeaturesPartial = true;
                     }
 
+                    $collOrderFeatures->getInternalIterator()->rewind();
                     return $collOrderFeatures;
                 }
 
@@ -1665,12 +1681,15 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      *
      * @param PropelCollection $orderFeatures A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return OrderProduct The current object (for fluent API support)
      */
     public function setOrderFeatures(PropelCollection $orderFeatures, PropelPDO $con = null)
     {
-        $this->orderFeaturesScheduledForDeletion = $this->getOrderFeatures(new Criteria(), $con)->diff($orderFeatures);
+        $orderFeaturesToDelete = $this->getOrderFeatures(new Criteria(), $con)->diff($orderFeatures);
 
-        foreach ($this->orderFeaturesScheduledForDeletion as $orderFeatureRemoved) {
+        $this->orderFeaturesScheduledForDeletion = unserialize(serialize($orderFeaturesToDelete));
+
+        foreach ($orderFeaturesToDelete as $orderFeatureRemoved) {
             $orderFeatureRemoved->setOrderProduct(null);
         }
 
@@ -1681,6 +1700,8 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
 
         $this->collOrderFeatures = $orderFeatures;
         $this->collOrderFeaturesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1698,22 +1719,22 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
         if (null === $this->collOrderFeatures || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collOrderFeatures) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getOrderFeatures());
-                }
-                $query = OrderFeatureQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByOrderProduct($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collOrderFeatures);
+
+            if($partial && !$criteria) {
+                return count($this->getOrderFeatures());
+            }
+            $query = OrderFeatureQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByOrderProduct($this)
+                ->count($con);
         }
+
+        return count($this->collOrderFeatures);
     }
 
     /**
@@ -1729,7 +1750,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
             $this->initOrderFeatures();
             $this->collOrderFeaturesPartial = true;
         }
-        if (!$this->collOrderFeatures->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collOrderFeatures->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddOrderFeature($l);
         }
 
@@ -1747,6 +1768,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
 
     /**
      * @param	OrderFeature $orderFeature The orderFeature object to remove.
+     * @return OrderProduct The current object (for fluent API support)
      */
     public function removeOrderFeature($orderFeature)
     {
@@ -1756,9 +1778,11 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
                 $this->orderFeaturesScheduledForDeletion = clone $this->collOrderFeatures;
                 $this->orderFeaturesScheduledForDeletion->clear();
             }
-            $this->orderFeaturesScheduledForDeletion[]= $orderFeature;
+            $this->orderFeaturesScheduledForDeletion[]= clone $orderFeature;
             $orderFeature->setOrderProduct(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1780,6 +1804,7 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1797,12 +1822,18 @@ abstract class BaseOrderProduct extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collOrderFeatures) {
                 foreach ($this->collOrderFeatures as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aOrder instanceof Persistent) {
+              $this->aOrder->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collOrderFeatures instanceof PropelCollection) {

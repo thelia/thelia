@@ -42,15 +42,15 @@ class ImageTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', false, null, null);
-        $this->addForeignKey('CATEGORY_ID', 'CategoryId', 'INTEGER', 'category', 'ID', false, null, null);
-        $this->addForeignKey('FOLDER_ID', 'FolderId', 'INTEGER', 'folder', 'ID', false, null, null);
-        $this->addForeignKey('CONTENT_ID', 'ContentId', 'INTEGER', 'content', 'ID', false, null, null);
-        $this->addColumn('FILE', 'File', 'VARCHAR', true, 255, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('product_id', 'ProductId', 'INTEGER', 'product', 'id', false, null, null);
+        $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', false, null, null);
+        $this->addForeignKey('folder_id', 'FolderId', 'INTEGER', 'folder', 'id', false, null, null);
+        $this->addForeignKey('content_id', 'ContentId', 'INTEGER', 'content', 'id', false, null, null);
+        $this->addColumn('file', 'File', 'VARCHAR', true, 255, null);
+        $this->addColumn('position', 'Position', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -75,8 +75,20 @@ class ImageTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
+            'i18n' =>  array (
+  'i18n_table' => '%TABLE%_i18n',
+  'i18n_phpname' => '%PHPNAME%I18n',
+  'i18n_columns' => 'title, description, chapo, postscriptum',
+  'i18n_pk_name' => NULL,
+  'locale_column' => 'locale',
+  'default_locale' => NULL,
+  'locale_alias' => '',
+),
         );
     } // getBehaviors()
 

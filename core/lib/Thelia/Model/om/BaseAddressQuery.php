@@ -72,7 +72,6 @@ use Thelia\Model\CustomerTitle;
  * @method Address findOne(PropelPDO $con = null) Return the first Address matching the query
  * @method Address findOneOrCreate(PropelPDO $con = null) Return the first Address matching the query, or a new Address object populated from the query conditions when no match is found
  *
- * @method Address findOneById(int $id) Return the first Address filtered by the id column
  * @method Address findOneByTitle(string $title) Return the first Address filtered by the title column
  * @method Address findOneByCustomerId(int $customer_id) Return the first Address filtered by the customer_id column
  * @method Address findOneByCustomerTitleId(int $customer_title_id) Return the first Address filtered by the customer_title_id column
@@ -126,7 +125,7 @@ abstract class BaseAddressQuery extends ModelCriteria
      * Returns a new AddressQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AddressQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AddressQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AddressQuery
      */
@@ -183,18 +182,32 @@ abstract class BaseAddressQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Address A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Address A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Address A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TITLE`, `CUSTOMER_ID`, `CUSTOMER_TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `COUNTRY_ID`, `PHONE`, `CREATED_AT`, `UPDATED_AT` FROM `address` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `title`, `customer_id`, `customer_title_id`, `company`, `firstname`, `lastname`, `address1`, `address2`, `address3`, `zipcode`, `city`, `country_id`, `phone`, `created_at`, `updated_at` FROM `address` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -290,7 +303,8 @@ abstract class BaseAddressQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -303,8 +317,22 @@ abstract class BaseAddressQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(AddressPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(AddressPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AddressPeer::ID, $id, $comparison);
@@ -346,7 +374,8 @@ abstract class BaseAddressQuery extends ModelCriteria
      * <code>
      * $query->filterByCustomerId(1234); // WHERE customer_id = 1234
      * $query->filterByCustomerId(array(12, 34)); // WHERE customer_id IN (12, 34)
-     * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id > 12
+     * $query->filterByCustomerId(array('min' => 12)); // WHERE customer_id >= 12
+     * $query->filterByCustomerId(array('max' => 12)); // WHERE customer_id <= 12
      * </code>
      *
      * @see       filterByCustomer()
@@ -389,7 +418,8 @@ abstract class BaseAddressQuery extends ModelCriteria
      * <code>
      * $query->filterByCustomerTitleId(1234); // WHERE customer_title_id = 1234
      * $query->filterByCustomerTitleId(array(12, 34)); // WHERE customer_title_id IN (12, 34)
-     * $query->filterByCustomerTitleId(array('min' => 12)); // WHERE customer_title_id > 12
+     * $query->filterByCustomerTitleId(array('min' => 12)); // WHERE customer_title_id >= 12
+     * $query->filterByCustomerTitleId(array('max' => 12)); // WHERE customer_title_id <= 12
      * </code>
      *
      * @see       filterByCustomerTitle()
@@ -664,7 +694,8 @@ abstract class BaseAddressQuery extends ModelCriteria
      * <code>
      * $query->filterByCountryId(1234); // WHERE country_id = 1234
      * $query->filterByCountryId(array(12, 34)); // WHERE country_id IN (12, 34)
-     * $query->filterByCountryId(array('min' => 12)); // WHERE country_id > 12
+     * $query->filterByCountryId(array('min' => 12)); // WHERE country_id >= 12
+     * $query->filterByCountryId(array('max' => 12)); // WHERE country_id <= 12
      * </code>
      *
      * @param     mixed $countryId The value to use as filter.
@@ -819,8 +850,8 @@ abstract class BaseAddressQuery extends ModelCriteria
      * @param   Customer|PropelObjectCollection $customer The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AddressQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AddressQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCustomer($customer, $comparison = null)
     {
@@ -895,8 +926,8 @@ abstract class BaseAddressQuery extends ModelCriteria
      * @param   CustomerTitle|PropelObjectCollection $customerTitle The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AddressQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AddressQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCustomerTitle($customerTitle, $comparison = null)
     {

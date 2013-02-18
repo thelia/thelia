@@ -42,14 +42,14 @@ class ContentVersionTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'content', 'ID', true, null, null);
-        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', false, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'content', 'id', true, null, null);
+        $this->addColumn('visible', 'Visible', 'TINYINT', false, null, null);
+        $this->addColumn('position', 'Position', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('version', 'Version', 'INTEGER', true, null, 0);
+        $this->addColumn('version_created_at', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version_created_by', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 

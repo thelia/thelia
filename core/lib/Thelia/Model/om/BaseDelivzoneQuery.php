@@ -45,7 +45,6 @@ use Thelia\Model\DelivzoneQuery;
  * @method Delivzone findOne(PropelPDO $con = null) Return the first Delivzone matching the query
  * @method Delivzone findOneOrCreate(PropelPDO $con = null) Return the first Delivzone matching the query, or a new Delivzone object populated from the query conditions when no match is found
  *
- * @method Delivzone findOneById(int $id) Return the first Delivzone filtered by the id column
  * @method Delivzone findOneByAreaId(int $area_id) Return the first Delivzone filtered by the area_id column
  * @method Delivzone findOneByDelivery(string $delivery) Return the first Delivzone filtered by the delivery column
  * @method Delivzone findOneByCreatedAt(string $created_at) Return the first Delivzone filtered by the created_at column
@@ -77,7 +76,7 @@ abstract class BaseDelivzoneQuery extends ModelCriteria
      * Returns a new DelivzoneQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     DelivzoneQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   DelivzoneQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return DelivzoneQuery
      */
@@ -134,18 +133,32 @@ abstract class BaseDelivzoneQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Delivzone A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Delivzone A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Delivzone A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `AREA_ID`, `DELIVERY`, `CREATED_AT`, `UPDATED_AT` FROM `delivzone` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `area_id`, `delivery`, `created_at`, `updated_at` FROM `delivzone` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -241,7 +254,8 @@ abstract class BaseDelivzoneQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -254,8 +268,22 @@ abstract class BaseDelivzoneQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(DelivzonePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(DelivzonePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(DelivzonePeer::ID, $id, $comparison);
@@ -268,7 +296,8 @@ abstract class BaseDelivzoneQuery extends ModelCriteria
      * <code>
      * $query->filterByAreaId(1234); // WHERE area_id = 1234
      * $query->filterByAreaId(array(12, 34)); // WHERE area_id IN (12, 34)
-     * $query->filterByAreaId(array('min' => 12)); // WHERE area_id > 12
+     * $query->filterByAreaId(array('min' => 12)); // WHERE area_id >= 12
+     * $query->filterByAreaId(array('max' => 12)); // WHERE area_id <= 12
      * </code>
      *
      * @see       filterByArea()
@@ -425,8 +454,8 @@ abstract class BaseDelivzoneQuery extends ModelCriteria
      * @param   Area|PropelObjectCollection $area The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DelivzoneQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DelivzoneQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByArea($area, $comparison = null)
     {

@@ -117,13 +117,19 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -194,22 +200,25 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -231,22 +240,25 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -257,7 +269,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -278,7 +290,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      */
     public function setPosition($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -380,7 +392,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 4; // 4 = AttributePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -597,7 +609,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
             if ($this->collAttributeAvs !== null) {
                 foreach ($this->collAttributeAvs as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -614,7 +626,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
             if ($this->collAttributeCombinations !== null) {
                 foreach ($this->collAttributeCombinations as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -631,7 +643,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
             if ($this->collAttributeCategorys !== null) {
                 foreach ($this->collAttributeCategorys as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -648,7 +660,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
             if ($this->collAttributeI18ns !== null) {
                 foreach ($this->collAttributeI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -681,16 +693,16 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AttributePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(AttributePeer::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = '`position`';
         }
         if ($this->isColumnModified(AttributePeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(AttributePeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -703,16 +715,16 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case '`position`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -783,11 +795,11 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1208,13 +1220,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Attribute The current object (for fluent API support)
      * @see        addAttributeAvs()
      */
     public function clearAttributeAvs()
     {
         $this->collAttributeAvs = null; // important to set this to null since that means it is uninitialized
         $this->collAttributeAvsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1286,6 +1300,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                       $this->collAttributeAvsPartial = true;
                     }
 
+                    $collAttributeAvs->getInternalIterator()->rewind();
                     return $collAttributeAvs;
                 }
 
@@ -1313,12 +1328,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @param PropelCollection $attributeAvs A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Attribute The current object (for fluent API support)
      */
     public function setAttributeAvs(PropelCollection $attributeAvs, PropelPDO $con = null)
     {
-        $this->attributeAvsScheduledForDeletion = $this->getAttributeAvs(new Criteria(), $con)->diff($attributeAvs);
+        $attributeAvsToDelete = $this->getAttributeAvs(new Criteria(), $con)->diff($attributeAvs);
 
-        foreach ($this->attributeAvsScheduledForDeletion as $attributeAvRemoved) {
+        $this->attributeAvsScheduledForDeletion = unserialize(serialize($attributeAvsToDelete));
+
+        foreach ($attributeAvsToDelete as $attributeAvRemoved) {
             $attributeAvRemoved->setAttribute(null);
         }
 
@@ -1329,6 +1347,8 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
         $this->collAttributeAvs = $attributeAvs;
         $this->collAttributeAvsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1346,22 +1366,22 @@ abstract class BaseAttribute extends BaseObject implements Persistent
         if (null === $this->collAttributeAvs || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAttributeAvs) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAttributeAvs());
-                }
-                $query = AttributeAvQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAttribute($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAttributeAvs);
+
+            if($partial && !$criteria) {
+                return count($this->getAttributeAvs());
+            }
+            $query = AttributeAvQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAttribute($this)
+                ->count($con);
         }
+
+        return count($this->collAttributeAvs);
     }
 
     /**
@@ -1377,7 +1397,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $this->initAttributeAvs();
             $this->collAttributeAvsPartial = true;
         }
-        if (!$this->collAttributeAvs->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collAttributeAvs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddAttributeAv($l);
         }
 
@@ -1395,6 +1415,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
     /**
      * @param	AttributeAv $attributeAv The attributeAv object to remove.
+     * @return Attribute The current object (for fluent API support)
      */
     public function removeAttributeAv($attributeAv)
     {
@@ -1404,9 +1425,11 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                 $this->attributeAvsScheduledForDeletion = clone $this->collAttributeAvs;
                 $this->attributeAvsScheduledForDeletion->clear();
             }
-            $this->attributeAvsScheduledForDeletion[]= $attributeAv;
+            $this->attributeAvsScheduledForDeletion[]= clone $attributeAv;
             $attributeAv->setAttribute(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1415,13 +1438,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Attribute The current object (for fluent API support)
      * @see        addAttributeCombinations()
      */
     public function clearAttributeCombinations()
     {
         $this->collAttributeCombinations = null; // important to set this to null since that means it is uninitialized
         $this->collAttributeCombinationsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1493,6 +1518,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                       $this->collAttributeCombinationsPartial = true;
                     }
 
+                    $collAttributeCombinations->getInternalIterator()->rewind();
                     return $collAttributeCombinations;
                 }
 
@@ -1520,12 +1546,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @param PropelCollection $attributeCombinations A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Attribute The current object (for fluent API support)
      */
     public function setAttributeCombinations(PropelCollection $attributeCombinations, PropelPDO $con = null)
     {
-        $this->attributeCombinationsScheduledForDeletion = $this->getAttributeCombinations(new Criteria(), $con)->diff($attributeCombinations);
+        $attributeCombinationsToDelete = $this->getAttributeCombinations(new Criteria(), $con)->diff($attributeCombinations);
 
-        foreach ($this->attributeCombinationsScheduledForDeletion as $attributeCombinationRemoved) {
+        $this->attributeCombinationsScheduledForDeletion = unserialize(serialize($attributeCombinationsToDelete));
+
+        foreach ($attributeCombinationsToDelete as $attributeCombinationRemoved) {
             $attributeCombinationRemoved->setAttribute(null);
         }
 
@@ -1536,6 +1565,8 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
         $this->collAttributeCombinations = $attributeCombinations;
         $this->collAttributeCombinationsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1553,22 +1584,22 @@ abstract class BaseAttribute extends BaseObject implements Persistent
         if (null === $this->collAttributeCombinations || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAttributeCombinations) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAttributeCombinations());
-                }
-                $query = AttributeCombinationQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAttribute($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAttributeCombinations);
+
+            if($partial && !$criteria) {
+                return count($this->getAttributeCombinations());
+            }
+            $query = AttributeCombinationQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAttribute($this)
+                ->count($con);
         }
+
+        return count($this->collAttributeCombinations);
     }
 
     /**
@@ -1584,7 +1615,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $this->initAttributeCombinations();
             $this->collAttributeCombinationsPartial = true;
         }
-        if (!$this->collAttributeCombinations->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collAttributeCombinations->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddAttributeCombination($l);
         }
 
@@ -1602,6 +1633,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
     /**
      * @param	AttributeCombination $attributeCombination The attributeCombination object to remove.
+     * @return Attribute The current object (for fluent API support)
      */
     public function removeAttributeCombination($attributeCombination)
     {
@@ -1611,9 +1643,11 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                 $this->attributeCombinationsScheduledForDeletion = clone $this->collAttributeCombinations;
                 $this->attributeCombinationsScheduledForDeletion->clear();
             }
-            $this->attributeCombinationsScheduledForDeletion[]= $attributeCombination;
+            $this->attributeCombinationsScheduledForDeletion[]= clone $attributeCombination;
             $attributeCombination->setAttribute(null);
         }
+
+        return $this;
     }
 
 
@@ -1672,13 +1706,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Attribute The current object (for fluent API support)
      * @see        addAttributeCategorys()
      */
     public function clearAttributeCategorys()
     {
         $this->collAttributeCategorys = null; // important to set this to null since that means it is uninitialized
         $this->collAttributeCategorysPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1750,6 +1786,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                       $this->collAttributeCategorysPartial = true;
                     }
 
+                    $collAttributeCategorys->getInternalIterator()->rewind();
                     return $collAttributeCategorys;
                 }
 
@@ -1777,12 +1814,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @param PropelCollection $attributeCategorys A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Attribute The current object (for fluent API support)
      */
     public function setAttributeCategorys(PropelCollection $attributeCategorys, PropelPDO $con = null)
     {
-        $this->attributeCategorysScheduledForDeletion = $this->getAttributeCategorys(new Criteria(), $con)->diff($attributeCategorys);
+        $attributeCategorysToDelete = $this->getAttributeCategorys(new Criteria(), $con)->diff($attributeCategorys);
 
-        foreach ($this->attributeCategorysScheduledForDeletion as $attributeCategoryRemoved) {
+        $this->attributeCategorysScheduledForDeletion = unserialize(serialize($attributeCategorysToDelete));
+
+        foreach ($attributeCategorysToDelete as $attributeCategoryRemoved) {
             $attributeCategoryRemoved->setAttribute(null);
         }
 
@@ -1793,6 +1833,8 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
         $this->collAttributeCategorys = $attributeCategorys;
         $this->collAttributeCategorysPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1810,22 +1852,22 @@ abstract class BaseAttribute extends BaseObject implements Persistent
         if (null === $this->collAttributeCategorys || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAttributeCategorys) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAttributeCategorys());
-                }
-                $query = AttributeCategoryQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAttribute($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAttributeCategorys);
+
+            if($partial && !$criteria) {
+                return count($this->getAttributeCategorys());
+            }
+            $query = AttributeCategoryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAttribute($this)
+                ->count($con);
         }
+
+        return count($this->collAttributeCategorys);
     }
 
     /**
@@ -1841,7 +1883,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $this->initAttributeCategorys();
             $this->collAttributeCategorysPartial = true;
         }
-        if (!$this->collAttributeCategorys->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collAttributeCategorys->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddAttributeCategory($l);
         }
 
@@ -1859,6 +1901,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
     /**
      * @param	AttributeCategory $attributeCategory The attributeCategory object to remove.
+     * @return Attribute The current object (for fluent API support)
      */
     public function removeAttributeCategory($attributeCategory)
     {
@@ -1868,9 +1911,11 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                 $this->attributeCategorysScheduledForDeletion = clone $this->collAttributeCategorys;
                 $this->attributeCategorysScheduledForDeletion->clear();
             }
-            $this->attributeCategorysScheduledForDeletion[]= $attributeCategory;
+            $this->attributeCategorysScheduledForDeletion[]= clone $attributeCategory;
             $attributeCategory->setAttribute(null);
         }
+
+        return $this;
     }
 
 
@@ -1904,13 +1949,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Attribute The current object (for fluent API support)
      * @see        addAttributeI18ns()
      */
     public function clearAttributeI18ns()
     {
         $this->collAttributeI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collAttributeI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1982,6 +2029,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                       $this->collAttributeI18nsPartial = true;
                     }
 
+                    $collAttributeI18ns->getInternalIterator()->rewind();
                     return $collAttributeI18ns;
                 }
 
@@ -2009,12 +2057,15 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @param PropelCollection $attributeI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Attribute The current object (for fluent API support)
      */
     public function setAttributeI18ns(PropelCollection $attributeI18ns, PropelPDO $con = null)
     {
-        $this->attributeI18nsScheduledForDeletion = $this->getAttributeI18ns(new Criteria(), $con)->diff($attributeI18ns);
+        $attributeI18nsToDelete = $this->getAttributeI18ns(new Criteria(), $con)->diff($attributeI18ns);
 
-        foreach ($this->attributeI18nsScheduledForDeletion as $attributeI18nRemoved) {
+        $this->attributeI18nsScheduledForDeletion = unserialize(serialize($attributeI18nsToDelete));
+
+        foreach ($attributeI18nsToDelete as $attributeI18nRemoved) {
             $attributeI18nRemoved->setAttribute(null);
         }
 
@@ -2025,6 +2076,8 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
         $this->collAttributeI18ns = $attributeI18ns;
         $this->collAttributeI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2042,22 +2095,22 @@ abstract class BaseAttribute extends BaseObject implements Persistent
         if (null === $this->collAttributeI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAttributeI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAttributeI18ns());
-                }
-                $query = AttributeI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAttribute($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAttributeI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getAttributeI18ns());
+            }
+            $query = AttributeI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAttribute($this)
+                ->count($con);
         }
+
+        return count($this->collAttributeI18ns);
     }
 
     /**
@@ -2077,7 +2130,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
             $this->initAttributeI18ns();
             $this->collAttributeI18nsPartial = true;
         }
-        if (!$this->collAttributeI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collAttributeI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddAttributeI18n($l);
         }
 
@@ -2095,6 +2148,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
 
     /**
      * @param	AttributeI18n $attributeI18n The attributeI18n object to remove.
+     * @return Attribute The current object (for fluent API support)
      */
     public function removeAttributeI18n($attributeI18n)
     {
@@ -2104,9 +2158,11 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                 $this->attributeI18nsScheduledForDeletion = clone $this->collAttributeI18ns;
                 $this->attributeI18nsScheduledForDeletion->clear();
             }
-            $this->attributeI18nsScheduledForDeletion[]= $attributeI18n;
+            $this->attributeI18nsScheduledForDeletion[]= clone $attributeI18n;
             $attributeI18n->setAttribute(null);
         }
+
+        return $this;
     }
 
     /**
@@ -2120,6 +2176,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -2137,7 +2194,8 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collAttributeAvs) {
                 foreach ($this->collAttributeAvs as $o) {
                     $o->clearAllReferences($deep);
@@ -2158,10 +2216,12 @@ abstract class BaseAttribute extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collAttributeAvs instanceof PropelCollection) {
@@ -2225,7 +2285,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @return    Attribute The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -2249,7 +2309,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return AttributeI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collAttributeI18ns) {
@@ -2284,7 +2344,7 @@ abstract class BaseAttribute extends BaseObject implements Persistent
      *
      * @return    Attribute The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             AttributeI18nQuery::create()

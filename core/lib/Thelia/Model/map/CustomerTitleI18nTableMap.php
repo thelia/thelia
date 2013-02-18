@@ -42,10 +42,10 @@ class CustomerTitleI18nTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'customer_title', 'ID', true, null, null);
-        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
-        $this->addColumn('SHORT', 'Short', 'VARCHAR', false, 10, null);
-        $this->addColumn('LONG', 'Long', 'VARCHAR', false, 45, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'customer_title', 'id', true, null, null);
+        $this->addPrimaryKey('locale', 'Locale', 'VARCHAR', true, 5, 'en_US');
+        $this->addColumn('short', 'Short', 'VARCHAR', false, 10, null);
+        $this->addColumn('long', 'Long', 'VARCHAR', false, 45, null);
         // validators
     } // initialize()
 

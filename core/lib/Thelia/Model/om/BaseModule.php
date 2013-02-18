@@ -119,13 +119,19 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -214,22 +220,25 @@ abstract class BaseModule extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -251,22 +260,25 @@ abstract class BaseModule extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -277,7 +289,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -298,7 +310,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     public function setCode($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -319,7 +331,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     public function set type($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -340,7 +352,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     public function setActivate($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -361,7 +373,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     public function setPosition($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -466,7 +478,7 @@ abstract class BaseModule extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 7; // 7 = ModulePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -680,7 +692,7 @@ abstract class BaseModule extends BaseObject implements Persistent
 
             if ($this->collGroupModules !== null) {
                 foreach ($this->collGroupModules as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -697,7 +709,7 @@ abstract class BaseModule extends BaseObject implements Persistent
 
             if ($this->collModuleI18ns !== null) {
                 foreach ($this->collModuleI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -726,25 +738,25 @@ abstract class BaseModule extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ModulePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(ModulePeer::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = '`code`';
         }
         if ($this->isColumnModified(ModulePeer:: TYPE)) {
-            $modifiedColumns[':p' . $index++]  = '` TYPE`';
+            $modifiedColumns[':p' . $index++]  = '` type`';
         }
         if ($this->isColumnModified(ModulePeer::ACTIVATE)) {
-            $modifiedColumns[':p' . $index++]  = '`ACTIVATE`';
+            $modifiedColumns[':p' . $index++]  = '`activate`';
         }
         if ($this->isColumnModified(ModulePeer::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = '`position`';
         }
         if ($this->isColumnModified(ModulePeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(ModulePeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -757,25 +769,25 @@ abstract class BaseModule extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`code`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '` TYPE`':
+                    case '` type`':
                         $stmt->bindValue($identifier, $this-> type, PDO::PARAM_INT);
                         break;
-                    case '`ACTIVATE`':
+                    case '`activate`':
                         $stmt->bindValue($identifier, $this->activate, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case '`position`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -839,11 +851,11 @@ abstract class BaseModule extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1254,13 +1266,15 @@ abstract class BaseModule extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Module The current object (for fluent API support)
      * @see        addGroupModules()
      */
     public function clearGroupModules()
     {
         $this->collGroupModules = null; // important to set this to null since that means it is uninitialized
         $this->collGroupModulesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1332,6 +1346,7 @@ abstract class BaseModule extends BaseObject implements Persistent
                       $this->collGroupModulesPartial = true;
                     }
 
+                    $collGroupModules->getInternalIterator()->rewind();
                     return $collGroupModules;
                 }
 
@@ -1359,12 +1374,15 @@ abstract class BaseModule extends BaseObject implements Persistent
      *
      * @param PropelCollection $groupModules A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Module The current object (for fluent API support)
      */
     public function setGroupModules(PropelCollection $groupModules, PropelPDO $con = null)
     {
-        $this->groupModulesScheduledForDeletion = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
+        $groupModulesToDelete = $this->getGroupModules(new Criteria(), $con)->diff($groupModules);
 
-        foreach ($this->groupModulesScheduledForDeletion as $groupModuleRemoved) {
+        $this->groupModulesScheduledForDeletion = unserialize(serialize($groupModulesToDelete));
+
+        foreach ($groupModulesToDelete as $groupModuleRemoved) {
             $groupModuleRemoved->setModule(null);
         }
 
@@ -1375,6 +1393,8 @@ abstract class BaseModule extends BaseObject implements Persistent
 
         $this->collGroupModules = $groupModules;
         $this->collGroupModulesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1392,22 +1412,22 @@ abstract class BaseModule extends BaseObject implements Persistent
         if (null === $this->collGroupModules || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collGroupModules) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getGroupModules());
-                }
-                $query = GroupModuleQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByModule($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collGroupModules);
+
+            if($partial && !$criteria) {
+                return count($this->getGroupModules());
+            }
+            $query = GroupModuleQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
         }
+
+        return count($this->collGroupModules);
     }
 
     /**
@@ -1423,7 +1443,7 @@ abstract class BaseModule extends BaseObject implements Persistent
             $this->initGroupModules();
             $this->collGroupModulesPartial = true;
         }
-        if (!$this->collGroupModules->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collGroupModules->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddGroupModule($l);
         }
 
@@ -1441,6 +1461,7 @@ abstract class BaseModule extends BaseObject implements Persistent
 
     /**
      * @param	GroupModule $groupModule The groupModule object to remove.
+     * @return Module The current object (for fluent API support)
      */
     public function removeGroupModule($groupModule)
     {
@@ -1453,6 +1474,8 @@ abstract class BaseModule extends BaseObject implements Persistent
             $this->groupModulesScheduledForDeletion[]= $groupModule;
             $groupModule->setModule(null);
         }
+
+        return $this;
     }
 
 
@@ -1486,13 +1509,15 @@ abstract class BaseModule extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Module The current object (for fluent API support)
      * @see        addModuleI18ns()
      */
     public function clearModuleI18ns()
     {
         $this->collModuleI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collModuleI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1564,6 +1589,7 @@ abstract class BaseModule extends BaseObject implements Persistent
                       $this->collModuleI18nsPartial = true;
                     }
 
+                    $collModuleI18ns->getInternalIterator()->rewind();
                     return $collModuleI18ns;
                 }
 
@@ -1591,12 +1617,15 @@ abstract class BaseModule extends BaseObject implements Persistent
      *
      * @param PropelCollection $moduleI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Module The current object (for fluent API support)
      */
     public function setModuleI18ns(PropelCollection $moduleI18ns, PropelPDO $con = null)
     {
-        $this->moduleI18nsScheduledForDeletion = $this->getModuleI18ns(new Criteria(), $con)->diff($moduleI18ns);
+        $moduleI18nsToDelete = $this->getModuleI18ns(new Criteria(), $con)->diff($moduleI18ns);
 
-        foreach ($this->moduleI18nsScheduledForDeletion as $moduleI18nRemoved) {
+        $this->moduleI18nsScheduledForDeletion = unserialize(serialize($moduleI18nsToDelete));
+
+        foreach ($moduleI18nsToDelete as $moduleI18nRemoved) {
             $moduleI18nRemoved->setModule(null);
         }
 
@@ -1607,6 +1636,8 @@ abstract class BaseModule extends BaseObject implements Persistent
 
         $this->collModuleI18ns = $moduleI18ns;
         $this->collModuleI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1624,22 +1655,22 @@ abstract class BaseModule extends BaseObject implements Persistent
         if (null === $this->collModuleI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collModuleI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getModuleI18ns());
-                }
-                $query = ModuleI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByModule($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collModuleI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getModuleI18ns());
+            }
+            $query = ModuleI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByModule($this)
+                ->count($con);
         }
+
+        return count($this->collModuleI18ns);
     }
 
     /**
@@ -1659,7 +1690,7 @@ abstract class BaseModule extends BaseObject implements Persistent
             $this->initModuleI18ns();
             $this->collModuleI18nsPartial = true;
         }
-        if (!$this->collModuleI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collModuleI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddModuleI18n($l);
         }
 
@@ -1677,6 +1708,7 @@ abstract class BaseModule extends BaseObject implements Persistent
 
     /**
      * @param	ModuleI18n $moduleI18n The moduleI18n object to remove.
+     * @return Module The current object (for fluent API support)
      */
     public function removeModuleI18n($moduleI18n)
     {
@@ -1686,9 +1718,11 @@ abstract class BaseModule extends BaseObject implements Persistent
                 $this->moduleI18nsScheduledForDeletion = clone $this->collModuleI18ns;
                 $this->moduleI18nsScheduledForDeletion->clear();
             }
-            $this->moduleI18nsScheduledForDeletion[]= $moduleI18n;
+            $this->moduleI18nsScheduledForDeletion[]= clone $moduleI18n;
             $moduleI18n->setModule(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1705,6 +1739,7 @@ abstract class BaseModule extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1722,7 +1757,8 @@ abstract class BaseModule extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collGroupModules) {
                 foreach ($this->collGroupModules as $o) {
                     $o->clearAllReferences($deep);
@@ -1733,10 +1769,12 @@ abstract class BaseModule extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collGroupModules instanceof PropelCollection) {
@@ -1792,7 +1830,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      *
      * @return    Module The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -1816,7 +1854,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return ModuleI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collModuleI18ns) {
@@ -1851,7 +1889,7 @@ abstract class BaseModule extends BaseObject implements Persistent
      *
      * @return    Module The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             ModuleI18nQuery::create()

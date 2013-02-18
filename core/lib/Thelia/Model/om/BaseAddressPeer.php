@@ -46,53 +46,53 @@ abstract class BaseAddressPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 16;
 
-    /** the column name for the ID field */
-    const ID = 'address.ID';
+    /** the column name for the id field */
+    const ID = 'address.id';
 
-    /** the column name for the TITLE field */
-    const TITLE = 'address.TITLE';
+    /** the column name for the title field */
+    const TITLE = 'address.title';
 
-    /** the column name for the CUSTOMER_ID field */
-    const CUSTOMER_ID = 'address.CUSTOMER_ID';
+    /** the column name for the customer_id field */
+    const CUSTOMER_ID = 'address.customer_id';
 
-    /** the column name for the CUSTOMER_TITLE_ID field */
-    const CUSTOMER_TITLE_ID = 'address.CUSTOMER_TITLE_ID';
+    /** the column name for the customer_title_id field */
+    const CUSTOMER_TITLE_ID = 'address.customer_title_id';
 
-    /** the column name for the COMPANY field */
-    const COMPANY = 'address.COMPANY';
+    /** the column name for the company field */
+    const COMPANY = 'address.company';
 
-    /** the column name for the FIRSTNAME field */
-    const FIRSTNAME = 'address.FIRSTNAME';
+    /** the column name for the firstname field */
+    const FIRSTNAME = 'address.firstname';
 
-    /** the column name for the LASTNAME field */
-    const LASTNAME = 'address.LASTNAME';
+    /** the column name for the lastname field */
+    const LASTNAME = 'address.lastname';
 
-    /** the column name for the ADDRESS1 field */
-    const ADDRESS1 = 'address.ADDRESS1';
+    /** the column name for the address1 field */
+    const ADDRESS1 = 'address.address1';
 
-    /** the column name for the ADDRESS2 field */
-    const ADDRESS2 = 'address.ADDRESS2';
+    /** the column name for the address2 field */
+    const ADDRESS2 = 'address.address2';
 
-    /** the column name for the ADDRESS3 field */
-    const ADDRESS3 = 'address.ADDRESS3';
+    /** the column name for the address3 field */
+    const ADDRESS3 = 'address.address3';
 
-    /** the column name for the ZIPCODE field */
-    const ZIPCODE = 'address.ZIPCODE';
+    /** the column name for the zipcode field */
+    const ZIPCODE = 'address.zipcode';
 
-    /** the column name for the CITY field */
-    const CITY = 'address.CITY';
+    /** the column name for the city field */
+    const CITY = 'address.city';
 
-    /** the column name for the COUNTRY_ID field */
-    const COUNTRY_ID = 'address.COUNTRY_ID';
+    /** the column name for the country_id field */
+    const COUNTRY_ID = 'address.country_id';
 
-    /** the column name for the PHONE field */
-    const PHONE = 'address.PHONE';
+    /** the column name for the phone field */
+    const PHONE = 'address.phone';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'address.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'address.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'address.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'address.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -224,22 +224,22 @@ abstract class BaseAddressPeer
             $criteria->addSelectColumn(AddressPeer::CREATED_AT);
             $criteria->addSelectColumn(AddressPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.CUSTOMER_ID');
-            $criteria->addSelectColumn($alias . '.CUSTOMER_TITLE_ID');
-            $criteria->addSelectColumn($alias . '.COMPANY');
-            $criteria->addSelectColumn($alias . '.FIRSTNAME');
-            $criteria->addSelectColumn($alias . '.LASTNAME');
-            $criteria->addSelectColumn($alias . '.ADDRESS1');
-            $criteria->addSelectColumn($alias . '.ADDRESS2');
-            $criteria->addSelectColumn($alias . '.ADDRESS3');
-            $criteria->addSelectColumn($alias . '.ZIPCODE');
-            $criteria->addSelectColumn($alias . '.CITY');
-            $criteria->addSelectColumn($alias . '.COUNTRY_ID');
-            $criteria->addSelectColumn($alias . '.PHONE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.title');
+            $criteria->addSelectColumn($alias . '.customer_id');
+            $criteria->addSelectColumn($alias . '.customer_title_id');
+            $criteria->addSelectColumn($alias . '.company');
+            $criteria->addSelectColumn($alias . '.firstname');
+            $criteria->addSelectColumn($alias . '.lastname');
+            $criteria->addSelectColumn($alias . '.address1');
+            $criteria->addSelectColumn($alias . '.address2');
+            $criteria->addSelectColumn($alias . '.address3');
+            $criteria->addSelectColumn($alias . '.zipcode');
+            $criteria->addSelectColumn($alias . '.city');
+            $criteria->addSelectColumn($alias . '.country_id');
+            $criteria->addSelectColumn($alias . '.phone');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -323,7 +323,7 @@ abstract class BaseAddressPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -428,8 +428,15 @@ abstract class BaseAddressPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AddressPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AddressPeer::$instances = array();
     }
 
@@ -1195,7 +1202,7 @@ abstract class BaseAddressPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AddressPeer::OM_CLASS;
     }

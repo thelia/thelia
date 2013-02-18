@@ -44,7 +44,6 @@ use Thelia\Model\AdminLogQuery;
  * @method AdminLog findOne(PropelPDO $con = null) Return the first AdminLog matching the query
  * @method AdminLog findOneOrCreate(PropelPDO $con = null) Return the first AdminLog matching the query, or a new AdminLog object populated from the query conditions when no match is found
  *
- * @method AdminLog findOneById(int $id) Return the first AdminLog filtered by the id column
  * @method AdminLog findOneByAdminLogin(string $admin_login) Return the first AdminLog filtered by the admin_login column
  * @method AdminLog findOneByAdminFirstname(string $admin_firstname) Return the first AdminLog filtered by the admin_firstname column
  * @method AdminLog findOneByAdminLastname(string $admin_lastname) Return the first AdminLog filtered by the admin_lastname column
@@ -82,7 +81,7 @@ abstract class BaseAdminLogQuery extends ModelCriteria
      * Returns a new AdminLogQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AdminLogQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AdminLogQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AdminLogQuery
      */
@@ -139,18 +138,32 @@ abstract class BaseAdminLogQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 AdminLog A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   AdminLog A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 AdminLog A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ADMIN_LOGIN`, `ADMIN_FIRSTNAME`, `ADMIN_LASTNAME`, `ACTION`, `REQUEST`, `CREATED_AT`, `UPDATED_AT` FROM `admin_log` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `admin_login`, `admin_firstname`, `admin_lastname`, `action`, `request`, `created_at`, `updated_at` FROM `admin_log` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -246,7 +259,8 @@ abstract class BaseAdminLogQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -259,8 +273,22 @@ abstract class BaseAdminLogQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(AdminLogPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(AdminLogPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AdminLogPeer::ID, $id, $comparison);

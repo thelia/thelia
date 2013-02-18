@@ -46,20 +46,20 @@ abstract class BaseAdminGroupPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'admin_group.ID';
+    /** the column name for the id field */
+    const ID = 'admin_group.id';
 
-    /** the column name for the GROUP_ID field */
-    const GROUP_ID = 'admin_group.GROUP_ID';
+    /** the column name for the group_id field */
+    const GROUP_ID = 'admin_group.group_id';
 
-    /** the column name for the ADMIN_ID field */
-    const ADMIN_ID = 'admin_group.ADMIN_ID';
+    /** the column name for the admin_id field */
+    const ADMIN_ID = 'admin_group.admin_id';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'admin_group.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'admin_group.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'admin_group.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'admin_group.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -180,11 +180,11 @@ abstract class BaseAdminGroupPeer
             $criteria->addSelectColumn(AdminGroupPeer::CREATED_AT);
             $criteria->addSelectColumn(AdminGroupPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.GROUP_ID');
-            $criteria->addSelectColumn($alias . '.ADMIN_ID');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.group_id');
+            $criteria->addSelectColumn($alias . '.admin_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -268,7 +268,7 @@ abstract class BaseAdminGroupPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -373,8 +373,15 @@ abstract class BaseAdminGroupPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AdminGroupPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AdminGroupPeer::$instances = array();
     }
 
@@ -1140,7 +1147,7 @@ abstract class BaseAdminGroupPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AdminGroupPeer::OM_CLASS;
     }

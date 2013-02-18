@@ -151,13 +151,19 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -260,22 +266,25 @@ abstract class BaseImage extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -297,22 +306,25 @@ abstract class BaseImage extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -323,7 +335,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -344,7 +356,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function setProductId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -369,7 +381,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function setCategoryId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -394,7 +406,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function setFolderId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -419,7 +431,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function setContentId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -444,7 +456,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function setFile($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -465,7 +477,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function setPosition($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -572,7 +584,7 @@ abstract class BaseImage extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 9; // 9 = ImagePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -832,7 +844,7 @@ abstract class BaseImage extends BaseObject implements Persistent
 
             if ($this->collImageI18ns !== null) {
                 foreach ($this->collImageI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -865,31 +877,31 @@ abstract class BaseImage extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ImagePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(ImagePeer::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`PRODUCT_ID`';
+            $modifiedColumns[':p' . $index++]  = '`product_id`';
         }
         if ($this->isColumnModified(ImagePeer::CATEGORY_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CATEGORY_ID`';
+            $modifiedColumns[':p' . $index++]  = '`category_id`';
         }
         if ($this->isColumnModified(ImagePeer::FOLDER_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`FOLDER_ID`';
+            $modifiedColumns[':p' . $index++]  = '`folder_id`';
         }
         if ($this->isColumnModified(ImagePeer::CONTENT_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`CONTENT_ID`';
+            $modifiedColumns[':p' . $index++]  = '`content_id`';
         }
         if ($this->isColumnModified(ImagePeer::FILE)) {
-            $modifiedColumns[':p' . $index++]  = '`FILE`';
+            $modifiedColumns[':p' . $index++]  = '`file`';
         }
         if ($this->isColumnModified(ImagePeer::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = '`position`';
         }
         if ($this->isColumnModified(ImagePeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(ImagePeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -902,31 +914,31 @@ abstract class BaseImage extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`PRODUCT_ID`':
+                    case '`product_id`':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case '`CATEGORY_ID`':
+                    case '`category_id`':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
                         break;
-                    case '`FOLDER_ID`':
+                    case '`folder_id`':
                         $stmt->bindValue($identifier, $this->folder_id, PDO::PARAM_INT);
                         break;
-                    case '`CONTENT_ID`':
+                    case '`content_id`':
                         $stmt->bindValue($identifier, $this->content_id, PDO::PARAM_INT);
                         break;
-                    case '`FILE`':
+                    case '`file`':
                         $stmt->bindValue($identifier, $this->file, PDO::PARAM_STR);
                         break;
-                    case '`POSITION`':
+                    case '`position`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -997,11 +1009,11 @@ abstract class BaseImage extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1464,12 +1476,13 @@ abstract class BaseImage extends BaseObject implements Persistent
      * Get the associated Product object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Product The associated Product object.
      * @throws PropelException
      */
-    public function getProduct(PropelPDO $con = null)
+    public function getProduct(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aProduct === null && ($this->product_id !== null)) {
+        if ($this->aProduct === null && ($this->product_id !== null) && $doQuery) {
             $this->aProduct = ProductQuery::create()->findPk($this->product_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1515,12 +1528,13 @@ abstract class BaseImage extends BaseObject implements Persistent
      * Get the associated Category object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Category The associated Category object.
      * @throws PropelException
      */
-    public function getCategory(PropelPDO $con = null)
+    public function getCategory(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aCategory === null && ($this->category_id !== null)) {
+        if ($this->aCategory === null && ($this->category_id !== null) && $doQuery) {
             $this->aCategory = CategoryQuery::create()->findPk($this->category_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1566,12 +1580,13 @@ abstract class BaseImage extends BaseObject implements Persistent
      * Get the associated Content object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Content The associated Content object.
      * @throws PropelException
      */
-    public function getContent(PropelPDO $con = null)
+    public function getContent(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aContent === null && ($this->content_id !== null)) {
+        if ($this->aContent === null && ($this->content_id !== null) && $doQuery) {
             $this->aContent = ContentQuery::create()->findPk($this->content_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1617,12 +1632,13 @@ abstract class BaseImage extends BaseObject implements Persistent
      * Get the associated Folder object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Folder The associated Folder object.
      * @throws PropelException
      */
-    public function getFolder(PropelPDO $con = null)
+    public function getFolder(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aFolder === null && ($this->folder_id !== null)) {
+        if ($this->aFolder === null && ($this->folder_id !== null) && $doQuery) {
             $this->aFolder = FolderQuery::create()->findPk($this->folder_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1658,13 +1674,15 @@ abstract class BaseImage extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Image The current object (for fluent API support)
      * @see        addImageI18ns()
      */
     public function clearImageI18ns()
     {
         $this->collImageI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collImageI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1736,6 +1754,7 @@ abstract class BaseImage extends BaseObject implements Persistent
                       $this->collImageI18nsPartial = true;
                     }
 
+                    $collImageI18ns->getInternalIterator()->rewind();
                     return $collImageI18ns;
                 }
 
@@ -1763,12 +1782,15 @@ abstract class BaseImage extends BaseObject implements Persistent
      *
      * @param PropelCollection $imageI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Image The current object (for fluent API support)
      */
     public function setImageI18ns(PropelCollection $imageI18ns, PropelPDO $con = null)
     {
-        $this->imageI18nsScheduledForDeletion = $this->getImageI18ns(new Criteria(), $con)->diff($imageI18ns);
+        $imageI18nsToDelete = $this->getImageI18ns(new Criteria(), $con)->diff($imageI18ns);
 
-        foreach ($this->imageI18nsScheduledForDeletion as $imageI18nRemoved) {
+        $this->imageI18nsScheduledForDeletion = unserialize(serialize($imageI18nsToDelete));
+
+        foreach ($imageI18nsToDelete as $imageI18nRemoved) {
             $imageI18nRemoved->setImage(null);
         }
 
@@ -1779,6 +1801,8 @@ abstract class BaseImage extends BaseObject implements Persistent
 
         $this->collImageI18ns = $imageI18ns;
         $this->collImageI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1796,22 +1820,22 @@ abstract class BaseImage extends BaseObject implements Persistent
         if (null === $this->collImageI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collImageI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getImageI18ns());
-                }
-                $query = ImageI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByImage($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collImageI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getImageI18ns());
+            }
+            $query = ImageI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByImage($this)
+                ->count($con);
         }
+
+        return count($this->collImageI18ns);
     }
 
     /**
@@ -1831,7 +1855,7 @@ abstract class BaseImage extends BaseObject implements Persistent
             $this->initImageI18ns();
             $this->collImageI18nsPartial = true;
         }
-        if (!$this->collImageI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collImageI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddImageI18n($l);
         }
 
@@ -1849,6 +1873,7 @@ abstract class BaseImage extends BaseObject implements Persistent
 
     /**
      * @param	ImageI18n $imageI18n The imageI18n object to remove.
+     * @return Image The current object (for fluent API support)
      */
     public function removeImageI18n($imageI18n)
     {
@@ -1858,9 +1883,11 @@ abstract class BaseImage extends BaseObject implements Persistent
                 $this->imageI18nsScheduledForDeletion = clone $this->collImageI18ns;
                 $this->imageI18nsScheduledForDeletion->clear();
             }
-            $this->imageI18nsScheduledForDeletion[]= $imageI18n;
+            $this->imageI18nsScheduledForDeletion[]= clone $imageI18n;
             $imageI18n->setImage(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1879,6 +1906,7 @@ abstract class BaseImage extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1896,16 +1924,31 @@ abstract class BaseImage extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collImageI18ns) {
                 foreach ($this->collImageI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aProduct instanceof Persistent) {
+              $this->aProduct->clearAllReferences($deep);
+            }
+            if ($this->aCategory instanceof Persistent) {
+              $this->aCategory->clearAllReferences($deep);
+            }
+            if ($this->aContent instanceof Persistent) {
+              $this->aContent->clearAllReferences($deep);
+            }
+            if ($this->aFolder instanceof Persistent) {
+              $this->aFolder->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collImageI18ns instanceof PropelCollection) {
@@ -1961,7 +2004,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      *
      * @return    Image The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -1985,7 +2028,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return ImageI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collImageI18ns) {
@@ -2020,7 +2063,7 @@ abstract class BaseImage extends BaseObject implements Persistent
      *
      * @return    Image The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             ImageI18nQuery::create()

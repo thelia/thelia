@@ -42,15 +42,15 @@ class AdminTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 100, null);
-        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 100, null);
-        $this->addColumn('LOGIN', 'Login', 'VARCHAR', true, 100, null);
-        $this->addColumn('PASSWORD', 'Password', 'VARCHAR', true, 128, null);
-        $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
-        $this->addColumn('SALT', 'Salt', 'VARCHAR', false, 128, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('firstname', 'Firstname', 'VARCHAR', true, 100, null);
+        $this->addColumn('lastname', 'Lastname', 'VARCHAR', true, 100, null);
+        $this->addColumn('login', 'Login', 'VARCHAR', true, 100, null);
+        $this->addColumn('password', 'Password', 'VARCHAR', true, 128, null);
+        $this->addColumn('algo', 'Algo', 'VARCHAR', false, 128, null);
+        $this->addColumn('salt', 'Salt', 'VARCHAR', false, 128, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -71,7 +71,11 @@ class AdminTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

@@ -45,35 +45,35 @@ abstract class BaseCouponPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 10;
 
-    /** the column name for the ID field */
-    const ID = 'coupon.ID';
+    /** the column name for the id field */
+    const ID = 'coupon.id';
 
-    /** the column name for the CODE field */
-    const CODE = 'coupon.CODE';
+    /** the column name for the code field */
+    const CODE = 'coupon.code';
 
-    /** the column name for the ACTION field */
-    const ACTION = 'coupon.ACTION';
+    /** the column name for the action field */
+    const ACTION = 'coupon.action';
 
-    /** the column name for the VALUE field */
-    const VALUE = 'coupon.VALUE';
+    /** the column name for the value field */
+    const VALUE = 'coupon.value';
 
-    /** the column name for the USED field */
-    const USED = 'coupon.USED';
+    /** the column name for the used field */
+    const USED = 'coupon.used';
 
-    /** the column name for the AVAILABLE_SINCE field */
-    const AVAILABLE_SINCE = 'coupon.AVAILABLE_SINCE';
+    /** the column name for the available_since field */
+    const AVAILABLE_SINCE = 'coupon.available_since';
 
-    /** the column name for the DATE_LIMIT field */
-    const DATE_LIMIT = 'coupon.DATE_LIMIT';
+    /** the column name for the date_limit field */
+    const DATE_LIMIT = 'coupon.date_limit';
 
-    /** the column name for the ACTIVATE field */
-    const ACTIVATE = 'coupon.ACTIVATE';
+    /** the column name for the activate field */
+    const ACTIVATE = 'coupon.activate';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'coupon.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'coupon.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'coupon.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'coupon.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -199,16 +199,16 @@ abstract class BaseCouponPeer
             $criteria->addSelectColumn(CouponPeer::CREATED_AT);
             $criteria->addSelectColumn(CouponPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.ACTION');
-            $criteria->addSelectColumn($alias . '.VALUE');
-            $criteria->addSelectColumn($alias . '.USED');
-            $criteria->addSelectColumn($alias . '.AVAILABLE_SINCE');
-            $criteria->addSelectColumn($alias . '.DATE_LIMIT');
-            $criteria->addSelectColumn($alias . '.ACTIVATE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '.action');
+            $criteria->addSelectColumn($alias . '.value');
+            $criteria->addSelectColumn($alias . '.used');
+            $criteria->addSelectColumn($alias . '.available_since');
+            $criteria->addSelectColumn($alias . '.date_limit');
+            $criteria->addSelectColumn($alias . '.activate');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -292,7 +292,7 @@ abstract class BaseCouponPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -397,8 +397,15 @@ abstract class BaseCouponPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CouponPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CouponPeer::$instances = array();
     }
 
@@ -536,7 +543,7 @@ abstract class BaseCouponPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return CouponPeer::OM_CLASS;
     }

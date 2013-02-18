@@ -51,7 +51,6 @@ use Thelia\Model\Product;
  * @method Accessory findOne(PropelPDO $con = null) Return the first Accessory matching the query
  * @method Accessory findOneOrCreate(PropelPDO $con = null) Return the first Accessory matching the query, or a new Accessory object populated from the query conditions when no match is found
  *
- * @method Accessory findOneById(int $id) Return the first Accessory filtered by the id column
  * @method Accessory findOneByProductId(int $product_id) Return the first Accessory filtered by the product_id column
  * @method Accessory findOneByAccessory(int $accessory) Return the first Accessory filtered by the accessory column
  * @method Accessory findOneByPosition(int $position) Return the first Accessory filtered by the position column
@@ -85,7 +84,7 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * Returns a new AccessoryQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AccessoryQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AccessoryQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AccessoryQuery
      */
@@ -142,18 +141,32 @@ abstract class BaseAccessoryQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Accessory A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Accessory A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Accessory A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `ACCESSORY`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `accessory` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `product_id`, `accessory`, `position`, `created_at`, `updated_at` FROM `accessory` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -249,7 +262,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -262,8 +276,22 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(AccessoryPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(AccessoryPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AccessoryPeer::ID, $id, $comparison);
@@ -276,7 +304,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * <code>
      * $query->filterByProductId(1234); // WHERE product_id = 1234
      * $query->filterByProductId(array(12, 34)); // WHERE product_id IN (12, 34)
-     * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
+     * $query->filterByProductId(array('min' => 12)); // WHERE product_id >= 12
+     * $query->filterByProductId(array('max' => 12)); // WHERE product_id <= 12
      * </code>
      *
      * @see       filterByProductRelatedByProductId()
@@ -319,7 +348,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * <code>
      * $query->filterByAccessory(1234); // WHERE accessory = 1234
      * $query->filterByAccessory(array(12, 34)); // WHERE accessory IN (12, 34)
-     * $query->filterByAccessory(array('min' => 12)); // WHERE accessory > 12
+     * $query->filterByAccessory(array('min' => 12)); // WHERE accessory >= 12
+     * $query->filterByAccessory(array('max' => 12)); // WHERE accessory <= 12
      * </code>
      *
      * @see       filterByProductRelatedByAccessory()
@@ -362,7 +392,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -488,8 +519,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AccessoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AccessoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProductRelatedByProductId($product, $comparison = null)
     {
@@ -564,8 +595,8 @@ abstract class BaseAccessoryQuery extends ModelCriteria
      * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AccessoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AccessoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProductRelatedByAccessory($product, $comparison = null)
     {

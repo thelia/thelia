@@ -118,6 +118,12 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
      * equivalent initialization method).
@@ -208,22 +214,25 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -245,22 +254,25 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -271,7 +283,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -292,7 +304,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      */
     public function setGroupId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -317,7 +329,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      */
     public function setResourceId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -342,7 +354,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      */
     public function setRead($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -363,7 +375,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      */
     public function setWrite($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -476,7 +488,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 7; // 7 = GroupResourcePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -728,25 +740,25 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(GroupResourcePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(GroupResourcePeer::GROUP_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`GROUP_ID`';
+            $modifiedColumns[':p' . $index++]  = '`group_id`';
         }
         if ($this->isColumnModified(GroupResourcePeer::RESOURCE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`RESOURCE_ID`';
+            $modifiedColumns[':p' . $index++]  = '`resource_id`';
         }
         if ($this->isColumnModified(GroupResourcePeer::READ)) {
-            $modifiedColumns[':p' . $index++]  = '`READ`';
+            $modifiedColumns[':p' . $index++]  = '`read`';
         }
         if ($this->isColumnModified(GroupResourcePeer::WRITE)) {
-            $modifiedColumns[':p' . $index++]  = '`WRITE`';
+            $modifiedColumns[':p' . $index++]  = '`write`';
         }
         if ($this->isColumnModified(GroupResourcePeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(GroupResourcePeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -759,25 +771,25 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`GROUP_ID`':
+                    case '`group_id`':
                         $stmt->bindValue($identifier, $this->group_id, PDO::PARAM_INT);
                         break;
-                    case '`RESOURCE_ID`':
+                    case '`resource_id`':
                         $stmt->bindValue($identifier, $this->resource_id, PDO::PARAM_INT);
                         break;
-                    case '`READ`':
+                    case '`read`':
                         $stmt->bindValue($identifier, $this->read, PDO::PARAM_INT);
                         break;
-                    case '`WRITE`':
+                    case '`write`':
                         $stmt->bindValue($identifier, $this->write, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -848,11 +860,11 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1260,12 +1272,13 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      * Get the associated Group object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Group The associated Group object.
      * @throws PropelException
      */
-    public function getGroup(PropelPDO $con = null)
+    public function getGroup(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aGroup === null && ($this->group_id !== null)) {
+        if ($this->aGroup === null && ($this->group_id !== null) && $doQuery) {
             $this->aGroup = GroupQuery::create()->findPk($this->group_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1311,12 +1324,13 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      * Get the associated Resource object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Resource The associated Resource object.
      * @throws PropelException
      */
-    public function getResource(PropelPDO $con = null)
+    public function getResource(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aResource === null && ($this->resource_id !== null)) {
+        if ($this->aResource === null && ($this->resource_id !== null) && $doQuery) {
             $this->aResource = ResourceQuery::create()->findPk($this->resource_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1344,6 +1358,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -1362,7 +1377,16 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aGroup instanceof Persistent) {
+              $this->aGroup->clearAllReferences($deep);
+            }
+            if ($this->aResource instanceof Persistent) {
+              $this->aResource->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aGroup = null;

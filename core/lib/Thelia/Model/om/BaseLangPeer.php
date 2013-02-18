@@ -44,29 +44,29 @@ abstract class BaseLangPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 8;
 
-    /** the column name for the ID field */
-    const ID = 'lang.ID';
+    /** the column name for the id field */
+    const ID = 'lang.id';
 
-    /** the column name for the TITLE field */
-    const TITLE = 'lang.TITLE';
+    /** the column name for the title field */
+    const TITLE = 'lang.title';
 
-    /** the column name for the CODE field */
-    const CODE = 'lang.CODE';
+    /** the column name for the code field */
+    const CODE = 'lang.code';
 
-    /** the column name for the LOCALE field */
-    const LOCALE = 'lang.LOCALE';
+    /** the column name for the locale field */
+    const LOCALE = 'lang.locale';
 
-    /** the column name for the URL field */
-    const URL = 'lang.URL';
+    /** the column name for the url field */
+    const URL = 'lang.url';
 
-    /** the column name for the BY_DEFAULT field */
-    const BY_DEFAULT = 'lang.BY_DEFAULT';
+    /** the column name for the by_default field */
+    const BY_DEFAULT = 'lang.by_default';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'lang.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'lang.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'lang.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'lang.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -190,14 +190,14 @@ abstract class BaseLangPeer
             $criteria->addSelectColumn(LangPeer::CREATED_AT);
             $criteria->addSelectColumn(LangPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.LOCALE');
-            $criteria->addSelectColumn($alias . '.URL');
-            $criteria->addSelectColumn($alias . '.BY_DEFAULT');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.title');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '.locale');
+            $criteria->addSelectColumn($alias . '.url');
+            $criteria->addSelectColumn($alias . '.by_default');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -281,7 +281,7 @@ abstract class BaseLangPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -386,8 +386,15 @@ abstract class BaseLangPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (LangPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         LangPeer::$instances = array();
     }
 
@@ -522,7 +529,7 @@ abstract class BaseLangPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return LangPeer::OM_CLASS;
     }

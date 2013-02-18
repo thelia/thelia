@@ -95,7 +95,6 @@ use Thelia\Model\Rewriting;
  * @method Category findOne(PropelPDO $con = null) Return the first Category matching the query
  * @method Category findOneOrCreate(PropelPDO $con = null) Return the first Category matching the query, or a new Category object populated from the query conditions when no match is found
  *
- * @method Category findOneById(int $id) Return the first Category filtered by the id column
  * @method Category findOneByParent(int $parent) Return the first Category filtered by the parent column
  * @method Category findOneByLink(string $link) Return the first Category filtered by the link column
  * @method Category findOneByVisible(int $visible) Return the first Category filtered by the visible column
@@ -137,7 +136,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * Returns a new CategoryQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CategoryQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CategoryQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CategoryQuery
      */
@@ -194,18 +193,32 @@ abstract class BaseCategoryQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Category A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Category A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Category A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PARENT`, `LINK`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `category` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `parent`, `link`, `visible`, `position`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `category` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -301,7 +314,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -314,8 +328,22 @@ abstract class BaseCategoryQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CategoryPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CategoryPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CategoryPeer::ID, $id, $comparison);
@@ -328,7 +356,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByParent(1234); // WHERE parent = 1234
      * $query->filterByParent(array(12, 34)); // WHERE parent IN (12, 34)
-     * $query->filterByParent(array('min' => 12)); // WHERE parent > 12
+     * $query->filterByParent(array('min' => 12)); // WHERE parent >= 12
+     * $query->filterByParent(array('max' => 12)); // WHERE parent <= 12
      * </code>
      *
      * @param     mixed $parent The value to use as filter.
@@ -398,7 +427,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByVisible(1234); // WHERE visible = 1234
      * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
-     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible >= 12
+     * $query->filterByVisible(array('max' => 12)); // WHERE visible <= 12
      * </code>
      *
      * @param     mixed $visible The value to use as filter.
@@ -439,7 +469,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -566,7 +597,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * <code>
      * $query->filterByVersion(1234); // WHERE version = 1234
      * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
-     * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+     * $query->filterByVersion(array('min' => 12)); // WHERE version >= 12
+     * $query->filterByVersion(array('max' => 12)); // WHERE version <= 12
      * </code>
      *
      * @param     mixed $version The value to use as filter.
@@ -678,8 +710,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   ProductCategory|PropelObjectCollection $productCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProductCategory($productCategory, $comparison = null)
     {
@@ -752,8 +784,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   FeatureCategory|PropelObjectCollection $featureCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeatureCategory($featureCategory, $comparison = null)
     {
@@ -826,8 +858,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   AttributeCategory|PropelObjectCollection $attributeCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttributeCategory($attributeCategory, $comparison = null)
     {
@@ -900,8 +932,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   ContentAssoc|PropelObjectCollection $contentAssoc  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByContentAssoc($contentAssoc, $comparison = null)
     {
@@ -974,8 +1006,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   Image|PropelObjectCollection $image  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByImage($image, $comparison = null)
     {
@@ -1048,8 +1080,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   Document|PropelObjectCollection $document  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDocument($document, $comparison = null)
     {
@@ -1122,8 +1154,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   Rewriting|PropelObjectCollection $rewriting  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByRewriting($rewriting, $comparison = null)
     {
@@ -1196,8 +1228,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   CategoryI18n|PropelObjectCollection $categoryI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCategoryI18n($categoryI18n, $comparison = null)
     {
@@ -1270,8 +1302,8 @@ abstract class BaseCategoryQuery extends ModelCriteria
      * @param   CategoryVersion|PropelObjectCollection $categoryVersion  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CategoryQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CategoryQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCategoryVersion($categoryVersion, $comparison = null)
     {
@@ -1430,7 +1462,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return    CategoryQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'CategoryI18n';
 
@@ -1448,7 +1480,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return    CategoryQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -1469,7 +1501,7 @@ abstract class BaseCategoryQuery extends ModelCriteria
      *
      * @return    CategoryI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

@@ -46,41 +46,41 @@ abstract class BaseOrderProductPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 12;
 
-    /** the column name for the ID field */
-    const ID = 'order_product.ID';
+    /** the column name for the id field */
+    const ID = 'order_product.id';
 
-    /** the column name for the ORDER_ID field */
-    const ORDER_ID = 'order_product.ORDER_ID';
+    /** the column name for the order_id field */
+    const ORDER_ID = 'order_product.order_id';
 
-    /** the column name for the PRODUCT_REF field */
-    const PRODUCT_REF = 'order_product.PRODUCT_REF';
+    /** the column name for the product_ref field */
+    const PRODUCT_REF = 'order_product.product_ref';
 
-    /** the column name for the TITLE field */
-    const TITLE = 'order_product.TITLE';
+    /** the column name for the title field */
+    const TITLE = 'order_product.title';
 
-    /** the column name for the DESCRIPTION field */
-    const DESCRIPTION = 'order_product.DESCRIPTION';
+    /** the column name for the description field */
+    const DESCRIPTION = 'order_product.description';
 
-    /** the column name for the CHAPO field */
-    const CHAPO = 'order_product.CHAPO';
+    /** the column name for the chapo field */
+    const CHAPO = 'order_product.chapo';
 
-    /** the column name for the QUANTITY field */
-    const QUANTITY = 'order_product.QUANTITY';
+    /** the column name for the quantity field */
+    const QUANTITY = 'order_product.quantity';
 
-    /** the column name for the PRICE field */
-    const PRICE = 'order_product.PRICE';
+    /** the column name for the price field */
+    const PRICE = 'order_product.price';
 
-    /** the column name for the TAX field */
-    const TAX = 'order_product.TAX';
+    /** the column name for the tax field */
+    const TAX = 'order_product.tax';
 
-    /** the column name for the PARENT field */
-    const PARENT = 'order_product.PARENT';
+    /** the column name for the parent field */
+    const PARENT = 'order_product.parent';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'order_product.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'order_product.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'order_product.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'order_product.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -208,18 +208,18 @@ abstract class BaseOrderProductPeer
             $criteria->addSelectColumn(OrderProductPeer::CREATED_AT);
             $criteria->addSelectColumn(OrderProductPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ORDER_ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_REF');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.CHAPO');
-            $criteria->addSelectColumn($alias . '.QUANTITY');
-            $criteria->addSelectColumn($alias . '.PRICE');
-            $criteria->addSelectColumn($alias . '.TAX');
-            $criteria->addSelectColumn($alias . '.PARENT');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.order_id');
+            $criteria->addSelectColumn($alias . '.product_ref');
+            $criteria->addSelectColumn($alias . '.title');
+            $criteria->addSelectColumn($alias . '.description');
+            $criteria->addSelectColumn($alias . '.chapo');
+            $criteria->addSelectColumn($alias . '.quantity');
+            $criteria->addSelectColumn($alias . '.price');
+            $criteria->addSelectColumn($alias . '.tax');
+            $criteria->addSelectColumn($alias . '.parent');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -303,7 +303,7 @@ abstract class BaseOrderProductPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -408,8 +408,15 @@ abstract class BaseOrderProductPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (OrderProductPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         OrderProductPeer::$instances = array();
     }
 
@@ -785,7 +792,7 @@ abstract class BaseOrderProductPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return OrderProductPeer::OM_CLASS;
     }

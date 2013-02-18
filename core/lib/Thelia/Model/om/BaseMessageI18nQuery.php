@@ -77,7 +77,7 @@ abstract class BaseMessageI18nQuery extends ModelCriteria
      * Returns a new MessageI18nQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     MessageI18nQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   MessageI18nQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return MessageI18nQuery
      */
@@ -141,12 +141,12 @@ abstract class BaseMessageI18nQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   MessageI18n A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 MessageI18n A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `LOCALE`, `TITLE`, `DESCRIPTION`, `DESCRIPTION_HTML` FROM `message_i18n` WHERE `ID` = :p0 AND `LOCALE` = :p1';
+        $sql = 'SELECT `id`, `locale`, `title`, `description`, `description_html` FROM `message_i18n` WHERE `id` = :p0 AND `locale` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -254,7 +254,8 @@ abstract class BaseMessageI18nQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @see       filterByMessage()
@@ -269,8 +270,22 @@ abstract class BaseMessageI18nQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(MessageI18nPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(MessageI18nPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessageI18nPeer::ID, $id, $comparison);
@@ -398,8 +413,8 @@ abstract class BaseMessageI18nQuery extends ModelCriteria
      * @param   Message|PropelObjectCollection $message The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageI18nQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageI18nQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMessage($message, $comparison = null)
     {

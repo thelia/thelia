@@ -46,26 +46,26 @@ abstract class BaseGroupResourcePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the ID field */
-    const ID = 'group_resource.ID';
+    /** the column name for the id field */
+    const ID = 'group_resource.id';
 
-    /** the column name for the GROUP_ID field */
-    const GROUP_ID = 'group_resource.GROUP_ID';
+    /** the column name for the group_id field */
+    const GROUP_ID = 'group_resource.group_id';
 
-    /** the column name for the RESOURCE_ID field */
-    const RESOURCE_ID = 'group_resource.RESOURCE_ID';
+    /** the column name for the resource_id field */
+    const RESOURCE_ID = 'group_resource.resource_id';
 
-    /** the column name for the READ field */
-    const READ = 'group_resource.READ';
+    /** the column name for the read field */
+    const READ = 'group_resource.read';
 
-    /** the column name for the WRITE field */
-    const WRITE = 'group_resource.WRITE';
+    /** the column name for the write field */
+    const WRITE = 'group_resource.write';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'group_resource.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'group_resource.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'group_resource.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'group_resource.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -188,13 +188,13 @@ abstract class BaseGroupResourcePeer
             $criteria->addSelectColumn(GroupResourcePeer::CREATED_AT);
             $criteria->addSelectColumn(GroupResourcePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.GROUP_ID');
-            $criteria->addSelectColumn($alias . '.RESOURCE_ID');
-            $criteria->addSelectColumn($alias . '.READ');
-            $criteria->addSelectColumn($alias . '.WRITE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.group_id');
+            $criteria->addSelectColumn($alias . '.resource_id');
+            $criteria->addSelectColumn($alias . '.read');
+            $criteria->addSelectColumn($alias . '.write');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -278,7 +278,7 @@ abstract class BaseGroupResourcePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -383,8 +383,15 @@ abstract class BaseGroupResourcePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (GroupResourcePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         GroupResourcePeer::$instances = array();
     }
 
@@ -1150,7 +1157,7 @@ abstract class BaseGroupResourcePeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return GroupResourcePeer::OM_CLASS;
     }

@@ -54,7 +54,6 @@ use Thelia\Model\Resource;
  * @method GroupResource findOne(PropelPDO $con = null) Return the first GroupResource matching the query
  * @method GroupResource findOneOrCreate(PropelPDO $con = null) Return the first GroupResource matching the query, or a new GroupResource object populated from the query conditions when no match is found
  *
- * @method GroupResource findOneById(int $id) Return the first GroupResource filtered by the id column
  * @method GroupResource findOneByGroupId(int $group_id) Return the first GroupResource filtered by the group_id column
  * @method GroupResource findOneByResourceId(int $resource_id) Return the first GroupResource filtered by the resource_id column
  * @method GroupResource findOneByRead(int $read) Return the first GroupResource filtered by the read column
@@ -90,7 +89,7 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * Returns a new GroupResourceQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     GroupResourceQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   GroupResourceQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return GroupResourceQuery
      */
@@ -147,18 +146,32 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 GroupResource A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   GroupResource A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 GroupResource A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `GROUP_ID`, `RESOURCE_ID`, `READ`, `WRITE`, `CREATED_AT`, `UPDATED_AT` FROM `group_resource` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `group_id`, `resource_id`, `read`, `write`, `created_at`, `updated_at` FROM `group_resource` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -254,7 +267,8 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -267,8 +281,22 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(GroupResourcePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(GroupResourcePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(GroupResourcePeer::ID, $id, $comparison);
@@ -281,7 +309,8 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * <code>
      * $query->filterByGroupId(1234); // WHERE group_id = 1234
      * $query->filterByGroupId(array(12, 34)); // WHERE group_id IN (12, 34)
-     * $query->filterByGroupId(array('min' => 12)); // WHERE group_id > 12
+     * $query->filterByGroupId(array('min' => 12)); // WHERE group_id >= 12
+     * $query->filterByGroupId(array('max' => 12)); // WHERE group_id <= 12
      * </code>
      *
      * @see       filterByGroup()
@@ -324,7 +353,8 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * <code>
      * $query->filterByResourceId(1234); // WHERE resource_id = 1234
      * $query->filterByResourceId(array(12, 34)); // WHERE resource_id IN (12, 34)
-     * $query->filterByResourceId(array('min' => 12)); // WHERE resource_id > 12
+     * $query->filterByResourceId(array('min' => 12)); // WHERE resource_id >= 12
+     * $query->filterByResourceId(array('max' => 12)); // WHERE resource_id <= 12
      * </code>
      *
      * @see       filterByResource()
@@ -367,7 +397,8 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * <code>
      * $query->filterByRead(1234); // WHERE read = 1234
      * $query->filterByRead(array(12, 34)); // WHERE read IN (12, 34)
-     * $query->filterByRead(array('min' => 12)); // WHERE read > 12
+     * $query->filterByRead(array('min' => 12)); // WHERE read >= 12
+     * $query->filterByRead(array('max' => 12)); // WHERE read <= 12
      * </code>
      *
      * @param     mixed $read The value to use as filter.
@@ -408,7 +439,8 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * <code>
      * $query->filterByWrite(1234); // WHERE write = 1234
      * $query->filterByWrite(array(12, 34)); // WHERE write IN (12, 34)
-     * $query->filterByWrite(array('min' => 12)); // WHERE write > 12
+     * $query->filterByWrite(array('min' => 12)); // WHERE write >= 12
+     * $query->filterByWrite(array('max' => 12)); // WHERE write <= 12
      * </code>
      *
      * @param     mixed $write The value to use as filter.
@@ -534,8 +566,8 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * @param   Group|PropelObjectCollection $group The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupResourceQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupResourceQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGroup($group, $comparison = null)
     {
@@ -610,8 +642,8 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * @param   Resource|PropelObjectCollection $resource The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupResourceQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupResourceQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByResource($resource, $comparison = null)
     {

@@ -55,7 +55,6 @@ use Thelia\Model\CustomerTitleQuery;
  * @method CustomerTitle findOne(PropelPDO $con = null) Return the first CustomerTitle matching the query
  * @method CustomerTitle findOneOrCreate(PropelPDO $con = null) Return the first CustomerTitle matching the query, or a new CustomerTitle object populated from the query conditions when no match is found
  *
- * @method CustomerTitle findOneById(int $id) Return the first CustomerTitle filtered by the id column
  * @method CustomerTitle findOneByByDefault(int $by_default) Return the first CustomerTitle filtered by the by_default column
  * @method CustomerTitle findOneByPosition(string $position) Return the first CustomerTitle filtered by the position column
  * @method CustomerTitle findOneByCreatedAt(string $created_at) Return the first CustomerTitle filtered by the created_at column
@@ -87,7 +86,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * Returns a new CustomerTitleQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CustomerTitleQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CustomerTitleQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CustomerTitleQuery
      */
@@ -144,18 +143,32 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 CustomerTitle A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   CustomerTitle A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 CustomerTitle A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `BY_DEFAULT`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `customer_title` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `by_default`, `position`, `created_at`, `updated_at` FROM `customer_title` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -251,7 +264,8 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -264,8 +278,22 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CustomerTitlePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CustomerTitlePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CustomerTitlePeer::ID, $id, $comparison);
@@ -278,7 +306,8 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * <code>
      * $query->filterByByDefault(1234); // WHERE by_default = 1234
      * $query->filterByByDefault(array(12, 34)); // WHERE by_default IN (12, 34)
-     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default > 12
+     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default >= 12
+     * $query->filterByByDefault(array('max' => 12)); // WHERE by_default <= 12
      * </code>
      *
      * @param     mixed $byDefault The value to use as filter.
@@ -433,8 +462,8 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * @param   Customer|PropelObjectCollection $customer  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CustomerTitleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CustomerTitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCustomer($customer, $comparison = null)
     {
@@ -507,8 +536,8 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * @param   Address|PropelObjectCollection $address  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CustomerTitleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CustomerTitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAddress($address, $comparison = null)
     {
@@ -581,8 +610,8 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      * @param   CustomerTitleI18n|PropelObjectCollection $customerTitleI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CustomerTitleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CustomerTitleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCustomerTitleI18n($customerTitleI18n, $comparison = null)
     {
@@ -741,7 +770,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return    CustomerTitleQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'CustomerTitleI18n';
 
@@ -759,7 +788,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return    CustomerTitleQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -780,7 +809,7 @@ abstract class BaseCustomerTitleQuery extends ModelCriteria
      *
      * @return    CustomerTitleI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

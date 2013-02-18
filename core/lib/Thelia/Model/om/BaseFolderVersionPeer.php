@@ -45,35 +45,35 @@ abstract class BaseFolderVersionPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 10;
 
-    /** the column name for the ID field */
-    const ID = 'folder_version.ID';
+    /** the column name for the id field */
+    const ID = 'folder_version.id';
 
-    /** the column name for the PARENT field */
-    const PARENT = 'folder_version.PARENT';
+    /** the column name for the parent field */
+    const PARENT = 'folder_version.parent';
 
-    /** the column name for the LINK field */
-    const LINK = 'folder_version.LINK';
+    /** the column name for the link field */
+    const LINK = 'folder_version.link';
 
-    /** the column name for the VISIBLE field */
-    const VISIBLE = 'folder_version.VISIBLE';
+    /** the column name for the visible field */
+    const VISIBLE = 'folder_version.visible';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'folder_version.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'folder_version.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'folder_version.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'folder_version.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'folder_version.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'folder_version.updated_at';
 
-    /** the column name for the VERSION field */
-    const VERSION = 'folder_version.VERSION';
+    /** the column name for the version field */
+    const VERSION = 'folder_version.version';
 
-    /** the column name for the VERSION_CREATED_AT field */
-    const VERSION_CREATED_AT = 'folder_version.VERSION_CREATED_AT';
+    /** the column name for the version_created_at field */
+    const VERSION_CREATED_AT = 'folder_version.version_created_at';
 
-    /** the column name for the VERSION_CREATED_BY field */
-    const VERSION_CREATED_BY = 'folder_version.VERSION_CREATED_BY';
+    /** the column name for the version_created_by field */
+    const VERSION_CREATED_BY = 'folder_version.version_created_by';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -199,16 +199,16 @@ abstract class BaseFolderVersionPeer
             $criteria->addSelectColumn(FolderVersionPeer::VERSION_CREATED_AT);
             $criteria->addSelectColumn(FolderVersionPeer::VERSION_CREATED_BY);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.PARENT');
-            $criteria->addSelectColumn($alias . '.LINK');
-            $criteria->addSelectColumn($alias . '.VISIBLE');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.parent');
+            $criteria->addSelectColumn($alias . '.link');
+            $criteria->addSelectColumn($alias . '.visible');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.version');
+            $criteria->addSelectColumn($alias . '.version_created_at');
+            $criteria->addSelectColumn($alias . '.version_created_by');
         }
     }
 
@@ -292,7 +292,7 @@ abstract class BaseFolderVersionPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -397,8 +397,15 @@ abstract class BaseFolderVersionPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (FolderVersionPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         FolderVersionPeer::$instances = array();
     }
 
@@ -771,7 +778,7 @@ abstract class BaseFolderVersionPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return FolderVersionPeer::OM_CLASS;
     }

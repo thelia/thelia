@@ -113,13 +113,19 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -224,22 +230,25 @@ abstract class BaseConfig extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -261,22 +270,25 @@ abstract class BaseConfig extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -287,7 +299,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -308,7 +320,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function setName($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -329,7 +341,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function setValue($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -350,7 +362,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function setSecured($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -371,7 +383,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function setHidden($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -484,7 +496,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 7; // 7 = ConfigPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -695,7 +707,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
 
             if ($this->collConfigI18ns !== null) {
                 foreach ($this->collConfigI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -728,25 +740,25 @@ abstract class BaseConfig extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(ConfigPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(ConfigPeer::NAME)) {
-            $modifiedColumns[':p' . $index++]  = '`NAME`';
+            $modifiedColumns[':p' . $index++]  = '`name`';
         }
         if ($this->isColumnModified(ConfigPeer::VALUE)) {
-            $modifiedColumns[':p' . $index++]  = '`VALUE`';
+            $modifiedColumns[':p' . $index++]  = '`value`';
         }
         if ($this->isColumnModified(ConfigPeer::SECURED)) {
-            $modifiedColumns[':p' . $index++]  = '`SECURED`';
+            $modifiedColumns[':p' . $index++]  = '`secured`';
         }
         if ($this->isColumnModified(ConfigPeer::HIDDEN)) {
-            $modifiedColumns[':p' . $index++]  = '`HIDDEN`';
+            $modifiedColumns[':p' . $index++]  = '`hidden`';
         }
         if ($this->isColumnModified(ConfigPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(ConfigPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -759,25 +771,25 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`NAME`':
+                    case '`name`':
                         $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
-                    case '`VALUE`':
+                    case '`value`':
                         $stmt->bindValue($identifier, $this->value, PDO::PARAM_STR);
                         break;
-                    case '`SECURED`':
+                    case '`secured`':
                         $stmt->bindValue($identifier, $this->secured, PDO::PARAM_INT);
                         break;
-                    case '`HIDDEN`':
+                    case '`hidden`':
                         $stmt->bindValue($identifier, $this->hidden, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -848,11 +860,11 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1243,13 +1255,15 @@ abstract class BaseConfig extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Config The current object (for fluent API support)
      * @see        addConfigI18ns()
      */
     public function clearConfigI18ns()
     {
         $this->collConfigI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collConfigI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1321,6 +1335,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
                       $this->collConfigI18nsPartial = true;
                     }
 
+                    $collConfigI18ns->getInternalIterator()->rewind();
                     return $collConfigI18ns;
                 }
 
@@ -1348,12 +1363,15 @@ abstract class BaseConfig extends BaseObject implements Persistent
      *
      * @param PropelCollection $configI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Config The current object (for fluent API support)
      */
     public function setConfigI18ns(PropelCollection $configI18ns, PropelPDO $con = null)
     {
-        $this->configI18nsScheduledForDeletion = $this->getConfigI18ns(new Criteria(), $con)->diff($configI18ns);
+        $configI18nsToDelete = $this->getConfigI18ns(new Criteria(), $con)->diff($configI18ns);
 
-        foreach ($this->configI18nsScheduledForDeletion as $configI18nRemoved) {
+        $this->configI18nsScheduledForDeletion = unserialize(serialize($configI18nsToDelete));
+
+        foreach ($configI18nsToDelete as $configI18nRemoved) {
             $configI18nRemoved->setConfig(null);
         }
 
@@ -1364,6 +1382,8 @@ abstract class BaseConfig extends BaseObject implements Persistent
 
         $this->collConfigI18ns = $configI18ns;
         $this->collConfigI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1381,22 +1401,22 @@ abstract class BaseConfig extends BaseObject implements Persistent
         if (null === $this->collConfigI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collConfigI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getConfigI18ns());
-                }
-                $query = ConfigI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByConfig($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collConfigI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getConfigI18ns());
+            }
+            $query = ConfigI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByConfig($this)
+                ->count($con);
         }
+
+        return count($this->collConfigI18ns);
     }
 
     /**
@@ -1416,7 +1436,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
             $this->initConfigI18ns();
             $this->collConfigI18nsPartial = true;
         }
-        if (!$this->collConfigI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collConfigI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddConfigI18n($l);
         }
 
@@ -1434,6 +1454,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
 
     /**
      * @param	ConfigI18n $configI18n The configI18n object to remove.
+     * @return Config The current object (for fluent API support)
      */
     public function removeConfigI18n($configI18n)
     {
@@ -1443,9 +1464,11 @@ abstract class BaseConfig extends BaseObject implements Persistent
                 $this->configI18nsScheduledForDeletion = clone $this->collConfigI18ns;
                 $this->configI18nsScheduledForDeletion->clear();
             }
-            $this->configI18nsScheduledForDeletion[]= $configI18n;
+            $this->configI18nsScheduledForDeletion[]= clone $configI18n;
             $configI18n->setConfig(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1462,6 +1485,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -1480,16 +1504,19 @@ abstract class BaseConfig extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collConfigI18ns) {
                 foreach ($this->collConfigI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collConfigI18ns instanceof PropelCollection) {
@@ -1541,7 +1568,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      *
      * @return    Config The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -1565,7 +1592,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return ConfigI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collConfigI18ns) {
@@ -1600,7 +1627,7 @@ abstract class BaseConfig extends BaseObject implements Persistent
      *
      * @return    Config The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             ConfigI18nQuery::create()

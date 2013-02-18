@@ -47,7 +47,6 @@ use Thelia\Model\OrderProduct;
  * @method OrderFeature findOne(PropelPDO $con = null) Return the first OrderFeature matching the query
  * @method OrderFeature findOneOrCreate(PropelPDO $con = null) Return the first OrderFeature matching the query, or a new OrderFeature object populated from the query conditions when no match is found
  *
- * @method OrderFeature findOneById(int $id) Return the first OrderFeature filtered by the id column
  * @method OrderFeature findOneByOrderProductId(int $order_product_id) Return the first OrderFeature filtered by the order_product_id column
  * @method OrderFeature findOneByFeatureDesc(string $feature_desc) Return the first OrderFeature filtered by the feature_desc column
  * @method OrderFeature findOneByFeatureAvDesc(string $feature_av_desc) Return the first OrderFeature filtered by the feature_av_desc column
@@ -81,7 +80,7 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
      * Returns a new OrderFeatureQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     OrderFeatureQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   OrderFeatureQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return OrderFeatureQuery
      */
@@ -138,18 +137,32 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 OrderFeature A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   OrderFeature A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 OrderFeature A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_PRODUCT_ID`, `FEATURE_DESC`, `FEATURE_AV_DESC`, `CREATED_AT`, `UPDATED_AT` FROM `order_feature` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `order_product_id`, `feature_desc`, `feature_av_desc`, `created_at`, `updated_at` FROM `order_feature` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -245,7 +258,8 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -258,8 +272,22 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(OrderFeaturePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(OrderFeaturePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(OrderFeaturePeer::ID, $id, $comparison);
@@ -272,7 +300,8 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
      * <code>
      * $query->filterByOrderProductId(1234); // WHERE order_product_id = 1234
      * $query->filterByOrderProductId(array(12, 34)); // WHERE order_product_id IN (12, 34)
-     * $query->filterByOrderProductId(array('min' => 12)); // WHERE order_product_id > 12
+     * $query->filterByOrderProductId(array('min' => 12)); // WHERE order_product_id >= 12
+     * $query->filterByOrderProductId(array('max' => 12)); // WHERE order_product_id <= 12
      * </code>
      *
      * @see       filterByOrderProduct()
@@ -458,8 +487,8 @@ abstract class BaseOrderFeatureQuery extends ModelCriteria
      * @param   OrderProduct|PropelObjectCollection $orderProduct The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderFeatureQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderFeatureQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrderProduct($orderProduct, $comparison = null)
     {

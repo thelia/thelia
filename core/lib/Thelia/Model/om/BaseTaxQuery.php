@@ -48,7 +48,6 @@ use Thelia\Model\TaxRuleCountry;
  * @method Tax findOne(PropelPDO $con = null) Return the first Tax matching the query
  * @method Tax findOneOrCreate(PropelPDO $con = null) Return the first Tax matching the query, or a new Tax object populated from the query conditions when no match is found
  *
- * @method Tax findOneById(int $id) Return the first Tax filtered by the id column
  * @method Tax findOneByRate(double $rate) Return the first Tax filtered by the rate column
  * @method Tax findOneByCreatedAt(string $created_at) Return the first Tax filtered by the created_at column
  * @method Tax findOneByUpdatedAt(string $updated_at) Return the first Tax filtered by the updated_at column
@@ -78,7 +77,7 @@ abstract class BaseTaxQuery extends ModelCriteria
      * Returns a new TaxQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     TaxQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   TaxQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return TaxQuery
      */
@@ -135,18 +134,32 @@ abstract class BaseTaxQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Tax A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Tax A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Tax A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `RATE`, `CREATED_AT`, `UPDATED_AT` FROM `tax` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `rate`, `created_at`, `updated_at` FROM `tax` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -242,7 +255,8 @@ abstract class BaseTaxQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -255,8 +269,22 @@ abstract class BaseTaxQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(TaxPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(TaxPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(TaxPeer::ID, $id, $comparison);
@@ -269,7 +297,8 @@ abstract class BaseTaxQuery extends ModelCriteria
      * <code>
      * $query->filterByRate(1234); // WHERE rate = 1234
      * $query->filterByRate(array(12, 34)); // WHERE rate IN (12, 34)
-     * $query->filterByRate(array('min' => 12)); // WHERE rate > 12
+     * $query->filterByRate(array('min' => 12)); // WHERE rate >= 12
+     * $query->filterByRate(array('max' => 12)); // WHERE rate <= 12
      * </code>
      *
      * @param     mixed $rate The value to use as filter.
@@ -395,8 +424,8 @@ abstract class BaseTaxQuery extends ModelCriteria
      * @param   TaxRuleCountry|PropelObjectCollection $taxRuleCountry  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaxQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaxQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTaxRuleCountry($taxRuleCountry, $comparison = null)
     {
@@ -469,8 +498,8 @@ abstract class BaseTaxQuery extends ModelCriteria
      * @param   TaxI18n|PropelObjectCollection $taxI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   TaxQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 TaxQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByTaxI18n($taxI18n, $comparison = null)
     {
@@ -629,7 +658,7 @@ abstract class BaseTaxQuery extends ModelCriteria
      *
      * @return    TaxQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'TaxI18n';
 
@@ -647,7 +676,7 @@ abstract class BaseTaxQuery extends ModelCriteria
      *
      * @return    TaxQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -668,7 +697,7 @@ abstract class BaseTaxQuery extends ModelCriteria
      *
      * @return    TaxI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

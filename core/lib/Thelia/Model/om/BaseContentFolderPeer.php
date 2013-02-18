@@ -46,17 +46,17 @@ abstract class BaseContentFolderPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
-    /** the column name for the CONTENT_ID field */
-    const CONTENT_ID = 'content_folder.CONTENT_ID';
+    /** the column name for the content_id field */
+    const CONTENT_ID = 'content_folder.content_id';
 
-    /** the column name for the FOLDER_ID field */
-    const FOLDER_ID = 'content_folder.FOLDER_ID';
+    /** the column name for the folder_id field */
+    const FOLDER_ID = 'content_folder.folder_id';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'content_folder.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'content_folder.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'content_folder.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'content_folder.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -176,10 +176,10 @@ abstract class BaseContentFolderPeer
             $criteria->addSelectColumn(ContentFolderPeer::CREATED_AT);
             $criteria->addSelectColumn(ContentFolderPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.CONTENT_ID');
-            $criteria->addSelectColumn($alias . '.FOLDER_ID');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.content_id');
+            $criteria->addSelectColumn($alias . '.folder_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -263,7 +263,7 @@ abstract class BaseContentFolderPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -368,8 +368,15 @@ abstract class BaseContentFolderPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (ContentFolderPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         ContentFolderPeer::$instances = array();
     }
 
@@ -1135,7 +1142,7 @@ abstract class BaseContentFolderPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return ContentFolderPeer::OM_CLASS;
     }

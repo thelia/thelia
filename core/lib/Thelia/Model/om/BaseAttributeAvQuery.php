@@ -55,7 +55,6 @@ use Thelia\Model\AttributeCombination;
  * @method AttributeAv findOne(PropelPDO $con = null) Return the first AttributeAv matching the query
  * @method AttributeAv findOneOrCreate(PropelPDO $con = null) Return the first AttributeAv matching the query, or a new AttributeAv object populated from the query conditions when no match is found
  *
- * @method AttributeAv findOneById(int $id) Return the first AttributeAv filtered by the id column
  * @method AttributeAv findOneByAttributeId(int $attribute_id) Return the first AttributeAv filtered by the attribute_id column
  * @method AttributeAv findOneByPosition(int $position) Return the first AttributeAv filtered by the position column
  * @method AttributeAv findOneByCreatedAt(string $created_at) Return the first AttributeAv filtered by the created_at column
@@ -87,7 +86,7 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      * Returns a new AttributeAvQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AttributeAvQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AttributeAvQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AttributeAvQuery
      */
@@ -144,18 +143,32 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 AttributeAv A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   AttributeAv A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 AttributeAv A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ATTRIBUTE_ID`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `attribute_av` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `attribute_id`, `position`, `created_at`, `updated_at` FROM `attribute_av` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -251,7 +264,8 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -264,8 +278,22 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(AttributeAvPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(AttributeAvPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AttributeAvPeer::ID, $id, $comparison);
@@ -278,7 +306,8 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      * <code>
      * $query->filterByAttributeId(1234); // WHERE attribute_id = 1234
      * $query->filterByAttributeId(array(12, 34)); // WHERE attribute_id IN (12, 34)
-     * $query->filterByAttributeId(array('min' => 12)); // WHERE attribute_id > 12
+     * $query->filterByAttributeId(array('min' => 12)); // WHERE attribute_id >= 12
+     * $query->filterByAttributeId(array('max' => 12)); // WHERE attribute_id <= 12
      * </code>
      *
      * @see       filterByAttribute()
@@ -321,7 +350,8 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -447,8 +477,8 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      * @param   Attribute|PropelObjectCollection $attribute The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AttributeAvQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AttributeAvQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttribute($attribute, $comparison = null)
     {
@@ -523,8 +553,8 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      * @param   AttributeCombination|PropelObjectCollection $attributeCombination  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AttributeAvQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AttributeAvQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttributeCombination($attributeCombination, $comparison = null)
     {
@@ -597,8 +627,8 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      * @param   AttributeAvI18n|PropelObjectCollection $attributeAvI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AttributeAvQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AttributeAvQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttributeAvI18n($attributeAvI18n, $comparison = null)
     {
@@ -757,7 +787,7 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      *
      * @return    AttributeAvQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'AttributeAvI18n';
 
@@ -775,7 +805,7 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      *
      * @return    AttributeAvQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -796,7 +826,7 @@ abstract class BaseAttributeAvQuery extends ModelCriteria
      *
      * @return    AttributeAvI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

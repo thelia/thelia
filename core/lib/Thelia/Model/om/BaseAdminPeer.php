@@ -45,32 +45,32 @@ abstract class BaseAdminPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 9;
 
-    /** the column name for the ID field */
-    const ID = 'admin.ID';
+    /** the column name for the id field */
+    const ID = 'admin.id';
 
-    /** the column name for the FIRSTNAME field */
-    const FIRSTNAME = 'admin.FIRSTNAME';
+    /** the column name for the firstname field */
+    const FIRSTNAME = 'admin.firstname';
 
-    /** the column name for the LASTNAME field */
-    const LASTNAME = 'admin.LASTNAME';
+    /** the column name for the lastname field */
+    const LASTNAME = 'admin.lastname';
 
-    /** the column name for the LOGIN field */
-    const LOGIN = 'admin.LOGIN';
+    /** the column name for the login field */
+    const LOGIN = 'admin.login';
 
-    /** the column name for the PASSWORD field */
-    const PASSWORD = 'admin.PASSWORD';
+    /** the column name for the password field */
+    const PASSWORD = 'admin.password';
 
-    /** the column name for the ALGO field */
-    const ALGO = 'admin.ALGO';
+    /** the column name for the algo field */
+    const ALGO = 'admin.algo';
 
-    /** the column name for the SALT field */
-    const SALT = 'admin.SALT';
+    /** the column name for the salt field */
+    const SALT = 'admin.salt';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'admin.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'admin.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'admin.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'admin.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -195,15 +195,15 @@ abstract class BaseAdminPeer
             $criteria->addSelectColumn(AdminPeer::CREATED_AT);
             $criteria->addSelectColumn(AdminPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.FIRSTNAME');
-            $criteria->addSelectColumn($alias . '.LASTNAME');
-            $criteria->addSelectColumn($alias . '.LOGIN');
-            $criteria->addSelectColumn($alias . '.PASSWORD');
-            $criteria->addSelectColumn($alias . '.ALGO');
-            $criteria->addSelectColumn($alias . '.SALT');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.firstname');
+            $criteria->addSelectColumn($alias . '.lastname');
+            $criteria->addSelectColumn($alias . '.login');
+            $criteria->addSelectColumn($alias . '.password');
+            $criteria->addSelectColumn($alias . '.algo');
+            $criteria->addSelectColumn($alias . '.salt');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -287,7 +287,7 @@ abstract class BaseAdminPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -392,8 +392,15 @@ abstract class BaseAdminPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AdminPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AdminPeer::$instances = array();
     }
 
@@ -531,7 +538,7 @@ abstract class BaseAdminPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AdminPeer::OM_CLASS;
     }

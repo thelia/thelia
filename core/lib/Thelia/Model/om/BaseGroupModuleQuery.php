@@ -52,7 +52,6 @@ use Thelia\Model\Module;
  * @method GroupModule findOne(PropelPDO $con = null) Return the first GroupModule matching the query
  * @method GroupModule findOneOrCreate(PropelPDO $con = null) Return the first GroupModule matching the query, or a new GroupModule object populated from the query conditions when no match is found
  *
- * @method GroupModule findOneById(int $id) Return the first GroupModule filtered by the id column
  * @method GroupModule findOneByGroupId(int $group_id) Return the first GroupModule filtered by the group_id column
  * @method GroupModule findOneByModuleId(int $module_id) Return the first GroupModule filtered by the module_id column
  * @method GroupModule findOneByAccess(int $access) Return the first GroupModule filtered by the access column
@@ -86,7 +85,7 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      * Returns a new GroupModuleQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     GroupModuleQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   GroupModuleQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return GroupModuleQuery
      */
@@ -143,18 +142,32 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 GroupModule A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   GroupModule A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 GroupModule A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `GROUP_ID`, `MODULE_ID`, `ACCESS`, `CREATED_AT`, `UPDATED_AT` FROM `group_module` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `group_id`, `module_id`, `access`, `created_at`, `updated_at` FROM `group_module` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -250,7 +263,8 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -263,8 +277,22 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(GroupModulePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(GroupModulePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(GroupModulePeer::ID, $id, $comparison);
@@ -277,7 +305,8 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      * <code>
      * $query->filterByGroupId(1234); // WHERE group_id = 1234
      * $query->filterByGroupId(array(12, 34)); // WHERE group_id IN (12, 34)
-     * $query->filterByGroupId(array('min' => 12)); // WHERE group_id > 12
+     * $query->filterByGroupId(array('min' => 12)); // WHERE group_id >= 12
+     * $query->filterByGroupId(array('max' => 12)); // WHERE group_id <= 12
      * </code>
      *
      * @see       filterByGroup()
@@ -320,7 +349,8 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      * <code>
      * $query->filterByModuleId(1234); // WHERE module_id = 1234
      * $query->filterByModuleId(array(12, 34)); // WHERE module_id IN (12, 34)
-     * $query->filterByModuleId(array('min' => 12)); // WHERE module_id > 12
+     * $query->filterByModuleId(array('min' => 12)); // WHERE module_id >= 12
+     * $query->filterByModuleId(array('max' => 12)); // WHERE module_id <= 12
      * </code>
      *
      * @see       filterByModule()
@@ -363,7 +393,8 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      * <code>
      * $query->filterByAccess(1234); // WHERE access = 1234
      * $query->filterByAccess(array(12, 34)); // WHERE access IN (12, 34)
-     * $query->filterByAccess(array('min' => 12)); // WHERE access > 12
+     * $query->filterByAccess(array('min' => 12)); // WHERE access >= 12
+     * $query->filterByAccess(array('max' => 12)); // WHERE access <= 12
      * </code>
      *
      * @param     mixed $access The value to use as filter.
@@ -489,8 +520,8 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      * @param   Group|PropelObjectCollection $group The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupModuleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupModuleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGroup($group, $comparison = null)
     {
@@ -565,8 +596,8 @@ abstract class BaseGroupModuleQuery extends ModelCriteria
      * @param   Module|PropelObjectCollection $module The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   GroupModuleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 GroupModuleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByModule($module, $comparison = null)
     {

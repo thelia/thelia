@@ -42,14 +42,14 @@ class AdminLogTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('ADMIN_LOGIN', 'AdminLogin', 'VARCHAR', false, 255, null);
-        $this->addColumn('ADMIN_FIRSTNAME', 'AdminFirstname', 'VARCHAR', false, 255, null);
-        $this->addColumn('ADMIN_LASTNAME', 'AdminLastname', 'VARCHAR', false, 255, null);
-        $this->addColumn('ACTION', 'Action', 'VARCHAR', false, 255, null);
-        $this->addColumn('REQUEST', 'Request', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('admin_login', 'AdminLogin', 'VARCHAR', false, 255, null);
+        $this->addColumn('admin_firstname', 'AdminFirstname', 'VARCHAR', false, 255, null);
+        $this->addColumn('admin_lastname', 'AdminLastname', 'VARCHAR', false, 255, null);
+        $this->addColumn('action', 'Action', 'VARCHAR', false, 255, null);
+        $this->addColumn('request', 'Request', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -69,7 +69,11 @@ class AdminLogTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

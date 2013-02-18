@@ -171,13 +171,19 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -319,22 +325,25 @@ abstract class BaseFolder extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -356,22 +365,25 @@ abstract class BaseFolder extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -403,22 +415,25 @@ abstract class BaseFolder extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->version_created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->version_created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->version_created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -439,7 +454,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -460,7 +475,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function setParent($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -481,7 +496,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function setLink($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -502,7 +517,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function setVisible($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -523,7 +538,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function setPosition($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -590,7 +605,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function setVersion($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -634,7 +649,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function setVersionCreatedBy($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -700,7 +715,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 10; // 10 = FolderPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -934,7 +949,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collImages !== null) {
                 foreach ($this->collImages as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -952,7 +967,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collDocuments !== null) {
                 foreach ($this->collDocuments as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -970,7 +985,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collRewritings !== null) {
                 foreach ($this->collRewritings as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -987,7 +1002,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collContentFolders !== null) {
                 foreach ($this->collContentFolders as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -1004,7 +1019,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collFolderI18ns !== null) {
                 foreach ($this->collFolderI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -1021,7 +1036,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             if ($this->collFolderVersions !== null) {
                 foreach ($this->collFolderVersions as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -1054,34 +1069,34 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(FolderPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(FolderPeer::PARENT)) {
-            $modifiedColumns[':p' . $index++]  = '`PARENT`';
+            $modifiedColumns[':p' . $index++]  = '`parent`';
         }
         if ($this->isColumnModified(FolderPeer::LINK)) {
-            $modifiedColumns[':p' . $index++]  = '`LINK`';
+            $modifiedColumns[':p' . $index++]  = '`link`';
         }
         if ($this->isColumnModified(FolderPeer::VISIBLE)) {
-            $modifiedColumns[':p' . $index++]  = '`VISIBLE`';
+            $modifiedColumns[':p' . $index++]  = '`visible`';
         }
         if ($this->isColumnModified(FolderPeer::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = '`POSITION`';
+            $modifiedColumns[':p' . $index++]  = '`position`';
         }
         if ($this->isColumnModified(FolderPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(FolderPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
         if ($this->isColumnModified(FolderPeer::VERSION)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION`';
+            $modifiedColumns[':p' . $index++]  = '`version`';
         }
         if ($this->isColumnModified(FolderPeer::VERSION_CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`version_created_at`';
         }
         if ($this->isColumnModified(FolderPeer::VERSION_CREATED_BY)) {
-            $modifiedColumns[':p' . $index++]  = '`VERSION_CREATED_BY`';
+            $modifiedColumns[':p' . $index++]  = '`version_created_by`';
         }
 
         $sql = sprintf(
@@ -1094,34 +1109,34 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`PARENT`':
+                    case '`parent`':
                         $stmt->bindValue($identifier, $this->parent, PDO::PARAM_INT);
                         break;
-                    case '`LINK`':
+                    case '`link`':
                         $stmt->bindValue($identifier, $this->link, PDO::PARAM_STR);
                         break;
-                    case '`VISIBLE`':
+                    case '`visible`':
                         $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
                         break;
-                    case '`POSITION`':
+                    case '`position`':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
-                    case '`VERSION`':
+                    case '`version`':
                         $stmt->bindValue($identifier, $this->version, PDO::PARAM_INT);
                         break;
-                    case '`VERSION_CREATED_AT`':
+                    case '`version_created_at`':
                         $stmt->bindValue($identifier, $this->version_created_at, PDO::PARAM_STR);
                         break;
-                    case '`VERSION_CREATED_BY`':
+                    case '`version_created_by`':
                         $stmt->bindValue($identifier, $this->version_created_by, PDO::PARAM_STR);
                         break;
                 }
@@ -1192,11 +1207,11 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1717,13 +1732,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Folder The current object (for fluent API support)
      * @see        addImages()
      */
     public function clearImages()
     {
         $this->collImages = null; // important to set this to null since that means it is uninitialized
         $this->collImagesPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1795,6 +1812,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
                       $this->collImagesPartial = true;
                     }
 
+                    $collImages->getInternalIterator()->rewind();
                     return $collImages;
                 }
 
@@ -1822,12 +1840,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @param PropelCollection $images A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Folder The current object (for fluent API support)
      */
     public function setImages(PropelCollection $images, PropelPDO $con = null)
     {
-        $this->imagesScheduledForDeletion = $this->getImages(new Criteria(), $con)->diff($images);
+        $imagesToDelete = $this->getImages(new Criteria(), $con)->diff($images);
 
-        foreach ($this->imagesScheduledForDeletion as $imageRemoved) {
+        $this->imagesScheduledForDeletion = unserialize(serialize($imagesToDelete));
+
+        foreach ($imagesToDelete as $imageRemoved) {
             $imageRemoved->setFolder(null);
         }
 
@@ -1838,6 +1859,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         $this->collImages = $images;
         $this->collImagesPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1855,22 +1878,22 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if (null === $this->collImages || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collImages) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getImages());
-                }
-                $query = ImageQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collImages);
+
+            if($partial && !$criteria) {
+                return count($this->getImages());
+            }
+            $query = ImageQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
         }
+
+        return count($this->collImages);
     }
 
     /**
@@ -1886,7 +1909,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->initImages();
             $this->collImagesPartial = true;
         }
-        if (!$this->collImages->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddImage($l);
         }
 
@@ -1904,6 +1927,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
     /**
      * @param	Image $image The image object to remove.
+     * @return Folder The current object (for fluent API support)
      */
     public function removeImage($image)
     {
@@ -1916,6 +1940,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->imagesScheduledForDeletion[]= $image;
             $image->setFolder(null);
         }
+
+        return $this;
     }
 
 
@@ -1999,13 +2025,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Folder The current object (for fluent API support)
      * @see        addDocuments()
      */
     public function clearDocuments()
     {
         $this->collDocuments = null; // important to set this to null since that means it is uninitialized
         $this->collDocumentsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -2077,6 +2105,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
                       $this->collDocumentsPartial = true;
                     }
 
+                    $collDocuments->getInternalIterator()->rewind();
                     return $collDocuments;
                 }
 
@@ -2104,12 +2133,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @param PropelCollection $documents A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Folder The current object (for fluent API support)
      */
     public function setDocuments(PropelCollection $documents, PropelPDO $con = null)
     {
-        $this->documentsScheduledForDeletion = $this->getDocuments(new Criteria(), $con)->diff($documents);
+        $documentsToDelete = $this->getDocuments(new Criteria(), $con)->diff($documents);
 
-        foreach ($this->documentsScheduledForDeletion as $documentRemoved) {
+        $this->documentsScheduledForDeletion = unserialize(serialize($documentsToDelete));
+
+        foreach ($documentsToDelete as $documentRemoved) {
             $documentRemoved->setFolder(null);
         }
 
@@ -2120,6 +2152,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         $this->collDocuments = $documents;
         $this->collDocumentsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2137,22 +2171,22 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if (null === $this->collDocuments || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collDocuments) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getDocuments());
-                }
-                $query = DocumentQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collDocuments);
+
+            if($partial && !$criteria) {
+                return count($this->getDocuments());
+            }
+            $query = DocumentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
         }
+
+        return count($this->collDocuments);
     }
 
     /**
@@ -2168,7 +2202,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->initDocuments();
             $this->collDocumentsPartial = true;
         }
-        if (!$this->collDocuments->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collDocuments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddDocument($l);
         }
 
@@ -2186,6 +2220,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
     /**
      * @param	Document $document The document object to remove.
+     * @return Folder The current object (for fluent API support)
      */
     public function removeDocument($document)
     {
@@ -2198,6 +2233,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->documentsScheduledForDeletion[]= $document;
             $document->setFolder(null);
         }
+
+        return $this;
     }
 
 
@@ -2281,13 +2318,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Folder The current object (for fluent API support)
      * @see        addRewritings()
      */
     public function clearRewritings()
     {
         $this->collRewritings = null; // important to set this to null since that means it is uninitialized
         $this->collRewritingsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -2359,6 +2398,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
                       $this->collRewritingsPartial = true;
                     }
 
+                    $collRewritings->getInternalIterator()->rewind();
                     return $collRewritings;
                 }
 
@@ -2386,12 +2426,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @param PropelCollection $rewritings A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Folder The current object (for fluent API support)
      */
     public function setRewritings(PropelCollection $rewritings, PropelPDO $con = null)
     {
-        $this->rewritingsScheduledForDeletion = $this->getRewritings(new Criteria(), $con)->diff($rewritings);
+        $rewritingsToDelete = $this->getRewritings(new Criteria(), $con)->diff($rewritings);
 
-        foreach ($this->rewritingsScheduledForDeletion as $rewritingRemoved) {
+        $this->rewritingsScheduledForDeletion = unserialize(serialize($rewritingsToDelete));
+
+        foreach ($rewritingsToDelete as $rewritingRemoved) {
             $rewritingRemoved->setFolder(null);
         }
 
@@ -2402,6 +2445,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         $this->collRewritings = $rewritings;
         $this->collRewritingsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2419,22 +2464,22 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if (null === $this->collRewritings || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collRewritings) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getRewritings());
-                }
-                $query = RewritingQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collRewritings);
+
+            if($partial && !$criteria) {
+                return count($this->getRewritings());
+            }
+            $query = RewritingQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
         }
+
+        return count($this->collRewritings);
     }
 
     /**
@@ -2450,7 +2495,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->initRewritings();
             $this->collRewritingsPartial = true;
         }
-        if (!$this->collRewritings->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collRewritings->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddRewriting($l);
         }
 
@@ -2468,6 +2513,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
     /**
      * @param	Rewriting $rewriting The rewriting object to remove.
+     * @return Folder The current object (for fluent API support)
      */
     public function removeRewriting($rewriting)
     {
@@ -2480,6 +2526,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->rewritingsScheduledForDeletion[]= $rewriting;
             $rewriting->setFolder(null);
         }
+
+        return $this;
     }
 
 
@@ -2563,13 +2611,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Folder The current object (for fluent API support)
      * @see        addContentFolders()
      */
     public function clearContentFolders()
     {
         $this->collContentFolders = null; // important to set this to null since that means it is uninitialized
         $this->collContentFoldersPartial = null;
+
+        return $this;
     }
 
     /**
@@ -2641,6 +2691,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
                       $this->collContentFoldersPartial = true;
                     }
 
+                    $collContentFolders->getInternalIterator()->rewind();
                     return $collContentFolders;
                 }
 
@@ -2668,12 +2719,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @param PropelCollection $contentFolders A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Folder The current object (for fluent API support)
      */
     public function setContentFolders(PropelCollection $contentFolders, PropelPDO $con = null)
     {
-        $this->contentFoldersScheduledForDeletion = $this->getContentFolders(new Criteria(), $con)->diff($contentFolders);
+        $contentFoldersToDelete = $this->getContentFolders(new Criteria(), $con)->diff($contentFolders);
 
-        foreach ($this->contentFoldersScheduledForDeletion as $contentFolderRemoved) {
+        $this->contentFoldersScheduledForDeletion = unserialize(serialize($contentFoldersToDelete));
+
+        foreach ($contentFoldersToDelete as $contentFolderRemoved) {
             $contentFolderRemoved->setFolder(null);
         }
 
@@ -2684,6 +2738,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         $this->collContentFolders = $contentFolders;
         $this->collContentFoldersPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2701,22 +2757,22 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if (null === $this->collContentFolders || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collContentFolders) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getContentFolders());
-                }
-                $query = ContentFolderQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collContentFolders);
+
+            if($partial && !$criteria) {
+                return count($this->getContentFolders());
+            }
+            $query = ContentFolderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
         }
+
+        return count($this->collContentFolders);
     }
 
     /**
@@ -2732,7 +2788,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->initContentFolders();
             $this->collContentFoldersPartial = true;
         }
-        if (!$this->collContentFolders->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collContentFolders->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddContentFolder($l);
         }
 
@@ -2750,6 +2806,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
     /**
      * @param	ContentFolder $contentFolder The contentFolder object to remove.
+     * @return Folder The current object (for fluent API support)
      */
     public function removeContentFolder($contentFolder)
     {
@@ -2759,9 +2816,11 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 $this->contentFoldersScheduledForDeletion = clone $this->collContentFolders;
                 $this->contentFoldersScheduledForDeletion->clear();
             }
-            $this->contentFoldersScheduledForDeletion[]= $contentFolder;
+            $this->contentFoldersScheduledForDeletion[]= clone $contentFolder;
             $contentFolder->setFolder(null);
         }
+
+        return $this;
     }
 
 
@@ -2795,13 +2854,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Folder The current object (for fluent API support)
      * @see        addFolderI18ns()
      */
     public function clearFolderI18ns()
     {
         $this->collFolderI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collFolderI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -2873,6 +2934,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
                       $this->collFolderI18nsPartial = true;
                     }
 
+                    $collFolderI18ns->getInternalIterator()->rewind();
                     return $collFolderI18ns;
                 }
 
@@ -2900,12 +2962,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @param PropelCollection $folderI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Folder The current object (for fluent API support)
      */
     public function setFolderI18ns(PropelCollection $folderI18ns, PropelPDO $con = null)
     {
-        $this->folderI18nsScheduledForDeletion = $this->getFolderI18ns(new Criteria(), $con)->diff($folderI18ns);
+        $folderI18nsToDelete = $this->getFolderI18ns(new Criteria(), $con)->diff($folderI18ns);
 
-        foreach ($this->folderI18nsScheduledForDeletion as $folderI18nRemoved) {
+        $this->folderI18nsScheduledForDeletion = unserialize(serialize($folderI18nsToDelete));
+
+        foreach ($folderI18nsToDelete as $folderI18nRemoved) {
             $folderI18nRemoved->setFolder(null);
         }
 
@@ -2916,6 +2981,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         $this->collFolderI18ns = $folderI18ns;
         $this->collFolderI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -2933,22 +3000,22 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if (null === $this->collFolderI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collFolderI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getFolderI18ns());
-                }
-                $query = FolderI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collFolderI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getFolderI18ns());
+            }
+            $query = FolderI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
         }
+
+        return count($this->collFolderI18ns);
     }
 
     /**
@@ -2968,7 +3035,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->initFolderI18ns();
             $this->collFolderI18nsPartial = true;
         }
-        if (!$this->collFolderI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collFolderI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddFolderI18n($l);
         }
 
@@ -2986,6 +3053,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
     /**
      * @param	FolderI18n $folderI18n The folderI18n object to remove.
+     * @return Folder The current object (for fluent API support)
      */
     public function removeFolderI18n($folderI18n)
     {
@@ -2995,9 +3063,11 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 $this->folderI18nsScheduledForDeletion = clone $this->collFolderI18ns;
                 $this->folderI18nsScheduledForDeletion->clear();
             }
-            $this->folderI18nsScheduledForDeletion[]= $folderI18n;
+            $this->folderI18nsScheduledForDeletion[]= clone $folderI18n;
             $folderI18n->setFolder(null);
         }
+
+        return $this;
     }
 
     /**
@@ -3006,13 +3076,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Folder The current object (for fluent API support)
      * @see        addFolderVersions()
      */
     public function clearFolderVersions()
     {
         $this->collFolderVersions = null; // important to set this to null since that means it is uninitialized
         $this->collFolderVersionsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -3084,6 +3156,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
                       $this->collFolderVersionsPartial = true;
                     }
 
+                    $collFolderVersions->getInternalIterator()->rewind();
                     return $collFolderVersions;
                 }
 
@@ -3111,12 +3184,15 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @param PropelCollection $folderVersions A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Folder The current object (for fluent API support)
      */
     public function setFolderVersions(PropelCollection $folderVersions, PropelPDO $con = null)
     {
-        $this->folderVersionsScheduledForDeletion = $this->getFolderVersions(new Criteria(), $con)->diff($folderVersions);
+        $folderVersionsToDelete = $this->getFolderVersions(new Criteria(), $con)->diff($folderVersions);
 
-        foreach ($this->folderVersionsScheduledForDeletion as $folderVersionRemoved) {
+        $this->folderVersionsScheduledForDeletion = unserialize(serialize($folderVersionsToDelete));
+
+        foreach ($folderVersionsToDelete as $folderVersionRemoved) {
             $folderVersionRemoved->setFolder(null);
         }
 
@@ -3127,6 +3203,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
         $this->collFolderVersions = $folderVersions;
         $this->collFolderVersionsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -3144,22 +3222,22 @@ abstract class BaseFolder extends BaseObject implements Persistent
         if (null === $this->collFolderVersions || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collFolderVersions) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getFolderVersions());
-                }
-                $query = FolderVersionQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFolder($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collFolderVersions);
+
+            if($partial && !$criteria) {
+                return count($this->getFolderVersions());
+            }
+            $query = FolderVersionQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
         }
+
+        return count($this->collFolderVersions);
     }
 
     /**
@@ -3175,7 +3253,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->initFolderVersions();
             $this->collFolderVersionsPartial = true;
         }
-        if (!$this->collFolderVersions->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collFolderVersions->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddFolderVersion($l);
         }
 
@@ -3193,6 +3271,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
     /**
      * @param	FolderVersion $folderVersion The folderVersion object to remove.
+     * @return Folder The current object (for fluent API support)
      */
     public function removeFolderVersion($folderVersion)
     {
@@ -3202,9 +3281,11 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 $this->folderVersionsScheduledForDeletion = clone $this->collFolderVersions;
                 $this->folderVersionsScheduledForDeletion->clear();
             }
-            $this->folderVersionsScheduledForDeletion[]= $folderVersion;
+            $this->folderVersionsScheduledForDeletion[]= clone $folderVersion;
             $folderVersion->setFolder(null);
         }
+
+        return $this;
     }
 
     /**
@@ -3224,6 +3305,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
         $this->version_created_by = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -3242,7 +3324,8 @@ abstract class BaseFolder extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collImages) {
                 foreach ($this->collImages as $o) {
                     $o->clearAllReferences($deep);
@@ -3273,10 +3356,12 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collImages instanceof PropelCollection) {
@@ -3348,7 +3433,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @return    Folder The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -3372,7 +3457,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return FolderI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collFolderI18ns) {
@@ -3407,7 +3492,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
      *
      * @return    Folder The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             FolderI18nQuery::create()

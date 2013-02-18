@@ -45,23 +45,23 @@ abstract class BaseFeatureI18nPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 6;
 
-    /** the column name for the ID field */
-    const ID = 'feature_i18n.ID';
+    /** the column name for the id field */
+    const ID = 'feature_i18n.id';
 
-    /** the column name for the LOCALE field */
-    const LOCALE = 'feature_i18n.LOCALE';
+    /** the column name for the locale field */
+    const LOCALE = 'feature_i18n.locale';
 
-    /** the column name for the TITLE field */
-    const TITLE = 'feature_i18n.TITLE';
+    /** the column name for the title field */
+    const TITLE = 'feature_i18n.title';
 
-    /** the column name for the DESCRIPTION field */
-    const DESCRIPTION = 'feature_i18n.DESCRIPTION';
+    /** the column name for the description field */
+    const DESCRIPTION = 'feature_i18n.description';
 
-    /** the column name for the CHAPO field */
-    const CHAPO = 'feature_i18n.CHAPO';
+    /** the column name for the chapo field */
+    const CHAPO = 'feature_i18n.chapo';
 
-    /** the column name for the POSTSCRIPTUM field */
-    const POSTSCRIPTUM = 'feature_i18n.POSTSCRIPTUM';
+    /** the column name for the postscriptum field */
+    const POSTSCRIPTUM = 'feature_i18n.postscriptum';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -183,12 +183,12 @@ abstract class BaseFeatureI18nPeer
             $criteria->addSelectColumn(FeatureI18nPeer::CHAPO);
             $criteria->addSelectColumn(FeatureI18nPeer::POSTSCRIPTUM);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.LOCALE');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.CHAPO');
-            $criteria->addSelectColumn($alias . '.POSTSCRIPTUM');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.locale');
+            $criteria->addSelectColumn($alias . '.title');
+            $criteria->addSelectColumn($alias . '.description');
+            $criteria->addSelectColumn($alias . '.chapo');
+            $criteria->addSelectColumn($alias . '.postscriptum');
         }
     }
 
@@ -272,7 +272,7 @@ abstract class BaseFeatureI18nPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -377,8 +377,15 @@ abstract class BaseFeatureI18nPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (FeatureI18nPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         FeatureI18nPeer::$instances = array();
     }
 
@@ -751,7 +758,7 @@ abstract class BaseFeatureI18nPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return FeatureI18nPeer::OM_CLASS;
     }

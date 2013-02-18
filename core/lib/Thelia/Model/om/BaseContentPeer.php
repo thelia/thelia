@@ -51,29 +51,29 @@ abstract class BaseContentPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 8;
 
-    /** the column name for the ID field */
-    const ID = 'content.ID';
+    /** the column name for the id field */
+    const ID = 'content.id';
 
-    /** the column name for the VISIBLE field */
-    const VISIBLE = 'content.VISIBLE';
+    /** the column name for the visible field */
+    const VISIBLE = 'content.visible';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'content.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'content.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'content.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'content.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'content.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'content.updated_at';
 
-    /** the column name for the VERSION field */
-    const VERSION = 'content.VERSION';
+    /** the column name for the version field */
+    const VERSION = 'content.version';
 
-    /** the column name for the VERSION_CREATED_AT field */
-    const VERSION_CREATED_AT = 'content.VERSION_CREATED_AT';
+    /** the column name for the version_created_at field */
+    const VERSION_CREATED_AT = 'content.version_created_at';
 
-    /** the column name for the VERSION_CREATED_BY field */
-    const VERSION_CREATED_BY = 'content.VERSION_CREATED_BY';
+    /** the column name for the version_created_by field */
+    const VERSION_CREATED_BY = 'content.version_created_by';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -93,7 +93,7 @@ abstract class BaseContentPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     // versionable behavior
 
     /**
@@ -211,14 +211,14 @@ abstract class BaseContentPeer
             $criteria->addSelectColumn(ContentPeer::VERSION_CREATED_AT);
             $criteria->addSelectColumn(ContentPeer::VERSION_CREATED_BY);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.VISIBLE');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.visible');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.version');
+            $criteria->addSelectColumn($alias . '.version_created_at');
+            $criteria->addSelectColumn($alias . '.version_created_by');
         }
     }
 
@@ -302,7 +302,7 @@ abstract class BaseContentPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -407,8 +407,15 @@ abstract class BaseContentPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (ContentPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         ContentPeer::$instances = array();
     }
 
@@ -564,7 +571,7 @@ abstract class BaseContentPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return ContentPeer::OM_CLASS;
     }

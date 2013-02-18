@@ -121,13 +121,19 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -212,22 +218,25 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -249,22 +258,25 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -275,7 +287,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -296,7 +308,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      */
     public function setCode($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -317,7 +329,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      */
     public function setTitle($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -338,7 +350,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      */
     public function setDescription($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -442,7 +454,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 6; // 6 = TaxRulePeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -658,7 +670,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
             if ($this->collProducts !== null) {
                 foreach ($this->collProducts as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -676,7 +688,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
             if ($this->collTaxRuleCountrys !== null) {
                 foreach ($this->collTaxRuleCountrys as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -693,7 +705,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
             if ($this->collTaxRuleI18ns !== null) {
                 foreach ($this->collTaxRuleI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -726,22 +738,22 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(TaxRulePeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(TaxRulePeer::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = '`code`';
         }
         if ($this->isColumnModified(TaxRulePeer::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE`';
+            $modifiedColumns[':p' . $index++]  = '`title`';
         }
         if ($this->isColumnModified(TaxRulePeer::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = '`description`';
         }
         if ($this->isColumnModified(TaxRulePeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(TaxRulePeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -754,22 +766,22 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`code`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`TITLE`':
+                    case '`title`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`DESCRIPTION`':
+                    case '`description`':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -840,11 +852,11 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1265,13 +1277,15 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return TaxRule The current object (for fluent API support)
      * @see        addProducts()
      */
     public function clearProducts()
     {
         $this->collProducts = null; // important to set this to null since that means it is uninitialized
         $this->collProductsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1343,6 +1357,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
                       $this->collProductsPartial = true;
                     }
 
+                    $collProducts->getInternalIterator()->rewind();
                     return $collProducts;
                 }
 
@@ -1370,12 +1385,15 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      *
      * @param PropelCollection $products A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return TaxRule The current object (for fluent API support)
      */
     public function setProducts(PropelCollection $products, PropelPDO $con = null)
     {
-        $this->productsScheduledForDeletion = $this->getProducts(new Criteria(), $con)->diff($products);
+        $productsToDelete = $this->getProducts(new Criteria(), $con)->diff($products);
 
-        foreach ($this->productsScheduledForDeletion as $productRemoved) {
+        $this->productsScheduledForDeletion = unserialize(serialize($productsToDelete));
+
+        foreach ($productsToDelete as $productRemoved) {
             $productRemoved->setTaxRule(null);
         }
 
@@ -1386,6 +1404,8 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
         $this->collProducts = $products;
         $this->collProductsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1403,22 +1423,22 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
         if (null === $this->collProducts || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collProducts) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getProducts());
-                }
-                $query = ProductQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByTaxRule($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collProducts);
+
+            if($partial && !$criteria) {
+                return count($this->getProducts());
+            }
+            $query = ProductQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTaxRule($this)
+                ->count($con);
         }
+
+        return count($this->collProducts);
     }
 
     /**
@@ -1434,7 +1454,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             $this->initProducts();
             $this->collProductsPartial = true;
         }
-        if (!$this->collProducts->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collProducts->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddProduct($l);
         }
 
@@ -1452,6 +1472,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
     /**
      * @param	Product $product The product object to remove.
+     * @return TaxRule The current object (for fluent API support)
      */
     public function removeProduct($product)
     {
@@ -1464,6 +1485,8 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             $this->productsScheduledForDeletion[]= $product;
             $product->setTaxRule(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1472,13 +1495,15 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return TaxRule The current object (for fluent API support)
      * @see        addTaxRuleCountrys()
      */
     public function clearTaxRuleCountrys()
     {
         $this->collTaxRuleCountrys = null; // important to set this to null since that means it is uninitialized
         $this->collTaxRuleCountrysPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1550,6 +1575,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
                       $this->collTaxRuleCountrysPartial = true;
                     }
 
+                    $collTaxRuleCountrys->getInternalIterator()->rewind();
                     return $collTaxRuleCountrys;
                 }
 
@@ -1577,12 +1603,15 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      *
      * @param PropelCollection $taxRuleCountrys A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return TaxRule The current object (for fluent API support)
      */
     public function setTaxRuleCountrys(PropelCollection $taxRuleCountrys, PropelPDO $con = null)
     {
-        $this->taxRuleCountrysScheduledForDeletion = $this->getTaxRuleCountrys(new Criteria(), $con)->diff($taxRuleCountrys);
+        $taxRuleCountrysToDelete = $this->getTaxRuleCountrys(new Criteria(), $con)->diff($taxRuleCountrys);
 
-        foreach ($this->taxRuleCountrysScheduledForDeletion as $taxRuleCountryRemoved) {
+        $this->taxRuleCountrysScheduledForDeletion = unserialize(serialize($taxRuleCountrysToDelete));
+
+        foreach ($taxRuleCountrysToDelete as $taxRuleCountryRemoved) {
             $taxRuleCountryRemoved->setTaxRule(null);
         }
 
@@ -1593,6 +1622,8 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
         $this->collTaxRuleCountrys = $taxRuleCountrys;
         $this->collTaxRuleCountrysPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1610,22 +1641,22 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
         if (null === $this->collTaxRuleCountrys || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collTaxRuleCountrys) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTaxRuleCountrys());
-                }
-                $query = TaxRuleCountryQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByTaxRule($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collTaxRuleCountrys);
+
+            if($partial && !$criteria) {
+                return count($this->getTaxRuleCountrys());
+            }
+            $query = TaxRuleCountryQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTaxRule($this)
+                ->count($con);
         }
+
+        return count($this->collTaxRuleCountrys);
     }
 
     /**
@@ -1641,7 +1672,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             $this->initTaxRuleCountrys();
             $this->collTaxRuleCountrysPartial = true;
         }
-        if (!$this->collTaxRuleCountrys->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collTaxRuleCountrys->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTaxRuleCountry($l);
         }
 
@@ -1659,6 +1690,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
     /**
      * @param	TaxRuleCountry $taxRuleCountry The taxRuleCountry object to remove.
+     * @return TaxRule The current object (for fluent API support)
      */
     public function removeTaxRuleCountry($taxRuleCountry)
     {
@@ -1671,6 +1703,8 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             $this->taxRuleCountrysScheduledForDeletion[]= $taxRuleCountry;
             $taxRuleCountry->setTaxRule(null);
         }
+
+        return $this;
     }
 
 
@@ -1729,13 +1763,15 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return TaxRule The current object (for fluent API support)
      * @see        addTaxRuleI18ns()
      */
     public function clearTaxRuleI18ns()
     {
         $this->collTaxRuleI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collTaxRuleI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1807,6 +1843,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
                       $this->collTaxRuleI18nsPartial = true;
                     }
 
+                    $collTaxRuleI18ns->getInternalIterator()->rewind();
                     return $collTaxRuleI18ns;
                 }
 
@@ -1834,12 +1871,15 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      *
      * @param PropelCollection $taxRuleI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return TaxRule The current object (for fluent API support)
      */
     public function setTaxRuleI18ns(PropelCollection $taxRuleI18ns, PropelPDO $con = null)
     {
-        $this->taxRuleI18nsScheduledForDeletion = $this->getTaxRuleI18ns(new Criteria(), $con)->diff($taxRuleI18ns);
+        $taxRuleI18nsToDelete = $this->getTaxRuleI18ns(new Criteria(), $con)->diff($taxRuleI18ns);
 
-        foreach ($this->taxRuleI18nsScheduledForDeletion as $taxRuleI18nRemoved) {
+        $this->taxRuleI18nsScheduledForDeletion = unserialize(serialize($taxRuleI18nsToDelete));
+
+        foreach ($taxRuleI18nsToDelete as $taxRuleI18nRemoved) {
             $taxRuleI18nRemoved->setTaxRule(null);
         }
 
@@ -1850,6 +1890,8 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
         $this->collTaxRuleI18ns = $taxRuleI18ns;
         $this->collTaxRuleI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1867,22 +1909,22 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
         if (null === $this->collTaxRuleI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collTaxRuleI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getTaxRuleI18ns());
-                }
-                $query = TaxRuleI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByTaxRule($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collTaxRuleI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getTaxRuleI18ns());
+            }
+            $query = TaxRuleI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByTaxRule($this)
+                ->count($con);
         }
+
+        return count($this->collTaxRuleI18ns);
     }
 
     /**
@@ -1902,7 +1944,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
             $this->initTaxRuleI18ns();
             $this->collTaxRuleI18nsPartial = true;
         }
-        if (!$this->collTaxRuleI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collTaxRuleI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddTaxRuleI18n($l);
         }
 
@@ -1920,6 +1962,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
 
     /**
      * @param	TaxRuleI18n $taxRuleI18n The taxRuleI18n object to remove.
+     * @return TaxRule The current object (for fluent API support)
      */
     public function removeTaxRuleI18n($taxRuleI18n)
     {
@@ -1929,9 +1972,11 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
                 $this->taxRuleI18nsScheduledForDeletion = clone $this->collTaxRuleI18ns;
                 $this->taxRuleI18nsScheduledForDeletion->clear();
             }
-            $this->taxRuleI18nsScheduledForDeletion[]= $taxRuleI18n;
+            $this->taxRuleI18nsScheduledForDeletion[]= clone $taxRuleI18n;
             $taxRuleI18n->setTaxRule(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1947,6 +1992,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1964,7 +2010,8 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collProducts) {
                 foreach ($this->collProducts as $o) {
                     $o->clearAllReferences($deep);
@@ -1980,10 +2027,12 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collProducts instanceof PropelCollection) {
@@ -2043,7 +2092,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      *
      * @return    TaxRule The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -2067,7 +2116,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return TaxRuleI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collTaxRuleI18ns) {
@@ -2102,7 +2151,7 @@ abstract class BaseTaxRule extends BaseObject implements Persistent
      *
      * @return    TaxRule The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             TaxRuleI18nQuery::create()

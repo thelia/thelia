@@ -45,20 +45,20 @@ abstract class BaseMessageI18nPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'message_i18n.ID';
+    /** the column name for the id field */
+    const ID = 'message_i18n.id';
 
-    /** the column name for the LOCALE field */
-    const LOCALE = 'message_i18n.LOCALE';
+    /** the column name for the locale field */
+    const LOCALE = 'message_i18n.locale';
 
-    /** the column name for the TITLE field */
-    const TITLE = 'message_i18n.TITLE';
+    /** the column name for the title field */
+    const TITLE = 'message_i18n.title';
 
-    /** the column name for the DESCRIPTION field */
-    const DESCRIPTION = 'message_i18n.DESCRIPTION';
+    /** the column name for the description field */
+    const DESCRIPTION = 'message_i18n.description';
 
-    /** the column name for the DESCRIPTION_HTML field */
-    const DESCRIPTION_HTML = 'message_i18n.DESCRIPTION_HTML';
+    /** the column name for the description_html field */
+    const DESCRIPTION_HTML = 'message_i18n.description_html';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -179,11 +179,11 @@ abstract class BaseMessageI18nPeer
             $criteria->addSelectColumn(MessageI18nPeer::DESCRIPTION);
             $criteria->addSelectColumn(MessageI18nPeer::DESCRIPTION_HTML);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.LOCALE');
-            $criteria->addSelectColumn($alias . '.TITLE');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION');
-            $criteria->addSelectColumn($alias . '.DESCRIPTION_HTML');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.locale');
+            $criteria->addSelectColumn($alias . '.title');
+            $criteria->addSelectColumn($alias . '.description');
+            $criteria->addSelectColumn($alias . '.description_html');
         }
     }
 
@@ -267,7 +267,7 @@ abstract class BaseMessageI18nPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -372,8 +372,15 @@ abstract class BaseMessageI18nPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (MessageI18nPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         MessageI18nPeer::$instances = array();
     }
 
@@ -746,7 +753,7 @@ abstract class BaseMessageI18nPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return MessageI18nPeer::OM_CLASS;
     }

@@ -101,13 +101,19 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -166,22 +172,25 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -203,22 +212,25 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -229,7 +241,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -250,7 +262,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      */
     public function setCode($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -352,7 +364,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 4; // 4 = OrderStatusPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -566,7 +578,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
             if ($this->collOrders !== null) {
                 foreach ($this->collOrders as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -583,7 +595,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
             if ($this->collOrderStatusI18ns !== null) {
                 foreach ($this->collOrderStatusI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -616,16 +628,16 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderStatusPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(OrderStatusPeer::CODE)) {
-            $modifiedColumns[':p' . $index++]  = '`CODE`';
+            $modifiedColumns[':p' . $index++]  = '`code`';
         }
         if ($this->isColumnModified(OrderStatusPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(OrderStatusPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -638,16 +650,16 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`CODE`':
+                    case '`code`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -718,11 +730,11 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1103,13 +1115,15 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return OrderStatus The current object (for fluent API support)
      * @see        addOrders()
      */
     public function clearOrders()
     {
         $this->collOrders = null; // important to set this to null since that means it is uninitialized
         $this->collOrdersPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1181,6 +1195,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                       $this->collOrdersPartial = true;
                     }
 
+                    $collOrders->getInternalIterator()->rewind();
                     return $collOrders;
                 }
 
@@ -1208,12 +1223,15 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      *
      * @param PropelCollection $orders A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return OrderStatus The current object (for fluent API support)
      */
     public function setOrders(PropelCollection $orders, PropelPDO $con = null)
     {
-        $this->ordersScheduledForDeletion = $this->getOrders(new Criteria(), $con)->diff($orders);
+        $ordersToDelete = $this->getOrders(new Criteria(), $con)->diff($orders);
 
-        foreach ($this->ordersScheduledForDeletion as $orderRemoved) {
+        $this->ordersScheduledForDeletion = unserialize(serialize($ordersToDelete));
+
+        foreach ($ordersToDelete as $orderRemoved) {
             $orderRemoved->setOrderStatus(null);
         }
 
@@ -1224,6 +1242,8 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
         $this->collOrders = $orders;
         $this->collOrdersPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1241,22 +1261,22 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
         if (null === $this->collOrders || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collOrders) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getOrders());
-                }
-                $query = OrderQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByOrderStatus($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collOrders);
+
+            if($partial && !$criteria) {
+                return count($this->getOrders());
+            }
+            $query = OrderQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByOrderStatus($this)
+                ->count($con);
         }
+
+        return count($this->collOrders);
     }
 
     /**
@@ -1272,7 +1292,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             $this->initOrders();
             $this->collOrdersPartial = true;
         }
-        if (!$this->collOrders->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collOrders->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddOrder($l);
         }
 
@@ -1290,6 +1310,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
     /**
      * @param	Order $order The order object to remove.
+     * @return OrderStatus The current object (for fluent API support)
      */
     public function removeOrder($order)
     {
@@ -1302,6 +1323,8 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             $this->ordersScheduledForDeletion[]= $order;
             $order->setOrderStatus(null);
         }
+
+        return $this;
     }
 
 
@@ -1410,13 +1433,15 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return OrderStatus The current object (for fluent API support)
      * @see        addOrderStatusI18ns()
      */
     public function clearOrderStatusI18ns()
     {
         $this->collOrderStatusI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collOrderStatusI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1488,6 +1513,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                       $this->collOrderStatusI18nsPartial = true;
                     }
 
+                    $collOrderStatusI18ns->getInternalIterator()->rewind();
                     return $collOrderStatusI18ns;
                 }
 
@@ -1515,12 +1541,15 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      *
      * @param PropelCollection $orderStatusI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return OrderStatus The current object (for fluent API support)
      */
     public function setOrderStatusI18ns(PropelCollection $orderStatusI18ns, PropelPDO $con = null)
     {
-        $this->orderStatusI18nsScheduledForDeletion = $this->getOrderStatusI18ns(new Criteria(), $con)->diff($orderStatusI18ns);
+        $orderStatusI18nsToDelete = $this->getOrderStatusI18ns(new Criteria(), $con)->diff($orderStatusI18ns);
 
-        foreach ($this->orderStatusI18nsScheduledForDeletion as $orderStatusI18nRemoved) {
+        $this->orderStatusI18nsScheduledForDeletion = unserialize(serialize($orderStatusI18nsToDelete));
+
+        foreach ($orderStatusI18nsToDelete as $orderStatusI18nRemoved) {
             $orderStatusI18nRemoved->setOrderStatus(null);
         }
 
@@ -1531,6 +1560,8 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
         $this->collOrderStatusI18ns = $orderStatusI18ns;
         $this->collOrderStatusI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1548,22 +1579,22 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
         if (null === $this->collOrderStatusI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collOrderStatusI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getOrderStatusI18ns());
-                }
-                $query = OrderStatusI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByOrderStatus($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collOrderStatusI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getOrderStatusI18ns());
+            }
+            $query = OrderStatusI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByOrderStatus($this)
+                ->count($con);
         }
+
+        return count($this->collOrderStatusI18ns);
     }
 
     /**
@@ -1583,7 +1614,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
             $this->initOrderStatusI18ns();
             $this->collOrderStatusI18nsPartial = true;
         }
-        if (!$this->collOrderStatusI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collOrderStatusI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddOrderStatusI18n($l);
         }
 
@@ -1601,6 +1632,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
 
     /**
      * @param	OrderStatusI18n $orderStatusI18n The orderStatusI18n object to remove.
+     * @return OrderStatus The current object (for fluent API support)
      */
     public function removeOrderStatusI18n($orderStatusI18n)
     {
@@ -1610,9 +1642,11 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                 $this->orderStatusI18nsScheduledForDeletion = clone $this->collOrderStatusI18ns;
                 $this->orderStatusI18nsScheduledForDeletion->clear();
             }
-            $this->orderStatusI18nsScheduledForDeletion[]= $orderStatusI18n;
+            $this->orderStatusI18nsScheduledForDeletion[]= clone $orderStatusI18n;
             $orderStatusI18n->setOrderStatus(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1626,6 +1660,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1643,7 +1678,8 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collOrders) {
                 foreach ($this->collOrders as $o) {
                     $o->clearAllReferences($deep);
@@ -1654,10 +1690,12 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collOrders instanceof PropelCollection) {
@@ -1713,7 +1751,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      *
      * @return    OrderStatus The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -1737,7 +1775,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return OrderStatusI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collOrderStatusI18ns) {
@@ -1772,7 +1810,7 @@ abstract class BaseOrderStatus extends BaseObject implements Persistent
      *
      * @return    OrderStatus The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             OrderStatusI18nQuery::create()

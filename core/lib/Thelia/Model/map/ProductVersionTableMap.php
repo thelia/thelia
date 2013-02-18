@@ -42,23 +42,23 @@ class ProductVersionTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product', 'ID', true, null, null);
-        $this->addColumn('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', false, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('PRICE2', 'Price2', 'FLOAT', false, null, null);
-        $this->addColumn('ECOTAX', 'Ecotax', 'FLOAT', false, null, null);
-        $this->addColumn('NEWNESS', 'Newness', 'TINYINT', false, null, 0);
-        $this->addColumn('PROMO', 'Promo', 'TINYINT', false, null, 0);
-        $this->addColumn('STOCK', 'Stock', 'INTEGER', false, null, 0);
-        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
-        $this->addColumn('WEIGHT', 'Weight', 'FLOAT', false, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'product', 'id', true, null, null);
+        $this->addColumn('tax_rule_id', 'TaxRuleId', 'INTEGER', false, null, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', true, 255, null);
+        $this->addColumn('price', 'Price', 'FLOAT', true, null, null);
+        $this->addColumn('price2', 'Price2', 'FLOAT', false, null, null);
+        $this->addColumn('ecotax', 'Ecotax', 'FLOAT', false, null, null);
+        $this->addColumn('newness', 'Newness', 'TINYINT', false, null, 0);
+        $this->addColumn('promo', 'Promo', 'TINYINT', false, null, 0);
+        $this->addColumn('stock', 'Stock', 'INTEGER', false, null, 0);
+        $this->addColumn('visible', 'Visible', 'TINYINT', true, null, 0);
+        $this->addColumn('weight', 'Weight', 'FLOAT', false, null, null);
+        $this->addColumn('position', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('version', 'Version', 'INTEGER', true, null, 0);
+        $this->addColumn('version_created_at', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version_created_by', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 

@@ -42,15 +42,15 @@ class MessageVersionTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'message', 'ID', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
-        $this->addColumn('SECURED', 'Secured', 'TINYINT', false, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 255, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'message', 'id', true, null, null);
+        $this->addColumn('code', 'Code', 'VARCHAR', true, 45, null);
+        $this->addColumn('secured', 'Secured', 'TINYINT', false, null, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', false, 255, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('version', 'Version', 'INTEGER', true, null, 0);
+        $this->addColumn('version_created_at', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version_created_by', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 

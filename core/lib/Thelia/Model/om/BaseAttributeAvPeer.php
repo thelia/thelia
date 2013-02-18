@@ -47,20 +47,20 @@ abstract class BaseAttributeAvPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'attribute_av.ID';
+    /** the column name for the id field */
+    const ID = 'attribute_av.id';
 
-    /** the column name for the ATTRIBUTE_ID field */
-    const ATTRIBUTE_ID = 'attribute_av.ATTRIBUTE_ID';
+    /** the column name for the attribute_id field */
+    const ATTRIBUTE_ID = 'attribute_av.attribute_id';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'attribute_av.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'attribute_av.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'attribute_av.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'attribute_av.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'attribute_av.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'attribute_av.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -80,7 +80,7 @@ abstract class BaseAttributeAvPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     /**
      * holds an array of fieldnames
      *
@@ -188,11 +188,11 @@ abstract class BaseAttributeAvPeer
             $criteria->addSelectColumn(AttributeAvPeer::CREATED_AT);
             $criteria->addSelectColumn(AttributeAvPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ATTRIBUTE_ID');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.attribute_id');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -276,7 +276,7 @@ abstract class BaseAttributeAvPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -381,8 +381,15 @@ abstract class BaseAttributeAvPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AttributeAvPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AttributeAvPeer::$instances = array();
     }
 
@@ -761,7 +768,7 @@ abstract class BaseAttributeAvPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AttributeAvPeer::OM_CLASS;
     }

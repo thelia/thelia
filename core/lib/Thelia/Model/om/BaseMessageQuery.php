@@ -58,7 +58,6 @@ use Thelia\Model\MessageVersion;
  * @method Message findOne(PropelPDO $con = null) Return the first Message matching the query
  * @method Message findOneOrCreate(PropelPDO $con = null) Return the first Message matching the query, or a new Message object populated from the query conditions when no match is found
  *
- * @method Message findOneById(int $id) Return the first Message filtered by the id column
  * @method Message findOneByCode(string $code) Return the first Message filtered by the code column
  * @method Message findOneBySecured(int $secured) Return the first Message filtered by the secured column
  * @method Message findOneByRef(string $ref) Return the first Message filtered by the ref column
@@ -98,7 +97,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      * Returns a new MessageQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     MessageQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   MessageQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return MessageQuery
      */
@@ -155,18 +154,32 @@ abstract class BaseMessageQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Message A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Message A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Message A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, `SECURED`, `REF`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `message` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `code`, `secured`, `ref`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `message` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -262,7 +275,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -275,8 +289,22 @@ abstract class BaseMessageQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(MessagePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(MessagePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(MessagePeer::ID, $id, $comparison);
@@ -318,7 +346,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterBySecured(1234); // WHERE secured = 1234
      * $query->filterBySecured(array(12, 34)); // WHERE secured IN (12, 34)
-     * $query->filterBySecured(array('min' => 12)); // WHERE secured > 12
+     * $query->filterBySecured(array('min' => 12)); // WHERE secured >= 12
+     * $query->filterBySecured(array('max' => 12)); // WHERE secured <= 12
      * </code>
      *
      * @param     mixed $secured The value to use as filter.
@@ -474,7 +503,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * <code>
      * $query->filterByVersion(1234); // WHERE version = 1234
      * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
-     * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+     * $query->filterByVersion(array('min' => 12)); // WHERE version >= 12
+     * $query->filterByVersion(array('max' => 12)); // WHERE version <= 12
      * </code>
      *
      * @param     mixed $version The value to use as filter.
@@ -586,8 +616,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   MessageI18n|PropelObjectCollection $messageI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMessageI18n($messageI18n, $comparison = null)
     {
@@ -660,8 +690,8 @@ abstract class BaseMessageQuery extends ModelCriteria
      * @param   MessageVersion|PropelObjectCollection $messageVersion  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   MessageQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 MessageQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByMessageVersion($messageVersion, $comparison = null)
     {
@@ -820,7 +850,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      *
      * @return    MessageQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'MessageI18n';
 
@@ -838,7 +868,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      *
      * @return    MessageQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -859,7 +889,7 @@ abstract class BaseMessageQuery extends ModelCriteria
      *
      * @return    MessageI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

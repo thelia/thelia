@@ -46,26 +46,26 @@ abstract class BaseModulePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the ID field */
-    const ID = 'module.ID';
+    /** the column name for the id field */
+    const ID = 'module.id';
 
-    /** the column name for the CODE field */
-    const CODE = 'module.CODE';
+    /** the column name for the code field */
+    const CODE = 'module.code';
 
-    /** the column name for the  TYPE field */
-    const  TYPE = 'module. TYPE';
+    /** the column name for the  type field */
+    const  TYPE = 'module. type';
 
-    /** the column name for the ACTIVATE field */
-    const ACTIVATE = 'module.ACTIVATE';
+    /** the column name for the activate field */
+    const ACTIVATE = 'module.activate';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'module.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'module.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'module.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'module.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'module.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'module.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -85,7 +85,7 @@ abstract class BaseModulePeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     /**
      * holds an array of fieldnames
      *
@@ -195,13 +195,13 @@ abstract class BaseModulePeer
             $criteria->addSelectColumn(ModulePeer::CREATED_AT);
             $criteria->addSelectColumn(ModulePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '. TYPE');
-            $criteria->addSelectColumn($alias . '.ACTIVATE');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '. type');
+            $criteria->addSelectColumn($alias . '.activate');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -285,7 +285,7 @@ abstract class BaseModulePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -390,8 +390,15 @@ abstract class BaseModulePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (ModulePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         ModulePeer::$instances = array();
     }
 
@@ -532,7 +539,7 @@ abstract class BaseModulePeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return ModulePeer::OM_CLASS;
     }

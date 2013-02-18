@@ -108,13 +108,19 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      */
     protected $alreadyInValidation = false;
 
+    /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
     // i18n behavior
 
     /**
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_EN';
+    protected $currentLocale = 'en_US';
 
     /**
      * Current translation objects
@@ -173,22 +179,25 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -210,22 +219,25 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -236,7 +248,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -257,7 +269,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      */
     public function setFeatureId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -363,7 +375,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 4; // 4 = FeatureAvPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -593,7 +605,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
             if ($this->collFeatureProds !== null) {
                 foreach ($this->collFeatureProds as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -610,7 +622,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
             if ($this->collFeatureAvI18ns !== null) {
                 foreach ($this->collFeatureAvI18ns as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -643,16 +655,16 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(FeatureAvPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(FeatureAvPeer::FEATURE_ID)) {
-            $modifiedColumns[':p' . $index++]  = '`FEATURE_ID`';
+            $modifiedColumns[':p' . $index++]  = '`feature_id`';
         }
         if ($this->isColumnModified(FeatureAvPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(FeatureAvPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -665,16 +677,16 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`FEATURE_ID`':
+                    case '`feature_id`':
                         $stmt->bindValue($identifier, $this->feature_id, PDO::PARAM_INT);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -745,11 +757,11 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1152,12 +1164,13 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      * Get the associated Feature object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return Feature The associated Feature object.
      * @throws PropelException
      */
-    public function getFeature(PropelPDO $con = null)
+    public function getFeature(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aFeature === null && ($this->feature_id !== null)) {
+        if ($this->aFeature === null && ($this->feature_id !== null) && $doQuery) {
             $this->aFeature = FeatureQuery::create()->findPk($this->feature_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1196,13 +1209,15 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return FeatureAv The current object (for fluent API support)
      * @see        addFeatureProds()
      */
     public function clearFeatureProds()
     {
         $this->collFeatureProds = null; // important to set this to null since that means it is uninitialized
         $this->collFeatureProdsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1274,6 +1289,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
                       $this->collFeatureProdsPartial = true;
                     }
 
+                    $collFeatureProds->getInternalIterator()->rewind();
                     return $collFeatureProds;
                 }
 
@@ -1301,12 +1317,15 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      *
      * @param PropelCollection $featureProds A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return FeatureAv The current object (for fluent API support)
      */
     public function setFeatureProds(PropelCollection $featureProds, PropelPDO $con = null)
     {
-        $this->featureProdsScheduledForDeletion = $this->getFeatureProds(new Criteria(), $con)->diff($featureProds);
+        $featureProdsToDelete = $this->getFeatureProds(new Criteria(), $con)->diff($featureProds);
 
-        foreach ($this->featureProdsScheduledForDeletion as $featureProdRemoved) {
+        $this->featureProdsScheduledForDeletion = unserialize(serialize($featureProdsToDelete));
+
+        foreach ($featureProdsToDelete as $featureProdRemoved) {
             $featureProdRemoved->setFeatureAv(null);
         }
 
@@ -1317,6 +1336,8 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
         $this->collFeatureProds = $featureProds;
         $this->collFeatureProdsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1334,22 +1355,22 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
         if (null === $this->collFeatureProds || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collFeatureProds) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getFeatureProds());
-                }
-                $query = FeatureProdQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFeatureAv($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collFeatureProds);
+
+            if($partial && !$criteria) {
+                return count($this->getFeatureProds());
+            }
+            $query = FeatureProdQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFeatureAv($this)
+                ->count($con);
         }
+
+        return count($this->collFeatureProds);
     }
 
     /**
@@ -1365,7 +1386,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $this->initFeatureProds();
             $this->collFeatureProdsPartial = true;
         }
-        if (!$this->collFeatureProds->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collFeatureProds->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddFeatureProd($l);
         }
 
@@ -1383,6 +1404,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
     /**
      * @param	FeatureProd $featureProd The featureProd object to remove.
+     * @return FeatureAv The current object (for fluent API support)
      */
     public function removeFeatureProd($featureProd)
     {
@@ -1395,6 +1417,8 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $this->featureProdsScheduledForDeletion[]= $featureProd;
             $featureProd->setFeatureAv(null);
         }
+
+        return $this;
     }
 
 
@@ -1453,13 +1477,15 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return FeatureAv The current object (for fluent API support)
      * @see        addFeatureAvI18ns()
      */
     public function clearFeatureAvI18ns()
     {
         $this->collFeatureAvI18ns = null; // important to set this to null since that means it is uninitialized
         $this->collFeatureAvI18nsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1531,6 +1557,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
                       $this->collFeatureAvI18nsPartial = true;
                     }
 
+                    $collFeatureAvI18ns->getInternalIterator()->rewind();
                     return $collFeatureAvI18ns;
                 }
 
@@ -1558,12 +1585,15 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      *
      * @param PropelCollection $featureAvI18ns A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return FeatureAv The current object (for fluent API support)
      */
     public function setFeatureAvI18ns(PropelCollection $featureAvI18ns, PropelPDO $con = null)
     {
-        $this->featureAvI18nsScheduledForDeletion = $this->getFeatureAvI18ns(new Criteria(), $con)->diff($featureAvI18ns);
+        $featureAvI18nsToDelete = $this->getFeatureAvI18ns(new Criteria(), $con)->diff($featureAvI18ns);
 
-        foreach ($this->featureAvI18nsScheduledForDeletion as $featureAvI18nRemoved) {
+        $this->featureAvI18nsScheduledForDeletion = unserialize(serialize($featureAvI18nsToDelete));
+
+        foreach ($featureAvI18nsToDelete as $featureAvI18nRemoved) {
             $featureAvI18nRemoved->setFeatureAv(null);
         }
 
@@ -1574,6 +1604,8 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
         $this->collFeatureAvI18ns = $featureAvI18ns;
         $this->collFeatureAvI18nsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1591,22 +1623,22 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
         if (null === $this->collFeatureAvI18ns || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collFeatureAvI18ns) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getFeatureAvI18ns());
-                }
-                $query = FeatureAvI18nQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByFeatureAv($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collFeatureAvI18ns);
+
+            if($partial && !$criteria) {
+                return count($this->getFeatureAvI18ns());
+            }
+            $query = FeatureAvI18nQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFeatureAv($this)
+                ->count($con);
         }
+
+        return count($this->collFeatureAvI18ns);
     }
 
     /**
@@ -1626,7 +1658,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
             $this->initFeatureAvI18ns();
             $this->collFeatureAvI18nsPartial = true;
         }
-        if (!$this->collFeatureAvI18ns->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collFeatureAvI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddFeatureAvI18n($l);
         }
 
@@ -1644,6 +1676,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
 
     /**
      * @param	FeatureAvI18n $featureAvI18n The featureAvI18n object to remove.
+     * @return FeatureAv The current object (for fluent API support)
      */
     public function removeFeatureAvI18n($featureAvI18n)
     {
@@ -1653,9 +1686,11 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
                 $this->featureAvI18nsScheduledForDeletion = clone $this->collFeatureAvI18ns;
                 $this->featureAvI18nsScheduledForDeletion->clear();
             }
-            $this->featureAvI18nsScheduledForDeletion[]= $featureAvI18n;
+            $this->featureAvI18nsScheduledForDeletion[]= clone $featureAvI18n;
             $featureAvI18n->setFeatureAv(null);
         }
+
+        return $this;
     }
 
     /**
@@ -1669,6 +1704,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1686,7 +1722,8 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collFeatureProds) {
                 foreach ($this->collFeatureProds as $o) {
                     $o->clearAllReferences($deep);
@@ -1697,10 +1734,15 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->aFeature instanceof Persistent) {
+              $this->aFeature->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_EN';
+        $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
         if ($this->collFeatureProds instanceof PropelCollection) {
@@ -1757,7 +1799,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      *
      * @return    FeatureAv The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_EN')
+    public function setLocale($locale = 'en_US')
     {
         $this->currentLocale = $locale;
 
@@ -1781,7 +1823,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      * @param     PropelPDO $con an optional connection object
      *
      * @return FeatureAvI18n */
-    public function getTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function getTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collFeatureAvI18ns) {
@@ -1816,7 +1858,7 @@ abstract class BaseFeatureAv extends BaseObject implements Persistent
      *
      * @return    FeatureAv The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_EN', PropelPDO $con = null)
+    public function removeTranslation($locale = 'en_US', PropelPDO $con = null)
     {
         if (!$this->isNew()) {
             FeatureAvI18nQuery::create()

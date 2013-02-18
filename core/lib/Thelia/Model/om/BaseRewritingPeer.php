@@ -48,29 +48,29 @@ abstract class BaseRewritingPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 8;
 
-    /** the column name for the ID field */
-    const ID = 'rewriting.ID';
+    /** the column name for the id field */
+    const ID = 'rewriting.id';
 
-    /** the column name for the URL field */
-    const URL = 'rewriting.URL';
+    /** the column name for the url field */
+    const URL = 'rewriting.url';
 
-    /** the column name for the PRODUCT_ID field */
-    const PRODUCT_ID = 'rewriting.PRODUCT_ID';
+    /** the column name for the product_id field */
+    const PRODUCT_ID = 'rewriting.product_id';
 
-    /** the column name for the CATEGORY_ID field */
-    const CATEGORY_ID = 'rewriting.CATEGORY_ID';
+    /** the column name for the category_id field */
+    const CATEGORY_ID = 'rewriting.category_id';
 
-    /** the column name for the FOLDER_ID field */
-    const FOLDER_ID = 'rewriting.FOLDER_ID';
+    /** the column name for the folder_id field */
+    const FOLDER_ID = 'rewriting.folder_id';
 
-    /** the column name for the CONTENT_ID field */
-    const CONTENT_ID = 'rewriting.CONTENT_ID';
+    /** the column name for the content_id field */
+    const CONTENT_ID = 'rewriting.content_id';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'rewriting.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'rewriting.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'rewriting.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'rewriting.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -194,14 +194,14 @@ abstract class BaseRewritingPeer
             $criteria->addSelectColumn(RewritingPeer::CREATED_AT);
             $criteria->addSelectColumn(RewritingPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.URL');
-            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.CATEGORY_ID');
-            $criteria->addSelectColumn($alias . '.FOLDER_ID');
-            $criteria->addSelectColumn($alias . '.CONTENT_ID');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.url');
+            $criteria->addSelectColumn($alias . '.product_id');
+            $criteria->addSelectColumn($alias . '.category_id');
+            $criteria->addSelectColumn($alias . '.folder_id');
+            $criteria->addSelectColumn($alias . '.content_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -285,7 +285,7 @@ abstract class BaseRewritingPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -390,8 +390,15 @@ abstract class BaseRewritingPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (RewritingPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         RewritingPeer::$instances = array();
     }
 
@@ -1901,7 +1908,7 @@ abstract class BaseRewritingPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return RewritingPeer::OM_CLASS;
     }

@@ -46,20 +46,20 @@ abstract class BaseFeatureCategoryPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'feature_category.ID';
+    /** the column name for the id field */
+    const ID = 'feature_category.id';
 
-    /** the column name for the FEATURE_ID field */
-    const FEATURE_ID = 'feature_category.FEATURE_ID';
+    /** the column name for the feature_id field */
+    const FEATURE_ID = 'feature_category.feature_id';
 
-    /** the column name for the CATEGORY_ID field */
-    const CATEGORY_ID = 'feature_category.CATEGORY_ID';
+    /** the column name for the category_id field */
+    const CATEGORY_ID = 'feature_category.category_id';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'feature_category.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'feature_category.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'feature_category.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'feature_category.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -180,11 +180,11 @@ abstract class BaseFeatureCategoryPeer
             $criteria->addSelectColumn(FeatureCategoryPeer::CREATED_AT);
             $criteria->addSelectColumn(FeatureCategoryPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.FEATURE_ID');
-            $criteria->addSelectColumn($alias . '.CATEGORY_ID');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.feature_id');
+            $criteria->addSelectColumn($alias . '.category_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -268,7 +268,7 @@ abstract class BaseFeatureCategoryPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -373,8 +373,15 @@ abstract class BaseFeatureCategoryPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (FeatureCategoryPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         FeatureCategoryPeer::$instances = array();
     }
 
@@ -1140,7 +1147,7 @@ abstract class BaseFeatureCategoryPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return FeatureCategoryPeer::OM_CLASS;
     }

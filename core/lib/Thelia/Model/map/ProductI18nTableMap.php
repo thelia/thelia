@@ -42,12 +42,12 @@ class ProductI18nTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
         // columns
-        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product', 'ID', true, null, null);
-        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
-        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('DESCRIPTION', 'Description', 'CLOB', false, null, null);
-        $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('POSTSCRIPTUM', 'Postscriptum', 'LONGVARCHAR', false, null, null);
+        $this->addForeignPrimaryKey('id', 'Id', 'INTEGER' , 'product', 'id', true, null, null);
+        $this->addPrimaryKey('locale', 'Locale', 'VARCHAR', true, 5, 'en_US');
+        $this->addColumn('title', 'Title', 'VARCHAR', false, 255, null);
+        $this->addColumn('description', 'Description', 'CLOB', false, null, null);
+        $this->addColumn('chapo', 'Chapo', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('postscriptum', 'Postscriptum', 'LONGVARCHAR', false, null, null);
         // validators
     } // initialize()
 

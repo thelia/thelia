@@ -42,14 +42,14 @@ class LangTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 100, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', false, 10, null);
-        $this->addColumn('LOCALE', 'Locale', 'VARCHAR', false, 45, null);
-        $this->addColumn('URL', 'Url', 'VARCHAR', false, 255, null);
-        $this->addColumn('BY_DEFAULT', 'ByDefault', 'TINYINT', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('title', 'Title', 'VARCHAR', false, 100, null);
+        $this->addColumn('code', 'Code', 'VARCHAR', false, 10, null);
+        $this->addColumn('locale', 'Locale', 'VARCHAR', false, 45, null);
+        $this->addColumn('url', 'Url', 'VARCHAR', false, 255, null);
+        $this->addColumn('by_default', 'ByDefault', 'TINYINT', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -69,7 +69,11 @@ class LangTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

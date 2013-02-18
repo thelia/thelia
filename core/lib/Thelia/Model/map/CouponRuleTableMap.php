@@ -42,13 +42,13 @@ class CouponRuleTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('COUPON_ID', 'CouponId', 'INTEGER', 'coupon', 'ID', true, null, null);
-        $this->addColumn('CONTROLLER', 'Controller', 'VARCHAR', false, 255, null);
-        $this->addColumn('OPERATION', 'Operation', 'VARCHAR', false, 255, null);
-        $this->addColumn('VALUE', 'Value', 'FLOAT', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('coupon_id', 'CouponId', 'INTEGER', 'coupon', 'id', true, null, null);
+        $this->addColumn('controller', 'Controller', 'VARCHAR', false, 255, null);
+        $this->addColumn('operation', 'Operation', 'VARCHAR', false, 255, null);
+        $this->addColumn('value', 'Value', 'FLOAT', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -69,7 +69,11 @@ class CouponRuleTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

@@ -45,29 +45,29 @@ abstract class BaseCurrencyPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 8;
 
-    /** the column name for the ID field */
-    const ID = 'currency.ID';
+    /** the column name for the id field */
+    const ID = 'currency.id';
 
-    /** the column name for the NAME field */
-    const NAME = 'currency.NAME';
+    /** the column name for the name field */
+    const NAME = 'currency.name';
 
-    /** the column name for the CODE field */
-    const CODE = 'currency.CODE';
+    /** the column name for the code field */
+    const CODE = 'currency.code';
 
-    /** the column name for the SYMBOL field */
-    const SYMBOL = 'currency.SYMBOL';
+    /** the column name for the symbol field */
+    const SYMBOL = 'currency.symbol';
 
-    /** the column name for the RATE field */
-    const RATE = 'currency.RATE';
+    /** the column name for the rate field */
+    const RATE = 'currency.rate';
 
-    /** the column name for the BY_DEFAULT field */
-    const BY_DEFAULT = 'currency.BY_DEFAULT';
+    /** the column name for the by_default field */
+    const BY_DEFAULT = 'currency.by_default';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'currency.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'currency.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'currency.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'currency.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -191,14 +191,14 @@ abstract class BaseCurrencyPeer
             $criteria->addSelectColumn(CurrencyPeer::CREATED_AT);
             $criteria->addSelectColumn(CurrencyPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.NAME');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.SYMBOL');
-            $criteria->addSelectColumn($alias . '.RATE');
-            $criteria->addSelectColumn($alias . '.BY_DEFAULT');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '.symbol');
+            $criteria->addSelectColumn($alias . '.rate');
+            $criteria->addSelectColumn($alias . '.by_default');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -282,7 +282,7 @@ abstract class BaseCurrencyPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -387,8 +387,15 @@ abstract class BaseCurrencyPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CurrencyPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CurrencyPeer::$instances = array();
     }
 
@@ -526,7 +533,7 @@ abstract class BaseCurrencyPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return CurrencyPeer::OM_CLASS;
     }

@@ -124,6 +124,12 @@ abstract class BaseAdmin extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * An array of objects scheduled for deletion.
      * @var		PropelObjectCollection
      */
@@ -218,22 +224,25 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->created_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->created_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->created_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -255,22 +264,25 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             // while technically this is not a default value of null,
             // this seems to be closest in meaning.
             return null;
-        } else {
-            try {
-                $dt = new DateTime($this->updated_at);
-            } catch (Exception $x) {
-                throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
-            }
+        }
+
+        try {
+            $dt = new DateTime($this->updated_at);
+        } catch (Exception $x) {
+            throw new PropelException("Internally stored date/time/timestamp value could not be converted to DateTime: " . var_export($this->updated_at, true), $x);
         }
 
         if ($format === null) {
             // Because propel.useDateTimeClass is true, we return a DateTime object.
             return $dt;
-        } elseif (strpos($format, '%') !== false) {
-            return strftime($format, $dt->format('U'));
-        } else {
-            return $dt->format($format);
         }
+
+        if (strpos($format, '%') !== false) {
+            return strftime($format, $dt->format('U'));
+        }
+
+        return $dt->format($format);
+
     }
 
     /**
@@ -281,7 +293,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -302,7 +314,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function setFirstname($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -323,7 +335,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function setLastname($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -344,7 +356,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function setLogin($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -365,7 +377,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function setPassword($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -386,7 +398,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function setAlgo($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -407,7 +419,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function setSalt($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -514,7 +526,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 9; // 9 = AdminPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -726,7 +738,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
 
             if ($this->collAdminGroups !== null) {
                 foreach ($this->collAdminGroups as $referrerFK) {
-                    if (!$referrerFK->isDeleted()) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
                 }
@@ -759,31 +771,31 @@ abstract class BaseAdmin extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(AdminPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(AdminPeer::FIRSTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`FIRSTNAME`';
+            $modifiedColumns[':p' . $index++]  = '`firstname`';
         }
         if ($this->isColumnModified(AdminPeer::LASTNAME)) {
-            $modifiedColumns[':p' . $index++]  = '`LASTNAME`';
+            $modifiedColumns[':p' . $index++]  = '`lastname`';
         }
         if ($this->isColumnModified(AdminPeer::LOGIN)) {
-            $modifiedColumns[':p' . $index++]  = '`LOGIN`';
+            $modifiedColumns[':p' . $index++]  = '`login`';
         }
         if ($this->isColumnModified(AdminPeer::PASSWORD)) {
-            $modifiedColumns[':p' . $index++]  = '`PASSWORD`';
+            $modifiedColumns[':p' . $index++]  = '`password`';
         }
         if ($this->isColumnModified(AdminPeer::ALGO)) {
-            $modifiedColumns[':p' . $index++]  = '`ALGO`';
+            $modifiedColumns[':p' . $index++]  = '`algo`';
         }
         if ($this->isColumnModified(AdminPeer::SALT)) {
-            $modifiedColumns[':p' . $index++]  = '`SALT`';
+            $modifiedColumns[':p' . $index++]  = '`salt`';
         }
         if ($this->isColumnModified(AdminPeer::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`CREATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`created_at`';
         }
         if ($this->isColumnModified(AdminPeer::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = '`UPDATED_AT`';
+            $modifiedColumns[':p' . $index++]  = '`updated_at`';
         }
 
         $sql = sprintf(
@@ -796,31 +808,31 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`FIRSTNAME`':
+                    case '`firstname`':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
                         break;
-                    case '`LASTNAME`':
+                    case '`lastname`':
                         $stmt->bindValue($identifier, $this->lastname, PDO::PARAM_STR);
                         break;
-                    case '`LOGIN`':
+                    case '`login`':
                         $stmt->bindValue($identifier, $this->login, PDO::PARAM_STR);
                         break;
-                    case '`PASSWORD`':
+                    case '`password`':
                         $stmt->bindValue($identifier, $this->password, PDO::PARAM_STR);
                         break;
-                    case '`ALGO`':
+                    case '`algo`':
                         $stmt->bindValue($identifier, $this->algo, PDO::PARAM_STR);
                         break;
-                    case '`SALT`':
+                    case '`salt`':
                         $stmt->bindValue($identifier, $this->salt, PDO::PARAM_STR);
                         break;
-                    case '`CREATED_AT`':
+                    case '`created_at`':
                         $stmt->bindValue($identifier, $this->created_at, PDO::PARAM_STR);
                         break;
-                    case '`UPDATED_AT`':
+                    case '`updated_at`':
                         $stmt->bindValue($identifier, $this->updated_at, PDO::PARAM_STR);
                         break;
                 }
@@ -891,11 +903,11 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1306,13 +1318,15 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
-     * @return void
+     * @return Admin The current object (for fluent API support)
      * @see        addAdminGroups()
      */
     public function clearAdminGroups()
     {
         $this->collAdminGroups = null; // important to set this to null since that means it is uninitialized
         $this->collAdminGroupsPartial = null;
+
+        return $this;
     }
 
     /**
@@ -1384,6 +1398,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
                       $this->collAdminGroupsPartial = true;
                     }
 
+                    $collAdminGroups->getInternalIterator()->rewind();
                     return $collAdminGroups;
                 }
 
@@ -1411,12 +1426,15 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      *
      * @param PropelCollection $adminGroups A Propel collection.
      * @param PropelPDO $con Optional connection object
+     * @return Admin The current object (for fluent API support)
      */
     public function setAdminGroups(PropelCollection $adminGroups, PropelPDO $con = null)
     {
-        $this->adminGroupsScheduledForDeletion = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
+        $adminGroupsToDelete = $this->getAdminGroups(new Criteria(), $con)->diff($adminGroups);
 
-        foreach ($this->adminGroupsScheduledForDeletion as $adminGroupRemoved) {
+        $this->adminGroupsScheduledForDeletion = unserialize(serialize($adminGroupsToDelete));
+
+        foreach ($adminGroupsToDelete as $adminGroupRemoved) {
             $adminGroupRemoved->setAdmin(null);
         }
 
@@ -1427,6 +1445,8 @@ abstract class BaseAdmin extends BaseObject implements Persistent
 
         $this->collAdminGroups = $adminGroups;
         $this->collAdminGroupsPartial = false;
+
+        return $this;
     }
 
     /**
@@ -1444,22 +1464,22 @@ abstract class BaseAdmin extends BaseObject implements Persistent
         if (null === $this->collAdminGroups || null !== $criteria || $partial) {
             if ($this->isNew() && null === $this->collAdminGroups) {
                 return 0;
-            } else {
-                if($partial && !$criteria) {
-                    return count($this->getAdminGroups());
-                }
-                $query = AdminGroupQuery::create(null, $criteria);
-                if ($distinct) {
-                    $query->distinct();
-                }
-
-                return $query
-                    ->filterByAdmin($this)
-                    ->count($con);
             }
-        } else {
-            return count($this->collAdminGroups);
+
+            if($partial && !$criteria) {
+                return count($this->getAdminGroups());
+            }
+            $query = AdminGroupQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAdmin($this)
+                ->count($con);
         }
+
+        return count($this->collAdminGroups);
     }
 
     /**
@@ -1475,7 +1495,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             $this->initAdminGroups();
             $this->collAdminGroupsPartial = true;
         }
-        if (!$this->collAdminGroups->contains($l)) { // only add it if the **same** object is not already associated
+        if (!in_array($l, $this->collAdminGroups->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
             $this->doAddAdminGroup($l);
         }
 
@@ -1493,6 +1513,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
 
     /**
      * @param	AdminGroup $adminGroup The adminGroup object to remove.
+     * @return Admin The current object (for fluent API support)
      */
     public function removeAdminGroup($adminGroup)
     {
@@ -1505,6 +1526,8 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             $this->adminGroupsScheduledForDeletion[]= $adminGroup;
             $adminGroup->setAdmin(null);
         }
+
+        return $this;
     }
 
 
@@ -1548,6 +1571,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->resetModified();
         $this->setNew(true);
@@ -1565,12 +1589,15 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
             if ($this->collAdminGroups) {
                 foreach ($this->collAdminGroups as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         if ($this->collAdminGroups instanceof PropelCollection) {

@@ -42,30 +42,30 @@ class CustomerTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 50, null);
-        $this->addForeignKey('CUSTOMER_TITLE_ID', 'CustomerTitleId', 'INTEGER', 'customer_title', 'ID', false, null, null);
-        $this->addColumn('COMPANY', 'Company', 'VARCHAR', false, 255, null);
-        $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
-        $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
-        $this->addColumn('ADDRESS1', 'Address1', 'VARCHAR', true, 255, null);
-        $this->addColumn('ADDRESS2', 'Address2', 'VARCHAR', false, 255, null);
-        $this->addColumn('ADDRESS3', 'Address3', 'VARCHAR', false, 255, null);
-        $this->addColumn('ZIPCODE', 'Zipcode', 'VARCHAR', false, 10, null);
-        $this->addColumn('CITY', 'City', 'VARCHAR', true, 255, null);
-        $this->addColumn('COUNTRY_ID', 'CountryId', 'INTEGER', true, null, null);
-        $this->addColumn('PHONE', 'Phone', 'VARCHAR', false, 20, null);
-        $this->addColumn('CELLPHONE', 'Cellphone', 'VARCHAR', false, 20, null);
-        $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 50, null);
-        $this->addColumn('PASSWORD', 'Password', 'VARCHAR', false, 255, null);
-        $this->addColumn('ALGO', 'Algo', 'VARCHAR', false, 128, null);
-        $this->addColumn('SALT', 'Salt', 'VARCHAR', false, 128, null);
-        $this->addColumn('RESELLER', 'Reseller', 'TINYINT', false, null, null);
-        $this->addColumn('LANG', 'Lang', 'VARCHAR', false, 10, null);
-        $this->addColumn('SPONSOR', 'Sponsor', 'VARCHAR', false, 50, null);
-        $this->addColumn('DISCOUNT', 'Discount', 'FLOAT', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', true, 50, null);
+        $this->addForeignKey('customer_title_id', 'CustomerTitleId', 'INTEGER', 'customer_title', 'id', false, null, null);
+        $this->addColumn('company', 'Company', 'VARCHAR', false, 255, null);
+        $this->addColumn('firstname', 'Firstname', 'VARCHAR', true, 255, null);
+        $this->addColumn('lastname', 'Lastname', 'VARCHAR', true, 255, null);
+        $this->addColumn('address1', 'Address1', 'VARCHAR', true, 255, null);
+        $this->addColumn('address2', 'Address2', 'VARCHAR', false, 255, null);
+        $this->addColumn('address3', 'Address3', 'VARCHAR', false, 255, null);
+        $this->addColumn('zipcode', 'Zipcode', 'VARCHAR', false, 10, null);
+        $this->addColumn('city', 'City', 'VARCHAR', true, 255, null);
+        $this->addColumn('country_id', 'CountryId', 'INTEGER', true, null, null);
+        $this->addColumn('phone', 'Phone', 'VARCHAR', false, 20, null);
+        $this->addColumn('cellphone', 'Cellphone', 'VARCHAR', false, 20, null);
+        $this->addColumn('email', 'Email', 'VARCHAR', false, 50, null);
+        $this->addColumn('password', 'Password', 'VARCHAR', false, 255, null);
+        $this->addColumn('algo', 'Algo', 'VARCHAR', false, 128, null);
+        $this->addColumn('salt', 'Salt', 'VARCHAR', false, 128, null);
+        $this->addColumn('reseller', 'Reseller', 'TINYINT', false, null, null);
+        $this->addColumn('lang', 'Lang', 'VARCHAR', false, 10, null);
+        $this->addColumn('sponsor', 'Sponsor', 'VARCHAR', false, 50, null);
+        $this->addColumn('discount', 'Discount', 'FLOAT', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -88,7 +88,11 @@ class CustomerTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

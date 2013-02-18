@@ -51,7 +51,6 @@ use Thelia\Model\Order;
  * @method Currency findOne(PropelPDO $con = null) Return the first Currency matching the query
  * @method Currency findOneOrCreate(PropelPDO $con = null) Return the first Currency matching the query, or a new Currency object populated from the query conditions when no match is found
  *
- * @method Currency findOneById(int $id) Return the first Currency filtered by the id column
  * @method Currency findOneByName(string $name) Return the first Currency filtered by the name column
  * @method Currency findOneByCode(string $code) Return the first Currency filtered by the code column
  * @method Currency findOneBySymbol(string $symbol) Return the first Currency filtered by the symbol column
@@ -89,7 +88,7 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      * Returns a new CurrencyQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CurrencyQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CurrencyQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CurrencyQuery
      */
@@ -146,18 +145,32 @@ abstract class BaseCurrencyQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Currency A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Currency A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Currency A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `NAME`, `CODE`, `SYMBOL`, `RATE`, `BY_DEFAULT`, `CREATED_AT`, `UPDATED_AT` FROM `currency` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `name`, `code`, `symbol`, `rate`, `by_default`, `created_at`, `updated_at` FROM `currency` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -253,7 +266,8 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -266,8 +280,22 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CurrencyPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CurrencyPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CurrencyPeer::ID, $id, $comparison);
@@ -367,7 +395,8 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      * <code>
      * $query->filterByRate(1234); // WHERE rate = 1234
      * $query->filterByRate(array(12, 34)); // WHERE rate IN (12, 34)
-     * $query->filterByRate(array('min' => 12)); // WHERE rate > 12
+     * $query->filterByRate(array('min' => 12)); // WHERE rate >= 12
+     * $query->filterByRate(array('max' => 12)); // WHERE rate <= 12
      * </code>
      *
      * @param     mixed $rate The value to use as filter.
@@ -408,7 +437,8 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      * <code>
      * $query->filterByByDefault(1234); // WHERE by_default = 1234
      * $query->filterByByDefault(array(12, 34)); // WHERE by_default IN (12, 34)
-     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default > 12
+     * $query->filterByByDefault(array('min' => 12)); // WHERE by_default >= 12
+     * $query->filterByByDefault(array('max' => 12)); // WHERE by_default <= 12
      * </code>
      *
      * @param     mixed $byDefault The value to use as filter.
@@ -534,8 +564,8 @@ abstract class BaseCurrencyQuery extends ModelCriteria
      * @param   Order|PropelObjectCollection $order  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CurrencyQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CurrencyQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrder($order, $comparison = null)
     {

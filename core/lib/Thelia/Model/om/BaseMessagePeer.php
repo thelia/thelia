@@ -46,32 +46,32 @@ abstract class BaseMessagePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 9;
 
-    /** the column name for the ID field */
-    const ID = 'message.ID';
+    /** the column name for the id field */
+    const ID = 'message.id';
 
-    /** the column name for the CODE field */
-    const CODE = 'message.CODE';
+    /** the column name for the code field */
+    const CODE = 'message.code';
 
-    /** the column name for the SECURED field */
-    const SECURED = 'message.SECURED';
+    /** the column name for the secured field */
+    const SECURED = 'message.secured';
 
-    /** the column name for the REF field */
-    const REF = 'message.REF';
+    /** the column name for the ref field */
+    const REF = 'message.ref';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'message.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'message.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'message.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'message.updated_at';
 
-    /** the column name for the VERSION field */
-    const VERSION = 'message.VERSION';
+    /** the column name for the version field */
+    const VERSION = 'message.version';
 
-    /** the column name for the VERSION_CREATED_AT field */
-    const VERSION_CREATED_AT = 'message.VERSION_CREATED_AT';
+    /** the column name for the version_created_at field */
+    const VERSION_CREATED_AT = 'message.version_created_at';
 
-    /** the column name for the VERSION_CREATED_BY field */
-    const VERSION_CREATED_BY = 'message.VERSION_CREATED_BY';
+    /** the column name for the version_created_by field */
+    const VERSION_CREATED_BY = 'message.version_created_by';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -91,7 +91,7 @@ abstract class BaseMessagePeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     // versionable behavior
 
     /**
@@ -210,15 +210,15 @@ abstract class BaseMessagePeer
             $criteria->addSelectColumn(MessagePeer::VERSION_CREATED_AT);
             $criteria->addSelectColumn(MessagePeer::VERSION_CREATED_BY);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.SECURED');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_AT');
-            $criteria->addSelectColumn($alias . '.VERSION_CREATED_BY');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '.secured');
+            $criteria->addSelectColumn($alias . '.ref');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
+            $criteria->addSelectColumn($alias . '.version');
+            $criteria->addSelectColumn($alias . '.version_created_at');
+            $criteria->addSelectColumn($alias . '.version_created_by');
         }
     }
 
@@ -302,7 +302,7 @@ abstract class BaseMessagePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -407,8 +407,15 @@ abstract class BaseMessagePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (MessagePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         MessagePeer::$instances = array();
     }
 
@@ -549,7 +556,7 @@ abstract class BaseMessagePeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return MessagePeer::OM_CLASS;
     }

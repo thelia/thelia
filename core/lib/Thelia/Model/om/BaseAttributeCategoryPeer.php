@@ -46,20 +46,20 @@ abstract class BaseAttributeCategoryPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'attribute_category.ID';
+    /** the column name for the id field */
+    const ID = 'attribute_category.id';
 
-    /** the column name for the CATEGORY_ID field */
-    const CATEGORY_ID = 'attribute_category.CATEGORY_ID';
+    /** the column name for the category_id field */
+    const CATEGORY_ID = 'attribute_category.category_id';
 
-    /** the column name for the ATTRIBUTE_ID field */
-    const ATTRIBUTE_ID = 'attribute_category.ATTRIBUTE_ID';
+    /** the column name for the attribute_id field */
+    const ATTRIBUTE_ID = 'attribute_category.attribute_id';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'attribute_category.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'attribute_category.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'attribute_category.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'attribute_category.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -180,11 +180,11 @@ abstract class BaseAttributeCategoryPeer
             $criteria->addSelectColumn(AttributeCategoryPeer::CREATED_AT);
             $criteria->addSelectColumn(AttributeCategoryPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CATEGORY_ID');
-            $criteria->addSelectColumn($alias . '.ATTRIBUTE_ID');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.category_id');
+            $criteria->addSelectColumn($alias . '.attribute_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -268,7 +268,7 @@ abstract class BaseAttributeCategoryPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -373,8 +373,15 @@ abstract class BaseAttributeCategoryPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AttributeCategoryPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AttributeCategoryPeer::$instances = array();
     }
 
@@ -1140,7 +1147,7 @@ abstract class BaseAttributeCategoryPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AttributeCategoryPeer::OM_CLASS;
     }

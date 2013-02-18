@@ -53,7 +53,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
 
     /**
      * The value for the locale field.
-     * Note: this column has a database default value of: 'en_EN'
+     * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
     protected $locale;
@@ -102,6 +102,12 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
     protected $alreadyInValidation = false;
 
     /**
+     * Flag to prevent endless clearAllReferences($deep=true) loop, if this object is referenced
+     * @var        boolean
+     */
+    protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
      * Applies default values to this object.
      * This method should be called from the object's constructor (or
      * equivalent initialization method).
@@ -109,7 +115,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_EN';
+        $this->locale = 'en_US';
     }
 
     /**
@@ -190,7 +196,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function setId($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
@@ -215,7 +221,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function setLocale($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -236,7 +242,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function setTitle($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -257,7 +263,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function setDescription($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -278,7 +284,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function setChapo($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -299,7 +305,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function setPostscriptum($v)
     {
-        if ($v !== null) {
+        if ($v !== null && is_numeric($v)) {
             $v = (string) $v;
         }
 
@@ -322,7 +328,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_EN') {
+            if ($this->locale !== 'en_US') {
                 return false;
             }
 
@@ -361,7 +367,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
             if ($rehydrate) {
                 $this->ensureConsistency();
             }
-
+            $this->postHydrate($row, $startcol, $rehydrate);
             return $startcol + 6; // 6 = OrderStatusI18nPeer::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
@@ -587,22 +593,22 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
 
          // check the columns in natural order for more readable SQL queries
         if ($this->isColumnModified(OrderStatusI18nPeer::ID)) {
-            $modifiedColumns[':p' . $index++]  = '`ID`';
+            $modifiedColumns[':p' . $index++]  = '`id`';
         }
         if ($this->isColumnModified(OrderStatusI18nPeer::LOCALE)) {
-            $modifiedColumns[':p' . $index++]  = '`LOCALE`';
+            $modifiedColumns[':p' . $index++]  = '`locale`';
         }
         if ($this->isColumnModified(OrderStatusI18nPeer::TITLE)) {
-            $modifiedColumns[':p' . $index++]  = '`TITLE`';
+            $modifiedColumns[':p' . $index++]  = '`title`';
         }
         if ($this->isColumnModified(OrderStatusI18nPeer::DESCRIPTION)) {
-            $modifiedColumns[':p' . $index++]  = '`DESCRIPTION`';
+            $modifiedColumns[':p' . $index++]  = '`description`';
         }
         if ($this->isColumnModified(OrderStatusI18nPeer::CHAPO)) {
-            $modifiedColumns[':p' . $index++]  = '`CHAPO`';
+            $modifiedColumns[':p' . $index++]  = '`chapo`';
         }
         if ($this->isColumnModified(OrderStatusI18nPeer::POSTSCRIPTUM)) {
-            $modifiedColumns[':p' . $index++]  = '`POSTSCRIPTUM`';
+            $modifiedColumns[':p' . $index++]  = '`postscriptum`';
         }
 
         $sql = sprintf(
@@ -615,22 +621,22 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case '`ID`':
+                    case '`id`':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case '`LOCALE`':
+                    case '`locale`':
                         $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case '`TITLE`':
+                    case '`title`':
                         $stmt->bindValue($identifier, $this->title, PDO::PARAM_STR);
                         break;
-                    case '`DESCRIPTION`':
+                    case '`description`':
                         $stmt->bindValue($identifier, $this->description, PDO::PARAM_STR);
                         break;
-                    case '`CHAPO`':
+                    case '`chapo`':
                         $stmt->bindValue($identifier, $this->chapo, PDO::PARAM_STR);
                         break;
-                    case '`POSTSCRIPTUM`':
+                    case '`postscriptum`':
                         $stmt->bindValue($identifier, $this->postscriptum, PDO::PARAM_STR);
                         break;
                 }
@@ -694,11 +700,11 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
             $this->validationFailures = array();
 
             return true;
-        } else {
-            $this->validationFailures = $res;
-
-            return false;
         }
+
+        $this->validationFailures = $res;
+
+        return false;
     }
 
     /**
@@ -1094,12 +1100,13 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      * Get the associated OrderStatus object
      *
      * @param PropelPDO $con Optional Connection object.
+     * @param $doQuery Executes a query to get the object if required
      * @return OrderStatus The associated OrderStatus object.
      * @throws PropelException
      */
-    public function getOrderStatus(PropelPDO $con = null)
+    public function getOrderStatus(PropelPDO $con = null, $doQuery = true)
     {
-        if ($this->aOrderStatus === null && ($this->id !== null)) {
+        if ($this->aOrderStatus === null && ($this->id !== null) && $doQuery) {
             $this->aOrderStatus = OrderStatusQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
@@ -1126,6 +1133,7 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
         $this->postscriptum = null;
         $this->alreadyInSave = false;
         $this->alreadyInValidation = false;
+        $this->alreadyInClearAllReferencesDeep = false;
         $this->clearAllReferences();
         $this->applyDefaultValues();
         $this->resetModified();
@@ -1144,7 +1152,13 @@ abstract class BaseOrderStatusI18n extends BaseObject implements Persistent
      */
     public function clearAllReferences($deep = false)
     {
-        if ($deep) {
+        if ($deep && !$this->alreadyInClearAllReferencesDeep) {
+            $this->alreadyInClearAllReferencesDeep = true;
+            if ($this->aOrderStatus instanceof Persistent) {
+              $this->aOrderStatus->clearAllReferences($deep);
+            }
+
+            $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
 
         $this->aOrderStatus = null;

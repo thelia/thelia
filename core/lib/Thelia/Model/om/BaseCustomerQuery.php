@@ -93,7 +93,6 @@ use Thelia\Model\Order;
  * @method Customer findOne(PropelPDO $con = null) Return the first Customer matching the query
  * @method Customer findOneOrCreate(PropelPDO $con = null) Return the first Customer matching the query, or a new Customer object populated from the query conditions when no match is found
  *
- * @method Customer findOneById(int $id) Return the first Customer filtered by the id column
  * @method Customer findOneByRef(string $ref) Return the first Customer filtered by the ref column
  * @method Customer findOneByCustomerTitleId(int $customer_title_id) Return the first Customer filtered by the customer_title_id column
  * @method Customer findOneByCompany(string $company) Return the first Customer filtered by the company column
@@ -163,7 +162,7 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * Returns a new CustomerQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CustomerQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CustomerQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CustomerQuery
      */
@@ -220,18 +219,32 @@ abstract class BaseCustomerQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Customer A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Customer A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Customer A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `CUSTOMER_TITLE_ID`, `COMPANY`, `FIRSTNAME`, `LASTNAME`, `ADDRESS1`, `ADDRESS2`, `ADDRESS3`, `ZIPCODE`, `CITY`, `COUNTRY_ID`, `PHONE`, `CELLPHONE`, `EMAIL`, `PASSWORD`, `ALGO`, `SALT`, `RESELLER`, `LANG`, `SPONSOR`, `DISCOUNT`, `CREATED_AT`, `UPDATED_AT` FROM `customer` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `ref`, `customer_title_id`, `company`, `firstname`, `lastname`, `address1`, `address2`, `address3`, `zipcode`, `city`, `country_id`, `phone`, `cellphone`, `email`, `password`, `algo`, `salt`, `reseller`, `lang`, `sponsor`, `discount`, `created_at`, `updated_at` FROM `customer` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -327,7 +340,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -340,8 +354,22 @@ abstract class BaseCustomerQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CustomerPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CustomerPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CustomerPeer::ID, $id, $comparison);
@@ -383,7 +411,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * <code>
      * $query->filterByCustomerTitleId(1234); // WHERE customer_title_id = 1234
      * $query->filterByCustomerTitleId(array(12, 34)); // WHERE customer_title_id IN (12, 34)
-     * $query->filterByCustomerTitleId(array('min' => 12)); // WHERE customer_title_id > 12
+     * $query->filterByCustomerTitleId(array('min' => 12)); // WHERE customer_title_id >= 12
+     * $query->filterByCustomerTitleId(array('max' => 12)); // WHERE customer_title_id <= 12
      * </code>
      *
      * @see       filterByCustomerTitle()
@@ -658,7 +687,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * <code>
      * $query->filterByCountryId(1234); // WHERE country_id = 1234
      * $query->filterByCountryId(array(12, 34)); // WHERE country_id IN (12, 34)
-     * $query->filterByCountryId(array('min' => 12)); // WHERE country_id > 12
+     * $query->filterByCountryId(array('min' => 12)); // WHERE country_id >= 12
+     * $query->filterByCountryId(array('max' => 12)); // WHERE country_id <= 12
      * </code>
      *
      * @param     mixed $countryId The value to use as filter.
@@ -873,7 +903,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * <code>
      * $query->filterByReseller(1234); // WHERE reseller = 1234
      * $query->filterByReseller(array(12, 34)); // WHERE reseller IN (12, 34)
-     * $query->filterByReseller(array('min' => 12)); // WHERE reseller > 12
+     * $query->filterByReseller(array('min' => 12)); // WHERE reseller >= 12
+     * $query->filterByReseller(array('max' => 12)); // WHERE reseller <= 12
      * </code>
      *
      * @param     mixed $reseller The value to use as filter.
@@ -972,7 +1003,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * <code>
      * $query->filterByDiscount(1234); // WHERE discount = 1234
      * $query->filterByDiscount(array(12, 34)); // WHERE discount IN (12, 34)
-     * $query->filterByDiscount(array('min' => 12)); // WHERE discount > 12
+     * $query->filterByDiscount(array('min' => 12)); // WHERE discount >= 12
+     * $query->filterByDiscount(array('max' => 12)); // WHERE discount <= 12
      * </code>
      *
      * @param     mixed $discount The value to use as filter.
@@ -1098,8 +1130,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * @param   CustomerTitle|PropelObjectCollection $customerTitle The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CustomerQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CustomerQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCustomerTitle($customerTitle, $comparison = null)
     {
@@ -1174,8 +1206,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * @param   Address|PropelObjectCollection $address  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CustomerQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CustomerQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAddress($address, $comparison = null)
     {
@@ -1248,8 +1280,8 @@ abstract class BaseCustomerQuery extends ModelCriteria
      * @param   Order|PropelObjectCollection $order  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CustomerQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CustomerQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrder($order, $comparison = null)
     {

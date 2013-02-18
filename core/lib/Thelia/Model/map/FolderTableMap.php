@@ -42,16 +42,16 @@ class FolderTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('PARENT', 'Parent', 'INTEGER', true, null, null);
-        $this->addColumn('LINK', 'Link', 'VARCHAR', false, 255, null);
-        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', false, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addColumn('parent', 'Parent', 'INTEGER', true, null, null);
+        $this->addColumn('link', 'Link', 'VARCHAR', false, 255, null);
+        $this->addColumn('visible', 'Visible', 'TINYINT', false, null, null);
+        $this->addColumn('position', 'Position', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version', 'Version', 'INTEGER', false, null, 0);
+        $this->addColumn('version_created_at', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version_created_by', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 
@@ -77,9 +77,30 @@ class FolderTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
-            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
+            'i18n' =>  array (
+  'i18n_table' => '%TABLE%_i18n',
+  'i18n_phpname' => '%PHPNAME%I18n',
+  'i18n_columns' => 'title, description, chapo, postscriptum',
+  'i18n_pk_name' => NULL,
+  'locale_column' => 'locale',
+  'default_locale' => NULL,
+  'locale_alias' => '',
+),
+            'versionable' =>  array (
+  'version_column' => 'version',
+  'version_table' => '',
+  'log_created_at' => 'true',
+  'log_created_by' => 'true',
+  'log_comment' => 'false',
+  'version_created_at_column' => 'version_created_at',
+  'version_created_by_column' => 'version_created_by',
+  'version_comment_column' => 'version_comment',
+),
         );
     } // getBehaviors()
 

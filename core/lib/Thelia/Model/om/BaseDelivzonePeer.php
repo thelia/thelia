@@ -45,20 +45,20 @@ abstract class BaseDelivzonePeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 5;
 
-    /** the column name for the ID field */
-    const ID = 'delivzone.ID';
+    /** the column name for the id field */
+    const ID = 'delivzone.id';
 
-    /** the column name for the AREA_ID field */
-    const AREA_ID = 'delivzone.AREA_ID';
+    /** the column name for the area_id field */
+    const AREA_ID = 'delivzone.area_id';
 
-    /** the column name for the DELIVERY field */
-    const DELIVERY = 'delivzone.DELIVERY';
+    /** the column name for the delivery field */
+    const DELIVERY = 'delivzone.delivery';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'delivzone.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'delivzone.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'delivzone.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'delivzone.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -179,11 +179,11 @@ abstract class BaseDelivzonePeer
             $criteria->addSelectColumn(DelivzonePeer::CREATED_AT);
             $criteria->addSelectColumn(DelivzonePeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.AREA_ID');
-            $criteria->addSelectColumn($alias . '.DELIVERY');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.area_id');
+            $criteria->addSelectColumn($alias . '.delivery');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -267,7 +267,7 @@ abstract class BaseDelivzonePeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -372,8 +372,15 @@ abstract class BaseDelivzonePeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (DelivzonePeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         DelivzonePeer::$instances = array();
     }
 
@@ -746,7 +753,7 @@ abstract class BaseDelivzonePeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return DelivzonePeer::OM_CLASS;
     }

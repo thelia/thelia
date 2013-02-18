@@ -54,7 +54,6 @@ use Thelia\Model\ModuleQuery;
  * @method Module findOne(PropelPDO $con = null) Return the first Module matching the query
  * @method Module findOneOrCreate(PropelPDO $con = null) Return the first Module matching the query, or a new Module object populated from the query conditions when no match is found
  *
- * @method Module findOneById(int $id) Return the first Module filtered by the id column
  * @method Module findOneByCode(string $code) Return the first Module filtered by the code column
  * @method Module findOneBy type(int $ type) Return the first Module filtered by the  type column
  * @method Module findOneByActivate(int $activate) Return the first Module filtered by the activate column
@@ -90,7 +89,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      * Returns a new ModuleQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     ModuleQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   ModuleQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return ModuleQuery
      */
@@ -147,18 +146,32 @@ abstract class BaseModuleQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Module A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Module A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Module A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `CODE`, ` TYPE`, `ACTIVATE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `module` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `code`, ` type`, `activate`, `position`, `created_at`, `updated_at` FROM `module` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -254,7 +267,8 @@ abstract class BaseModuleQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -267,8 +281,22 @@ abstract class BaseModuleQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(ModulePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(ModulePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ModulePeer::ID, $id, $comparison);
@@ -310,7 +338,8 @@ abstract class BaseModuleQuery extends ModelCriteria
      * <code>
      * $query->filterBy type(1234); // WHERE  type = 1234
      * $query->filterBy type(array(12, 34)); // WHERE  type IN (12, 34)
-     * $query->filterBy type(array('min' => 12)); // WHERE  type > 12
+     * $query->filterBy type(array('min' => 12)); // WHERE  type >= 12
+     * $query->filterBy type(array('max' => 12)); // WHERE  type <= 12
      * </code>
      *
      * @param     mixed $ type The value to use as filter.
@@ -351,7 +380,8 @@ abstract class BaseModuleQuery extends ModelCriteria
      * <code>
      * $query->filterByActivate(1234); // WHERE activate = 1234
      * $query->filterByActivate(array(12, 34)); // WHERE activate IN (12, 34)
-     * $query->filterByActivate(array('min' => 12)); // WHERE activate > 12
+     * $query->filterByActivate(array('min' => 12)); // WHERE activate >= 12
+     * $query->filterByActivate(array('max' => 12)); // WHERE activate <= 12
      * </code>
      *
      * @param     mixed $activate The value to use as filter.
@@ -392,7 +422,8 @@ abstract class BaseModuleQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -518,8 +549,8 @@ abstract class BaseModuleQuery extends ModelCriteria
      * @param   GroupModule|PropelObjectCollection $groupModule  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ModuleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ModuleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByGroupModule($groupModule, $comparison = null)
     {
@@ -592,8 +623,8 @@ abstract class BaseModuleQuery extends ModelCriteria
      * @param   ModuleI18n|PropelObjectCollection $moduleI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ModuleQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ModuleQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByModuleI18n($moduleI18n, $comparison = null)
     {
@@ -752,7 +783,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      *
      * @return    ModuleQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'ModuleI18n';
 
@@ -770,7 +801,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      *
      * @return    ModuleQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -791,7 +822,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      *
      * @return    ModuleI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

@@ -42,18 +42,18 @@ class OrderProductTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
-        $this->addColumn('PRODUCT_REF', 'ProductRef', 'VARCHAR', false, 255, null);
-        $this->addColumn('TITLE', 'Title', 'VARCHAR', false, 255, null);
-        $this->addColumn('DESCRIPTION', 'Description', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('CHAPO', 'Chapo', 'LONGVARCHAR', false, null, null);
-        $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('TAX', 'Tax', 'FLOAT', false, null, null);
-        $this->addColumn('PARENT', 'Parent', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('order_id', 'OrderId', 'INTEGER', 'order', 'id', true, null, null);
+        $this->addColumn('product_ref', 'ProductRef', 'VARCHAR', false, 255, null);
+        $this->addColumn('title', 'Title', 'VARCHAR', false, 255, null);
+        $this->addColumn('description', 'Description', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('chapo', 'Chapo', 'LONGVARCHAR', false, null, null);
+        $this->addColumn('quantity', 'Quantity', 'FLOAT', true, null, null);
+        $this->addColumn('price', 'Price', 'FLOAT', true, null, null);
+        $this->addColumn('tax', 'Tax', 'FLOAT', false, null, null);
+        $this->addColumn('parent', 'Parent', 'INTEGER', false, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -75,7 +75,11 @@ class OrderProductTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

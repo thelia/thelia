@@ -125,7 +125,7 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * Returns a new ProductVersionQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     ProductVersionQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   ProductVersionQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return ProductVersionQuery
      */
@@ -189,12 +189,12 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   ProductVersion A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 ProductVersion A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `TAX_RULE_ID`, `REF`, `PRICE`, `PRICE2`, `ECOTAX`, `NEWNESS`, `PROMO`, `STOCK`, `VISIBLE`, `WEIGHT`, `POSITION`, `CREATED_AT`, `UPDATED_AT`, `VERSION`, `VERSION_CREATED_AT`, `VERSION_CREATED_BY` FROM `product_version` WHERE `ID` = :p0 AND `VERSION` = :p1';
+        $sql = 'SELECT `id`, `tax_rule_id`, `ref`, `price`, `price2`, `ecotax`, `newness`, `promo`, `stock`, `visible`, `weight`, `position`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `product_version` WHERE `id` = :p0 AND `version` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -302,7 +302,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @see       filterByProduct()
@@ -317,8 +318,22 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(ProductVersionPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(ProductVersionPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ProductVersionPeer::ID, $id, $comparison);
@@ -331,7 +346,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByTaxRuleId(1234); // WHERE tax_rule_id = 1234
      * $query->filterByTaxRuleId(array(12, 34)); // WHERE tax_rule_id IN (12, 34)
-     * $query->filterByTaxRuleId(array('min' => 12)); // WHERE tax_rule_id > 12
+     * $query->filterByTaxRuleId(array('min' => 12)); // WHERE tax_rule_id >= 12
+     * $query->filterByTaxRuleId(array('max' => 12)); // WHERE tax_rule_id <= 12
      * </code>
      *
      * @param     mixed $taxRuleId The value to use as filter.
@@ -401,7 +417,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByPrice(1234); // WHERE price = 1234
      * $query->filterByPrice(array(12, 34)); // WHERE price IN (12, 34)
-     * $query->filterByPrice(array('min' => 12)); // WHERE price > 12
+     * $query->filterByPrice(array('min' => 12)); // WHERE price >= 12
+     * $query->filterByPrice(array('max' => 12)); // WHERE price <= 12
      * </code>
      *
      * @param     mixed $price The value to use as filter.
@@ -442,7 +459,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByPrice2(1234); // WHERE price2 = 1234
      * $query->filterByPrice2(array(12, 34)); // WHERE price2 IN (12, 34)
-     * $query->filterByPrice2(array('min' => 12)); // WHERE price2 > 12
+     * $query->filterByPrice2(array('min' => 12)); // WHERE price2 >= 12
+     * $query->filterByPrice2(array('max' => 12)); // WHERE price2 <= 12
      * </code>
      *
      * @param     mixed $price2 The value to use as filter.
@@ -483,7 +501,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByEcotax(1234); // WHERE ecotax = 1234
      * $query->filterByEcotax(array(12, 34)); // WHERE ecotax IN (12, 34)
-     * $query->filterByEcotax(array('min' => 12)); // WHERE ecotax > 12
+     * $query->filterByEcotax(array('min' => 12)); // WHERE ecotax >= 12
+     * $query->filterByEcotax(array('max' => 12)); // WHERE ecotax <= 12
      * </code>
      *
      * @param     mixed $ecotax The value to use as filter.
@@ -524,7 +543,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByNewness(1234); // WHERE newness = 1234
      * $query->filterByNewness(array(12, 34)); // WHERE newness IN (12, 34)
-     * $query->filterByNewness(array('min' => 12)); // WHERE newness > 12
+     * $query->filterByNewness(array('min' => 12)); // WHERE newness >= 12
+     * $query->filterByNewness(array('max' => 12)); // WHERE newness <= 12
      * </code>
      *
      * @param     mixed $newness The value to use as filter.
@@ -565,7 +585,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByPromo(1234); // WHERE promo = 1234
      * $query->filterByPromo(array(12, 34)); // WHERE promo IN (12, 34)
-     * $query->filterByPromo(array('min' => 12)); // WHERE promo > 12
+     * $query->filterByPromo(array('min' => 12)); // WHERE promo >= 12
+     * $query->filterByPromo(array('max' => 12)); // WHERE promo <= 12
      * </code>
      *
      * @param     mixed $promo The value to use as filter.
@@ -606,7 +627,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByStock(1234); // WHERE stock = 1234
      * $query->filterByStock(array(12, 34)); // WHERE stock IN (12, 34)
-     * $query->filterByStock(array('min' => 12)); // WHERE stock > 12
+     * $query->filterByStock(array('min' => 12)); // WHERE stock >= 12
+     * $query->filterByStock(array('max' => 12)); // WHERE stock <= 12
      * </code>
      *
      * @param     mixed $stock The value to use as filter.
@@ -647,7 +669,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByVisible(1234); // WHERE visible = 1234
      * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
-     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible >= 12
+     * $query->filterByVisible(array('max' => 12)); // WHERE visible <= 12
      * </code>
      *
      * @param     mixed $visible The value to use as filter.
@@ -688,7 +711,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByWeight(1234); // WHERE weight = 1234
      * $query->filterByWeight(array(12, 34)); // WHERE weight IN (12, 34)
-     * $query->filterByWeight(array('min' => 12)); // WHERE weight > 12
+     * $query->filterByWeight(array('min' => 12)); // WHERE weight >= 12
+     * $query->filterByWeight(array('max' => 12)); // WHERE weight <= 12
      * </code>
      *
      * @param     mixed $weight The value to use as filter.
@@ -729,7 +753,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -856,7 +881,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * <code>
      * $query->filterByVersion(1234); // WHERE version = 1234
      * $query->filterByVersion(array(12, 34)); // WHERE version IN (12, 34)
-     * $query->filterByVersion(array('min' => 12)); // WHERE version > 12
+     * $query->filterByVersion(array('min' => 12)); // WHERE version >= 12
+     * $query->filterByVersion(array('max' => 12)); // WHERE version <= 12
      * </code>
      *
      * @param     mixed $version The value to use as filter.
@@ -869,8 +895,22 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      */
     public function filterByVersion($version = null, $comparison = null)
     {
-        if (is_array($version) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($version)) {
+            $useMinMax = false;
+            if (isset($version['min'])) {
+                $this->addUsingAlias(ProductVersionPeer::VERSION, $version['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($version['max'])) {
+                $this->addUsingAlias(ProductVersionPeer::VERSION, $version['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ProductVersionPeer::VERSION, $version, $comparison);
@@ -954,8 +994,8 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ProductVersionQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ProductVersionQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProduct($product, $comparison = null)
     {

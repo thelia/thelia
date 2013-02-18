@@ -42,13 +42,13 @@ class GroupResourceTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('GROUP_ID', 'GroupId', 'INTEGER', 'group', 'ID', true, null, null);
-        $this->addForeignKey('RESOURCE_ID', 'ResourceId', 'INTEGER', 'resource', 'ID', true, null, null);
-        $this->addColumn('READ', 'Read', 'TINYINT', false, null, 0);
-        $this->addColumn('WRITE', 'Write', 'TINYINT', false, null, 0);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('group_id', 'GroupId', 'INTEGER', 'group', 'id', true, null, null);
+        $this->addForeignKey('resource_id', 'ResourceId', 'INTEGER', 'resource', 'id', true, null, null);
+        $this->addColumn('read', 'Read', 'TINYINT', false, null, 0);
+        $this->addColumn('write', 'Write', 'TINYINT', false, null, 0);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators
     } // initialize()
 
@@ -70,7 +70,11 @@ class GroupResourceTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
         );
     } // getBehaviors()
 

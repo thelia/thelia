@@ -50,7 +50,6 @@ use Thelia\Model\Delivzone;
  * @method Area findOne(PropelPDO $con = null) Return the first Area matching the query
  * @method Area findOneOrCreate(PropelPDO $con = null) Return the first Area matching the query, or a new Area object populated from the query conditions when no match is found
  *
- * @method Area findOneById(int $id) Return the first Area filtered by the id column
  * @method Area findOneByName(string $name) Return the first Area filtered by the name column
  * @method Area findOneByUnit(double $unit) Return the first Area filtered by the unit column
  * @method Area findOneByCreatedAt(string $created_at) Return the first Area filtered by the created_at column
@@ -82,7 +81,7 @@ abstract class BaseAreaQuery extends ModelCriteria
      * Returns a new AreaQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AreaQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AreaQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AreaQuery
      */
@@ -139,18 +138,32 @@ abstract class BaseAreaQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Area A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Area A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Area A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `NAME`, `UNIT`, `CREATED_AT`, `UPDATED_AT` FROM `area` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `name`, `unit`, `created_at`, `updated_at` FROM `area` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -246,7 +259,8 @@ abstract class BaseAreaQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -259,8 +273,22 @@ abstract class BaseAreaQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(AreaPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(AreaPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AreaPeer::ID, $id, $comparison);
@@ -302,7 +330,8 @@ abstract class BaseAreaQuery extends ModelCriteria
      * <code>
      * $query->filterByUnit(1234); // WHERE unit = 1234
      * $query->filterByUnit(array(12, 34)); // WHERE unit IN (12, 34)
-     * $query->filterByUnit(array('min' => 12)); // WHERE unit > 12
+     * $query->filterByUnit(array('min' => 12)); // WHERE unit >= 12
+     * $query->filterByUnit(array('max' => 12)); // WHERE unit <= 12
      * </code>
      *
      * @param     mixed $unit The value to use as filter.
@@ -428,8 +457,8 @@ abstract class BaseAreaQuery extends ModelCriteria
      * @param   Country|PropelObjectCollection $country  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AreaQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AreaQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCountry($country, $comparison = null)
     {
@@ -502,8 +531,8 @@ abstract class BaseAreaQuery extends ModelCriteria
      * @param   Delivzone|PropelObjectCollection $delivzone  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AreaQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AreaQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDelivzone($delivzone, $comparison = null)
     {

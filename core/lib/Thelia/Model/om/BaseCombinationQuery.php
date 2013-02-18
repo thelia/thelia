@@ -48,7 +48,6 @@ use Thelia\Model\Stock;
  * @method Combination findOne(PropelPDO $con = null) Return the first Combination matching the query
  * @method Combination findOneOrCreate(PropelPDO $con = null) Return the first Combination matching the query, or a new Combination object populated from the query conditions when no match is found
  *
- * @method Combination findOneById(int $id) Return the first Combination filtered by the id column
  * @method Combination findOneByRef(string $ref) Return the first Combination filtered by the ref column
  * @method Combination findOneByCreatedAt(string $created_at) Return the first Combination filtered by the created_at column
  * @method Combination findOneByUpdatedAt(string $updated_at) Return the first Combination filtered by the updated_at column
@@ -78,7 +77,7 @@ abstract class BaseCombinationQuery extends ModelCriteria
      * Returns a new CombinationQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     CombinationQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   CombinationQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return CombinationQuery
      */
@@ -135,18 +134,32 @@ abstract class BaseCombinationQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Combination A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Combination A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Combination A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `REF`, `CREATED_AT`, `UPDATED_AT` FROM `combination` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `ref`, `created_at`, `updated_at` FROM `combination` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -242,7 +255,8 @@ abstract class BaseCombinationQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -255,8 +269,22 @@ abstract class BaseCombinationQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(CombinationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(CombinationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(CombinationPeer::ID, $id, $comparison);
@@ -383,8 +411,8 @@ abstract class BaseCombinationQuery extends ModelCriteria
      * @param   AttributeCombination|PropelObjectCollection $attributeCombination  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CombinationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CombinationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttributeCombination($attributeCombination, $comparison = null)
     {
@@ -457,8 +485,8 @@ abstract class BaseCombinationQuery extends ModelCriteria
      * @param   Stock|PropelObjectCollection $stock  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   CombinationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 CombinationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByStock($stock, $comparison = null)
     {

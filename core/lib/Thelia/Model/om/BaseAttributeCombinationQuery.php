@@ -91,7 +91,7 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * Returns a new AttributeCombinationQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     AttributeCombinationQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   AttributeCombinationQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return AttributeCombinationQuery
      */
@@ -155,12 +155,12 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   AttributeCombination A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 AttributeCombination A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ATTRIBUTE_ID`, `COMBINATION_ID`, `ATTRIBUTE_AV_ID`, `CREATED_AT`, `UPDATED_AT` FROM `attribute_combination` WHERE `ID` = :p0 AND `ATTRIBUTE_ID` = :p1 AND `COMBINATION_ID` = :p2 AND `ATTRIBUTE_AV_ID` = :p3';
+        $sql = 'SELECT `id`, `attribute_id`, `combination_id`, `attribute_av_id`, `created_at`, `updated_at` FROM `attribute_combination` WHERE `id` = :p0 AND `attribute_id` = :p1 AND `combination_id` = :p2 AND `attribute_av_id` = :p3';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -276,7 +276,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -289,8 +290,22 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AttributeCombinationPeer::ID, $id, $comparison);
@@ -303,7 +318,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * <code>
      * $query->filterByAttributeId(1234); // WHERE attribute_id = 1234
      * $query->filterByAttributeId(array(12, 34)); // WHERE attribute_id IN (12, 34)
-     * $query->filterByAttributeId(array('min' => 12)); // WHERE attribute_id > 12
+     * $query->filterByAttributeId(array('min' => 12)); // WHERE attribute_id >= 12
+     * $query->filterByAttributeId(array('max' => 12)); // WHERE attribute_id <= 12
      * </code>
      *
      * @see       filterByAttribute()
@@ -318,8 +334,22 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      */
     public function filterByAttributeId($attributeId = null, $comparison = null)
     {
-        if (is_array($attributeId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($attributeId)) {
+            $useMinMax = false;
+            if (isset($attributeId['min'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_ID, $attributeId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($attributeId['max'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_ID, $attributeId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_ID, $attributeId, $comparison);
@@ -332,7 +362,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * <code>
      * $query->filterByCombinationId(1234); // WHERE combination_id = 1234
      * $query->filterByCombinationId(array(12, 34)); // WHERE combination_id IN (12, 34)
-     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
+     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id >= 12
+     * $query->filterByCombinationId(array('max' => 12)); // WHERE combination_id <= 12
      * </code>
      *
      * @see       filterByCombination()
@@ -347,8 +378,22 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      */
     public function filterByCombinationId($combinationId = null, $comparison = null)
     {
-        if (is_array($combinationId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($combinationId)) {
+            $useMinMax = false;
+            if (isset($combinationId['min'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::COMBINATION_ID, $combinationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($combinationId['max'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::COMBINATION_ID, $combinationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AttributeCombinationPeer::COMBINATION_ID, $combinationId, $comparison);
@@ -361,7 +406,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * <code>
      * $query->filterByAttributeAvId(1234); // WHERE attribute_av_id = 1234
      * $query->filterByAttributeAvId(array(12, 34)); // WHERE attribute_av_id IN (12, 34)
-     * $query->filterByAttributeAvId(array('min' => 12)); // WHERE attribute_av_id > 12
+     * $query->filterByAttributeAvId(array('min' => 12)); // WHERE attribute_av_id >= 12
+     * $query->filterByAttributeAvId(array('max' => 12)); // WHERE attribute_av_id <= 12
      * </code>
      *
      * @see       filterByAttributeAv()
@@ -376,8 +422,22 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      */
     public function filterByAttributeAvId($attributeAvId = null, $comparison = null)
     {
-        if (is_array($attributeAvId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($attributeAvId)) {
+            $useMinMax = false;
+            if (isset($attributeAvId['min'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_AV_ID, $attributeAvId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($attributeAvId['max'])) {
+                $this->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_AV_ID, $attributeAvId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(AttributeCombinationPeer::ATTRIBUTE_AV_ID, $attributeAvId, $comparison);
@@ -475,8 +535,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * @param   Attribute|PropelObjectCollection $attribute The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AttributeCombinationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AttributeCombinationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttribute($attribute, $comparison = null)
     {
@@ -551,8 +611,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * @param   AttributeAv|PropelObjectCollection $attributeAv The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AttributeCombinationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AttributeCombinationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByAttributeAv($attributeAv, $comparison = null)
     {
@@ -627,8 +687,8 @@ abstract class BaseAttributeCombinationQuery extends ModelCriteria
      * @param   Combination|PropelObjectCollection $combination The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   AttributeCombinationQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 AttributeCombinationQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCombination($combination, $comparison = null)
     {

@@ -9,7 +9,7 @@
     "require":{
         "php": ">=5.4.0",
         "ircmaxell/password-compat": "dev-master",
-        "propel/propel1" : "1.6.7",
+        "propel/propel1" : "1.6.*",
         "psr/log" : "dev-master",
         "symfony/class-loader": "2.1.*",
         "symfony/config" : "2.1.*",

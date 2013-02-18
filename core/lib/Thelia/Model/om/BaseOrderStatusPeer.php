@@ -46,17 +46,17 @@ abstract class BaseOrderStatusPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 4;
 
-    /** the column name for the ID field */
-    const ID = 'order_status.ID';
+    /** the column name for the id field */
+    const ID = 'order_status.id';
 
-    /** the column name for the CODE field */
-    const CODE = 'order_status.CODE';
+    /** the column name for the code field */
+    const CODE = 'order_status.code';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'order_status.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'order_status.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'order_status.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'order_status.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -76,7 +76,7 @@ abstract class BaseOrderStatusPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     /**
      * holds an array of fieldnames
      *
@@ -183,10 +183,10 @@ abstract class BaseOrderStatusPeer
             $criteria->addSelectColumn(OrderStatusPeer::CREATED_AT);
             $criteria->addSelectColumn(OrderStatusPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CODE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.code');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -270,7 +270,7 @@ abstract class BaseOrderStatusPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -375,8 +375,15 @@ abstract class BaseOrderStatusPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (OrderStatusPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         OrderStatusPeer::$instances = array();
     }
 
@@ -517,7 +524,7 @@ abstract class BaseOrderStatusPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return OrderStatusPeer::OM_CLASS;
     }

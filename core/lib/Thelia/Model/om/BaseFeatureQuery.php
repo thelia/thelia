@@ -60,7 +60,6 @@ use Thelia\Model\FeatureQuery;
  * @method Feature findOne(PropelPDO $con = null) Return the first Feature matching the query
  * @method Feature findOneOrCreate(PropelPDO $con = null) Return the first Feature matching the query, or a new Feature object populated from the query conditions when no match is found
  *
- * @method Feature findOneById(int $id) Return the first Feature filtered by the id column
  * @method Feature findOneByVisible(int $visible) Return the first Feature filtered by the visible column
  * @method Feature findOneByPosition(int $position) Return the first Feature filtered by the position column
  * @method Feature findOneByCreatedAt(string $created_at) Return the first Feature filtered by the created_at column
@@ -92,7 +91,7 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * Returns a new FeatureQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     FeatureQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   FeatureQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return FeatureQuery
      */
@@ -149,18 +148,32 @@ abstract class BaseFeatureQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Feature A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Feature A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Feature A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `VISIBLE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `feature` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `visible`, `position`, `created_at`, `updated_at` FROM `feature` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -256,7 +269,8 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -269,8 +283,22 @@ abstract class BaseFeatureQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(FeaturePeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(FeaturePeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(FeaturePeer::ID, $id, $comparison);
@@ -283,7 +311,8 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * <code>
      * $query->filterByVisible(1234); // WHERE visible = 1234
      * $query->filterByVisible(array(12, 34)); // WHERE visible IN (12, 34)
-     * $query->filterByVisible(array('min' => 12)); // WHERE visible > 12
+     * $query->filterByVisible(array('min' => 12)); // WHERE visible >= 12
+     * $query->filterByVisible(array('max' => 12)); // WHERE visible <= 12
      * </code>
      *
      * @param     mixed $visible The value to use as filter.
@@ -324,7 +353,8 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -450,8 +480,8 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * @param   FeatureAv|PropelObjectCollection $featureAv  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeatureAv($featureAv, $comparison = null)
     {
@@ -524,8 +554,8 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * @param   FeatureProd|PropelObjectCollection $featureProd  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeatureProd($featureProd, $comparison = null)
     {
@@ -598,8 +628,8 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * @param   FeatureCategory|PropelObjectCollection $featureCategory  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeatureCategory($featureCategory, $comparison = null)
     {
@@ -672,8 +702,8 @@ abstract class BaseFeatureQuery extends ModelCriteria
      * @param   FeatureI18n|PropelObjectCollection $featureI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   FeatureQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 FeatureQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFeatureI18n($featureI18n, $comparison = null)
     {
@@ -832,7 +862,7 @@ abstract class BaseFeatureQuery extends ModelCriteria
      *
      * @return    FeatureQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'FeatureI18n';
 
@@ -850,7 +880,7 @@ abstract class BaseFeatureQuery extends ModelCriteria
      *
      * @return    FeatureQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -871,7 +901,7 @@ abstract class BaseFeatureQuery extends ModelCriteria
      *
      * @return    FeatureI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

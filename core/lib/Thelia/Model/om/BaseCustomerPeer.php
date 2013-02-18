@@ -47,77 +47,77 @@ abstract class BaseCustomerPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 24;
 
-    /** the column name for the ID field */
-    const ID = 'customer.ID';
+    /** the column name for the id field */
+    const ID = 'customer.id';
 
-    /** the column name for the REF field */
-    const REF = 'customer.REF';
+    /** the column name for the ref field */
+    const REF = 'customer.ref';
 
-    /** the column name for the CUSTOMER_TITLE_ID field */
-    const CUSTOMER_TITLE_ID = 'customer.CUSTOMER_TITLE_ID';
+    /** the column name for the customer_title_id field */
+    const CUSTOMER_TITLE_ID = 'customer.customer_title_id';
 
-    /** the column name for the COMPANY field */
-    const COMPANY = 'customer.COMPANY';
+    /** the column name for the company field */
+    const COMPANY = 'customer.company';
 
-    /** the column name for the FIRSTNAME field */
-    const FIRSTNAME = 'customer.FIRSTNAME';
+    /** the column name for the firstname field */
+    const FIRSTNAME = 'customer.firstname';
 
-    /** the column name for the LASTNAME field */
-    const LASTNAME = 'customer.LASTNAME';
+    /** the column name for the lastname field */
+    const LASTNAME = 'customer.lastname';
 
-    /** the column name for the ADDRESS1 field */
-    const ADDRESS1 = 'customer.ADDRESS1';
+    /** the column name for the address1 field */
+    const ADDRESS1 = 'customer.address1';
 
-    /** the column name for the ADDRESS2 field */
-    const ADDRESS2 = 'customer.ADDRESS2';
+    /** the column name for the address2 field */
+    const ADDRESS2 = 'customer.address2';
 
-    /** the column name for the ADDRESS3 field */
-    const ADDRESS3 = 'customer.ADDRESS3';
+    /** the column name for the address3 field */
+    const ADDRESS3 = 'customer.address3';
 
-    /** the column name for the ZIPCODE field */
-    const ZIPCODE = 'customer.ZIPCODE';
+    /** the column name for the zipcode field */
+    const ZIPCODE = 'customer.zipcode';
 
-    /** the column name for the CITY field */
-    const CITY = 'customer.CITY';
+    /** the column name for the city field */
+    const CITY = 'customer.city';
 
-    /** the column name for the COUNTRY_ID field */
-    const COUNTRY_ID = 'customer.COUNTRY_ID';
+    /** the column name for the country_id field */
+    const COUNTRY_ID = 'customer.country_id';
 
-    /** the column name for the PHONE field */
-    const PHONE = 'customer.PHONE';
+    /** the column name for the phone field */
+    const PHONE = 'customer.phone';
 
-    /** the column name for the CELLPHONE field */
-    const CELLPHONE = 'customer.CELLPHONE';
+    /** the column name for the cellphone field */
+    const CELLPHONE = 'customer.cellphone';
 
-    /** the column name for the EMAIL field */
-    const EMAIL = 'customer.EMAIL';
+    /** the column name for the email field */
+    const EMAIL = 'customer.email';
 
-    /** the column name for the PASSWORD field */
-    const PASSWORD = 'customer.PASSWORD';
+    /** the column name for the password field */
+    const PASSWORD = 'customer.password';
 
-    /** the column name for the ALGO field */
-    const ALGO = 'customer.ALGO';
+    /** the column name for the algo field */
+    const ALGO = 'customer.algo';
 
-    /** the column name for the SALT field */
-    const SALT = 'customer.SALT';
+    /** the column name for the salt field */
+    const SALT = 'customer.salt';
 
-    /** the column name for the RESELLER field */
-    const RESELLER = 'customer.RESELLER';
+    /** the column name for the reseller field */
+    const RESELLER = 'customer.reseller';
 
-    /** the column name for the LANG field */
-    const LANG = 'customer.LANG';
+    /** the column name for the lang field */
+    const LANG = 'customer.lang';
 
-    /** the column name for the SPONSOR field */
-    const SPONSOR = 'customer.SPONSOR';
+    /** the column name for the sponsor field */
+    const SPONSOR = 'customer.sponsor';
 
-    /** the column name for the DISCOUNT field */
-    const DISCOUNT = 'customer.DISCOUNT';
+    /** the column name for the discount field */
+    const DISCOUNT = 'customer.discount';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'customer.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'customer.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'customer.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'customer.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -257,30 +257,30 @@ abstract class BaseCustomerPeer
             $criteria->addSelectColumn(CustomerPeer::CREATED_AT);
             $criteria->addSelectColumn(CustomerPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.CUSTOMER_TITLE_ID');
-            $criteria->addSelectColumn($alias . '.COMPANY');
-            $criteria->addSelectColumn($alias . '.FIRSTNAME');
-            $criteria->addSelectColumn($alias . '.LASTNAME');
-            $criteria->addSelectColumn($alias . '.ADDRESS1');
-            $criteria->addSelectColumn($alias . '.ADDRESS2');
-            $criteria->addSelectColumn($alias . '.ADDRESS3');
-            $criteria->addSelectColumn($alias . '.ZIPCODE');
-            $criteria->addSelectColumn($alias . '.CITY');
-            $criteria->addSelectColumn($alias . '.COUNTRY_ID');
-            $criteria->addSelectColumn($alias . '.PHONE');
-            $criteria->addSelectColumn($alias . '.CELLPHONE');
-            $criteria->addSelectColumn($alias . '.EMAIL');
-            $criteria->addSelectColumn($alias . '.PASSWORD');
-            $criteria->addSelectColumn($alias . '.ALGO');
-            $criteria->addSelectColumn($alias . '.SALT');
-            $criteria->addSelectColumn($alias . '.RESELLER');
-            $criteria->addSelectColumn($alias . '.LANG');
-            $criteria->addSelectColumn($alias . '.SPONSOR');
-            $criteria->addSelectColumn($alias . '.DISCOUNT');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.ref');
+            $criteria->addSelectColumn($alias . '.customer_title_id');
+            $criteria->addSelectColumn($alias . '.company');
+            $criteria->addSelectColumn($alias . '.firstname');
+            $criteria->addSelectColumn($alias . '.lastname');
+            $criteria->addSelectColumn($alias . '.address1');
+            $criteria->addSelectColumn($alias . '.address2');
+            $criteria->addSelectColumn($alias . '.address3');
+            $criteria->addSelectColumn($alias . '.zipcode');
+            $criteria->addSelectColumn($alias . '.city');
+            $criteria->addSelectColumn($alias . '.country_id');
+            $criteria->addSelectColumn($alias . '.phone');
+            $criteria->addSelectColumn($alias . '.cellphone');
+            $criteria->addSelectColumn($alias . '.email');
+            $criteria->addSelectColumn($alias . '.password');
+            $criteria->addSelectColumn($alias . '.algo');
+            $criteria->addSelectColumn($alias . '.salt');
+            $criteria->addSelectColumn($alias . '.reseller');
+            $criteria->addSelectColumn($alias . '.lang');
+            $criteria->addSelectColumn($alias . '.sponsor');
+            $criteria->addSelectColumn($alias . '.discount');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -364,7 +364,7 @@ abstract class BaseCustomerPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -469,8 +469,15 @@ abstract class BaseCustomerPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (CustomerPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         CustomerPeer::$instances = array();
     }
 
@@ -849,7 +856,7 @@ abstract class BaseCustomerPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return CustomerPeer::OM_CLASS;
     }

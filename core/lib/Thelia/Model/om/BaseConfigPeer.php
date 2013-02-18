@@ -45,26 +45,26 @@ abstract class BaseConfigPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the ID field */
-    const ID = 'config.ID';
+    /** the column name for the id field */
+    const ID = 'config.id';
 
-    /** the column name for the NAME field */
-    const NAME = 'config.NAME';
+    /** the column name for the name field */
+    const NAME = 'config.name';
 
-    /** the column name for the VALUE field */
-    const VALUE = 'config.VALUE';
+    /** the column name for the value field */
+    const VALUE = 'config.value';
 
-    /** the column name for the SECURED field */
-    const SECURED = 'config.SECURED';
+    /** the column name for the secured field */
+    const SECURED = 'config.secured';
 
-    /** the column name for the HIDDEN field */
-    const HIDDEN = 'config.HIDDEN';
+    /** the column name for the hidden field */
+    const HIDDEN = 'config.hidden';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'config.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'config.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'config.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'config.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -84,7 +84,7 @@ abstract class BaseConfigPeer
      * The default locale to use for translations
      * @var        string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
     /**
      * holds an array of fieldnames
      *
@@ -194,13 +194,13 @@ abstract class BaseConfigPeer
             $criteria->addSelectColumn(ConfigPeer::CREATED_AT);
             $criteria->addSelectColumn(ConfigPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.NAME');
-            $criteria->addSelectColumn($alias . '.VALUE');
-            $criteria->addSelectColumn($alias . '.SECURED');
-            $criteria->addSelectColumn($alias . '.HIDDEN');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.name');
+            $criteria->addSelectColumn($alias . '.value');
+            $criteria->addSelectColumn($alias . '.secured');
+            $criteria->addSelectColumn($alias . '.hidden');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -284,7 +284,7 @@ abstract class BaseConfigPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -389,8 +389,15 @@ abstract class BaseConfigPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (ConfigPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         ConfigPeer::$instances = array();
     }
 
@@ -528,7 +535,7 @@ abstract class BaseConfigPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return ConfigPeer::OM_CLASS;
     }

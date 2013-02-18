@@ -73,7 +73,6 @@ use Thelia\Model\Product;
  * @method Document findOne(PropelPDO $con = null) Return the first Document matching the query
  * @method Document findOneOrCreate(PropelPDO $con = null) Return the first Document matching the query, or a new Document object populated from the query conditions when no match is found
  *
- * @method Document findOneById(int $id) Return the first Document filtered by the id column
  * @method Document findOneByProductId(int $product_id) Return the first Document filtered by the product_id column
  * @method Document findOneByCategoryId(int $category_id) Return the first Document filtered by the category_id column
  * @method Document findOneByFolderId(int $folder_id) Return the first Document filtered by the folder_id column
@@ -113,7 +112,7 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * Returns a new DocumentQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     DocumentQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   DocumentQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return DocumentQuery
      */
@@ -170,18 +169,32 @@ abstract class BaseDocumentQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 Document A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   Document A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 Document A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `PRODUCT_ID`, `CATEGORY_ID`, `FOLDER_ID`, `CONTENT_ID`, `FILE`, `POSITION`, `CREATED_AT`, `UPDATED_AT` FROM `document` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `product_id`, `category_id`, `folder_id`, `content_id`, `file`, `position`, `created_at`, `updated_at` FROM `document` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -277,7 +290,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -290,8 +304,22 @@ abstract class BaseDocumentQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(DocumentPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(DocumentPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(DocumentPeer::ID, $id, $comparison);
@@ -304,7 +332,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * <code>
      * $query->filterByProductId(1234); // WHERE product_id = 1234
      * $query->filterByProductId(array(12, 34)); // WHERE product_id IN (12, 34)
-     * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
+     * $query->filterByProductId(array('min' => 12)); // WHERE product_id >= 12
+     * $query->filterByProductId(array('max' => 12)); // WHERE product_id <= 12
      * </code>
      *
      * @see       filterByProduct()
@@ -347,7 +376,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * <code>
      * $query->filterByCategoryId(1234); // WHERE category_id = 1234
      * $query->filterByCategoryId(array(12, 34)); // WHERE category_id IN (12, 34)
-     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id > 12
+     * $query->filterByCategoryId(array('min' => 12)); // WHERE category_id >= 12
+     * $query->filterByCategoryId(array('max' => 12)); // WHERE category_id <= 12
      * </code>
      *
      * @see       filterByCategory()
@@ -390,7 +420,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * <code>
      * $query->filterByFolderId(1234); // WHERE folder_id = 1234
      * $query->filterByFolderId(array(12, 34)); // WHERE folder_id IN (12, 34)
-     * $query->filterByFolderId(array('min' => 12)); // WHERE folder_id > 12
+     * $query->filterByFolderId(array('min' => 12)); // WHERE folder_id >= 12
+     * $query->filterByFolderId(array('max' => 12)); // WHERE folder_id <= 12
      * </code>
      *
      * @see       filterByFolder()
@@ -433,7 +464,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * <code>
      * $query->filterByContentId(1234); // WHERE content_id = 1234
      * $query->filterByContentId(array(12, 34)); // WHERE content_id IN (12, 34)
-     * $query->filterByContentId(array('min' => 12)); // WHERE content_id > 12
+     * $query->filterByContentId(array('min' => 12)); // WHERE content_id >= 12
+     * $query->filterByContentId(array('max' => 12)); // WHERE content_id <= 12
      * </code>
      *
      * @see       filterByContent()
@@ -505,7 +537,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * <code>
      * $query->filterByPosition(1234); // WHERE position = 1234
      * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
-     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * $query->filterByPosition(array('min' => 12)); // WHERE position >= 12
+     * $query->filterByPosition(array('max' => 12)); // WHERE position <= 12
      * </code>
      *
      * @param     mixed $position The value to use as filter.
@@ -631,8 +664,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * @param   Product|PropelObjectCollection $product The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DocumentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DocumentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByProduct($product, $comparison = null)
     {
@@ -707,8 +740,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * @param   Category|PropelObjectCollection $category The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DocumentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DocumentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByCategory($category, $comparison = null)
     {
@@ -783,8 +816,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * @param   Content|PropelObjectCollection $content The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DocumentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DocumentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByContent($content, $comparison = null)
     {
@@ -859,8 +892,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * @param   Folder|PropelObjectCollection $folder The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DocumentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DocumentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFolder($folder, $comparison = null)
     {
@@ -935,8 +968,8 @@ abstract class BaseDocumentQuery extends ModelCriteria
      * @param   DocumentI18n|PropelObjectCollection $documentI18n  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   DocumentQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 DocumentQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByDocumentI18n($documentI18n, $comparison = null)
     {
@@ -1095,7 +1128,7 @@ abstract class BaseDocumentQuery extends ModelCriteria
      *
      * @return    DocumentQuery The current query, for fluid interface
      */
-    public function joinI18n($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         $relationName = $relationAlias ? $relationAlias : 'DocumentI18n';
 
@@ -1113,7 +1146,7 @@ abstract class BaseDocumentQuery extends ModelCriteria
      *
      * @return    DocumentQuery The current query, for fluid interface
      */
-    public function joinWithI18n($locale = 'en_EN', $joinType = Criteria::LEFT_JOIN)
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
@@ -1134,7 +1167,7 @@ abstract class BaseDocumentQuery extends ModelCriteria
      *
      * @return    DocumentI18nQuery A secondary query class using the current class as primary query
      */
-    public function useI18nQuery($locale = 'en_EN', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)

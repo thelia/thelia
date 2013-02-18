@@ -47,26 +47,26 @@ abstract class BaseTaxRuleCountryPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the ID field */
-    const ID = 'tax_rule_country.ID';
+    /** the column name for the id field */
+    const ID = 'tax_rule_country.id';
 
-    /** the column name for the TAX_RULE_ID field */
-    const TAX_RULE_ID = 'tax_rule_country.TAX_RULE_ID';
+    /** the column name for the tax_rule_id field */
+    const TAX_RULE_ID = 'tax_rule_country.tax_rule_id';
 
-    /** the column name for the COUNTRY_ID field */
-    const COUNTRY_ID = 'tax_rule_country.COUNTRY_ID';
+    /** the column name for the country_id field */
+    const COUNTRY_ID = 'tax_rule_country.country_id';
 
-    /** the column name for the TAX_ID field */
-    const TAX_ID = 'tax_rule_country.TAX_ID';
+    /** the column name for the tax_id field */
+    const TAX_ID = 'tax_rule_country.tax_id';
 
-    /** the column name for the NONE field */
-    const NONE = 'tax_rule_country.NONE';
+    /** the column name for the none field */
+    const NONE = 'tax_rule_country.none';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'tax_rule_country.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'tax_rule_country.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'tax_rule_country.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'tax_rule_country.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -189,13 +189,13 @@ abstract class BaseTaxRuleCountryPeer
             $criteria->addSelectColumn(TaxRuleCountryPeer::CREATED_AT);
             $criteria->addSelectColumn(TaxRuleCountryPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.TAX_RULE_ID');
-            $criteria->addSelectColumn($alias . '.COUNTRY_ID');
-            $criteria->addSelectColumn($alias . '.TAX_ID');
-            $criteria->addSelectColumn($alias . '.NONE');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.tax_rule_id');
+            $criteria->addSelectColumn($alias . '.country_id');
+            $criteria->addSelectColumn($alias . '.tax_id');
+            $criteria->addSelectColumn($alias . '.none');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -279,7 +279,7 @@ abstract class BaseTaxRuleCountryPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -384,8 +384,15 @@ abstract class BaseTaxRuleCountryPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (TaxRuleCountryPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         TaxRuleCountryPeer::$instances = array();
     }
 
@@ -1497,7 +1504,7 @@ abstract class BaseTaxRuleCountryPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return TaxRuleCountryPeer::OM_CLASS;
     }

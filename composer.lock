@@ -7,15 +7,15 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ircmaxell/password_compat.git",
-                "reference": "fc4ad2d46794ace07cbf04fe654a8bf546fc6764"
+                "reference": "733c06c599bfeb511f54253ddb127701bce0917d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/fc4ad2d46794ace07cbf04fe654a8bf546fc6764",
-                "reference": "fc4ad2d46794ace07cbf04fe654a8bf546fc6764",
+                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/733c06c599bfeb511f54253ddb127701bce0917d",
+                "reference": "733c06c599bfeb511f54253ddb127701bce0917d",
                 "shasum": ""
             },
-            "time": "2013-02-04 16:45:02",
+            "time": "2013-02-13 16:58:34",
             "type": "library",
             "autoload": {
                 "files": [
@@ -36,28 +36,28 @@
             "description": "A compatibility library for the proposed simplified password hashing algorithm: https://wiki.php.net/rfc/password_hash",
             "homepage": "https://github.com/ircmaxell/password_compat",
             "keywords": [
-                "password",
-                "hashing"
+                "hashing",
+                "password"
             ]
         },
         {
             "name": "phing/phing",
-            "version": "2.4.14",
+            "version": "2.5.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phingofficial/phing",
-                "reference": "2.4.14"
+                "url": "https://github.com/phingofficial/phing.git",
+                "reference": "2.5.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/phingofficial/phing/archive/2.4.14.zip",
-                "reference": "2.4.14",
+                "url": "https://api.github.com/repos/phingofficial/phing/zipball/2.5.0",
+                "reference": "2.5.0",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2.0"
             },
-            "time": "2012-11-29 21:23:47",
+            "time": "2013-02-16 14:23:57",
             "bin": [
                 "bin/phing"
             ],
@@ -94,23 +94,23 @@
         },
         {
             "name": "propel/propel1",
-            "version": "1.6.7",
+            "version": "1.6.8",
             "source": {
                 "type": "git",
-                "url": "https://github.com/propelorm/Propel",
-                "reference": "1.6.7"
+                "url": "https://github.com/propelorm/Propel.git",
+                "reference": "1.6.8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/propelorm/Propel/zipball/1.6.7",
-                "reference": "1.6.7",
+                "url": "https://api.github.com/repos/propelorm/Propel/zipball/1.6.8",
+                "reference": "1.6.8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.2.4",
-                "phing/phing": ">=2.4.12,2.4.*"
+                "phing/phing": ">=2.4,<3.0",
+                "php": ">=5.2.4"
             },
-            "time": "2012-07-30 00:58:15",
+            "time": "2013-02-14 20:50:27",
             "bin": [
                 "generator/bin/propel-gen",
                 "generator/bin/propel-gen.bat"
@@ -145,11 +145,11 @@
             "description": "Propel is an open-source Object-Relational Mapping (ORM) for PHP5.",
             "homepage": "http://www.propelorm.org/",
             "keywords": [
-                "database",
-                "orm",
-                "persistence",
                 "Active Record",
-                "mapping"
+                "database",
+                "mapping",
+                "orm",
+                "persistence"
             ]
         },
         {
@@ -338,12 +338,12 @@
                 "php": ">=5.3.3"
             },
             "require-dev": {
-                "symfony/yaml": "2.1.*",
-                "symfony/config": "2.1.*"
+                "symfony/config": "2.1.*",
+                "symfony/yaml": "2.1.*"
             },
             "suggest": {
-                "symfony/yaml": "2.1.*",
-                "symfony/config": "2.1.*"
+                "symfony/config": "2.1.*",
+                "symfony/yaml": "2.1.*"
             },
             "time": "2013-01-17 21:21:51",
             "type": "library",
@@ -542,15 +542,15 @@
                 "php": ">=5.3.3"
             },
             "require-dev": {
+                "doctrine/common": ">=2.2,<2.4-dev",
                 "symfony/config": "2.1.*",
-                "symfony/yaml": "2.1.*",
                 "symfony/http-kernel": "2.1.*",
-                "doctrine/common": ">=2.2,<2.4-dev"
+                "symfony/yaml": "2.1.*"
             },
             "suggest": {
+                "doctrine/common": ">=2.2,<2.4-dev",
                 "symfony/config": "2.1.*",
-                "symfony/yaml": "2.1.*",
-                "doctrine/common": ">=2.2,<2.4-dev"
+                "symfony/yaml": "2.1.*"
             },
             "time": "2013-01-09 08:51:07",
             "type": "library",

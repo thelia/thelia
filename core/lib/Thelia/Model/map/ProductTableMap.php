@@ -42,23 +42,23 @@ class ProductTableMap extends TableMap
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', 'tax_rule', 'ID', false, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('PRICE2', 'Price2', 'FLOAT', false, null, null);
-        $this->addColumn('ECOTAX', 'Ecotax', 'FLOAT', false, null, null);
-        $this->addColumn('NEWNESS', 'Newness', 'TINYINT', false, null, 0);
-        $this->addColumn('PROMO', 'Promo', 'TINYINT', false, null, 0);
-        $this->addColumn('STOCK', 'Stock', 'INTEGER', false, null, 0);
-        $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
-        $this->addColumn('WEIGHT', 'Weight', 'FLOAT', false, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
-        $this->addColumn('VERSION_CREATED_AT', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION_CREATED_BY', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
+        $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignKey('tax_rule_id', 'TaxRuleId', 'INTEGER', 'tax_rule', 'id', false, null, null);
+        $this->addColumn('ref', 'Ref', 'VARCHAR', true, 255, null);
+        $this->addColumn('price', 'Price', 'FLOAT', true, null, null);
+        $this->addColumn('price2', 'Price2', 'FLOAT', false, null, null);
+        $this->addColumn('ecotax', 'Ecotax', 'FLOAT', false, null, null);
+        $this->addColumn('newness', 'Newness', 'TINYINT', false, null, 0);
+        $this->addColumn('promo', 'Promo', 'TINYINT', false, null, 0);
+        $this->addColumn('stock', 'Stock', 'INTEGER', false, null, 0);
+        $this->addColumn('visible', 'Visible', 'TINYINT', true, null, 0);
+        $this->addColumn('weight', 'Weight', 'FLOAT', false, null, null);
+        $this->addColumn('position', 'Position', 'INTEGER', true, null, null);
+        $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version', 'Version', 'INTEGER', false, null, 0);
+        $this->addColumn('version_created_at', 'VersionCreatedAt', 'TIMESTAMP', false, null, null);
+        $this->addColumn('version_created_by', 'VersionCreatedBy', 'VARCHAR', false, 100, null);
         // validators
     } // initialize()
 
@@ -90,9 +90,30 @@ class ProductTableMap extends TableMap
     public function getBehaviors()
     {
         return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', 'disable_updated_at' => 'false', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'title, description, chapo, postscriptum', 'locale_column' => 'locale', 'default_locale' => '', 'locale_alias' => '', ),
-            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'true', 'log_created_by' => 'true', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
+            'timestampable' =>  array (
+  'create_column' => 'created_at',
+  'update_column' => 'updated_at',
+  'disable_updated_at' => 'false',
+),
+            'i18n' =>  array (
+  'i18n_table' => '%TABLE%_i18n',
+  'i18n_phpname' => '%PHPNAME%I18n',
+  'i18n_columns' => 'title, description, chapo, postscriptum',
+  'i18n_pk_name' => NULL,
+  'locale_column' => 'locale',
+  'default_locale' => NULL,
+  'locale_alias' => '',
+),
+            'versionable' =>  array (
+  'version_column' => 'version',
+  'version_table' => '',
+  'log_created_at' => 'true',
+  'log_created_by' => 'true',
+  'log_comment' => 'false',
+  'version_created_at_column' => 'version_created_at',
+  'version_created_by_column' => 'version_created_by',
+  'version_comment_column' => 'version_comment',
+),
         );
     } // getBehaviors()
 

@@ -64,7 +64,6 @@ use Thelia\Model\OrderProductQuery;
  * @method OrderProduct findOne(PropelPDO $con = null) Return the first OrderProduct matching the query
  * @method OrderProduct findOneOrCreate(PropelPDO $con = null) Return the first OrderProduct matching the query, or a new OrderProduct object populated from the query conditions when no match is found
  *
- * @method OrderProduct findOneById(int $id) Return the first OrderProduct filtered by the id column
  * @method OrderProduct findOneByOrderId(int $order_id) Return the first OrderProduct filtered by the order_id column
  * @method OrderProduct findOneByProductRef(string $product_ref) Return the first OrderProduct filtered by the product_ref column
  * @method OrderProduct findOneByTitle(string $title) Return the first OrderProduct filtered by the title column
@@ -110,7 +109,7 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * Returns a new OrderProductQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     OrderProductQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   OrderProductQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return OrderProductQuery
      */
@@ -167,18 +166,32 @@ abstract class BaseOrderProductQuery extends ModelCriteria
     }
 
     /**
+     * Alias of findPk to use instance pooling
+     *
+     * @param     mixed $key Primary key to use for the query
+     * @param     PropelPDO $con A connection object
+     *
+     * @return                 OrderProduct A model object, or null if the key is not found
+     * @throws PropelException
+     */
+     public function findOneById($key, $con = null)
+     {
+        return $this->findPk($key, $con);
+     }
+
+    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   OrderProduct A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 OrderProduct A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `ID`, `ORDER_ID`, `PRODUCT_REF`, `TITLE`, `DESCRIPTION`, `CHAPO`, `QUANTITY`, `PRICE`, `TAX`, `PARENT`, `CREATED_AT`, `UPDATED_AT` FROM `order_product` WHERE `ID` = :p0';
+        $sql = 'SELECT `id`, `order_id`, `product_ref`, `title`, `description`, `chapo`, `quantity`, `price`, `tax`, `parent`, `created_at`, `updated_at` FROM `order_product` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -274,7 +287,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * <code>
      * $query->filterById(1234); // WHERE id = 1234
      * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
+     * $query->filterById(array('min' => 12)); // WHERE id >= 12
+     * $query->filterById(array('max' => 12)); // WHERE id <= 12
      * </code>
      *
      * @param     mixed $id The value to use as filter.
@@ -287,8 +301,22 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      */
     public function filterById($id = null, $comparison = null)
     {
-        if (is_array($id) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($id)) {
+            $useMinMax = false;
+            if (isset($id['min'])) {
+                $this->addUsingAlias(OrderProductPeer::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($id['max'])) {
+                $this->addUsingAlias(OrderProductPeer::ID, $id['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(OrderProductPeer::ID, $id, $comparison);
@@ -301,7 +329,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * <code>
      * $query->filterByOrderId(1234); // WHERE order_id = 1234
      * $query->filterByOrderId(array(12, 34)); // WHERE order_id IN (12, 34)
-     * $query->filterByOrderId(array('min' => 12)); // WHERE order_id > 12
+     * $query->filterByOrderId(array('min' => 12)); // WHERE order_id >= 12
+     * $query->filterByOrderId(array('max' => 12)); // WHERE order_id <= 12
      * </code>
      *
      * @see       filterByOrder()
@@ -460,7 +489,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * <code>
      * $query->filterByQuantity(1234); // WHERE quantity = 1234
      * $query->filterByQuantity(array(12, 34)); // WHERE quantity IN (12, 34)
-     * $query->filterByQuantity(array('min' => 12)); // WHERE quantity > 12
+     * $query->filterByQuantity(array('min' => 12)); // WHERE quantity >= 12
+     * $query->filterByQuantity(array('max' => 12)); // WHERE quantity <= 12
      * </code>
      *
      * @param     mixed $quantity The value to use as filter.
@@ -501,7 +531,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * <code>
      * $query->filterByPrice(1234); // WHERE price = 1234
      * $query->filterByPrice(array(12, 34)); // WHERE price IN (12, 34)
-     * $query->filterByPrice(array('min' => 12)); // WHERE price > 12
+     * $query->filterByPrice(array('min' => 12)); // WHERE price >= 12
+     * $query->filterByPrice(array('max' => 12)); // WHERE price <= 12
      * </code>
      *
      * @param     mixed $price The value to use as filter.
@@ -542,7 +573,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * <code>
      * $query->filterByTax(1234); // WHERE tax = 1234
      * $query->filterByTax(array(12, 34)); // WHERE tax IN (12, 34)
-     * $query->filterByTax(array('min' => 12)); // WHERE tax > 12
+     * $query->filterByTax(array('min' => 12)); // WHERE tax >= 12
+     * $query->filterByTax(array('max' => 12)); // WHERE tax <= 12
      * </code>
      *
      * @param     mixed $tax The value to use as filter.
@@ -583,7 +615,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * <code>
      * $query->filterByParent(1234); // WHERE parent = 1234
      * $query->filterByParent(array(12, 34)); // WHERE parent IN (12, 34)
-     * $query->filterByParent(array('min' => 12)); // WHERE parent > 12
+     * $query->filterByParent(array('min' => 12)); // WHERE parent >= 12
+     * $query->filterByParent(array('max' => 12)); // WHERE parent <= 12
      * </code>
      *
      * @param     mixed $parent The value to use as filter.
@@ -709,8 +742,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * @param   Order|PropelObjectCollection $order The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderProductQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderProductQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrder($order, $comparison = null)
     {
@@ -785,8 +818,8 @@ abstract class BaseOrderProductQuery extends ModelCriteria
      * @param   OrderFeature|PropelObjectCollection $orderFeature  the related object to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   OrderProductQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 OrderProductQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByOrderFeature($orderFeature, $comparison = null)
     {

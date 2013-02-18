@@ -78,7 +78,7 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * Returns a new ContentFolderQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
-     * @param     ContentFolderQuery|Criteria $criteria Optional Criteria to build the query from
+     * @param   ContentFolderQuery|Criteria $criteria Optional Criteria to build the query from
      *
      * @return ContentFolderQuery
      */
@@ -142,12 +142,12 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     PropelPDO $con A connection object
      *
-     * @return   ContentFolder A model object, or null if the key is not found
-     * @throws   PropelException
+     * @return                 ContentFolder A model object, or null if the key is not found
+     * @throws PropelException
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `CONTENT_ID`, `FOLDER_ID`, `CREATED_AT`, `UPDATED_AT` FROM `content_folder` WHERE `CONTENT_ID` = :p0 AND `FOLDER_ID` = :p1';
+        $sql = 'SELECT `content_id`, `folder_id`, `created_at`, `updated_at` FROM `content_folder` WHERE `content_id` = :p0 AND `folder_id` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -255,7 +255,8 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * <code>
      * $query->filterByContentId(1234); // WHERE content_id = 1234
      * $query->filterByContentId(array(12, 34)); // WHERE content_id IN (12, 34)
-     * $query->filterByContentId(array('min' => 12)); // WHERE content_id > 12
+     * $query->filterByContentId(array('min' => 12)); // WHERE content_id >= 12
+     * $query->filterByContentId(array('max' => 12)); // WHERE content_id <= 12
      * </code>
      *
      * @see       filterByContent()
@@ -270,8 +271,22 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      */
     public function filterByContentId($contentId = null, $comparison = null)
     {
-        if (is_array($contentId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($contentId)) {
+            $useMinMax = false;
+            if (isset($contentId['min'])) {
+                $this->addUsingAlias(ContentFolderPeer::CONTENT_ID, $contentId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($contentId['max'])) {
+                $this->addUsingAlias(ContentFolderPeer::CONTENT_ID, $contentId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ContentFolderPeer::CONTENT_ID, $contentId, $comparison);
@@ -284,7 +299,8 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * <code>
      * $query->filterByFolderId(1234); // WHERE folder_id = 1234
      * $query->filterByFolderId(array(12, 34)); // WHERE folder_id IN (12, 34)
-     * $query->filterByFolderId(array('min' => 12)); // WHERE folder_id > 12
+     * $query->filterByFolderId(array('min' => 12)); // WHERE folder_id >= 12
+     * $query->filterByFolderId(array('max' => 12)); // WHERE folder_id <= 12
      * </code>
      *
      * @see       filterByFolder()
@@ -299,8 +315,22 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      */
     public function filterByFolderId($folderId = null, $comparison = null)
     {
-        if (is_array($folderId) && null === $comparison) {
-            $comparison = Criteria::IN;
+        if (is_array($folderId)) {
+            $useMinMax = false;
+            if (isset($folderId['min'])) {
+                $this->addUsingAlias(ContentFolderPeer::FOLDER_ID, $folderId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($folderId['max'])) {
+                $this->addUsingAlias(ContentFolderPeer::FOLDER_ID, $folderId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
         }
 
         return $this->addUsingAlias(ContentFolderPeer::FOLDER_ID, $folderId, $comparison);
@@ -398,8 +428,8 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * @param   Content|PropelObjectCollection $content The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ContentFolderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ContentFolderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByContent($content, $comparison = null)
     {
@@ -474,8 +504,8 @@ abstract class BaseContentFolderQuery extends ModelCriteria
      * @param   Folder|PropelObjectCollection $folder The related object(s) to use as filter
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return   ContentFolderQuery The current query, for fluid interface
-     * @throws   PropelException - if the provided filter is invalid.
+     * @return                 ContentFolderQuery The current query, for fluid interface
+     * @throws PropelException - if the provided filter is invalid.
      */
     public function filterByFolder($folder, $comparison = null)
     {

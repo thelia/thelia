@@ -47,26 +47,26 @@ abstract class BaseContentAssocPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 7;
 
-    /** the column name for the ID field */
-    const ID = 'content_assoc.ID';
+    /** the column name for the id field */
+    const ID = 'content_assoc.id';
 
-    /** the column name for the CATEGORY_ID field */
-    const CATEGORY_ID = 'content_assoc.CATEGORY_ID';
+    /** the column name for the category_id field */
+    const CATEGORY_ID = 'content_assoc.category_id';
 
-    /** the column name for the PRODUCT_ID field */
-    const PRODUCT_ID = 'content_assoc.PRODUCT_ID';
+    /** the column name for the product_id field */
+    const PRODUCT_ID = 'content_assoc.product_id';
 
-    /** the column name for the CONTENT_ID field */
-    const CONTENT_ID = 'content_assoc.CONTENT_ID';
+    /** the column name for the content_id field */
+    const CONTENT_ID = 'content_assoc.content_id';
 
-    /** the column name for the POSITION field */
-    const POSITION = 'content_assoc.POSITION';
+    /** the column name for the position field */
+    const POSITION = 'content_assoc.position';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'content_assoc.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'content_assoc.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'content_assoc.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'content_assoc.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -189,13 +189,13 @@ abstract class BaseContentAssocPeer
             $criteria->addSelectColumn(ContentAssocPeer::CREATED_AT);
             $criteria->addSelectColumn(ContentAssocPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CATEGORY_ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.CONTENT_ID');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.category_id');
+            $criteria->addSelectColumn($alias . '.product_id');
+            $criteria->addSelectColumn($alias . '.content_id');
+            $criteria->addSelectColumn($alias . '.position');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -279,7 +279,7 @@ abstract class BaseContentAssocPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -384,8 +384,15 @@ abstract class BaseContentAssocPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (ContentAssocPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         ContentAssocPeer::$instances = array();
     }
 
@@ -1497,7 +1504,7 @@ abstract class BaseContentAssocPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return ContentAssocPeer::OM_CLASS;
     }

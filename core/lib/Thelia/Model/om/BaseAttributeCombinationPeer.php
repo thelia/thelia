@@ -47,23 +47,23 @@ abstract class BaseAttributeCombinationPeer
     /** The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS) */
     const NUM_HYDRATE_COLUMNS = 6;
 
-    /** the column name for the ID field */
-    const ID = 'attribute_combination.ID';
+    /** the column name for the id field */
+    const ID = 'attribute_combination.id';
 
-    /** the column name for the ATTRIBUTE_ID field */
-    const ATTRIBUTE_ID = 'attribute_combination.ATTRIBUTE_ID';
+    /** the column name for the attribute_id field */
+    const ATTRIBUTE_ID = 'attribute_combination.attribute_id';
 
-    /** the column name for the COMBINATION_ID field */
-    const COMBINATION_ID = 'attribute_combination.COMBINATION_ID';
+    /** the column name for the combination_id field */
+    const COMBINATION_ID = 'attribute_combination.combination_id';
 
-    /** the column name for the ATTRIBUTE_AV_ID field */
-    const ATTRIBUTE_AV_ID = 'attribute_combination.ATTRIBUTE_AV_ID';
+    /** the column name for the attribute_av_id field */
+    const ATTRIBUTE_AV_ID = 'attribute_combination.attribute_av_id';
 
-    /** the column name for the CREATED_AT field */
-    const CREATED_AT = 'attribute_combination.CREATED_AT';
+    /** the column name for the created_at field */
+    const CREATED_AT = 'attribute_combination.created_at';
 
-    /** the column name for the UPDATED_AT field */
-    const UPDATED_AT = 'attribute_combination.UPDATED_AT';
+    /** the column name for the updated_at field */
+    const UPDATED_AT = 'attribute_combination.updated_at';
 
     /** The default string format for model objects of the related table **/
     const DEFAULT_STRING_FORMAT = 'YAML';
@@ -185,12 +185,12 @@ abstract class BaseAttributeCombinationPeer
             $criteria->addSelectColumn(AttributeCombinationPeer::CREATED_AT);
             $criteria->addSelectColumn(AttributeCombinationPeer::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.ATTRIBUTE_ID');
-            $criteria->addSelectColumn($alias . '.COMBINATION_ID');
-            $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_ID');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.id');
+            $criteria->addSelectColumn($alias . '.attribute_id');
+            $criteria->addSelectColumn($alias . '.combination_id');
+            $criteria->addSelectColumn($alias . '.attribute_av_id');
+            $criteria->addSelectColumn($alias . '.created_at');
+            $criteria->addSelectColumn($alias . '.updated_at');
         }
     }
 
@@ -274,7 +274,7 @@ abstract class BaseAttributeCombinationPeer
     /**
      * Prepares the Criteria object and uses the parent doSelect() method to execute a PDOStatement.
      *
-     * Use this method directly if you want to work with an executed statement durirectly (for example
+     * Use this method directly if you want to work with an executed statement directly (for example
      * to perform your own object hydration).
      *
      * @param      Criteria $criteria The Criteria object used to build the SELECT statement.
@@ -379,8 +379,15 @@ abstract class BaseAttributeCombinationPeer
      *
      * @return void
      */
-    public static function clearInstancePool()
+    public static function clearInstancePool($and_clear_all_references = false)
     {
+      if ($and_clear_all_references)
+      {
+        foreach (AttributeCombinationPeer::$instances as $instance)
+        {
+          $instance->clearAllReferences(true);
+        }
+      }
         AttributeCombinationPeer::$instances = array();
     }
 
@@ -1492,7 +1499,7 @@ abstract class BaseAttributeCombinationPeer
      *
      * @return string ClassName
      */
-    public static function getOMClass()
+    public static function getOMClass($row = 0, $colnum = 0)
     {
         return AttributeCombinationPeer::OM_CLASS;
     }
