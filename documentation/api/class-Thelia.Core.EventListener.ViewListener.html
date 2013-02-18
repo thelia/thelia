@@ -152,7 +152,7 @@
 href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&gt;<br />
 				<b>TODO:</b>
 				Look if it's possible to block this definition in dependency-injection<br />
-		<b>Located at</b> <a href="source-class-Thelia.Core.EventListener.ViewListener.html#32-85" title="Go to source code">core/lib/Thelia/Core/EventListener/ViewListener.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Core.EventListener.ViewListener.html#35-123" title="Go to source code">core/lib/Thelia/Core/EventListener/ViewListener.php</a><br />
 	</div>
 
 
@@ -170,7 +170,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#44-51" title="Go to source code">__construct</a>( <span><code><a href="class-Thelia.Core.Template.ParserInterface.html">Thelia\Core\Template\ParserInterface</a></code> <var>$parser</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#51-58" title="Go to source code">__construct</a>( <span>Symfony\Component\DependencyInjection\ContainerInterface <var>$container</var></span> )</code>
 
 		<div class="description short">
 			
@@ -182,7 +182,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 				<h4>Parameters</h4>
 				<div class="list"><dl>
-					<dt><var>$parser</var></dt>
+					<dt><var>$container</var></dt>
 					<dd><code><code><a href="class-Thelia.Core.Template.ParserInterface.html">Thelia\Core\Template\ParserInterface</a></code></code><br>$parser</dd>
 				</dl></div>
 
@@ -204,7 +204,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_onKernelView">#</a>
-		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#53-70" title="Go to source code">onKernelView</a>( <span>Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent <var>$event</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#60-83" title="Go to source code">onKernelView</a>( <span>Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent <var>$event</var></span> )</code>
 
 		<div class="description short">
 			
@@ -231,6 +231,64 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 		</div>
 		</div></td>
 	</tr>
+	<tr data-order="beforeKernelView" id="_beforeKernelView">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_beforeKernelView">#</a>
+		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#85-93" title="Go to source code">beforeKernelView</a>( <span>Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent <var>$event</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="findView" id="_findView">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findView">#</a>
+		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#95-105" title="Go to source code">findView</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
 	<tr data-order="getSubscribedEvents" id="_getSubscribedEvents">
 
 		<td class="attributes"><code>
@@ -242,7 +300,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getSubscribedEvents">#</a>
-		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#73-84" title="Go to source code">getSubscribedEvents</a>( )</code>
+		<code><a href="source-class-Thelia.Core.EventListener.ViewListener.html#108-122" title="Go to source code">getSubscribedEvents</a>( )</code>
 
 		<div class="description short">
 			

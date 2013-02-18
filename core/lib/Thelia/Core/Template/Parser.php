@@ -139,9 +139,11 @@ class Parser implements ParserInterface
     public function loadParser()
     {
         $content = $this->openFile($this->getRequest());
+        
+        $content = $this->parseInclude($content);
     }
     
-    public function openFile(Request $request)
+    protected function openFile(Request $request)
     {
         $file = $request->attributes->get('_view');
         $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file . ".html";
@@ -150,8 +152,14 @@ class Parser implements ParserInterface
         } else {
             throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
         }
+        
+        return $content;
     }
     
+    protected function parseInclude($content)
+    {
+        
+    }
 
 
 }

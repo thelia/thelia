@@ -256,35 +256,36 @@
 </span><span id="45" class="l"><a class="l" href="#45">45: </a>        <span class="php-var">$this</span>-&gt;addPrimaryKey(<span class="php-quote">'ID'</span>, <span class="php-quote">'Id'</span>, <span class="php-quote">'INTEGER'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
 </span><span id="46" class="l"><a class="l" href="#46">46: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'TITLE'</span>, <span class="php-quote">'Title'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">100</span>, <span class="php-keyword1">null</span>);
 </span><span id="47" class="l"><a class="l" href="#47">47: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'CODE'</span>, <span class="php-quote">'Code'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">10</span>, <span class="php-keyword1">null</span>);
-</span><span id="48" class="l"><a class="l" href="#48">48: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'URL'</span>, <span class="php-quote">'Url'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
-</span><span id="49" class="l"><a class="l" href="#49">49: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'BY_DEFAULT'</span>, <span class="php-quote">'ByDefault'</span>, <span class="php-quote">'TINYINT'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="50" class="l"><a class="l" href="#50">50: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'CREATED_AT'</span>, <span class="php-quote">'CreatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="51" class="l"><a class="l" href="#51">51: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'UPDATED_AT'</span>, <span class="php-quote">'UpdatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="52" class="l"><a class="l" href="#52">52: </a>        <span class="php-comment">// validators</span>
-</span><span id="53" class="l"><a class="l" href="#53">53: </a>    } <span class="php-comment">// initialize()</span>
-</span><span id="54" class="l"><a class="l" href="#54">54: </a>
-</span><span id="55" class="l"><a class="l" href="#55">55: </a>    <span class="php-comment">/**
-</span></span><span id="56" class="l"><a class="l" href="#56">56: </a><span class="php-comment">     * Build the RelationMap objects for this table relationships
-</span></span><span id="57" class="l"><a class="l" href="#57">57: </a><span class="php-comment">     */</span>
-</span><span id="58" class="l"><a class="l" href="#58">58: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_buildRelations" href="#_buildRelations">buildRelations</a>()
-</span><span id="59" class="l"><a class="l" href="#59">59: </a>    {
-</span><span id="60" class="l"><a class="l" href="#60">60: </a>    } <span class="php-comment">// buildRelations()</span>
-</span><span id="61" class="l"><a class="l" href="#61">61: </a>
-</span><span id="62" class="l"><a class="l" href="#62">62: </a>    <span class="php-comment">/**
-</span></span><span id="63" class="l"><a class="l" href="#63">63: </a><span class="php-comment">     *
-</span></span><span id="64" class="l"><a class="l" href="#64">64: </a><span class="php-comment">     * Gets the list of behaviors registered for this table
-</span></span><span id="65" class="l"><a class="l" href="#65">65: </a><span class="php-comment">     *
-</span></span><span id="66" class="l"><a class="l" href="#66">66: </a><span class="php-comment">     * @return array Associative array (name =&gt; parameters) of behaviors
-</span></span><span id="67" class="l"><a class="l" href="#67">67: </a><span class="php-comment">     */</span>
-</span><span id="68" class="l"><a class="l" href="#68">68: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_getBehaviors" href="#_getBehaviors">getBehaviors</a>()
-</span><span id="69" class="l"><a class="l" href="#69">69: </a>    {
-</span><span id="70" class="l"><a class="l" href="#70">70: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
-</span><span id="71" class="l"><a class="l" href="#71">71: </a>            <span class="php-quote">'timestampable'</span> =&gt; <span class="php-keyword1">array</span>(<span class="php-quote">'create_column'</span> =&gt; <span class="php-quote">'created_at'</span>, <span class="php-quote">'update_column'</span> =&gt; <span class="php-quote">'updated_at'</span>, <span class="php-quote">'disable_updated_at'</span> =&gt; <span class="php-quote">'false'</span>, ),
-</span><span id="72" class="l"><a class="l" href="#72">72: </a>        );
-</span><span id="73" class="l"><a class="l" href="#73">73: </a>    } <span class="php-comment">// getBehaviors()</span>
-</span><span id="74" class="l"><a class="l" href="#74">74: </a>
-</span><span id="75" class="l"><a class="l" href="#75">75: </a>} <span class="php-comment">// LangTableMap</span>
-</span><span id="76" class="l"><a class="l" href="#76">76: </a></span></code></pre>
+</span><span id="48" class="l"><a class="l" href="#48">48: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'LOCALE'</span>, <span class="php-quote">'Locale'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">45</span>, <span class="php-keyword1">null</span>);
+</span><span id="49" class="l"><a class="l" href="#49">49: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'URL'</span>, <span class="php-quote">'Url'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
+</span><span id="50" class="l"><a class="l" href="#50">50: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'BY_DEFAULT'</span>, <span class="php-quote">'ByDefault'</span>, <span class="php-quote">'TINYINT'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="51" class="l"><a class="l" href="#51">51: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'CREATED_AT'</span>, <span class="php-quote">'CreatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="52" class="l"><a class="l" href="#52">52: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'UPDATED_AT'</span>, <span class="php-quote">'UpdatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="53" class="l"><a class="l" href="#53">53: </a>        <span class="php-comment">// validators</span>
+</span><span id="54" class="l"><a class="l" href="#54">54: </a>    } <span class="php-comment">// initialize()</span>
+</span><span id="55" class="l"><a class="l" href="#55">55: </a>
+</span><span id="56" class="l"><a class="l" href="#56">56: </a>    <span class="php-comment">/**
+</span></span><span id="57" class="l"><a class="l" href="#57">57: </a><span class="php-comment">     * Build the RelationMap objects for this table relationships
+</span></span><span id="58" class="l"><a class="l" href="#58">58: </a><span class="php-comment">     */</span>
+</span><span id="59" class="l"><a class="l" href="#59">59: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_buildRelations" href="#_buildRelations">buildRelations</a>()
+</span><span id="60" class="l"><a class="l" href="#60">60: </a>    {
+</span><span id="61" class="l"><a class="l" href="#61">61: </a>    } <span class="php-comment">// buildRelations()</span>
+</span><span id="62" class="l"><a class="l" href="#62">62: </a>
+</span><span id="63" class="l"><a class="l" href="#63">63: </a>    <span class="php-comment">/**
+</span></span><span id="64" class="l"><a class="l" href="#64">64: </a><span class="php-comment">     *
+</span></span><span id="65" class="l"><a class="l" href="#65">65: </a><span class="php-comment">     * Gets the list of behaviors registered for this table
+</span></span><span id="66" class="l"><a class="l" href="#66">66: </a><span class="php-comment">     *
+</span></span><span id="67" class="l"><a class="l" href="#67">67: </a><span class="php-comment">     * @return array Associative array (name =&gt; parameters) of behaviors
+</span></span><span id="68" class="l"><a class="l" href="#68">68: </a><span class="php-comment">     */</span>
+</span><span id="69" class="l"><a class="l" href="#69">69: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_getBehaviors" href="#_getBehaviors">getBehaviors</a>()
+</span><span id="70" class="l"><a class="l" href="#70">70: </a>    {
+</span><span id="71" class="l"><a class="l" href="#71">71: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
+</span><span id="72" class="l"><a class="l" href="#72">72: </a>            <span class="php-quote">'timestampable'</span> =&gt; <span class="php-keyword1">array</span>(<span class="php-quote">'create_column'</span> =&gt; <span class="php-quote">'created_at'</span>, <span class="php-quote">'update_column'</span> =&gt; <span class="php-quote">'updated_at'</span>, <span class="php-quote">'disable_updated_at'</span> =&gt; <span class="php-quote">'false'</span>, ),
+</span><span id="73" class="l"><a class="l" href="#73">73: </a>        );
+</span><span id="74" class="l"><a class="l" href="#74">74: </a>    } <span class="php-comment">// getBehaviors()</span>
+</span><span id="75" class="l"><a class="l" href="#75">75: </a>
+</span><span id="76" class="l"><a class="l" href="#76">76: </a>} <span class="php-comment">// LangTableMap</span>
+</span><span id="77" class="l"><a class="l" href="#77">77: </a></span></code></pre>
 
 	<div id="footer">
 		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>

@@ -419,7 +419,7 @@
 </span></span><span id="18" class="l"><a class="l" href="#18">18: </a><span class="php-comment"> */</span>
 </span><span id="19" class="l"><a class="l" href="#19">19: </a><span class="php-keyword1">class</span> <a id="ConfigQuery" href="#ConfigQuery">ConfigQuery</a> <span class="php-keyword1">extends</span> BaseConfigQuery
 </span><span id="20" class="l"><a class="l" href="#20">20: </a>{
-</span><span id="21" class="l"><a class="l" href="#21">21: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">static</span> <span class="php-keyword1">function</span> <a id="_read" href="#_read">read</a>(<span class="php-var">$search</span>, <span class="php-var">$default</span>)
+</span><span id="21" class="l"><a class="l" href="#21">21: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">static</span> <span class="php-keyword1">function</span> <a id="_read" href="#_read">read</a>(<span class="php-var">$search</span>, <span class="php-var">$default</span> = <span class="php-keyword1">null</span>)
 </span><span id="22" class="l"><a class="l" href="#22">22: </a>    {
 </span><span id="23" class="l"><a class="l" href="#23">23: </a>        <span class="php-var">$value</span> = self::create()-&gt;findOneByName(<span class="php-var">$search</span>);
 </span><span id="24" class="l"><a class="l" href="#24">24: </a>        
