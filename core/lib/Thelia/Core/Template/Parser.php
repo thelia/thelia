@@ -27,6 +27,7 @@ use Thelia\Core\Template\ParserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Symfony\Component\Config\ConfigCache;
 
 /**
  *
@@ -58,6 +59,8 @@ class Parser implements ParserInterface
     protected $status = 200;
     
     protected $template = "default";
+    
+    protected $init = false;
 
     /**
      *
@@ -68,6 +71,27 @@ class Parser implements ParserInterface
     public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
+    }
+    
+    protected function initialize()
+    {
+        if ($this->init === true) {
+            return;
+        }
+        
+        /** /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\
+         * @TODO
+         * 
+         * Avant le lancement du parser, enregistrer les boucles, filtres.
+         * Pour ne pas le faire à chaque lancement, on va créer une class qui contient toutes les classes nécessaires
+         * 
+         * Créer : 
+         * un dumper
+         * une méthode qui récupère les différents éléments : boucles, filtres, substitutions, etc
+         * 
+         * 
+         * /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ 
+         */
     }
     
     /**
