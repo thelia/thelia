@@ -1,6 +1,33 @@
 {
-    "hash": "bec45b0a4848cd287809e9a0a83b6d51",
+    "hash": "2f31adf8756fec850487c80b20b42e0f",
     "packages": [
+        {
+            "name": "Thelia/Tpex",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thelia/Tpex.git",
+                "reference": "a19b49de4c2eb1c759646a9d7d4caf5e00825f67"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thelia/Tpex/zipball/a19b49de4c2eb1c759646a9d7d4caf5e00825f67",
+                "reference": "a19b49de4c2eb1c759646a9d7d4caf5e00825f67",
+                "shasum": ""
+            },
+            "time": "2013-02-18 20:38:40",
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Thelia\\Tpex": ""
+                }
+            },
+            "homepage": "http://thelia.net",
+            "support": {
+                "source": "https://github.com/thelia/Tpex/tree/master",
+                "issues": "https://github.com/thelia/Tpex/issues"
+            }
+        },
         {
             "name": "ircmaxell/password-compat",
             "version": "dev-master",
@@ -162,7 +189,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-fig/log/zipball/1.0.0",
+                "url": "https://github.com/php-fig/log/archive/1.0.0.zip",
                 "reference": "1.0.0",
                 "shasum": ""
             },
@@ -499,7 +526,7 @@
                 "symfony/dependency-injection": "2.1.*",
                 "symfony/finder": "2.1.*"
             },
-            "time": "2013-01-17 16:21:47",
+            "time": "2012-12-21 10:24:53",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -584,6 +611,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "ircmaxell/password-compat": 20,
-        "psr/log": 20
+        "psr/log": 20,
+        "thelia/tpex": 20
     }
 }
