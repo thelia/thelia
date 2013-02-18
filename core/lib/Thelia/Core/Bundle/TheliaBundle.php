@@ -69,8 +69,11 @@ class TheliaBundle extends Bundle
 
         $container->register('resolver', 'Symfony\Component\HttpKernel\Controller\ControllerResolver');
 
+        $container->register('tpex', 'Thelia\Tpex\Tpex');
+        
         $container->register('parser','Thelia\Core\Template\Parser')
                 ->addArgument(new Reference('service_container'))
+                ->addArgument(new Reference('tpex'))
         ;
         /**
          * RouterListener implements EventSubscriberInterface and listen for kernel.request event

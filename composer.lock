@@ -4,18 +4,23 @@
         {
             "name": "Thelia/Tpex",
             "version": "dev-master",
+            "target-dir": "Thelia/Tpex",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thelia/Tpex.git",
-                "reference": "a19b49de4c2eb1c759646a9d7d4caf5e00825f67"
+                "reference": "1be74fd835d6e08b5c4500d7720945412195495e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Tpex/zipball/a19b49de4c2eb1c759646a9d7d4caf5e00825f67",
-                "reference": "a19b49de4c2eb1c759646a9d7d4caf5e00825f67",
+                "url": "https://api.github.com/repos/thelia/Tpex/zipball/1be74fd835d6e08b5c4500d7720945412195495e",
+                "reference": "1be74fd835d6e08b5c4500d7720945412195495e",
                 "shasum": ""
             },
-            "time": "2013-02-18 20:38:40",
+            "require": {
+                "symfony/event-dispatcher": "2.1.*",
+                "symfony/http-foundation": "2.1.*"
+            },
+            "time": "2013-02-18 21:44:38",
             "type": "library",
             "autoload": {
                 "psr-0": {

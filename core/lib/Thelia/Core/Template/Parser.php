@@ -29,6 +29,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Config\ConfigCache;
 
+use Thelia\Tpex\Tpex;
+
 /**
  *
  * Master class of Thelia's parser. The loop mechanism depends of this parser
@@ -58,6 +60,8 @@ class Parser implements ParserInterface
     protected $content;
     protected $status = 200;
     
+    protected $tpex;
+    
     protected $template = "default";
     
     protected $init = false;
@@ -68,9 +72,10 @@ class Parser implements ParserInterface
      *
      * public function __construct(ContainerBuilder $container)
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, Tpex $tpex)
     {
         $this->container = $container;
+        $this->tpex = $tpex;
     }
     
     protected function initialize()
@@ -164,7 +169,11 @@ class Parser implements ParserInterface
     {
         $content = $this->openFile($this->getRequest());
         
-        $content = $this->parseInclude($content);
+        $this->tpex->setContent($content);
+        $this->tpex->setDispatcher($this->container->get("dispatcher"));
+        $this->tpex->setRequest($this->container->get("request"));
+        
+        $this->tpex->execute();
     }
     
     protected function openFile(Request $request)
