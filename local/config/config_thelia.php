@@ -13,6 +13,6 @@ $conf = array (
       ),
     ),
   ),
-  'generator_version' => '1.6.7',
+  'generator_version' => '1.6.8',
 );
 return $conf;
