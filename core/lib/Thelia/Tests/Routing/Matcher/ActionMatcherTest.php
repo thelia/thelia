@@ -25,26 +25,43 @@ namespace Thelia\Tests\Routing\Matcher;
 
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Routing\Matcher\ActionMatcher;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\ActionEvent;
 
 class ActionMatcherTest extends \PHPUnit_Framework_TestCase
 {
     
     /**
+     * 
+     * if there is no action parameter and n
+     * 
      * @expectedException Symfony\Component\Routing\Exception\ResourceNotFoundException
+     * @expectedExceptionMessage No action parameter found
      */
     public function testDispatchActionWithoutAction()
     {
         $actionMatcher = new ActionMatcher();
-        $request = new Request();
         
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
         
         $dispatcher->expects($this->any())
                 ->method("dispatch");
         $actionMatcher->setDispatcher($dispatcher);
-        $actionMatcher->matchRequest($request);
+        $actionMatcher->matchRequest(new Request());
+    }
+
+    public function testDispatchActionWithAddProduct()
+    {
+        $request = new Request(array(
+            "action" => "addProduct"
+        ));
+        
+        $actionMatcher = new ActionMatcher();
+        $actionMatcher->setDispatcher($this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface"));
+        $action = $actionMatcher->matchRequest($request);
+        
+        $this->assertArrayHasKey("_controller", $action);
+        $this->assertInstanceOf("Thelia\Action\Cart", $action["_controller"][0]);
+        
     }
 
 }
