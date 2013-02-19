@@ -8,19 +8,19 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/thelia/Tpex.git",
-                "reference": "1be74fd835d6e08b5c4500d7720945412195495e"
+                "reference": "c2b8151f4c378d30887900290467b21585a0eb15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Tpex/zipball/1be74fd835d6e08b5c4500d7720945412195495e",
-                "reference": "1be74fd835d6e08b5c4500d7720945412195495e",
+                "url": "https://api.github.com/repos/thelia/Tpex/zipball/c2b8151f4c378d30887900290467b21585a0eb15",
+                "reference": "c2b8151f4c378d30887900290467b21585a0eb15",
                 "shasum": ""
             },
             "require": {
                 "symfony/event-dispatcher": "2.1.*",
                 "symfony/http-foundation": "2.1.*"
             },
-            "time": "2013-02-18 21:44:38",
+            "time": "2013-02-18 22:51:33",
             "type": "library",
             "autoload": {
                 "psr-0": {
@@ -194,7 +194,7 @@
             },
             "dist": {
                 "type": "zip",
-                "url": "https://github.com/php-fig/log/archive/1.0.0.zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/1.0.0",
                 "reference": "1.0.0",
                 "shasum": ""
             },
@@ -531,7 +531,7 @@
                 "symfony/dependency-injection": "2.1.*",
                 "symfony/finder": "2.1.*"
             },
-            "time": "2012-12-21 10:24:53",
+            "time": "2013-01-17 16:21:47",
             "type": "library",
             "autoload": {
                 "psr-0": {
