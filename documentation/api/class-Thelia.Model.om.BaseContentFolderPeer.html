@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseContentFolderPeer | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -424,7 +426,7 @@
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#18-1388" title="Go to source code">core/lib/Thelia/Model/om/BaseContentFolderPeer.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#18-1395" title="Go to source code">core/lib/Thelia/Model/om/BaseContentFolderPeer.php</a><br />
 	</div>
 
 
@@ -784,7 +786,7 @@ PropelException.<br />
 
 		<td class="attributes"><code>
 			 public static
-			<code><a href="class-PDOStatement.html">PDOStatement</a></code>
+			PDOStatement
 			
 			</code>
 		</td>
@@ -806,7 +808,7 @@ a PDOStatement.</p>
 a PDOStatement.</p>
 
 <p>Use this method directly if you want to work with an executed statement
-durirectly (for example to perform your own object hydration).</p>
+directly (for example to perform your own object hydration).</p>
 
 
 
@@ -820,7 +822,7 @@ durirectly (for example to perform your own object hydration).</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code><code><a href="class-PDOStatement.html">PDOStatement</a></code></code><br>The executed PDOStatement object.<br />
+					<code>PDOStatement</code><br>The executed PDOStatement object.<br />
 				</div>
 
 				<h4>Throws</h4>
@@ -997,7 +999,7 @@ pooling has been disabled.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_clearInstancePool">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#366-374" title="Go to source code">clearInstancePool</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#366-381" title="Go to source code">clearInstancePool</a>( <span>mixed <var>$and_clear_all_references</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1030,7 +1032,7 @@ pooling has been disabled.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_clearRelatedInstancePool">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#376-382" title="Go to source code">clearRelatedInstancePool</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#383-389" title="Go to source code">clearRelatedInstancePool</a>( )</code>
 
 		<div class="description short">
 			
@@ -1065,7 +1067,7 @@ content_folder by a foreign key with ON DELETE CASCADE</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getPrimaryKeyHashFromRow">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#384-402" title="Go to source code">getPrimaryKeyHashFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#391-409" title="Go to source code">getPrimaryKeyHashFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1116,7 +1118,7 @@ are all null.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getPrimaryKeyFromRow">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#404-417" title="Go to source code">getPrimaryKeyFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#411-424" title="Go to source code">getPrimaryKeyFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1166,7 +1168,7 @@ returned.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_populateObjects">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#419-450" title="Go to source code">populateObjects</a>( <span><code><a href="class-PDOStatement.html">PDOStatement</a></code> <var>$stmt</var></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#426-457" title="Go to source code">populateObjects</a>( <span>PDOStatement <var>$stmt</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1206,7 +1208,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_populateObject">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#451-476" title="Go to source code">populateObject</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#458-483" title="Go to source code">populateObject</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1257,7 +1259,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinContent">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#479-527" title="Go to source code">doCountJoinContent</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#486-534" title="Go to source code">doCountJoinContent</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1308,7 +1310,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinFolder">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#530-578" title="Go to source code">doCountJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#537-585" title="Go to source code">doCountJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1359,7 +1361,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinContent">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#581-645" title="Go to source code">doSelectJoinContent</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#588-652" title="Go to source code">doSelectJoinContent</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1412,7 +1414,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinFolder">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#648-712" title="Go to source code">doSelectJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#655-719" title="Go to source code">doSelectJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1465,7 +1467,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#715-765" title="Go to source code">doCountJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#722-772" title="Go to source code">doCountJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1514,7 +1516,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#767-857" title="Go to source code">doSelectJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#774-864" title="Go to source code">doSelectJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1567,7 +1569,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinAllExceptContent">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#860-908" title="Go to source code">doCountJoinAllExceptContent</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#867-915" title="Go to source code">doCountJoinAllExceptContent</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1618,7 +1620,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinAllExceptFolder">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#911-959" title="Go to source code">doCountJoinAllExceptFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#918-966" title="Go to source code">doCountJoinAllExceptFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1669,7 +1671,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinAllExceptContent">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#962-1033" title="Go to source code">doSelectJoinAllExceptContent</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#969-1040" title="Go to source code">doSelectJoinAllExceptContent</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1722,7 +1724,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinAllExceptFolder">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1036-1107" title="Go to source code">doSelectJoinAllExceptFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1043-1114" title="Go to source code">doSelectJoinAllExceptFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1775,7 +1777,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getTableMap">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1109-1119" title="Go to source code">getTableMap</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1116-1126" title="Go to source code">getTableMap</a>( )</code>
 
 		<div class="description short">
 			
@@ -1819,7 +1821,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_buildTableMap">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1121-1130" title="Go to source code">buildTableMap</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1128-1137" title="Go to source code">buildTableMap</a>( )</code>
 
 		<div class="description short">
 			
@@ -1852,7 +1854,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getOMClass">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1132-1141" title="Go to source code">getOMClass</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1139-1148" title="Go to source code">getOMClass</a>( <span>mixed <var>$row</var> = <span class="php-num">0</span></span>, <span>mixed <var>$colnum</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1889,7 +1891,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doInsert">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1143-1180" title="Go to source code">doInsert</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1150-1187" title="Go to source code">doInsert</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1941,7 +1943,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doUpdate">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1182-1227" title="Go to source code">doUpdate</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1189-1234" title="Go to source code">doUpdate</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1994,7 +1996,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doDeleteAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1229-1259" title="Go to source code">doDeleteAll</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1236-1266" title="Go to source code">doDeleteAll</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2040,7 +2042,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doDelete">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1261-1326" title="Go to source code">doDelete</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1268-1333" title="Go to source code">doDelete</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2094,7 +2096,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doValidate">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1328-1363" title="Go to source code">doValidate</a>( <span><code><a href="class-Thelia.Model.ContentFolder.html">Thelia\Model\ContentFolder</a></code> <var>$obj</var></span>, <span>mixed <var>$cols</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1335-1370" title="Go to source code">doValidate</a>( <span><code><a href="class-Thelia.Model.ContentFolder.html">Thelia\Model\ContentFolder</a></code> <var>$obj</var></span>, <span>mixed <var>$cols</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2144,7 +2146,7 @@ those columns are validated.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_retrieveByPK">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1365-1387" title="Go to source code">retrieveByPK</a>( <span>integer <var>$content_id</var></span>, <span>integer <var>$folder_id</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#1372-1394" title="Go to source code">retrieveByPK</a>( <span>integer <var>$content_id</var></span>, <span>integer <var>$folder_id</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2364,19 +2366,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#49-50" title="Go to source code"><b>CONTENT_ID</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'content_folder.CONTENT_ID'</span></code></td>
+		<td class="value"><code><span class="php-quote">'content_folder.content_id'</span></code></td>
 		<td class="description"><div>
 			<a href="#CONTENT_ID" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the CONTENT_ID field</p>
+<p>the column name for the content_id field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the CONTENT_ID field</p>
+<p>the column name for the content_id field</p>
 
 
 			</div>
@@ -2388,19 +2390,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#52-53" title="Go to source code"><b>FOLDER_ID</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'content_folder.FOLDER_ID'</span></code></td>
+		<td class="value"><code><span class="php-quote">'content_folder.folder_id'</span></code></td>
 		<td class="description"><div>
 			<a href="#FOLDER_ID" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the FOLDER_ID field</p>
+<p>the column name for the folder_id field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the FOLDER_ID field</p>
+<p>the column name for the folder_id field</p>
 
 
 			</div>
@@ -2412,19 +2414,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#55-56" title="Go to source code"><b>CREATED_AT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'content_folder.CREATED_AT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'content_folder.created_at'</span></code></td>
 		<td class="description"><div>
 			<a href="#CREATED_AT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the CREATED_AT field</p>
+<p>the column name for the created_at field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the CREATED_AT field</p>
+<p>the column name for the created_at field</p>
 
 
 			</div>
@@ -2436,19 +2438,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseContentFolderPeer.html#58-59" title="Go to source code"><b>UPDATED_AT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'content_folder.UPDATED_AT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'content_folder.updated_at'</span></code></td>
 		<td class="description"><div>
 			<a href="#UPDATED_AT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the UPDATED_AT field</p>
+<p>the column name for the updated_at field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the UPDATED_AT field</p>
+<p>the column name for the updated_at field</p>
 
 
 			</div>

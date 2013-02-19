@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseProductVersionQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -436,7 +438,7 @@ ModelCriteria
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#20-1045" title="Go to source code">core/lib/Thelia/Model/om/BaseProductVersionQuery.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#20-1085" title="Go to source code">core/lib/Thelia/Model/om/BaseProductVersionQuery.php</a><br />
 	</div>
 
 
@@ -837,7 +839,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#298-325" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#298-340" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -864,7 +866,12 @@ class="php-comment">// WHERE id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterById(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE id &gt; 12</span>
+class="php-comment">// WHERE id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &lt;= 12</span>
 </pre>
 
 
@@ -906,7 +913,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByTaxRuleId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#327-366" title="Go to source code">filterByTaxRuleId</a>( <span>mixed <var>$taxRuleId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#342-382" title="Go to source code">filterByTaxRuleId</a>( <span>mixed <var>$taxRuleId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -933,7 +940,12 @@ class="php-comment">// WHERE tax_rule_id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByTaxRuleId(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE tax_rule_id &gt; 12</span>
+class="php-comment">// WHERE tax_rule_id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByTaxRuleId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE tax_rule_id &lt;= 12</span>
 </pre>
 
 
@@ -971,7 +983,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByRef">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#368-395" title="Go to source code">filterByRef</a>( <span>string <var>$ref</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#384-411" title="Go to source code">filterByRef</a>( <span>string <var>$ref</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1028,7 +1040,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByPrice">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#397-436" title="Go to source code">filterByPrice</a>( <span>mixed <var>$price</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#413-453" title="Go to source code">filterByPrice</a>( <span>mixed <var>$price</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1055,7 +1067,12 @@ class="php-comment">// WHERE price IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByPrice(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE price &gt; 12</span>
+class="php-comment">// WHERE price &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByPrice(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE price &lt;= 12</span>
 </pre>
 
 
@@ -1093,7 +1110,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByPrice2">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#438-477" title="Go to source code">filterByPrice2</a>( <span>mixed <var>$price2</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#455-495" title="Go to source code">filterByPrice2</a>( <span>mixed <var>$price2</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1120,7 +1137,12 @@ class="php-comment">// WHERE price2 IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByPrice2(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE price2 &gt; 12</span>
+class="php-comment">// WHERE price2 &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByPrice2(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE price2 &lt;= 12</span>
 </pre>
 
 
@@ -1158,7 +1180,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByEcotax">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#479-518" title="Go to source code">filterByEcotax</a>( <span>mixed <var>$ecotax</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#497-537" title="Go to source code">filterByEcotax</a>( <span>mixed <var>$ecotax</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1185,7 +1207,12 @@ class="php-comment">// WHERE ecotax IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByEcotax(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE ecotax &gt; 12</span>
+class="php-comment">// WHERE ecotax &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByEcotax(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE ecotax &lt;= 12</span>
 </pre>
 
 
@@ -1223,7 +1250,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByNewness">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#520-559" title="Go to source code">filterByNewness</a>( <span>mixed <var>$newness</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#539-579" title="Go to source code">filterByNewness</a>( <span>mixed <var>$newness</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1250,7 +1277,12 @@ class="php-comment">// WHERE newness IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByNewness(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE newness &gt; 12</span>
+class="php-comment">// WHERE newness &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByNewness(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE newness &lt;= 12</span>
 </pre>
 
 
@@ -1288,7 +1320,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByPromo">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#561-600" title="Go to source code">filterByPromo</a>( <span>mixed <var>$promo</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#581-621" title="Go to source code">filterByPromo</a>( <span>mixed <var>$promo</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1315,7 +1347,12 @@ class="php-comment">// WHERE promo IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByPromo(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE promo &gt; 12</span>
+class="php-comment">// WHERE promo &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByPromo(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE promo &lt;= 12</span>
 </pre>
 
 
@@ -1353,7 +1390,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByStock">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#602-641" title="Go to source code">filterByStock</a>( <span>mixed <var>$stock</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#623-663" title="Go to source code">filterByStock</a>( <span>mixed <var>$stock</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1380,7 +1417,12 @@ class="php-comment">// WHERE stock IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByStock(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE stock &gt; 12</span>
+class="php-comment">// WHERE stock &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByStock(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE stock &lt;= 12</span>
 </pre>
 
 
@@ -1418,7 +1460,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByVisible">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#643-682" title="Go to source code">filterByVisible</a>( <span>mixed <var>$visible</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#665-705" title="Go to source code">filterByVisible</a>( <span>mixed <var>$visible</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1445,7 +1487,12 @@ class="php-comment">// WHERE visible IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByVisible(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE visible &gt; 12</span>
+class="php-comment">// WHERE visible &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByVisible(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE visible &lt;= 12</span>
 </pre>
 
 
@@ -1483,7 +1530,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByWeight">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#684-723" title="Go to source code">filterByWeight</a>( <span>mixed <var>$weight</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#707-747" title="Go to source code">filterByWeight</a>( <span>mixed <var>$weight</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1510,7 +1557,12 @@ class="php-comment">// WHERE weight IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByWeight(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE weight &gt; 12</span>
+class="php-comment">// WHERE weight &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByWeight(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE weight &lt;= 12</span>
 </pre>
 
 
@@ -1548,7 +1600,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByPosition">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#725-764" title="Go to source code">filterByPosition</a>( <span>mixed <var>$position</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#749-789" title="Go to source code">filterByPosition</a>( <span>mixed <var>$position</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1575,7 +1627,12 @@ class="php-comment">// WHERE position IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByPosition(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE position &gt; 12</span>
+class="php-comment">// WHERE position &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByPosition(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE position &lt;= 12</span>
 </pre>
 
 
@@ -1613,7 +1670,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByCreatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#766-807" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#791-832" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1679,7 +1736,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByUpdatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#809-850" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#834-875" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1745,7 +1802,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByVersion">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#852-877" title="Go to source code">filterByVersion</a>( <span>mixed <var>$version</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#877-917" title="Go to source code">filterByVersion</a>( <span>mixed <var>$version</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1772,7 +1829,12 @@ class="php-comment">// WHERE version IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByVersion(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE version &gt; 12</span>
+class="php-comment">// WHERE version &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByVersion(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE version &lt;= 12</span>
 </pre>
 
 
@@ -1810,7 +1872,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByVersionCreatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#879-920" title="Go to source code">filterByVersionCreatedAt</a>( <span>mixed <var>$versionCreatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#919-960" title="Go to source code">filterByVersionCreatedAt</a>( <span>mixed <var>$versionCreatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1876,7 +1938,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByVersionCreatedBy">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#922-949" title="Go to source code">filterByVersionCreatedBy</a>( <span>string <var>$versionCreatedBy</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#962-989" title="Go to source code">filterByVersionCreatedBy</a>( <span>string <var>$versionCreatedBy</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1934,7 +1996,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByProduct">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#951-975" title="Go to source code">filterByProduct</a>( <span><code><a href="class-Thelia.Model.Product.html">Thelia\Model\Product</a></code>|PropelObjectCollection <var>$product</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#991-1015" title="Go to source code">filterByProduct</a>( <span><code><a href="class-Thelia.Model.Product.html">Thelia\Model\Product</a></code>|PropelObjectCollection <var>$product</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1983,7 +2045,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinProduct">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#977-1007" title="Go to source code">joinProduct</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#1017-1047" title="Go to source code">joinProduct</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -2027,7 +2089,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useProductQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#1009-1025" title="Go to source code">useProductQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#1049-1065" title="Go to source code">useProductQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -2076,7 +2138,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prune">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#1027-1043" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.ProductVersion.html">Thelia\Model\ProductVersion</a></code> <var>$productVersion</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseProductVersionQuery.html#1067-1083" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.ProductVersion.html">Thelia\Model\ProductVersion</a></code> <var>$productVersion</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			

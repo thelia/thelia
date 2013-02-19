@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseFolderVersionPeer | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -424,7 +426,7 @@
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#17-1024" title="Go to source code">core/lib/Thelia/Model/om/BaseFolderVersionPeer.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#17-1031" title="Go to source code">core/lib/Thelia/Model/om/BaseFolderVersionPeer.php</a><br />
 	</div>
 
 
@@ -784,7 +786,7 @@ PropelException.<br />
 
 		<td class="attributes"><code>
 			 public static
-			<code><a href="class-PDOStatement.html">PDOStatement</a></code>
+			PDOStatement
 			
 			</code>
 		</td>
@@ -806,7 +808,7 @@ a PDOStatement.</p>
 a PDOStatement.</p>
 
 <p>Use this method directly if you want to work with an executed statement
-durirectly (for example to perform your own object hydration).</p>
+directly (for example to perform your own object hydration).</p>
 
 
 
@@ -820,7 +822,7 @@ durirectly (for example to perform your own object hydration).</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code><code><a href="class-PDOStatement.html">PDOStatement</a></code></code><br>The executed PDOStatement object.<br />
+					<code>PDOStatement</code><br>The executed PDOStatement object.<br />
 				</div>
 
 				<h4>Throws</h4>
@@ -997,7 +999,7 @@ pooling has been disabled.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_clearInstancePool">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#395-403" title="Go to source code">clearInstancePool</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#395-410" title="Go to source code">clearInstancePool</a>( <span>mixed <var>$and_clear_all_references</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1030,7 +1032,7 @@ pooling has been disabled.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_clearRelatedInstancePool">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#405-411" title="Go to source code">clearRelatedInstancePool</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#412-418" title="Go to source code">clearRelatedInstancePool</a>( )</code>
 
 		<div class="description short">
 			
@@ -1065,7 +1067,7 @@ folder_version by a foreign key with ON DELETE CASCADE</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getPrimaryKeyHashFromRow">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#413-431" title="Go to source code">getPrimaryKeyHashFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#420-438" title="Go to source code">getPrimaryKeyHashFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1116,7 +1118,7 @@ are all null.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getPrimaryKeyFromRow">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#433-446" title="Go to source code">getPrimaryKeyFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#440-453" title="Go to source code">getPrimaryKeyFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1166,7 +1168,7 @@ returned.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_populateObjects">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#448-479" title="Go to source code">populateObjects</a>( <span><code><a href="class-PDOStatement.html">PDOStatement</a></code> <var>$stmt</var></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#455-486" title="Go to source code">populateObjects</a>( <span>PDOStatement <var>$stmt</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1206,7 +1208,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_populateObject">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#480-505" title="Go to source code">populateObject</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#487-512" title="Go to source code">populateObject</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1257,7 +1259,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinFolder">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#508-556" title="Go to source code">doCountJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#515-563" title="Go to source code">doCountJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1308,7 +1310,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinFolder">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#559-623" title="Go to source code">doSelectJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#566-630" title="Go to source code">doSelectJoinFolder</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1361,7 +1363,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#626-674" title="Go to source code">doCountJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#633-681" title="Go to source code">doCountJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1410,7 +1412,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#676-743" title="Go to source code">doSelectJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#683-750" title="Go to source code">doSelectJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1463,7 +1465,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getTableMap">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#745-755" title="Go to source code">getTableMap</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#752-762" title="Go to source code">getTableMap</a>( )</code>
 
 		<div class="description short">
 			
@@ -1507,7 +1509,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_buildTableMap">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#757-766" title="Go to source code">buildTableMap</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#764-773" title="Go to source code">buildTableMap</a>( )</code>
 
 		<div class="description short">
 			
@@ -1540,7 +1542,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getOMClass">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#768-777" title="Go to source code">getOMClass</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#775-784" title="Go to source code">getOMClass</a>( <span>mixed <var>$row</var> = <span class="php-num">0</span></span>, <span>mixed <var>$colnum</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1577,7 +1579,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doInsert">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#779-816" title="Go to source code">doInsert</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#786-823" title="Go to source code">doInsert</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1629,7 +1631,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doUpdate">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#818-863" title="Go to source code">doUpdate</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#825-870" title="Go to source code">doUpdate</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1682,7 +1684,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doDeleteAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#865-895" title="Go to source code">doDeleteAll</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#872-902" title="Go to source code">doDeleteAll</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1728,7 +1730,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doDelete">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#897-962" title="Go to source code">doDelete</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#904-969" title="Go to source code">doDelete</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1782,7 +1784,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doValidate">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#964-999" title="Go to source code">doValidate</a>( <span><code><a href="class-Thelia.Model.FolderVersion.html">Thelia\Model\FolderVersion</a></code> <var>$obj</var></span>, <span>mixed <var>$cols</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#971-1006" title="Go to source code">doValidate</a>( <span><code><a href="class-Thelia.Model.FolderVersion.html">Thelia\Model\FolderVersion</a></code> <var>$obj</var></span>, <span>mixed <var>$cols</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1832,7 +1834,7 @@ those columns are validated.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_retrieveByPK">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#1001-1023" title="Go to source code">retrieveByPK</a>( <span>integer <var>$id</var></span>, <span>integer <var>$version</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#1008-1030" title="Go to source code">retrieveByPK</a>( <span>integer <var>$id</var></span>, <span>integer <var>$version</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2052,19 +2054,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#48-49" title="Go to source code"><b>ID</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.ID'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.id'</span></code></td>
 		<td class="description"><div>
 			<a href="#ID" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the ID field</p>
+<p>the column name for the id field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the ID field</p>
+<p>the column name for the id field</p>
 
 
 			</div>
@@ -2076,19 +2078,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#51-52" title="Go to source code"><b>PARENT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.PARENT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.parent'</span></code></td>
 		<td class="description"><div>
 			<a href="#PARENT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the PARENT field</p>
+<p>the column name for the parent field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the PARENT field</p>
+<p>the column name for the parent field</p>
 
 
 			</div>
@@ -2100,19 +2102,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#54-55" title="Go to source code"><b>LINK</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.LINK'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.link'</span></code></td>
 		<td class="description"><div>
 			<a href="#LINK" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the LINK field</p>
+<p>the column name for the link field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the LINK field</p>
+<p>the column name for the link field</p>
 
 
 			</div>
@@ -2124,19 +2126,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#57-58" title="Go to source code"><b>VISIBLE</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.VISIBLE'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.visible'</span></code></td>
 		<td class="description"><div>
 			<a href="#VISIBLE" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the VISIBLE field</p>
+<p>the column name for the visible field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the VISIBLE field</p>
+<p>the column name for the visible field</p>
 
 
 			</div>
@@ -2148,19 +2150,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#60-61" title="Go to source code"><b>POSITION</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.POSITION'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.position'</span></code></td>
 		<td class="description"><div>
 			<a href="#POSITION" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the POSITION field</p>
+<p>the column name for the position field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the POSITION field</p>
+<p>the column name for the position field</p>
 
 
 			</div>
@@ -2172,19 +2174,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#63-64" title="Go to source code"><b>CREATED_AT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.CREATED_AT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.created_at'</span></code></td>
 		<td class="description"><div>
 			<a href="#CREATED_AT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the CREATED_AT field</p>
+<p>the column name for the created_at field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the CREATED_AT field</p>
+<p>the column name for the created_at field</p>
 
 
 			</div>
@@ -2196,19 +2198,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#66-67" title="Go to source code"><b>UPDATED_AT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.UPDATED_AT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.updated_at'</span></code></td>
 		<td class="description"><div>
 			<a href="#UPDATED_AT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the UPDATED_AT field</p>
+<p>the column name for the updated_at field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the UPDATED_AT field</p>
+<p>the column name for the updated_at field</p>
 
 
 			</div>
@@ -2220,19 +2222,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#69-70" title="Go to source code"><b>VERSION</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.VERSION'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.version'</span></code></td>
 		<td class="description"><div>
 			<a href="#VERSION" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the VERSION field</p>
+<p>the column name for the version field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the VERSION field</p>
+<p>the column name for the version field</p>
 
 
 			</div>
@@ -2244,19 +2246,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#72-73" title="Go to source code"><b>VERSION_CREATED_AT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.VERSION_CREATED_AT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.version_created_at'</span></code></td>
 		<td class="description"><div>
 			<a href="#VERSION_CREATED_AT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the VERSION_CREATED_AT field</p>
+<p>the column name for the version_created_at field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the VERSION_CREATED_AT field</p>
+<p>the column name for the version_created_at field</p>
 
 
 			</div>
@@ -2268,19 +2270,19 @@ those columns are validated.</p>
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseFolderVersionPeer.html#75-76" title="Go to source code"><b>VERSION_CREATED_BY</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'folder_version.VERSION_CREATED_BY'</span></code></td>
+		<td class="value"><code><span class="php-quote">'folder_version.version_created_by'</span></code></td>
 		<td class="description"><div>
 			<a href="#VERSION_CREATED_BY" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the VERSION_CREATED_BY field</p>
+<p>the column name for the version_created_by field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the VERSION_CREATED_BY field</p>
+<p>the column name for the version_created_by field</p>
 
 
 			</div>

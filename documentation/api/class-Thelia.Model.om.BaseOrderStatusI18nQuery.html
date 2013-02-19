@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseOrderStatusI18nQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -436,7 +438,7 @@ ModelCriteria
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#20-522" title="Go to source code">core/lib/Thelia/Model/om/BaseOrderStatusI18nQuery.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#20-537" title="Go to source code">core/lib/Thelia/Model/om/BaseOrderStatusI18nQuery.php</a><br />
 	</div>
 
 
@@ -837,7 +839,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#254-281" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#254-296" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -864,7 +866,12 @@ class="php-comment">// WHERE id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterById(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE id &gt; 12</span>
+class="php-comment">// WHERE id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &lt;= 12</span>
 </pre>
 
 
@@ -906,7 +913,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByLocale">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#283-310" title="Go to source code">filterByLocale</a>( <span>string <var>$locale</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#298-325" title="Go to source code">filterByLocale</a>( <span>string <var>$locale</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -963,7 +970,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByTitle">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#312-339" title="Go to source code">filterByTitle</a>( <span>string <var>$title</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#327-354" title="Go to source code">filterByTitle</a>( <span>string <var>$title</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1020,7 +1027,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByDescription">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#341-368" title="Go to source code">filterByDescription</a>( <span>string <var>$description</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#356-383" title="Go to source code">filterByDescription</a>( <span>string <var>$description</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1078,7 +1085,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByChapo">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#370-397" title="Go to source code">filterByChapo</a>( <span>string <var>$chapo</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#385-412" title="Go to source code">filterByChapo</a>( <span>string <var>$chapo</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1135,7 +1142,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByPostscriptum">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#399-426" title="Go to source code">filterByPostscriptum</a>( <span>string <var>$postscriptum</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#414-441" title="Go to source code">filterByPostscriptum</a>( <span>string <var>$postscriptum</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1193,7 +1200,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByOrderStatus">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#428-452" title="Go to source code">filterByOrderStatus</a>( <span><code><a href="class-Thelia.Model.OrderStatus.html">Thelia\Model\OrderStatus</a></code>|PropelObjectCollection <var>$orderStatus</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#443-467" title="Go to source code">filterByOrderStatus</a>( <span><code><a href="class-Thelia.Model.OrderStatus.html">Thelia\Model\OrderStatus</a></code>|PropelObjectCollection <var>$orderStatus</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1242,7 +1249,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinOrderStatus">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#454-484" title="Go to source code">joinOrderStatus</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#469-499" title="Go to source code">joinOrderStatus</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1286,7 +1293,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useOrderStatusQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#486-502" title="Go to source code">useOrderStatusQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#501-517" title="Go to source code">useOrderStatusQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1335,7 +1342,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prune">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#504-520" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.OrderStatusI18n.html">Thelia\Model\OrderStatusI18n</a></code> <var>$orderStatusI18n</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseOrderStatusI18nQuery.html#519-535" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.OrderStatusI18n.html">Thelia\Model\OrderStatusI18n</a></code> <var>$orderStatusI18n</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			

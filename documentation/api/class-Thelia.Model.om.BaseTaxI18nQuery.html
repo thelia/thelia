@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseTaxI18nQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -436,7 +438,7 @@ ModelCriteria
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#20-456" title="Go to source code">core/lib/Thelia/Model/om/BaseTaxI18nQuery.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#20-471" title="Go to source code">core/lib/Thelia/Model/om/BaseTaxI18nQuery.php</a><br />
 	</div>
 
 
@@ -837,7 +839,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#246-273" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#246-288" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -864,7 +866,12 @@ class="php-comment">// WHERE id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterById(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE id &gt; 12</span>
+class="php-comment">// WHERE id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &lt;= 12</span>
 </pre>
 
 
@@ -906,7 +913,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByLocale">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#275-302" title="Go to source code">filterByLocale</a>( <span>string <var>$locale</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#290-317" title="Go to source code">filterByLocale</a>( <span>string <var>$locale</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -963,7 +970,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByTitle">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#304-331" title="Go to source code">filterByTitle</a>( <span>string <var>$title</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#319-346" title="Go to source code">filterByTitle</a>( <span>string <var>$title</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1020,7 +1027,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByDescription">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#333-360" title="Go to source code">filterByDescription</a>( <span>string <var>$description</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#348-375" title="Go to source code">filterByDescription</a>( <span>string <var>$description</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1078,7 +1085,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByTax">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#362-386" title="Go to source code">filterByTax</a>( <span><code><a href="class-Thelia.Model.Tax.html">Thelia\Model\Tax</a></code>|PropelObjectCollection <var>$tax</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#377-401" title="Go to source code">filterByTax</a>( <span><code><a href="class-Thelia.Model.Tax.html">Thelia\Model\Tax</a></code>|PropelObjectCollection <var>$tax</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1127,7 +1134,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinTax">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#388-418" title="Go to source code">joinTax</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#403-433" title="Go to source code">joinTax</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1171,7 +1178,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useTaxQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#420-436" title="Go to source code">useTaxQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#435-451" title="Go to source code">useTaxQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1220,7 +1227,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prune">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#438-454" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.TaxI18n.html">Thelia\Model\TaxI18n</a></code> <var>$taxI18n</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxI18nQuery.html#453-469" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.TaxI18n.html">Thelia\Model\TaxI18n</a></code> <var>$taxI18n</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			

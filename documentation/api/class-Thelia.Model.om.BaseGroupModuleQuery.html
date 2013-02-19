@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseGroupModuleQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -436,7 +438,7 @@ ModelCriteria
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#21-719" title="Go to source code">core/lib/Thelia/Model/om/BaseGroupModuleQuery.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#21-750" title="Go to source code">core/lib/Thelia/Model/om/BaseGroupModuleQuery.php</a><br />
 	</div>
 
 
@@ -454,7 +456,7 @@ ModelCriteria
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#73-83" title="Go to source code">__construct</a>( <span>string <var>$dbName</var> = <span class="php-quote">'thelia'</span></span>, <span>string <var>$modelName</var> = <span class="php-quote">'Thelia\\Model\\GroupModule'</span></span>, <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#72-82" title="Go to source code">__construct</a>( <span>string <var>$dbName</var> = <span class="php-quote">'thelia'</span></span>, <span>string <var>$modelName</var> = <span class="php-quote">'Thelia\\Model\\GroupModule'</span></span>, <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -496,7 +498,7 @@ ModelCriteria
 
 		<td class="name"><div>
 		<a class="anchor" href="#_create">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#85-107" title="Go to source code">create</a>( <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span>, <span><code><a href="class-Thelia.Model.GroupModuleQuery.html">Thelia\Model\GroupModuleQuery</a></code>|Criteria <var>$criteria</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#84-106" title="Go to source code">create</a>( <span>string <var>$modelAlias</var> = <span class="php-keyword1">null</span></span>, <span><code><a href="class-Thelia.Model.GroupModuleQuery.html">Thelia\Model\GroupModuleQuery</a></code>|Criteria <var>$criteria</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -540,7 +542,7 @@ ModelCriteria
 
 		<td class="name"><div>
 		<a class="anchor" href="#_findPk">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#109-143" title="Go to source code">findPk</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#108-142" title="Go to source code">findPk</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -581,6 +583,54 @@ class="php-var">$con</span>);
 		</div>
 		</div></td>
 	</tr>
+	<tr data-order="findOneById" id="_findOneById">
+
+		<td class="attributes"><code>
+			 public 
+			<code><a href="class-Thelia.Model.GroupModule.html">Thelia\Model\GroupModule</a></code>
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_findOneById">#</a>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#144-156" title="Go to source code">findOneById</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Alias of findPk to use instance pooling</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Alias of findPk to use instance pooling</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$key</var></dt>
+					<dd><code>mixed</code><br>$key Primary key to use for the query</dd>
+					<dt><var>$con</var></dt>
+					<dd><code>PropelPDO</code><br>$con A connection object</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code><code><a href="class-Thelia.Model.GroupModule.html">Thelia\Model\GroupModule</a></code></code><br>A model object, or null if the key is not found<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>PropelException</code><br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
 	<tr data-order="findPkSimple" id="_findPkSimple">
 
 		<td class="attributes"><code>
@@ -592,7 +642,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_findPkSimple">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#145-175" title="Go to source code">findPkSimple</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#158-188" title="Go to source code">findPkSimple</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
 
 		<div class="description short">
 			
@@ -642,7 +692,7 @@ the object formatter by using generated code.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_findPkComplex">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#177-194" title="Go to source code">findPkComplex</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#190-207" title="Go to source code">findPkComplex</a>( <span>mixed <var>$key</var></span>, <span>PropelPDO <var>$con</var></span> )</code>
 
 		<div class="description short">
 			
@@ -686,7 +736,7 @@ the object formatter by using generated code.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_findPks">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#196-218" title="Go to source code">findPks</a>( <span>array <var>$keys</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#209-231" title="Go to source code">findPks</a>( <span>array <var>$keys</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -746,7 +796,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByPrimaryKey">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#220-231" title="Go to source code">filterByPrimaryKey</a>( <span>mixed <var>$key</var></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#233-244" title="Go to source code">filterByPrimaryKey</a>( <span>mixed <var>$key</var></span> )</code>
 
 		<div class="description short">
 			
@@ -788,7 +838,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByPrimaryKeys">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#233-244" title="Go to source code">filterByPrimaryKeys</a>( <span>array <var>$keys</var></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#246-257" title="Go to source code">filterByPrimaryKeys</a>( <span>array <var>$keys</var></span> )</code>
 
 		<div class="description short">
 			
@@ -830,7 +880,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#246-271" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#259-299" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -857,7 +907,12 @@ class="php-comment">// WHERE id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterById(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE id &gt; 12</span>
+class="php-comment">// WHERE id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &lt;= 12</span>
 </pre>
 
 
@@ -895,7 +950,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByGroupId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#273-314" title="Go to source code">filterByGroupId</a>( <span>mixed <var>$groupId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#301-343" title="Go to source code">filterByGroupId</a>( <span>mixed <var>$groupId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -922,7 +977,12 @@ class="php-comment">// WHERE group_id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByGroupId(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE group_id &gt; 12</span>
+class="php-comment">// WHERE group_id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByGroupId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE group_id &lt;= 12</span>
 </pre>
 
 
@@ -964,7 +1024,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByModuleId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#316-357" title="Go to source code">filterByModuleId</a>( <span>mixed <var>$moduleId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#345-387" title="Go to source code">filterByModuleId</a>( <span>mixed <var>$moduleId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -991,7 +1051,12 @@ class="php-comment">// WHERE module_id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByModuleId(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE module_id &gt; 12</span>
+class="php-comment">// WHERE module_id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByModuleId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE module_id &lt;= 12</span>
 </pre>
 
 
@@ -1033,7 +1098,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByAccess">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#359-398" title="Go to source code">filterByAccess</a>( <span>mixed <var>$access</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#389-429" title="Go to source code">filterByAccess</a>( <span>mixed <var>$access</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1060,7 +1125,12 @@ class="php-comment">// WHERE access IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByAccess(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE access &gt; 12</span>
+class="php-comment">// WHERE access &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByAccess(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE access &lt;= 12</span>
 </pre>
 
 
@@ -1098,7 +1168,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByCreatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#400-441" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#431-472" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1164,7 +1234,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByUpdatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#443-484" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#474-515" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1230,7 +1300,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByGroup">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#486-510" title="Go to source code">filterByGroup</a>( <span><code><a href="class-Thelia.Model.Group.html">Thelia\Model\Group</a></code>|PropelObjectCollection <var>$group</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#517-541" title="Go to source code">filterByGroup</a>( <span><code><a href="class-Thelia.Model.Group.html">Thelia\Model\Group</a></code>|PropelObjectCollection <var>$group</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1279,7 +1349,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinGroup">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#512-542" title="Go to source code">joinGroup</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#543-573" title="Go to source code">joinGroup</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1323,7 +1393,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useGroupQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#544-560" title="Go to source code">useGroupQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#575-591" title="Go to source code">useGroupQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1372,7 +1442,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByModule">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#562-586" title="Go to source code">filterByModule</a>( <span><code><a href="class-Thelia.Model.Module.html">Thelia\Model\Module</a></code>|PropelObjectCollection <var>$module</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#593-617" title="Go to source code">filterByModule</a>( <span><code><a href="class-Thelia.Model.Module.html">Thelia\Model\Module</a></code>|PropelObjectCollection <var>$module</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1421,7 +1491,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinModule">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#588-618" title="Go to source code">joinModule</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#619-649" title="Go to source code">joinModule</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1465,7 +1535,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useModuleQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#620-636" title="Go to source code">useModuleQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#651-667" title="Go to source code">useModuleQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1514,7 +1584,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prune">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#638-652" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.GroupModule.html">Thelia\Model\GroupModule</a></code> <var>$groupModule</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#669-683" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.GroupModule.html">Thelia\Model\GroupModule</a></code> <var>$groupModule</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1556,7 +1626,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_recentlyUpdated">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#656-666" title="Go to source code">recentlyUpdated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#687-697" title="Go to source code">recentlyUpdated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1598,7 +1668,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_lastUpdatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#668-676" title="Go to source code">lastUpdatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#699-707" title="Go to source code">lastUpdatedFirst</a>( )</code>
 
 		<div class="description short">
 			
@@ -1635,7 +1705,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_firstUpdatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#678-686" title="Go to source code">firstUpdatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#709-717" title="Go to source code">firstUpdatedFirst</a>( )</code>
 
 		<div class="description short">
 			
@@ -1672,7 +1742,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_recentlyCreated">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#688-698" title="Go to source code">recentlyCreated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#719-729" title="Go to source code">recentlyCreated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1714,7 +1784,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_lastCreatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#700-708" title="Go to source code">lastCreatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#731-739" title="Go to source code">lastCreatedFirst</a>( )</code>
 
 		<div class="description short">
 			
@@ -1751,7 +1821,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_firstCreatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#710-718" title="Go to source code">firstCreatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#741-749" title="Go to source code">firstCreatedFirst</a>( )</code>
 
 		<div class="description short">
 			
@@ -2721,48 +2791,6 @@ populated from the query conditions when no match is found</p>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="findOneById" id="m_findOneById">
-
-		<td class="attributes"><code>
-			 public 
-			<code><a href="class-Thelia.Model.GroupModule.html">Thelia\Model\GroupModule</a></code>
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#m_findOneById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#55" title="Go to source code">findOneById</a>( <span>integer <var>$id</var> = </span> )</code>
-
-		<div class="description short">
-			
-<p>Return the first GroupModule filtered by the id column</p>
-
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>Return the first GroupModule filtered by the id column</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$id</var></dt>
-					<dd><code>integer</code><br>$id</dd>
-				</dl></div>
-
-				<h4>Returns</h4>
-				<div class="list">
-					<code><code><a href="class-Thelia.Model.GroupModule.html">Thelia\Model\GroupModule</a></code></code><br />
-				</div>
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	<tr data-order="findOneByGroupId" id="m_findOneByGroupId">
 
 		<td class="attributes"><code>
@@ -2774,7 +2802,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findOneByGroupId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#56" title="Go to source code">findOneByGroupId</a>( <span>integer <var>$group_id</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#55" title="Go to source code">findOneByGroupId</a>( <span>integer <var>$group_id</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -2816,7 +2844,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findOneByModuleId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#57" title="Go to source code">findOneByModuleId</a>( <span>integer <var>$module_id</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#56" title="Go to source code">findOneByModuleId</a>( <span>integer <var>$module_id</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -2858,7 +2886,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findOneByAccess">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#58" title="Go to source code">findOneByAccess</a>( <span>integer <var>$access</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#57" title="Go to source code">findOneByAccess</a>( <span>integer <var>$access</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -2900,7 +2928,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findOneByCreatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#59" title="Go to source code">findOneByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#58" title="Go to source code">findOneByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -2942,7 +2970,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findOneByUpdatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#60" title="Go to source code">findOneByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#59" title="Go to source code">findOneByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -2984,7 +3012,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#62" title="Go to source code">findById</a>( <span>integer <var>$id</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#61" title="Go to source code">findById</a>( <span>integer <var>$id</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -3026,7 +3054,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findByGroupId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#63" title="Go to source code">findByGroupId</a>( <span>integer <var>$group_id</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#62" title="Go to source code">findByGroupId</a>( <span>integer <var>$group_id</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -3068,7 +3096,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findByModuleId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#64" title="Go to source code">findByModuleId</a>( <span>integer <var>$module_id</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#63" title="Go to source code">findByModuleId</a>( <span>integer <var>$module_id</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -3110,7 +3138,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findByAccess">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#65" title="Go to source code">findByAccess</a>( <span>integer <var>$access</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#64" title="Go to source code">findByAccess</a>( <span>integer <var>$access</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -3152,7 +3180,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findByCreatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#66" title="Go to source code">findByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#65" title="Go to source code">findByCreatedAt</a>( <span>string <var>$created_at</var> = </span> )</code>
 
 		<div class="description short">
 			
@@ -3194,7 +3222,7 @@ populated from the query conditions when no match is found</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#m_findByUpdatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#67" title="Go to source code">findByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseGroupModuleQuery.html#66" title="Go to source code">findByUpdatedAt</a>( <span>string <var>$updated_at</var> = </span> )</code>
 
 		<div class="description short">
 			

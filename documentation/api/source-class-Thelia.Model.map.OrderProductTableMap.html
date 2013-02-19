@@ -8,7 +8,7 @@
 	<title>File core/lib/Thelia/Model/map/OrderProductTableMap.php | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -22,8 +22,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -62,7 +60,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -253,18 +255,18 @@
 </span><span id="42" class="l"><a class="l" href="#42">42: </a>        <span class="php-var">$this</span>-&gt;setPackage(<span class="php-quote">'Thelia.Model'</span>);
 </span><span id="43" class="l"><a class="l" href="#43">43: </a>        <span class="php-var">$this</span>-&gt;setUseIdGenerator(<span class="php-keyword1">true</span>);
 </span><span id="44" class="l"><a class="l" href="#44">44: </a>        <span class="php-comment">// columns</span>
-</span><span id="45" class="l"><a class="l" href="#45">45: </a>        <span class="php-var">$this</span>-&gt;addPrimaryKey(<span class="php-quote">'ID'</span>, <span class="php-quote">'Id'</span>, <span class="php-quote">'INTEGER'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="46" class="l"><a class="l" href="#46">46: </a>        <span class="php-var">$this</span>-&gt;addForeignKey(<span class="php-quote">'ORDER_ID'</span>, <span class="php-quote">'OrderId'</span>, <span class="php-quote">'INTEGER'</span>, <span class="php-quote">'order'</span>, <span class="php-quote">'ID'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="47" class="l"><a class="l" href="#47">47: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'PRODUCT_REF'</span>, <span class="php-quote">'ProductRef'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
-</span><span id="48" class="l"><a class="l" href="#48">48: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'TITLE'</span>, <span class="php-quote">'Title'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
-</span><span id="49" class="l"><a class="l" href="#49">49: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'DESCRIPTION'</span>, <span class="php-quote">'Description'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="50" class="l"><a class="l" href="#50">50: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'CHAPO'</span>, <span class="php-quote">'Chapo'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="51" class="l"><a class="l" href="#51">51: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'QUANTITY'</span>, <span class="php-quote">'Quantity'</span>, <span class="php-quote">'FLOAT'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="52" class="l"><a class="l" href="#52">52: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'PRICE'</span>, <span class="php-quote">'Price'</span>, <span class="php-quote">'FLOAT'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="53" class="l"><a class="l" href="#53">53: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'TAX'</span>, <span class="php-quote">'Tax'</span>, <span class="php-quote">'FLOAT'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="54" class="l"><a class="l" href="#54">54: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'PARENT'</span>, <span class="php-quote">'Parent'</span>, <span class="php-quote">'INTEGER'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="55" class="l"><a class="l" href="#55">55: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'CREATED_AT'</span>, <span class="php-quote">'CreatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="56" class="l"><a class="l" href="#56">56: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'UPDATED_AT'</span>, <span class="php-quote">'UpdatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="45" class="l"><a class="l" href="#45">45: </a>        <span class="php-var">$this</span>-&gt;addPrimaryKey(<span class="php-quote">'id'</span>, <span class="php-quote">'Id'</span>, <span class="php-quote">'INTEGER'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="46" class="l"><a class="l" href="#46">46: </a>        <span class="php-var">$this</span>-&gt;addForeignKey(<span class="php-quote">'order_id'</span>, <span class="php-quote">'OrderId'</span>, <span class="php-quote">'INTEGER'</span>, <span class="php-quote">'order'</span>, <span class="php-quote">'id'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="47" class="l"><a class="l" href="#47">47: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'product_ref'</span>, <span class="php-quote">'ProductRef'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
+</span><span id="48" class="l"><a class="l" href="#48">48: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'title'</span>, <span class="php-quote">'Title'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
+</span><span id="49" class="l"><a class="l" href="#49">49: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'description'</span>, <span class="php-quote">'Description'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="50" class="l"><a class="l" href="#50">50: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'chapo'</span>, <span class="php-quote">'Chapo'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="51" class="l"><a class="l" href="#51">51: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'quantity'</span>, <span class="php-quote">'Quantity'</span>, <span class="php-quote">'FLOAT'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="52" class="l"><a class="l" href="#52">52: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'price'</span>, <span class="php-quote">'Price'</span>, <span class="php-quote">'FLOAT'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="53" class="l"><a class="l" href="#53">53: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'tax'</span>, <span class="php-quote">'Tax'</span>, <span class="php-quote">'FLOAT'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="54" class="l"><a class="l" href="#54">54: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'parent'</span>, <span class="php-quote">'Parent'</span>, <span class="php-quote">'INTEGER'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="55" class="l"><a class="l" href="#55">55: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'created_at'</span>, <span class="php-quote">'CreatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="56" class="l"><a class="l" href="#56">56: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'updated_at'</span>, <span class="php-quote">'UpdatedAt'</span>, <span class="php-quote">'TIMESTAMP'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
 </span><span id="57" class="l"><a class="l" href="#57">57: </a>        <span class="php-comment">// validators</span>
 </span><span id="58" class="l"><a class="l" href="#58">58: </a>    } <span class="php-comment">// initialize()</span>
 </span><span id="59" class="l"><a class="l" href="#59">59: </a>
@@ -286,12 +288,16 @@
 </span><span id="75" class="l"><a class="l" href="#75">75: </a>    <span class="php-keyword1">public</span> <span class="php-keyword1">function</span> <a id="_getBehaviors" href="#_getBehaviors">getBehaviors</a>()
 </span><span id="76" class="l"><a class="l" href="#76">76: </a>    {
 </span><span id="77" class="l"><a class="l" href="#77">77: </a>        <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
-</span><span id="78" class="l"><a class="l" href="#78">78: </a>            <span class="php-quote">'timestampable'</span> =&gt; <span class="php-keyword1">array</span>(<span class="php-quote">'create_column'</span> =&gt; <span class="php-quote">'created_at'</span>, <span class="php-quote">'update_column'</span> =&gt; <span class="php-quote">'updated_at'</span>, <span class="php-quote">'disable_updated_at'</span> =&gt; <span class="php-quote">'false'</span>, ),
-</span><span id="79" class="l"><a class="l" href="#79">79: </a>        );
-</span><span id="80" class="l"><a class="l" href="#80">80: </a>    } <span class="php-comment">// getBehaviors()</span>
-</span><span id="81" class="l"><a class="l" href="#81">81: </a>
-</span><span id="82" class="l"><a class="l" href="#82">82: </a>} <span class="php-comment">// OrderProductTableMap</span>
-</span><span id="83" class="l"><a class="l" href="#83">83: </a></span></code></pre>
+</span><span id="78" class="l"><a class="l" href="#78">78: </a>            <span class="php-quote">'timestampable'</span> =&gt;  <span class="php-keyword1">array</span> (
+</span><span id="79" class="l"><a class="l" href="#79">79: </a>  <span class="php-quote">'create_column'</span> =&gt; <span class="php-quote">'created_at'</span>,
+</span><span id="80" class="l"><a class="l" href="#80">80: </a>  <span class="php-quote">'update_column'</span> =&gt; <span class="php-quote">'updated_at'</span>,
+</span><span id="81" class="l"><a class="l" href="#81">81: </a>  <span class="php-quote">'disable_updated_at'</span> =&gt; <span class="php-quote">'false'</span>,
+</span><span id="82" class="l"><a class="l" href="#82">82: </a>),
+</span><span id="83" class="l"><a class="l" href="#83">83: </a>        );
+</span><span id="84" class="l"><a class="l" href="#84">84: </a>    } <span class="php-comment">// getBehaviors()</span>
+</span><span id="85" class="l"><a class="l" href="#85">85: </a>
+</span><span id="86" class="l"><a class="l" href="#86">86: </a>} <span class="php-comment">// OrderProductTableMap</span>
+</span><span id="87" class="l"><a class="l" href="#87">87: </a></span></code></pre>
 
 	<div id="footer">
 		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>

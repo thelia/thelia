@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseAttributeCombinationQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -436,7 +438,7 @@ ModelCriteria
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#22-785" title="Go to source code">core/lib/Thelia/Model/om/BaseAttributeCombinationQuery.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#22-845" title="Go to source code">core/lib/Thelia/Model/om/BaseAttributeCombinationQuery.php</a><br />
 	</div>
 
 
@@ -839,7 +841,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#272-297" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#272-312" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -866,7 +868,12 @@ class="php-comment">// WHERE id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterById(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE id &gt; 12</span>
+class="php-comment">// WHERE id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &lt;= 12</span>
 </pre>
 
 
@@ -904,7 +911,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByAttributeId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#299-326" title="Go to source code">filterByAttributeId</a>( <span>mixed <var>$attributeId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#314-356" title="Go to source code">filterByAttributeId</a>( <span>mixed <var>$attributeId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -931,7 +938,12 @@ class="php-comment">// WHERE attribute_id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByAttributeId(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE attribute_id &gt; 12</span>
+class="php-comment">// WHERE attribute_id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByAttributeId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE attribute_id &lt;= 12</span>
 </pre>
 
 
@@ -973,7 +985,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByCombinationId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#328-355" title="Go to source code">filterByCombinationId</a>( <span>mixed <var>$combinationId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#358-400" title="Go to source code">filterByCombinationId</a>( <span>mixed <var>$combinationId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1000,7 +1012,12 @@ class="php-comment">// WHERE combination_id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByCombinationId(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE combination_id &gt; 12</span>
+class="php-comment">// WHERE combination_id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByCombinationId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE combination_id &lt;= 12</span>
 </pre>
 
 
@@ -1042,7 +1059,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByAttributeAvId">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#357-384" title="Go to source code">filterByAttributeAvId</a>( <span>mixed <var>$attributeAvId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#402-444" title="Go to source code">filterByAttributeAvId</a>( <span>mixed <var>$attributeAvId</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1069,7 +1086,12 @@ class="php-comment">// WHERE attribute_av_id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterByAttributeAvId(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE attribute_av_id &gt; 12</span>
+class="php-comment">// WHERE attribute_av_id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterByAttributeAvId(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE attribute_av_id &lt;= 12</span>
 </pre>
 
 
@@ -1111,7 +1133,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByCreatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#386-427" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#446-487" title="Go to source code">filterByCreatedAt</a>( <span>mixed <var>$createdAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1177,7 +1199,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByUpdatedAt">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#429-470" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#489-530" title="Go to source code">filterByUpdatedAt</a>( <span>mixed <var>$updatedAt</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1243,7 +1265,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByAttribute">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#472-496" title="Go to source code">filterByAttribute</a>( <span><code><a href="class-Thelia.Model.Attribute.html">Thelia\Model\Attribute</a></code>|PropelObjectCollection <var>$attribute</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#532-556" title="Go to source code">filterByAttribute</a>( <span><code><a href="class-Thelia.Model.Attribute.html">Thelia\Model\Attribute</a></code>|PropelObjectCollection <var>$attribute</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1292,7 +1314,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinAttribute">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#498-528" title="Go to source code">joinAttribute</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#558-588" title="Go to source code">joinAttribute</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1336,7 +1358,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useAttributeQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#530-546" title="Go to source code">useAttributeQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#590-606" title="Go to source code">useAttributeQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1385,7 +1407,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByAttributeAv">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#548-572" title="Go to source code">filterByAttributeAv</a>( <span><code><a href="class-Thelia.Model.AttributeAv.html">Thelia\Model\AttributeAv</a></code>|PropelObjectCollection <var>$attributeAv</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#608-632" title="Go to source code">filterByAttributeAv</a>( <span><code><a href="class-Thelia.Model.AttributeAv.html">Thelia\Model\AttributeAv</a></code>|PropelObjectCollection <var>$attributeAv</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1434,7 +1456,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinAttributeAv">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#574-604" title="Go to source code">joinAttributeAv</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#634-664" title="Go to source code">joinAttributeAv</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1478,7 +1500,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useAttributeAvQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#606-622" title="Go to source code">useAttributeAvQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#666-682" title="Go to source code">useAttributeAvQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1527,7 +1549,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByCombination">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#624-648" title="Go to source code">filterByCombination</a>( <span><code><a href="class-Thelia.Model.Combination.html">Thelia\Model\Combination</a></code>|PropelObjectCollection <var>$combination</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#684-708" title="Go to source code">filterByCombination</a>( <span><code><a href="class-Thelia.Model.Combination.html">Thelia\Model\Combination</a></code>|PropelObjectCollection <var>$combination</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1576,7 +1598,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinCombination">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#650-680" title="Go to source code">joinCombination</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#710-740" title="Go to source code">joinCombination</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1620,7 +1642,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useCombinationQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#682-698" title="Go to source code">useCombinationQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#742-758" title="Go to source code">useCombinationQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = Thelia\Model\om\Criteria::INNER_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1669,7 +1691,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prune">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#700-718" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.AttributeCombination.html">Thelia\Model\AttributeCombination</a></code> <var>$attributeCombination</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#760-778" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.AttributeCombination.html">Thelia\Model\AttributeCombination</a></code> <var>$attributeCombination</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1711,7 +1733,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_recentlyUpdated">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#722-732" title="Go to source code">recentlyUpdated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#782-792" title="Go to source code">recentlyUpdated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1753,7 +1775,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_lastUpdatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#734-742" title="Go to source code">lastUpdatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#794-802" title="Go to source code">lastUpdatedFirst</a>( )</code>
 
 		<div class="description short">
 			
@@ -1790,7 +1812,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_firstUpdatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#744-752" title="Go to source code">firstUpdatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#804-812" title="Go to source code">firstUpdatedFirst</a>( )</code>
 
 		<div class="description short">
 			
@@ -1827,7 +1849,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_recentlyCreated">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#754-764" title="Go to source code">recentlyCreated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#814-824" title="Go to source code">recentlyCreated</a>( <span>integer <var>$nbDays</var> = <span class="php-num">7</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1869,7 +1891,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_lastCreatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#766-774" title="Go to source code">lastCreatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#826-834" title="Go to source code">lastCreatedFirst</a>( )</code>
 
 		<div class="description short">
 			
@@ -1906,7 +1928,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_firstCreatedFirst">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#776-784" title="Go to source code">firstCreatedFirst</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAttributeCombinationQuery.html#836-844" title="Go to source code">firstCreatedFirst</a>( )</code>
 
 		<div class="description short">
 			

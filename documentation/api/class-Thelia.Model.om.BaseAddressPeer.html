@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseAddressPeer | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -424,7 +426,7 @@ table.</p>
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseAddressPeer.html#18-1466" title="Go to source code">core/lib/Thelia/Model/om/BaseAddressPeer.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseAddressPeer.html#18-1473" title="Go to source code">core/lib/Thelia/Model/om/BaseAddressPeer.php</a><br />
 	</div>
 
 
@@ -783,7 +785,7 @@ PropelException.<br />
 
 		<td class="attributes"><code>
 			 public static
-			<code><a href="class-PDOStatement.html">PDOStatement</a></code>
+			PDOStatement
 			
 			</code>
 		</td>
@@ -805,7 +807,7 @@ a PDOStatement.</p>
 a PDOStatement.</p>
 
 <p>Use this method directly if you want to work with an executed statement
-durirectly (for example to perform your own object hydration).</p>
+directly (for example to perform your own object hydration).</p>
 
 
 
@@ -819,7 +821,7 @@ durirectly (for example to perform your own object hydration).</p>
 
 				<h4>Returns</h4>
 				<div class="list">
-					<code><code><a href="class-PDOStatement.html">PDOStatement</a></code></code><br>The executed PDOStatement object.<br />
+					<code>PDOStatement</code><br>The executed PDOStatement object.<br />
 				</div>
 
 				<h4>Throws</h4>
@@ -996,7 +998,7 @@ pooling has been disabled.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_clearInstancePool">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#426-434" title="Go to source code">clearInstancePool</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#426-441" title="Go to source code">clearInstancePool</a>( <span>mixed <var>$and_clear_all_references</var> = <span class="php-keyword1">false</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1029,7 +1031,7 @@ pooling has been disabled.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_clearRelatedInstancePool">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#436-442" title="Go to source code">clearRelatedInstancePool</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#443-449" title="Go to source code">clearRelatedInstancePool</a>( )</code>
 
 		<div class="description short">
 			
@@ -1064,7 +1066,7 @@ foreign key with ON DELETE CASCADE</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getPrimaryKeyHashFromRow">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#444-462" title="Go to source code">getPrimaryKeyHashFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#451-469" title="Go to source code">getPrimaryKeyHashFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1115,7 +1117,7 @@ are all null.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getPrimaryKeyFromRow">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#464-477" title="Go to source code">getPrimaryKeyFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#471-484" title="Go to source code">getPrimaryKeyFromRow</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1165,7 +1167,7 @@ returned.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_populateObjects">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#479-510" title="Go to source code">populateObjects</a>( <span><code><a href="class-PDOStatement.html">PDOStatement</a></code> <var>$stmt</var></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#486-517" title="Go to source code">populateObjects</a>( <span>PDOStatement <var>$stmt</var></span> )</code>
 
 		<div class="description short">
 			
@@ -1205,7 +1207,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_populateObject">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#511-536" title="Go to source code">populateObject</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#518-543" title="Go to source code">populateObject</a>( <span>array <var>$row</var></span>, <span>integer <var>$startcol</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1256,7 +1258,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinCustomer">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#539-587" title="Go to source code">doCountJoinCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#546-594" title="Go to source code">doCountJoinCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1307,7 +1309,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinCustomerTitle">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#590-638" title="Go to source code">doCountJoinCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#597-645" title="Go to source code">doCountJoinCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1358,7 +1360,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinCustomer">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#641-705" title="Go to source code">doSelectJoinCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#648-712" title="Go to source code">doSelectJoinCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1411,7 +1413,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinCustomerTitle">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#708-772" title="Go to source code">doSelectJoinCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#715-779" title="Go to source code">doSelectJoinCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1464,7 +1466,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#775-825" title="Go to source code">doCountJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#782-832" title="Go to source code">doCountJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1513,7 +1515,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#827-917" title="Go to source code">doSelectJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#834-924" title="Go to source code">doSelectJoinAll</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1566,7 +1568,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinAllExceptCustomer">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#920-968" title="Go to source code">doCountJoinAllExceptCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#927-975" title="Go to source code">doCountJoinAllExceptCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1617,7 +1619,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doCountJoinAllExceptCustomerTitle">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#971-1019" title="Go to source code">doCountJoinAllExceptCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#978-1026" title="Go to source code">doCountJoinAllExceptCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>boolean <var>$distinct</var> = <span class="php-keyword1">false</span></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1668,7 +1670,7 @@ Criteria-&gt;setDistinct() instead.</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinAllExceptCustomer">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1022-1093" title="Go to source code">doSelectJoinAllExceptCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1029-1100" title="Go to source code">doSelectJoinAllExceptCustomer</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1721,7 +1723,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doSelectJoinAllExceptCustomerTitle">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1096-1167" title="Go to source code">doSelectJoinAllExceptCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1103-1174" title="Go to source code">doSelectJoinAllExceptCustomerTitle</a>( <span>Criteria <var>$criteria</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span>, <span>String <var>$join_behavior</var> = Thelia\Model\om\Criteria::LEFT_JOIN</span> )</code>
 
 		<div class="description short">
 			
@@ -1774,7 +1776,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getTableMap">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1169-1179" title="Go to source code">getTableMap</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1176-1186" title="Go to source code">getTableMap</a>( )</code>
 
 		<div class="description short">
 			
@@ -1818,7 +1820,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_buildTableMap">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1181-1190" title="Go to source code">buildTableMap</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1188-1197" title="Go to source code">buildTableMap</a>( )</code>
 
 		<div class="description short">
 			
@@ -1851,7 +1853,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getOMClass">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1192-1201" title="Go to source code">getOMClass</a>( )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1199-1208" title="Go to source code">getOMClass</a>( <span>mixed <var>$row</var> = <span class="php-num">0</span></span>, <span>mixed <var>$colnum</var> = <span class="php-num">0</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1888,7 +1890,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doInsert">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1203-1244" title="Go to source code">doInsert</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1210-1251" title="Go to source code">doInsert</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1938,7 +1940,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doUpdate">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1246-1283" title="Go to source code">doUpdate</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1253-1290" title="Go to source code">doUpdate</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1989,7 +1991,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doDeleteAll">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1285-1315" title="Go to source code">doDeleteAll</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1292-1322" title="Go to source code">doDeleteAll</a>( <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2035,7 +2037,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doDelete">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1317-1374" title="Go to source code">doDelete</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1324-1381" title="Go to source code">doDelete</a>( <span>mixed <var>$values</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2089,7 +2091,7 @@ PropelException.<br />
 
 		<td class="name"><div>
 		<a class="anchor" href="#_doValidate">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1376-1411" title="Go to source code">doValidate</a>( <span><code><a href="class-Thelia.Model.Address.html">Thelia\Model\Address</a></code> <var>$obj</var></span>, <span>mixed <var>$cols</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1383-1418" title="Go to source code">doValidate</a>( <span><code><a href="class-Thelia.Model.Address.html">Thelia\Model\Address</a></code> <var>$obj</var></span>, <span>mixed <var>$cols</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2139,7 +2141,7 @@ columns are validated.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_retrieveByPK">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1413-1437" title="Go to source code">retrieveByPK</a>( <span>integer <var>$pk</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1420-1444" title="Go to source code">retrieveByPK</a>( <span>integer <var>$pk</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2183,7 +2185,7 @@ columns are validated.</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_retrieveByPKs">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1439-1464" title="Go to source code">retrieveByPKs</a>( <span>array <var>$pks</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseAddressPeer.html#1446-1471" title="Go to source code">retrieveByPKs</a>( <span>array <var>$pks</var></span>, <span>PropelPDO <var>$con</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -2406,19 +2408,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#49-50" title="Go to source code"><b>ID</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.ID'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.id'</span></code></td>
 		<td class="description"><div>
 			<a href="#ID" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the ID field</p>
+<p>the column name for the id field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the ID field</p>
+<p>the column name for the id field</p>
 
 
 			</div>
@@ -2430,19 +2432,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#52-53" title="Go to source code"><b>TITLE</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.TITLE'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.title'</span></code></td>
 		<td class="description"><div>
 			<a href="#TITLE" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the TITLE field</p>
+<p>the column name for the title field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the TITLE field</p>
+<p>the column name for the title field</p>
 
 
 			</div>
@@ -2454,19 +2456,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#55-56" title="Go to source code"><b>CUSTOMER_ID</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.CUSTOMER_ID'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.customer_id'</span></code></td>
 		<td class="description"><div>
 			<a href="#CUSTOMER_ID" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the CUSTOMER_ID field</p>
+<p>the column name for the customer_id field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the CUSTOMER_ID field</p>
+<p>the column name for the customer_id field</p>
 
 
 			</div>
@@ -2478,19 +2480,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#58-59" title="Go to source code"><b>CUSTOMER_TITLE_ID</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.CUSTOMER_TITLE_ID'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.customer_title_id'</span></code></td>
 		<td class="description"><div>
 			<a href="#CUSTOMER_TITLE_ID" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the CUSTOMER_TITLE_ID field</p>
+<p>the column name for the customer_title_id field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the CUSTOMER_TITLE_ID field</p>
+<p>the column name for the customer_title_id field</p>
 
 
 			</div>
@@ -2502,19 +2504,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#61-62" title="Go to source code"><b>COMPANY</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.COMPANY'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.company'</span></code></td>
 		<td class="description"><div>
 			<a href="#COMPANY" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the COMPANY field</p>
+<p>the column name for the company field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the COMPANY field</p>
+<p>the column name for the company field</p>
 
 
 			</div>
@@ -2526,19 +2528,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#64-65" title="Go to source code"><b>FIRSTNAME</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.FIRSTNAME'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.firstname'</span></code></td>
 		<td class="description"><div>
 			<a href="#FIRSTNAME" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the FIRSTNAME field</p>
+<p>the column name for the firstname field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the FIRSTNAME field</p>
+<p>the column name for the firstname field</p>
 
 
 			</div>
@@ -2550,19 +2552,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#67-68" title="Go to source code"><b>LASTNAME</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.LASTNAME'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.lastname'</span></code></td>
 		<td class="description"><div>
 			<a href="#LASTNAME" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the LASTNAME field</p>
+<p>the column name for the lastname field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the LASTNAME field</p>
+<p>the column name for the lastname field</p>
 
 
 			</div>
@@ -2574,19 +2576,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#70-71" title="Go to source code"><b>ADDRESS1</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.ADDRESS1'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.address1'</span></code></td>
 		<td class="description"><div>
 			<a href="#ADDRESS1" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the ADDRESS1 field</p>
+<p>the column name for the address1 field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the ADDRESS1 field</p>
+<p>the column name for the address1 field</p>
 
 
 			</div>
@@ -2598,19 +2600,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#73-74" title="Go to source code"><b>ADDRESS2</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.ADDRESS2'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.address2'</span></code></td>
 		<td class="description"><div>
 			<a href="#ADDRESS2" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the ADDRESS2 field</p>
+<p>the column name for the address2 field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the ADDRESS2 field</p>
+<p>the column name for the address2 field</p>
 
 
 			</div>
@@ -2622,19 +2624,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#76-77" title="Go to source code"><b>ADDRESS3</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.ADDRESS3'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.address3'</span></code></td>
 		<td class="description"><div>
 			<a href="#ADDRESS3" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the ADDRESS3 field</p>
+<p>the column name for the address3 field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the ADDRESS3 field</p>
+<p>the column name for the address3 field</p>
 
 
 			</div>
@@ -2646,19 +2648,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#79-80" title="Go to source code"><b>ZIPCODE</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.ZIPCODE'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.zipcode'</span></code></td>
 		<td class="description"><div>
 			<a href="#ZIPCODE" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the ZIPCODE field</p>
+<p>the column name for the zipcode field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the ZIPCODE field</p>
+<p>the column name for the zipcode field</p>
 
 
 			</div>
@@ -2670,19 +2672,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#82-83" title="Go to source code"><b>CITY</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.CITY'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.city'</span></code></td>
 		<td class="description"><div>
 			<a href="#CITY" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the CITY field</p>
+<p>the column name for the city field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the CITY field</p>
+<p>the column name for the city field</p>
 
 
 			</div>
@@ -2694,19 +2696,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#85-86" title="Go to source code"><b>COUNTRY_ID</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.COUNTRY_ID'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.country_id'</span></code></td>
 		<td class="description"><div>
 			<a href="#COUNTRY_ID" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the COUNTRY_ID field</p>
+<p>the column name for the country_id field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the COUNTRY_ID field</p>
+<p>the column name for the country_id field</p>
 
 
 			</div>
@@ -2718,19 +2720,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#88-89" title="Go to source code"><b>PHONE</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.PHONE'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.phone'</span></code></td>
 		<td class="description"><div>
 			<a href="#PHONE" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the PHONE field</p>
+<p>the column name for the phone field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the PHONE field</p>
+<p>the column name for the phone field</p>
 
 
 			</div>
@@ -2742,19 +2744,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#91-92" title="Go to source code"><b>CREATED_AT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.CREATED_AT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.created_at'</span></code></td>
 		<td class="description"><div>
 			<a href="#CREATED_AT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the CREATED_AT field</p>
+<p>the column name for the created_at field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the CREATED_AT field</p>
+<p>the column name for the created_at field</p>
 
 
 			</div>
@@ -2766,19 +2768,19 @@ PropelException.<br />
 		<td class="name"><code>
 				<a href="source-class-Thelia.Model.om.BaseAddressPeer.html#94-95" title="Go to source code"><b>UPDATED_AT</b></a>
 		</code></td>
-		<td class="value"><code><span class="php-quote">'address.UPDATED_AT'</span></code></td>
+		<td class="value"><code><span class="php-quote">'address.updated_at'</span></code></td>
 		<td class="description"><div>
 			<a href="#UPDATED_AT" class="anchor">#</a>
 
 			<div class="description short">
 				
-<p>the column name for the UPDATED_AT field</p>
+<p>the column name for the updated_at field</p>
 
 			</div>
 
 			<div class="description detailed hidden">
 				
-<p>the column name for the UPDATED_AT field</p>
+<p>the column name for the updated_at field</p>
 
 
 			</div>

@@ -30,6 +30,7 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 use Symfony\Component\Config\ConfigCache;
 
 use Thelia\Tpex\Tpex;
+use Thelia\Log\Tlog;
 
 /**
  *
@@ -174,7 +175,7 @@ class Parser implements ParserInterface
         $content = $this->openFile($this->getRequest());
         
         $this->tpex->init($this->container->get("request"), $this->container->get("dispatcher"), $content, THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
-        
+        $this->tpex->setLogger(Tlog::getInstance());
         $this->tpex->execute();
     }
     

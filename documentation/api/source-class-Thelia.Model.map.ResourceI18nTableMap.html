@@ -8,7 +8,7 @@
 	<title>File core/lib/Thelia/Model/map/ResourceI18nTableMap.php | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -22,8 +22,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -62,7 +60,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -253,12 +255,12 @@
 </span><span id="42" class="l"><a class="l" href="#42">42: </a>        <span class="php-var">$this</span>-&gt;setPackage(<span class="php-quote">'Thelia.Model'</span>);
 </span><span id="43" class="l"><a class="l" href="#43">43: </a>        <span class="php-var">$this</span>-&gt;setUseIdGenerator(<span class="php-keyword1">false</span>);
 </span><span id="44" class="l"><a class="l" href="#44">44: </a>        <span class="php-comment">// columns</span>
-</span><span id="45" class="l"><a class="l" href="#45">45: </a>        <span class="php-var">$this</span>-&gt;addForeignPrimaryKey(<span class="php-quote">'ID'</span>, <span class="php-quote">'Id'</span>, <span class="php-quote">'INTEGER'</span> , <span class="php-quote">'resource'</span>, <span class="php-quote">'ID'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="46" class="l"><a class="l" href="#46">46: </a>        <span class="php-var">$this</span>-&gt;addPrimaryKey(<span class="php-quote">'LOCALE'</span>, <span class="php-quote">'Locale'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">true</span>, <span class="php-num">5</span>, <span class="php-quote">'en_EN'</span>);
-</span><span id="47" class="l"><a class="l" href="#47">47: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'TITLE'</span>, <span class="php-quote">'Title'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
-</span><span id="48" class="l"><a class="l" href="#48">48: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'DESCRIPTION'</span>, <span class="php-quote">'Description'</span>, <span class="php-quote">'CLOB'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="49" class="l"><a class="l" href="#49">49: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'CHAPO'</span>, <span class="php-quote">'Chapo'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
-</span><span id="50" class="l"><a class="l" href="#50">50: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'POSTSCRIPTUM'</span>, <span class="php-quote">'Postscriptum'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="45" class="l"><a class="l" href="#45">45: </a>        <span class="php-var">$this</span>-&gt;addForeignPrimaryKey(<span class="php-quote">'id'</span>, <span class="php-quote">'Id'</span>, <span class="php-quote">'INTEGER'</span> , <span class="php-quote">'resource'</span>, <span class="php-quote">'id'</span>, <span class="php-keyword1">true</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="46" class="l"><a class="l" href="#46">46: </a>        <span class="php-var">$this</span>-&gt;addPrimaryKey(<span class="php-quote">'locale'</span>, <span class="php-quote">'Locale'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">true</span>, <span class="php-num">5</span>, <span class="php-quote">'en_US'</span>);
+</span><span id="47" class="l"><a class="l" href="#47">47: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'title'</span>, <span class="php-quote">'Title'</span>, <span class="php-quote">'VARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-num">255</span>, <span class="php-keyword1">null</span>);
+</span><span id="48" class="l"><a class="l" href="#48">48: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'description'</span>, <span class="php-quote">'Description'</span>, <span class="php-quote">'CLOB'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="49" class="l"><a class="l" href="#49">49: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'chapo'</span>, <span class="php-quote">'Chapo'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
+</span><span id="50" class="l"><a class="l" href="#50">50: </a>        <span class="php-var">$this</span>-&gt;addColumn(<span class="php-quote">'postscriptum'</span>, <span class="php-quote">'Postscriptum'</span>, <span class="php-quote">'LONGVARCHAR'</span>, <span class="php-keyword1">false</span>, <span class="php-keyword1">null</span>, <span class="php-keyword1">null</span>);
 </span><span id="51" class="l"><a class="l" href="#51">51: </a>        <span class="php-comment">// validators</span>
 </span><span id="52" class="l"><a class="l" href="#52">52: </a>    } <span class="php-comment">// initialize()</span>
 </span><span id="53" class="l"><a class="l" href="#53">53: </a>

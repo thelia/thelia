@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\om\BaseTaxRuleI18nQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -436,7 +438,7 @@ ModelCriteria
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a>\<a href="namespace-Thelia.Model.om.html">om</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model\om<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#20-390" title="Go to source code">core/lib/Thelia/Model/om/BaseTaxRuleI18nQuery.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#20-405" title="Go to source code">core/lib/Thelia/Model/om/BaseTaxRuleI18nQuery.php</a><br />
 	</div>
 
 
@@ -837,7 +839,7 @@ class="php-var">$con</span>);
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterById">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#238-265" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#238-280" title="Go to source code">filterById</a>( <span>mixed <var>$id</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -864,7 +866,12 @@ class="php-comment">// WHERE id IN (12, 34)</span>
 class="php-var">$query</span>-&gt;filterById(<span
 class="php-keyword1">array</span>(<span
 class="php-quote">'min'</span> =&gt; <span class="php-num">12</span>)); <span
-class="php-comment">// WHERE id &gt; 12</span>
+class="php-comment">// WHERE id &gt;= 12</span>
+<span
+class="php-var">$query</span>-&gt;filterById(<span
+class="php-keyword1">array</span>(<span
+class="php-quote">'max'</span> =&gt; <span class="php-num">12</span>)); <span
+class="php-comment">// WHERE id &lt;= 12</span>
 </pre>
 
 
@@ -906,7 +913,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByLocale">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#267-294" title="Go to source code">filterByLocale</a>( <span>string <var>$locale</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#282-309" title="Go to source code">filterByLocale</a>( <span>string <var>$locale</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -963,7 +970,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_filterByTaxRule">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#296-320" title="Go to source code">filterByTaxRule</a>( <span><code><a href="class-Thelia.Model.TaxRule.html">Thelia\Model\TaxRule</a></code>|PropelObjectCollection <var>$taxRule</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#311-335" title="Go to source code">filterByTaxRule</a>( <span><code><a href="class-Thelia.Model.TaxRule.html">Thelia\Model\TaxRule</a></code>|PropelObjectCollection <var>$taxRule</var></span>, <span>string <var>$comparison</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1012,7 +1019,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_joinTaxRule">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#322-352" title="Go to source code">joinTaxRule</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#337-367" title="Go to source code">joinTaxRule</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1056,7 +1063,7 @@ Criteria::EQUAL</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_useTaxRuleQuery">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#354-370" title="Go to source code">useTaxRuleQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#369-385" title="Go to source code">useTaxRuleQuery</a>( <span>string <var>$relationAlias</var> = <span class="php-keyword1">null</span></span>, <span>string <var>$joinType</var> = <span class="php-quote">'LEFT JOIN'</span></span> )</code>
 
 		<div class="description short">
 			
@@ -1105,7 +1112,7 @@ secondary query</dd>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_prune">#</a>
-		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#372-388" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.TaxRuleI18n.html">Thelia\Model\TaxRuleI18n</a></code> <var>$taxRuleI18n</var> = <span class="php-keyword1">null</span></span> )</code>
+		<code><a href="source-class-Thelia.Model.om.BaseTaxRuleI18nQuery.html#387-403" title="Go to source code">prune</a>( <span><code><a href="class-Thelia.Model.TaxRuleI18n.html">Thelia\Model\TaxRuleI18n</a></code> <var>$taxRuleI18n</var> = <span class="php-keyword1">null</span></span> )</code>
 
 		<div class="description short">
 			

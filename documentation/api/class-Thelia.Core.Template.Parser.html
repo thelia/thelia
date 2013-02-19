@@ -7,7 +7,7 @@
 	<title>Class Thelia\Core\Template\Parser | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?319012511"></script>
+	<script type="text/javascript" src="elementlist.js?3178389089"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -21,8 +21,6 @@
 		<div id="groups">
 			<h3>Namespaces</h3>
 			<ul>
-				<li><a href="namespace-PHP.html">PHP</a>
-						</li>
 				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
@@ -61,7 +59,11 @@
 							</ul></li>
 				<li><a href="namespace-Thelia.Tools.html">Tools</a>
 						</li>
-							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+						</li>
+							</ul></li></ul></li>
 			</ul>
 		</div>
 
@@ -156,7 +158,7 @@ parser</p>
 				<b>Author:</b>
 				Manuel Raynaud &lt;<a
 href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&gt;<br />
-		<b>Located at</b> <a href="source-class-Thelia.Core.Template.Parser.html#33-159" title="Go to source code">core/lib/Thelia/Core/Template/Parser.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Core.Template.Parser.html#37-201" title="Go to source code">core/lib/Thelia/Core/Template/Parser.php</a><br />
 	</div>
 
 
@@ -174,7 +176,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#62-71" title="Go to source code">__construct</a>( <span>Symfony\Component\DependencyInjection\ContainerInterface <var>$container</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#74-84" title="Go to source code">__construct</a>( <span>Symfony\Component\DependencyInjection\ContainerInterface <var>$container</var></span>, <span><code><a href="class-Thelia.Tpex.Tpex.html">Thelia\Tpex\Tpex</a></code> <var>$tpex</var></span> )</code>
 
 		<div class="description short">
 			
@@ -188,7 +190,38 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 				<div class="list"><dl>
 					<dt><var>$container</var></dt>
 					<dd><code>type</code><br>$container public function __construct(ContainerBuilder $container)</dd>
+					<dt><var>$tpex</var></dt>
+					<dd></dd>
 				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="initialize" id="_initialize">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_initialize">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#86-105" title="Go to source code">initialize</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
 
 
 
@@ -208,7 +241,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getRequest">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#73-80" title="Go to source code">getRequest</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#107-114" title="Go to source code">getRequest</a>( )</code>
 
 		<div class="description short">
 			
@@ -241,7 +274,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getDispatcher">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#82-89" title="Go to source code">getDispatcher</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#116-123" title="Go to source code">getDispatcher</a>( )</code>
 
 		<div class="description short">
 			
@@ -274,7 +307,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getContent">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#91-103" title="Go to source code">getContent</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#125-137" title="Go to source code">getContent</a>( )</code>
 
 		<div class="description short">
 			
@@ -308,7 +341,7 @@ or the content of the response</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setContent">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#105-114" title="Go to source code">setContent</a>( <span>string|Symfony\Component\HttpFoundation\Response <var>$content</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#139-148" title="Go to source code">setContent</a>( <span>string|Symfony\Component\HttpFoundation\Response <var>$content</var></span> )</code>
 
 		<div class="description short">
 			
@@ -347,7 +380,7 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getStatus">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#116-123" title="Go to source code">getStatus</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#150-157" title="Go to source code">getStatus</a>( )</code>
 
 		<div class="description short">
 			
@@ -382,7 +415,7 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setStatus">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#125-134" title="Go to source code">setStatus</a>( <span>integer <var>$status</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#159-168" title="Go to source code">setStatus</a>( <span>integer <var>$status</var></span> )</code>
 
 		<div class="description short">
 			
@@ -420,7 +453,7 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_loadParser">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#136-142" title="Go to source code">loadParser</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#170-180" title="Go to source code">loadParser</a>( )</code>
 
 		<div class="description short">
 			
@@ -445,7 +478,7 @@ directly</p>
 	<tr data-order="openFile" id="_openFile">
 
 		<td class="attributes"><code>
-			 public 
+			 protected 
 			
 			
 			</code>
@@ -453,7 +486,36 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_openFile">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#144-155" title="Go to source code">openFile</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#182-193" title="Go to source code">openFile</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseInclude" id="_parseInclude">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseInclude">#</a>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#195-198" title="Go to source code">parseInclude</a>( <span>mixed <var>$content</var></span> )</code>
 
 		<div class="description short">
 			
@@ -486,7 +548,7 @@ directly</p>
 
 		<td class="attributes"><code>string</code></td>
 		<td class="name"><code>
-				<a href="source-class-Thelia.Core.Template.Parser.html#44" title="Go to source code"><b>PREFIXE</b></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#48" title="Go to source code"><b>PREFIXE</b></a>
 		</code></td>
 		<td class="value"><code><span class="php-quote">'prx'</span></code></td>
 		<td class="description"><div>
@@ -506,7 +568,7 @@ directly</p>
 
 		<td class="attributes"><code>boolean</code></td>
 		<td class="name"><code>
-				<a href="source-class-Thelia.Core.Template.Parser.html#46" title="Go to source code"><b>SHOW_TIME</b></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#50" title="Go to source code"><b>SHOW_TIME</b></a>
 		</code></td>
 		<td class="value"><code><span class="php-keyword1">true</span></code></td>
 		<td class="description"><div>
@@ -526,7 +588,7 @@ directly</p>
 
 		<td class="attributes"><code>boolean</code></td>
 		<td class="name"><code>
-				<a href="source-class-Thelia.Core.Template.Parser.html#47" title="Go to source code"><b>ALLOW_DEBUG</b></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#51" title="Go to source code"><b>ALLOW_DEBUG</b></a>
 		</code></td>
 		<td class="value"><code><span class="php-keyword1">true</span></code></td>
 		<td class="description"><div>
@@ -546,7 +608,7 @@ directly</p>
 
 		<td class="attributes"><code>boolean</code></td>
 		<td class="name"><code>
-				<a href="source-class-Thelia.Core.Template.Parser.html#48" title="Go to source code"><b>USE_CACHE</b></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#52" title="Go to source code"><b>USE_CACHE</b></a>
 		</code></td>
 		<td class="value"><code><span class="php-keyword1">true</span></code></td>
 		<td class="description"><div>
@@ -576,7 +638,7 @@ directly</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Core.Template.Parser.html#51-55" title="Go to source code"><var>$container</var></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#55-59" title="Go to source code"><var>$container</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -599,7 +661,7 @@ directly</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Core.Template.Parser.html#57" title="Go to source code"><var>$content</var></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#61" title="Go to source code"><var>$content</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -622,11 +684,34 @@ directly</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Core.Template.Parser.html#58" title="Go to source code"><var>$status</var></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#62" title="Go to source code"><var>$status</var></a>
 		</td>
 		<td class="value"><code><span class="php-num">200</span></code></td>
 		<td class="description"><div>
 			<a href="#$status" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="tpex" id="$tpex">
+		<td class="attributes"><code>
+			protected  
+			<code><a href="class-Thelia.Tpex.Tpex.html">Thelia\Tpex\Tpex</a></code>
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Core.Template.Parser.html#64-68" title="Go to source code"><var>$tpex</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$tpex" class="anchor">#</a>
 
 			<div class="description short">
 				
@@ -645,11 +730,34 @@ directly</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Core.Template.Parser.html#60" title="Go to source code"><var>$template</var></a>
+				<a href="source-class-Thelia.Core.Template.Parser.html#70" title="Go to source code"><var>$template</var></a>
 		</td>
 		<td class="value"><code><span class="php-quote">&quot;default&quot;</span></code></td>
 		<td class="description"><div>
 			<a href="#$template" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="init" id="$init">
+		<td class="attributes"><code>
+			protected  
+			boolean
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Core.Template.Parser.html#72" title="Go to source code"><var>$init</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
+		<td class="description"><div>
+			<a href="#$init" class="anchor">#</a>
 
 			<div class="description short">
 				
