@@ -131,8 +131,6 @@ class Parser implements ParserInterface
     {
        $this->loadParser();
        
-       echo \Thelia\Model\ConfigQuery::read("alfred", "dupont");
-       
        return $this->content;
     }
 
@@ -176,7 +174,7 @@ class Parser implements ParserInterface
         
         $this->tpex->init($this->container->get("request"), $this->container->get("dispatcher"), $content, THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
         $this->tpex->setLogger(Tlog::getInstance());
-        $this->tpex->execute();
+        $this->setContent($this->tpex->execute());
     }
     
     protected function openFile(Request $request)
