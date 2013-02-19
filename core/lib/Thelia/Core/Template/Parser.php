@@ -166,11 +166,4 @@ class Parser implements ParserInterface
         
         return $content;
     }
-    
-    protected function parseInclude($content)
-    {
-        
-    }
-
-
 }
