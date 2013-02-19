@@ -1,38 +1,6 @@
 {
-    "hash": "2f31adf8756fec850487c80b20b42e0f",
+    "hash": "668b9cca3649c47d9016fb912f74856a",
     "packages": [
-        {
-            "name": "Thelia/Tpex",
-            "version": "dev-master",
-            "target-dir": "Thelia/Tpex",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/thelia/Tpex.git",
-                "reference": "c2b8151f4c378d30887900290467b21585a0eb15"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/thelia/Tpex/zipball/c2b8151f4c378d30887900290467b21585a0eb15",
-                "reference": "c2b8151f4c378d30887900290467b21585a0eb15",
-                "shasum": ""
-            },
-            "require": {
-                "symfony/event-dispatcher": "2.1.*",
-                "symfony/http-foundation": "2.1.*"
-            },
-            "time": "2013-02-18 22:51:33",
-            "type": "library",
-            "autoload": {
-                "psr-0": {
-                    "Thelia\\Tpex": ""
-                }
-            },
-            "homepage": "http://thelia.net",
-            "support": {
-                "source": "https://github.com/thelia/Tpex/tree/master",
-                "issues": "https://github.com/thelia/Tpex/issues"
-            }
-        },
         {
             "name": "ircmaxell/password-compat",
             "version": "dev-master",
@@ -616,7 +584,6 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "ircmaxell/password-compat": 20,
-        "psr/log": 20,
-        "thelia/tpex": 20
+        "psr/log": 20
     }
 }

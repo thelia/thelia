@@ -69,8 +69,6 @@ class Parser implements ParserInterface
     
     protected $template = "default";
     
-    protected $init = false;
-
     /**
      *
      * @param type $container
@@ -81,27 +79,6 @@ class Parser implements ParserInterface
     {
         $this->container = $container;
         $this->tpex = $tpex;
-    }
-    
-    protected function initialize()
-    {
-        if ($this->init === true) {
-            return;
-        }
-        
-        /** /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\
-         * @TODO
-         * 
-         * Avant le lancement du parser, enregistrer les boucles, filtres.
-         * Pour ne pas le faire à chaque lancement, on va créer une class qui contient toutes les classes nécessaires
-         * 
-         * Créer : 
-         * un dumper
-         * une méthode qui récupère les différents éléments : boucles, filtres, substitutions, etc
-         * 
-         * 
-         * /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ /!\ 
-         */
     }
     
     /**

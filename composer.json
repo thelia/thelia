@@ -6,12 +6,6 @@
         "forum" : "http://thelia.net/forum",
         "wiki" : "http://thelia.net/wiki"
     },
-    "repositories" : [
-        {
-            "type" : "vcs",
-            "url" : "https://github.com/thelia/Tpex"
-        }
-    ],
     "require":{
         "php": ">=5.4.0",
         "ircmaxell/password-compat": "dev-master",
@@ -23,8 +17,7 @@
         "symfony/dependency-injection" : "2.1.*",
         "symfony/event-dispatcher" : "2.1.*",
         "symfony/http-kernel" : "2.1.*",
-        "symfony/routing" : "2.1.*",
-        "Thelia/Tpex" : "dev-master"
+        "symfony/routing" : "2.1.*"
     },
     "minimum-stability": "stable",
     "config" : {
