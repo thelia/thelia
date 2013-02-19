@@ -60,6 +60,10 @@ class Parser implements ParserInterface
     protected $content;
     protected $status = 200;
     
+    /**
+     *
+     * @var Thelia\Tpex\Tpex
+     */
     protected $tpex;
     
     protected $template = "default";
@@ -169,9 +173,7 @@ class Parser implements ParserInterface
     {
         $content = $this->openFile($this->getRequest());
         
-        $this->tpex->setContent($content);
-        $this->tpex->setDispatcher($this->container->get("dispatcher"));
-        $this->tpex->setRequest($this->container->get("request"));
+        $this->tpex->init($this->container->get("request"), $this->container->get("dispatcher"), $content, THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
         
         $this->tpex->execute();
     }
