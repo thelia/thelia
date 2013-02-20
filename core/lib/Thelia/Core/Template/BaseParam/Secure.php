@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\BaseParam;
 
 use Thelia\Tpex\BaseParam\BaseParam;
+use Thelia\Tools\Redirect;
 
 class Secure extends BaseParam
 {
@@ -31,8 +32,8 @@ class Secure extends BaseParam
     {
         $request = $this->getRequest();
         
-        if ($request->getSession()->get('connected') && $this->baseParamValue) {
-            
+        if (!$request->getSession()->get('connected') && $this->baseParamValue) {
+            Redirect::unauthorize();
         }
     }
 }
