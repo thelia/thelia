@@ -8,3 +8,4 @@ log/*
 bin/*
 local/session/*
 coverage
+.idea
