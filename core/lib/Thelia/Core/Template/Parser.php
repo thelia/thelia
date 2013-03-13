@@ -75,10 +75,9 @@ class Parser implements ParserInterface
      *
      * public function __construct(ContainerBuilder $container)
      */
-    public function __construct(ContainerInterface $container, Tpex $tpex)
+    public function __construct(ContainerInterface $container)
     {
         $this->container = $container;
-        $this->tpex = $tpex;
     }
     
     /**
@@ -148,16 +147,18 @@ class Parser implements ParserInterface
     public function loadParser()
     {
         $content = $this->openFile($this->getRequest());
-        
-        $this->tpex->init($this->container->get("request"), $this->container->get("dispatcher"), $content, THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
-        $this->tpex->configure(
+
+        $tpex = new Tpex();
+
+        $tpex->init($this->container->get("request"), $this->container->get("dispatcher"), $content, THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
+        $tpex->configure(
                 array(),
                 array(),
                 array(
                     "secure" => "Thelia\Core\Template\BaseParam\Secure"
                     )
                 );
-        $this->setContent($this->tpex->execute());
+        $this->setContent($tpex->execute());
     }
     
     protected function openFile(Request $request)

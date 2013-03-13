@@ -5,8 +5,34 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
-        <div>TODO write content
-        #INCLUDE "include1.html"
+        <div>TODO write content #SET{toto, 4} toto vaut #GET{toto} zeafazefaze azef azef azef azef
+        <THELIA_FOO type="foo" id="loop1" param1="#GET{toto}">
+            #TOTO
+            <THELIA_FU type="doobitch" param1="value1" param2="#TUTU">
+                #ALFRED azd azd azed azd
+                <T:CHAPO>#CHAPO</T:CHAPO>le chapo est vide<//T:CHAPO>
+            </THELIA_FU>
+        </THELIA_FOO>
+        <T_BAR>
+            avant boucle
+        <THELIA_BAR type="bar" id="loop2" param1="value1">
+            #FU
+            <TEST_ex3 variable="#UNEVARIABLE" test="egal" valeur="0">
+                UNEVARIABLE vaut zéro
+            </TEST_ex3>
+                UNEVARIABLE ne vaut pas zéro
+            <//TEST_ex3>
+        </THELIA_BAR>
+            après boucle
+        </T_BAR>
+            après boucle vide
+        <//T_BAR>
+
+        <REPEAT_loopy start="1" end="5" increment="2">
+            Compteur = #INDEX<br />
+        </REPEAT_loopy>
+
+
         </div>
     </body>
 </html>
