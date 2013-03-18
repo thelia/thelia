@@ -159,8 +159,11 @@ class Parser implements ParserInterface
                 array(),
                 array(
                     "secure" => "Thelia\Core\Template\BaseParam\Secure"
-                    )
-                );
+                ),
+                array(
+                    "equal" => "Test\TestLoop\Equal"
+                )
+        );
         $this->setContent($tpex->execute());
     }
     
