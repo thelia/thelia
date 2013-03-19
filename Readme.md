@@ -29,10 +29,10 @@ $ cp config_db.mysql.php config_db.php
 ```
 
 Edit config_db.php file and fulfill your mysql connection parameters :
-- replace __DB_LOGIN__ with your mysql user
-- replace __DB_PASSWORD__ with your mysql password
-- replace __DB_NAME__ with you database name
-- replace __DB_HOST__ with your mysql host
+- replace ```__DB_LOGIN__``` with your mysql user
+- replace ```__DB_PASSWORD__``` with your mysql password
+- replace ```__DB_NAME__``` with you database name
+- replace ```__DB_HOST__``` with your mysql host
 
 Usage
 -----
