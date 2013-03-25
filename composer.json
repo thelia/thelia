@@ -10,14 +10,14 @@
         "php": ">=5.4.0",
         "ircmaxell/password-compat": "dev-master",
         "propel/propel1" : "1.6.*",
-        "psr/log" : "dev-master",
-        "symfony/class-loader": "2.1.*",
-        "symfony/config" : "2.1.*",
-        "symfony/console" : "2.1.*",
-        "symfony/dependency-injection" : "2.1.*",
-        "symfony/event-dispatcher" : "2.1.*",
-        "symfony/http-kernel" : "2.1.*",
-        "symfony/routing" : "2.1.*"
+        "psr/log" : "1.0",
+        "symfony/class-loader": "2.2.*",
+        "symfony/config" : "2.2.*",
+        "symfony/console" : "2.2.*",
+        "symfony/dependency-injection" : "2.2.*",
+        "symfony/event-dispatcher" : "2.2.*",
+        "symfony/http-kernel" : "2.2.*",
+        "symfony/routing" : "2.2.*"
     },
     "minimum-stability": "stable",
     "config" : {
