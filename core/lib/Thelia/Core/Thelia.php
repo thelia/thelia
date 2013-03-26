@@ -34,10 +34,14 @@ namespace Thelia\Core;
 
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Yaml\Yaml;
 
 
 use Thelia\Core\Bundle;
 use Thelia\Log\Tlog;
+use Thelia\Config\DatabaseConfiguration;
+use Thelia\Config\DefinePropel;
 
 use Propel;
 use PropelConfiguration;
@@ -47,27 +51,38 @@ class Thelia extends Kernel
     
     public function init()
     {
-        parent::init(); 
-        
+        parent::init();
+        if($this->debug) {
+            ini_set('display_errors', 1);
+        }
         $this->initPropel();
     }
     
     protected function initPropel()
     {
-        if (file_exists(THELIA_ROOT . '/local/config/config_db.php') === false) {
+        if (file_exists(THELIA_ROOT . '/local/config/database.yml') === false) {
             return ;
         }
-        Propel::init(THELIA_CONF_DIR . "/config_thelia.php");
-        
-        if ($this->isDebug()) {
-            Propel::setLogger(Tlog::getInstance());
-            $config = Propel::getConfiguration(PropelConfiguration::TYPE_OBJECT);
-            $config->setParameter('debugpdo.logging.details.method.enabled', true);
-            $config->setParameter('debugpdo.logging.details.time.enabled', true);
-            $config->setParameter('debugpdo.logging.details.mem.enabled', true);
-            
-            $con = Propel::getConnection("thelia");
-            $con->useDebug(true);
+
+        if(! Propel::isInit()) {
+
+            $definePropel = new DefinePropel(new DatabaseConfiguration(),
+                Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
+
+            Propel::setConfiguration($definePropel->getConfig());
+
+            if ($this->isDebug()) {
+                Propel::setLogger(Tlog::getInstance());
+                $config = Propel::getConfiguration(PropelConfiguration::TYPE_OBJECT);
+                $config->setParameter('debugpdo.logging.details.method.enabled', true);
+                $config->setParameter('debugpdo.logging.details.time.enabled', true);
+                $config->setParameter('debugpdo.logging.details.mem.enabled', true);
+
+                $con = Propel::getConnection("thelia");
+                $con->useDebug(true);
+            }
+
+            Propel::initialize();
         }
     }
 

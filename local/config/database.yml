@@ -1,0 +1,6 @@
+database:
+  connection:
+    driver: mysql
+    user: root
+    password: azerty
+    dsn: mysql:dbname=thelia;host:localhost
