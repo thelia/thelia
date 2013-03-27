@@ -25,7 +25,7 @@ use Thelia\Model\ModuleQuery;
  *
  * @method ModuleQuery orderById($order = Criteria::ASC) Order by the id column
  * @method ModuleQuery orderByCode($order = Criteria::ASC) Order by the code column
- * @method ModuleQuery orderBy type($order = Criteria::ASC) Order by the  type column
+ * @method ModuleQuery orderByType($order = Criteria::ASC) Order by the type column
  * @method ModuleQuery orderByActivate($order = Criteria::ASC) Order by the activate column
  * @method ModuleQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method ModuleQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -33,7 +33,7 @@ use Thelia\Model\ModuleQuery;
  *
  * @method ModuleQuery groupById() Group by the id column
  * @method ModuleQuery groupByCode() Group by the code column
- * @method ModuleQuery groupBy type() Group by the  type column
+ * @method ModuleQuery groupByType() Group by the type column
  * @method ModuleQuery groupByActivate() Group by the activate column
  * @method ModuleQuery groupByPosition() Group by the position column
  * @method ModuleQuery groupByCreatedAt() Group by the created_at column
@@ -55,7 +55,7 @@ use Thelia\Model\ModuleQuery;
  * @method Module findOneOrCreate(PropelPDO $con = null) Return the first Module matching the query, or a new Module object populated from the query conditions when no match is found
  *
  * @method Module findOneByCode(string $code) Return the first Module filtered by the code column
- * @method Module findOneBy type(int $ type) Return the first Module filtered by the  type column
+ * @method Module findOneByType(int $type) Return the first Module filtered by the type column
  * @method Module findOneByActivate(int $activate) Return the first Module filtered by the activate column
  * @method Module findOneByPosition(int $position) Return the first Module filtered by the position column
  * @method Module findOneByCreatedAt(string $created_at) Return the first Module filtered by the created_at column
@@ -63,7 +63,7 @@ use Thelia\Model\ModuleQuery;
  *
  * @method array findById(int $id) Return Module objects filtered by the id column
  * @method array findByCode(string $code) Return Module objects filtered by the code column
- * @method array findBy type(int $ type) Return Module objects filtered by the  type column
+ * @method array findByType(int $type) Return Module objects filtered by the type column
  * @method array findByActivate(int $activate) Return Module objects filtered by the activate column
  * @method array findByPosition(int $position) Return Module objects filtered by the position column
  * @method array findByCreatedAt(string $created_at) Return Module objects filtered by the created_at column
@@ -171,7 +171,7 @@ abstract class BaseModuleQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `code`, ` type`, `activate`, `position`, `created_at`, `updated_at` FROM `module` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `code`, `type`, `activate`, `position`, `created_at`, `updated_at` FROM `module` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -332,17 +332,17 @@ abstract class BaseModuleQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the  type column
+     * Filter the query on the type column
      *
      * Example usage:
      * <code>
-     * $query->filterBy type(1234); // WHERE  type = 1234
-     * $query->filterBy type(array(12, 34)); // WHERE  type IN (12, 34)
-     * $query->filterBy type(array('min' => 12)); // WHERE  type >= 12
-     * $query->filterBy type(array('max' => 12)); // WHERE  type <= 12
+     * $query->filterByType(1234); // WHERE type = 1234
+     * $query->filterByType(array(12, 34)); // WHERE type IN (12, 34)
+     * $query->filterByType(array('min' => 12)); // WHERE type >= 12
+     * $query->filterByType(array('max' => 12)); // WHERE type <= 12
      * </code>
      *
-     * @param     mixed $ type The value to use as filter.
+     * @param     mixed $type The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -350,16 +350,16 @@ abstract class BaseModuleQuery extends ModelCriteria
      *
      * @return ModuleQuery The current query, for fluid interface
      */
-    public function filterBy type($ type = null, $comparison = null)
+    public function filterByType($type = null, $comparison = null)
     {
-        if (is_array($ type)) {
+        if (is_array($type)) {
             $useMinMax = false;
-            if (isset($ type['min'])) {
-                $this->addUsingAlias(ModulePeer:: TYPE, $ type['min'], Criteria::GREATER_EQUAL);
+            if (isset($type['min'])) {
+                $this->addUsingAlias(ModulePeer::TYPE, $type['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($ type['max'])) {
-                $this->addUsingAlias(ModulePeer:: TYPE, $ type['max'], Criteria::LESS_EQUAL);
+            if (isset($type['max'])) {
+                $this->addUsingAlias(ModulePeer::TYPE, $type['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -370,7 +370,7 @@ abstract class BaseModuleQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ModulePeer:: TYPE, $ type, $comparison);
+        return $this->addUsingAlias(ModulePeer::TYPE, $type, $comparison);
     }
 
     /**

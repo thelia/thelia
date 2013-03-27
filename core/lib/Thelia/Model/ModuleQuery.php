@@ -18,4 +18,10 @@ use Thelia\Model\om\BaseModuleQuery;
  */
 class ModuleQuery extends BaseModuleQuery
 {
+    public static function getActivated()
+    {
+        return self::create()
+            ->findByActivate(1)
+            ->find();
+    }
 }

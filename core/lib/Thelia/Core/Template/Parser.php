@@ -152,17 +152,10 @@ class Parser implements ParserInterface
 
         $tpex->init($this->container->get("request"), $this->container->get("dispatcher"), $content, THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
         $tpex->configure(
-                array(
-                    "foo" => "Test\Loop\Foo",
-                    "doobitch" => "Test\Loop\Doobitch"
-                ),
-                array(),
-                array(
-                    "secure" => "Thelia\Core\Template\BaseParam\Secure"
-                ),
-                array(
-                    "equal" => "Test\TestLoop\Equal"
-                )
+                $this->container->get("loop"),
+                $this->container->get("filter"),
+                $this->container->get("baseParam"),
+                $this->container->get("testLoop")
         );
         $this->setContent($tpex->execute());
     }

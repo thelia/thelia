@@ -64,10 +64,10 @@ abstract class BaseModule extends BaseObject implements Persistent
     protected $code;
 
     /**
-     * The value for the  type field.
+     * The value for the type field.
      * @var        int
      */
-    protected $ type;
+    protected $type;
 
     /**
      * The value for the activate field.
@@ -172,13 +172,13 @@ abstract class BaseModule extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [ type] column value.
+     * Get the [type] column value.
      *
      * @return int
      */
-    public function get type()
+    public function getType()
     {
-        return $this-> type;
+        return $this->type;
     }
 
     /**
@@ -324,25 +324,25 @@ abstract class BaseModule extends BaseObject implements Persistent
     } // setCode()
 
     /**
-     * Set the value of [ type] column.
+     * Set the value of [type] column.
      *
      * @param int $v new value
      * @return Module The current object (for fluent API support)
      */
-    public function set type($v)
+    public function setType($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this-> type !== $v) {
-            $this-> type = $v;
-            $this->modifiedColumns[] = ModulePeer:: TYPE;
+        if ($this->type !== $v) {
+            $this->type = $v;
+            $this->modifiedColumns[] = ModulePeer::TYPE;
         }
 
 
         return $this;
-    } // set type()
+    } // setType()
 
     /**
      * Set the value of [activate] column.
@@ -466,7 +466,7 @@ abstract class BaseModule extends BaseObject implements Persistent
 
             $this->id = ($row[$startcol + 0] !== null) ? (int) $row[$startcol + 0] : null;
             $this->code = ($row[$startcol + 1] !== null) ? (string) $row[$startcol + 1] : null;
-            $this-> type = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
+            $this->type = ($row[$startcol + 2] !== null) ? (int) $row[$startcol + 2] : null;
             $this->activate = ($row[$startcol + 3] !== null) ? (int) $row[$startcol + 3] : null;
             $this->position = ($row[$startcol + 4] !== null) ? (int) $row[$startcol + 4] : null;
             $this->created_at = ($row[$startcol + 5] !== null) ? (string) $row[$startcol + 5] : null;
@@ -743,8 +743,8 @@ abstract class BaseModule extends BaseObject implements Persistent
         if ($this->isColumnModified(ModulePeer::CODE)) {
             $modifiedColumns[':p' . $index++]  = '`code`';
         }
-        if ($this->isColumnModified(ModulePeer:: TYPE)) {
-            $modifiedColumns[':p' . $index++]  = '` type`';
+        if ($this->isColumnModified(ModulePeer::TYPE)) {
+            $modifiedColumns[':p' . $index++]  = '`type`';
         }
         if ($this->isColumnModified(ModulePeer::ACTIVATE)) {
             $modifiedColumns[':p' . $index++]  = '`activate`';
@@ -775,8 +775,8 @@ abstract class BaseModule extends BaseObject implements Persistent
                     case '`code`':
                         $stmt->bindValue($identifier, $this->code, PDO::PARAM_STR);
                         break;
-                    case '` type`':
-                        $stmt->bindValue($identifier, $this-> type, PDO::PARAM_INT);
+                    case '`type`':
+                        $stmt->bindValue($identifier, $this->type, PDO::PARAM_INT);
                         break;
                     case '`activate`':
                         $stmt->bindValue($identifier, $this->activate, PDO::PARAM_INT);
@@ -940,7 +940,7 @@ abstract class BaseModule extends BaseObject implements Persistent
                 return $this->getCode();
                 break;
             case 2:
-                return $this->get type();
+                return $this->getType();
                 break;
             case 3:
                 return $this->getActivate();
@@ -985,7 +985,7 @@ abstract class BaseModule extends BaseObject implements Persistent
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCode(),
-            $keys[2] => $this->get type(),
+            $keys[2] => $this->getType(),
             $keys[3] => $this->getActivate(),
             $keys[4] => $this->getPosition(),
             $keys[5] => $this->getCreatedAt(),
@@ -1039,7 +1039,7 @@ abstract class BaseModule extends BaseObject implements Persistent
                 $this->setCode($value);
                 break;
             case 2:
-                $this->set type($value);
+                $this->setType($value);
                 break;
             case 3:
                 $this->setActivate($value);
@@ -1079,7 +1079,7 @@ abstract class BaseModule extends BaseObject implements Persistent
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->set type($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setType($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setActivate($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
@@ -1097,7 +1097,7 @@ abstract class BaseModule extends BaseObject implements Persistent
 
         if ($this->isColumnModified(ModulePeer::ID)) $criteria->add(ModulePeer::ID, $this->id);
         if ($this->isColumnModified(ModulePeer::CODE)) $criteria->add(ModulePeer::CODE, $this->code);
-        if ($this->isColumnModified(ModulePeer:: TYPE)) $criteria->add(ModulePeer:: TYPE, $this-> type);
+        if ($this->isColumnModified(ModulePeer::TYPE)) $criteria->add(ModulePeer::TYPE, $this->type);
         if ($this->isColumnModified(ModulePeer::ACTIVATE)) $criteria->add(ModulePeer::ACTIVATE, $this->activate);
         if ($this->isColumnModified(ModulePeer::POSITION)) $criteria->add(ModulePeer::POSITION, $this->position);
         if ($this->isColumnModified(ModulePeer::CREATED_AT)) $criteria->add(ModulePeer::CREATED_AT, $this->created_at);
@@ -1166,7 +1166,7 @@ abstract class BaseModule extends BaseObject implements Persistent
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCode($this->getCode());
-        $copyObj->set type($this->get type());
+        $copyObj->setType($this->getType());
         $copyObj->setActivate($this->getActivate());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -1732,7 +1732,7 @@ abstract class BaseModule extends BaseObject implements Persistent
     {
         $this->id = null;
         $this->code = null;
-        $this-> type = null;
+        $this->type = null;
         $this->activate = null;
         $this->position = null;
         $this->created_at = null;

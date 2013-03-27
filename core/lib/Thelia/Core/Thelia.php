@@ -94,7 +94,53 @@ class Thelia extends Kernel
      */
     public function loadConfiguration()
     {
+        /**
+         * TODO :
+         *  - Retrieve all actives plugins
+         *  - load config (create a cache and use this cache
+         */
+        $container = $this->getContainer();
 
+        /**
+         * Set all listener here.
+         * Use $dispatcher->addSubscriber or addListener ?
+         */
+        $dispatcher = $container->get("dispatcher");
+
+
+
+
+        /**
+         * manage Tpex configuration here
+         */
+
+        $config =\Symfony\Component\Config\Util\XmlUtils::loadFile(THELIA_PLUGIN_DIR  . "/Test/Config/config.xml");
+        var_dump(\Symfony\Component\Config\Util\XmlUtils::convertDomElementToArray($config->documentElement));
+
+        $this->getLoopConfig();
+
+        $container->set("loop", array(
+            "foo" => "Test\Loop\Foo",
+            "doobitch" => "Test\Loop\Doobitch"
+        ));
+
+        $container->set("filter", array());
+
+        $container->set("baseParam", array());
+
+        $container->set("testLoop", array(
+            "equal" => "Test\TestLoop\Equal"
+        ));
+
+
+
+    }
+
+    protected function getLoopConfig()
+    {
+        $modules = \Thelia\Model\ModuleQuery::getActivated();
+
+        var_dump($modules);
     }
     
     /**
