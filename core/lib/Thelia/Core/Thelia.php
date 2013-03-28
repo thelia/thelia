@@ -35,6 +35,9 @@ namespace Thelia\Core;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Config\ConfigCache;
+use Symfony\Component\Config\Resource\FileResource;
+use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Yaml\Yaml;
 
 
@@ -42,12 +45,15 @@ use Thelia\Core\Bundle;
 use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
+use Thelia\Config\Dumper\TpexConfigDumper;
 
 use Propel;
 use PropelConfiguration;
 
 class Thelia extends Kernel
 {
+
+    protected $tpexConfig;
     
     public function init()
     {
@@ -114,33 +120,97 @@ class Thelia extends Kernel
          * manage Tpex configuration here
          */
 
-        $config =\Symfony\Component\Config\Util\XmlUtils::loadFile(THELIA_PLUGIN_DIR  . "/Test/Config/config.xml");
-        var_dump(\Symfony\Component\Config\Util\XmlUtils::convertDomElementToArray($config->documentElement));
+        $file = $this->getCacheDir() . "/TpexConfig.php";
+        $configCache = new ConfigCache($file, $this->debug);
 
-        $this->getLoopConfig();
+        if (!$configCache->isFresh()) {
+            $this->generateTpexConfigCache($configCache);
+        }
 
-        $container->set("loop", array(
-            "foo" => "Test\Loop\Foo",
-            "doobitch" => "Test\Loop\Doobitch"
-        ));
+        require_once $configCache;
 
-        $container->set("filter", array());
+        $this->tpexConfig = new \TpexConfig();
 
-        $container->set("baseParam", array());
+        $container->set("loop", $this->tpexConfig->getLoopConfig());
 
-        $container->set("testLoop", array(
-            "equal" => "Test\TestLoop\Equal"
-        ));
+        $container->set("filter", $this->tpexConfig->getFilterConfig());
 
+        $container->set("baseParam", $this->tpexConfig->getBaseParamConfig());
 
+        $container->set("testLoop", $this->tpexConfig->getLoopTestConfig());
 
     }
 
-    protected function getLoopConfig()
+    protected function generateTpexConfigCache(ConfigCache $cache)
     {
+        $loopConfig = array();
+        $filterConfig = array();
+        $baseParamConfig = array();
+        $loopTestConfig = array();
+        $resources = array();
+
+        //load master config, can be overload using modules
+
+        $masterConfigFile = THELIA_ROOT . "/core/lib/Thelia/config.xml";
+
+        if (file_exists($masterConfigFile)) {
+            $resources[] = new FileResource($masterConfigFile);
+
+            $dom = XmlUtils::loadFile($masterConfigFile);
+
+            $loopConfig = $this->processConfig($dom->getElementsByTagName("loop"));
+
+            $filterConfig = $this->processConfig($dom->getElementsByTagName("filter"));
+
+            $baseParamConfig = $this->processConfig($dom->getElementsByTagName("baseParam"));
+
+            $loopTestConfig = $this->processConfig($dom->getElementsByTagName("testLoop"));
+        }
+
+
         $modules = \Thelia\Model\ModuleQuery::getActivated();
 
-        var_dump($modules);
+        foreach ($modules as $module) {
+            $configFile = THELIA_PLUGIN_DIR . "/" . ucfirst($module->getCode()) . "/Config/config.xml";
+            if (file_exists($configFile)) {
+                $resources[] = new FileResource($configFile);
+                $dom = XmlUtils::loadFile($configFile);
+
+                $loopConfig = array_merge($loopConfig, $this->processConfig($dom->getElementsByTagName("loop")));
+
+                $filterConfig = array_merge($filterConfig, $this->processConfig($dom->getElementsByTagName("filter")));
+
+                $baseParamConfig = array_merge(
+                    $baseParamConfig,
+                    $this->processConfig($dom->getElementsByTagName("baseParam"))
+                );
+
+                $loopTestConfig = array_merge(
+                    $loopTestConfig,
+                    $this->processConfig($dom->getElementsByTagName("testLoop"))
+                );
+
+            }
+        }
+
+        $tpexConfig = new TpexConfigDumper(
+            $loopConfig,
+            $filterConfig,
+            $baseParamConfig,
+            $loopTestConfig
+        );
+
+        $cache->write($tpexConfig->dump(), $resources);
+    }
+
+    protected function processConfig(\DOMNodeList $elements)
+    {
+        $result = array();
+        for ($i = 0; $i < $elements->length; $i ++) {
+            $element = XmlUtils::convertDomElementToArray($elements->item($i));
+            $result[$element["name"]] = $element["class"];
+        }
+        return $result;
     }
     
     /**
@@ -152,7 +222,7 @@ class Thelia extends Kernel
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
     
-    
+
     /**
      * 
      * boot parent kernel and after current kernel
@@ -160,9 +230,6 @@ class Thelia extends Kernel
      */
     public function boot()
     {
-        
-        
-        
         parent::boot();
         
         $this->loadConfiguration();

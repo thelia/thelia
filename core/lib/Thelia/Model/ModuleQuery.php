@@ -18,10 +18,14 @@ use Thelia\Model\om\BaseModuleQuery;
  */
 class ModuleQuery extends BaseModuleQuery
 {
+    /**
+     * @return array|mixed|\PropelObjectCollection
+     */
     public static function getActivated()
     {
         return self::create()
-            ->findByActivate(1)
-            ->find();
+            ->filterByActivate(1)
+            ->find()
+            ;
     }
 }

@@ -565,6 +565,10 @@ abstract class BaseModulePeer
             $criteria = $values->buildCriteria(); // build Criteria from Module object
         }
 
+        if ($criteria->containsKey(ModulePeer::ID) && $criteria->keyContainsValue(ModulePeer::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ModulePeer::ID.')');
+        }
+
 
         // Set the correct dbName
         $criteria->setDbName(ModulePeer::DATABASE_NAME);

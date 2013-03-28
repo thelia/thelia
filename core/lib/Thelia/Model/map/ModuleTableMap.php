@@ -40,7 +40,7 @@ class ModuleTableMap extends TableMap
         $this->setPhpName('Module');
         $this->setClassname('Thelia\\Model\\Module');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(false);
+        $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('code', 'Code', 'VARCHAR', true, 55, null);
