@@ -1,0 +1,8 @@
+<root>
+    <testLoops>
+        <testLoop name="equal" class="Test\TestLoop\Equal"/>
+    </testLoops>
+    <loops>
+        <loop name="foo" class="Foo\Bar"/>
+    </loops>
+</root>

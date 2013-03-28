@@ -32,6 +32,7 @@ namespace Thelia\Core;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -39,6 +40,7 @@ use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 
 use Thelia\Core\Bundle;
@@ -46,6 +48,7 @@ use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
 use Thelia\Config\Dumper\TpexConfigDumper;
+use Thelia\Core\TheliaContainerBuilder;
 
 use Propel;
 use PropelConfiguration;
@@ -98,14 +101,14 @@ class Thelia extends Kernel
      * Initialize all plugins
      * 
      */
-    public function loadConfiguration()
+    public function loadConfiguration(ContainerBuilder $container)
     {
         /**
          * TODO :
          *  - Retrieve all actives plugins
          *  - load config (create a cache and use this cache
          */
-        $container = $this->getContainer();
+
 
         /**
          * Set all listener here.
@@ -119,29 +122,15 @@ class Thelia extends Kernel
         /**
          * manage Tpex configuration here
          */
+        $container = $this->generateTpexConfig($container);
 
-        $file = $this->getCacheDir() . "/TpexConfig.php";
-        $configCache = new ConfigCache($file, $this->debug);
 
-        if (!$configCache->isFresh()) {
-            $this->generateTpexConfigCache($configCache);
-        }
 
-        require_once $configCache;
-
-        $this->tpexConfig = new \TpexConfig();
-
-        $container->set("loop", $this->tpexConfig->getLoopConfig());
-
-        $container->set("filter", $this->tpexConfig->getFilterConfig());
-
-        $container->set("baseParam", $this->tpexConfig->getBaseParamConfig());
-
-        $container->set("testLoop", $this->tpexConfig->getLoopTestConfig());
+        return $container;
 
     }
 
-    protected function generateTpexConfigCache(ConfigCache $cache)
+    protected function generateTpexConfig(ContainerBuilder $container)
     {
         $loopConfig = array();
         $filterConfig = array();
@@ -154,7 +143,7 @@ class Thelia extends Kernel
         $masterConfigFile = THELIA_ROOT . "/core/lib/Thelia/config.xml";
 
         if (file_exists($masterConfigFile)) {
-            $resources[] = new FileResource($masterConfigFile);
+            $container->addResource(new FileResource($masterConfigFile));
 
             $dom = XmlUtils::loadFile($masterConfigFile);
 
@@ -173,7 +162,7 @@ class Thelia extends Kernel
         foreach ($modules as $module) {
             $configFile = THELIA_PLUGIN_DIR . "/" . ucfirst($module->getCode()) . "/Config/config.xml";
             if (file_exists($configFile)) {
-                $resources[] = new FileResource($configFile);
+                $container->addResource(new FileResource($configFile));
                 $dom = XmlUtils::loadFile($configFile);
 
                 $loopConfig = array_merge($loopConfig, $this->processConfig($dom->getElementsByTagName("loop")));
@@ -193,14 +182,15 @@ class Thelia extends Kernel
             }
         }
 
-        $tpexConfig = new TpexConfigDumper(
-            $loopConfig,
-            $filterConfig,
-            $baseParamConfig,
-            $loopTestConfig
-        );
+        $container->setParameter("Tpex.loop", $loopConfig);
 
-        $cache->write($tpexConfig->dump(), $resources);
+        $container->setParameter("Tpex.filter", $filterConfig);
+
+        $container->setParameter("Tpex.baseParam", $baseParamConfig);
+
+        $container->setParameter("Tpex.testLoop", $loopTestConfig);
+
+        return $container;
     }
 
     protected function processConfig(\DOMNodeList $elements)
@@ -221,18 +211,33 @@ class Thelia extends Kernel
      * 
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
-    
 
     /**
-     * 
-     * boot parent kernel and after current kernel
-     * 
+     * Gets a new ContainerBuilder instance used to build the service container.
+     *
+     * @return ContainerBuilder
      */
-    public function boot()
+    protected function getContainerBuilder()
     {
-        parent::boot();
-        
-        $this->loadConfiguration();
+        return new TheliaContainerBuilder(new ParameterBag($this->getKernelParameters()));
+    }
+
+    /**
+     * Builds the service container.
+     *
+     * @return ContainerBuilder The compiled service container
+     *
+     * @throws \RuntimeException
+     */
+    protected function buildContainer()
+    {
+        $container = parent::buildContainer();
+
+        $container = $this->loadConfiguration($container);
+
+        $container->customCompile();
+
+        return $container;
     }
 
     /**
@@ -267,23 +272,6 @@ class Thelia extends Kernel
             return parent::getLogDir();
         }
     }
-
-    /**
-     * Builds the service container.
-     *
-     * @return ContainerBuilder The compiled service container
-     */
-//    protected function buildContainer()
-//    {
-//        $container = $this->getContainerBuilder();
-//        $container->set('kernel', $this);
-//
-//        foreach ($this->bundles as $bundle) {
-//            $bundle->build($container);
-//        }
-//
-//        return $container;
-//    }
 
     /**
      * return available bundle

@@ -1,0 +1,6 @@
+<plugin>
+    <loops>
+        <loop name="foo" class="Test\Loop\Foo"/>
+        <loop name="doobitch" class="Test\Loop\Doobitch"/>
+    </loops>
+</plugin>
