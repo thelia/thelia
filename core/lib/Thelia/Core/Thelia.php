@@ -47,8 +47,9 @@ use Thelia\Core\Bundle;
 use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
-use Thelia\Config\Dumper\TpexConfigDumper;
 use Thelia\Core\TheliaContainerBuilder;
+use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\Config\FileLocator;
 
 use Propel;
 use PropelConfiguration;
@@ -101,106 +102,23 @@ class Thelia extends Kernel
      * Initialize all plugins
      * 
      */
-    public function loadConfiguration(ContainerBuilder $container)
+    protected function loadConfiguration(ContainerBuilder $container)
     {
-        /**
-         * TODO :
-         *  - Retrieve all actives plugins
-         *  - load config (create a cache and use this cache
-         */
 
-
-        /**
-         * Set all listener here.
-         * Use $dispatcher->addSubscriber or addListener ?
-         */
-        $dispatcher = $container->get("dispatcher");
-
-
-
-
-        /**
-         * manage Tpex configuration here
-         */
-        $container = $this->generateTpexConfig($container);
-
-
-
-        return $container;
-
-    }
-
-    protected function generateTpexConfig(ContainerBuilder $container)
-    {
-        $loopConfig = array();
-        $filterConfig = array();
-        $baseParamConfig = array();
-        $loopTestConfig = array();
-        $resources = array();
-
-        //load master config, can be overload using modules
-
-        $masterConfigFile = THELIA_ROOT . "/core/lib/Thelia/config.xml";
-
-        if (file_exists($masterConfigFile)) {
-            $container->addResource(new FileResource($masterConfigFile));
-
-            $dom = XmlUtils::loadFile($masterConfigFile);
-
-            $loopConfig = $this->processConfig($dom->getElementsByTagName("loop"));
-
-            $filterConfig = $this->processConfig($dom->getElementsByTagName("filter"));
-
-            $baseParamConfig = $this->processConfig($dom->getElementsByTagName("baseParam"));
-
-            $loopTestConfig = $this->processConfig($dom->getElementsByTagName("testLoop"));
-        }
-
+        $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia"));
+        $loader->load("config.xml");
 
         $modules = \Thelia\Model\ModuleQuery::getActivated();
 
         foreach ($modules as $module) {
-            $configFile = THELIA_PLUGIN_DIR . "/" . ucfirst($module->getCode()) . "/Config/config.xml";
-            if (file_exists($configFile)) {
-                $container->addResource(new FileResource($configFile));
-                $dom = XmlUtils::loadFile($configFile);
 
-                $loopConfig = array_merge($loopConfig, $this->processConfig($dom->getElementsByTagName("loop")));
-
-                $filterConfig = array_merge($filterConfig, $this->processConfig($dom->getElementsByTagName("filter")));
-
-                $baseParamConfig = array_merge(
-                    $baseParamConfig,
-                    $this->processConfig($dom->getElementsByTagName("baseParam"))
-                );
-
-                $loopTestConfig = array_merge(
-                    $loopTestConfig,
-                    $this->processConfig($dom->getElementsByTagName("testLoop"))
-                );
+            try {
+                $loader = new XmlFileLoader($container, new FileLocator(THELIA_PLUGIN_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
+                $loader->load("config.xml");
+            } catch(\InvalidArgumentException $e) {
 
             }
         }
-
-        $container->setParameter("Tpex.loop", $loopConfig);
-
-        $container->setParameter("Tpex.filter", $filterConfig);
-
-        $container->setParameter("Tpex.baseParam", $baseParamConfig);
-
-        $container->setParameter("Tpex.testLoop", $loopTestConfig);
-
-        return $container;
-    }
-
-    protected function processConfig(\DOMNodeList $elements)
-    {
-        $result = array();
-        for ($i = 0; $i < $elements->length; $i ++) {
-            $element = XmlUtils::convertDomElementToArray($elements->item($i));
-            $result[$element["name"]] = $element["class"];
-        }
-        return $result;
     }
     
     /**
@@ -233,8 +151,7 @@ class Thelia extends Kernel
     {
         $container = parent::buildContainer();
 
-        $container = $this->loadConfiguration($container);
-
+        $this->loadConfiguration($container);
         $container->customCompile();
 
         return $container;

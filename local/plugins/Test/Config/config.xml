@@ -1,6 +1,17 @@
-<plugin>
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <testLoops>
+        <testLoop name="equal" class="Test\TestLoop\Equal"/>
+    </testLoops>
+
     <loops>
         <loop name="foo" class="Test\Loop\Foo"/>
         <loop name="doobitch" class="Test\Loop\Doobitch"/>
     </loops>
-</plugin>
+
+</config>
+
