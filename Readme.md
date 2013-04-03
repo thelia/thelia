@@ -23,16 +23,9 @@ $ php composer.phar install
 Create a mysql database and import sql dump files located in the install folder : thelia.sql first, then insert.sql.
 
 Configure mysql connection : 
-``` bash
-$ cd local/config
-$ cp config_db.mysql.php config_db.php
-```
 
-Edit config_db.php file and fulfill your mysql connection parameters :
-- replace ```__DB_LOGIN__``` with your mysql user
-- replace ```__DB_PASSWORD__``` with your mysql password
-- replace ```__DB_NAME__``` with you database name
-- replace ```__DB_HOST__``` with your mysql host
+* rename ```local/config/database.yml.sample"``` into ```local/config/database.yml```
+* edit ```local/config/database.yml``` file and add needed information
 
 Usage
 -----
