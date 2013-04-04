@@ -26,7 +26,12 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
-
+/**
+ * Class RegisterListenersPass
+ * @package Thelia\Core\DependencyInjection\Compiler
+ *
+ * Source code come from Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\RegisterKernelListenersPass class
+ */
 class RegisterListenersPass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container)

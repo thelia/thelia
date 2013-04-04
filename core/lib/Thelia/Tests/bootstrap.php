@@ -8,6 +8,10 @@
 $env = "test";
 require_once __DIR__ . '/../../../bootstrap.php';
 
+use Thelia\Core\Thelia;
+
+$thelia = new Thelia("test", true);
 
 
-\Propel::init(THELIA_ROOT . "/core/lib/Thelia/Tests/Db/thelia-conf.php");
+
+
