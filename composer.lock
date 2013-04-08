@@ -1,6 +1,50 @@
 {
-    "hash": "89f5db06d70dd16aa1ba0f4983c89335",
+    "hash": "b0cd7b00eccd6c31a028d4536d822017",
     "packages": [
+        {
+            "name": "ezyang/htmlpurifier",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ezyang/htmlpurifier.git",
+                "reference": "v4.5.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/v4.5.0",
+                "reference": "v4.5.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "HTMLPurifier": "library/"
+                },
+                "files": [
+                    "library/HTMLPurifier.composer.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL"
+            ],
+            "authors": [
+                {
+                    "name": "Edward Z. Yang",
+                    "email": "admin@htmlpurifier.org",
+                    "homepage": "http://ezyang.com"
+                }
+            ],
+            "description": "Standards compliant HTML filter written in PHP",
+            "homepage": "http://htmlpurifier.org/",
+            "keywords": [
+                "html"
+            ],
+            "time": "2013-02-18 00:04:08"
+        },
         {
             "name": "ircmaxell/password-compat",
             "version": "dev-master",
@@ -94,16 +138,16 @@
         },
         {
             "name": "propel/propel1",
-            "version": "1.6.8",
+            "version": "1.6.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel.git",
-                "reference": "1.6.8"
+                "reference": "1.6.9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel/zipball/1.6.8",
-                "reference": "1.6.8",
+                "url": "https://api.github.com/repos/propelorm/Propel/zipball/1.6.9",
+                "reference": "1.6.9",
                 "shasum": ""
             },
             "require": {
@@ -150,7 +194,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2013-02-14 20:50:27"
+            "time": "2013-03-31 17:20:51"
         },
         {
             "name": "psr/log",
@@ -676,6 +720,7 @@
     ],
     "minimum-stability": "stable",
     "stability-flags": {
+        "ezyang/htmlpurifier": 20,
         "ircmaxell/password-compat": 20
     },
     "platform": {
