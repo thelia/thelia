@@ -7,7 +7,7 @@
         "wiki" : "http://thelia.net/wiki"
     },
     "require":{
-        "php": ">=5.4.0",
+        "php": ">=5.3.7",
         "ezyang/htmlpurifier": "dev-master",
         "ircmaxell/password-compat": "dev-master",
         "propel/propel1" : "1.6.*",
