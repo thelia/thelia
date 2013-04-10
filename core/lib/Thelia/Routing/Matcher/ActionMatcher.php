@@ -64,7 +64,13 @@ class ActionMatcher implements RequestMatcherInterface
     protected function dispatchAction(Request $request, $action)
     {
         $controller = null;
-        switch ($action) {
+        $event = new ActionEvent($request, $action);
+        $this->dispatcher->dispatch(TheliaEvents::ACTION, $event);
+        if ($event->hasController()) {
+            $controller = $event->getController();
+        }
+
+/*        switch ($action) {
             case 'addProduct':
                 $controller = array(
                     new Cart($this->dispatcher),
@@ -78,7 +84,7 @@ class ActionMatcher implements RequestMatcherInterface
                     $controller = $event->getController();
                 }
                 break;
-        }
+        }*/
 
         if ($controller) {
             return array(

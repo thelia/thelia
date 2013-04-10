@@ -14,8 +14,44 @@
             <xsd:element name="baseParams" type="baseParams" />
             <xsd:element name="testLoops" type="testLoops" />
             <xsd:element name="services" type="services" />
+            <xsd:element name="parameters" type="parameters"/>
         </xsd:choice>
     </xsd:complexType>
+
+    <xsd:complexType name="parameters">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+            <xsd:element name="parameter" type="parameter" />
+        </xsd:choice>
+        <xsd:attribute name="type" type="parameter_type" />
+        <xsd:attribute name="key" type="xsd:string" />
+    </xsd:complexType>
+
+    <xsd:complexType name="parameter" mixed="true">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="parameter" type="parameter" />
+        </xsd:choice>
+        <xsd:attribute name="type" type="parameter_type" />
+        <xsd:attribute name="id" type="xsd:string" />
+        <xsd:attribute name="key" type="xsd:string" />
+        <xsd:attribute name="on-invalid" type="invalid_sequence" />
+    </xsd:complexType>
+
+    <xsd:simpleType name="parameter_type">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="collection" />
+            <xsd:enumeration value="service" />
+            <xsd:enumeration value="string" />
+            <xsd:enumeration value="constant" />
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="invalid_sequence">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="null" />
+            <xsd:enumeration value="ignore" />
+            <xsd:enumeration value="exception" />
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:complexType name="loops">
         <xsd:choice minOccurs="1" maxOccurs="unbounded" >

@@ -53,8 +53,6 @@ class XmlFileLoader extends FileLoader
 
         $this->container->addResource(new FileResource($path));
 
-        $this->parseDefinitions($xml, $path);
-
         $this->parseLoops($xml);
 
         $this->parseFilters($xml);
@@ -62,8 +60,32 @@ class XmlFileLoader extends FileLoader
         $this->parseBaseParams($xml);
 
         $this->parseTestLoops($xml);
+
+        $this->parseParameters($xml);
+
+        $this->parseDefinitions($xml, $path);
     }
 
+    /**
+     * Parses parameters
+     *
+     * @param SimpleXMLElement $xml
+     */
+    protected function parseParameters(SimpleXMLElement $xml)
+    {
+        if (!$xml->parameters) {
+            return;
+        }
+
+        $this->container->getParameterBag()->add($xml->parameters->getArgumentsAsPhp('parameter'));
+    }
+
+    /**
+     *
+     * parse Loops property
+     *
+     * @param SimpleXMLElement $xml
+     */
     protected function parseLoops(SimpleXMLElement $xml)
     {
         if (false === $loops = $xml->xpath('//config:loops/config:loop')) {
@@ -82,6 +104,11 @@ class XmlFileLoader extends FileLoader
         $this->container->setParameter("Tpex.loop", $loopConfig);
     }
 
+    /**
+     * parse Filters property
+     *
+     * @param SimpleXMLElement $xml
+     */
     protected function parseFilters(SimpleXMLElement $xml)
     {
         if (false === $filters = $xml->xpath('//config:filters/config:filter')) {
@@ -100,6 +127,11 @@ class XmlFileLoader extends FileLoader
         $this->container->setParameter("Tpex.filter", $filterConfig);
     }
 
+    /**
+     * parse BaseParams property
+     *
+     * @param SimpleXMLElement $xml
+     */
     protected function parseBaseParams(SimpleXMLElement $xml)
     {
         if (false === $baseParams = $xml->xpath('//config:baseParams/config:baseParam')) {
@@ -118,6 +150,11 @@ class XmlFileLoader extends FileLoader
         $this->container->setParameter("Tpex.baseParam", $baseParamConfig);
     }
 
+    /**
+     * parse testLoops property
+     *
+     * @param SimpleXMLElement $xml
+     */
     protected function parseTestLoops(SimpleXMLElement $xml)
     {
         if (false === $testLoops = $xml->xpath('//config:testLoops/config:testLoop')) {
