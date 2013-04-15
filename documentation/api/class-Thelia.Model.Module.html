@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\Module | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -423,11 +441,20 @@ exist in the output directory.</p>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
-Thelia\Model\om\BaseModule
+BaseObject
 			
 			
 		</dd>
 		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
+			<a href="class-Thelia.Model.om.BaseModule.html"><span>Thelia\Model\om\BaseModule</span></a>
+			
+			 implements 
+<span>Persistent</span>
+			
+			
+		</dd>
+		<dd style="padding-left:60px">
 			<img src="resources/inherit.png" alt="Extended by" />
 <b><span>Thelia\Model\Module</span></b>			
 			
@@ -454,6 +481,91 @@ Thelia\Model\om\BaseModule
 
 
 
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Thelia.Model.om.BaseModule.html#methods">Thelia\Model\om\BaseModule</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Thelia.Model.om.BaseModule.html#___toString">__toString()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_addGroupModule">addGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_addModuleI18n">addModuleI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_buildCriteria">buildCriteria()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_buildPkeyCriteria">buildPkeyCriteria()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_clear">clear()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_clearAllReferences">clearAllReferences()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_clearGroupModules">clearGroupModules()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_clearModuleI18ns">clearModuleI18ns()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_copy">copy()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_copyInto">copyInto()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_countGroupModules">countGroupModules()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_countModuleI18ns">countModuleI18ns()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_delete">delete()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_doAddGroupModule">doAddGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_doAddModuleI18n">doAddModuleI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_doInsert">doInsert()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_doSave">doSave()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_doUpdate">doUpdate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_doValidate">doValidate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_ensureConsistency">ensureConsistency()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_fromArray">fromArray()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getActivate">getActivate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getByName">getByName()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getByPosition">getByPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getChapo">getChapo()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getCode">getCode()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getCreatedAt">getCreatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getCurrentTranslation">getCurrentTranslation()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getDescription">getDescription()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getGroupModules">getGroupModules()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getGroupModulesJoinGroup">getGroupModulesJoinGroup()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getId">getId()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getLocale">getLocale()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getModuleI18ns">getModuleI18ns()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getPeer">getPeer()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getPosition">getPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getPostscriptum">getPostscriptum()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getPrimaryKey">getPrimaryKey()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getTitle">getTitle()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getTranslation">getTranslation()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getType">getType()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getUpdatedAt">getUpdatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_getValidationFailures">getValidationFailures()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_hasOnlyDefaultValues">hasOnlyDefaultValues()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_hydrate">hydrate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_initGroupModules">initGroupModules()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_initModuleI18ns">initModuleI18ns()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_initRelation">initRelation()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_isAlreadyInSave">isAlreadyInSave()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_isPrimaryKeyNull">isPrimaryKeyNull()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_keepUpdateDateUnchanged">keepUpdateDateUnchanged()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_reload">reload()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_removeGroupModule">removeGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_removeModuleI18n">removeModuleI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_removeTranslation">removeTranslation()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_resetPartialGroupModules">resetPartialGroupModules()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_resetPartialModuleI18ns">resetPartialModuleI18ns()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_save">save()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setActivate">setActivate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setByName">setByName()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setByPosition">setByPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setChapo">setChapo()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setCode">setCode()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setCreatedAt">setCreatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setDescription">setDescription()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setGroupModules">setGroupModules()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setId">setId()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setLocale">setLocale()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setModuleI18ns">setModuleI18ns()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setPosition">setPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setPostscriptum">setPostscriptum()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setPrimaryKey">setPrimaryKey()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setTitle">setTitle()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setType">setType()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_setUpdatedAt">setUpdatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_toArray">toArray()</a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#_validate">validate()</a>
+		</code></td>
+	</tr>
+	</table>
 
 
 
@@ -462,10 +574,46 @@ Thelia\Model\om\BaseModule
 
 
 
+	<table class="summary inherited">
+	<caption>Constants inherited from <a href="class-Thelia.Model.om.BaseModule.html#constants">Thelia\Model\om\BaseModule</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Thelia.Model.om.BaseModule.html#PEER"><b>PEER</b></a>
+		</code></td>
+	</tr>
+	</table>
 
 
 
 
+	<table class="summary inherited">
+	<caption>Properties inherited from <a href="class-Thelia.Model.om.BaseModule.html#properties">Thelia\Model\om\BaseModule</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Thelia.Model.om.BaseModule.html#$activate"><var>$activate</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$alreadyInClearAllReferencesDeep"><var>$alreadyInClearAllReferencesDeep</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$alreadyInSave"><var>$alreadyInSave</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$alreadyInValidation"><var>$alreadyInValidation</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$code"><var>$code</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$collGroupModules"><var>$collGroupModules</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$collGroupModulesPartial"><var>$collGroupModulesPartial</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$collModuleI18ns"><var>$collModuleI18ns</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$collModuleI18nsPartial"><var>$collModuleI18nsPartial</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$created_at"><var>$created_at</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$currentLocale"><var>$currentLocale</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$currentTranslations"><var>$currentTranslations</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$groupModulesScheduledForDeletion"><var>$groupModulesScheduledForDeletion</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$id"><var>$id</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$moduleI18nsScheduledForDeletion"><var>$moduleI18nsScheduledForDeletion</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$peer"><var>$peer</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$position"><var>$position</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$startCopy"><var>$startCopy</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$type"><var>$type</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$updated_at"><var>$updated_at</var></a>, 
+			<a href="class-Thelia.Model.om.BaseModule.html#$validationFailures"><var>$validationFailures</var></a>
+		</code></td>
+	</tr>
+	</table>
 
 
 

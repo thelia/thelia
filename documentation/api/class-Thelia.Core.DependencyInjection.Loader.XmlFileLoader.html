@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="generator" content="ApiGen 2.8.0" />
+
+	<title>Class Thelia\Core\DependencyInjection\Loader\XmlFileLoader | thelia</title>
+
+	<script type="text/javascript" src="resources/combined.js?394153670"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
+	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
+
+</head>
+
+<body>
+<div id="left">
+	<div id="menu">
+		<a href="index.html" title="Overview"><span>Overview</span></a>
+
+
+		<div id="groups">
+			<h3>Namespaces</h3>
+			<ul>
+				<li class="active"><a href="namespace-Thelia.html">Thelia<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Action.html">Action</a>
+						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
+				<li><a href="namespace-Thelia.Controller.html">Controller</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Core.html">Core<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li class="active"><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.Template.html">Template<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.Template.BaseParam.html">BaseParam</a>
+						</li>
+							</ul></li></ul></li>
+				<li><a href="namespace-Thelia.Exception.html">Exception</a>
+						</li>
+				<li><a href="namespace-Thelia.Log.html">Log<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Log.Destination.html">Destination</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Model.html">Model<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Model.map.html">map</a>
+						</li>
+				<li><a href="namespace-Thelia.Model.om.html">om</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Routing.html">Routing<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Routing.Matcher.html">Matcher</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tools.html">Tools</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.html">Tpex<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
+						</li>
+							</ul></li></ul></li>
+			</ul>
+		</div>
+
+		<hr />
+
+
+		<div id="elements">
+			<h3>Classes</h3>
+			<ul>
+				<li class="active"><a href="class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html">XmlFileLoader</a></li>
+			</ul>
+
+
+
+
+
+		</div>
+	</div>
+</div>
+
+<div id="splitter"></div>
+
+<div id="right">
+<div id="rightInner">
+	<form id="search">
+		<input type="hidden" name="cx" value="" />
+		<input type="hidden" name="ie" value="UTF-8" />
+		<input type="text" name="q" class="text" />
+		<input type="submit" value="Search" />
+	</form>
+
+	<div id="navigation">
+		<ul>
+			<li>
+				<a href="index.html" title="Overview"><span>Overview</span></a>
+			</li>
+			<li>
+				<a href="namespace-Thelia.Core.DependencyInjection.Loader.html" title="Summary of Thelia\Core\DependencyInjection\Loader"><span>Namespace</span></a>
+			</li>
+			<li class="active">
+<span>Class</span>			</li>
+		</ul>
+		<ul>
+			<li>
+				<a href="tree.html" title="Tree view of classes, interfaces, traits and exceptions"><span>Tree</span></a>
+			</li>
+		</ul>
+		<ul>
+		</ul>
+	</div>
+
+<div id="content" class="class">
+	<h1>Class XmlFileLoader</h1>
+
+
+
+	<dl class="tree">
+		<dd style="padding-left:0px">
+Symfony\Component\DependencyInjection\Loader\FileLoader
+			
+			
+		</dd>
+		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
+<b><span>Thelia\Core\DependencyInjection\Loader\XmlFileLoader</span></b>			
+			
+			
+		</dd>
+	</dl>
+
+
+
+
+
+
+
+
+	<div class="info">
+		
+		
+		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Core.html">Core</a>\<a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection</a>\<a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a><br />
+		
+
+		<b>Located at</b> <a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#39-351" title="Go to source code">core/lib/Thelia/Core/DependencyInjection/Loader/XmlFileLoader.php</a><br />
+	</div>
+
+
+
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="load" id="_load">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_load">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#41-67" title="Go to source code">load</a>( <span>mixed <var>$file</var></span>, <span>string <var>$type</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Loads an XML file.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Loads an XML file.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$file</var></dt>
+					<dd><code>mixed</code><br>$file The resource</dd>
+					<dt><var>$type</var></dt>
+					<dd><code>string</code><br>$type The resource type</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseParameters" id="_parseParameters">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseParameters">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#69-81" title="Go to source code">parseParameters</a>( <span>Symfony\Component\DependencyInjection\SimpleXMLElement <var>$xml</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parses parameters</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parses parameters</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$xml</var></dt>
+					<dd><code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br>$xml</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseLoops" id="_parseLoops">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseLoops">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#83-105" title="Go to source code">parseLoops</a>( <span>Symfony\Component\DependencyInjection\SimpleXMLElement <var>$xml</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>parse Loops property</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$xml</var></dt>
+					<dd><code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br>$xml</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseFilters" id="_parseFilters">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseFilters">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#107-128" title="Go to source code">parseFilters</a>( <span>Symfony\Component\DependencyInjection\SimpleXMLElement <var>$xml</var></span> )</code>
+
+		<div class="description short">
+			
+<p>parse Filters property</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>parse Filters property</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$xml</var></dt>
+					<dd><code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br>$xml</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseBaseParams" id="_parseBaseParams">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseBaseParams">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#130-151" title="Go to source code">parseBaseParams</a>( <span>Symfony\Component\DependencyInjection\SimpleXMLElement <var>$xml</var></span> )</code>
+
+		<div class="description short">
+			
+<p>parse BaseParams property</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>parse BaseParams property</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$xml</var></dt>
+					<dd><code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br>$xml</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseTestLoops" id="_parseTestLoops">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseTestLoops">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#153-174" title="Go to source code">parseTestLoops</a>( <span>Symfony\Component\DependencyInjection\SimpleXMLElement <var>$xml</var></span> )</code>
+
+		<div class="description short">
+			
+<p>parse testLoops property</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>parse testLoops property</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$xml</var></dt>
+					<dd><code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br>$xml</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseDefinitions" id="_parseDefinitions">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseDefinitions">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#176-190" title="Go to source code">parseDefinitions</a>( <span>Symfony\Component\DependencyInjection\SimpleXMLElement <var>$xml</var></span>, <span>string <var>$file</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parses multiple definitions</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parses multiple definitions</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$xml</var></dt>
+					<dd><code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br>$xml</dd>
+					<dt><var>$file</var></dt>
+					<dd><code>string</code><br>$file</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseDefinition" id="_parseDefinition">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseDefinition">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#192-264" title="Go to source code">parseDefinition</a>( <span>string <var>$id</var></span>, <span>Symfony\Component\DependencyInjection\SimpleXMLElement <var>$service</var></span>, <span>string <var>$file</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parses an individual Definition</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parses an individual Definition</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$id</var></dt>
+					<dd><code>string</code><br>$id</dd>
+					<dt><var>$service</var></dt>
+					<dd><code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br>$service</dd>
+					<dt><var>$file</var></dt>
+					<dd><code>string</code><br>$file</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseFile" id="_parseFile">
+
+		<td class="attributes"><code>
+			 protected 
+			Symfony\Component\DependencyInjection\SimpleXMLElement
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseFile">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#266-284" title="Go to source code">parseFile</a>( <span>string <var>$file</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Parses a XML file.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Parses a XML file.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$file</var></dt>
+					<dd><code>string</code><br>$file Path to a file</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>Symfony\Component\DependencyInjection\SimpleXMLElement</code><br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>Symfony\Component\DependencyInjection\Exception\InvalidArgumentException</code><br>When loading of XML file returns error<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="validateSchema" id="_validateSchema">
+
+		<td class="attributes"><code>
+			 public 
+			Boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_validateSchema">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#286-337" title="Go to source code">validateSchema</a>( <span>DOMDocument <var>$dom</var></span> )</code>
+
+		<div class="description short">
+			
+<p>Validates a documents XML schema.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Validates a documents XML schema.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$dom</var></dt>
+					<dd><code>DOMDocument</code><br>$dom</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>Boolean</code><br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>Symfony\Component\DependencyInjection\Exception\RuntimeException</code><br>When extension references a non-existent XSD file<br />
+				</div>
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="supports" id="_supports">
+
+		<td class="attributes"><code>
+			 public 
+			Boolean
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_supports">#</a>
+		<code><a href="source-class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html#339-350" title="Go to source code">supports</a>( <span>mixed <var>$resource</var></span>, <span>string <var>$type</var> = <span class="php-keyword1">null</span></span> )</code>
+
+		<div class="description short">
+			
+<p>Returns true if this class supports the given resource.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Returns true if this class supports the given resource.</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$resource</var></dt>
+					<dd><code>mixed</code><br>$resource A resource</dd>
+					<dt><var>$type</var></dt>
+					<dd><code>string</code><br>$type The resource type</dd>
+				</dl></div>
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>Boolean</code><br>true if this class supports the given resource, false otherwise<br />
+				</div>
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+	<div id="footer">
+		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>
+	</div>
+</div>
+</div>
+</body>
+</html>

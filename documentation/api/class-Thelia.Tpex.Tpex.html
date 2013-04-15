@@ -7,7 +7,7 @@
 	<title>Class Thelia\Tpex\Tpex | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -81,7 +99,10 @@
 		<div id="elements">
 			<h3>Classes</h3>
 			<ul>
+				<li><a href="class-Thelia.Tpex.Tools.html">Tools</a></li>
 				<li class="active"><a href="class-Thelia.Tpex.Tpex.html">Tpex</a></li>
+				<li><a href="class-Thelia.Tpex.TpexEvents.html">TpexEvents</a></li>
+				<li><a href="class-Thelia.Tpex.TpexToken.html">TpexToken</a></li>
 			</ul>
 
 
@@ -132,16 +153,16 @@
 <p>Tpex is a parser used by Thelia CMS (<a
 href="http://thelia.net">http://thelia.net</a>)</p>
 
-<p>Tpex use syntax like loop : &lt;THELIA_name type="loopName"
+<p>Tpex use syntax like loop : &lt;THELIA id="loopId" type="loopName"
 parameter1="value1" parameter2="value2"&gt; #SUBTITUTION1 #SUBSTITUTION2
-#SUBSTITUTION-n &lt;/THELIA_name&gt;</p>
+#SUBSTITUTION-n &lt;/THELIA&gt;</p>
 
 <p>you have to implements your own loop, all the logical is in your loop not in
 Tpex</p>
 
 <p>filter syntax :</p>
 
-<p>[...(filter_name{param1, param2, ... } ... ]</p>
+<p>[...(filter_name{param1, param2, ... }) ... ]</p>
 
 <p>base param syntax :</p>
 
@@ -166,14 +187,14 @@ Tpex</p>
 				<b>Author:</b>
 				Manuel Raynaud &lt;<a
 href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&gt;<br />
-		<b>Located at</b> <a href="source-class-Thelia.Tpex.Tpex.html#33-346" title="Go to source code">core/lib/Thelia/Tpex/Tpex.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Tpex.Tpex.html#34-374" title="Go to source code">core/lib/Thelia/Tpex/Tpex.php</a><br />
 	</div>
 
 
 
 	<table class="summary" id="methods">
 	<caption>Methods summary</caption>
-	<tr data-order="init" id="_init">
+	<tr data-order="__construct" id="___construct">
 
 		<td class="attributes"><code>
 			 public 
@@ -183,27 +204,103 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_init">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#149-164" title="Go to source code">init</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span>, <span>Symfony\Component\EventDispatcher\EventDispatcherInterface <var>$dispatcher</var></span>, <span>string <var>$content</var></span>, <span>string <var>$basedir</var></span> )</code>
+		<a class="anchor" href="#___construct">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#134-146" title="Go to source code">__construct</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span>, <span>Symfony\Component\EventDispatcher\EventDispatcherInterface <var>$dispatcher</var></span> )</code>
 
 		<div class="description short">
 			
+<p>Tpex constructor</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
+<p>Tpex constructor</p>
+
 
 
 				<h4>Parameters</h4>
 				<div class="list"><dl>
 					<dt><var>$request</var></dt>
-					<dd><code>Symfony\Component\HttpFoundation\Request</code><br>$request Request object containing current http request</dd>
+					<dd><code>Symfony\Component\HttpFoundation\Request</code><br>$request</dd>
 					<dt><var>$dispatcher</var></dt>
-					<dd><code>Symfony\Component\EventDispatcher\EventDispatcherInterface</code><br>$dispatcher for dispatching Tpex event like substitute or include</dd>
+					<dd><code>Symfony\Component\EventDispatcher\EventDispatcherInterface</code><br>$dispatcher</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setContent" id="_setContent">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setContent">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#148-157" title="Go to source code">setContent</a>( <span>string <var>$content</var></span> )</code>
+
+		<div class="description short">
+			
+<p>set the content to parse</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>set the content to parse</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
 					<dt><var>$content</var></dt>
-					<dd><code>string</code><br>$content the content to parse</dd>
-					<dt><var>$basedir</var></dt>
-					<dd><code>string</code><br>$basedir where files are located</dd>
+					<dd><code>string</code><br>$content</dd>
+				</dl></div>
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setBaseDir" id="_setBaseDir">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setBaseDir">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#159-167" title="Go to source code">setBaseDir</a>( <span>string <var>$baseDir</var></span> )</code>
+
+		<div class="description short">
+			
+<p>set the base directory. include are based from this base directory</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>set the base directory. include are based from this base directory</p>
+
+
+
+				<h4>Parameters</h4>
+				<div class="list"><dl>
+					<dt><var>$baseDir</var></dt>
+					<dd><code>string</code><br>$baseDir</dd>
 				</dl></div>
 
 
@@ -224,36 +321,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_configure">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#166-171" title="Go to source code">configure</a>( <span>array <var>$loops</var> = <span class="php-keyword1">array</span>()</span>, <span>array <var>$filters</var> = <span class="php-keyword1">array</span>()</span>, <span>array <var>$baseParams</var> = <span class="php-keyword1">array</span>()</span> )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="setLogger" id="_setLogger">
-
-		<td class="attributes"><code>
-			 public 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_setLogger">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#173-180" title="Go to source code">setLogger</a>( <span>Psr\Log\LoggerInterface <var>$logger</var></span> )</code>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#169-189" title="Go to source code">configure</a>( <span>array <var>$config</var></span> )</code>
 
 		<div class="description short">
 			
@@ -265,56 +333,14 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 				<h4>Parameters</h4>
 				<div class="list"><dl>
-					<dt><var>$logger</var></dt>
-					<dd><code>Psr\Log\LoggerInterface</code><br>$logger logger implementing LoggerInterface like Tlog</dd>
-				</dl></div>
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="addLoops" id="_addLoops">
-
-		<td class="attributes"><code>
-			 public 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_addLoops">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#182-201" title="Go to source code">addLoops</a>( <span>array <var>$loops</var></span> )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-<p>add multiple loops in one time in Tpex parser</p>
-
-<p>array key contains loop name array value contain className to execute for
-rendering this loop</p>
-
-<p>$loops = array( "product" =&gt; "Thelia\Loop\Product", "category" =&gt;
-"Thelia\Loop\Category", "myLoop" =&gt; "My\Own\Loop" );</p>
-
-
-
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$loops</var></dt>
-					<dd><code>array</code><br>$loops</dd>
+					<dt><var>$config</var></dt>
+					<dd><code>array</code><br>$config</dd>
 				</dl></div>
 
 
 				<h4>Throws</h4>
 				<div class="list">
-					<code>InvalidArgumentException</code><br />
+					<code>RuntimeException</code><br />
 				</div>
 
 
@@ -322,18 +348,18 @@ rendering this loop</p>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="addLoop" id="_addLoop">
+	<tr data-order="isInitialized" id="_isInitialized">
 
 		<td class="attributes"><code>
 			 public 
-			
+			boolean
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_addLoop">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#203-214" title="Go to source code">addLoop</a>( <span>string <var>$name</var></span>, <span>type <var>$className</var></span> )</code>
+		<a class="anchor" href="#_isInitialized">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#191-200" title="Go to source code">isInitialized</a>( )</code>
 
 		<div class="description short">
 			
@@ -341,41 +367,34 @@ rendering this loop</p>
 
 		<div class="description detailed hidden">
 			
-<p>add a new loop to Tpex parser</p>
+<p>verify if Tpex is initialized</p>
 
 
 
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$name</var></dt>
-					<dd><code>string</code><br>$name loop name. Must be unique</dd>
-					<dt><var>$className</var></dt>
-					<dd><code>type</code><br>$className class name implementing/extending loop classes</dd>
-				</dl></div>
 
-
-				<h4>Throws</h4>
+				<h4>Returns</h4>
 				<div class="list">
-					<code>InvalidArgumentException</code><br />
+					<code>boolean</code><br />
 				</div>
+
 
 
 
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="addFilters" id="_addFilters">
+	<tr data-order="getContent" id="_getContent">
 
 		<td class="attributes"><code>
 			 public 
-			
+			string
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_addFilters">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#216-235" title="Go to source code">addFilters</a>( <span>array <var>$filters</var></span> )</code>
+		<a class="anchor" href="#_getContent">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#202-211" title="Go to source code">getContent</a>( )</code>
 
 		<div class="description short">
 			
@@ -383,34 +402,23 @@ rendering this loop</p>
 
 		<div class="description detailed hidden">
 			
-<p>add multiple filters in one time in Tpex parser</p>
-
-<p>key is filter name, must be unique value is the class implementing/extending
-base loop classes</p>
-
-<p>$filter = array( "upperCase" =&gt; "Thelia\Filter\UpperCase", "lowerCase"
-=&gt; "Thelia\Filter\LowerCase", "myFilter" =&gt; "My\Own\Filter" );</p>
+<p>return the current at the current state during parsing</p>
 
 
 
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$filters</var></dt>
-					<dd><code>array</code><br>$filters</dd>
-				</dl></div>
 
-
-				<h4>Throws</h4>
+				<h4>Returns</h4>
 				<div class="list">
-					<code>InvalidArgumentException</code><br />
+					<code>string</code><br />
 				</div>
+
 
 
 
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="addFilter" id="_addFilter">
+	<tr data-order="setLoop" id="_setLoop">
 
 		<td class="attributes"><code>
 			 public 
@@ -420,8 +428,8 @@ base loop classes</p>
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_addFilter">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#237-248" title="Go to source code">addFilter</a>( <span>string <var>$name</var></span>, <span>type <var>$className</var></span> )</code>
+		<a class="anchor" href="#_setLoop">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#213-216" title="Go to source code">setLoop</a>( <span>array <var>$loop</var></span> )</code>
 
 		<div class="description short">
 			
@@ -429,30 +437,17 @@ base loop classes</p>
 
 		<div class="description detailed hidden">
 			
-<p>add a new filter to Tpex parser</p>
 
 
 
-				<h4>Parameters</h4>
-				<div class="list"><dl>
-					<dt><var>$name</var></dt>
-					<dd><code>string</code><br>$name filter name. Must be unique</dd>
-					<dt><var>$className</var></dt>
-					<dd><code>type</code><br>$className class name implementing/extending filter classes</dd>
-				</dl></div>
 
-
-				<h4>Throws</h4>
-				<div class="list">
-					<code>InvalidArgumentException</code><br />
-				</div>
 
 
 
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="addBaseParams" id="_addBaseParams">
+	<tr data-order="setFilter" id="_setFilter">
 
 		<td class="attributes"><code>
 			 public 
@@ -462,8 +457,66 @@ base loop classes</p>
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_addBaseParams">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#250-269" title="Go to source code">addBaseParams</a>( <span>array <var>$baseParams</var></span> )</code>
+		<a class="anchor" href="#_setFilter">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#218-221" title="Go to source code">setFilter</a>( <span>array <var>$filter</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setTestLoop" id="_setTestLoop">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setTestLoop">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#223-226" title="Go to source code">setTestLoop</a>( <span>array <var>$testLoop</var></span> )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="setBaseParams" id="_setBaseParams">
+
+		<td class="attributes"><code>
+			 public 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_setBaseParams">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#228-249" title="Go to source code">setBaseParams</a>( <span>array <var>$baseParams</var></span> )</code>
 
 		<div class="description short">
 			
@@ -509,7 +562,7 @@ baseParam classes</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_addBaseParam">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#271-282" title="Go to source code">addBaseParam</a>( <span>type <var>$name</var></span>, <span>type <var>$className</var></span> )</code>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#251-266" title="Go to source code">addBaseParam</a>( <span>type <var>$name</var></span>, <span>type <var>$className</var></span> )</code>
 
 		<div class="description short">
 			
@@ -540,64 +593,6 @@ baseParam classes</p>
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="addProperties" id="_addProperties">
-
-		<td class="attributes"><code>
-			 protected 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_addProperties">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#284-289" title="Go to source code">addProperties</a>( <span>mixed <var>$property</var></span>, <span>array <var>$parameters</var></span> )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
-	<tr data-order="addProperty" id="_addProperty">
-
-		<td class="attributes"><code>
-			 protected 
-			
-			
-			</code>
-		</td>
-
-		<td class="name"><div>
-		<a class="anchor" href="#_addProperty">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#291-302" title="Go to source code">addProperty</a>( <span>mixed <var>$property</var></span>, <span>mixed <var>$name</var></span>, <span>mixed <var>$className</var></span> )</code>
-
-		<div class="description short">
-			
-		</div>
-
-		<div class="description detailed hidden">
-			
-
-
-
-
-
-
-
-		</div>
-		</div></td>
-	</tr>
 	<tr data-order="execute" id="_execute">
 
 		<td class="attributes"><code>
@@ -609,7 +604,7 @@ baseParam classes</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_execute">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#304-315" title="Go to source code">execute</a>( )</code>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#268-287" title="Go to source code">execute</a>( )</code>
 
 		<div class="description short">
 			
@@ -638,7 +633,7 @@ baseParam classes</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parseBaseParam">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#317-322" title="Go to source code">parseBaseParam</a>( )</code>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#289-305" title="Go to source code">parseBaseParam</a>( )</code>
 
 		<div class="description short">
 			
@@ -667,7 +662,94 @@ baseParam classes</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_parseInclude">#</a>
-		<code><a href="source-class-Thelia.Tpex.Tpex.html#324-344" title="Go to source code">parseInclude</a>( )</code>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#307-327" title="Go to source code">parseInclude</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseString" id="_parseString">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseString">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#329-337" title="Go to source code">parseString</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="parseStringWithCache" id="_parseStringWithCache">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_parseStringWithCache">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#339-352" title="Go to source code">parseStringWithCache</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="cleanCache" id="_cleanCache">
+
+		<td class="attributes"><code>
+			 protected 
+			
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_cleanCache">#</a>
+		<code><a href="source-class-Thelia.Tpex.Tpex.html#354-373" title="Go to source code">cleanCache</a>( )</code>
 
 		<div class="description short">
 			
@@ -707,7 +789,7 @@ baseParam classes</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#57-63" title="Go to source code"><var>$content</var></a>
+				<a href="source-class-Thelia.Tpex.Tpex.html#58-64" title="Go to source code"><var>$content</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -732,7 +814,7 @@ baseParam classes</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#65-71" title="Go to source code"><var>$basedir</var></a>
+				<a href="source-class-Thelia.Tpex.Tpex.html#66-72" title="Go to source code"><var>$basedir</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -757,34 +839,11 @@ baseParam classes</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#73-77" title="Go to source code"><var>$request</var></a>
+				<a href="source-class-Thelia.Tpex.Tpex.html#74-78" title="Go to source code"><var>$request</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
 			<a href="#$request" class="anchor">#</a>
-
-			<div class="description short">
-				
-			</div>
-
-			<div class="description detailed hidden">
-				
-
-			</div>
-		</div></td>
-	</tr>
-	<tr data-order="logger" id="$logger">
-		<td class="attributes"><code>
-			protected  
-			Psr\Log\LoggerInterface
-		</code></td>
-
-		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#79-83" title="Go to source code"><var>$logger</var></a>
-		</td>
-		<td class="value"><code></code></td>
-		<td class="description"><div>
-			<a href="#$logger" class="anchor">#</a>
 
 			<div class="description short">
 				
@@ -803,7 +862,7 @@ baseParam classes</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#85-89" title="Go to source code"><var>$dispatcher</var></a>
+				<a href="source-class-Thelia.Tpex.Tpex.html#80-84" title="Go to source code"><var>$dispatcher</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
@@ -819,76 +878,6 @@ baseParam classes</p>
 			</div>
 		</div></td>
 	</tr>
-	<tr data-order="loop" id="$loop">
-		<td class="attributes"><code>
-			protected  
-			Array
-		</code></td>
-
-		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#91-107" title="Go to source code"><var>$loop</var></a>
-		</td>
-		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
-		<td class="description"><div>
-			<a href="#$loop" class="anchor">#</a>
-
-			<div class="description short">
-				
-<p>associative array containing information for loop execution</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>associative array containing information for loop execution</p>
-
-<p>key is loop name value is the class implementing/extending base loop
-classes</p>
-
-<p>ex :</p>
-
-<p>$loop = array( "product" =&gt; "Thelia\Loop\Product", "category" =&gt;
-"Thelia\Loop\Category", "myLoop" =&gt; "My\Own\Loop" );</p>
-
-
-			</div>
-		</div></td>
-	</tr>
-	<tr data-order="filter" id="$filter">
-		<td class="attributes"><code>
-			protected  
-			Array
-		</code></td>
-
-		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#109-125" title="Go to source code"><var>$filter</var></a>
-		</td>
-		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
-		<td class="description"><div>
-			<a href="#$filter" class="anchor">#</a>
-
-			<div class="description short">
-				
-<p>associative array containing information for filter execution</p>
-
-			</div>
-
-			<div class="description detailed hidden">
-				
-<p>associative array containing information for filter execution</p>
-
-<p>key is filter name value is the class implementing/extending base loop
-classes</p>
-
-<p>ex :</p>
-
-<p>$filter = array( "upperCase" =&gt; "Thelia\Filter\UpperCase", "lowerCase"
-=&gt; "Thelia\Filter\LowerCase", "myFilter" =&gt; "My\Own\Filter" );</p>
-
-
-			</div>
-		</div></td>
-	</tr>
 	<tr data-order="baseParam" id="$baseParam">
 		<td class="attributes"><code>
 			protected  
@@ -896,7 +885,7 @@ classes</p>
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#127-143" title="Go to source code"><var>$baseParam</var></a>
+				<a href="source-class-Thelia.Tpex.Tpex.html#86-102" title="Go to source code"><var>$baseParam</var></a>
 		</td>
 		<td class="value"><code><span class="php-keyword1">array</span>()</code></td>
 		<td class="description"><div>
@@ -924,18 +913,18 @@ baseParam classes</p>
 			</div>
 		</div></td>
 	</tr>
-	<tr data-order="substitution" id="$substitution">
+	<tr data-order="init" id="$init">
 		<td class="attributes"><code>
 			protected  
-			mixed
+			boolean
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#145" title="Go to source code"><var>$substitution</var></a>
+				<a href="source-class-Thelia.Tpex.Tpex.html#104" title="Go to source code"><var>$init</var></a>
 		</td>
-		<td class="value"><code></code></td>
+		<td class="value"><code><span class="php-keyword1">false</span></code></td>
 		<td class="description"><div>
-			<a href="#$substitution" class="anchor">#</a>
+			<a href="#$init" class="anchor">#</a>
 
 			<div class="description short">
 				
@@ -947,18 +936,78 @@ baseParam classes</p>
 			</div>
 		</div></td>
 	</tr>
-	<tr data-order="init" id="$init">
+	<tr data-order="config" id="$config">
 		<td class="attributes"><code>
 			protected  
-			mixed
+			array
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-Thelia.Tpex.Tpex.html#147" title="Go to source code"><var>$init</var></a>
+				<a href="source-class-Thelia.Tpex.Tpex.html#106-122" title="Go to source code"><var>$config</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>(
+    <span class="php-quote">&quot;cacheDir&quot;</span> =&gt; <span class="php-keyword1">false</span>,
+    <span class="php-quote">&quot;cacheTimeFile&quot;</span> =&gt; <span class="php-quote">&quot;.time_cache&quot;</span>,
+    <span class="php-quote">&quot;fileLifeTime&quot;</span> =&gt; <span class="php-num">86400</span>,
+    <span class="php-quote">&quot;checkPeriod&quot;</span> =&gt; <span class="php-num">7200</span>
+)</code></td>
+		<td class="description"><div>
+			<a href="#$config" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+<p>config array</p>
+
+<p>cacheDir where cache is created cacheTimeFile File containing last cache pass
+fileLifeTime : file lifetime in seconds in cache system checkPeriod : Time in
+seconds between each cache examination</p>
+
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="regex" id="$regex">
+		<td class="attributes"><code>
+			protected  
+			array
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Tpex.Tpex.html#124-127" title="Go to source code"><var>$regex</var></a>
+		</td>
+		<td class="value"><code><span class="php-keyword1">array</span>(
+    <span class="php-quote">'include'</span> =&gt; <span class="php-quote">'/#INCLUDE[\s]*&quot;([^&quot;]*)&quot;/'</span>,
+    <span class="php-quote">'baseParam'</span> =&gt; <span class="php-quote">'/#PARAM_BASE_([a-zA-Z0-9_]+)[\s]*=[\s]*([0-9]*)[\s]*/'</span>
+)</code></td>
+		<td class="description"><div>
+			<a href="#$regex" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	<tr data-order="tokenizer" id="$tokenizer">
+		<td class="attributes"><code>
+			protected  
+			<code><a href="class-Thelia.Tpex.Tokenizer.Tokenize.html">Thelia\Tpex\Tokenizer\Tokenize</a></code>
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Tpex.Tpex.html#129-132" title="Go to source code"><var>$tokenizer</var></a>
 		</td>
 		<td class="value"><code></code></td>
 		<td class="description"><div>
-			<a href="#$init" class="anchor">#</a>
+			<a href="#$tokenizer" class="anchor">#</a>
 
 			<div class="description short">
 				

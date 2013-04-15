@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\ModuleQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -424,11 +442,18 @@ exist in the output directory.</p>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
-Thelia\Model\om\BaseModuleQuery
+ModelCriteria
 			
 			
 		</dd>
 		<dd style="padding-left:30px">
+			<img src="resources/inherit.png" alt="Extended by" />
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html"><span>Thelia\Model\om\BaseModuleQuery</span></a>
+			
+			
+			
+		</dd>
+		<dd style="padding-left:60px">
 			<img src="resources/inherit.png" alt="Extended by" />
 <b><span>Thelia\Model\ModuleQuery</span></b>			
 			
@@ -449,15 +474,135 @@ Thelia\Model\om\BaseModuleQuery
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Model.html">Model</a><br />
 		<b>Package:</b> propel\generator\Thelia\Model<br />
 
-		<b>Located at</b> <a href="source-class-Thelia.Model.ModuleQuery.html#8-21" title="Go to source code">core/lib/Thelia/Model/ModuleQuery.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Model.ModuleQuery.html#8-31" title="Go to source code">core/lib/Thelia/Model/ModuleQuery.php</a><br />
 	</div>
 
 
 
+	<table class="summary" id="methods">
+	<caption>Methods summary</caption>
+	<tr data-order="getActivated" id="_getActivated">
+
+		<td class="attributes"><code>
+			 public static
+			array|mixed|PropelObjectCollection
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_getActivated">#</a>
+		<code><a href="source-class-Thelia.Model.ModuleQuery.html#21-30" title="Go to source code">getActivated</a>( )</code>
+
+		<div class="description short">
+			
+		</div>
+
+		<div class="description detailed hidden">
+			
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>array|mixed|PropelObjectCollection</code><br />
+				</div>
 
 
 
 
+		</div>
+		</div></td>
+	</tr>
+	</table>
+
+	<table class="summary inherited">
+	<caption>Methods inherited from <a href="class-Thelia.Model.om.BaseModuleQuery.html#methods">Thelia\Model\om\BaseModuleQuery</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#___construct">__construct()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_create">create()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByActivate">filterByActivate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByCode">filterByCode()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByCreatedAt">filterByCreatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByGroupModule">filterByGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterById">filterById()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByModuleI18n">filterByModuleI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByPosition">filterByPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByPrimaryKey">filterByPrimaryKey()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByPrimaryKeys">filterByPrimaryKeys()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByType">filterByType()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_filterByUpdatedAt">filterByUpdatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_findOneById">findOneById()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_findPk">findPk()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_findPkComplex">findPkComplex()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_findPkSimple">findPkSimple()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_findPks">findPks()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_firstCreatedFirst">firstCreatedFirst()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_firstUpdatedFirst">firstUpdatedFirst()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_joinGroupModule">joinGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_joinI18n">joinI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_joinModuleI18n">joinModuleI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_joinWithI18n">joinWithI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_lastCreatedFirst">lastCreatedFirst()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_lastUpdatedFirst">lastUpdatedFirst()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_prune">prune()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_recentlyCreated">recentlyCreated()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_recentlyUpdated">recentlyUpdated()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_useGroupModuleQuery">useGroupModuleQuery()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_useI18nQuery">useI18nQuery()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#_useModuleI18nQuery">useModuleI18nQuery()</a>
+		</code></td>
+	</tr>
+	</table>
+
+
+
+	<table class="summary inherited">
+	<caption>Magic methods inherited from <a href="class-Thelia.Model.om.BaseModuleQuery.html#methods">Thelia\Model\om\BaseModuleQuery</a></caption>
+	<tr>
+		<td><code>
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findByActivate">findByActivate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findByCode">findByCode()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findByCreatedAt">findByCreatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findById">findById()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findByPosition">findByPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findByType">findByType()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findByUpdatedAt">findByUpdatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOne">findOne()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOneByActivate">findOneByActivate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOneByCode">findOneByCode()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOneByCreatedAt">findOneByCreatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOneByPosition">findOneByPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOneByType">findOneByType()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOneByUpdatedAt">findOneByUpdatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_findOneOrCreate">findOneOrCreate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_groupByActivate">groupByActivate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_groupByCode">groupByCode()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_groupByCreatedAt">groupByCreatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_groupById">groupById()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_groupByPosition">groupByPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_groupByType">groupByType()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_groupByUpdatedAt">groupByUpdatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_innerJoin">innerJoin()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_innerJoinGroupModule">innerJoinGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_innerJoinModuleI18n">innerJoinModuleI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_leftJoin">leftJoin()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_leftJoinGroupModule">leftJoinGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_leftJoinModuleI18n">leftJoinModuleI18n()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_orderByActivate">orderByActivate()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_orderByCode">orderByCode()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_orderByCreatedAt">orderByCreatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_orderById">orderById()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_orderByPosition">orderByPosition()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_orderByType">orderByType()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_orderByUpdatedAt">orderByUpdatedAt()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_rightJoin">rightJoin()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_rightJoinGroupModule">rightJoinGroupModule()</a>, 
+			<a href="class-Thelia.Model.om.BaseModuleQuery.html#m_rightJoinModuleI18n">rightJoinModuleI18n()</a>
+		</code></td>
+	</tr>
+	</table>
 
 
 

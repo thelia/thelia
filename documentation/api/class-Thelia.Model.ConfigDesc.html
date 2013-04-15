@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\ConfigDesc | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -423,20 +441,11 @@ exist in the output directory.</p>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
-BaseObject
+Thelia\Model\om\BaseConfigDesc
 			
 			
 		</dd>
 		<dd style="padding-left:30px">
-			<img src="resources/inherit.png" alt="Extended by" />
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html"><span>Thelia\Model\om\BaseConfigDesc</span></a>
-			
-			 implements 
-<span>Persistent</span>
-			
-			
-		</dd>
-		<dd style="padding-left:60px">
 			<img src="resources/inherit.png" alt="Extended by" />
 <b><span>Thelia\Model\ConfigDesc</span></b>			
 			
@@ -463,62 +472,6 @@ BaseObject
 
 
 
-	<table class="summary inherited">
-	<caption>Methods inherited from <a href="class-Thelia.Model.om.BaseConfigDesc.html#methods">Thelia\Model\om\BaseConfigDesc</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#___toString">__toString()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_buildCriteria">buildCriteria()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_buildPkeyCriteria">buildPkeyCriteria()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_clear">clear()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_clearAllReferences">clearAllReferences()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_copy">copy()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_copyInto">copyInto()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_delete">delete()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_doInsert">doInsert()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_doSave">doSave()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_doUpdate">doUpdate()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_doValidate">doValidate()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_ensureConsistency">ensureConsistency()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_fromArray">fromArray()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getByName">getByName()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getByPosition">getByPosition()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getChapo">getChapo()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getConfig">getConfig()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getConfigId">getConfigId()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getCreatedAt">getCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getDescription">getDescription()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getId">getId()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getLang">getLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getPeer">getPeer()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getPrimaryKey">getPrimaryKey()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getTitle">getTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getUpdatedAt">getUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_getValidationFailures">getValidationFailures()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_hasOnlyDefaultValues">hasOnlyDefaultValues()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_hydrate">hydrate()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_isAlreadyInSave">isAlreadyInSave()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_isPrimaryKeyNull">isPrimaryKeyNull()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_keepUpdateDateUnchanged">keepUpdateDateUnchanged()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_reload">reload()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_save">save()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setByName">setByName()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setByPosition">setByPosition()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setChapo">setChapo()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setConfig">setConfig()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setConfigId">setConfigId()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setCreatedAt">setCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setDescription">setDescription()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setId">setId()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setLang">setLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setPrimaryKey">setPrimaryKey()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setTitle">setTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_setUpdatedAt">setUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_toArray">toArray()</a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#_validate">validate()</a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
@@ -527,39 +480,10 @@ BaseObject
 
 
 
-	<table class="summary inherited">
-	<caption>Constants inherited from <a href="class-Thelia.Model.om.BaseConfigDesc.html#constants">Thelia\Model\om\BaseConfigDesc</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#PEER"><b>PEER</b></a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
 
-	<table class="summary inherited">
-	<caption>Properties inherited from <a href="class-Thelia.Model.om.BaseConfigDesc.html#properties">Thelia\Model\om\BaseConfigDesc</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$aConfig"><var>$aConfig</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$alreadyInSave"><var>$alreadyInSave</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$alreadyInValidation"><var>$alreadyInValidation</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$chapo"><var>$chapo</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$config_id"><var>$config_id</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$created_at"><var>$created_at</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$description"><var>$description</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$id"><var>$id</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$lang"><var>$lang</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$peer"><var>$peer</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$startCopy"><var>$startCopy</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$title"><var>$title</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$updated_at"><var>$updated_at</var></a>, 
-			<a href="class-Thelia.Model.om.BaseConfigDesc.html#$validationFailures"><var>$validationFailures</var></a>
-		</code></td>
-	</tr>
-	</table>
 
 
 

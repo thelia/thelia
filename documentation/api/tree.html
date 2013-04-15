@@ -7,7 +7,7 @@
 	<title>Tree | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -84,8 +102,12 @@
 				<li><a href="class-Thelia.Action.BaseAction.html">Thelia\Action\BaseAction</a></li>
 				<li><a href="class-Thelia.Action.Cart.html">Thelia\Action\Cart</a></li>
 				<li><a href="class-Thelia.Action.Customer.html">Thelia\Action\Customer</a></li>
+				<li><a href="class-Thelia.Config.DatabaseConfiguration.html">Thelia\Config\DatabaseConfiguration</a></li>
+				<li><a href="class-Thelia.Config.DefinePropel.html">Thelia\Config\DefinePropel</a></li>
 				<li><a href="class-Thelia.Controller.DefaultController.html">Thelia\Controller\DefaultController</a></li>
 				<li><a href="class-Thelia.Core.Bundle.TheliaBundle.html">Thelia\Core\Bundle\TheliaBundle</a></li>
+				<li><a href="class-Thelia.Core.DependencyInjection.Compiler.RegisterListenersPass.html">Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass</a></li>
+				<li><a href="class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html">Thelia\Core\DependencyInjection\Loader\XmlFileLoader</a></li>
 				<li><a href="class-Thelia.Core.Event.ActionEvent.html">Thelia\Core\Event\ActionEvent</a></li>
 				<li><a href="class-Thelia.Core.Event.TheliaEvents.html">Thelia\Core\Event\TheliaEvents</a></li>
 				<li><a href="class-Thelia.Core.EventListener.RequestListener.html">Thelia\Core\EventListener\RequestListener</a></li>
@@ -93,6 +115,7 @@
 				<li><a href="class-Thelia.Core.Template.BaseParam.Secure.html">Thelia\Core\Template\BaseParam\Secure</a></li>
 				<li><a href="class-Thelia.Core.Template.Parser.html">Thelia\Core\Template\Parser</a></li>
 				<li><a href="class-Thelia.Core.Thelia.html">Thelia\Core\Thelia</a></li>
+				<li><a href="class-Thelia.Core.TheliaContainerBuilder.html">Thelia\Core\TheliaContainerBuilder</a></li>
 				<li><a href="class-Thelia.Core.TheliaHttpKernel.html">Thelia\Core\TheliaHttpKernel</a></li>
 				<li><a href="class-Thelia.Log.AbstractTlogDestination.html">Thelia\Log\AbstractTlogDestination</a></li>
 				<li><a href="class-Thelia.Log.Destination.TlogDestinationFile.html">Thelia\Log\Destination\TlogDestinationFile</a></li>
@@ -299,29 +322,23 @@
 				<li><a href="class-Thelia.Model.map.AdminLogTableMap.html">Thelia\Model\map\AdminLogTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AdminTableMap.html">Thelia\Model\map\AdminTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AreaTableMap.html">Thelia\Model\map\AreaTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.AttributeAvDescTableMap.html">Thelia\Model\map\AttributeAvDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AttributeAvI18nTableMap.html">Thelia\Model\map\AttributeAvI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AttributeAvTableMap.html">Thelia\Model\map\AttributeAvTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AttributeCategoryTableMap.html">Thelia\Model\map\AttributeCategoryTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AttributeCombinationTableMap.html">Thelia\Model\map\AttributeCombinationTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.AttributeDescTableMap.html">Thelia\Model\map\AttributeDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AttributeI18nTableMap.html">Thelia\Model\map\AttributeI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.AttributeTableMap.html">Thelia\Model\map\AttributeTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.CategoryDescTableMap.html">Thelia\Model\map\CategoryDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CategoryI18nTableMap.html">Thelia\Model\map\CategoryI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CategoryTableMap.html">Thelia\Model\map\CategoryTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CategoryVersionTableMap.html">Thelia\Model\map\CategoryVersionTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CombinationTableMap.html">Thelia\Model\map\CombinationTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.ConfigDescTableMap.html">Thelia\Model\map\ConfigDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ConfigI18nTableMap.html">Thelia\Model\map\ConfigI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ConfigTableMap.html">Thelia\Model\map\ConfigTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ContentAssocTableMap.html">Thelia\Model\map\ContentAssocTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.ContentDescTableMap.html">Thelia\Model\map\ContentDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ContentFolderTableMap.html">Thelia\Model\map\ContentFolderTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ContentI18nTableMap.html">Thelia\Model\map\ContentI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ContentTableMap.html">Thelia\Model\map\ContentTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ContentVersionTableMap.html">Thelia\Model\map\ContentVersionTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.CountryDescTableMap.html">Thelia\Model\map\CountryDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CountryI18nTableMap.html">Thelia\Model\map\CountryI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CountryTableMap.html">Thelia\Model\map\CountryTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CouponOrderTableMap.html">Thelia\Model\map\CouponOrderTableMap</a></li>
@@ -329,62 +346,48 @@
 				<li><a href="class-Thelia.Model.map.CouponTableMap.html">Thelia\Model\map\CouponTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CurrencyTableMap.html">Thelia\Model\map\CurrencyTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CustomerTableMap.html">Thelia\Model\map\CustomerTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.CustomerTitleDescTableMap.html">Thelia\Model\map\CustomerTitleDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CustomerTitleI18nTableMap.html">Thelia\Model\map\CustomerTitleI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.CustomerTitleTableMap.html">Thelia\Model\map\CustomerTitleTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.DelivzoneTableMap.html">Thelia\Model\map\DelivzoneTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.DocumentDescTableMap.html">Thelia\Model\map\DocumentDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.DocumentI18nTableMap.html">Thelia\Model\map\DocumentI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.DocumentTableMap.html">Thelia\Model\map\DocumentTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.FeatureAvDescTableMap.html">Thelia\Model\map\FeatureAvDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FeatureAvI18nTableMap.html">Thelia\Model\map\FeatureAvI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FeatureAvTableMap.html">Thelia\Model\map\FeatureAvTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FeatureCategoryTableMap.html">Thelia\Model\map\FeatureCategoryTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.FeatureDescTableMap.html">Thelia\Model\map\FeatureDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FeatureI18nTableMap.html">Thelia\Model\map\FeatureI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FeatureProdTableMap.html">Thelia\Model\map\FeatureProdTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FeatureTableMap.html">Thelia\Model\map\FeatureTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.FolderDescTableMap.html">Thelia\Model\map\FolderDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FolderI18nTableMap.html">Thelia\Model\map\FolderI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FolderTableMap.html">Thelia\Model\map\FolderTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.FolderVersionTableMap.html">Thelia\Model\map\FolderVersionTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.GroupDescTableMap.html">Thelia\Model\map\GroupDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.GroupI18nTableMap.html">Thelia\Model\map\GroupI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.GroupModuleTableMap.html">Thelia\Model\map\GroupModuleTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.GroupResourceTableMap.html">Thelia\Model\map\GroupResourceTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.GroupTableMap.html">Thelia\Model\map\GroupTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.ImageDescTableMap.html">Thelia\Model\map\ImageDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ImageI18nTableMap.html">Thelia\Model\map\ImageI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ImageTableMap.html">Thelia\Model\map\ImageTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.LangTableMap.html">Thelia\Model\map\LangTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.MessageDescTableMap.html">Thelia\Model\map\MessageDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.MessageI18nTableMap.html">Thelia\Model\map\MessageI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.MessageTableMap.html">Thelia\Model\map\MessageTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.MessageVersionTableMap.html">Thelia\Model\map\MessageVersionTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.ModuleDescTableMap.html">Thelia\Model\map\ModuleDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ModuleI18nTableMap.html">Thelia\Model\map\ModuleI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ModuleTableMap.html">Thelia\Model\map\ModuleTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.OrderAddressTableMap.html">Thelia\Model\map\OrderAddressTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.OrderFeatureTableMap.html">Thelia\Model\map\OrderFeatureTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.OrderProductTableMap.html">Thelia\Model\map\OrderProductTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.OrderStatusDescTableMap.html">Thelia\Model\map\OrderStatusDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.OrderStatusI18nTableMap.html">Thelia\Model\map\OrderStatusI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.OrderStatusTableMap.html">Thelia\Model\map\OrderStatusTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.OrderTableMap.html">Thelia\Model\map\OrderTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ProductCategoryTableMap.html">Thelia\Model\map\ProductCategoryTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.ProductDescTableMap.html">Thelia\Model\map\ProductDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ProductI18nTableMap.html">Thelia\Model\map\ProductI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ProductTableMap.html">Thelia\Model\map\ProductTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ProductVersionTableMap.html">Thelia\Model\map\ProductVersionTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.ResourceDescTableMap.html">Thelia\Model\map\ResourceDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ResourceI18nTableMap.html">Thelia\Model\map\ResourceI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.ResourceTableMap.html">Thelia\Model\map\ResourceTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.RewritingTableMap.html">Thelia\Model\map\RewritingTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.StockTableMap.html">Thelia\Model\map\StockTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.TaxDescTableMap.html">Thelia\Model\map\TaxDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.TaxI18nTableMap.html">Thelia\Model\map\TaxI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.TaxRuleCountryTableMap.html">Thelia\Model\map\TaxRuleCountryTableMap</a></li>
-				<li><a href="class-Thelia.Model.map.TaxRuleDescTableMap.html">Thelia\Model\map\TaxRuleDescTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.TaxRuleI18nTableMap.html">Thelia\Model\map\TaxRuleI18nTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.TaxRuleTableMap.html">Thelia\Model\map\TaxRuleTableMap</a></li>
 				<li><a href="class-Thelia.Model.map.TaxTableMap.html">Thelia\Model\map\TaxTableMap</a></li>
@@ -429,9 +432,6 @@
 				<li><a href="class-Thelia.Model.om.BaseAreaQuery.html">Thelia\Model\om\BaseAreaQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttribute.html">Thelia\Model\om\BaseAttribute</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeAv.html">Thelia\Model\om\BaseAttributeAv</a></li>
-				<li><a href="class-Thelia.Model.om.BaseAttributeAvDesc.html">Thelia\Model\om\BaseAttributeAvDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescPeer.html">Thelia\Model\om\BaseAttributeAvDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseAttributeAvDescQuery.html">Thelia\Model\om\BaseAttributeAvDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18n.html">Thelia\Model\om\BaseAttributeAvI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nPeer.html">Thelia\Model\om\BaseAttributeAvI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeAvI18nQuery.html">Thelia\Model\om\BaseAttributeAvI18nQuery</a></li>
@@ -443,18 +443,12 @@
 				<li><a href="class-Thelia.Model.om.BaseAttributeCombination.html">Thelia\Model\om\BaseAttributeCombination</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationPeer.html">Thelia\Model\om\BaseAttributeCombinationPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeCombinationQuery.html">Thelia\Model\om\BaseAttributeCombinationQuery</a></li>
-				<li><a href="class-Thelia.Model.om.BaseAttributeDesc.html">Thelia\Model\om\BaseAttributeDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseAttributeDescPeer.html">Thelia\Model\om\BaseAttributeDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseAttributeDescQuery.html">Thelia\Model\om\BaseAttributeDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeI18n.html">Thelia\Model\om\BaseAttributeI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeI18nPeer.html">Thelia\Model\om\BaseAttributeI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeI18nQuery.html">Thelia\Model\om\BaseAttributeI18nQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributePeer.html">Thelia\Model\om\BaseAttributePeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseAttributeQuery.html">Thelia\Model\om\BaseAttributeQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCategory.html">Thelia\Model\om\BaseCategory</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCategoryDesc.html">Thelia\Model\om\BaseCategoryDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCategoryDescPeer.html">Thelia\Model\om\BaseCategoryDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCategoryDescQuery.html">Thelia\Model\om\BaseCategoryDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCategoryI18n.html">Thelia\Model\om\BaseCategoryI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCategoryI18nPeer.html">Thelia\Model\om\BaseCategoryI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCategoryI18nQuery.html">Thelia\Model\om\BaseCategoryI18nQuery</a></li>
@@ -467,9 +461,6 @@
 				<li><a href="class-Thelia.Model.om.BaseCombinationPeer.html">Thelia\Model\om\BaseCombinationPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCombinationQuery.html">Thelia\Model\om\BaseCombinationQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseConfig.html">Thelia\Model\om\BaseConfig</a></li>
-				<li><a href="class-Thelia.Model.om.BaseConfigDesc.html">Thelia\Model\om\BaseConfigDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseConfigDescPeer.html">Thelia\Model\om\BaseConfigDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseConfigDescQuery.html">Thelia\Model\om\BaseConfigDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseConfigI18n.html">Thelia\Model\om\BaseConfigI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseConfigI18nPeer.html">Thelia\Model\om\BaseConfigI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseConfigI18nQuery.html">Thelia\Model\om\BaseConfigI18nQuery</a></li>
@@ -479,9 +470,6 @@
 				<li><a href="class-Thelia.Model.om.BaseContentAssoc.html">Thelia\Model\om\BaseContentAssoc</a></li>
 				<li><a href="class-Thelia.Model.om.BaseContentAssocPeer.html">Thelia\Model\om\BaseContentAssocPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseContentAssocQuery.html">Thelia\Model\om\BaseContentAssocQuery</a></li>
-				<li><a href="class-Thelia.Model.om.BaseContentDesc.html">Thelia\Model\om\BaseContentDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseContentDescPeer.html">Thelia\Model\om\BaseContentDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseContentDescQuery.html">Thelia\Model\om\BaseContentDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseContentFolder.html">Thelia\Model\om\BaseContentFolder</a></li>
 				<li><a href="class-Thelia.Model.om.BaseContentFolderPeer.html">Thelia\Model\om\BaseContentFolderPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseContentFolderQuery.html">Thelia\Model\om\BaseContentFolderQuery</a></li>
@@ -494,9 +482,6 @@
 				<li><a href="class-Thelia.Model.om.BaseContentVersionPeer.html">Thelia\Model\om\BaseContentVersionPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseContentVersionQuery.html">Thelia\Model\om\BaseContentVersionQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCountry.html">Thelia\Model\om\BaseCountry</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCountryDesc.html">Thelia\Model\om\BaseCountryDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCountryDescPeer.html">Thelia\Model\om\BaseCountryDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCountryDescQuery.html">Thelia\Model\om\BaseCountryDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCountryI18n.html">Thelia\Model\om\BaseCountryI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCountryI18nPeer.html">Thelia\Model\om\BaseCountryI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCountryI18nQuery.html">Thelia\Model\om\BaseCountryI18nQuery</a></li>
@@ -518,9 +503,6 @@
 				<li><a href="class-Thelia.Model.om.BaseCustomerPeer.html">Thelia\Model\om\BaseCustomerPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCustomerQuery.html">Thelia\Model\om\BaseCustomerQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCustomerTitle.html">Thelia\Model\om\BaseCustomerTitle</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDesc.html">Thelia\Model\om\BaseCustomerTitleDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescPeer.html">Thelia\Model\om\BaseCustomerTitleDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html">Thelia\Model\om\BaseCustomerTitleDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18n.html">Thelia\Model\om\BaseCustomerTitleI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nPeer.html">Thelia\Model\om\BaseCustomerTitleI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseCustomerTitleI18nQuery.html">Thelia\Model\om\BaseCustomerTitleI18nQuery</a></li>
@@ -530,9 +512,6 @@
 				<li><a href="class-Thelia.Model.om.BaseDelivzonePeer.html">Thelia\Model\om\BaseDelivzonePeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseDelivzoneQuery.html">Thelia\Model\om\BaseDelivzoneQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseDocument.html">Thelia\Model\om\BaseDocument</a></li>
-				<li><a href="class-Thelia.Model.om.BaseDocumentDesc.html">Thelia\Model\om\BaseDocumentDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseDocumentDescPeer.html">Thelia\Model\om\BaseDocumentDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseDocumentDescQuery.html">Thelia\Model\om\BaseDocumentDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseDocumentI18n.html">Thelia\Model\om\BaseDocumentI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseDocumentI18nPeer.html">Thelia\Model\om\BaseDocumentI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseDocumentI18nQuery.html">Thelia\Model\om\BaseDocumentI18nQuery</a></li>
@@ -540,9 +519,6 @@
 				<li><a href="class-Thelia.Model.om.BaseDocumentQuery.html">Thelia\Model\om\BaseDocumentQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeature.html">Thelia\Model\om\BaseFeature</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureAv.html">Thelia\Model\om\BaseFeatureAv</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFeatureAvDesc.html">Thelia\Model\om\BaseFeatureAvDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescPeer.html">Thelia\Model\om\BaseFeatureAvDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFeatureAvDescQuery.html">Thelia\Model\om\BaseFeatureAvDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18n.html">Thelia\Model\om\BaseFeatureAvI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nPeer.html">Thelia\Model\om\BaseFeatureAvI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureAvI18nQuery.html">Thelia\Model\om\BaseFeatureAvI18nQuery</a></li>
@@ -551,9 +527,6 @@
 				<li><a href="class-Thelia.Model.om.BaseFeatureCategory.html">Thelia\Model\om\BaseFeatureCategory</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryPeer.html">Thelia\Model\om\BaseFeatureCategoryPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureCategoryQuery.html">Thelia\Model\om\BaseFeatureCategoryQuery</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFeatureDesc.html">Thelia\Model\om\BaseFeatureDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFeatureDescPeer.html">Thelia\Model\om\BaseFeatureDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFeatureDescQuery.html">Thelia\Model\om\BaseFeatureDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureI18n.html">Thelia\Model\om\BaseFeatureI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureI18nPeer.html">Thelia\Model\om\BaseFeatureI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureI18nQuery.html">Thelia\Model\om\BaseFeatureI18nQuery</a></li>
@@ -563,9 +536,6 @@
 				<li><a href="class-Thelia.Model.om.BaseFeatureProdQuery.html">Thelia\Model\om\BaseFeatureProdQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFeatureQuery.html">Thelia\Model\om\BaseFeatureQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFolder.html">Thelia\Model\om\BaseFolder</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFolderDesc.html">Thelia\Model\om\BaseFolderDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFolderDescPeer.html">Thelia\Model\om\BaseFolderDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseFolderDescQuery.html">Thelia\Model\om\BaseFolderDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFolderI18n.html">Thelia\Model\om\BaseFolderI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFolderI18nPeer.html">Thelia\Model\om\BaseFolderI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFolderI18nQuery.html">Thelia\Model\om\BaseFolderI18nQuery</a></li>
@@ -575,9 +545,6 @@
 				<li><a href="class-Thelia.Model.om.BaseFolderVersionPeer.html">Thelia\Model\om\BaseFolderVersionPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseFolderVersionQuery.html">Thelia\Model\om\BaseFolderVersionQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseGroup.html">Thelia\Model\om\BaseGroup</a></li>
-				<li><a href="class-Thelia.Model.om.BaseGroupDesc.html">Thelia\Model\om\BaseGroupDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseGroupDescPeer.html">Thelia\Model\om\BaseGroupDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseGroupDescQuery.html">Thelia\Model\om\BaseGroupDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseGroupI18n.html">Thelia\Model\om\BaseGroupI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseGroupI18nPeer.html">Thelia\Model\om\BaseGroupI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseGroupI18nQuery.html">Thelia\Model\om\BaseGroupI18nQuery</a></li>
@@ -590,9 +557,6 @@
 				<li><a href="class-Thelia.Model.om.BaseGroupResourcePeer.html">Thelia\Model\om\BaseGroupResourcePeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseGroupResourceQuery.html">Thelia\Model\om\BaseGroupResourceQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseImage.html">Thelia\Model\om\BaseImage</a></li>
-				<li><a href="class-Thelia.Model.om.BaseImageDesc.html">Thelia\Model\om\BaseImageDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseImageDescPeer.html">Thelia\Model\om\BaseImageDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseImageDescQuery.html">Thelia\Model\om\BaseImageDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseImageI18n.html">Thelia\Model\om\BaseImageI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseImageI18nPeer.html">Thelia\Model\om\BaseImageI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseImageI18nQuery.html">Thelia\Model\om\BaseImageI18nQuery</a></li>
@@ -602,9 +566,6 @@
 				<li><a href="class-Thelia.Model.om.BaseLangPeer.html">Thelia\Model\om\BaseLangPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseLangQuery.html">Thelia\Model\om\BaseLangQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseMessage.html">Thelia\Model\om\BaseMessage</a></li>
-				<li><a href="class-Thelia.Model.om.BaseMessageDesc.html">Thelia\Model\om\BaseMessageDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseMessageDescPeer.html">Thelia\Model\om\BaseMessageDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseMessageDescQuery.html">Thelia\Model\om\BaseMessageDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseMessageI18n.html">Thelia\Model\om\BaseMessageI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseMessageI18nPeer.html">Thelia\Model\om\BaseMessageI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseMessageI18nQuery.html">Thelia\Model\om\BaseMessageI18nQuery</a></li>
@@ -613,13 +574,12 @@
 				<li><a href="class-Thelia.Model.om.BaseMessageVersion.html">Thelia\Model\om\BaseMessageVersion</a></li>
 				<li><a href="class-Thelia.Model.om.BaseMessageVersionPeer.html">Thelia\Model\om\BaseMessageVersionPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseMessageVersionQuery.html">Thelia\Model\om\BaseMessageVersionQuery</a></li>
-				<li><a href="class-Thelia.Model.om.BaseModuleDesc.html">Thelia\Model\om\BaseModuleDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseModuleDescPeer.html">Thelia\Model\om\BaseModuleDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseModuleDescQuery.html">Thelia\Model\om\BaseModuleDescQuery</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModule.html">Thelia\Model\om\BaseModule</a></li>
 				<li><a href="class-Thelia.Model.om.BaseModuleI18n.html">Thelia\Model\om\BaseModuleI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseModuleI18nPeer.html">Thelia\Model\om\BaseModuleI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseModuleI18nQuery.html">Thelia\Model\om\BaseModuleI18nQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseModulePeer.html">Thelia\Model\om\BaseModulePeer</a></li>
+				<li><a href="class-Thelia.Model.om.BaseModuleQuery.html">Thelia\Model\om\BaseModuleQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrder.html">Thelia\Model\om\BaseOrder</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrderAddress.html">Thelia\Model\om\BaseOrderAddress</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrderAddressPeer.html">Thelia\Model\om\BaseOrderAddressPeer</a></li>
@@ -633,9 +593,6 @@
 				<li><a href="class-Thelia.Model.om.BaseOrderProductQuery.html">Thelia\Model\om\BaseOrderProductQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrderQuery.html">Thelia\Model\om\BaseOrderQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrderStatus.html">Thelia\Model\om\BaseOrderStatus</a></li>
-				<li><a href="class-Thelia.Model.om.BaseOrderStatusDesc.html">Thelia\Model\om\BaseOrderStatusDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescPeer.html">Thelia\Model\om\BaseOrderStatusDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseOrderStatusDescQuery.html">Thelia\Model\om\BaseOrderStatusDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18n.html">Thelia\Model\om\BaseOrderStatusI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nPeer.html">Thelia\Model\om\BaseOrderStatusI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseOrderStatusI18nQuery.html">Thelia\Model\om\BaseOrderStatusI18nQuery</a></li>
@@ -645,9 +602,6 @@
 				<li><a href="class-Thelia.Model.om.BaseProductCategory.html">Thelia\Model\om\BaseProductCategory</a></li>
 				<li><a href="class-Thelia.Model.om.BaseProductCategoryPeer.html">Thelia\Model\om\BaseProductCategoryPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseProductCategoryQuery.html">Thelia\Model\om\BaseProductCategoryQuery</a></li>
-				<li><a href="class-Thelia.Model.om.BaseProductDesc.html">Thelia\Model\om\BaseProductDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseProductDescPeer.html">Thelia\Model\om\BaseProductDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseProductDescQuery.html">Thelia\Model\om\BaseProductDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseProductI18n.html">Thelia\Model\om\BaseProductI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseProductI18nPeer.html">Thelia\Model\om\BaseProductI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseProductI18nQuery.html">Thelia\Model\om\BaseProductI18nQuery</a></li>
@@ -657,9 +611,6 @@
 				<li><a href="class-Thelia.Model.om.BaseProductVersionPeer.html">Thelia\Model\om\BaseProductVersionPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseProductVersionQuery.html">Thelia\Model\om\BaseProductVersionQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseResource.html">Thelia\Model\om\BaseResource</a></li>
-				<li><a href="class-Thelia.Model.om.BaseResourceDesc.html">Thelia\Model\om\BaseResourceDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseResourceDescPeer.html">Thelia\Model\om\BaseResourceDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseResourceDescQuery.html">Thelia\Model\om\BaseResourceDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseResourceI18n.html">Thelia\Model\om\BaseResourceI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseResourceI18nPeer.html">Thelia\Model\om\BaseResourceI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseResourceI18nQuery.html">Thelia\Model\om\BaseResourceI18nQuery</a></li>
@@ -672,9 +623,6 @@
 				<li><a href="class-Thelia.Model.om.BaseStockPeer.html">Thelia\Model\om\BaseStockPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseStockQuery.html">Thelia\Model\om\BaseStockQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTax.html">Thelia\Model\om\BaseTax</a></li>
-				<li><a href="class-Thelia.Model.om.BaseTaxDesc.html">Thelia\Model\om\BaseTaxDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseTaxDescPeer.html">Thelia\Model\om\BaseTaxDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseTaxDescQuery.html">Thelia\Model\om\BaseTaxDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxI18n.html">Thelia\Model\om\BaseTaxI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxI18nPeer.html">Thelia\Model\om\BaseTaxI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxI18nQuery.html">Thelia\Model\om\BaseTaxI18nQuery</a></li>
@@ -684,9 +632,6 @@
 				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountry.html">Thelia\Model\om\BaseTaxRuleCountry</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountryPeer.html">Thelia\Model\om\BaseTaxRuleCountryPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxRuleCountryQuery.html">Thelia\Model\om\BaseTaxRuleCountryQuery</a></li>
-				<li><a href="class-Thelia.Model.om.BaseTaxRuleDesc.html">Thelia\Model\om\BaseTaxRuleDesc</a></li>
-				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescPeer.html">Thelia\Model\om\BaseTaxRuleDescPeer</a></li>
-				<li><a href="class-Thelia.Model.om.BaseTaxRuleDescQuery.html">Thelia\Model\om\BaseTaxRuleDescQuery</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18n.html">Thelia\Model\om\BaseTaxRuleI18n</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nPeer.html">Thelia\Model\om\BaseTaxRuleI18nPeer</a></li>
 				<li><a href="class-Thelia.Model.om.BaseTaxRuleI18nQuery.html">Thelia\Model\om\BaseTaxRuleI18nQuery</a></li>
@@ -770,8 +715,26 @@
 				<li><a href="class-Thelia.Tools.DIGenerator.html">Thelia\Tools\DIGenerator</a></li>
 				<li><a href="class-Thelia.Tools.Redirect.html">Thelia\Tools\Redirect</a></li>
 				<li><a href="class-Thelia.Tpex.BaseParam.BaseParam.html">Thelia\Tpex\BaseParam\BaseParam</a></li>
-				<li><a href="class-Thelia.Tpex.Tests.TpexTest.html">Thelia\Tpex\Tests\TpexTest</a></li>
+				<li><a href="class-Thelia.Tpex.Element.BaseElement.html">Thelia\Tpex\Element\BaseElement</a></li>
+				<li><a href="class-Thelia.Tpex.Element.ConditionalLoopElement.html">Thelia\Tpex\Element\ConditionalLoopElement</a></li>
+				<li><a href="class-Thelia.Tpex.Element.ConditionalVarLoopElement.html">Thelia\Tpex\Element\ConditionalVarLoopElement</a></li>
+				<li><a href="class-Thelia.Tpex.Element.ElementCollection.html">Thelia\Tpex\Element\ElementCollection</a></li>
+				<li><a href="class-Thelia.Tpex.Element.Loop.BaseLoop.html">Thelia\Tpex\Element\Loop\BaseLoop</a></li>
+				<li><a href="class-Thelia.Tpex.Element.Loop.LoopIteration.html">Thelia\Tpex\Element\Loop\LoopIteration</a></li>
+				<li><a href="class-Thelia.Tpex.Element.Loop.LoopIterationCollection.html">Thelia\Tpex\Element\Loop\LoopIterationCollection</a></li>
+				<li><a href="class-Thelia.Tpex.Element.RepeatLoopElement.html">Thelia\Tpex\Element\RepeatLoopElement</a></li>
+				<li><a href="class-Thelia.Tpex.Element.SimpleLoopElement.html">Thelia\Tpex\Element\SimpleLoopElement</a></li>
+				<li><a href="class-Thelia.Tpex.Element.TestLoop.BaseTestLoop.html">Thelia\Tpex\Element\TestLoop\BaseTestLoop</a></li>
+				<li><a href="class-Thelia.Tpex.Element.TestLoopElement.html">Thelia\Tpex\Element\TestLoopElement</a></li>
+				<li><a href="class-Thelia.Tpex.Element.TextElement.html">Thelia\Tpex\Element\TextElement</a></li>
+				<li><a href="class-Thelia.Tpex.Element.VariablesTemplate.html">Thelia\Tpex\Element\VariablesTemplate</a></li>
+				<li><a href="class-Thelia.Tpex.Event.TpexEvent.html">Thelia\Tpex\Event\TpexEvent</a></li>
+				<li><a href="class-Thelia.Tpex.Filter.BaseFilter.html">Thelia\Tpex\Filter\BaseFilter</a></li>
+				<li><a href="class-Thelia.Tpex.Tokenizer.Tokenize.html">Thelia\Tpex\Tokenizer\Tokenize</a></li>
+				<li><a href="class-Thelia.Tpex.Tools.html">Thelia\Tpex\Tools</a></li>
 				<li><a href="class-Thelia.Tpex.Tpex.html">Thelia\Tpex\Tpex</a></li>
+				<li><a href="class-Thelia.Tpex.TpexEvents.html">Thelia\Tpex\TpexEvents</a></li>
+				<li><a href="class-Thelia.Tpex.TpexToken.html">Thelia\Tpex\TpexToken</a></li>
 			</ul>
 
 			<h3>Interfaces</h3>
@@ -779,14 +742,19 @@
 				<li><a href="class-Thelia.Controller.NullControllerInterface.html">Thelia\Controller\NullControllerInterface</a></li>
 				<li><a href="class-Thelia.Core.Template.ParserInterface.html">Thelia\Core\Template\ParserInterface</a></li>
 				<li><a href="class-Thelia.Log.TlogInterface.html">Thelia\Log\TlogInterface</a></li>
-				<li><a href="class-Thelia.Tpex.Loop.LoopInterface.html">Thelia\Tpex\Loop\LoopInterface</a></li>
+				<li><a href="class-Thelia.Tpex.Tokenizer.TokenizeInterface.html">Thelia\Tpex\Tokenizer\TokenizeInterface</a></li>
 			</ul>
 
 
 			<h3>Exceptions</h3>
 			<ul>
 				<li><a href="class-Thelia.Exception.MemberAccessException.html">Thelia\Exception\MemberAccessException</a></li>
+				<li><a href="class-Thelia.Tpex.Exception.ElementNotFoundException.html">Thelia\Tpex\Exception\ElementNotFoundException</a></li>
 				<li><a href="class-Thelia.Tpex.Exception.FileNotFoundException.html">Thelia\Tpex\Exception\FileNotFoundException</a></li>
+				<li><a href="class-Thelia.Tpex.Exception.InvalidElementException.html">Thelia\Tpex\Exception\InvalidElementException</a></li>
+				<li><a href="class-Thelia.Tpex.Exception.TokenNotFoundException.html">Thelia\Tpex\Exception\TokenNotFoundException</a></li>
+				<li><a href="class-Thelia.Tpex.Exception.TokenSyntaxException.html">Thelia\Tpex\Exception\TokenSyntaxException</a></li>
+				<li><a href="class-Thelia.Tpex.Exception.TpexException.html">Thelia\Tpex\Exception\TpexException</a></li>
 			</ul>
 
 
@@ -964,22 +932,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeAvDesc.html"><span>Thelia\Model\om\BaseAttributeAvDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeAvDesc.html"><span>Thelia\Model\AttributeAvDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeAvI18n.html"><span>Thelia\Model\om\BaseAttributeAvI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1028,22 +980,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeDesc.html"><span>Thelia\Model\om\BaseAttributeDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeDesc.html"><span>Thelia\Model\AttributeDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeI18n.html"><span>Thelia\Model\om\BaseAttributeI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1070,22 +1006,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.Category.html"><span>Thelia\Model\Category</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCategoryDesc.html"><span>Thelia\Model\om\BaseCategoryDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.CategoryDesc.html"><span>Thelia\Model\CategoryDesc</span></a>
 			
 			
 			</div>
@@ -1156,22 +1076,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseConfigDesc.html"><span>Thelia\Model\om\BaseConfigDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ConfigDesc.html"><span>Thelia\Model\ConfigDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseConfigI18n.html"><span>Thelia\Model\om\BaseConfigI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1214,22 +1118,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentAssoc.html"><span>Thelia\Model\ContentAssoc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseContentDesc.html"><span>Thelia\Model\om\BaseContentDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentDesc.html"><span>Thelia\Model\ContentDesc</span></a>
 			
 			
 			</div>
@@ -1294,22 +1182,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.Country.html"><span>Thelia\Model\Country</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCountryDesc.html"><span>Thelia\Model\om\BaseCountryDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.CountryDesc.html"><span>Thelia\Model\CountryDesc</span></a>
 			
 			
 			</div>
@@ -1428,22 +1300,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCustomerTitleDesc.html"><span>Thelia\Model\om\BaseCustomerTitleDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.CustomerTitleDesc.html"><span>Thelia\Model\CustomerTitleDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCustomerTitleI18n.html"><span>Thelia\Model\om\BaseCustomerTitleI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1486,22 +1342,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.Document.html"><span>Thelia\Model\Document</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseDocumentDesc.html"><span>Thelia\Model\om\BaseDocumentDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.DocumentDesc.html"><span>Thelia\Model\DocumentDesc</span></a>
 			
 			
 			</div>
@@ -1556,22 +1396,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureAvDesc.html"><span>Thelia\Model\om\BaseFeatureAvDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureAvDesc.html"><span>Thelia\Model\FeatureAvDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureAvI18n.html"><span>Thelia\Model\om\BaseFeatureAvI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1598,22 +1422,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureCategory.html"><span>Thelia\Model\FeatureCategory</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureDesc.html"><span>Thelia\Model\om\BaseFeatureDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureDesc.html"><span>Thelia\Model\FeatureDesc</span></a>
 			
 			
 			</div>
@@ -1668,22 +1476,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFolderDesc.html"><span>Thelia\Model\om\BaseFolderDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.FolderDesc.html"><span>Thelia\Model\FolderDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFolderI18n.html"><span>Thelia\Model\om\BaseFolderI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1726,22 +1518,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.Group.html"><span>Thelia\Model\Group</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseGroupDesc.html"><span>Thelia\Model\om\BaseGroupDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.GroupDesc.html"><span>Thelia\Model\GroupDesc</span></a>
 			
 			
 			</div>
@@ -1812,22 +1588,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseImageDesc.html"><span>Thelia\Model\om\BaseImageDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ImageDesc.html"><span>Thelia\Model\ImageDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseImageI18n.html"><span>Thelia\Model\om\BaseImageI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1876,22 +1636,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseMessageDesc.html"><span>Thelia\Model\om\BaseMessageDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.MessageDesc.html"><span>Thelia\Model\MessageDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseMessageI18n.html"><span>Thelia\Model\om\BaseMessageI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -1924,7 +1668,7 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseModuleDesc.html"><span>Thelia\Model\om\BaseModuleDesc</span></a>
+			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseModule.html"><span>Thelia\Model\om\BaseModule</span></a>
 			 implements 
 <span>Persistent</span>
 			
@@ -1933,7 +1677,7 @@
 
 				<ul>
 
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleDesc.html"><span>Thelia\Model\ModuleDesc</span></a>
+			<li class="last"><div class="last"><a href="class-Thelia.Model.Module.html"><span>Thelia\Model\Module</span></a>
 			
 			
 			</div>
@@ -2036,22 +1780,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseOrderStatusDesc.html"><span>Thelia\Model\om\BaseOrderStatusDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.OrderStatusDesc.html"><span>Thelia\Model\OrderStatusDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseOrderStatusI18n.html"><span>Thelia\Model\om\BaseOrderStatusI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -2100,22 +1828,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseProductDesc.html"><span>Thelia\Model\om\BaseProductDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ProductDesc.html"><span>Thelia\Model\ProductDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseProductI18n.html"><span>Thelia\Model\om\BaseProductI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -2158,22 +1870,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.Resource.html"><span>Thelia\Model\Resource</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseResourceDesc.html"><span>Thelia\Model\om\BaseResourceDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ResourceDesc.html"><span>Thelia\Model\ResourceDesc</span></a>
 			
 			
 			</div>
@@ -2244,22 +1940,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxDesc.html"><span>Thelia\Model\om\BaseTaxDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxDesc.html"><span>Thelia\Model\TaxDesc</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxI18n.html"><span>Thelia\Model\om\BaseTaxI18n</span></a>
 			 implements 
 <span>Persistent</span>
@@ -2302,22 +1982,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxRuleCountry.html"><span>Thelia\Model\TaxRuleCountry</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxRuleDesc.html"><span>Thelia\Model\om\BaseTaxRuleDesc</span></a>
-			 implements 
-<span>Persistent</span>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxRuleDesc.html"><span>Thelia\Model\TaxRuleDesc</span></a>
 			
 			
 			</div>
@@ -2430,20 +2094,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeAvDescQuery.html"><span>Thelia\Model\om\BaseAttributeAvDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeAvDescQuery.html"><span>Thelia\Model\AttributeAvDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeAvI18nQuery.html"><span>Thelia\Model\om\BaseAttributeAvI18nQuery</span></a>
 			
 			
@@ -2500,20 +2150,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeDescQuery.html"><span>Thelia\Model\om\BaseAttributeDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeDescQuery.html"><span>Thelia\Model\AttributeDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeI18nQuery.html"><span>Thelia\Model\om\BaseAttributeI18nQuery</span></a>
 			
 			
@@ -2536,20 +2172,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeQuery.html"><span>Thelia\Model\AttributeQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCategoryDescQuery.html"><span>Thelia\Model\om\BaseCategoryDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.CategoryDescQuery.html"><span>Thelia\Model\CategoryDescQuery</span></a>
 			
 			
 			</div>
@@ -2612,20 +2234,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseConfigDescQuery.html"><span>Thelia\Model\om\BaseConfigDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ConfigDescQuery.html"><span>Thelia\Model\ConfigDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseConfigI18nQuery.html"><span>Thelia\Model\om\BaseConfigI18nQuery</span></a>
 			
 			
@@ -2662,20 +2270,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentAssocQuery.html"><span>Thelia\Model\ContentAssocQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseContentDescQuery.html"><span>Thelia\Model\om\BaseContentDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentDescQuery.html"><span>Thelia\Model\ContentDescQuery</span></a>
 			
 			
 			</div>
@@ -2732,20 +2326,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentVersionQuery.html"><span>Thelia\Model\ContentVersionQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCountryDescQuery.html"><span>Thelia\Model\om\BaseCountryDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.CountryDescQuery.html"><span>Thelia\Model\CountryDescQuery</span></a>
 			
 			
 			</div>
@@ -2850,20 +2430,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html"><span>Thelia\Model\om\BaseCustomerTitleDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.CustomerTitleDescQuery.html"><span>Thelia\Model\CustomerTitleDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCustomerTitleI18nQuery.html"><span>Thelia\Model\om\BaseCustomerTitleI18nQuery</span></a>
 			
 			
@@ -2906,20 +2472,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseDocumentDescQuery.html"><span>Thelia\Model\om\BaseDocumentDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.DocumentDescQuery.html"><span>Thelia\Model\DocumentDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseDocumentI18nQuery.html"><span>Thelia\Model\om\BaseDocumentI18nQuery</span></a>
 			
 			
@@ -2942,20 +2494,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.DocumentQuery.html"><span>Thelia\Model\DocumentQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureAvDescQuery.html"><span>Thelia\Model\om\BaseFeatureAvDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureAvDescQuery.html"><span>Thelia\Model\FeatureAvDescQuery</span></a>
 			
 			
 			</div>
@@ -3004,20 +2542,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureDescQuery.html"><span>Thelia\Model\om\BaseFeatureDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureDescQuery.html"><span>Thelia\Model\FeatureDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureI18nQuery.html"><span>Thelia\Model\om\BaseFeatureI18nQuery</span></a>
 			
 			
@@ -3060,20 +2584,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFolderDescQuery.html"><span>Thelia\Model\om\BaseFolderDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.FolderDescQuery.html"><span>Thelia\Model\FolderDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFolderI18nQuery.html"><span>Thelia\Model\om\BaseFolderI18nQuery</span></a>
 			
 			
@@ -3110,20 +2620,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.FolderVersionQuery.html"><span>Thelia\Model\FolderVersionQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseGroupDescQuery.html"><span>Thelia\Model\om\BaseGroupDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.GroupDescQuery.html"><span>Thelia\Model\GroupDescQuery</span></a>
 			
 			
 			</div>
@@ -3186,20 +2682,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseImageDescQuery.html"><span>Thelia\Model\om\BaseImageDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ImageDescQuery.html"><span>Thelia\Model\ImageDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseImageI18nQuery.html"><span>Thelia\Model\om\BaseImageI18nQuery</span></a>
 			
 			
@@ -3236,20 +2718,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.LangQuery.html"><span>Thelia\Model\LangQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseMessageDescQuery.html"><span>Thelia\Model\om\BaseMessageDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.MessageDescQuery.html"><span>Thelia\Model\MessageDescQuery</span></a>
 			
 			
 			</div>
@@ -3298,20 +2766,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseModuleDescQuery.html"><span>Thelia\Model\om\BaseModuleDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleDescQuery.html"><span>Thelia\Model\ModuleDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseModuleI18nQuery.html"><span>Thelia\Model\om\BaseModuleI18nQuery</span></a>
 			
 			
@@ -3320,6 +2774,20 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleI18nQuery.html"><span>Thelia\Model\ModuleI18nQuery</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseModuleQuery.html"><span>Thelia\Model\om\BaseModuleQuery</span></a>
+			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleQuery.html"><span>Thelia\Model\ModuleQuery</span></a>
 			
 			
 			</div>
@@ -3382,20 +2850,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseOrderStatusDescQuery.html"><span>Thelia\Model\om\BaseOrderStatusDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.OrderStatusDescQuery.html"><span>Thelia\Model\OrderStatusDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseOrderStatusI18nQuery.html"><span>Thelia\Model\om\BaseOrderStatusI18nQuery</span></a>
 			
 			
@@ -3438,20 +2892,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseProductDescQuery.html"><span>Thelia\Model\om\BaseProductDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ProductDescQuery.html"><span>Thelia\Model\ProductDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseProductI18nQuery.html"><span>Thelia\Model\om\BaseProductI18nQuery</span></a>
 			
 			
@@ -3488,20 +2928,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ProductVersionQuery.html"><span>Thelia\Model\ProductVersionQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseResourceDescQuery.html"><span>Thelia\Model\om\BaseResourceDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ResourceDescQuery.html"><span>Thelia\Model\ResourceDescQuery</span></a>
 			
 			
 			</div>
@@ -3564,20 +2990,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxDescQuery.html"><span>Thelia\Model\om\BaseTaxDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxDescQuery.html"><span>Thelia\Model\TaxDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxI18nQuery.html"><span>Thelia\Model\om\BaseTaxI18nQuery</span></a>
 			
 			
@@ -3620,20 +3032,6 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxRuleDescQuery.html"><span>Thelia\Model\om\BaseTaxRuleDescQuery</span></a>
-			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxRuleDescQuery.html"><span>Thelia\Model\TaxRuleDescQuery</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxRuleI18nQuery.html"><span>Thelia\Model\om\BaseTaxRuleI18nQuery</span></a>
 			
 			
@@ -3662,13 +3060,26 @@
 
 				</ul></li></ul></li>
 
-			<li><div class="notlast"><span>PHPUnit_Framework_TestCase</span>			
+			<li><div class="notlast"><span>Symfony\Component\DependencyInjection\ContainerBuilder</span>			
 			
 			</div>
 
 				<ul>
 
-			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Tests.TpexTest.html"><span>Thelia\Tpex\Tests\TpexTest</span></a>
+			<li class="last"><div class="last"><a href="class-Thelia.Core.TheliaContainerBuilder.html"><span>Thelia\Core\TheliaContainerBuilder</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Symfony\Component\DependencyInjection\Loader\FileLoader</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Core.DependencyInjection.Loader.XmlFileLoader.html"><span>Thelia\Core\DependencyInjection\Loader\XmlFileLoader</span></a>
 			
 			
 			</div>
@@ -3681,7 +3092,14 @@
 
 				<ul>
 
-			<li class="last"><div class="last"><a href="class-Thelia.Core.Event.ActionEvent.html"><span>Thelia\Core\Event\ActionEvent</span></a>
+			<li><div class="notlast"><a href="class-Thelia.Core.Event.ActionEvent.html"><span>Thelia\Core\Event\ActionEvent</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Event.TpexEvent.html"><span>Thelia\Tpex\Event\TpexEvent</span></a>
 			
 			
 			</div>
@@ -3775,13 +3193,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.AttributeAvDescTableMap.html"><span>Thelia\Model\map\AttributeAvDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.AttributeAvI18nTableMap.html"><span>Thelia\Model\map\AttributeAvI18nTableMap</span></a>
 			
 			
@@ -3810,13 +3221,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.AttributeDescTableMap.html"><span>Thelia\Model\map\AttributeDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.AttributeI18nTableMap.html"><span>Thelia\Model\map\AttributeI18nTableMap</span></a>
 			
 			
@@ -3825,13 +3229,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.AttributeTableMap.html"><span>Thelia\Model\map\AttributeTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.CategoryDescTableMap.html"><span>Thelia\Model\map\CategoryDescTableMap</span></a>
 			
 			
 			</div>
@@ -3866,13 +3263,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.ConfigDescTableMap.html"><span>Thelia\Model\map\ConfigDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.ConfigI18nTableMap.html"><span>Thelia\Model\map\ConfigI18nTableMap</span></a>
 			
 			
@@ -3888,13 +3278,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.ContentAssocTableMap.html"><span>Thelia\Model\map\ContentAssocTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.ContentDescTableMap.html"><span>Thelia\Model\map\ContentDescTableMap</span></a>
 			
 			
 			</div>
@@ -3923,13 +3306,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.ContentVersionTableMap.html"><span>Thelia\Model\map\ContentVersionTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.CountryDescTableMap.html"><span>Thelia\Model\map\CountryDescTableMap</span></a>
 			
 			
 			</div>
@@ -3985,13 +3361,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.CustomerTitleDescTableMap.html"><span>Thelia\Model\map\CustomerTitleDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.CustomerTitleI18nTableMap.html"><span>Thelia\Model\map\CustomerTitleI18nTableMap</span></a>
 			
 			
@@ -4013,13 +3382,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.DocumentDescTableMap.html"><span>Thelia\Model\map\DocumentDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.DocumentI18nTableMap.html"><span>Thelia\Model\map\DocumentI18nTableMap</span></a>
 			
 			
@@ -4028,13 +3390,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.DocumentTableMap.html"><span>Thelia\Model\map\DocumentTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.FeatureAvDescTableMap.html"><span>Thelia\Model\map\FeatureAvDescTableMap</span></a>
 			
 			
 			</div>
@@ -4062,13 +3417,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.FeatureDescTableMap.html"><span>Thelia\Model\map\FeatureDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.FeatureI18nTableMap.html"><span>Thelia\Model\map\FeatureI18nTableMap</span></a>
 			
 			
@@ -4090,13 +3438,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.FolderDescTableMap.html"><span>Thelia\Model\map\FolderDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.FolderI18nTableMap.html"><span>Thelia\Model\map\FolderI18nTableMap</span></a>
 			
 			
@@ -4112,13 +3453,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.FolderVersionTableMap.html"><span>Thelia\Model\map\FolderVersionTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.GroupDescTableMap.html"><span>Thelia\Model\map\GroupDescTableMap</span></a>
 			
 			
 			</div>
@@ -4153,13 +3487,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.ImageDescTableMap.html"><span>Thelia\Model\map\ImageDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.ImageI18nTableMap.html"><span>Thelia\Model\map\ImageI18nTableMap</span></a>
 			
 			
@@ -4181,13 +3508,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.MessageDescTableMap.html"><span>Thelia\Model\map\MessageDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.MessageI18nTableMap.html"><span>Thelia\Model\map\MessageI18nTableMap</span></a>
 			
 			
@@ -4203,13 +3523,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.MessageVersionTableMap.html"><span>Thelia\Model\map\MessageVersionTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.ModuleDescTableMap.html"><span>Thelia\Model\map\ModuleDescTableMap</span></a>
 			
 			
 			</div>
@@ -4251,13 +3564,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.OrderStatusDescTableMap.html"><span>Thelia\Model\map\OrderStatusDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.OrderStatusI18nTableMap.html"><span>Thelia\Model\map\OrderStatusI18nTableMap</span></a>
 			
 			
@@ -4286,13 +3592,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.ProductDescTableMap.html"><span>Thelia\Model\map\ProductDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.ProductI18nTableMap.html"><span>Thelia\Model\map\ProductI18nTableMap</span></a>
 			
 			
@@ -4308,13 +3607,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.ProductVersionTableMap.html"><span>Thelia\Model\map\ProductVersionTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.ResourceDescTableMap.html"><span>Thelia\Model\map\ResourceDescTableMap</span></a>
 			
 			
 			</div>
@@ -4349,13 +3641,6 @@
 
 				</li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.map.TaxDescTableMap.html"><span>Thelia\Model\map\TaxDescTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
 			<li><div class="notlast"><a href="class-Thelia.Model.map.TaxI18nTableMap.html"><span>Thelia\Model\map\TaxI18nTableMap</span></a>
 			
 			
@@ -4364,13 +3649,6 @@
 				</li>
 
 			<li><div class="notlast"><a href="class-Thelia.Model.map.TaxRuleCountryTableMap.html"><span>Thelia\Model\map\TaxRuleCountryTableMap</span></a>
-			
-			
-			</div>
-
-				</li>
-
-			<li><div class="notlast"><a href="class-Thelia.Model.map.TaxRuleDescTableMap.html"><span>Thelia\Model\map\TaxRuleDescTableMap</span></a>
 			
 			
 			</div>
@@ -4419,9 +3697,34 @@
 
 				</li>
 
+			<li><div class="notlast"><a href="class-Thelia.Config.DatabaseConfiguration.html"><span>Thelia\Config\DatabaseConfiguration</span></a>
+			 implements 
+<span>Symfony\Component\Config\Definition\ConfigurationInterface</span>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Config.DefinePropel.html"><span>Thelia\Config\DefinePropel</span></a>
+			
+			
+			</div>
+
+				</li>
+
 			<li><div class="notlast"><a href="class-Thelia.Controller.DefaultController.html"><span>Thelia\Controller\DefaultController</span></a>
 			 implements 
 				<a href="class-Thelia.Controller.NullControllerInterface.html"><span>Thelia\Controller\NullControllerInterface</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Core.DependencyInjection.Compiler.RegisterListenersPass.html"><span>Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass</span></a>
+			 implements 
+<span>Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface</span>
 			
 			
 			</div>
@@ -4597,14 +3900,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeAvDescPeer.html"><span>Thelia\Model\om\BaseAttributeAvDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseAttributeAvDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeAvDesc.html"><span>Thelia\Model\AttributeAvDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseAttributeAvDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeAvDescPeer.html"><span>Thelia\Model\AttributeAvDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseAttributeAvDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeAvDescQuery.html"><span>Thelia\Model\AttributeAvDescQuery</span></a>
 			
 			
 			</div>
@@ -4667,14 +3995,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseAttributeDescPeer.html"><span>Thelia\Model\om\BaseAttributeDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseAttributeDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeDesc.html"><span>Thelia\Model\AttributeDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseAttributeDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeDescPeer.html"><span>Thelia\Model\AttributeDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseAttributeDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.AttributeDescQuery.html"><span>Thelia\Model\AttributeDescQuery</span></a>
 			
 			
 			</div>
@@ -4709,14 +4062,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCategoryDescPeer.html"><span>Thelia\Model\om\BaseCategoryDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCategoryDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.CategoryDesc.html"><span>Thelia\Model\CategoryDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCategoryDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.CategoryDescPeer.html"><span>Thelia\Model\CategoryDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCategoryDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.CategoryDescQuery.html"><span>Thelia\Model\CategoryDescQuery</span></a>
 			
 			
 			</div>
@@ -4779,14 +4157,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseConfigDescPeer.html"><span>Thelia\Model\om\BaseConfigDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseConfigDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ConfigDesc.html"><span>Thelia\Model\ConfigDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseConfigDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ConfigDescPeer.html"><span>Thelia\Model\ConfigDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseConfigDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ConfigDescQuery.html"><span>Thelia\Model\ConfigDescQuery</span></a>
 			
 			
 			</div>
@@ -4835,14 +4238,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseContentDescPeer.html"><span>Thelia\Model\om\BaseContentDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseContentDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentDesc.html"><span>Thelia\Model\ContentDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseContentDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentDescPeer.html"><span>Thelia\Model\ContentDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseContentDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ContentDescQuery.html"><span>Thelia\Model\ContentDescQuery</span></a>
 			
 			
 			</div>
@@ -4905,14 +4333,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCountryDescPeer.html"><span>Thelia\Model\om\BaseCountryDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCountryDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.CountryDesc.html"><span>Thelia\Model\CountryDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCountryDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.CountryDescPeer.html"><span>Thelia\Model\CountryDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCountryDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.CountryDescQuery.html"><span>Thelia\Model\CountryDescQuery</span></a>
 			
 			
 			</div>
@@ -5017,14 +4470,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseCustomerTitleDescPeer.html"><span>Thelia\Model\om\BaseCustomerTitleDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCustomerTitleDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.CustomerTitleDesc.html"><span>Thelia\Model\CustomerTitleDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCustomerTitleDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.CustomerTitleDescPeer.html"><span>Thelia\Model\CustomerTitleDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseCustomerTitleDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.CustomerTitleDescQuery.html"><span>Thelia\Model\CustomerTitleDescQuery</span></a>
 			
 			
 			</div>
@@ -5073,14 +4551,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseDocumentDescPeer.html"><span>Thelia\Model\om\BaseDocumentDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseDocumentDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.DocumentDesc.html"><span>Thelia\Model\DocumentDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseDocumentDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.DocumentDescPeer.html"><span>Thelia\Model\DocumentDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseDocumentDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.DocumentDescQuery.html"><span>Thelia\Model\DocumentDescQuery</span></a>
 			
 			
 			</div>
@@ -5115,14 +4618,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureAvDescPeer.html"><span>Thelia\Model\om\BaseFeatureAvDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFeatureAvDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureAvDesc.html"><span>Thelia\Model\FeatureAvDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFeatureAvDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureAvDescPeer.html"><span>Thelia\Model\FeatureAvDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFeatureAvDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureAvDescQuery.html"><span>Thelia\Model\FeatureAvDescQuery</span></a>
 			
 			
 			</div>
@@ -5171,14 +4699,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFeatureDescPeer.html"><span>Thelia\Model\om\BaseFeatureDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFeatureDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureDesc.html"><span>Thelia\Model\FeatureDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFeatureDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureDescPeer.html"><span>Thelia\Model\FeatureDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFeatureDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.FeatureDescQuery.html"><span>Thelia\Model\FeatureDescQuery</span></a>
 			
 			
 			</div>
@@ -5227,14 +4780,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseFolderDescPeer.html"><span>Thelia\Model\om\BaseFolderDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFolderDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.FolderDesc.html"><span>Thelia\Model\FolderDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFolderDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.FolderDescPeer.html"><span>Thelia\Model\FolderDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseFolderDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.FolderDescQuery.html"><span>Thelia\Model\FolderDescQuery</span></a>
 			
 			
 			</div>
@@ -5283,14 +4861,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseGroupDescPeer.html"><span>Thelia\Model\om\BaseGroupDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseGroupDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.GroupDesc.html"><span>Thelia\Model\GroupDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseGroupDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.GroupDescPeer.html"><span>Thelia\Model\GroupDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseGroupDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.GroupDescQuery.html"><span>Thelia\Model\GroupDescQuery</span></a>
 			
 			
 			</div>
@@ -5353,14 +4956,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseImageDescPeer.html"><span>Thelia\Model\om\BaseImageDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseImageDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ImageDesc.html"><span>Thelia\Model\ImageDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseImageDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ImageDescPeer.html"><span>Thelia\Model\ImageDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseImageDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ImageDescQuery.html"><span>Thelia\Model\ImageDescQuery</span></a>
 			
 			
 			</div>
@@ -5409,14 +5037,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseMessageDescPeer.html"><span>Thelia\Model\om\BaseMessageDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseMessageDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.MessageDesc.html"><span>Thelia\Model\MessageDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseMessageDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.MessageDescPeer.html"><span>Thelia\Model\MessageDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseMessageDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.MessageDescQuery.html"><span>Thelia\Model\MessageDescQuery</span></a>
 			
 			
 			</div>
@@ -5465,27 +5118,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><span>Thelia\Model\om\BaseModule</span>			
+			<li><div class="notlast"><span>Thelia\Model\om\BaseModuleDesc</span>			
 			
 			</div>
 
 				<ul>
 
-			<li class="last"><div class="last"><a href="class-Thelia.Model.Module.html"><span>Thelia\Model\Module</span></a>
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleDesc.html"><span>Thelia\Model\ModuleDesc</span></a>
 			
 			
 			</div>
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseModuleDescPeer.html"><span>Thelia\Model\om\BaseModuleDescPeer</span></a>
-			
+			<li><div class="notlast"><span>Thelia\Model\om\BaseModuleDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleDescPeer.html"><span>Thelia\Model\ModuleDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseModuleDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleDescQuery.html"><span>Thelia\Model\ModuleDescQuery</span></a>
 			
 			
 			</div>
@@ -5514,19 +5179,6 @@
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ModulePeer.html"><span>Thelia\Model\ModulePeer</span></a>
-			
-			
-			</div>
-
-				</ul></li>
-
-			<li><div class="notlast"><span>Thelia\Model\om\BaseModuleQuery</span>			
-			
-			</div>
-
-				<ul>
-
-			<li class="last"><div class="last"><a href="class-Thelia.Model.ModuleQuery.html"><span>Thelia\Model\ModuleQuery</span></a>
 			
 			
 			</div>
@@ -5589,14 +5241,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseOrderStatusDescPeer.html"><span>Thelia\Model\om\BaseOrderStatusDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseOrderStatusDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.OrderStatusDesc.html"><span>Thelia\Model\OrderStatusDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseOrderStatusDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.OrderStatusDescPeer.html"><span>Thelia\Model\OrderStatusDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseOrderStatusDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.OrderStatusDescQuery.html"><span>Thelia\Model\OrderStatusDescQuery</span></a>
 			
 			
 			</div>
@@ -5645,14 +5322,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseProductDescPeer.html"><span>Thelia\Model\om\BaseProductDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseProductDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ProductDesc.html"><span>Thelia\Model\ProductDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseProductDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ProductDescPeer.html"><span>Thelia\Model\ProductDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseProductDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ProductDescQuery.html"><span>Thelia\Model\ProductDescQuery</span></a>
 			
 			
 			</div>
@@ -5701,14 +5403,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseResourceDescPeer.html"><span>Thelia\Model\om\BaseResourceDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseResourceDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ResourceDesc.html"><span>Thelia\Model\ResourceDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseResourceDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.ResourceDescPeer.html"><span>Thelia\Model\ResourceDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseResourceDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.ResourceDescQuery.html"><span>Thelia\Model\ResourceDescQuery</span></a>
 			
 			
 			</div>
@@ -5771,14 +5498,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxDescPeer.html"><span>Thelia\Model\om\BaseTaxDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseTaxDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxDesc.html"><span>Thelia\Model\TaxDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseTaxDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxDescPeer.html"><span>Thelia\Model\TaxDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseTaxDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxDescQuery.html"><span>Thelia\Model\TaxDescQuery</span></a>
 			
 			
 			</div>
@@ -5827,14 +5579,39 @@
 
 				</ul></li>
 
-			<li><div class="notlast"><a href="class-Thelia.Model.om.BaseTaxRuleDescPeer.html"><span>Thelia\Model\om\BaseTaxRuleDescPeer</span></a>
+			<li><div class="notlast"><span>Thelia\Model\om\BaseTaxRuleDesc</span>			
 			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxRuleDesc.html"><span>Thelia\Model\TaxRuleDesc</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseTaxRuleDescPeer</span>			
 			
 			</div>
 
 				<ul>
 
 			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxRuleDescPeer.html"><span>Thelia\Model\TaxRuleDescPeer</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><span>Thelia\Model\om\BaseTaxRuleDescQuery</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Model.TaxRuleDescQuery.html"><span>Thelia\Model\TaxRuleDescQuery</span></a>
 			
 			
 			</div>
@@ -5926,7 +5703,135 @@
 
 				</ul></li>
 
-			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Tpex.html"><span>Thelia\Tpex\Tpex</span></a>
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.BaseElement.html"><span>Thelia\Tpex\Element\BaseElement</span></a>
+			
+			
+			</div>
+
+				<ul>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.ConditionalLoopElement.html"><span>Thelia\Tpex\Element\ConditionalLoopElement</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.ConditionalVarLoopElement.html"><span>Thelia\Tpex\Element\ConditionalVarLoopElement</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.ElementCollection.html"><span>Thelia\Tpex\Element\ElementCollection</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.RepeatLoopElement.html"><span>Thelia\Tpex\Element\RepeatLoopElement</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.SimpleLoopElement.html"><span>Thelia\Tpex\Element\SimpleLoopElement</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.TestLoopElement.html"><span>Thelia\Tpex\Element\TestLoopElement</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Element.TextElement.html"><span>Thelia\Tpex\Element\TextElement</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.Loop.BaseLoop.html"><span>Thelia\Tpex\Element\Loop\BaseLoop</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.Loop.LoopIteration.html"><span>Thelia\Tpex\Element\Loop\LoopIteration</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.Loop.LoopIterationCollection.html"><span>Thelia\Tpex\Element\Loop\LoopIterationCollection</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.TestLoop.BaseTestLoop.html"><span>Thelia\Tpex\Element\TestLoop\BaseTestLoop</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Element.VariablesTemplate.html"><span>Thelia\Tpex\Element\VariablesTemplate</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Filter.BaseFilter.html"><span>Thelia\Tpex\Filter\BaseFilter</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Tokenizer.Tokenize.html"><span>Thelia\Tpex\Tokenizer\Tokenize</span></a>
+			 implements 
+				<a href="class-Thelia.Tpex.Tokenizer.TokenizeInterface.html"><span>Thelia\Tpex\Tokenizer\TokenizeInterface</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Tools.html"><span>Thelia\Tpex\Tools</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Tpex.html"><span>Thelia\Tpex\Tpex</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.TpexEvents.html"><span>Thelia\Tpex\TpexEvents</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Tpex.TpexToken.html"><span>Thelia\Tpex\TpexToken</span></a>
 			
 			
 			</div>
@@ -5961,7 +5866,7 @@
 
 				</li>
 
-			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Loop.LoopInterface.html"><span>Thelia\Tpex\Loop\LoopInterface</span></a>
+			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Tokenizer.TokenizeInterface.html"><span>Thelia\Tpex\Tokenizer\TokenizeInterface</span></a>
 			
 			
 			</div>
@@ -5982,26 +5887,67 @@
 
 				<ul>
 
-			<li class="last"><div class="last"><span>LogicException</span>			
+			<li><div class="notlast"><span>LogicException</span>			
 			
 			</div>
 
 				<ul>
 
-			<li><div class="notlast"><a href="class-Thelia.Exception.MemberAccessException.html"><span>Thelia\Exception\MemberAccessException</span></a>
+			<li class="last"><div class="last"><a href="class-Thelia.Exception.MemberAccessException.html"><span>Thelia\Exception\MemberAccessException</span></a>
+			
+			
+			</div>
+
+				</ul></li>
+
+			<li class="last"><div class="last"><span>RuntimeException</span>			
+			
+			</div>
+
+				<ul>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Exception.TpexException.html"><span>Thelia\Tpex\Exception\TpexException</span></a>
+			
+			
+			</div>
+
+				<ul>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Exception.ElementNotFoundException.html"><span>Thelia\Tpex\Exception\ElementNotFoundException</span></a>
 			
 			
 			</div>
 
 				</li>
 
-			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Exception.FileNotFoundException.html"><span>Thelia\Tpex\Exception\FileNotFoundException</span></a>
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Exception.FileNotFoundException.html"><span>Thelia\Tpex\Exception\FileNotFoundException</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Exception.InvalidElementException.html"><span>Thelia\Tpex\Exception\InvalidElementException</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li><div class="notlast"><a href="class-Thelia.Tpex.Exception.TokenNotFoundException.html"><span>Thelia\Tpex\Exception\TokenNotFoundException</span></a>
+			
+			
+			</div>
+
+				</li>
+
+			<li class="last"><div class="last"><a href="class-Thelia.Tpex.Exception.TokenSyntaxException.html"><span>Thelia\Tpex\Exception\TokenSyntaxException</span></a>
 			
 			
 			</div>
 
 		</li>
-		</ul></li></ul></li>
+		</ul></li></ul></li></ul></li>
 	</ul>
 </div>
 </div>

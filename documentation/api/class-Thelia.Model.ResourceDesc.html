@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\ResourceDesc | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -423,20 +441,11 @@ exist in the output directory.</p>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
-BaseObject
+Thelia\Model\om\BaseResourceDesc
 			
 			
 		</dd>
 		<dd style="padding-left:30px">
-			<img src="resources/inherit.png" alt="Extended by" />
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html"><span>Thelia\Model\om\BaseResourceDesc</span></a>
-			
-			 implements 
-<span>Persistent</span>
-			
-			
-		</dd>
-		<dd style="padding-left:60px">
 			<img src="resources/inherit.png" alt="Extended by" />
 <b><span>Thelia\Model\ResourceDesc</span></b>			
 			
@@ -463,58 +472,6 @@ BaseObject
 
 
 
-	<table class="summary inherited">
-	<caption>Methods inherited from <a href="class-Thelia.Model.om.BaseResourceDesc.html#methods">Thelia\Model\om\BaseResourceDesc</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#___toString">__toString()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_buildCriteria">buildCriteria()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_buildPkeyCriteria">buildPkeyCriteria()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_clear">clear()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_clearAllReferences">clearAllReferences()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_copy">copy()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_copyInto">copyInto()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_delete">delete()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_doInsert">doInsert()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_doSave">doSave()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_doUpdate">doUpdate()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_doValidate">doValidate()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_ensureConsistency">ensureConsistency()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_fromArray">fromArray()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getByName">getByName()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getByPosition">getByPosition()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getCreatedAt">getCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getId">getId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getLang">getLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getPeer">getPeer()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getPrimaryKey">getPrimaryKey()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getResource">getResource()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getResourceId">getResourceId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getTitle">getTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getUpdatedAt">getUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_getValidationFailures">getValidationFailures()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_hasOnlyDefaultValues">hasOnlyDefaultValues()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_hydrate">hydrate()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_isAlreadyInSave">isAlreadyInSave()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_isPrimaryKeyNull">isPrimaryKeyNull()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_keepUpdateDateUnchanged">keepUpdateDateUnchanged()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_reload">reload()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_save">save()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setByName">setByName()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setByPosition">setByPosition()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setCreatedAt">setCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setId">setId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setLang">setLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setPrimaryKey">setPrimaryKey()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setResource">setResource()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setResourceId">setResourceId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setTitle">setTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_setUpdatedAt">setUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_toArray">toArray()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#_validate">validate()</a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
@@ -523,37 +480,10 @@ BaseObject
 
 
 
-	<table class="summary inherited">
-	<caption>Constants inherited from <a href="class-Thelia.Model.om.BaseResourceDesc.html#constants">Thelia\Model\om\BaseResourceDesc</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#PEER"><b>PEER</b></a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
 
-	<table class="summary inherited">
-	<caption>Properties inherited from <a href="class-Thelia.Model.om.BaseResourceDesc.html#properties">Thelia\Model\om\BaseResourceDesc</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$aResource"><var>$aResource</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$alreadyInSave"><var>$alreadyInSave</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$alreadyInValidation"><var>$alreadyInValidation</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$created_at"><var>$created_at</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$id"><var>$id</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$lang"><var>$lang</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$peer"><var>$peer</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$resource_id"><var>$resource_id</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$startCopy"><var>$startCopy</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$title"><var>$title</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$updated_at"><var>$updated_at</var></a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDesc.html#$validationFailures"><var>$validationFailures</var></a>
-		</code></td>
-	</tr>
-	</table>
 
 
 

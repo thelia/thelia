@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\ResourceDescQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -424,18 +442,11 @@ exist in the output directory.</p>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
-ModelCriteria
+Thelia\Model\om\BaseResourceDescQuery
 			
 			
 		</dd>
 		<dd style="padding-left:30px">
-			<img src="resources/inherit.png" alt="Extended by" />
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html"><span>Thelia\Model\om\BaseResourceDescQuery</span></a>
-			
-			
-			
-		</dd>
-		<dd style="padding-left:60px">
 			<img src="resources/inherit.png" alt="Extended by" />
 <b><span>Thelia\Model\ResourceDescQuery</span></b>			
 			
@@ -462,79 +473,9 @@ ModelCriteria
 
 
 
-	<table class="summary inherited">
-	<caption>Methods inherited from <a href="class-Thelia.Model.om.BaseResourceDescQuery.html#methods">Thelia\Model\om\BaseResourceDescQuery</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#___construct">__construct()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_create">create()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByCreatedAt">filterByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterById">filterById()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByLang">filterByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByPrimaryKey">filterByPrimaryKey()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByPrimaryKeys">filterByPrimaryKeys()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByResource">filterByResource()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByResourceId">filterByResourceId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByTitle">filterByTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_filterByUpdatedAt">filterByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_findPk">findPk()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_findPkComplex">findPkComplex()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_findPkSimple">findPkSimple()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_findPks">findPks()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_firstCreatedFirst">firstCreatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_firstUpdatedFirst">firstUpdatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_joinResource">joinResource()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_lastCreatedFirst">lastCreatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_lastUpdatedFirst">lastUpdatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_prune">prune()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_recentlyCreated">recentlyCreated()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_recentlyUpdated">recentlyUpdated()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#_useResourceQuery">useResourceQuery()</a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
-	<table class="summary inherited">
-	<caption>Magic methods inherited from <a href="class-Thelia.Model.om.BaseResourceDescQuery.html#methods">Thelia\Model\om\BaseResourceDescQuery</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findByCreatedAt">findByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findById">findById()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findByLang">findByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findByResourceId">findByResourceId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findByTitle">findByTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findByUpdatedAt">findByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOne">findOne()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOneByCreatedAt">findOneByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOneById">findOneById()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOneByLang">findOneByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOneByResourceId">findOneByResourceId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOneByTitle">findOneByTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOneByUpdatedAt">findOneByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_findOneOrCreate">findOneOrCreate()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_groupByCreatedAt">groupByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_groupById">groupById()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_groupByLang">groupByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_groupByResourceId">groupByResourceId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_groupByTitle">groupByTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_groupByUpdatedAt">groupByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_innerJoin">innerJoin()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_innerJoinResource">innerJoinResource()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_leftJoin">leftJoin()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_leftJoinResource">leftJoinResource()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_orderByCreatedAt">orderByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_orderById">orderById()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_orderByLang">orderByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_orderByResourceId">orderByResourceId()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_orderByTitle">orderByTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_orderByUpdatedAt">orderByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_rightJoin">rightJoin()</a>, 
-			<a href="class-Thelia.Model.om.BaseResourceDescQuery.html#m_rightJoinResource">rightJoinResource()</a>
-		</code></td>
-	</tr>
-	</table>
 
 
 

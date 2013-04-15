@@ -8,7 +8,7 @@
 	<title>File core/lib/Thelia/Routing/Matcher/ActionMatcher.php | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -26,12 +26,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -66,11 +75,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -192,33 +210,39 @@
 </span><span id="64" class="l"><a class="l" href="#64">64: </a>    <span class="php-keyword1">protected</span> <span class="php-keyword1">function</span> <a id="_dispatchAction" href="#_dispatchAction">dispatchAction</a>(Request <span class="php-var">$request</span>, <span class="php-var">$action</span>)
 </span><span id="65" class="l"><a class="l" href="#65">65: </a>    {
 </span><span id="66" class="l"><a class="l" href="#66">66: </a>        <span class="php-var">$controller</span> = <span class="php-keyword1">null</span>;
-</span><span id="67" class="l"><a class="l" href="#67">67: </a>        <span class="php-keyword1">switch</span> (<span class="php-var">$action</span>) {
-</span><span id="68" class="l"><a class="l" href="#68">68: </a>            <span class="php-keyword1">case</span> <span class="php-quote">'addProduct'</span>:
-</span><span id="69" class="l"><a class="l" href="#69">69: </a>                <span class="php-var">$controller</span> = <span class="php-keyword1">array</span>(
-</span><span id="70" class="l"><a class="l" href="#70">70: </a>                    <span class="php-keyword1">new</span> Cart(<span class="php-var">$this</span>-&gt;dispatcher),
-</span><span id="71" class="l"><a class="l" href="#71">71: </a>                    <span class="php-quote">&quot;addCart&quot;</span>
-</span><span id="72" class="l"><a class="l" href="#72">72: </a>                );
-</span><span id="73" class="l"><a class="l" href="#73">73: </a>                <span class="php-keyword1">break</span>;
-</span><span id="74" class="l"><a class="l" href="#74">74: </a>            <span class="php-keyword1">default</span> :
-</span><span id="75" class="l"><a class="l" href="#75">75: </a>                <span class="php-var">$event</span> = <span class="php-keyword1">new</span> ActionEvent(<span class="php-var">$request</span>, <span class="php-var">$action</span>);
-</span><span id="76" class="l"><a class="l" href="#76">76: </a>                <span class="php-var">$this</span>-&gt;dispatcher-&gt;dispatch(TheliaEvents::ACTION, <span class="php-var">$event</span>);
-</span><span id="77" class="l"><a class="l" href="#77">77: </a>                <span class="php-keyword1">if</span> (<span class="php-var">$event</span>-&gt;hasController()) {
-</span><span id="78" class="l"><a class="l" href="#78">78: </a>                    <span class="php-var">$controller</span> = <span class="php-var">$event</span>-&gt;getController();
-</span><span id="79" class="l"><a class="l" href="#79">79: </a>                }
-</span><span id="80" class="l"><a class="l" href="#80">80: </a>                <span class="php-keyword1">break</span>;
-</span><span id="81" class="l"><a class="l" href="#81">81: </a>        }
-</span><span id="82" class="l"><a class="l" href="#82">82: </a>
-</span><span id="83" class="l"><a class="l" href="#83">83: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$controller</span>) {
-</span><span id="84" class="l"><a class="l" href="#84">84: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
-</span><span id="85" class="l"><a class="l" href="#85">85: </a>                <span class="php-quote">'_controller'</span> =&gt; <span class="php-var">$controller</span>
-</span><span id="86" class="l"><a class="l" href="#86">86: </a>            );
-</span><span id="87" class="l"><a class="l" href="#87">87: </a>        }
+</span><span id="67" class="l"><a class="l" href="#67">67: </a>        <span class="php-var">$event</span> = <span class="php-keyword1">new</span> ActionEvent(<span class="php-var">$request</span>, <span class="php-var">$action</span>);
+</span><span id="68" class="l"><a class="l" href="#68">68: </a>        <span class="php-var">$this</span>-&gt;dispatcher-&gt;dispatch(TheliaEvents::ACTION, <span class="php-var">$event</span>);
+</span><span id="69" class="l"><a class="l" href="#69">69: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$event</span>-&gt;hasController()) {
+</span><span id="70" class="l"><a class="l" href="#70">70: </a>            <span class="php-var">$controller</span> = <span class="php-var">$event</span>-&gt;getController();
+</span><span id="71" class="l"><a class="l" href="#71">71: </a>        }
+</span><span id="72" class="l"><a class="l" href="#72">72: </a>
+</span><span id="73" class="l"><a class="l" href="#73">73: </a><span class="php-comment">/*        switch ($action) {
+</span></span><span id="74" class="l"><a class="l" href="#74">74: </a><span class="php-comment">            case 'addProduct':
+</span></span><span id="75" class="l"><a class="l" href="#75">75: </a><span class="php-comment">                $controller = array(
+</span></span><span id="76" class="l"><a class="l" href="#76">76: </a><span class="php-comment">                    new Cart($this-&gt;dispatcher),
+</span></span><span id="77" class="l"><a class="l" href="#77">77: </a><span class="php-comment">                    &quot;addCart&quot;
+</span></span><span id="78" class="l"><a class="l" href="#78">78: </a><span class="php-comment">                );
+</span></span><span id="79" class="l"><a class="l" href="#79">79: </a><span class="php-comment">                break;
+</span></span><span id="80" class="l"><a class="l" href="#80">80: </a><span class="php-comment">            default :
+</span></span><span id="81" class="l"><a class="l" href="#81">81: </a><span class="php-comment">                $event = new ActionEvent($request, $action);
+</span></span><span id="82" class="l"><a class="l" href="#82">82: </a><span class="php-comment">                $this-&gt;dispatcher-&gt;dispatch(TheliaEvents::ACTION, $event);
+</span></span><span id="83" class="l"><a class="l" href="#83">83: </a><span class="php-comment">                if ($event-&gt;hasController()) {
+</span></span><span id="84" class="l"><a class="l" href="#84">84: </a><span class="php-comment">                    $controller = $event-&gt;getController();
+</span></span><span id="85" class="l"><a class="l" href="#85">85: </a><span class="php-comment">                }
+</span></span><span id="86" class="l"><a class="l" href="#86">86: </a><span class="php-comment">                break;
+</span></span><span id="87" class="l"><a class="l" href="#87">87: </a><span class="php-comment">        }*/</span>
 </span><span id="88" class="l"><a class="l" href="#88">88: </a>
-</span><span id="89" class="l"><a class="l" href="#89">89: </a>        <span class="php-keyword1">throw</span> <span class="php-keyword1">new</span> ResourceNotFoundException(<span class="php-quote">&quot;No action parameter found&quot;</span>);
-</span><span id="90" class="l"><a class="l" href="#90">90: </a>
-</span><span id="91" class="l"><a class="l" href="#91">91: </a>    }
-</span><span id="92" class="l"><a class="l" href="#92">92: </a>}
-</span><span id="93" class="l"><a class="l" href="#93">93: </a></span></code></pre>
+</span><span id="89" class="l"><a class="l" href="#89">89: </a>        <span class="php-keyword1">if</span> (<span class="php-var">$controller</span>) {
+</span><span id="90" class="l"><a class="l" href="#90">90: </a>            <span class="php-keyword1">return</span> <span class="php-keyword1">array</span>(
+</span><span id="91" class="l"><a class="l" href="#91">91: </a>                <span class="php-quote">'_controller'</span> =&gt; <span class="php-var">$controller</span>
+</span><span id="92" class="l"><a class="l" href="#92">92: </a>            );
+</span><span id="93" class="l"><a class="l" href="#93">93: </a>        }
+</span><span id="94" class="l"><a class="l" href="#94">94: </a>
+</span><span id="95" class="l"><a class="l" href="#95">95: </a>        <span class="php-keyword1">throw</span> <span class="php-keyword1">new</span> ResourceNotFoundException(<span class="php-quote">&quot;No action parameter found&quot;</span>);
+</span><span id="96" class="l"><a class="l" href="#96">96: </a>
+</span><span id="97" class="l"><a class="l" href="#97">97: </a>    }
+</span><span id="98" class="l"><a class="l" href="#98">98: </a>}
+</span><span id="99" class="l"><a class="l" href="#99">99: </a></span></code></pre>
 
 	<div id="footer">
 		thelia API documentation generated by <a href="http://apigen.org">ApiGen 2.8.0</a>

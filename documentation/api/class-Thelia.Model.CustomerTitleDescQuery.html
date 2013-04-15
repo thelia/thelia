@@ -7,7 +7,7 @@
 	<title>Class Thelia\Model\CustomerTitleDescQuery | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -424,18 +442,11 @@ exist in the output directory.</p>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
-ModelCriteria
+Thelia\Model\om\BaseCustomerTitleDescQuery
 			
 			
 		</dd>
 		<dd style="padding-left:30px">
-			<img src="resources/inherit.png" alt="Extended by" />
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html"><span>Thelia\Model\om\BaseCustomerTitleDescQuery</span></a>
-			
-			
-			
-		</dd>
-		<dd style="padding-left:60px">
 			<img src="resources/inherit.png" alt="Extended by" />
 <b><span>Thelia\Model\CustomerTitleDescQuery</span></b>			
 			
@@ -462,84 +473,9 @@ ModelCriteria
 
 
 
-	<table class="summary inherited">
-	<caption>Methods inherited from <a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#methods">Thelia\Model\om\BaseCustomerTitleDescQuery</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#___construct">__construct()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_create">create()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByCreatedAt">filterByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByCustomerTitle">filterByCustomerTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByCustomerTitleId">filterByCustomerTitleId()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterById">filterById()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByLang">filterByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByLong">filterByLong()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByPrimaryKey">filterByPrimaryKey()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByPrimaryKeys">filterByPrimaryKeys()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByShort">filterByShort()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_filterByUpdatedAt">filterByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_findPk">findPk()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_findPkComplex">findPkComplex()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_findPkSimple">findPkSimple()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_findPks">findPks()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_firstCreatedFirst">firstCreatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_firstUpdatedFirst">firstUpdatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_joinCustomerTitle">joinCustomerTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_lastCreatedFirst">lastCreatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_lastUpdatedFirst">lastUpdatedFirst()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_prune">prune()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_recentlyCreated">recentlyCreated()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_recentlyUpdated">recentlyUpdated()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#_useCustomerTitleQuery">useCustomerTitleQuery()</a>
-		</code></td>
-	</tr>
-	</table>
 
 
 
-	<table class="summary inherited">
-	<caption>Magic methods inherited from <a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#methods">Thelia\Model\om\BaseCustomerTitleDescQuery</a></caption>
-	<tr>
-		<td><code>
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findByCreatedAt">findByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findByCustomerTitleId">findByCustomerTitleId()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findById">findById()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findByLang">findByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findByLong">findByLong()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findByShort">findByShort()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findByUpdatedAt">findByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOne">findOne()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneByCreatedAt">findOneByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneByCustomerTitleId">findOneByCustomerTitleId()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneById">findOneById()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneByLang">findOneByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneByLong">findOneByLong()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneByShort">findOneByShort()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneByUpdatedAt">findOneByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_findOneOrCreate">findOneOrCreate()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_groupByCreatedAt">groupByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_groupByCustomerTitleId">groupByCustomerTitleId()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_groupById">groupById()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_groupByLang">groupByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_groupByLong">groupByLong()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_groupByShort">groupByShort()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_groupByUpdatedAt">groupByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_innerJoin">innerJoin()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_innerJoinCustomerTitle">innerJoinCustomerTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_leftJoin">leftJoin()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_leftJoinCustomerTitle">leftJoinCustomerTitle()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_orderByCreatedAt">orderByCreatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_orderByCustomerTitleId">orderByCustomerTitleId()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_orderById">orderById()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_orderByLang">orderByLang()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_orderByLong">orderByLong()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_orderByShort">orderByShort()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_orderByUpdatedAt">orderByUpdatedAt()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_rightJoin">rightJoin()</a>, 
-			<a href="class-Thelia.Model.om.BaseCustomerTitleDescQuery.html#m_rightJoinCustomerTitle">rightJoinCustomerTitle()</a>
-		</code></td>
-	</tr>
-	</table>
 
 
 

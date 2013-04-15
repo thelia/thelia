@@ -7,7 +7,7 @@
 	<title>Class Thelia\Core\Template\Parser | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li class="active"><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -166,7 +184,7 @@ parser</p>
 				<b>Author:</b>
 				Manuel Raynaud &lt;<a
 href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&gt;<br />
-		<b>Located at</b> <a href="source-class-Thelia.Core.Template.Parser.html#37-176" title="Go to source code">core/lib/Thelia/Core/Template/Parser.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Core.Template.Parser.html#37-171" title="Go to source code">core/lib/Thelia/Core/Template/Parser.php</a><br />
 	</div>
 
 
@@ -184,7 +202,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#72-82" title="Go to source code">__construct</a>( <span>Symfony\Component\DependencyInjection\ContainerInterface <var>$container</var></span>, <span><code><a href="class-Thelia.Tpex.Tpex.html">Thelia\Tpex\Tpex</a></code> <var>$tpex</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#72-81" title="Go to source code">__construct</a>( <span>Symfony\Component\DependencyInjection\ContainerInterface <var>$container</var></span> )</code>
 
 		<div class="description short">
 			
@@ -198,8 +216,6 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 				<div class="list"><dl>
 					<dt><var>$container</var></dt>
 					<dd><code>type</code><br>$container public function __construct(ContainerBuilder $container)</dd>
-					<dt><var>$tpex</var></dt>
-					<dd></dd>
 				</dl></div>
 
 
@@ -220,7 +236,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getRequest">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#84-91" title="Go to source code">getRequest</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#83-90" title="Go to source code">getRequest</a>( )</code>
 
 		<div class="description short">
 			
@@ -253,7 +269,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getDispatcher">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#93-100" title="Go to source code">getDispatcher</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#92-99" title="Go to source code">getDispatcher</a>( )</code>
 
 		<div class="description short">
 			
@@ -286,7 +302,7 @@ href="mailto:mraynaud&#64;openstudio.fr">mraynaud&#64;<!---->openstudio.fr</a>&g
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getContent">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#102-112" title="Go to source code">getContent</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#101-111" title="Go to source code">getContent</a>( )</code>
 
 		<div class="description short">
 			
@@ -320,7 +336,7 @@ or the content of the response</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setContent">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#114-123" title="Go to source code">setContent</a>( <span>string|Symfony\Component\HttpFoundation\Response <var>$content</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#113-122" title="Go to source code">setContent</a>( <span>string|Symfony\Component\HttpFoundation\Response <var>$content</var></span> )</code>
 
 		<div class="description short">
 			
@@ -359,7 +375,7 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getStatus">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#125-132" title="Go to source code">getStatus</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#124-131" title="Go to source code">getStatus</a>( )</code>
 
 		<div class="description short">
 			
@@ -394,7 +410,7 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_setStatus">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#134-143" title="Go to source code">setStatus</a>( <span>integer <var>$status</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#133-142" title="Go to source code">setStatus</a>( <span>integer <var>$status</var></span> )</code>
 
 		<div class="description short">
 			
@@ -432,7 +448,7 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_loadParser">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#145-162" title="Go to source code">loadParser</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#144-157" title="Go to source code">loadParser</a>( )</code>
 
 		<div class="description short">
 			
@@ -465,7 +481,7 @@ directly</p>
 
 		<td class="name"><div>
 		<a class="anchor" href="#_openFile">#</a>
-		<code><a href="source-class-Thelia.Core.Template.Parser.html#164-175" title="Go to source code">openFile</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Template.Parser.html#159-170" title="Go to source code">openFile</a>( <span>Symfony\Component\HttpFoundation\Request <var>$request</var></span> )</code>
 
 		<div class="description short">
 			

@@ -7,7 +7,7 @@
 	<title>Class Thelia\Core\Thelia | thelia</title>
 
 	<script type="text/javascript" src="resources/combined.js?394153670"></script>
-	<script type="text/javascript" src="elementlist.js?394832703"></script>
+	<script type="text/javascript" src="elementlist.js?2310571897"></script>
 	<link rel="stylesheet" type="text/css" media="all" href="resources/style.css?3505392360" />
 
 </head>
@@ -25,12 +25,21 @@
 						<ul>
 				<li><a href="namespace-Thelia.Action.html">Action</a>
 						</li>
+				<li><a href="namespace-Thelia.Config.html">Config</a>
+						</li>
 				<li><a href="namespace-Thelia.Controller.html">Controller</a>
 						</li>
 				<li class="active"><a href="namespace-Thelia.Core.html">Core<span></span></a>
 						<ul>
 				<li><a href="namespace-Thelia.Core.Bundle.html">Bundle</a>
 						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.html">DependencyInjection<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Compiler.html">Compiler</a>
+						</li>
+				<li><a href="namespace-Thelia.Core.DependencyInjection.Loader.html">Loader</a>
+						</li>
+							</ul></li>
 				<li><a href="namespace-Thelia.Core.Event.html">Event</a>
 						</li>
 				<li><a href="namespace-Thelia.Core.EventListener.html">EventListener</a>
@@ -65,11 +74,20 @@
 						<ul>
 				<li><a href="namespace-Thelia.Tpex.BaseParam.html">BaseParam</a>
 						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.html">Element<span></span></a>
+						<ul>
+				<li><a href="namespace-Thelia.Tpex.Element.Loop.html">Loop</a>
+						</li>
+				<li><a href="namespace-Thelia.Tpex.Element.TestLoop.html">TestLoop</a>
+						</li>
+							</ul></li>
+				<li><a href="namespace-Thelia.Tpex.Event.html">Event</a>
+						</li>
 				<li><a href="namespace-Thelia.Tpex.Exception.html">Exception</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Loop.html">Loop</a>
+				<li><a href="namespace-Thelia.Tpex.Filter.html">Filter</a>
 						</li>
-				<li><a href="namespace-Thelia.Tpex.Tests.html">Tests</a>
+				<li><a href="namespace-Thelia.Tpex.Tokenizer.html">Tokenizer</a>
 						</li>
 							</ul></li></ul></li>
 			</ul>
@@ -82,6 +100,7 @@
 			<h3>Classes</h3>
 			<ul>
 				<li class="active"><a href="class-Thelia.Core.Thelia.html">Thelia</a></li>
+				<li><a href="class-Thelia.Core.TheliaContainerBuilder.html">TheliaContainerBuilder</a></li>
 				<li><a href="class-Thelia.Core.TheliaHttpKernel.html">TheliaHttpKernel</a></li>
 			</ul>
 
@@ -156,7 +175,7 @@ Symfony\Component\HttpKernel\Kernel
 		<b>Namespace:</b> <a href="namespace-Thelia.html">Thelia</a>\<a href="namespace-Thelia.Core.html">Core</a><br />
 		
 
-		<b>Located at</b> <a href="source-class-Thelia.Core.Thelia.html#45-200" title="Go to source code">core/lib/Thelia/Core/Thelia.php</a><br />
+		<b>Located at</b> <a href="source-class-Thelia.Core.Thelia.html#57-233" title="Go to source code">core/lib/Thelia/Core/Thelia.php</a><br />
 	</div>
 
 
@@ -174,7 +193,7 @@ Symfony\Component\HttpKernel\Kernel
 
 		<td class="name"><div>
 		<a class="anchor" href="#_init">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#48-53" title="Go to source code">init</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Thelia.html#62-69" title="Go to source code">init</a>( )</code>
 
 		<div class="description short">
 			
@@ -203,7 +222,7 @@ Symfony\Component\HttpKernel\Kernel
 
 		<td class="name"><div>
 		<a class="anchor" href="#_initPropel">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#55-72" title="Go to source code">initPropel</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Thelia.html#71-97" title="Go to source code">initPropel</a>( )</code>
 
 		<div class="description short">
 			
@@ -224,7 +243,7 @@ Symfony\Component\HttpKernel\Kernel
 	<tr data-order="loadConfiguration" id="_loadConfiguration">
 
 		<td class="attributes"><code>
-			 public 
+			 protected 
 			
 			
 			</code>
@@ -232,7 +251,7 @@ Symfony\Component\HttpKernel\Kernel
 
 		<td class="name"><div>
 		<a class="anchor" href="#_loadConfiguration">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#74-83" title="Go to source code">loadConfiguration</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Thelia.html#99-122" title="Go to source code">loadConfiguration</a>( <span>Symfony\Component\DependencyInjection\ContainerBuilder <var>$container</var></span> )</code>
 
 		<div class="description short">
 			
@@ -252,31 +271,78 @@ Symfony\Component\HttpKernel\Kernel
 		</div>
 		</div></td>
 	</tr>
-	<tr data-order="boot" id="_boot">
+	<tr data-order="getContainerBuilder" id="_getContainerBuilder">
 
 		<td class="attributes"><code>
-			 public 
-			
+			 protected 
+			Symfony\Component\DependencyInjection\ContainerBuilder
 			
 			</code>
 		</td>
 
 		<td class="name"><div>
-		<a class="anchor" href="#_boot">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#95-108" title="Go to source code">boot</a>( )</code>
+		<a class="anchor" href="#_getContainerBuilder">#</a>
+		<code><a href="source-class-Thelia.Core.Thelia.html#133-141" title="Go to source code">getContainerBuilder</a>( )</code>
 
 		<div class="description short">
 			
+<p>Gets a new ContainerBuilder instance used to build the service container.</p>
+
 		</div>
 
 		<div class="description detailed hidden">
 			
-<p>boot parent kernel and after current kernel</p>
+<p>Gets a new ContainerBuilder instance used to build the service container.</p>
 
 
 
 
+				<h4>Returns</h4>
+				<div class="list">
+					<code>Symfony\Component\DependencyInjection\ContainerBuilder</code><br />
+				</div>
 
+
+
+
+		</div>
+		</div></td>
+	</tr>
+	<tr data-order="buildContainer" id="_buildContainer">
+
+		<td class="attributes"><code>
+			 protected 
+			Symfony\Component\DependencyInjection\ContainerBuilder
+			
+			</code>
+		</td>
+
+		<td class="name"><div>
+		<a class="anchor" href="#_buildContainer">#</a>
+		<code><a href="source-class-Thelia.Core.Thelia.html#143-158" title="Go to source code">buildContainer</a>( )</code>
+
+		<div class="description short">
+			
+<p>Builds the service container.</p>
+
+		</div>
+
+		<div class="description detailed hidden">
+			
+<p>Builds the service container.</p>
+
+
+
+
+				<h4>Returns</h4>
+				<div class="list">
+					<code>Symfony\Component\DependencyInjection\ContainerBuilder</code><br>The compiled service container<br />
+				</div>
+
+				<h4>Throws</h4>
+				<div class="list">
+					<code>RuntimeException</code><br />
+				</div>
 
 
 
@@ -294,7 +360,7 @@ Symfony\Component\HttpKernel\Kernel
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getCacheDir">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#110-125" title="Go to source code">getCacheDir</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Thelia.html#160-175" title="Go to source code">getCacheDir</a>( )</code>
 
 		<div class="description short">
 			
@@ -334,7 +400,7 @@ Symfony\Component\HttpKernel\Kernel
 
 		<td class="name"><div>
 		<a class="anchor" href="#_getLogDir">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#127-141" title="Go to source code">getLogDir</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Thelia.html#177-191" title="Go to source code">getLogDir</a>( )</code>
 
 		<div class="description short">
 			
@@ -374,7 +440,7 @@ Symfony\Component\HttpKernel\Kernel
 
 		<td class="name"><div>
 		<a class="anchor" href="#_registerBundles">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#160-183" title="Go to source code">registerBundles</a>( )</code>
+		<code><a href="source-class-Thelia.Core.Thelia.html#193-216" title="Go to source code">registerBundles</a>( )</code>
 
 		<div class="description short">
 			
@@ -413,7 +479,7 @@ Symfony\Component\HttpKernel\Kernel
 
 		<td class="name"><div>
 		<a class="anchor" href="#_registerContainerConfiguration">#</a>
-		<code><a href="source-class-Thelia.Core.Thelia.html#185-198" title="Go to source code">registerContainerConfiguration</a>( <span>Symfony\Component\Config\Loader\LoaderInterface <var>$loader</var></span> )</code>
+		<code><a href="source-class-Thelia.Core.Thelia.html#218-231" title="Go to source code">registerContainerConfiguration</a>( <span>Symfony\Component\Config\Loader\LoaderInterface <var>$loader</var></span> )</code>
 
 		<div class="description short">
 			
@@ -458,6 +524,32 @@ Symfony\Component\HttpKernel\Kernel
 
 
 
+	<table class="summary" id="properties">
+	<caption>Properties summary</caption>
+	<tr data-order="tpexConfig" id="$tpexConfig">
+		<td class="attributes"><code>
+			protected  
+			mixed
+		</code></td>
+
+		<td class="name">
+				<a href="source-class-Thelia.Core.Thelia.html#60" title="Go to source code"><var>$tpexConfig</var></a>
+		</td>
+		<td class="value"><code></code></td>
+		<td class="description"><div>
+			<a href="#$tpexConfig" class="anchor">#</a>
+
+			<div class="description short">
+				
+			</div>
+
+			<div class="description detailed hidden">
+				
+
+			</div>
+		</div></td>
+	</tr>
+	</table>
 
 
 
