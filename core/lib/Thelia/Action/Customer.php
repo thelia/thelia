@@ -23,23 +23,54 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Event\ActionEvent;
 
-class Customer
+class Customer implements EventSubscriberInterface
 {
 
-    public function create(Request $request)
+    public function create(ActionEvent $event)
     {
 
     }
 
-    public function modify(Request $request)
+    public function modify(ActionEvent $event)
     {
 
     }
 
-    public function modifyPassword(Request $request)
+    public function modifyPassword(ActionEvent $event)
     {
 
     }
+
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            "action.createCustomer" => array("create", 128),
+            "action.modifyCustomer" => array("modify", 128)
+        );
+    }
+
 }

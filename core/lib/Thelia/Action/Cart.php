@@ -24,17 +24,19 @@
 namespace Thelia\Action;
 
 use Symfony\Component\HttpFoundation\Request;
-use Thelia\Action\BaseAction;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Thelia\Core\Event\ActionEvent;
 
-class Cart extends BaseAction
+
+class Cart implements EventSubscriberInterface
 {
     /**
      *
      * add an article to cart
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Thelia\Core\Event\ActionEvent $event
      */
-    public function addCart(Request $request)
+    public function addArticle(ActionEvent $event)
     {
 
     }
@@ -43,9 +45,9 @@ class Cart extends BaseAction
      *
      * Delete specify article present into cart
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Thelia\Core\Event\ActionEvent $event
      */
-    public function deleteArticle(Request $request)
+    public function deleteArticle(ActionEvent $event)
     {
 
     }
@@ -54,10 +56,39 @@ class Cart extends BaseAction
      *
      * Modify article's quantity
      *
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Thelia\Core\Event\ActionEvent $event
      */
-    public function modifyArticle(Request $request)
+    public function modifyArticle(ActionEvent $event)
     {
 
+    }
+
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            "action.addArticle" => array("addArticle", 128),
+            "action.deleteArticle" => array("deleteArticle", 128),
+            "action.modifyArticle" => array("modifyArticle", 128),
+        );
     }
 }

@@ -48,12 +48,6 @@ class ActionEvent extends Event
     protected $action;
     
     /**
-     *
-     * @var string
-     */
-    protected $controller;
-    
-    /**
      * 
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param string $action
@@ -80,25 +74,4 @@ class ActionEvent extends Event
     {
         return $this->request;
     }
-    
-    /**
-     * 
-     * @param string $controller
-     */
-    public function setController($controller)
-    {
-        $this->controller = $controller;
-    }
-    
-    public function getController()
-    {
-        return $this->controller;
-    }
-    
-    public function hasController()
-    {
-        return null !== $this->controller;
-    }
-    
-    
 }

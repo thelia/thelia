@@ -25,25 +25,29 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\TheliaEvents;
 
 class RequestListener implements EventSubscriberInterface
 {
-   protected $container;
 
-   public function __construct(ContainerInterface $container)
-   {
-       $this->container = $container;
-   }
 
-   public function onKernelRequest(GetResponseEvent $event)
-   {
-   }
+    public function onKernelRequest(GetResponseEvent $event)
+    {
+        $dispatcher = $event->getDispatcher();
+        $request = $event->getRequest();
+        if (false !== $action = $request->get("action")) {
+           //search corresponding action
+            $event = new ActionEvent($request, $action);
+            $dispatcher->dispatch("action.".$action, $event);
+        }
+
+    }
 
    public static function getSubscribedEvents()
    {
-       return array(
-        KernelEvents::REQUEST => array('onKernelRequest', 30)
-       );
+        return array(
+            KernelEvents::REQUEST => array('onKernelRequest', 0)
+        );
    }
 }

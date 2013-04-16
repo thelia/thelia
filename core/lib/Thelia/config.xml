@@ -28,26 +28,37 @@
             <argument type="service" id="controller.default"/>
         </service>
 
-        <service id="matcher.action" class="Thelia\Routing\Matcher\ActionMatcher">
+<!--        <service id="matcher.action" class="Thelia\Routing\Matcher\ActionMatcher">
             <call method="setDispatcher">
                 <argument type="service" id="event_dispatcher"/>
             </call>
-        </service>
+        </service>-->
 
         <service id="matcher" class="Thelia\Routing\TheliaMatcherCollection">
             <call method="add">
                 <argument type="service" id="matcher.default"/>
                 <argument>-255</argument>
             </call>
-            <call method="add">
+<!--            <call method="add">
                 <argument type="service" id="matcher.action"/>
                 <argument>-200</argument>
-            </call>
+            </call>-->
         </service>
 
         <service id="listener.router" class="Symfony\Component\HttpKernel\EventListener\RouterListener">
             <tag name="kernel.event_subscriber"/>
             <argument type="service" id="matcher"/>
+        </service>
+
+        <service id="thelia.request_listener" class="Thelia\Core\EventListener\RequestListener">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="thelia.action.cart" class="Thelia\Action\Cart">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="thelia.action.customer" class="Thelia\Action\Customer">
+            <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="controller_resolver" class="Symfony\Component\HttpKernel\Controller\ControllerResolver"/>
