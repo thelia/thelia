@@ -1,5 +1,5 @@
 {
-    "hash": "cf4088dc8f62e5c8b39d474fbcc90de3",
+    "hash": "05d2d7252b42f45fd8415a6c47087d97",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -233,6 +233,55 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "symfony-cmf/routing",
+            "version": "1.0.0",
+            "target-dir": "Symfony/Cmf/Component/Routing",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony-cmf/Routing.git",
+                "reference": "1.0.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony-cmf/Routing/zipball/1.0.0",
+                "reference": "1.0.0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.2",
+                "symfony/http-kernel": ">=2.1,<2.3-dev",
+                "symfony/routing": ">=2.1,<2.3-dev"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Symfony\\Cmf\\Component\\Routing": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Symfony CMF Community",
+                    "homepage": "https://github.com/symfony-cmf/Routing/contributors"
+                }
+            ],
+            "description": "Extends the Symfony2 routing component for dynamic routes and chaining several routers",
+            "homepage": "http://cmf.symfony.com",
+            "keywords": [
+                "database",
+                "routing"
+            ],
+            "time": "2013-03-25 15:02:40"
         },
         {
             "name": "symfony/class-loader",

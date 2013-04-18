@@ -12,6 +12,12 @@
         <loop name="foo" class="Foo\Bar"/>
         <loop name="fooz" class="Foo\Barz"/>
     </loops>
+    <parameters>
+        <parameter key="router.request_context.class">Symfony\Component\Routing\RequestContext</parameter>
+        <parameter key="router.null_generator.class">Thelia\Routing\NullUrlGenerator</parameter>
+        <parameter key="router.dynamicRouter.class">Symfony\Cmf\Component\Routing\DynamicRouter</parameter>
+        <parameter key="router.chainRouter.class">Symfony\Cmf\Component\Routing\ChainRouter</parameter>
+    </parameters>
     <services>
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
@@ -28,26 +34,29 @@
             <argument type="service" id="controller.default"/>
         </service>
 
-<!--        <service id="matcher.action" class="Thelia\Routing\Matcher\ActionMatcher">
-            <call method="setDispatcher">
-                <argument type="service" id="event_dispatcher"/>
-            </call>
-        </service>-->
+        <service id="request.context" class="%router.request_context.class%" />
 
-        <service id="matcher" class="Thelia\Routing\TheliaMatcherCollection">
+        <service id="router.null_generator" class="%router.null_generator.class%"/>
+
+        <service id="router.default_route" class="%router.dynamicRouter.class%">
+            <argument type="service" id="request.context"/>
+            <argument type="service" id="matcher.default"/>
+            <argument type="service" id="router.null_generator"/>
+        </service>
+
+        <service id="router.chainRequest" class="%router.chainRouter.class%">
+            <call method="setContext">
+                <argument type="service" id="request.context"/>
+            </call>
             <call method="add">
-                <argument type="service" id="matcher.default"/>
+                <argument type="service" id="router.default_route"/>
                 <argument>-255</argument>
             </call>
-<!--            <call method="add">
-                <argument type="service" id="matcher.action"/>
-                <argument>-200</argument>
-            </call>-->
         </service>
 
         <service id="listener.router" class="Symfony\Component\HttpKernel\EventListener\RouterListener">
             <tag name="kernel.event_subscriber"/>
-            <argument type="service" id="matcher"/>
+            <argument type="service" id="router.chainRequest"/>
         </service>
 
         <service id="thelia.request_listener" class="Thelia\Core\EventListener\RequestListener">
