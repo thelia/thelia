@@ -24,7 +24,6 @@
 namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Event\ActionEvent;
 
 class Customer implements EventSubscriberInterface
