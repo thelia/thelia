@@ -17,6 +17,7 @@
         <parameter key="router.null_generator.class">Thelia\Routing\NullUrlGenerator</parameter>
         <parameter key="router.dynamicRouter.class">Symfony\Cmf\Component\Routing\DynamicRouter</parameter>
         <parameter key="router.chainRouter.class">Symfony\Cmf\Component\Routing\ChainRouter</parameter>
+        <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
     </parameters>
     <services>
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
@@ -44,6 +45,24 @@
             <argument type="service" id="router.null_generator"/>
         </service>
 
+        <service id="router.admin.fileLocator" class="Symfony\Component\Config\FileLocator">
+            <argument>%thelia.core_dir%/Config/Resources/</argument>
+        </service>
+
+        <service id="router.admin.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
+            <argument type="service" id="router.admin.fileLocator"/>
+        </service>
+
+        <service id="router.admin" class="%router.class%">
+            <argument type="service" id="router.admin.xmlLoader"/>
+            <argument>routing.xml</argument>
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%</argument>
+                <argument key="debug">%kernel.debug%</argument>
+            </argument>
+            <argument type="service" id="request.context"/>
+        </service>
+
         <service id="router.chainRequest" class="%router.chainRouter.class%">
             <call method="setContext">
                 <argument type="service" id="request.context"/>
@@ -51,6 +70,10 @@
             <call method="add">
                 <argument type="service" id="router.default_route"/>
                 <argument>-255</argument>
+            </call>
+            <call method="add">
+                <argument type="service" id="router.admin"/>
+                <argument>0</argument>
             </call>
         </service>
 

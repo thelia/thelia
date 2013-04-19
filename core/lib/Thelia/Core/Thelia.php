@@ -105,7 +105,7 @@ class Thelia extends Kernel
     protected function loadConfiguration(ContainerBuilder $container)
     {
 
-        $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia"));
+        $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia/Config/Resources"));
         $loader->load("config.xml");
 
         $modules = \Thelia\Model\ModuleQuery::getActivated();
@@ -153,7 +153,6 @@ class Thelia extends Kernel
 
         $this->loadConfiguration($container);
         $container->customCompile();
-
         return $container;
     }
 
@@ -188,6 +187,21 @@ class Thelia extends Kernel
         } else {
             return parent::getLogDir();
         }
+    }
+
+    /**
+     * Returns the kernel parameters.
+     *
+     * @return array An array of kernel parameters
+     */
+    protected function getKernelParameters()
+    {
+        $parameters = parent::getKernelParameters();
+
+        $parameters["thelia.root_dir"] = THELIA_ROOT;
+        $parameters["thelia.core_dir"] = THELIA_ROOT . "core/lib/Thelia";
+
+        return $parameters;
     }
 
     /**
