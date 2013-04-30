@@ -15,6 +15,8 @@ use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Category;
+use Thelia\Model\CategoryQuery;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureAvQuery;
@@ -111,6 +113,11 @@ abstract class BaseFeature extends BaseObject implements Persistent
     protected $collFeatureI18nsPartial;
 
     /**
+     * @var        PropelObjectCollection|Category[] Collection to store aggregation of Category objects.
+     */
+    protected $collCategorys;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -143,6 +150,12 @@ abstract class BaseFeature extends BaseObject implements Persistent
      * @var        array[FeatureI18n]
      */
     protected $currentTranslations;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $categorysScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -527,6 +540,7 @@ abstract class BaseFeature extends BaseObject implements Persistent
 
             $this->collFeatureI18ns = null;
 
+            $this->collCategorys = null;
         } // if (deep)
     }
 
@@ -660,6 +674,32 @@ abstract class BaseFeature extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->categorysScheduledForDeletion !== null) {
+                if (!$this->categorysScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->categorysScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    FeatureCategoryQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->categorysScheduledForDeletion = null;
+                }
+
+                foreach ($this->getCategorys() as $category) {
+                    if ($category->isModified()) {
+                        $category->save($con);
+                    }
+                }
+            } elseif ($this->collCategorys) {
+                foreach ($this->collCategorys as $category) {
+                    if ($category->isModified()) {
+                        $category->save($con);
+                    }
+                }
             }
 
             if ($this->featureAvsScheduledForDeletion !== null) {
@@ -2246,6 +2286,183 @@ abstract class BaseFeature extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCategorys collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Feature The current object (for fluent API support)
+     * @see        addCategorys()
+     */
+    public function clearCategorys()
+    {
+        $this->collCategorys = null; // important to set this to null since that means it is uninitialized
+        $this->collCategorysPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collCategorys collection.
+     *
+     * By default this just sets the collCategorys collection to an empty collection (like clearCategorys());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initCategorys()
+    {
+        $this->collCategorys = new PropelObjectCollection();
+        $this->collCategorys->setModel('Category');
+    }
+
+    /**
+     * Gets a collection of Category objects related by a many-to-many relationship
+     * to the current object by way of the feature_category cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Feature is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Category[] List of Category objects
+     */
+    public function getCategorys($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collCategorys || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCategorys) {
+                // return empty collection
+                $this->initCategorys();
+            } else {
+                $collCategorys = CategoryQuery::create(null, $criteria)
+                    ->filterByFeature($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collCategorys;
+                }
+                $this->collCategorys = $collCategorys;
+            }
+        }
+
+        return $this->collCategorys;
+    }
+
+    /**
+     * Sets a collection of Category objects related by a many-to-many relationship
+     * to the current object by way of the feature_category cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $categorys A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Feature The current object (for fluent API support)
+     */
+    public function setCategorys(PropelCollection $categorys, PropelPDO $con = null)
+    {
+        $this->clearCategorys();
+        $currentCategorys = $this->getCategorys();
+
+        $this->categorysScheduledForDeletion = $currentCategorys->diff($categorys);
+
+        foreach ($categorys as $category) {
+            if (!$currentCategorys->contains($category)) {
+                $this->doAddCategory($category);
+            }
+        }
+
+        $this->collCategorys = $categorys;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Category objects related by a many-to-many relationship
+     * to the current object by way of the feature_category cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Category objects
+     */
+    public function countCategorys($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collCategorys || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCategorys) {
+                return 0;
+            } else {
+                $query = CategoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByFeature($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCategorys);
+        }
+    }
+
+    /**
+     * Associate a Category object to this object
+     * through the feature_category cross reference table.
+     *
+     * @param  Category $category The FeatureCategory object to relate
+     * @return Feature The current object (for fluent API support)
+     */
+    public function addCategory(Category $category)
+    {
+        if ($this->collCategorys === null) {
+            $this->initCategorys();
+        }
+        if (!$this->collCategorys->contains($category)) { // only add it if the **same** object is not already associated
+            $this->doAddCategory($category);
+
+            $this->collCategorys[]= $category;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Category $category The category object to add.
+     */
+    protected function doAddCategory($category)
+    {
+        $featureCategory = new FeatureCategory();
+        $featureCategory->setCategory($category);
+        $this->addFeatureCategory($featureCategory);
+    }
+
+    /**
+     * Remove a Category object to this object
+     * through the feature_category cross reference table.
+     *
+     * @param Category $category The FeatureCategory object to relate
+     * @return Feature The current object (for fluent API support)
+     */
+    public function removeCategory(Category $category)
+    {
+        if ($this->getCategorys()->contains($category)) {
+            $this->collCategorys->remove($this->collCategorys->search($category));
+            if (null === $this->categorysScheduledForDeletion) {
+                $this->categorysScheduledForDeletion = clone $this->collCategorys;
+                $this->categorysScheduledForDeletion->clear();
+            }
+            $this->categorysScheduledForDeletion[]= $category;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2298,6 +2515,11 @@ abstract class BaseFeature extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCategorys) {
+                foreach ($this->collCategorys as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -2322,6 +2544,10 @@ abstract class BaseFeature extends BaseObject implements Persistent
             $this->collFeatureI18ns->clearIterator();
         }
         $this->collFeatureI18ns = null;
+        if ($this->collCategorys instanceof PropelCollection) {
+            $this->collCategorys->clearIterator();
+        }
+        $this->collCategorys = null;
     }
 
     /**

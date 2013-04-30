@@ -12,84 +12,13 @@
         <loop name="foo" class="Foo\Bar"/>
         <loop name="fooz" class="Foo\Barz"/>
     </loops>
-    <parameters>
-        <parameter key="router.request_context.class">Symfony\Component\Routing\RequestContext</parameter>
-        <parameter key="router.null_generator.class">Thelia\Routing\NullUrlGenerator</parameter>
-        <parameter key="router.dynamicRouter.class">Symfony\Cmf\Component\Routing\DynamicRouter</parameter>
-        <parameter key="router.chainRouter.class">Symfony\Cmf\Component\Routing\ChainRouter</parameter>
-        <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
-    </parameters>
+
     <services>
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="thelia.listener.view" class="Thelia\Core\EventListener\ViewListener">
-            <tag name="kernel.event_subscriber"/>
-            <argument type="service" id="service_container"/>
-        </service>
-
-        <service id="controller.default" class="Thelia\Controller\DefaultController"/>
-
-        <service id="matcher.default" class="Thelia\Routing\Matcher\DefaultMatcher">
-            <argument type="service" id="controller.default"/>
-        </service>
-
-        <service id="request.context" class="%router.request_context.class%" />
-
-        <service id="router.null_generator" class="%router.null_generator.class%"/>
-
-        <service id="router.default_route" class="%router.dynamicRouter.class%">
-            <argument type="service" id="request.context"/>
-            <argument type="service" id="matcher.default"/>
-            <argument type="service" id="router.null_generator"/>
-        </service>
-
-        <service id="router.admin.fileLocator" class="Symfony\Component\Config\FileLocator">
-            <argument>%thelia.core_dir%/Config/Resources/</argument>
-        </service>
-
-        <service id="router.admin.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
-            <argument type="service" id="router.admin.fileLocator"/>
-        </service>
-
-        <service id="router.admin" class="%router.class%">
-            <argument type="service" id="router.admin.xmlLoader"/>
-            <argument>routing.xml</argument>
-            <argument type="collection">
-                <argument key="cache_dir">%kernel.cache_dir%</argument>
-                <argument key="debug">%kernel.debug%</argument>
-            </argument>
-            <argument type="service" id="request.context"/>
-        </service>
-
-        <service id="router.chainRequest" class="%router.chainRouter.class%">
-            <call method="setContext">
-                <argument type="service" id="request.context"/>
-            </call>
-            <call method="add">
-                <argument type="service" id="router.default_route"/>
-                <argument>-255</argument>
-            </call>
-            <call method="add">
-                <argument type="service" id="router.admin"/>
-                <argument>0</argument>
-            </call>
-        </service>
-
-        <service id="listener.router" class="Symfony\Component\HttpKernel\EventListener\RouterListener">
-            <tag name="kernel.event_subscriber"/>
-            <argument type="service" id="router.chainRequest"/>
-        </service>
-
         <service id="thelia.request_listener" class="Thelia\Core\EventListener\RequestListener">
-            <tag name="kernel.event_subscriber"/>
-        </service>
-
-        <service id="thelia.action.cart" class="Thelia\Action\Cart">
-            <tag name="kernel.event_subscriber"/>
-        </service>
-        <service id="thelia.action.customer" class="Thelia\Action\Customer">
             <tag name="kernel.event_subscriber"/>
         </service>
 

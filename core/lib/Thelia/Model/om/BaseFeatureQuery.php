@@ -12,6 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Category;
 use Thelia\Model\Feature;
 use Thelia\Model\FeatureAv;
 use Thelia\Model\FeatureCategory;
@@ -768,6 +769,23 @@ abstract class BaseFeatureQuery extends ModelCriteria
         return $this
             ->joinFeatureI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'FeatureI18n', '\Thelia\Model\FeatureI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related Category object
+     * using the feature_category table as cross reference
+     *
+     * @param   Category $category the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FeatureQuery The current query, for fluid interface
+     */
+    public function filterByCategory($category, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useFeatureCategoryQuery()
+            ->filterByCategory($category, $comparison)
+            ->endUse();
     }
 
     /**

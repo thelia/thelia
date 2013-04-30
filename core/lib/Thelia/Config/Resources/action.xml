@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<config xmlns="http://thelia.net/schema/dic/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
+
+    <services>
+
+        <service id="thelia.action.cart" class="Thelia\Action\Cart">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+        <service id="thelia.action.customer" class="Thelia\Action\Customer">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+    </services>
+
+</config>

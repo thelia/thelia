@@ -1,5 +1,9 @@
 {
-    "hash": "05d2d7252b42f45fd8415a6c47087d97",
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
+    ],
+    "hash": "01f45cf9b2249fce35b127051f36f68d",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -762,7 +766,51 @@
         }
     ],
     "packages-dev": [
-
+        {
+            "name": "fzaninotto/faker",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/fzaninotto/Faker.git",
+                "reference": "a9c1c8b76abe4622b285dcd7aa342cab9dfb6de6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/a9c1c8b76abe4622b285dcd7aa342cab9dfb6de6",
+                "reference": "a9c1c8b76abe4622b285dcd7aa342cab9dfb6de6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Faker": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "François Zaninotto"
+                }
+            ],
+            "description": "Faker is a PHP library that generates fake data for you.",
+            "keywords": [
+                "data",
+                "faker",
+                "fixtures"
+            ],
+            "time": "2013-04-23 12:35:55"
+        }
     ],
     "aliases": [
 
@@ -770,7 +818,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "ezyang/htmlpurifier": 20,
-        "ircmaxell/password-compat": 20
+        "ircmaxell/password-compat": 20,
+        "fzaninotto/faker": 20
     },
     "platform": {
         "php": ">=5.3.7"

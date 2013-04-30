@@ -20,6 +20,8 @@ use Thelia\Model\AdminGroup;
 use Thelia\Model\AdminGroupQuery;
 use Thelia\Model\AdminPeer;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\Group;
+use Thelia\Model\GroupQuery;
 
 /**
  * Base class that represents a row from the 'admin' table.
@@ -110,6 +112,11 @@ abstract class BaseAdmin extends BaseObject implements Persistent
     protected $collAdminGroupsPartial;
 
     /**
+     * @var        PropelObjectCollection|Group[] Collection to store aggregation of Group objects.
+     */
+    protected $collGroups;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -128,6 +135,12 @@ abstract class BaseAdmin extends BaseObject implements Persistent
      * @var        boolean
      */
     protected $alreadyInClearAllReferencesDeep = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -591,6 +604,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
 
             $this->collAdminGroups = null;
 
+            $this->collGroups = null;
         } // if (deep)
     }
 
@@ -726,12 +740,37 @@ abstract class BaseAdmin extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->groupsScheduledForDeletion !== null) {
+                if (!$this->groupsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->groupsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    AdminGroupQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->groupsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getGroups() as $group) {
+                    if ($group->isModified()) {
+                        $group->save($con);
+                    }
+                }
+            } elseif ($this->collGroups) {
+                foreach ($this->collGroups as $group) {
+                    if ($group->isModified()) {
+                        $group->save($con);
+                    }
+                }
+            }
+
             if ($this->adminGroupsScheduledForDeletion !== null) {
                 if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->adminGroupsScheduledForDeletion as $adminGroup) {
-                        // need to save related object because we set the relation to null
-                        $adminGroup->save($con);
-                    }
+                    AdminGroupQuery::create()
+                        ->filterByPrimaryKeys($this->adminGroupsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->adminGroupsScheduledForDeletion = null;
                 }
             }
@@ -1523,7 +1562,7 @@ abstract class BaseAdmin extends BaseObject implements Persistent
                 $this->adminGroupsScheduledForDeletion = clone $this->collAdminGroups;
                 $this->adminGroupsScheduledForDeletion->clear();
             }
-            $this->adminGroupsScheduledForDeletion[]= $adminGroup;
+            $this->adminGroupsScheduledForDeletion[]= clone $adminGroup;
             $adminGroup->setAdmin(null);
         }
 
@@ -1553,6 +1592,183 @@ abstract class BaseAdmin extends BaseObject implements Persistent
         $query->joinWith('Group', $join_behavior);
 
         return $this->getAdminGroups($query, $con);
+    }
+
+    /**
+     * Clears out the collGroups collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Admin The current object (for fluent API support)
+     * @see        addGroups()
+     */
+    public function clearGroups()
+    {
+        $this->collGroups = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collGroups collection.
+     *
+     * By default this just sets the collGroups collection to an empty collection (like clearGroups());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initGroups()
+    {
+        $this->collGroups = new PropelObjectCollection();
+        $this->collGroups->setModel('Group');
+    }
+
+    /**
+     * Gets a collection of Group objects related by a many-to-many relationship
+     * to the current object by way of the admin_group cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Admin is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Group[] List of Group objects
+     */
+    public function getGroups($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collGroups || null !== $criteria) {
+            if ($this->isNew() && null === $this->collGroups) {
+                // return empty collection
+                $this->initGroups();
+            } else {
+                $collGroups = GroupQuery::create(null, $criteria)
+                    ->filterByAdmin($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collGroups;
+                }
+                $this->collGroups = $collGroups;
+            }
+        }
+
+        return $this->collGroups;
+    }
+
+    /**
+     * Sets a collection of Group objects related by a many-to-many relationship
+     * to the current object by way of the admin_group cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groups A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Admin The current object (for fluent API support)
+     */
+    public function setGroups(PropelCollection $groups, PropelPDO $con = null)
+    {
+        $this->clearGroups();
+        $currentGroups = $this->getGroups();
+
+        $this->groupsScheduledForDeletion = $currentGroups->diff($groups);
+
+        foreach ($groups as $group) {
+            if (!$currentGroups->contains($group)) {
+                $this->doAddGroup($group);
+            }
+        }
+
+        $this->collGroups = $groups;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Group objects related by a many-to-many relationship
+     * to the current object by way of the admin_group cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Group objects
+     */
+    public function countGroups($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collGroups || null !== $criteria) {
+            if ($this->isNew() && null === $this->collGroups) {
+                return 0;
+            } else {
+                $query = GroupQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByAdmin($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collGroups);
+        }
+    }
+
+    /**
+     * Associate a Group object to this object
+     * through the admin_group cross reference table.
+     *
+     * @param  Group $group The AdminGroup object to relate
+     * @return Admin The current object (for fluent API support)
+     */
+    public function addGroup(Group $group)
+    {
+        if ($this->collGroups === null) {
+            $this->initGroups();
+        }
+        if (!$this->collGroups->contains($group)) { // only add it if the **same** object is not already associated
+            $this->doAddGroup($group);
+
+            $this->collGroups[]= $group;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Group $group The group object to add.
+     */
+    protected function doAddGroup($group)
+    {
+        $adminGroup = new AdminGroup();
+        $adminGroup->setGroup($group);
+        $this->addAdminGroup($adminGroup);
+    }
+
+    /**
+     * Remove a Group object to this object
+     * through the admin_group cross reference table.
+     *
+     * @param Group $group The AdminGroup object to relate
+     * @return Admin The current object (for fluent API support)
+     */
+    public function removeGroup(Group $group)
+    {
+        if ($this->getGroups()->contains($group)) {
+            $this->collGroups->remove($this->collGroups->search($group));
+            if (null === $this->groupsScheduledForDeletion) {
+                $this->groupsScheduledForDeletion = clone $this->collGroups;
+                $this->groupsScheduledForDeletion->clear();
+            }
+            $this->groupsScheduledForDeletion[]= $group;
+        }
+
+        return $this;
     }
 
     /**
@@ -1596,6 +1812,11 @@ abstract class BaseAdmin extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collGroups) {
+                foreach ($this->collGroups as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -1604,6 +1825,10 @@ abstract class BaseAdmin extends BaseObject implements Persistent
             $this->collAdminGroups->clearIterator();
         }
         $this->collAdminGroups = null;
+        if ($this->collGroups instanceof PropelCollection) {
+            $this->collGroups->clearIterator();
+        }
+        $this->collGroups = null;
     }
 
     /**

@@ -41,10 +41,11 @@ class GroupResourceTableMap extends TableMap
         $this->setClassname('Thelia\\Model\\GroupResource');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('group_id', 'GroupId', 'INTEGER', 'group', 'id', true, null, null);
-        $this->addForeignKey('resource_id', 'ResourceId', 'INTEGER', 'resource', 'id', true, null, null);
+        $this->addForeignPrimaryKey('group_id', 'GroupId', 'INTEGER' , 'group', 'id', true, null, null);
+        $this->addForeignPrimaryKey('resource_id', 'ResourceId', 'INTEGER' , 'resource', 'id', true, null, null);
         $this->addColumn('read', 'Read', 'TINYINT', false, null, 0);
         $this->addColumn('write', 'Write', 'TINYINT', false, null, 0);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);

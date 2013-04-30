@@ -21,7 +21,7 @@ class ConfigQuery extends BaseConfigQuery
     public static function read($search, $default = null)
     {
         $value = self::create()->findOneByName($search);
-        
+
         return $value ? $value->getValue() : $default;
     }
 }

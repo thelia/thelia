@@ -16,6 +16,7 @@ use Thelia\Model\Admin;
 use Thelia\Model\AdminGroup;
 use Thelia\Model\AdminPeer;
 use Thelia\Model\AdminQuery;
+use Thelia\Model\Group;
 
 /**
  * Base class that represents a query for the 'admin' table.
@@ -597,7 +598,7 @@ abstract class BaseAdminQuery extends ModelCriteria
      *
      * @return AdminQuery The current query, for fluid interface
      */
-    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('AdminGroup');
@@ -632,11 +633,28 @@ abstract class BaseAdminQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AdminGroupQuery A secondary query class using the current class as primary query
      */
-    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinAdminGroup($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'AdminGroup', '\Thelia\Model\AdminGroupQuery');
+    }
+
+    /**
+     * Filter the query by a related Group object
+     * using the admin_group table as cross reference
+     *
+     * @param   Group $group the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   AdminQuery The current query, for fluid interface
+     */
+    public function filterByGroup($group, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useAdminGroupQuery()
+            ->filterByGroup($group, $comparison)
+            ->endUse();
     }
 
     /**

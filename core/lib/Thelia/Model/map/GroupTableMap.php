@@ -58,6 +58,8 @@ class GroupTableMap extends TableMap
         $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', 'RESTRICT', 'GroupResources');
         $this->addRelation('GroupModule', 'Thelia\\Model\\GroupModule', RelationMap::ONE_TO_MANY, array('id' => 'group_id', ), 'CASCADE', 'CASCADE', 'GroupModules');
         $this->addRelation('GroupI18n', 'Thelia\\Model\\GroupI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'GroupI18ns');
+        $this->addRelation('Admin', 'Thelia\\Model\\Admin', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Admins');
+        $this->addRelation('Resource', 'Thelia\\Model\\Resource', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Resources');
     } // buildRelations()
 
     /**

@@ -12,6 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Group;
 use Thelia\Model\GroupResource;
 use Thelia\Model\Resource;
 use Thelia\Model\ResourceI18n;
@@ -551,6 +552,23 @@ abstract class BaseResourceQuery extends ModelCriteria
         return $this
             ->joinResourceI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ResourceI18n', '\Thelia\Model\ResourceI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related Group object
+     * using the group_resource table as cross reference
+     *
+     * @param   Group $group the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ResourceQuery The current query, for fluid interface
+     */
+    public function filterByGroup($group, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useGroupResourceQuery()
+            ->filterByGroup($group, $comparison)
+            ->endUse();
     }
 
     /**

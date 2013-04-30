@@ -321,7 +321,7 @@ abstract class BaseGroupResourcePeer
     {
         if (Propel::isInstancePoolingEnabled()) {
             if ($key === null) {
-                $key = (string) $obj->getId();
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getGroupId(), (string) $obj->getResourceId()));
             } // if key === null
             GroupResourcePeer::$instances[$key] = $obj;
         }
@@ -344,10 +344,10 @@ abstract class BaseGroupResourcePeer
     {
         if (Propel::isInstancePoolingEnabled() && $value !== null) {
             if (is_object($value) && $value instanceof GroupResource) {
-                $key = (string) $value->getId();
-            } elseif (is_scalar($value)) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getGroupId(), (string) $value->getResourceId()));
+            } elseif (is_array($value) && count($value) === 3) {
                 // assume we've been passed a primary key
-                $key = (string) $value;
+                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
             } else {
                 $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or GroupResource object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value,true)));
                 throw $e;
@@ -416,11 +416,11 @@ abstract class BaseGroupResourcePeer
     public static function getPrimaryKeyHashFromRow($row, $startcol = 0)
     {
         // If the PK cannot be derived from the row, return null.
-        if ($row[$startcol] === null) {
+        if ($row[$startcol] === null && $row[$startcol + 1] === null && $row[$startcol + 2] === null) {
             return null;
         }
 
-        return (string) $row[$startcol];
+        return serialize(array((string) $row[$startcol], (string) $row[$startcol + 1], (string) $row[$startcol + 2]));
     }
 
     /**
@@ -435,7 +435,7 @@ abstract class BaseGroupResourcePeer
     public static function getPrimaryKeyFromRow($row, $startcol = 0)
     {
 
-        return (int) $row[$startcol];
+        return array((int) $row[$startcol], (int) $row[$startcol + 1], (int) $row[$startcol + 2]);
     }
 
     /**
@@ -1233,6 +1233,22 @@ abstract class BaseGroupResourcePeer
                 $selectCriteria->setPrimaryTableName(GroupResourcePeer::TABLE_NAME);
             }
 
+            $comparison = $criteria->getComparison(GroupResourcePeer::GROUP_ID);
+            $value = $criteria->remove(GroupResourcePeer::GROUP_ID);
+            if ($value) {
+                $selectCriteria->add(GroupResourcePeer::GROUP_ID, $value, $comparison);
+            } else {
+                $selectCriteria->setPrimaryTableName(GroupResourcePeer::TABLE_NAME);
+            }
+
+            $comparison = $criteria->getComparison(GroupResourcePeer::RESOURCE_ID);
+            $value = $criteria->remove(GroupResourcePeer::RESOURCE_ID);
+            if ($value) {
+                $selectCriteria->add(GroupResourcePeer::RESOURCE_ID, $value, $comparison);
+            } else {
+                $selectCriteria->setPrimaryTableName(GroupResourcePeer::TABLE_NAME);
+            }
+
         } else { // $values is GroupResource object
             $criteria = $values->buildCriteria(); // gets full criteria
             $selectCriteria = $values->buildPkeyCriteria(); // gets criteria w/ primary key(s)
@@ -1307,10 +1323,19 @@ abstract class BaseGroupResourcePeer
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
             $criteria = new Criteria(GroupResourcePeer::DATABASE_NAME);
-            $criteria->add(GroupResourcePeer::ID, (array) $values, Criteria::IN);
-            // invalidate the cache for this object(s)
-            foreach ((array) $values as $singleval) {
-                GroupResourcePeer::removeInstanceFromPool($singleval);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(GroupResourcePeer::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(GroupResourcePeer::GROUP_ID, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(GroupResourcePeer::RESOURCE_ID, $value[2]));
+                $criteria->addOr($criterion);
+                // we can invalidate the cache for this single PK
+                GroupResourcePeer::removeInstanceFromPool($value);
             }
         }
 
@@ -1373,58 +1398,30 @@ abstract class BaseGroupResourcePeer
     }
 
     /**
-     * Retrieve a single object by pkey.
-     *
-     * @param      int $pk the primary key.
-     * @param      PropelPDO $con the connection to use
-     * @return GroupResource
+     * Retrieve object using using composite pkey values.
+     * @param   int $id
+     * @param   int $group_id
+     * @param   int $resource_id
+     * @param      PropelPDO $con
+     * @return   GroupResource
      */
-    public static function retrieveByPK($pk, PropelPDO $con = null)
-    {
-
-        if (null !== ($obj = GroupResourcePeer::getInstanceFromPool((string) $pk))) {
-            return $obj;
+    public static function retrieveByPK($id, $group_id, $resource_id, PropelPDO $con = null) {
+        $_instancePoolKey = serialize(array((string) $id, (string) $group_id, (string) $resource_id));
+         if (null !== ($obj = GroupResourcePeer::getInstanceFromPool($_instancePoolKey))) {
+             return $obj;
         }
 
         if ($con === null) {
             $con = Propel::getConnection(GroupResourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
         }
-
         $criteria = new Criteria(GroupResourcePeer::DATABASE_NAME);
-        $criteria->add(GroupResourcePeer::ID, $pk);
-
+        $criteria->add(GroupResourcePeer::ID, $id);
+        $criteria->add(GroupResourcePeer::GROUP_ID, $group_id);
+        $criteria->add(GroupResourcePeer::RESOURCE_ID, $resource_id);
         $v = GroupResourcePeer::doSelect($criteria, $con);
 
-        return !empty($v) > 0 ? $v[0] : null;
+        return !empty($v) ? $v[0] : null;
     }
-
-    /**
-     * Retrieve multiple objects by pkey.
-     *
-     * @param      array $pks List of primary keys
-     * @param      PropelPDO $con the connection to use
-     * @return GroupResource[]
-     * @throws PropelException Any exceptions caught during processing will be
-     *		 rethrown wrapped into a PropelException.
-     */
-    public static function retrieveByPKs($pks, PropelPDO $con = null)
-    {
-        if ($con === null) {
-            $con = Propel::getConnection(GroupResourcePeer::DATABASE_NAME, Propel::CONNECTION_READ);
-        }
-
-        $objs = null;
-        if (empty($pks)) {
-            $objs = array();
-        } else {
-            $criteria = new Criteria(GroupResourcePeer::DATABASE_NAME);
-            $criteria->add(GroupResourcePeer::ID, $pks, Criteria::IN);
-            $objs = GroupResourcePeer::doSelect($criteria, $con);
-        }
-
-        return $objs;
-    }
-
 } // BaseGroupResourcePeer
 
 // This is the static code needed to register the TableMap for this table with the main Propel class.

@@ -22,6 +22,9 @@
         "symfony/yaml" : "2.2.*",
         "symfony-cmf/routing": "1.0.0"
     },
+    "require-dev" : {
+        "fzaninotto/faker": "dev-master"
+    },
     "minimum-stability": "stable",
     "config" : {
         "vendor-dir" : "core/vendor",

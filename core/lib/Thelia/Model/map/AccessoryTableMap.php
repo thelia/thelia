@@ -41,6 +41,7 @@ class AccessoryTableMap extends TableMap
         $this->setClassname('Thelia\\Model\\Accessory');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('product_id', 'ProductId', 'INTEGER', 'product', 'id', true, null, null);

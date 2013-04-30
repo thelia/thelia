@@ -20,6 +20,7 @@ use Thelia\Model\ContentPeer;
 use Thelia\Model\ContentQuery;
 use Thelia\Model\ContentVersion;
 use Thelia\Model\Document;
+use Thelia\Model\Folder;
 use Thelia\Model\Image;
 use Thelia\Model\Rewriting;
 
@@ -1131,6 +1132,23 @@ abstract class BaseContentQuery extends ModelCriteria
         return $this
             ->joinContentVersion($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ContentVersion', '\Thelia\Model\ContentVersionQuery');
+    }
+
+    /**
+     * Filter the query by a related Folder object
+     * using the content_folder table as cross reference
+     *
+     * @param   Folder $folder the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ContentQuery The current query, for fluid interface
+     */
+    public function filterByFolder($folder, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useContentFolderQuery()
+            ->filterByFolder($folder, $comparison)
+            ->endUse();
     }
 
     /**

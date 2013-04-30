@@ -11,6 +11,7 @@ namespace Test\Loop;
 
 use Thelia\Tpex\Element\Loop\BaseLoop;
 use Thelia\Tpex\Tools;
+use Thelia\Model\ProductQuery;
 
 class Doobitch extends BaseLoop {
 

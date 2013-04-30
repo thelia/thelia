@@ -15,8 +15,10 @@ use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Attribute;
 use Thelia\Model\AttributeCategory;
 use Thelia\Model\AttributeCategoryQuery;
+use Thelia\Model\AttributeQuery;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryI18n;
 use Thelia\Model\CategoryI18nQuery;
@@ -29,12 +31,16 @@ use Thelia\Model\ContentAssoc;
 use Thelia\Model\ContentAssocQuery;
 use Thelia\Model\Document;
 use Thelia\Model\DocumentQuery;
+use Thelia\Model\Feature;
 use Thelia\Model\FeatureCategory;
 use Thelia\Model\FeatureCategoryQuery;
+use Thelia\Model\FeatureQuery;
 use Thelia\Model\Image;
 use Thelia\Model\ImageQuery;
+use Thelia\Model\Product;
 use Thelia\Model\ProductCategory;
 use Thelia\Model\ProductCategoryQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Model\Rewriting;
 use Thelia\Model\RewritingQuery;
 
@@ -182,6 +188,21 @@ abstract class BaseCategory extends BaseObject implements Persistent
     protected $collCategoryVersionsPartial;
 
     /**
+     * @var        PropelObjectCollection|Product[] Collection to store aggregation of Product objects.
+     */
+    protected $collProducts;
+
+    /**
+     * @var        PropelObjectCollection|Feature[] Collection to store aggregation of Feature objects.
+     */
+    protected $collFeatures;
+
+    /**
+     * @var        PropelObjectCollection|Attribute[] Collection to store aggregation of Attribute objects.
+     */
+    protected $collAttributes;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -222,6 +243,24 @@ abstract class BaseCategory extends BaseObject implements Persistent
      * @var bool
      */
     protected $enforceVersion = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $featuresScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $attributesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -838,6 +877,9 @@ abstract class BaseCategory extends BaseObject implements Persistent
 
             $this->collCategoryVersions = null;
 
+            $this->collProducts = null;
+            $this->collFeatures = null;
+            $this->collAttributes = null;
         } // if (deep)
     }
 
@@ -983,6 +1025,84 @@ abstract class BaseCategory extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->productsScheduledForDeletion !== null) {
+                if (!$this->productsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->productsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    ProductCategoryQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->productsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getProducts() as $product) {
+                    if ($product->isModified()) {
+                        $product->save($con);
+                    }
+                }
+            } elseif ($this->collProducts) {
+                foreach ($this->collProducts as $product) {
+                    if ($product->isModified()) {
+                        $product->save($con);
+                    }
+                }
+            }
+
+            if ($this->featuresScheduledForDeletion !== null) {
+                if (!$this->featuresScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->featuresScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    FeatureCategoryQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->featuresScheduledForDeletion = null;
+                }
+
+                foreach ($this->getFeatures() as $feature) {
+                    if ($feature->isModified()) {
+                        $feature->save($con);
+                    }
+                }
+            } elseif ($this->collFeatures) {
+                foreach ($this->collFeatures as $feature) {
+                    if ($feature->isModified()) {
+                        $feature->save($con);
+                    }
+                }
+            }
+
+            if ($this->attributesScheduledForDeletion !== null) {
+                if (!$this->attributesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->attributesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    AttributeCategoryQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->attributesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getAttributes() as $attribute) {
+                    if ($attribute->isModified()) {
+                        $attribute->save($con);
+                    }
+                }
+            } elseif ($this->collAttributes) {
+                foreach ($this->collAttributes as $attribute) {
+                    if ($attribute->isModified()) {
+                        $attribute->save($con);
+                    }
+                }
             }
 
             if ($this->productCategorysScheduledForDeletion !== null) {
@@ -4203,6 +4323,537 @@ abstract class BaseCategory extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collProducts collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Category The current object (for fluent API support)
+     * @see        addProducts()
+     */
+    public function clearProducts()
+    {
+        $this->collProducts = null; // important to set this to null since that means it is uninitialized
+        $this->collProductsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collProducts collection.
+     *
+     * By default this just sets the collProducts collection to an empty collection (like clearProducts());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initProducts()
+    {
+        $this->collProducts = new PropelObjectCollection();
+        $this->collProducts->setModel('Product');
+    }
+
+    /**
+     * Gets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the product_category cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Product[] List of Product objects
+     */
+    public function getProducts($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collProducts || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProducts) {
+                // return empty collection
+                $this->initProducts();
+            } else {
+                $collProducts = ProductQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collProducts;
+                }
+                $this->collProducts = $collProducts;
+            }
+        }
+
+        return $this->collProducts;
+    }
+
+    /**
+     * Sets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the product_category cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $products A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Category The current object (for fluent API support)
+     */
+    public function setProducts(PropelCollection $products, PropelPDO $con = null)
+    {
+        $this->clearProducts();
+        $currentProducts = $this->getProducts();
+
+        $this->productsScheduledForDeletion = $currentProducts->diff($products);
+
+        foreach ($products as $product) {
+            if (!$currentProducts->contains($product)) {
+                $this->doAddProduct($product);
+            }
+        }
+
+        $this->collProducts = $products;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Product objects related by a many-to-many relationship
+     * to the current object by way of the product_category cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Product objects
+     */
+    public function countProducts($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collProducts || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProducts) {
+                return 0;
+            } else {
+                $query = ProductQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProducts);
+        }
+    }
+
+    /**
+     * Associate a Product object to this object
+     * through the product_category cross reference table.
+     *
+     * @param  Product $product The ProductCategory object to relate
+     * @return Category The current object (for fluent API support)
+     */
+    public function addProduct(Product $product)
+    {
+        if ($this->collProducts === null) {
+            $this->initProducts();
+        }
+        if (!$this->collProducts->contains($product)) { // only add it if the **same** object is not already associated
+            $this->doAddProduct($product);
+
+            $this->collProducts[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Product $product The product object to add.
+     */
+    protected function doAddProduct($product)
+    {
+        $productCategory = new ProductCategory();
+        $productCategory->setProduct($product);
+        $this->addProductCategory($productCategory);
+    }
+
+    /**
+     * Remove a Product object to this object
+     * through the product_category cross reference table.
+     *
+     * @param Product $product The ProductCategory object to relate
+     * @return Category The current object (for fluent API support)
+     */
+    public function removeProduct(Product $product)
+    {
+        if ($this->getProducts()->contains($product)) {
+            $this->collProducts->remove($this->collProducts->search($product));
+            if (null === $this->productsScheduledForDeletion) {
+                $this->productsScheduledForDeletion = clone $this->collProducts;
+                $this->productsScheduledForDeletion->clear();
+            }
+            $this->productsScheduledForDeletion[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collFeatures collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Category The current object (for fluent API support)
+     * @see        addFeatures()
+     */
+    public function clearFeatures()
+    {
+        $this->collFeatures = null; // important to set this to null since that means it is uninitialized
+        $this->collFeaturesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collFeatures collection.
+     *
+     * By default this just sets the collFeatures collection to an empty collection (like clearFeatures());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initFeatures()
+    {
+        $this->collFeatures = new PropelObjectCollection();
+        $this->collFeatures->setModel('Feature');
+    }
+
+    /**
+     * Gets a collection of Feature objects related by a many-to-many relationship
+     * to the current object by way of the feature_category cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Feature[] List of Feature objects
+     */
+    public function getFeatures($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collFeatures || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFeatures) {
+                // return empty collection
+                $this->initFeatures();
+            } else {
+                $collFeatures = FeatureQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collFeatures;
+                }
+                $this->collFeatures = $collFeatures;
+            }
+        }
+
+        return $this->collFeatures;
+    }
+
+    /**
+     * Sets a collection of Feature objects related by a many-to-many relationship
+     * to the current object by way of the feature_category cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $features A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Category The current object (for fluent API support)
+     */
+    public function setFeatures(PropelCollection $features, PropelPDO $con = null)
+    {
+        $this->clearFeatures();
+        $currentFeatures = $this->getFeatures();
+
+        $this->featuresScheduledForDeletion = $currentFeatures->diff($features);
+
+        foreach ($features as $feature) {
+            if (!$currentFeatures->contains($feature)) {
+                $this->doAddFeature($feature);
+            }
+        }
+
+        $this->collFeatures = $features;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Feature objects related by a many-to-many relationship
+     * to the current object by way of the feature_category cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Feature objects
+     */
+    public function countFeatures($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collFeatures || null !== $criteria) {
+            if ($this->isNew() && null === $this->collFeatures) {
+                return 0;
+            } else {
+                $query = FeatureQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collFeatures);
+        }
+    }
+
+    /**
+     * Associate a Feature object to this object
+     * through the feature_category cross reference table.
+     *
+     * @param  Feature $feature The FeatureCategory object to relate
+     * @return Category The current object (for fluent API support)
+     */
+    public function addFeature(Feature $feature)
+    {
+        if ($this->collFeatures === null) {
+            $this->initFeatures();
+        }
+        if (!$this->collFeatures->contains($feature)) { // only add it if the **same** object is not already associated
+            $this->doAddFeature($feature);
+
+            $this->collFeatures[]= $feature;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Feature $feature The feature object to add.
+     */
+    protected function doAddFeature($feature)
+    {
+        $featureCategory = new FeatureCategory();
+        $featureCategory->setFeature($feature);
+        $this->addFeatureCategory($featureCategory);
+    }
+
+    /**
+     * Remove a Feature object to this object
+     * through the feature_category cross reference table.
+     *
+     * @param Feature $feature The FeatureCategory object to relate
+     * @return Category The current object (for fluent API support)
+     */
+    public function removeFeature(Feature $feature)
+    {
+        if ($this->getFeatures()->contains($feature)) {
+            $this->collFeatures->remove($this->collFeatures->search($feature));
+            if (null === $this->featuresScheduledForDeletion) {
+                $this->featuresScheduledForDeletion = clone $this->collFeatures;
+                $this->featuresScheduledForDeletion->clear();
+            }
+            $this->featuresScheduledForDeletion[]= $feature;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collAttributes collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Category The current object (for fluent API support)
+     * @see        addAttributes()
+     */
+    public function clearAttributes()
+    {
+        $this->collAttributes = null; // important to set this to null since that means it is uninitialized
+        $this->collAttributesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collAttributes collection.
+     *
+     * By default this just sets the collAttributes collection to an empty collection (like clearAttributes());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initAttributes()
+    {
+        $this->collAttributes = new PropelObjectCollection();
+        $this->collAttributes->setModel('Attribute');
+    }
+
+    /**
+     * Gets a collection of Attribute objects related by a many-to-many relationship
+     * to the current object by way of the attribute_category cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Category is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Attribute[] List of Attribute objects
+     */
+    public function getAttributes($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collAttributes || null !== $criteria) {
+            if ($this->isNew() && null === $this->collAttributes) {
+                // return empty collection
+                $this->initAttributes();
+            } else {
+                $collAttributes = AttributeQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collAttributes;
+                }
+                $this->collAttributes = $collAttributes;
+            }
+        }
+
+        return $this->collAttributes;
+    }
+
+    /**
+     * Sets a collection of Attribute objects related by a many-to-many relationship
+     * to the current object by way of the attribute_category cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $attributes A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Category The current object (for fluent API support)
+     */
+    public function setAttributes(PropelCollection $attributes, PropelPDO $con = null)
+    {
+        $this->clearAttributes();
+        $currentAttributes = $this->getAttributes();
+
+        $this->attributesScheduledForDeletion = $currentAttributes->diff($attributes);
+
+        foreach ($attributes as $attribute) {
+            if (!$currentAttributes->contains($attribute)) {
+                $this->doAddAttribute($attribute);
+            }
+        }
+
+        $this->collAttributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Attribute objects related by a many-to-many relationship
+     * to the current object by way of the attribute_category cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Attribute objects
+     */
+    public function countAttributes($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collAttributes || null !== $criteria) {
+            if ($this->isNew() && null === $this->collAttributes) {
+                return 0;
+            } else {
+                $query = AttributeQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByCategory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAttributes);
+        }
+    }
+
+    /**
+     * Associate a Attribute object to this object
+     * through the attribute_category cross reference table.
+     *
+     * @param  Attribute $attribute The AttributeCategory object to relate
+     * @return Category The current object (for fluent API support)
+     */
+    public function addAttribute(Attribute $attribute)
+    {
+        if ($this->collAttributes === null) {
+            $this->initAttributes();
+        }
+        if (!$this->collAttributes->contains($attribute)) { // only add it if the **same** object is not already associated
+            $this->doAddAttribute($attribute);
+
+            $this->collAttributes[]= $attribute;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Attribute $attribute The attribute object to add.
+     */
+    protected function doAddAttribute($attribute)
+    {
+        $attributeCategory = new AttributeCategory();
+        $attributeCategory->setAttribute($attribute);
+        $this->addAttributeCategory($attributeCategory);
+    }
+
+    /**
+     * Remove a Attribute object to this object
+     * through the attribute_category cross reference table.
+     *
+     * @param Attribute $attribute The AttributeCategory object to relate
+     * @return Category The current object (for fluent API support)
+     */
+    public function removeAttribute(Attribute $attribute)
+    {
+        if ($this->getAttributes()->contains($attribute)) {
+            $this->collAttributes->remove($this->collAttributes->search($attribute));
+            if (null === $this->attributesScheduledForDeletion) {
+                $this->attributesScheduledForDeletion = clone $this->collAttributes;
+                $this->attributesScheduledForDeletion->clear();
+            }
+            $this->attributesScheduledForDeletion[]= $attribute;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -4285,6 +4936,21 @@ abstract class BaseCategory extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collProducts) {
+                foreach ($this->collProducts as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFeatures) {
+                foreach ($this->collFeatures as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collAttributes) {
+                foreach ($this->collAttributes as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -4329,6 +4995,18 @@ abstract class BaseCategory extends BaseObject implements Persistent
             $this->collCategoryVersions->clearIterator();
         }
         $this->collCategoryVersions = null;
+        if ($this->collProducts instanceof PropelCollection) {
+            $this->collProducts->clearIterator();
+        }
+        $this->collProducts = null;
+        if ($this->collFeatures instanceof PropelCollection) {
+            $this->collFeatures->clearIterator();
+        }
+        $this->collFeatures = null;
+        if ($this->collAttributes instanceof PropelCollection) {
+            $this->collAttributes->clearIterator();
+        }
+        $this->collAttributes = null;
     }
 
     /**

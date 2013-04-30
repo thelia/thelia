@@ -50,6 +50,7 @@ use Thelia\Model\Group;
  * @method AdminGroup findOne(PropelPDO $con = null) Return the first AdminGroup matching the query
  * @method AdminGroup findOneOrCreate(PropelPDO $con = null) Return the first AdminGroup matching the query, or a new AdminGroup object populated from the query conditions when no match is found
  *
+ * @method AdminGroup findOneById(int $id) Return the first AdminGroup filtered by the id column
  * @method AdminGroup findOneByGroupId(int $group_id) Return the first AdminGroup filtered by the group_id column
  * @method AdminGroup findOneByAdminId(int $admin_id) Return the first AdminGroup filtered by the admin_id column
  * @method AdminGroup findOneByCreatedAt(string $created_at) Return the first AdminGroup filtered by the created_at column
@@ -107,10 +108,11 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34, 56), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array $key Primary key to use for the query
+                         A Primary key composition: [$id, $group_id, $admin_id]
      * @param     PropelPDO $con an optional connection object
      *
      * @return   AdminGroup|AdminGroup[]|mixed the result, formatted by the current formatter
@@ -120,7 +122,7 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = AdminGroupPeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = AdminGroupPeer::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
             // the object is alredy in the instance pool
             return $obj;
         }
@@ -138,20 +140,6 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
     }
 
     /**
-     * Alias of findPk to use instance pooling
-     *
-     * @param     mixed $key Primary key to use for the query
-     * @param     PropelPDO $con A connection object
-     *
-     * @return                 AdminGroup A model object, or null if the key is not found
-     * @throws PropelException
-     */
-     public function findOneById($key, $con = null)
-     {
-        return $this->findPk($key, $con);
-     }
-
-    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
@@ -163,10 +151,12 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `group_id`, `admin_id`, `created_at`, `updated_at` FROM `admin_group` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `group_id`, `admin_id`, `created_at`, `updated_at` FROM `admin_group` WHERE `id` = :p0 AND `group_id` = :p1 AND `admin_id` = :p2';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
+            $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -176,7 +166,7 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $obj = new AdminGroup();
             $obj->hydrate($row);
-            AdminGroupPeer::addInstanceToPool($obj, (string) $key);
+            AdminGroupPeer::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
         }
         $stmt->closeCursor();
 
@@ -205,7 +195,7 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     PropelPDO $con an optional connection object
@@ -235,8 +225,11 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(AdminGroupPeer::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(AdminGroupPeer::GROUP_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(AdminGroupPeer::ADMIN_ID, $key[2], Criteria::EQUAL);
 
-        return $this->addUsingAlias(AdminGroupPeer::ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -248,8 +241,19 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(AdminGroupPeer::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(AdminGroupPeer::GROUP_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $cton2 = $this->getNewCriterion(AdminGroupPeer::ADMIN_ID, $key[2], Criteria::EQUAL);
+            $cton0->addAnd($cton2);
+            $this->addOr($cton0);
+        }
 
-        return $this->addUsingAlias(AdminGroupPeer::ID, $keys, Criteria::IN);
+        return $this;
     }
 
     /**
@@ -502,7 +506,7 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      *
      * @return AdminGroupQuery The current query, for fluid interface
      */
-    public function joinGroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinGroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Group');
@@ -537,7 +541,7 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\GroupQuery A secondary query class using the current class as primary query
      */
-    public function useGroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useGroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinGroup($relationAlias, $joinType)
@@ -578,7 +582,7 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      *
      * @return AdminGroupQuery The current query, for fluid interface
      */
-    public function joinAdmin($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinAdmin($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Admin');
@@ -613,7 +617,7 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AdminQuery A secondary query class using the current class as primary query
      */
-    public function useAdminQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useAdminQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinAdmin($relationAlias, $joinType)
@@ -630,7 +634,10 @@ abstract class BaseAdminGroupQuery extends ModelCriteria
     public function prune($adminGroup = null)
     {
         if ($adminGroup) {
-            $this->addUsingAlias(AdminGroupPeer::ID, $adminGroup->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(AdminGroupPeer::ID), $adminGroup->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(AdminGroupPeer::GROUP_ID), $adminGroup->getGroupId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond2', $this->getAliasedColName(AdminGroupPeer::ADMIN_ID), $adminGroup->getAdminId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
         }
 
         return $this;

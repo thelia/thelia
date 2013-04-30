@@ -79,6 +79,9 @@ class ProductTableMap extends TableMap
         $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('ProductI18n', 'Thelia\\Model\\ProductI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProductI18ns');
         $this->addRelation('ProductVersion', 'Thelia\\Model\\ProductVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProductVersions');
+        $this->addRelation('Category', 'Thelia\\Model\\Category', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Categorys');
+        $this->addRelation('ProductRelatedByAccessory', 'Thelia\\Model\\Product', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'ProductsRelatedByAccessory');
+        $this->addRelation('ProductRelatedByProductId', 'Thelia\\Model\\Product', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'ProductsRelatedByProductId');
     } // buildRelations()
 
     /**

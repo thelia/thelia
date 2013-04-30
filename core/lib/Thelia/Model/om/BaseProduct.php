@@ -17,6 +17,8 @@ use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Accessory;
 use Thelia\Model\AccessoryQuery;
+use Thelia\Model\Category;
+use Thelia\Model\CategoryQuery;
 use Thelia\Model\ContentAssoc;
 use Thelia\Model\ContentAssocQuery;
 use Thelia\Model\Document;
@@ -249,6 +251,21 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $collProductVersionsPartial;
 
     /**
+     * @var        PropelObjectCollection|Category[] Collection to store aggregation of Category objects.
+     */
+    protected $collCategorys;
+
+    /**
+     * @var        PropelObjectCollection|Product[] Collection to store aggregation of Product objects.
+     */
+    protected $collProductsRelatedByAccessory;
+
+    /**
+     * @var        PropelObjectCollection|Product[] Collection to store aggregation of Product objects.
+     */
+    protected $collProductsRelatedByProductId;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -289,6 +306,24 @@ abstract class BaseProduct extends BaseObject implements Persistent
      * @var bool
      */
     protected $enforceVersion = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $categorysScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productsRelatedByAccessoryScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $productsRelatedByProductIdScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1173,6 +1208,9 @@ abstract class BaseProduct extends BaseObject implements Persistent
 
             $this->collProductVersions = null;
 
+            $this->collCategorys = null;
+            $this->collProductsRelatedByAccessory = null;
+            $this->collProductsRelatedByProductId = null;
         } // if (deep)
     }
 
@@ -1330,6 +1368,84 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->categorysScheduledForDeletion !== null) {
+                if (!$this->categorysScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->categorysScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    ProductCategoryQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->categorysScheduledForDeletion = null;
+                }
+
+                foreach ($this->getCategorys() as $category) {
+                    if ($category->isModified()) {
+                        $category->save($con);
+                    }
+                }
+            } elseif ($this->collCategorys) {
+                foreach ($this->collCategorys as $category) {
+                    if ($category->isModified()) {
+                        $category->save($con);
+                    }
+                }
+            }
+
+            if ($this->productsRelatedByAccessoryScheduledForDeletion !== null) {
+                if (!$this->productsRelatedByAccessoryScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->productsRelatedByAccessoryScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    AccessoryRelatedByProductIdQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->productsRelatedByAccessoryScheduledForDeletion = null;
+                }
+
+                foreach ($this->getProductsRelatedByAccessory() as $productRelatedByAccessory) {
+                    if ($productRelatedByAccessory->isModified()) {
+                        $productRelatedByAccessory->save($con);
+                    }
+                }
+            } elseif ($this->collProductsRelatedByAccessory) {
+                foreach ($this->collProductsRelatedByAccessory as $productRelatedByAccessory) {
+                    if ($productRelatedByAccessory->isModified()) {
+                        $productRelatedByAccessory->save($con);
+                    }
+                }
+            }
+
+            if ($this->productsRelatedByProductIdScheduledForDeletion !== null) {
+                if (!$this->productsRelatedByProductIdScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->productsRelatedByProductIdScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    AccessoryRelatedByAccessoryQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->productsRelatedByProductIdScheduledForDeletion = null;
+                }
+
+                foreach ($this->getProductsRelatedByProductId() as $productRelatedByProductId) {
+                    if ($productRelatedByProductId->isModified()) {
+                        $productRelatedByProductId->save($con);
+                    }
+                }
+            } elseif ($this->collProductsRelatedByProductId) {
+                foreach ($this->collProductsRelatedByProductId as $productRelatedByProductId) {
+                    if ($productRelatedByProductId->isModified()) {
+                        $productRelatedByProductId->save($con);
+                    }
+                }
             }
 
             if ($this->productCategorysScheduledForDeletion !== null) {
@@ -5264,6 +5380,537 @@ abstract class BaseProduct extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collCategorys collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Product The current object (for fluent API support)
+     * @see        addCategorys()
+     */
+    public function clearCategorys()
+    {
+        $this->collCategorys = null; // important to set this to null since that means it is uninitialized
+        $this->collCategorysPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collCategorys collection.
+     *
+     * By default this just sets the collCategorys collection to an empty collection (like clearCategorys());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initCategorys()
+    {
+        $this->collCategorys = new PropelObjectCollection();
+        $this->collCategorys->setModel('Category');
+    }
+
+    /**
+     * Gets a collection of Category objects related by a many-to-many relationship
+     * to the current object by way of the product_category cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Category[] List of Category objects
+     */
+    public function getCategorys($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collCategorys || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCategorys) {
+                // return empty collection
+                $this->initCategorys();
+            } else {
+                $collCategorys = CategoryQuery::create(null, $criteria)
+                    ->filterByProduct($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collCategorys;
+                }
+                $this->collCategorys = $collCategorys;
+            }
+        }
+
+        return $this->collCategorys;
+    }
+
+    /**
+     * Sets a collection of Category objects related by a many-to-many relationship
+     * to the current object by way of the product_category cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $categorys A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Product The current object (for fluent API support)
+     */
+    public function setCategorys(PropelCollection $categorys, PropelPDO $con = null)
+    {
+        $this->clearCategorys();
+        $currentCategorys = $this->getCategorys();
+
+        $this->categorysScheduledForDeletion = $currentCategorys->diff($categorys);
+
+        foreach ($categorys as $category) {
+            if (!$currentCategorys->contains($category)) {
+                $this->doAddCategory($category);
+            }
+        }
+
+        $this->collCategorys = $categorys;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Category objects related by a many-to-many relationship
+     * to the current object by way of the product_category cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Category objects
+     */
+    public function countCategorys($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collCategorys || null !== $criteria) {
+            if ($this->isNew() && null === $this->collCategorys) {
+                return 0;
+            } else {
+                $query = CategoryQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProduct($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collCategorys);
+        }
+    }
+
+    /**
+     * Associate a Category object to this object
+     * through the product_category cross reference table.
+     *
+     * @param  Category $category The ProductCategory object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function addCategory(Category $category)
+    {
+        if ($this->collCategorys === null) {
+            $this->initCategorys();
+        }
+        if (!$this->collCategorys->contains($category)) { // only add it if the **same** object is not already associated
+            $this->doAddCategory($category);
+
+            $this->collCategorys[]= $category;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Category $category The category object to add.
+     */
+    protected function doAddCategory($category)
+    {
+        $productCategory = new ProductCategory();
+        $productCategory->setCategory($category);
+        $this->addProductCategory($productCategory);
+    }
+
+    /**
+     * Remove a Category object to this object
+     * through the product_category cross reference table.
+     *
+     * @param Category $category The ProductCategory object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function removeCategory(Category $category)
+    {
+        if ($this->getCategorys()->contains($category)) {
+            $this->collCategorys->remove($this->collCategorys->search($category));
+            if (null === $this->categorysScheduledForDeletion) {
+                $this->categorysScheduledForDeletion = clone $this->collCategorys;
+                $this->categorysScheduledForDeletion->clear();
+            }
+            $this->categorysScheduledForDeletion[]= $category;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collProductsRelatedByAccessory collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Product The current object (for fluent API support)
+     * @see        addProductsRelatedByAccessory()
+     */
+    public function clearProductsRelatedByAccessory()
+    {
+        $this->collProductsRelatedByAccessory = null; // important to set this to null since that means it is uninitialized
+        $this->collProductsRelatedByAccessoryPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collProductsRelatedByAccessory collection.
+     *
+     * By default this just sets the collProductsRelatedByAccessory collection to an empty collection (like clearProductsRelatedByAccessory());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initProductsRelatedByAccessory()
+    {
+        $this->collProductsRelatedByAccessory = new PropelObjectCollection();
+        $this->collProductsRelatedByAccessory->setModel('Product');
+    }
+
+    /**
+     * Gets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the accessory cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Product[] List of Product objects
+     */
+    public function getProductsRelatedByAccessory($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collProductsRelatedByAccessory || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductsRelatedByAccessory) {
+                // return empty collection
+                $this->initProductsRelatedByAccessory();
+            } else {
+                $collProductsRelatedByAccessory = ProductQuery::create(null, $criteria)
+                    ->filterByProductRelatedByProductId($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collProductsRelatedByAccessory;
+                }
+                $this->collProductsRelatedByAccessory = $collProductsRelatedByAccessory;
+            }
+        }
+
+        return $this->collProductsRelatedByAccessory;
+    }
+
+    /**
+     * Sets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the accessory cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productsRelatedByAccessory A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Product The current object (for fluent API support)
+     */
+    public function setProductsRelatedByAccessory(PropelCollection $productsRelatedByAccessory, PropelPDO $con = null)
+    {
+        $this->clearProductsRelatedByAccessory();
+        $currentProductsRelatedByAccessory = $this->getProductsRelatedByAccessory();
+
+        $this->productsRelatedByAccessoryScheduledForDeletion = $currentProductsRelatedByAccessory->diff($productsRelatedByAccessory);
+
+        foreach ($productsRelatedByAccessory as $productRelatedByAccessory) {
+            if (!$currentProductsRelatedByAccessory->contains($productRelatedByAccessory)) {
+                $this->doAddProductRelatedByAccessory($productRelatedByAccessory);
+            }
+        }
+
+        $this->collProductsRelatedByAccessory = $productsRelatedByAccessory;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Product objects related by a many-to-many relationship
+     * to the current object by way of the accessory cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Product objects
+     */
+    public function countProductsRelatedByAccessory($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collProductsRelatedByAccessory || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductsRelatedByAccessory) {
+                return 0;
+            } else {
+                $query = ProductQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProductRelatedByProductId($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductsRelatedByAccessory);
+        }
+    }
+
+    /**
+     * Associate a Product object to this object
+     * through the accessory cross reference table.
+     *
+     * @param  Product $product The Accessory object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function addProductRelatedByAccessory(Product $product)
+    {
+        if ($this->collProductsRelatedByAccessory === null) {
+            $this->initProductsRelatedByAccessory();
+        }
+        if (!$this->collProductsRelatedByAccessory->contains($product)) { // only add it if the **same** object is not already associated
+            $this->doAddProductRelatedByAccessory($product);
+
+            $this->collProductsRelatedByAccessory[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductRelatedByAccessory $productRelatedByAccessory The productRelatedByAccessory object to add.
+     */
+    protected function doAddProductRelatedByAccessory($productRelatedByAccessory)
+    {
+        $accessory = new Accessory();
+        $accessory->setProductRelatedByAccessory($productRelatedByAccessory);
+        $this->addAccessoryRelatedByProductId($accessory);
+    }
+
+    /**
+     * Remove a Product object to this object
+     * through the accessory cross reference table.
+     *
+     * @param Product $product The Accessory object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function removeProductRelatedByAccessory(Product $product)
+    {
+        if ($this->getProductsRelatedByAccessory()->contains($product)) {
+            $this->collProductsRelatedByAccessory->remove($this->collProductsRelatedByAccessory->search($product));
+            if (null === $this->productsRelatedByAccessoryScheduledForDeletion) {
+                $this->productsRelatedByAccessoryScheduledForDeletion = clone $this->collProductsRelatedByAccessory;
+                $this->productsRelatedByAccessoryScheduledForDeletion->clear();
+            }
+            $this->productsRelatedByAccessoryScheduledForDeletion[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collProductsRelatedByProductId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Product The current object (for fluent API support)
+     * @see        addProductsRelatedByProductId()
+     */
+    public function clearProductsRelatedByProductId()
+    {
+        $this->collProductsRelatedByProductId = null; // important to set this to null since that means it is uninitialized
+        $this->collProductsRelatedByProductIdPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collProductsRelatedByProductId collection.
+     *
+     * By default this just sets the collProductsRelatedByProductId collection to an empty collection (like clearProductsRelatedByProductId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initProductsRelatedByProductId()
+    {
+        $this->collProductsRelatedByProductId = new PropelObjectCollection();
+        $this->collProductsRelatedByProductId->setModel('Product');
+    }
+
+    /**
+     * Gets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the accessory cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Product is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Product[] List of Product objects
+     */
+    public function getProductsRelatedByProductId($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collProductsRelatedByProductId || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductsRelatedByProductId) {
+                // return empty collection
+                $this->initProductsRelatedByProductId();
+            } else {
+                $collProductsRelatedByProductId = ProductQuery::create(null, $criteria)
+                    ->filterByProductRelatedByAccessory($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collProductsRelatedByProductId;
+                }
+                $this->collProductsRelatedByProductId = $collProductsRelatedByProductId;
+            }
+        }
+
+        return $this->collProductsRelatedByProductId;
+    }
+
+    /**
+     * Sets a collection of Product objects related by a many-to-many relationship
+     * to the current object by way of the accessory cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $productsRelatedByProductId A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Product The current object (for fluent API support)
+     */
+    public function setProductsRelatedByProductId(PropelCollection $productsRelatedByProductId, PropelPDO $con = null)
+    {
+        $this->clearProductsRelatedByProductId();
+        $currentProductsRelatedByProductId = $this->getProductsRelatedByProductId();
+
+        $this->productsRelatedByProductIdScheduledForDeletion = $currentProductsRelatedByProductId->diff($productsRelatedByProductId);
+
+        foreach ($productsRelatedByProductId as $productRelatedByProductId) {
+            if (!$currentProductsRelatedByProductId->contains($productRelatedByProductId)) {
+                $this->doAddProductRelatedByProductId($productRelatedByProductId);
+            }
+        }
+
+        $this->collProductsRelatedByProductId = $productsRelatedByProductId;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Product objects related by a many-to-many relationship
+     * to the current object by way of the accessory cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Product objects
+     */
+    public function countProductsRelatedByProductId($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collProductsRelatedByProductId || null !== $criteria) {
+            if ($this->isNew() && null === $this->collProductsRelatedByProductId) {
+                return 0;
+            } else {
+                $query = ProductQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByProductRelatedByAccessory($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collProductsRelatedByProductId);
+        }
+    }
+
+    /**
+     * Associate a Product object to this object
+     * through the accessory cross reference table.
+     *
+     * @param  Product $product The Accessory object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function addProductRelatedByProductId(Product $product)
+    {
+        if ($this->collProductsRelatedByProductId === null) {
+            $this->initProductsRelatedByProductId();
+        }
+        if (!$this->collProductsRelatedByProductId->contains($product)) { // only add it if the **same** object is not already associated
+            $this->doAddProductRelatedByProductId($product);
+
+            $this->collProductsRelatedByProductId[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	ProductRelatedByProductId $productRelatedByProductId The productRelatedByProductId object to add.
+     */
+    protected function doAddProductRelatedByProductId($productRelatedByProductId)
+    {
+        $accessory = new Accessory();
+        $accessory->setProductRelatedByProductId($productRelatedByProductId);
+        $this->addAccessoryRelatedByAccessory($accessory);
+    }
+
+    /**
+     * Remove a Product object to this object
+     * through the accessory cross reference table.
+     *
+     * @param Product $product The Accessory object to relate
+     * @return Product The current object (for fluent API support)
+     */
+    public function removeProductRelatedByProductId(Product $product)
+    {
+        if ($this->getProductsRelatedByProductId()->contains($product)) {
+            $this->collProductsRelatedByProductId->remove($this->collProductsRelatedByProductId->search($product));
+            if (null === $this->productsRelatedByProductIdScheduledForDeletion) {
+                $this->productsRelatedByProductIdScheduledForDeletion = clone $this->collProductsRelatedByProductId;
+                $this->productsRelatedByProductIdScheduledForDeletion->clear();
+            }
+            $this->productsRelatedByProductIdScheduledForDeletion[]= $product;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -5363,6 +6010,21 @@ abstract class BaseProduct extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCategorys) {
+                foreach ($this->collCategorys as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductsRelatedByAccessory) {
+                foreach ($this->collProductsRelatedByAccessory as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductsRelatedByProductId) {
+                foreach ($this->collProductsRelatedByProductId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->aTaxRule instanceof Persistent) {
               $this->aTaxRule->clearAllReferences($deep);
             }
@@ -5418,6 +6080,18 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $this->collProductVersions->clearIterator();
         }
         $this->collProductVersions = null;
+        if ($this->collCategorys instanceof PropelCollection) {
+            $this->collCategorys->clearIterator();
+        }
+        $this->collCategorys = null;
+        if ($this->collProductsRelatedByAccessory instanceof PropelCollection) {
+            $this->collProductsRelatedByAccessory->clearIterator();
+        }
+        $this->collProductsRelatedByAccessory = null;
+        if ($this->collProductsRelatedByProductId instanceof PropelCollection) {
+            $this->collProductsRelatedByProductId->clearIterator();
+        }
+        $this->collProductsRelatedByProductId = null;
         $this->aTaxRule = null;
     }
 

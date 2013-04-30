@@ -18,6 +18,7 @@ use Thelia\Model\om\BaseModuleQuery;
  */
 class ModuleQuery extends BaseModuleQuery
 {
+
     /**
      * @return array|mixed|\PropelObjectCollection
      */

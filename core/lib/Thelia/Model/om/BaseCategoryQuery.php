@@ -12,6 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Attribute;
 use Thelia\Model\AttributeCategory;
 use Thelia\Model\Category;
 use Thelia\Model\CategoryI18n;
@@ -20,8 +21,10 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\CategoryVersion;
 use Thelia\Model\ContentAssoc;
 use Thelia\Model\Document;
+use Thelia\Model\Feature;
 use Thelia\Model\FeatureCategory;
 use Thelia\Model\Image;
+use Thelia\Model\Product;
 use Thelia\Model\ProductCategory;
 use Thelia\Model\Rewriting;
 
@@ -1368,6 +1371,57 @@ abstract class BaseCategoryQuery extends ModelCriteria
         return $this
             ->joinCategoryVersion($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CategoryVersion', '\Thelia\Model\CategoryVersionQuery');
+    }
+
+    /**
+     * Filter the query by a related Product object
+     * using the product_category table as cross reference
+     *
+     * @param   Product $product the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CategoryQuery The current query, for fluid interface
+     */
+    public function filterByProduct($product, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useProductCategoryQuery()
+            ->filterByProduct($product, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Feature object
+     * using the feature_category table as cross reference
+     *
+     * @param   Feature $feature the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CategoryQuery The current query, for fluid interface
+     */
+    public function filterByFeature($feature, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useFeatureCategoryQuery()
+            ->filterByFeature($feature, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Attribute object
+     * using the attribute_category table as cross reference
+     *
+     * @param   Attribute $attribute the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   CategoryQuery The current query, for fluid interface
+     */
+    public function filterByAttribute($attribute, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useAttributeCategoryQuery()
+            ->filterByAttribute($attribute, $comparison)
+            ->endUse();
     }
 
     /**

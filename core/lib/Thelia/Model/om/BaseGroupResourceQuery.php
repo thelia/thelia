@@ -54,6 +54,7 @@ use Thelia\Model\Resource;
  * @method GroupResource findOne(PropelPDO $con = null) Return the first GroupResource matching the query
  * @method GroupResource findOneOrCreate(PropelPDO $con = null) Return the first GroupResource matching the query, or a new GroupResource object populated from the query conditions when no match is found
  *
+ * @method GroupResource findOneById(int $id) Return the first GroupResource filtered by the id column
  * @method GroupResource findOneByGroupId(int $group_id) Return the first GroupResource filtered by the group_id column
  * @method GroupResource findOneByResourceId(int $resource_id) Return the first GroupResource filtered by the resource_id column
  * @method GroupResource findOneByRead(int $read) Return the first GroupResource filtered by the read column
@@ -115,10 +116,11 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj  = $c->findPk(12, $con);
+     * $obj = $c->findPk(array(12, 34, 56), $con);
      * </code>
      *
-     * @param mixed $key Primary key to use for the query
+     * @param array $key Primary key to use for the query
+                         A Primary key composition: [$id, $group_id, $resource_id]
      * @param     PropelPDO $con an optional connection object
      *
      * @return   GroupResource|GroupResource[]|mixed the result, formatted by the current formatter
@@ -128,7 +130,7 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = GroupResourcePeer::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = GroupResourcePeer::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
             // the object is alredy in the instance pool
             return $obj;
         }
@@ -146,20 +148,6 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
     }
 
     /**
-     * Alias of findPk to use instance pooling
-     *
-     * @param     mixed $key Primary key to use for the query
-     * @param     PropelPDO $con A connection object
-     *
-     * @return                 GroupResource A model object, or null if the key is not found
-     * @throws PropelException
-     */
-     public function findOneById($key, $con = null)
-     {
-        return $this->findPk($key, $con);
-     }
-
-    /**
      * Find object by primary key using raw SQL to go fast.
      * Bypass doSelect() and the object formatter by using generated code.
      *
@@ -171,10 +159,12 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `group_id`, `resource_id`, `read`, `write`, `created_at`, `updated_at` FROM `group_resource` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `group_id`, `resource_id`, `read`, `write`, `created_at`, `updated_at` FROM `group_resource` WHERE `id` = :p0 AND `group_id` = :p1 AND `resource_id` = :p2';
         try {
             $stmt = $con->prepare($sql);
-            $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
+            $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
+            $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
+            $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -184,7 +174,7 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
         if ($row = $stmt->fetch(PDO::FETCH_NUM)) {
             $obj = new GroupResource();
             $obj->hydrate($row);
-            GroupResourcePeer::addInstanceToPool($obj, (string) $key);
+            GroupResourcePeer::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
         }
         $stmt->closeCursor();
 
@@ -213,7 +203,7 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
     /**
      * Find objects by primary key
      * <code>
-     * $objs = $c->findPks(array(12, 56, 832), $con);
+     * $objs = $c->findPks(array(array(12, 56), array(832, 123), array(123, 456)), $con);
      * </code>
      * @param     array $keys Primary keys to use for the query
      * @param     PropelPDO $con an optional connection object
@@ -243,8 +233,11 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
+        $this->addUsingAlias(GroupResourcePeer::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(GroupResourcePeer::GROUP_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(GroupResourcePeer::RESOURCE_ID, $key[2], Criteria::EQUAL);
 
-        return $this->addUsingAlias(GroupResourcePeer::ID, $key, Criteria::EQUAL);
+        return $this;
     }
 
     /**
@@ -256,8 +249,19 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
      */
     public function filterByPrimaryKeys($keys)
     {
+        if (empty($keys)) {
+            return $this->add(null, '1<>1', Criteria::CUSTOM);
+        }
+        foreach ($keys as $key) {
+            $cton0 = $this->getNewCriterion(GroupResourcePeer::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(GroupResourcePeer::GROUP_ID, $key[1], Criteria::EQUAL);
+            $cton0->addAnd($cton1);
+            $cton2 = $this->getNewCriterion(GroupResourcePeer::RESOURCE_ID, $key[2], Criteria::EQUAL);
+            $cton0->addAnd($cton2);
+            $this->addOr($cton0);
+        }
 
-        return $this->addUsingAlias(GroupResourcePeer::ID, $keys, Criteria::IN);
+        return $this;
     }
 
     /**
@@ -722,7 +726,10 @@ abstract class BaseGroupResourceQuery extends ModelCriteria
     public function prune($groupResource = null)
     {
         if ($groupResource) {
-            $this->addUsingAlias(GroupResourcePeer::ID, $groupResource->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond0', $this->getAliasedColName(GroupResourcePeer::ID), $groupResource->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(GroupResourcePeer::GROUP_ID), $groupResource->getGroupId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond2', $this->getAliasedColName(GroupResourcePeer::RESOURCE_ID), $groupResource->getResourceId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
         }
 
         return $this;

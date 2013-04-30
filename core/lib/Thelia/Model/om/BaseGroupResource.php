@@ -988,10 +988,10 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['GroupResource'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['GroupResource'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['GroupResource'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['GroupResource'][serialize($this->getPrimaryKey())] = true;
         $keys = GroupResourcePeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
@@ -1129,28 +1129,38 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
     {
         $criteria = new Criteria(GroupResourcePeer::DATABASE_NAME);
         $criteria->add(GroupResourcePeer::ID, $this->id);
+        $criteria->add(GroupResourcePeer::GROUP_ID, $this->group_id);
+        $criteria->add(GroupResourcePeer::RESOURCE_ID, $this->resource_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getGroupId();
+        $pks[2] = $this->getResourceId();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param  int $key Primary key.
+     * @param array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setId($keys[0]);
+        $this->setGroupId($keys[1]);
+        $this->setResourceId($keys[2]);
     }
 
     /**
@@ -1160,7 +1170,7 @@ abstract class BaseGroupResource extends BaseObject implements Persistent
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getId()) && (null === $this->getGroupId()) && (null === $this->getResourceId());
     }
 
     /**

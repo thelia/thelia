@@ -56,6 +56,7 @@ class ResourceTableMap extends TableMap
     {
         $this->addRelation('GroupResource', 'Thelia\\Model\\GroupResource', RelationMap::ONE_TO_MANY, array('id' => 'resource_id', ), 'CASCADE', 'RESTRICT', 'GroupResources');
         $this->addRelation('ResourceI18n', 'Thelia\\Model\\ResourceI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ResourceI18ns');
+        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Groups');
     } // buildRelations()
 
     /**

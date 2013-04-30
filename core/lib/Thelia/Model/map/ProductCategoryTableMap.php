@@ -41,6 +41,7 @@ class ProductCategoryTableMap extends TableMap
         $this->setClassname('Thelia\\Model\\ProductCategory');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
         $this->addForeignPrimaryKey('product_id', 'ProductId', 'INTEGER' , 'product', 'id', true, null, null);
         $this->addForeignPrimaryKey('category_id', 'CategoryId', 'INTEGER' , 'category', 'id', true, null, null);

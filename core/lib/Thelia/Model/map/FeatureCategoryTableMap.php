@@ -41,6 +41,7 @@ class FeatureCategoryTableMap extends TableMap
         $this->setClassname('Thelia\\Model\\FeatureCategory');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('feature_id', 'FeatureId', 'INTEGER', 'feature', 'id', true, null, null);

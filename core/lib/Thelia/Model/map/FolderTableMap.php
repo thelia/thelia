@@ -66,6 +66,7 @@ class FolderTableMap extends TableMap
         $this->addRelation('ContentFolder', 'Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
         $this->addRelation('FolderI18n', 'Thelia\\Model\\FolderI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FolderI18ns');
         $this->addRelation('FolderVersion', 'Thelia\\Model\\FolderVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FolderVersions');
+        $this->addRelation('Content', 'Thelia\\Model\\Content', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Contents');
     } // buildRelations()
 
     /**

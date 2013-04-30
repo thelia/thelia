@@ -60,6 +60,7 @@ class AdminTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('AdminGroup', 'Thelia\\Model\\AdminGroup', RelationMap::ONE_TO_MANY, array('id' => 'admin_id', ), 'CASCADE', 'RESTRICT', 'AdminGroups');
+        $this->addRelation('Group', 'Thelia\\Model\\Group', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Groups');
     } // buildRelations()
 
     /**

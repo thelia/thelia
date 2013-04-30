@@ -12,6 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Admin;
 use Thelia\Model\AdminGroup;
 use Thelia\Model\Group;
 use Thelia\Model\GroupI18n;
@@ -19,6 +20,7 @@ use Thelia\Model\GroupModule;
 use Thelia\Model\GroupPeer;
 use Thelia\Model\GroupQuery;
 use Thelia\Model\GroupResource;
+use Thelia\Model\Resource;
 
 /**
  * Base class that represents a query for the 'group' table.
@@ -447,7 +449,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      *
      * @return GroupQuery The current query, for fluid interface
      */
-    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinAdminGroup($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('AdminGroup');
@@ -482,7 +484,7 @@ abstract class BaseGroupQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AdminGroupQuery A secondary query class using the current class as primary query
      */
-    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useAdminGroupQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinAdminGroup($relationAlias, $joinType)
@@ -709,6 +711,40 @@ abstract class BaseGroupQuery extends ModelCriteria
         return $this
             ->joinGroupI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'GroupI18n', '\Thelia\Model\GroupI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related Admin object
+     * using the admin_group table as cross reference
+     *
+     * @param   Admin $admin the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   GroupQuery The current query, for fluid interface
+     */
+    public function filterByAdmin($admin, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useAdminGroupQuery()
+            ->filterByAdmin($admin, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Resource object
+     * using the group_resource table as cross reference
+     *
+     * @param   Resource $resource the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   GroupQuery The current query, for fluid interface
+     */
+    public function filterByResource($resource, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useGroupResourceQuery()
+            ->filterByResource($resource, $comparison)
+            ->endUse();
     }
 
     /**

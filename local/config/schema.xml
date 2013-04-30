@@ -54,7 +54,7 @@
       <parameter name="log_created_by" value="true" />
     </behavior>
   </table>
-  <table name="product_category">
+  <table isCrossRef="true" name="product_category">
     <column name="product_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="product" name="fk_product_has_category_product1" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -194,7 +194,7 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="feature_category">
+  <table isCrossRef="true" name="feature_category">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="feature_id" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />
@@ -293,7 +293,7 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="attribute_category">
+  <table isCrossRef="true" name="attribute_category">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="category_id" required="true" type="INTEGER" />
     <column name="attribute_id" required="true" type="INTEGER" />
@@ -688,7 +688,7 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
-  <table name="accessory">
+  <table isCrossRef="true" name="accessory">
     <column name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="accessory" required="true" type="INTEGER" />
@@ -765,10 +765,10 @@
     <column name="salt" size="128" type="VARCHAR" />
     <behavior name="timestampable" />
   </table>
-  <table name="admin_group">
+  <table isCrossRef="true" name="admin_group">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="group_id" type="INTEGER" />
-    <column name="admin_id" type="INTEGER" />
+    <column name="group_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="admin_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="group" name="fk_admin_group_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="group_id" />
     </foreign-key>
@@ -783,10 +783,10 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="group_resource">
+  <table isCrossRef="true" name="group_resource">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="group_id" required="true" type="INTEGER" />
-    <column name="resource_id" required="true" type="INTEGER" />
+    <column name="group_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="resource_id" primaryKey="true" required="true" type="INTEGER" />
     <column defaultValue="0" name="read" type="TINYINT" />
     <column defaultValue="0" name="write" type="TINYINT" />
     <foreign-key foreignTable="group" name="fk_group_resource_group_id" onDelete="CASCADE" onUpdate="RESTRICT">
@@ -795,7 +795,7 @@
     <foreign-key foreignTable="resource" name="fk_group_resource_resource_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="resource_id" />
     </foreign-key>
-    <index name="id_idx">
+    <index name="id_group_resource_group_id">
       <index-column name="group_id" />
     </index>
     <index name="idx_group_resource_resource_id">
@@ -922,7 +922,7 @@
     <column name="request" type="LONGVARCHAR" />
     <behavior name="timestampable" />
   </table>
-  <table name="content_folder">
+  <table isCrossRef="true" name="content_folder">
     <column name="content_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="folder_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="content" name="fk_content_folder_content_id" onDelete="CASCADE" onUpdate="RESTRICT">

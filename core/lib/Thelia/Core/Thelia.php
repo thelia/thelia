@@ -107,6 +107,8 @@ class Thelia extends Kernel
 
         $loader = new XmlFileLoader($container, new FileLocator(THELIA_ROOT . "/core/lib/Thelia/Config/Resources"));
         $loader->load("config.xml");
+        $loader->load("routing.xml");
+        $loader->load("action.xml");
 
         $modules = \Thelia\Model\ModuleQuery::getActivated();
 

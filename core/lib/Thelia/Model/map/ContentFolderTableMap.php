@@ -41,6 +41,7 @@ class ContentFolderTableMap extends TableMap
         $this->setClassname('Thelia\\Model\\ContentFolder');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(false);
+        $this->setIsCrossRef(true);
         // columns
         $this->addForeignPrimaryKey('content_id', 'ContentId', 'INTEGER' , 'content', 'id', true, null, null);
         $this->addForeignPrimaryKey('folder_id', 'FolderId', 'INTEGER' , 'folder', 'id', true, null, null);

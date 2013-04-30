@@ -12,6 +12,7 @@ use \PropelCollection;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Content;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\Document;
 use Thelia\Model\Folder;
@@ -1131,6 +1132,23 @@ abstract class BaseFolderQuery extends ModelCriteria
         return $this
             ->joinFolderVersion($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'FolderVersion', '\Thelia\Model\FolderVersionQuery');
+    }
+
+    /**
+     * Filter the query by a related Content object
+     * using the content_folder table as cross reference
+     *
+     * @param   Content $content the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   FolderQuery The current query, for fluid interface
+     */
+    public function filterByContent($content, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useContentFolderQuery()
+            ->filterByContent($content, $comparison)
+            ->endUse();
     }
 
     /**

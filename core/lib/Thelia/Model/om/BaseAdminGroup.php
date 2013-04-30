@@ -862,10 +862,10 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
      */
     public function toArray($keyType = BasePeer::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['AdminGroup'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['AdminGroup'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['AdminGroup'][$this->getPrimaryKey()] = true;
+        $alreadyDumpedObjects['AdminGroup'][serialize($this->getPrimaryKey())] = true;
         $keys = AdminGroupPeer::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
@@ -991,28 +991,38 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
     {
         $criteria = new Criteria(AdminGroupPeer::DATABASE_NAME);
         $criteria->add(AdminGroupPeer::ID, $this->id);
+        $criteria->add(AdminGroupPeer::GROUP_ID, $this->group_id);
+        $criteria->add(AdminGroupPeer::ADMIN_ID, $this->admin_id);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getGroupId();
+        $pks[2] = $this->getAdminId();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param  int $key Primary key.
+     * @param array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setId($keys[0]);
+        $this->setGroupId($keys[1]);
+        $this->setAdminId($keys[2]);
     }
 
     /**
@@ -1022,7 +1032,7 @@ abstract class BaseAdminGroup extends BaseObject implements Persistent
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getId()) && (null === $this->getGroupId()) && (null === $this->getAdminId());
     }
 
     /**

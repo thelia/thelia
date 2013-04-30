@@ -15,8 +15,10 @@ use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Content;
 use Thelia\Model\ContentFolder;
 use Thelia\Model\ContentFolderQuery;
+use Thelia\Model\ContentQuery;
 use Thelia\Model\Document;
 use Thelia\Model\DocumentQuery;
 use Thelia\Model\Folder;
@@ -158,6 +160,11 @@ abstract class BaseFolder extends BaseObject implements Persistent
     protected $collFolderVersionsPartial;
 
     /**
+     * @var        PropelObjectCollection|Content[] Collection to store aggregation of Content objects.
+     */
+    protected $collContents;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -198,6 +205,12 @@ abstract class BaseFolder extends BaseObject implements Persistent
      * @var bool
      */
     protected $enforceVersion = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $contentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -790,6 +803,7 @@ abstract class BaseFolder extends BaseObject implements Persistent
 
             $this->collFolderVersions = null;
 
+            $this->collContents = null;
         } // if (deep)
     }
 
@@ -935,6 +949,32 @@ abstract class BaseFolder extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->contentsScheduledForDeletion !== null) {
+                if (!$this->contentsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->contentsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    ContentFolderQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->contentsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getContents() as $content) {
+                    if ($content->isModified()) {
+                        $content->save($con);
+                    }
+                }
+            } elseif ($this->collContents) {
+                foreach ($this->collContents as $content) {
+                    if ($content->isModified()) {
+                        $content->save($con);
+                    }
+                }
             }
 
             if ($this->imagesScheduledForDeletion !== null) {
@@ -3289,6 +3329,183 @@ abstract class BaseFolder extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collContents collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Folder The current object (for fluent API support)
+     * @see        addContents()
+     */
+    public function clearContents()
+    {
+        $this->collContents = null; // important to set this to null since that means it is uninitialized
+        $this->collContentsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collContents collection.
+     *
+     * By default this just sets the collContents collection to an empty collection (like clearContents());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initContents()
+    {
+        $this->collContents = new PropelObjectCollection();
+        $this->collContents->setModel('Content');
+    }
+
+    /**
+     * Gets a collection of Content objects related by a many-to-many relationship
+     * to the current object by way of the content_folder cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Folder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Content[] List of Content objects
+     */
+    public function getContents($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collContents || null !== $criteria) {
+            if ($this->isNew() && null === $this->collContents) {
+                // return empty collection
+                $this->initContents();
+            } else {
+                $collContents = ContentQuery::create(null, $criteria)
+                    ->filterByFolder($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collContents;
+                }
+                $this->collContents = $collContents;
+            }
+        }
+
+        return $this->collContents;
+    }
+
+    /**
+     * Sets a collection of Content objects related by a many-to-many relationship
+     * to the current object by way of the content_folder cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $contents A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Folder The current object (for fluent API support)
+     */
+    public function setContents(PropelCollection $contents, PropelPDO $con = null)
+    {
+        $this->clearContents();
+        $currentContents = $this->getContents();
+
+        $this->contentsScheduledForDeletion = $currentContents->diff($contents);
+
+        foreach ($contents as $content) {
+            if (!$currentContents->contains($content)) {
+                $this->doAddContent($content);
+            }
+        }
+
+        $this->collContents = $contents;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Content objects related by a many-to-many relationship
+     * to the current object by way of the content_folder cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Content objects
+     */
+    public function countContents($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collContents || null !== $criteria) {
+            if ($this->isNew() && null === $this->collContents) {
+                return 0;
+            } else {
+                $query = ContentQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByFolder($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collContents);
+        }
+    }
+
+    /**
+     * Associate a Content object to this object
+     * through the content_folder cross reference table.
+     *
+     * @param  Content $content The ContentFolder object to relate
+     * @return Folder The current object (for fluent API support)
+     */
+    public function addContent(Content $content)
+    {
+        if ($this->collContents === null) {
+            $this->initContents();
+        }
+        if (!$this->collContents->contains($content)) { // only add it if the **same** object is not already associated
+            $this->doAddContent($content);
+
+            $this->collContents[]= $content;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Content $content The content object to add.
+     */
+    protected function doAddContent($content)
+    {
+        $contentFolder = new ContentFolder();
+        $contentFolder->setContent($content);
+        $this->addContentFolder($contentFolder);
+    }
+
+    /**
+     * Remove a Content object to this object
+     * through the content_folder cross reference table.
+     *
+     * @param Content $content The ContentFolder object to relate
+     * @return Folder The current object (for fluent API support)
+     */
+    public function removeContent(Content $content)
+    {
+        if ($this->getContents()->contains($content)) {
+            $this->collContents->remove($this->collContents->search($content));
+            if (null === $this->contentsScheduledForDeletion) {
+                $this->contentsScheduledForDeletion = clone $this->collContents;
+                $this->contentsScheduledForDeletion->clear();
+            }
+            $this->contentsScheduledForDeletion[]= $content;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -3356,6 +3573,11 @@ abstract class BaseFolder extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collContents) {
+                foreach ($this->collContents as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -3388,6 +3610,10 @@ abstract class BaseFolder extends BaseObject implements Persistent
             $this->collFolderVersions->clearIterator();
         }
         $this->collFolderVersions = null;
+        if ($this->collContents instanceof PropelCollection) {
+            $this->collContents->clearIterator();
+        }
+        $this->collContents = null;
     }
 
     /**

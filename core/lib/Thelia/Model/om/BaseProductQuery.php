@@ -13,6 +13,7 @@ use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
 use Thelia\Model\Accessory;
+use Thelia\Model\Category;
 use Thelia\Model\ContentAssoc;
 use Thelia\Model\Document;
 use Thelia\Model\FeatureProd;
@@ -1930,6 +1931,57 @@ abstract class BaseProductQuery extends ModelCriteria
         return $this
             ->joinProductVersion($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ProductVersion', '\Thelia\Model\ProductVersionQuery');
+    }
+
+    /**
+     * Filter the query by a related Category object
+     * using the product_category table as cross reference
+     *
+     * @param   Category $category the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ProductQuery The current query, for fluid interface
+     */
+    public function filterByCategory($category, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useProductCategoryQuery()
+            ->filterByCategory($category, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Product object
+     * using the accessory table as cross reference
+     *
+     * @param   Product $product the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ProductQuery The current query, for fluid interface
+     */
+    public function filterByProductRelatedByAccessory($product, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useAccessoryRelatedByProductIdQuery()
+            ->filterByProductRelatedByAccessory($product, $comparison)
+            ->endUse();
+    }
+
+    /**
+     * Filter the query by a related Product object
+     * using the accessory table as cross reference
+     *
+     * @param   Product $product the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   ProductQuery The current query, for fluid interface
+     */
+    public function filterByProductRelatedByProductId($product, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useAccessoryRelatedByAccessoryQuery()
+            ->filterByProductRelatedByProductId($product, $comparison)
+            ->endUse();
     }
 
     /**

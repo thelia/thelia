@@ -15,6 +15,8 @@ use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Group;
+use Thelia\Model\GroupQuery;
 use Thelia\Model\GroupResource;
 use Thelia\Model\GroupResourceQuery;
 use Thelia\Model\Resource;
@@ -88,6 +90,11 @@ abstract class BaseResource extends BaseObject implements Persistent
     protected $collResourceI18nsPartial;
 
     /**
+     * @var        PropelObjectCollection|Group[] Collection to store aggregation of Group objects.
+     */
+    protected $collGroups;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -120,6 +127,12 @@ abstract class BaseResource extends BaseObject implements Persistent
      * @var        array[ResourceI18n]
      */
     protected $currentTranslations;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $groupsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -431,6 +444,7 @@ abstract class BaseResource extends BaseObject implements Persistent
 
             $this->collResourceI18ns = null;
 
+            $this->collGroups = null;
         } // if (deep)
     }
 
@@ -564,6 +578,32 @@ abstract class BaseResource extends BaseObject implements Persistent
                 }
                 $affectedRows += 1;
                 $this->resetModified();
+            }
+
+            if ($this->groupsScheduledForDeletion !== null) {
+                if (!$this->groupsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->groupsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($remotePk, $pk);
+                    }
+                    GroupResourceQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->groupsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getGroups() as $group) {
+                    if ($group->isModified()) {
+                        $group->save($con);
+                    }
+                }
+            } elseif ($this->collGroups) {
+                foreach ($this->collGroups as $group) {
+                    if ($group->isModified()) {
+                        $group->save($con);
+                    }
+                }
             }
 
             if ($this->groupResourcesScheduledForDeletion !== null) {
@@ -1574,6 +1614,183 @@ abstract class BaseResource extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collGroups collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Resource The current object (for fluent API support)
+     * @see        addGroups()
+     */
+    public function clearGroups()
+    {
+        $this->collGroups = null; // important to set this to null since that means it is uninitialized
+        $this->collGroupsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collGroups collection.
+     *
+     * By default this just sets the collGroups collection to an empty collection (like clearGroups());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initGroups()
+    {
+        $this->collGroups = new PropelObjectCollection();
+        $this->collGroups->setModel('Group');
+    }
+
+    /**
+     * Gets a collection of Group objects related by a many-to-many relationship
+     * to the current object by way of the group_resource cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Resource is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Group[] List of Group objects
+     */
+    public function getGroups($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collGroups || null !== $criteria) {
+            if ($this->isNew() && null === $this->collGroups) {
+                // return empty collection
+                $this->initGroups();
+            } else {
+                $collGroups = GroupQuery::create(null, $criteria)
+                    ->filterByResource($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collGroups;
+                }
+                $this->collGroups = $collGroups;
+            }
+        }
+
+        return $this->collGroups;
+    }
+
+    /**
+     * Sets a collection of Group objects related by a many-to-many relationship
+     * to the current object by way of the group_resource cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $groups A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Resource The current object (for fluent API support)
+     */
+    public function setGroups(PropelCollection $groups, PropelPDO $con = null)
+    {
+        $this->clearGroups();
+        $currentGroups = $this->getGroups();
+
+        $this->groupsScheduledForDeletion = $currentGroups->diff($groups);
+
+        foreach ($groups as $group) {
+            if (!$currentGroups->contains($group)) {
+                $this->doAddGroup($group);
+            }
+        }
+
+        $this->collGroups = $groups;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Group objects related by a many-to-many relationship
+     * to the current object by way of the group_resource cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Group objects
+     */
+    public function countGroups($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collGroups || null !== $criteria) {
+            if ($this->isNew() && null === $this->collGroups) {
+                return 0;
+            } else {
+                $query = GroupQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByResource($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collGroups);
+        }
+    }
+
+    /**
+     * Associate a Group object to this object
+     * through the group_resource cross reference table.
+     *
+     * @param  Group $group The GroupResource object to relate
+     * @return Resource The current object (for fluent API support)
+     */
+    public function addGroup(Group $group)
+    {
+        if ($this->collGroups === null) {
+            $this->initGroups();
+        }
+        if (!$this->collGroups->contains($group)) { // only add it if the **same** object is not already associated
+            $this->doAddGroup($group);
+
+            $this->collGroups[]= $group;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Group $group The group object to add.
+     */
+    protected function doAddGroup($group)
+    {
+        $groupResource = new GroupResource();
+        $groupResource->setGroup($group);
+        $this->addGroupResource($groupResource);
+    }
+
+    /**
+     * Remove a Group object to this object
+     * through the group_resource cross reference table.
+     *
+     * @param Group $group The GroupResource object to relate
+     * @return Resource The current object (for fluent API support)
+     */
+    public function removeGroup(Group $group)
+    {
+        if ($this->getGroups()->contains($group)) {
+            $this->collGroups->remove($this->collGroups->search($group));
+            if (null === $this->groupsScheduledForDeletion) {
+                $this->groupsScheduledForDeletion = clone $this->collGroups;
+                $this->groupsScheduledForDeletion->clear();
+            }
+            $this->groupsScheduledForDeletion[]= $group;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1614,6 +1831,11 @@ abstract class BaseResource extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collGroups) {
+                foreach ($this->collGroups as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -1630,6 +1852,10 @@ abstract class BaseResource extends BaseObject implements Persistent
             $this->collResourceI18ns->clearIterator();
         }
         $this->collResourceI18ns = null;
+        if ($this->collGroups instanceof PropelCollection) {
+            $this->collGroups->clearIterator();
+        }
+        $this->collGroups = null;
     }
 
     /**

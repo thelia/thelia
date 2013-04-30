@@ -19,6 +19,7 @@ use Thelia\Model\AttributeCombination;
 use Thelia\Model\AttributeI18n;
 use Thelia\Model\AttributePeer;
 use Thelia\Model\AttributeQuery;
+use Thelia\Model\Category;
 
 /**
  * Base class that represents a query for the 'attribute' table.
@@ -722,6 +723,23 @@ abstract class BaseAttributeQuery extends ModelCriteria
         return $this
             ->joinAttributeI18n($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'AttributeI18n', '\Thelia\Model\AttributeI18nQuery');
+    }
+
+    /**
+     * Filter the query by a related Category object
+     * using the attribute_category table as cross reference
+     *
+     * @param   Category $category the related object to use as filter
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return   AttributeQuery The current query, for fluid interface
+     */
+    public function filterByCategory($category, $comparison = Criteria::EQUAL)
+    {
+        return $this
+            ->useAttributeCategoryQuery()
+            ->filterByCategory($category, $comparison)
+            ->endUse();
     }
 
     /**

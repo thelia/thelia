@@ -41,10 +41,11 @@ class AdminGroupTableMap extends TableMap
         $this->setClassname('Thelia\\Model\\AdminGroup');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('group_id', 'GroupId', 'INTEGER', 'group', 'id', false, null, null);
-        $this->addForeignKey('admin_id', 'AdminId', 'INTEGER', 'admin', 'id', false, null, null);
+        $this->addForeignPrimaryKey('group_id', 'GroupId', 'INTEGER' , 'group', 'id', true, null, null);
+        $this->addForeignPrimaryKey('admin_id', 'AdminId', 'INTEGER' , 'admin', 'id', true, null, null);
         $this->addColumn('created_at', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('updated_at', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         // validators

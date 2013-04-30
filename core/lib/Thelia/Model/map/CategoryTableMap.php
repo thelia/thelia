@@ -69,6 +69,9 @@ class CategoryTableMap extends TableMap
         $this->addRelation('Rewriting', 'Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('CategoryI18n', 'Thelia\\Model\\CategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryI18ns');
         $this->addRelation('CategoryVersion', 'Thelia\\Model\\CategoryVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryVersions');
+        $this->addRelation('Product', 'Thelia\\Model\\Product', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Products');
+        $this->addRelation('Feature', 'Thelia\\Model\\Feature', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Features');
+        $this->addRelation('Attribute', 'Thelia\\Model\\Attribute', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Attributes');
     } // buildRelations()
 
     /**

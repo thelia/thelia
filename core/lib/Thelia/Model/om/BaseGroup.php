@@ -15,8 +15,10 @@ use \PropelDateTime;
 use \PropelException;
 use \PropelObjectCollection;
 use \PropelPDO;
+use Thelia\Model\Admin;
 use Thelia\Model\AdminGroup;
 use Thelia\Model\AdminGroupQuery;
+use Thelia\Model\AdminQuery;
 use Thelia\Model\Group;
 use Thelia\Model\GroupI18n;
 use Thelia\Model\GroupI18nQuery;
@@ -26,6 +28,8 @@ use Thelia\Model\GroupPeer;
 use Thelia\Model\GroupQuery;
 use Thelia\Model\GroupResource;
 use Thelia\Model\GroupResourceQuery;
+use Thelia\Model\Resource;
+use Thelia\Model\ResourceQuery;
 
 /**
  * Base class that represents a row from the 'group' table.
@@ -104,6 +108,16 @@ abstract class BaseGroup extends BaseObject implements Persistent
     protected $collGroupI18nsPartial;
 
     /**
+     * @var        PropelObjectCollection|Admin[] Collection to store aggregation of Admin objects.
+     */
+    protected $collAdmins;
+
+    /**
+     * @var        PropelObjectCollection|Resource[] Collection to store aggregation of Resource objects.
+     */
+    protected $collResources;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      * @var        boolean
@@ -136,6 +150,18 @@ abstract class BaseGroup extends BaseObject implements Persistent
      * @var        array[GroupI18n]
      */
     protected $currentTranslations;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $adminsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var		PropelObjectCollection
+     */
+    protected $resourcesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -463,6 +489,8 @@ abstract class BaseGroup extends BaseObject implements Persistent
 
             $this->collGroupI18ns = null;
 
+            $this->collAdmins = null;
+            $this->collResources = null;
         } // if (deep)
     }
 
@@ -598,12 +626,63 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 $this->resetModified();
             }
 
+            if ($this->adminsScheduledForDeletion !== null) {
+                if (!$this->adminsScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->adminsScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    AdminGroupQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->adminsScheduledForDeletion = null;
+                }
+
+                foreach ($this->getAdmins() as $admin) {
+                    if ($admin->isModified()) {
+                        $admin->save($con);
+                    }
+                }
+            } elseif ($this->collAdmins) {
+                foreach ($this->collAdmins as $admin) {
+                    if ($admin->isModified()) {
+                        $admin->save($con);
+                    }
+                }
+            }
+
+            if ($this->resourcesScheduledForDeletion !== null) {
+                if (!$this->resourcesScheduledForDeletion->isEmpty()) {
+                    $pks = array();
+                    $pk = $this->getPrimaryKey();
+                    foreach ($this->resourcesScheduledForDeletion->getPrimaryKeys(false) as $remotePk) {
+                        $pks[] = array($pk, $remotePk);
+                    }
+                    GroupResourceQuery::create()
+                        ->filterByPrimaryKeys($pks)
+                        ->delete($con);
+                    $this->resourcesScheduledForDeletion = null;
+                }
+
+                foreach ($this->getResources() as $resource) {
+                    if ($resource->isModified()) {
+                        $resource->save($con);
+                    }
+                }
+            } elseif ($this->collResources) {
+                foreach ($this->collResources as $resource) {
+                    if ($resource->isModified()) {
+                        $resource->save($con);
+                    }
+                }
+            }
+
             if ($this->adminGroupsScheduledForDeletion !== null) {
                 if (!$this->adminGroupsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->adminGroupsScheduledForDeletion as $adminGroup) {
-                        // need to save related object because we set the relation to null
-                        $adminGroup->save($con);
-                    }
+                    AdminGroupQuery::create()
+                        ->filterByPrimaryKeys($this->adminGroupsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->adminGroupsScheduledForDeletion = null;
                 }
             }
@@ -1426,7 +1505,7 @@ abstract class BaseGroup extends BaseObject implements Persistent
                 $this->adminGroupsScheduledForDeletion = clone $this->collAdminGroups;
                 $this->adminGroupsScheduledForDeletion->clear();
             }
-            $this->adminGroupsScheduledForDeletion[]= $adminGroup;
+            $this->adminGroupsScheduledForDeletion[]= clone $adminGroup;
             $adminGroup->setGroup(null);
         }
 
@@ -2167,6 +2246,360 @@ abstract class BaseGroup extends BaseObject implements Persistent
     }
 
     /**
+     * Clears out the collAdmins collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Group The current object (for fluent API support)
+     * @see        addAdmins()
+     */
+    public function clearAdmins()
+    {
+        $this->collAdmins = null; // important to set this to null since that means it is uninitialized
+        $this->collAdminsPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collAdmins collection.
+     *
+     * By default this just sets the collAdmins collection to an empty collection (like clearAdmins());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initAdmins()
+    {
+        $this->collAdmins = new PropelObjectCollection();
+        $this->collAdmins->setModel('Admin');
+    }
+
+    /**
+     * Gets a collection of Admin objects related by a many-to-many relationship
+     * to the current object by way of the admin_group cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Admin[] List of Admin objects
+     */
+    public function getAdmins($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collAdmins || null !== $criteria) {
+            if ($this->isNew() && null === $this->collAdmins) {
+                // return empty collection
+                $this->initAdmins();
+            } else {
+                $collAdmins = AdminQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collAdmins;
+                }
+                $this->collAdmins = $collAdmins;
+            }
+        }
+
+        return $this->collAdmins;
+    }
+
+    /**
+     * Sets a collection of Admin objects related by a many-to-many relationship
+     * to the current object by way of the admin_group cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $admins A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Group The current object (for fluent API support)
+     */
+    public function setAdmins(PropelCollection $admins, PropelPDO $con = null)
+    {
+        $this->clearAdmins();
+        $currentAdmins = $this->getAdmins();
+
+        $this->adminsScheduledForDeletion = $currentAdmins->diff($admins);
+
+        foreach ($admins as $admin) {
+            if (!$currentAdmins->contains($admin)) {
+                $this->doAddAdmin($admin);
+            }
+        }
+
+        $this->collAdmins = $admins;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Admin objects related by a many-to-many relationship
+     * to the current object by way of the admin_group cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Admin objects
+     */
+    public function countAdmins($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collAdmins || null !== $criteria) {
+            if ($this->isNew() && null === $this->collAdmins) {
+                return 0;
+            } else {
+                $query = AdminQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collAdmins);
+        }
+    }
+
+    /**
+     * Associate a Admin object to this object
+     * through the admin_group cross reference table.
+     *
+     * @param  Admin $admin The AdminGroup object to relate
+     * @return Group The current object (for fluent API support)
+     */
+    public function addAdmin(Admin $admin)
+    {
+        if ($this->collAdmins === null) {
+            $this->initAdmins();
+        }
+        if (!$this->collAdmins->contains($admin)) { // only add it if the **same** object is not already associated
+            $this->doAddAdmin($admin);
+
+            $this->collAdmins[]= $admin;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Admin $admin The admin object to add.
+     */
+    protected function doAddAdmin($admin)
+    {
+        $adminGroup = new AdminGroup();
+        $adminGroup->setAdmin($admin);
+        $this->addAdminGroup($adminGroup);
+    }
+
+    /**
+     * Remove a Admin object to this object
+     * through the admin_group cross reference table.
+     *
+     * @param Admin $admin The AdminGroup object to relate
+     * @return Group The current object (for fluent API support)
+     */
+    public function removeAdmin(Admin $admin)
+    {
+        if ($this->getAdmins()->contains($admin)) {
+            $this->collAdmins->remove($this->collAdmins->search($admin));
+            if (null === $this->adminsScheduledForDeletion) {
+                $this->adminsScheduledForDeletion = clone $this->collAdmins;
+                $this->adminsScheduledForDeletion->clear();
+            }
+            $this->adminsScheduledForDeletion[]= $admin;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collResources collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return Group The current object (for fluent API support)
+     * @see        addResources()
+     */
+    public function clearResources()
+    {
+        $this->collResources = null; // important to set this to null since that means it is uninitialized
+        $this->collResourcesPartial = null;
+
+        return $this;
+    }
+
+    /**
+     * Initializes the collResources collection.
+     *
+     * By default this just sets the collResources collection to an empty collection (like clearResources());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @return void
+     */
+    public function initResources()
+    {
+        $this->collResources = new PropelObjectCollection();
+        $this->collResources->setModel('Resource');
+    }
+
+    /**
+     * Gets a collection of Resource objects related by a many-to-many relationship
+     * to the current object by way of the group_resource cross-reference table.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this Group is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return PropelObjectCollection|Resource[] List of Resource objects
+     */
+    public function getResources($criteria = null, PropelPDO $con = null)
+    {
+        if (null === $this->collResources || null !== $criteria) {
+            if ($this->isNew() && null === $this->collResources) {
+                // return empty collection
+                $this->initResources();
+            } else {
+                $collResources = ResourceQuery::create(null, $criteria)
+                    ->filterByGroup($this)
+                    ->find($con);
+                if (null !== $criteria) {
+                    return $collResources;
+                }
+                $this->collResources = $collResources;
+            }
+        }
+
+        return $this->collResources;
+    }
+
+    /**
+     * Sets a collection of Resource objects related by a many-to-many relationship
+     * to the current object by way of the group_resource cross-reference table.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param PropelCollection $resources A Propel collection.
+     * @param PropelPDO $con Optional connection object
+     * @return Group The current object (for fluent API support)
+     */
+    public function setResources(PropelCollection $resources, PropelPDO $con = null)
+    {
+        $this->clearResources();
+        $currentResources = $this->getResources();
+
+        $this->resourcesScheduledForDeletion = $currentResources->diff($resources);
+
+        foreach ($resources as $resource) {
+            if (!$currentResources->contains($resource)) {
+                $this->doAddResource($resource);
+            }
+        }
+
+        $this->collResources = $resources;
+
+        return $this;
+    }
+
+    /**
+     * Gets the number of Resource objects related by a many-to-many relationship
+     * to the current object by way of the group_resource cross-reference table.
+     *
+     * @param Criteria $criteria Optional query object to filter the query
+     * @param boolean $distinct Set to true to force count distinct
+     * @param PropelPDO $con Optional connection object
+     *
+     * @return int the number of related Resource objects
+     */
+    public function countResources($criteria = null, $distinct = false, PropelPDO $con = null)
+    {
+        if (null === $this->collResources || null !== $criteria) {
+            if ($this->isNew() && null === $this->collResources) {
+                return 0;
+            } else {
+                $query = ResourceQuery::create(null, $criteria);
+                if ($distinct) {
+                    $query->distinct();
+                }
+
+                return $query
+                    ->filterByGroup($this)
+                    ->count($con);
+            }
+        } else {
+            return count($this->collResources);
+        }
+    }
+
+    /**
+     * Associate a Resource object to this object
+     * through the group_resource cross reference table.
+     *
+     * @param  Resource $resource The GroupResource object to relate
+     * @return Group The current object (for fluent API support)
+     */
+    public function addResource(Resource $resource)
+    {
+        if ($this->collResources === null) {
+            $this->initResources();
+        }
+        if (!$this->collResources->contains($resource)) { // only add it if the **same** object is not already associated
+            $this->doAddResource($resource);
+
+            $this->collResources[]= $resource;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param	Resource $resource The resource object to add.
+     */
+    protected function doAddResource($resource)
+    {
+        $groupResource = new GroupResource();
+        $groupResource->setResource($resource);
+        $this->addGroupResource($groupResource);
+    }
+
+    /**
+     * Remove a Resource object to this object
+     * through the group_resource cross reference table.
+     *
+     * @param Resource $resource The GroupResource object to relate
+     * @return Group The current object (for fluent API support)
+     */
+    public function removeResource(Resource $resource)
+    {
+        if ($this->getResources()->contains($resource)) {
+            $this->collResources->remove($this->collResources->search($resource));
+            if (null === $this->resourcesScheduledForDeletion) {
+                $this->resourcesScheduledForDeletion = clone $this->collResources;
+                $this->resourcesScheduledForDeletion->clear();
+            }
+            $this->resourcesScheduledForDeletion[]= $resource;
+        }
+
+        return $this;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2217,6 +2650,16 @@ abstract class BaseGroup extends BaseObject implements Persistent
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collAdmins) {
+                foreach ($this->collAdmins as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collResources) {
+                foreach ($this->collResources as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
 
             $this->alreadyInClearAllReferencesDeep = false;
         } // if ($deep)
@@ -2241,6 +2684,14 @@ abstract class BaseGroup extends BaseObject implements Persistent
             $this->collGroupI18ns->clearIterator();
         }
         $this->collGroupI18ns = null;
+        if ($this->collAdmins instanceof PropelCollection) {
+            $this->collAdmins->clearIterator();
+        }
+        $this->collAdmins = null;
+        if ($this->collResources instanceof PropelCollection) {
+            $this->collResources->clearIterator();
+        }
+        $this->collResources = null;
     }
 
     /**

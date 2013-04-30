@@ -41,6 +41,7 @@ class AttributeCategoryTableMap extends TableMap
         $this->setClassname('Thelia\\Model\\AttributeCategory');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
+        $this->setIsCrossRef(true);
         // columns
         $this->addPrimaryKey('id', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('category_id', 'CategoryId', 'INTEGER', 'category', 'id', true, null, null);
