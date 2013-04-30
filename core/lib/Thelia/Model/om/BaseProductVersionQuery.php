@@ -30,7 +30,7 @@ use Thelia\Model\ProductVersionQuery;
  * @method ProductVersionQuery orderByEcotax($order = Criteria::ASC) Order by the ecotax column
  * @method ProductVersionQuery orderByNewness($order = Criteria::ASC) Order by the newness column
  * @method ProductVersionQuery orderByPromo($order = Criteria::ASC) Order by the promo column
- * @method ProductVersionQuery orderByStock($order = Criteria::ASC) Order by the stock column
+ * @method ProductVersionQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method ProductVersionQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method ProductVersionQuery orderByWeight($order = Criteria::ASC) Order by the weight column
  * @method ProductVersionQuery orderByPosition($order = Criteria::ASC) Order by the position column
@@ -48,7 +48,7 @@ use Thelia\Model\ProductVersionQuery;
  * @method ProductVersionQuery groupByEcotax() Group by the ecotax column
  * @method ProductVersionQuery groupByNewness() Group by the newness column
  * @method ProductVersionQuery groupByPromo() Group by the promo column
- * @method ProductVersionQuery groupByStock() Group by the stock column
+ * @method ProductVersionQuery groupByQuantity() Group by the quantity column
  * @method ProductVersionQuery groupByVisible() Group by the visible column
  * @method ProductVersionQuery groupByWeight() Group by the weight column
  * @method ProductVersionQuery groupByPosition() Group by the position column
@@ -77,7 +77,7 @@ use Thelia\Model\ProductVersionQuery;
  * @method ProductVersion findOneByEcotax(double $ecotax) Return the first ProductVersion filtered by the ecotax column
  * @method ProductVersion findOneByNewness(int $newness) Return the first ProductVersion filtered by the newness column
  * @method ProductVersion findOneByPromo(int $promo) Return the first ProductVersion filtered by the promo column
- * @method ProductVersion findOneByStock(int $stock) Return the first ProductVersion filtered by the stock column
+ * @method ProductVersion findOneByQuantity(int $quantity) Return the first ProductVersion filtered by the quantity column
  * @method ProductVersion findOneByVisible(int $visible) Return the first ProductVersion filtered by the visible column
  * @method ProductVersion findOneByWeight(double $weight) Return the first ProductVersion filtered by the weight column
  * @method ProductVersion findOneByPosition(int $position) Return the first ProductVersion filtered by the position column
@@ -95,7 +95,7 @@ use Thelia\Model\ProductVersionQuery;
  * @method array findByEcotax(double $ecotax) Return ProductVersion objects filtered by the ecotax column
  * @method array findByNewness(int $newness) Return ProductVersion objects filtered by the newness column
  * @method array findByPromo(int $promo) Return ProductVersion objects filtered by the promo column
- * @method array findByStock(int $stock) Return ProductVersion objects filtered by the stock column
+ * @method array findByQuantity(int $quantity) Return ProductVersion objects filtered by the quantity column
  * @method array findByVisible(int $visible) Return ProductVersion objects filtered by the visible column
  * @method array findByWeight(double $weight) Return ProductVersion objects filtered by the weight column
  * @method array findByPosition(int $position) Return ProductVersion objects filtered by the position column
@@ -194,7 +194,7 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `tax_rule_id`, `ref`, `price`, `price2`, `ecotax`, `newness`, `promo`, `stock`, `visible`, `weight`, `position`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `product_version` WHERE `id` = :p0 AND `version` = :p1';
+        $sql = 'SELECT `id`, `tax_rule_id`, `ref`, `price`, `price2`, `ecotax`, `newness`, `promo`, `quantity`, `visible`, `weight`, `position`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `product_version` WHERE `id` = :p0 AND `version` = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -621,17 +621,17 @@ abstract class BaseProductVersionQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the stock column
+     * Filter the query on the quantity column
      *
      * Example usage:
      * <code>
-     * $query->filterByStock(1234); // WHERE stock = 1234
-     * $query->filterByStock(array(12, 34)); // WHERE stock IN (12, 34)
-     * $query->filterByStock(array('min' => 12)); // WHERE stock >= 12
-     * $query->filterByStock(array('max' => 12)); // WHERE stock <= 12
+     * $query->filterByQuantity(1234); // WHERE quantity = 1234
+     * $query->filterByQuantity(array(12, 34)); // WHERE quantity IN (12, 34)
+     * $query->filterByQuantity(array('min' => 12)); // WHERE quantity >= 12
+     * $query->filterByQuantity(array('max' => 12)); // WHERE quantity <= 12
      * </code>
      *
-     * @param     mixed $stock The value to use as filter.
+     * @param     mixed $quantity The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -639,16 +639,16 @@ abstract class BaseProductVersionQuery extends ModelCriteria
      *
      * @return ProductVersionQuery The current query, for fluid interface
      */
-    public function filterByStock($stock = null, $comparison = null)
+    public function filterByQuantity($quantity = null, $comparison = null)
     {
-        if (is_array($stock)) {
+        if (is_array($quantity)) {
             $useMinMax = false;
-            if (isset($stock['min'])) {
-                $this->addUsingAlias(ProductVersionPeer::STOCK, $stock['min'], Criteria::GREATER_EQUAL);
+            if (isset($quantity['min'])) {
+                $this->addUsingAlias(ProductVersionPeer::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($stock['max'])) {
-                $this->addUsingAlias(ProductVersionPeer::STOCK, $stock['max'], Criteria::LESS_EQUAL);
+            if (isset($quantity['max'])) {
+                $this->addUsingAlias(ProductVersionPeer::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -659,7 +659,7 @@ abstract class BaseProductVersionQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProductVersionPeer::STOCK, $stock, $comparison);
+        return $this->addUsingAlias(ProductVersionPeer::QUANTITY, $quantity, $comparison);
     }
 
     /**

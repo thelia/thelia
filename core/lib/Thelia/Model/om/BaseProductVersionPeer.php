@@ -69,8 +69,8 @@ abstract class BaseProductVersionPeer
     /** the column name for the promo field */
     const PROMO = 'product_version.promo';
 
-    /** the column name for the stock field */
-    const STOCK = 'product_version.stock';
+    /** the column name for the quantity field */
+    const QUANTITY = 'product_version.quantity';
 
     /** the column name for the visible field */
     const VISIBLE = 'product_version.visible';
@@ -115,11 +115,11 @@ abstract class BaseProductVersionPeer
      * e.g. ProductVersionPeer::$fieldNames[ProductVersionPeer::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        BasePeer::TYPE_PHPNAME => array ('Id', 'TaxRuleId', 'Ref', 'Price', 'Price2', 'Ecotax', 'Newness', 'Promo', 'Stock', 'Visible', 'Weight', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'taxRuleId', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'stock', 'visible', 'weight', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        BasePeer::TYPE_COLNAME => array (ProductVersionPeer::ID, ProductVersionPeer::TAX_RULE_ID, ProductVersionPeer::REF, ProductVersionPeer::PRICE, ProductVersionPeer::PRICE2, ProductVersionPeer::ECOTAX, ProductVersionPeer::NEWNESS, ProductVersionPeer::PROMO, ProductVersionPeer::STOCK, ProductVersionPeer::VISIBLE, ProductVersionPeer::WEIGHT, ProductVersionPeer::POSITION, ProductVersionPeer::CREATED_AT, ProductVersionPeer::UPDATED_AT, ProductVersionPeer::VERSION, ProductVersionPeer::VERSION_CREATED_AT, ProductVersionPeer::VERSION_CREATED_BY, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAX_RULE_ID', 'REF', 'PRICE', 'PRICE2', 'ECOTAX', 'NEWNESS', 'PROMO', 'STOCK', 'VISIBLE', 'WEIGHT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        BasePeer::TYPE_FIELDNAME => array ('id', 'tax_rule_id', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'stock', 'visible', 'weight', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        BasePeer::TYPE_PHPNAME => array ('Id', 'TaxRuleId', 'Ref', 'Price', 'Price2', 'Ecotax', 'Newness', 'Promo', 'Quantity', 'Visible', 'Weight', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id', 'taxRuleId', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'quantity', 'visible', 'weight', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        BasePeer::TYPE_COLNAME => array (ProductVersionPeer::ID, ProductVersionPeer::TAX_RULE_ID, ProductVersionPeer::REF, ProductVersionPeer::PRICE, ProductVersionPeer::PRICE2, ProductVersionPeer::ECOTAX, ProductVersionPeer::NEWNESS, ProductVersionPeer::PROMO, ProductVersionPeer::QUANTITY, ProductVersionPeer::VISIBLE, ProductVersionPeer::WEIGHT, ProductVersionPeer::POSITION, ProductVersionPeer::CREATED_AT, ProductVersionPeer::UPDATED_AT, ProductVersionPeer::VERSION, ProductVersionPeer::VERSION_CREATED_AT, ProductVersionPeer::VERSION_CREATED_BY, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID', 'TAX_RULE_ID', 'REF', 'PRICE', 'PRICE2', 'ECOTAX', 'NEWNESS', 'PROMO', 'QUANTITY', 'VISIBLE', 'WEIGHT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        BasePeer::TYPE_FIELDNAME => array ('id', 'tax_rule_id', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'quantity', 'visible', 'weight', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
@@ -130,11 +130,11 @@ abstract class BaseProductVersionPeer
      * e.g. ProductVersionPeer::$fieldNames[BasePeer::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Price' => 3, 'Price2' => 4, 'Ecotax' => 5, 'Newness' => 6, 'Promo' => 7, 'Stock' => 8, 'Visible' => 9, 'Weight' => 10, 'Position' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'Version' => 14, 'VersionCreatedAt' => 15, 'VersionCreatedBy' => 16, ),
-        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'stock' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'version' => 14, 'versionCreatedAt' => 15, 'versionCreatedBy' => 16, ),
-        BasePeer::TYPE_COLNAME => array (ProductVersionPeer::ID => 0, ProductVersionPeer::TAX_RULE_ID => 1, ProductVersionPeer::REF => 2, ProductVersionPeer::PRICE => 3, ProductVersionPeer::PRICE2 => 4, ProductVersionPeer::ECOTAX => 5, ProductVersionPeer::NEWNESS => 6, ProductVersionPeer::PROMO => 7, ProductVersionPeer::STOCK => 8, ProductVersionPeer::VISIBLE => 9, ProductVersionPeer::WEIGHT => 10, ProductVersionPeer::POSITION => 11, ProductVersionPeer::CREATED_AT => 12, ProductVersionPeer::UPDATED_AT => 13, ProductVersionPeer::VERSION => 14, ProductVersionPeer::VERSION_CREATED_AT => 15, ProductVersionPeer::VERSION_CREATED_BY => 16, ),
-        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'PRICE' => 3, 'PRICE2' => 4, 'ECOTAX' => 5, 'NEWNESS' => 6, 'PROMO' => 7, 'STOCK' => 8, 'VISIBLE' => 9, 'WEIGHT' => 10, 'POSITION' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, 'VERSION' => 14, 'VERSION_CREATED_AT' => 15, 'VERSION_CREATED_BY' => 16, ),
-        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'stock' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'created_at' => 12, 'updated_at' => 13, 'version' => 14, 'version_created_at' => 15, 'version_created_by' => 16, ),
+        BasePeer::TYPE_PHPNAME => array ('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Price' => 3, 'Price2' => 4, 'Ecotax' => 5, 'Newness' => 6, 'Promo' => 7, 'Quantity' => 8, 'Visible' => 9, 'Weight' => 10, 'Position' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'Version' => 14, 'VersionCreatedAt' => 15, 'VersionCreatedBy' => 16, ),
+        BasePeer::TYPE_STUDLYPHPNAME => array ('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'quantity' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'version' => 14, 'versionCreatedAt' => 15, 'versionCreatedBy' => 16, ),
+        BasePeer::TYPE_COLNAME => array (ProductVersionPeer::ID => 0, ProductVersionPeer::TAX_RULE_ID => 1, ProductVersionPeer::REF => 2, ProductVersionPeer::PRICE => 3, ProductVersionPeer::PRICE2 => 4, ProductVersionPeer::ECOTAX => 5, ProductVersionPeer::NEWNESS => 6, ProductVersionPeer::PROMO => 7, ProductVersionPeer::QUANTITY => 8, ProductVersionPeer::VISIBLE => 9, ProductVersionPeer::WEIGHT => 10, ProductVersionPeer::POSITION => 11, ProductVersionPeer::CREATED_AT => 12, ProductVersionPeer::UPDATED_AT => 13, ProductVersionPeer::VERSION => 14, ProductVersionPeer::VERSION_CREATED_AT => 15, ProductVersionPeer::VERSION_CREATED_BY => 16, ),
+        BasePeer::TYPE_RAW_COLNAME => array ('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'PRICE' => 3, 'PRICE2' => 4, 'ECOTAX' => 5, 'NEWNESS' => 6, 'PROMO' => 7, 'QUANTITY' => 8, 'VISIBLE' => 9, 'WEIGHT' => 10, 'POSITION' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, 'VERSION' => 14, 'VERSION_CREATED_AT' => 15, 'VERSION_CREATED_BY' => 16, ),
+        BasePeer::TYPE_FIELDNAME => array ('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'quantity' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'created_at' => 12, 'updated_at' => 13, 'version' => 14, 'version_created_at' => 15, 'version_created_by' => 16, ),
         BasePeer::TYPE_NUM => array (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
     );
 
@@ -217,7 +217,7 @@ abstract class BaseProductVersionPeer
             $criteria->addSelectColumn(ProductVersionPeer::ECOTAX);
             $criteria->addSelectColumn(ProductVersionPeer::NEWNESS);
             $criteria->addSelectColumn(ProductVersionPeer::PROMO);
-            $criteria->addSelectColumn(ProductVersionPeer::STOCK);
+            $criteria->addSelectColumn(ProductVersionPeer::QUANTITY);
             $criteria->addSelectColumn(ProductVersionPeer::VISIBLE);
             $criteria->addSelectColumn(ProductVersionPeer::WEIGHT);
             $criteria->addSelectColumn(ProductVersionPeer::POSITION);
@@ -235,7 +235,7 @@ abstract class BaseProductVersionPeer
             $criteria->addSelectColumn($alias . '.ecotax');
             $criteria->addSelectColumn($alias . '.newness');
             $criteria->addSelectColumn($alias . '.promo');
-            $criteria->addSelectColumn($alias . '.stock');
+            $criteria->addSelectColumn($alias . '.quantity');
             $criteria->addSelectColumn($alias . '.visible');
             $criteria->addSelectColumn($alias . '.weight');
             $criteria->addSelectColumn($alias . '.position');

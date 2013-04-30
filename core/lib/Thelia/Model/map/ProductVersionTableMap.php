@@ -50,7 +50,7 @@ class ProductVersionTableMap extends TableMap
         $this->addColumn('ecotax', 'Ecotax', 'FLOAT', false, null, null);
         $this->addColumn('newness', 'Newness', 'TINYINT', false, null, 0);
         $this->addColumn('promo', 'Promo', 'TINYINT', false, null, 0);
-        $this->addColumn('stock', 'Stock', 'INTEGER', false, null, 0);
+        $this->addColumn('quantity', 'Quantity', 'INTEGER', false, null, 0);
         $this->addColumn('visible', 'Visible', 'TINYINT', true, null, 0);
         $this->addColumn('weight', 'Weight', 'FLOAT', false, null, null);
         $this->addColumn('position', 'Position', 'INTEGER', true, null, null);

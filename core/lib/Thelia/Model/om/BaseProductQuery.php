@@ -41,7 +41,7 @@ use Thelia\Model\TaxRule;
  * @method ProductQuery orderByEcotax($order = Criteria::ASC) Order by the ecotax column
  * @method ProductQuery orderByNewness($order = Criteria::ASC) Order by the newness column
  * @method ProductQuery orderByPromo($order = Criteria::ASC) Order by the promo column
- * @method ProductQuery orderByStock($order = Criteria::ASC) Order by the stock column
+ * @method ProductQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method ProductQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method ProductQuery orderByWeight($order = Criteria::ASC) Order by the weight column
  * @method ProductQuery orderByPosition($order = Criteria::ASC) Order by the position column
@@ -59,7 +59,7 @@ use Thelia\Model\TaxRule;
  * @method ProductQuery groupByEcotax() Group by the ecotax column
  * @method ProductQuery groupByNewness() Group by the newness column
  * @method ProductQuery groupByPromo() Group by the promo column
- * @method ProductQuery groupByStock() Group by the stock column
+ * @method ProductQuery groupByQuantity() Group by the quantity column
  * @method ProductQuery groupByVisible() Group by the visible column
  * @method ProductQuery groupByWeight() Group by the weight column
  * @method ProductQuery groupByPosition() Group by the position column
@@ -131,7 +131,7 @@ use Thelia\Model\TaxRule;
  * @method Product findOneByEcotax(double $ecotax) Return the first Product filtered by the ecotax column
  * @method Product findOneByNewness(int $newness) Return the first Product filtered by the newness column
  * @method Product findOneByPromo(int $promo) Return the first Product filtered by the promo column
- * @method Product findOneByStock(int $stock) Return the first Product filtered by the stock column
+ * @method Product findOneByQuantity(int $quantity) Return the first Product filtered by the quantity column
  * @method Product findOneByVisible(int $visible) Return the first Product filtered by the visible column
  * @method Product findOneByWeight(double $weight) Return the first Product filtered by the weight column
  * @method Product findOneByPosition(int $position) Return the first Product filtered by the position column
@@ -149,7 +149,7 @@ use Thelia\Model\TaxRule;
  * @method array findByEcotax(double $ecotax) Return Product objects filtered by the ecotax column
  * @method array findByNewness(int $newness) Return Product objects filtered by the newness column
  * @method array findByPromo(int $promo) Return Product objects filtered by the promo column
- * @method array findByStock(int $stock) Return Product objects filtered by the stock column
+ * @method array findByQuantity(int $quantity) Return Product objects filtered by the quantity column
  * @method array findByVisible(int $visible) Return Product objects filtered by the visible column
  * @method array findByWeight(double $weight) Return Product objects filtered by the weight column
  * @method array findByPosition(int $position) Return Product objects filtered by the position column
@@ -261,7 +261,7 @@ abstract class BaseProductQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT `id`, `tax_rule_id`, `ref`, `price`, `price2`, `ecotax`, `newness`, `promo`, `stock`, `visible`, `weight`, `position`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `product` WHERE `id` = :p0';
+        $sql = 'SELECT `id`, `tax_rule_id`, `ref`, `price`, `price2`, `ecotax`, `newness`, `promo`, `quantity`, `visible`, `weight`, `position`, `created_at`, `updated_at`, `version`, `version_created_at`, `version_created_by` FROM `product` WHERE `id` = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -676,17 +676,17 @@ abstract class BaseProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the stock column
+     * Filter the query on the quantity column
      *
      * Example usage:
      * <code>
-     * $query->filterByStock(1234); // WHERE stock = 1234
-     * $query->filterByStock(array(12, 34)); // WHERE stock IN (12, 34)
-     * $query->filterByStock(array('min' => 12)); // WHERE stock >= 12
-     * $query->filterByStock(array('max' => 12)); // WHERE stock <= 12
+     * $query->filterByQuantity(1234); // WHERE quantity = 1234
+     * $query->filterByQuantity(array(12, 34)); // WHERE quantity IN (12, 34)
+     * $query->filterByQuantity(array('min' => 12)); // WHERE quantity >= 12
+     * $query->filterByQuantity(array('max' => 12)); // WHERE quantity <= 12
      * </code>
      *
-     * @param     mixed $stock The value to use as filter.
+     * @param     mixed $quantity The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -694,16 +694,16 @@ abstract class BaseProductQuery extends ModelCriteria
      *
      * @return ProductQuery The current query, for fluid interface
      */
-    public function filterByStock($stock = null, $comparison = null)
+    public function filterByQuantity($quantity = null, $comparison = null)
     {
-        if (is_array($stock)) {
+        if (is_array($quantity)) {
             $useMinMax = false;
-            if (isset($stock['min'])) {
-                $this->addUsingAlias(ProductPeer::STOCK, $stock['min'], Criteria::GREATER_EQUAL);
+            if (isset($quantity['min'])) {
+                $this->addUsingAlias(ProductPeer::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($stock['max'])) {
-                $this->addUsingAlias(ProductPeer::STOCK, $stock['max'], Criteria::LESS_EQUAL);
+            if (isset($quantity['max'])) {
+                $this->addUsingAlias(ProductPeer::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -714,7 +714,7 @@ abstract class BaseProductQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProductPeer::STOCK, $stock, $comparison);
+        return $this->addUsingAlias(ProductPeer::QUANTITY, $quantity, $comparison);
     }
 
     /**

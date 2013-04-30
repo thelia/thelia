@@ -123,11 +123,11 @@ abstract class BaseProduct extends BaseObject implements Persistent
     protected $promo;
 
     /**
-     * The value for the stock field.
+     * The value for the quantity field.
      * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $stock;
+    protected $quantity;
 
     /**
      * The value for the visible field.
@@ -401,7 +401,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
     {
         $this->newness = 0;
         $this->promo = 0;
-        $this->stock = 0;
+        $this->quantity = 0;
         $this->visible = 0;
         $this->version = 0;
     }
@@ -497,13 +497,13 @@ abstract class BaseProduct extends BaseObject implements Persistent
     }
 
     /**
-     * Get the [stock] column value.
+     * Get the [quantity] column value.
      *
      * @return int
      */
-    public function getStock()
+    public function getQuantity()
     {
-        return $this->stock;
+        return $this->quantity;
     }
 
     /**
@@ -849,25 +849,25 @@ abstract class BaseProduct extends BaseObject implements Persistent
     } // setPromo()
 
     /**
-     * Set the value of [stock] column.
+     * Set the value of [quantity] column.
      *
      * @param int $v new value
      * @return Product The current object (for fluent API support)
      */
-    public function setStock($v)
+    public function setQuantity($v)
     {
         if ($v !== null && is_numeric($v)) {
             $v = (int) $v;
         }
 
-        if ($this->stock !== $v) {
-            $this->stock = $v;
-            $this->modifiedColumns[] = ProductPeer::STOCK;
+        if ($this->quantity !== $v) {
+            $this->quantity = $v;
+            $this->modifiedColumns[] = ProductPeer::QUANTITY;
         }
 
 
         return $this;
-    } // setStock()
+    } // setQuantity()
 
     /**
      * Set the value of [visible] column.
@@ -1061,7 +1061,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 return false;
             }
 
-            if ($this->stock !== 0) {
+            if ($this->quantity !== 0) {
                 return false;
             }
 
@@ -1103,7 +1103,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $this->ecotax = ($row[$startcol + 5] !== null) ? (double) $row[$startcol + 5] : null;
             $this->newness = ($row[$startcol + 6] !== null) ? (int) $row[$startcol + 6] : null;
             $this->promo = ($row[$startcol + 7] !== null) ? (int) $row[$startcol + 7] : null;
-            $this->stock = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
+            $this->quantity = ($row[$startcol + 8] !== null) ? (int) $row[$startcol + 8] : null;
             $this->visible = ($row[$startcol + 9] !== null) ? (int) $row[$startcol + 9] : null;
             $this->weight = ($row[$startcol + 10] !== null) ? (double) $row[$startcol + 10] : null;
             $this->position = ($row[$startcol + 11] !== null) ? (int) $row[$startcol + 11] : null;
@@ -1689,8 +1689,8 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if ($this->isColumnModified(ProductPeer::PROMO)) {
             $modifiedColumns[':p' . $index++]  = '`promo`';
         }
-        if ($this->isColumnModified(ProductPeer::STOCK)) {
-            $modifiedColumns[':p' . $index++]  = '`stock`';
+        if ($this->isColumnModified(ProductPeer::QUANTITY)) {
+            $modifiedColumns[':p' . $index++]  = '`quantity`';
         }
         if ($this->isColumnModified(ProductPeer::VISIBLE)) {
             $modifiedColumns[':p' . $index++]  = '`visible`';
@@ -1751,8 +1751,8 @@ abstract class BaseProduct extends BaseObject implements Persistent
                     case '`promo`':
                         $stmt->bindValue($identifier, $this->promo, PDO::PARAM_INT);
                         break;
-                    case '`stock`':
-                        $stmt->bindValue($identifier, $this->stock, PDO::PARAM_INT);
+                    case '`quantity`':
+                        $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_INT);
                         break;
                     case '`visible`':
                         $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
@@ -2037,7 +2037,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 return $this->getPromo();
                 break;
             case 8:
-                return $this->getStock();
+                return $this->getQuantity();
                 break;
             case 9:
                 return $this->getVisible();
@@ -2100,7 +2100,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
             $keys[5] => $this->getEcotax(),
             $keys[6] => $this->getNewness(),
             $keys[7] => $this->getPromo(),
-            $keys[8] => $this->getStock(),
+            $keys[8] => $this->getQuantity(),
             $keys[9] => $this->getVisible(),
             $keys[10] => $this->getWeight(),
             $keys[11] => $this->getPosition(),
@@ -2206,7 +2206,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
                 $this->setPromo($value);
                 break;
             case 8:
-                $this->setStock($value);
+                $this->setQuantity($value);
                 break;
             case 9:
                 $this->setVisible($value);
@@ -2264,7 +2264,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if (array_key_exists($keys[5], $arr)) $this->setEcotax($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setNewness($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setPromo($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setStock($arr[$keys[8]]);
+        if (array_key_exists($keys[8], $arr)) $this->setQuantity($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setVisible($arr[$keys[9]]);
         if (array_key_exists($keys[10], $arr)) $this->setWeight($arr[$keys[10]]);
         if (array_key_exists($keys[11], $arr)) $this->setPosition($arr[$keys[11]]);
@@ -2292,7 +2292,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
         if ($this->isColumnModified(ProductPeer::ECOTAX)) $criteria->add(ProductPeer::ECOTAX, $this->ecotax);
         if ($this->isColumnModified(ProductPeer::NEWNESS)) $criteria->add(ProductPeer::NEWNESS, $this->newness);
         if ($this->isColumnModified(ProductPeer::PROMO)) $criteria->add(ProductPeer::PROMO, $this->promo);
-        if ($this->isColumnModified(ProductPeer::STOCK)) $criteria->add(ProductPeer::STOCK, $this->stock);
+        if ($this->isColumnModified(ProductPeer::QUANTITY)) $criteria->add(ProductPeer::QUANTITY, $this->quantity);
         if ($this->isColumnModified(ProductPeer::VISIBLE)) $criteria->add(ProductPeer::VISIBLE, $this->visible);
         if ($this->isColumnModified(ProductPeer::WEIGHT)) $criteria->add(ProductPeer::WEIGHT, $this->weight);
         if ($this->isColumnModified(ProductPeer::POSITION)) $criteria->add(ProductPeer::POSITION, $this->position);
@@ -2371,7 +2371,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $copyObj->setEcotax($this->getEcotax());
         $copyObj->setNewness($this->getNewness());
         $copyObj->setPromo($this->getPromo());
-        $copyObj->setStock($this->getStock());
+        $copyObj->setQuantity($this->getQuantity());
         $copyObj->setVisible($this->getVisible());
         $copyObj->setWeight($this->getWeight());
         $copyObj->setPosition($this->getPosition());
@@ -5923,7 +5923,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $this->ecotax = null;
         $this->newness = null;
         $this->promo = null;
-        $this->stock = null;
+        $this->quantity = null;
         $this->visible = null;
         $this->weight = null;
         $this->position = null;
@@ -6382,7 +6382,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $version->setEcotax($this->getEcotax());
         $version->setNewness($this->getNewness());
         $version->setPromo($this->getPromo());
-        $version->setStock($this->getStock());
+        $version->setQuantity($this->getQuantity());
         $version->setVisible($this->getVisible());
         $version->setWeight($this->getWeight());
         $version->setPosition($this->getPosition());
@@ -6438,7 +6438,7 @@ abstract class BaseProduct extends BaseObject implements Persistent
         $this->setEcotax($version->getEcotax());
         $this->setNewness($version->getNewness());
         $this->setPromo($version->getPromo());
-        $this->setStock($version->getStock());
+        $this->setQuantity($version->getQuantity());
         $this->setVisible($version->getVisible());
         $this->setWeight($version->getWeight());
         $this->setPosition($version->getPosition());

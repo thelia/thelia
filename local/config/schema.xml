@@ -28,7 +28,7 @@
     <column name="ecotax" type="FLOAT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
     <column defaultValue="0" name="promo" type="TINYINT" />
-    <column defaultValue="0" name="stock" type="INTEGER" />
+    <column defaultValue="0" name="quantity" type="INTEGER" />
     <column defaultValue="0" name="visible" required="true" type="TINYINT" />
     <column name="weight" type="FLOAT" />
     <column name="position" required="true" type="INTEGER" />

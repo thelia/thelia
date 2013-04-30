@@ -8,6 +8,15 @@ $faker = Faker\Factory::create();
 $con = \Propel::getConnection(Thelia\Model\ProductPeer::DATABASE_NAME);
 $con->beginTransaction();
 try {
+
+    $category = Thelia\Model\CategoryQuery::create()
+        ->find();
+    $category->delete();
+
+    $product = Thelia\Model\ProductQuery::create()
+        ->find();
+    $product->delete();
+
     //first category
     $sweet = new Thelia\Model\Category();
     $sweet->setParent(0);
@@ -33,7 +42,7 @@ try {
         $product->addCategory($sweet);
         $product->setTitle($faker->bs);
         $product->setDescription($faker->text(250));
-        $product->setStock($faker->randomNumber(1,50));
+        $product->setQuantity($faker->randomNumber(1,50));
         $product->setPrice($faker->randomFloat(2, 20, 2500));
         $product->setVisible(1);
         $product->setPosition($i);
@@ -47,7 +56,7 @@ try {
         $product->addCategory($jeans);
         $product->setTitle($faker->bs);
         $product->setDescription($faker->text(250));
-        $product->setStock($faker->randomNumber(1,50));
+        $product->setQuantity($faker->randomNumber(1,50));
         $product->setPrice($faker->randomFloat(2, 20, 2500));
         $product->setVisible(1);
         $product->setPosition($i);
