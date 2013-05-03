@@ -50,7 +50,8 @@ class DefinePropel {
                                 array(
                                     "dsn" => $connection["dsn"],
                                     "user" => $connection["user"],
-                                    "password" => $connection["password"]
+                                    "password" => $connection["password"],
+                                    "classname" => $connection["classname"]
                                 )
                         )
                 )

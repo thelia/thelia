@@ -11,6 +11,7 @@
     <loops>
         <loop name="foo" class="Foo\Bar"/>
         <loop name="fooz" class="Foo\Barz"/>
+        <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
     </loops>
 
     <services>

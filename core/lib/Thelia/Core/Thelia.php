@@ -84,10 +84,17 @@ class Thelia extends Kernel
             if ($this->isDebug()) {
                 Propel::setLogger(Tlog::getInstance());
                 $config = Propel::getConfiguration(PropelConfiguration::TYPE_OBJECT);
-                $config->setParameter('debugpdo.logging.details.method.enabled', true);
-                $config->setParameter('debugpdo.logging.details.time.enabled', true);
-                $config->setParameter('debugpdo.logging.details.mem.enabled', true);
-
+                $config->setParameter('debugpdo.logging.methods', array(
+                    'PropelPDO::exec',
+                    'PropelPDO::query',
+                    'PropelPDO::prepare',
+                    'DebugPDOStatement::execute',
+                ), false);
+                $config->setParameter('debugpdo.logging.details', array(
+                    'time' => array('enabled' => true),
+                    'mem' => array('enabled' => true),
+                    'connection' => array('enabled' => true),
+                ));
                 $con = Propel::getConnection("thelia");
                 $con->useDebug(true);
             }

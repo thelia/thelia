@@ -68,7 +68,7 @@ try {
 
     $con->commit();
 } catch (Exception $e) {
-    echo "error : ".$e->getMessage();
+    echo "error : ".$e->getMessage()."\n";
     $con->rollBack();
 }
 

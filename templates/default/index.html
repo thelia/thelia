@@ -5,21 +5,17 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     </head>
     <body>
-        <div>TODO write content #SET{toto, 4} toto vaut #GET{toto} zeafazefaze azef azef azef azef <br />
-        <THELIA_FOO type="foo" id="loop1" param1="#GET{toto}">
-            toto : #TOTO <br />
-            count : #__COUNT__ <br /><br />
-            <THELIA_FU type="doobitch" param1="#__COUNT__" param2="#TUTU">
-                #ALFRED azd azd azed azd <br />
-                <T:CHAPO>#CHAPO n'est pas vide</T:CHAPO>le chapo est vide<//T:CHAPO> <br />
-            </THELIA_FU>
-        </THELIA_FOO>
+        <div>TODO write content<br />
 
-        <TEST_equel test="equal" variable="3" value="1">
+        <THELIA_cat type="category" order="alpha_reverse">
+            #__COUNT__ - #TITLE <br />
+        </THELIA_cat>
+
+        <TEST_equal test="equal" variable="3" value="1">
             test vrai
-        </TEST_equel>
+        </TEST_equal>
             test faux
-        <//TEST_equel>
+        <//TEST_equal>
         <br />
         <REPEAT_loopy start="6" end="12" increment="1">
             Compteur = #INDEX<br />

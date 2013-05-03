@@ -15,13 +15,19 @@ use Thelia\Model\ProductQuery;
 
 class Doobitch extends BaseLoop {
 
-    public function exec($text, $args)
+    public function defineArgs()
+    {
+        return array(
+            "param1",
+            "param2" => array("default" => "foo")
+        );
+    }
+
+    public function exec($text)
     {
 
-        $param1 = Tools::extractValueParam("param1", $args);
-
         $res = "";
-        if($param1 == 2 || $param1 == 3) {
+        if($this->param1 == 2 || $this->param1 == 3) {
             for($i = 0; $i < 4; $i++) {
                 $tmp = str_replace("#ALFRED", "foo".$i, $text);
                 if($i%2){
@@ -34,6 +40,8 @@ class Doobitch extends BaseLoop {
                 $res .= $tmp;
             }
         }
+
+            echo $this->param2;
 
         return $res;
     }

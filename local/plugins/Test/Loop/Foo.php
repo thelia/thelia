@@ -13,7 +13,12 @@ use Thelia\Tpex\Element\Loop\BaseLoop;
 
 class Foo extends BaseLoop {
 
-    public function exec($text, $args)
+    public function defineArgs()
+    {
+        return array();
+    }
+
+    public function exec($text)
     {
         $res = "";
         for($i = 0; $i < 4; $i++) {
