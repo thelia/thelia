@@ -5,12 +5,10 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <testLoops>
-        <testLoop name="equal" class="Test\TestLoop\Equal"/>
+        <testLoop name="equal" class="Thelia\Core\Template\TestLoop\Equal"/>
     </testLoops>
 
     <loops>
-        <loop name="foo" class="Foo\Bar"/>
-        <loop name="fooz" class="Foo\Barz"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
     </loops>
 

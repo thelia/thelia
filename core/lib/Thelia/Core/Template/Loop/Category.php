@@ -25,11 +25,39 @@
 namespace Thelia\Core\Template\Loop;
 
 
-
-use Thelia\Log\Tlog;
 use Thelia\Tpex\Element\Loop\BaseLoop;
 use Thelia\Model\CategoryQuery;
 
+/**
+ *
+ * Category loop, all params available :
+ *
+ * - id : can be an id (eq : 3) or a "string list" (eg: 3, 4, 5)
+ * - parent : categories having this parent id
+ * - current : current id is used if you are on a category page
+ * - not_empty : if value is 1, category and subcategories must have at least 1 product
+ * - visible : default 1, if you want category not visible put 0
+ * - order : all value available :
+ *      * alpha : sorting by title alphabetical order
+ *      * alpha_reverse : sorting by title alphabetical reverse order
+ *      * reverse : sorting by position descending
+ *      * by default results are sorting by position ascending
+ * - random : if 1, random results. Default value is 0
+ * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
+ * - limit : number of results. Default value is 10
+ * - offset : at witch id start the search
+ *
+ * example :
+ *
+ * <THELIA_cat type="category" parent="3" limit="4">
+ *      #TITLE : #ID
+ * </THELIA_cat>
+ *
+ *
+ * Class Category
+ * @package Thelia\Core\Template\Loop
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ */
 class Category extends BaseLoop {
 
     public $id;
@@ -41,7 +69,7 @@ class Category extends BaseLoop {
     public $order;
     public $random;
     public $exclude;
-    public $start;
+    public $limit;
     public $offset;
 
     public function defineArgs()
@@ -64,7 +92,7 @@ class Category extends BaseLoop {
     /**
      *
      *
-     * @param \Thelia\Tpex\Element\Loop\text $text
+     * @param string $text
      * @return mixed|string
      */
     public function exec($text)
@@ -72,7 +100,7 @@ class Category extends BaseLoop {
         $search = CategoryQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById($this->id);
+            $search->filterById($this->id, \Criteria::IN);
         }
 
         if(!is_null($this->parent)) {
