@@ -61,7 +61,12 @@ class Category extends BaseLoop {
         );
     }
 
-
+    /**
+     *
+     *
+     * @param \Thelia\Tpex\Element\Loop\text $text
+     * @return mixed|string
+     */
     public function exec($text)
     {
         $search = CategoryQuery::create();
@@ -91,7 +96,9 @@ class Category extends BaseLoop {
         if($this->limit > -1) {
             $search->limit($this->limit);
         }
+        $search->filterByVisible($this->visible);
         $search->offset($this->offset);
+
 
         switch($this->order) {
             case "alpha":
@@ -112,16 +119,31 @@ class Category extends BaseLoop {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }
-        $search->joinWithI18n('en_US');
+
+        /**
+         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
+         *
+         * @todo : verify here if we want results for row without translations.
+         */
+        $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
 
         $categories = $search->find();
 
         $res = "";
 
         foreach ($categories as $category) {
+
+            if ($this->not_empty && $category->countAllProducts() == 0) continue;
+
             $temp = str_replace("#TITLE", $category->getTitle(), $text);
             $temp = str_replace("#CHAPO", $category->getChapo(), $temp);
+            $temp = str_replace("#DESCRIPTION", $category->getDescription(), $temp);
+            $temp = str_replace("#POSTSCRIPTUM", $category->getPostscriptum(), $temp);
+            $temp = str_replace("#PARENT", $category->getParent(), $temp);
             $temp = str_replace("#ID", $category->getId(), $temp);
+            $temp = str_replace("#URL", $category->getUrl(), $temp);
+            $temp = str_replace("#LINK", $category->getLink(), $temp);
+            $temp = str_replace("#NB_CHILD", $category->countChild(), $temp);
             $res .= $temp;
         }
 

@@ -62,6 +62,7 @@ class TheliaHttpKernel extends HttpKernel
      * @throws \Exception When an Exception occurs during processing
      *
      * @api
+     *
      */
     public function handle(Request $request, $type = HttpKernelInterface::MASTER_REQUEST, $catch = true)
     {
@@ -81,6 +82,36 @@ class TheliaHttpKernel extends HttpKernel
         $this->container->leaveScope('request');
 
         return $response;
+    }
+
+    /*
+
+     * @TODO define here all needed parameters like locale, currency, etc :
+     *
+     *
+     * LOCALE :
+     * define locale with this order :
+     * 1) locale define into plugins
+     * 2) locale paramter in request
+     * 3) current locale <-> locale
+     * 4) locale in session
+     * 5) default locale
+     *
+     * $lang déjà défini par un plugin
+     * 2) paramètre 'lang' dans l'URL courante
+     * 3) Correspondance URL courante <-> langue
+     * 4) Langue précédemment stockée en session
+     * 5) Defaut
+     * put this locale into session with keyname "locale"
+     *
+     *
+     *
+     *
+     *
+     */
+    protected function initParam(Request $request)
+    {
+
     }
     
     protected function initSession(Request $request)

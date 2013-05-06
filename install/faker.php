@@ -37,6 +37,16 @@ try {
 
     $jeans->save();
 
+    //third category
+    $other = new Thelia\Model\Category();
+    $other->setParent($jeans->getId());
+    $other->setVisible(1);
+    $other->setPosition(3);
+    $other->setDescription($faker->text(255));
+    $other->setTitle($faker->bs);
+
+    $other->save();
+
     for ($i=1; $i <= 5; $i++) {
         $product = new \Thelia\Model\Product();
         $product->addCategory($sweet);
