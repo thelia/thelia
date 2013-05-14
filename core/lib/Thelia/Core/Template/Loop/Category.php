@@ -26,6 +26,8 @@ namespace Thelia\Core\Template\Loop;
 
 
 use Thelia\Tpex\Element\Loop\BaseLoop;
+use Thelia\Tpex\Element\Loop\LoopResult;
+use Thelia\Tpex\Element\Loop\LoopResultRow;
 use Thelia\Model\CategoryQuery;
 
 /**
@@ -92,10 +94,9 @@ class Category extends BaseLoop {
     /**
      *
      *
-     * @param string $text
-     * @return mixed|string
+     * @return \Thelia\Tpex\Element\Loop\LoopResult
      */
-    public function exec($text)
+    public function exec()
     {
         $search = CategoryQuery::create();
 
@@ -157,25 +158,27 @@ class Category extends BaseLoop {
 
         $categories = $search->find();
 
-        $res = "";
+        $loopResult = new LoopResult();
 
         foreach ($categories as $category) {
 
             if ($this->not_empty && $category->countAllProducts() == 0) continue;
 
-            $temp = str_replace("#TITLE", $category->getTitle(), $text);
-            $temp = str_replace("#CHAPO", $category->getChapo(), $temp);
-            $temp = str_replace("#DESCRIPTION", $category->getDescription(), $temp);
-            $temp = str_replace("#POSTSCRIPTUM", $category->getPostscriptum(), $temp);
-            $temp = str_replace("#PARENT", $category->getParent(), $temp);
-            $temp = str_replace("#ID", $category->getId(), $temp);
-            $temp = str_replace("#URL", $category->getUrl(), $temp);
-            $temp = str_replace("#LINK", $category->getLink(), $temp);
-            $temp = str_replace("#NB_CHILD", $category->countChild(), $temp);
-            $res .= $temp;
+            $loopResultRow = new LoopResultRow();
+            $loopResultRow->set("TITLE",$category->getTitle());
+            $loopResultRow->set("CHAPO", $category->getChapo());
+            $loopResultRow->set("DESCRIPTION", $category->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $category->getPostscriptum());
+            $loopResultRow->set("PARENT", $category->getParent());
+            $loopResultRow->set("ID", $category->getId());
+            $loopResultRow->set("URL", $category->getUrl());
+            $loopResultRow->set("LINK", $category->getLink());
+            $loopResultRow->set("NB_CHILD", $category->countChild());
+
+            $loopResult->addRow($loopResultRow);
         }
 
-        return $res;
+        return $loopResult;
     }
 
 }
