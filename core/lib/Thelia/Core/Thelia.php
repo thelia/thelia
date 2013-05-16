@@ -122,7 +122,7 @@ class Thelia extends Kernel
         foreach ($modules as $module) {
 
             try {
-                $loader = new XmlFileLoader($container, new FileLocator(THELIA_PLUGIN_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
+                $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
                 $loader->load("config.xml");
             } catch(\InvalidArgumentException $e) {
 
