@@ -32,7 +32,7 @@
     },
     "autoload": {
         "psr-0": { 
-            "": "local/plugins/",
+            "": "local/modules/",
             "Thelia" : "core/lib/"
         }
     },
