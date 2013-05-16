@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "01f45cf9b2249fce35b127051f36f68d",
+    "hash": "d0aa87e405dbeb21f65d8d8321b7cca7",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -55,12 +55,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ircmaxell/password_compat.git",
-                "reference": "733c06c599bfeb511f54253ddb127701bce0917d"
+                "reference": "6925da603b31bfff9488480c0a9db48a0feeadf1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/733c06c599bfeb511f54253ddb127701bce0917d",
-                "reference": "733c06c599bfeb511f54253ddb127701bce0917d",
+                "url": "https://api.github.com/repos/ircmaxell/password_compat/zipball/6925da603b31bfff9488480c0a9db48a0feeadf1",
+                "reference": "6925da603b31bfff9488480c0a9db48a0feeadf1",
                 "shasum": ""
             },
             "type": "library",
@@ -76,7 +76,7 @@
             "authors": [
                 {
                     "name": "Anthony Ferrara",
-                    "email": "ircmaxell@php.net",
+                    "email": "ircmaxell@ircmaxell.com",
                     "homepage": "http://blog.ircmaxell.com"
                 }
             ],
@@ -86,7 +86,7 @@
                 "hashing",
                 "password"
             ],
-            "time": "2013-02-13 16:58:34"
+            "time": "2013-05-10 11:19:13"
         },
         {
             "name": "phing/phing",
@@ -772,12 +772,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "a9c1c8b76abe4622b285dcd7aa342cab9dfb6de6"
+                "reference": "c2b06f9741106c35eb7e21dda4c72a54415277dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/a9c1c8b76abe4622b285dcd7aa342cab9dfb6de6",
-                "reference": "a9c1c8b76abe4622b285dcd7aa342cab9dfb6de6",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/c2b06f9741106c35eb7e21dda4c72a54415277dd",
+                "reference": "c2b06f9741106c35eb7e21dda4c72a54415277dd",
                 "shasum": ""
             },
             "require": {
@@ -809,7 +809,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2013-04-23 12:35:55"
+            "time": "2013-05-13 07:57:43"
         }
     ],
     "aliases": [
@@ -822,7 +822,7 @@
         "fzaninotto/faker": 20
     },
     "platform": {
-        "php": ">=5.3.7"
+        "php": ">=5.4"
     },
     "platform-dev": [
 

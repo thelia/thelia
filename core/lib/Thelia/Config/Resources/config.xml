@@ -17,7 +17,7 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="thelia.request_listener" class="Thelia\Core\EventListener\RequestListener">
+        <service id="thelia.controller_listener" class="Thelia\Core\EventListener\ControllerListener">
             <tag name="kernel.event_subscriber"/>
         </service>
 

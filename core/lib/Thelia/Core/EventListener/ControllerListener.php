@@ -24,15 +24,15 @@ namespace Thelia\Core\EventListener;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\HttpKernel\Event\GetResponseEvent;
+use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 
-class RequestListener implements EventSubscriberInterface
+class ControllerListener implements EventSubscriberInterface
 {
 
 
-    public function onKernelRequest(GetResponseEvent $event)
+    public function onKernelController(FilterControllerEvent $event)
     {
         $dispatcher = $event->getDispatcher();
         $request = $event->getRequest();
@@ -47,7 +47,7 @@ class RequestListener implements EventSubscriberInterface
    public static function getSubscribedEvents()
    {
         return array(
-            KernelEvents::REQUEST => array('onKernelRequest', 0)
+            KernelEvents::CONTROLLER => array('onKernelController', 0)
         );
    }
 }
