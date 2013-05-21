@@ -25,9 +25,19 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Factory\ActionEventFactory;
 
+
+/**
+ *
+ * Action are dispatch here.
+ *
+ * A factory is used for creating appropriate action object
+ *
+ * Class ControllerListener
+ * @package Thelia\Core\EventListener
+ */
 class ControllerListener implements EventSubscriberInterface
 {
 
@@ -38,8 +48,8 @@ class ControllerListener implements EventSubscriberInterface
         $request = $event->getRequest();
         if (false !== $action = $request->get("action")) {
            //search corresponding action
-            $event = new ActionEvent($request, $action);
-            $dispatcher->dispatch("action.".$action, $event);
+            $event = new ActionEventFactory($request, $action, $event->getDispatcher());
+            $dispatcher->dispatch("action.".$action, $event->createActionEvent());
         }
 
     }

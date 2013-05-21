@@ -21,57 +21,53 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
+namespace Thelia\Core\Factory;
 
-use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
-/**
- * 
- * Class thrown on Thelia.action event
- * 
- * call setAction if action match yours
- * 
- */
-abstract class ActionEvent extends Event
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\ActionEventClass;
+
+class ActionEventFactory
 {
-    
-    /**
-     *
-     * @var Symfony\Component\HttpFoundation\Request
-     */
+
     protected $request;
-    
-    /**
-     *
-     * @var string
-     */
     protected $action;
-    
-    /**
-     * 
-     * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string $action
-     */
-    public function __construct(Request $request, $action) {
+    protected $dispatcher;
+
+    public function __construct(Request $request, $action, EventDispatcherInterface $dispatcher)
+    {
         $this->request = $request;
         $this->action = $action;
+        $this->dispatcher = $dispatcher;
     }
-    
-    /**
-     * 
-     * @return string
-     */
-    public function getAction()
+
+    public function createActionEvent()
     {
-        return $this->action;
+        $className = "Thelia\\Core\\Event\\".$this->action."Event";
+        $class = null;
+        if (class_exists($className)) {
+            $class = new \ReflectionClass($className);
+            // return $class->newInstance($this->request, $this->action);
+        } else {
+            $actionEventClass = new ActionEventClass($this->action);
+            $this->dispatcher->dispatch("action.searchClass", $actionEventClass);
+
+            if ($actionEventClass->hasClassName()) {
+                $class = new \ReflectionClass($className);
+            }
+        }
+
+        if( is_null($class)) {
+            $class = new \ReflectionClass("Thelia\Core\Event\DefaultActionEvent");
+        }
+
+        if ($class->isSubclassOf("Thelia\Core\Event\ActionEvent") === false) {
+
+        }
+
+        return $class->newInstance($this->request, $this->action);
     }
-    
-    /**
-     * 
-     * @return \Symfony\Component\HttpFoundation\Request
-     */
-    public function getRequest()
-    {
-        return $this->request;
-    }
+
+
+
 }
