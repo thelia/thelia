@@ -76,7 +76,7 @@
             "authors": [
                 {
                     "name": "Anthony Ferrara",
-                    "email": "ircmaxell@ircmaxell.com",
+                    "email": "ircmaxell@php.net",
                     "homepage": "http://blog.ircmaxell.com"
                 }
             ],
@@ -772,12 +772,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "c2b06f9741106c35eb7e21dda4c72a54415277dd"
+                "reference": "202c8517478011464e0e50923cab2bcd6344453b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/c2b06f9741106c35eb7e21dda4c72a54415277dd",
-                "reference": "c2b06f9741106c35eb7e21dda4c72a54415277dd",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/202c8517478011464e0e50923cab2bcd6344453b",
+                "reference": "202c8517478011464e0e50923cab2bcd6344453b",
                 "shasum": ""
             },
             "require": {
@@ -791,7 +791,8 @@
             },
             "autoload": {
                 "psr-0": {
-                    "Faker": "src/"
+                    "Faker": "src/",
+                    "Faker\\PHPUnit": "test/"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -809,7 +810,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2013-05-13 07:57:43"
+            "time": "2013-05-20 20:34:10"
         }
     ],
     "aliases": [

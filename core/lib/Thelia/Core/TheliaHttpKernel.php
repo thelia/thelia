@@ -39,11 +39,19 @@ use Thelia\Model;
 
 class TheliaHttpKernel extends HttpKernel
 {
+
+    protected $container;
+
     public function __construct(EventDispatcherInterface $dispatcher, ContainerInterface $container, ControllerResolverInterface $controllerResolver)
     {
         parent::__construct($dispatcher, $controllerResolver);
 
         $this->container = $container;
+    }
+
+    public function getContainer()
+    {
+        return $this->container;
     }
 
     /**

@@ -39,19 +39,16 @@ class ActionEventFactory
      *
      * @var array
      */
-    protected $className = array(
-        "addArticle" => "Thelia\Core\Event\CartEvent",
-        "deleteArticle" => "Thelia\Core\Event\CartEvent",
-        "modifyArticle" => "Thelia\Core\Event\CartEvent",
-    );
+    protected $className;
 
     protected $defaultClassName = "Thelia\Core\Event\DefaultActionEvent";
 
-    public function __construct(Request $request, $action, EventDispatcherInterface $dispatcher)
+    public function __construct(Request $request, $action, EventDispatcherInterface $dispatcher, $className)
     {
         $this->request = $request;
         $this->action = $action;
         $this->dispatcher = $dispatcher;
+        $this->className = $className;
     }
 
     public function createActionEvent()
