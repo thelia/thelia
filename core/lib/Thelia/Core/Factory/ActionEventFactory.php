@@ -34,6 +34,14 @@ class ActionEventFactory
     protected $action;
     protected $dispatcher;
 
+    protected $className = array(
+        "addArticle" => "Thelia\Core\Event\CartEvent",
+        "deleteArticle" => "Thelia\Core\Event\CartEvent",
+        "modifyArticle" => "Thelia\Core\Event\CartEvent",
+    );
+
+    protected $defaultClassName = "Thelia\Core\Event\DefaultActionEvent";
+
     public function __construct(Request $request, $action, EventDispatcherInterface $dispatcher)
     {
         $this->request = $request;
@@ -43,31 +51,28 @@ class ActionEventFactory
 
     public function createActionEvent()
     {
-        $className = "Thelia\\Core\\Event\\".$this->action."Event";
         $class = null;
-        if (class_exists($className)) {
-            $class = new \ReflectionClass($className);
+        if (array_key_exists($this->action, $this->className)) {
+            $class = new \ReflectionClass($this->className[$this->action]);
+
             // return $class->newInstance($this->request, $this->action);
         } else {
             $actionEventClass = new ActionEventClass($this->action);
             $this->dispatcher->dispatch("action.searchClass", $actionEventClass);
 
             if ($actionEventClass->hasClassName()) {
-                $class = new \ReflectionClass($className);
+                $class = new \ReflectionClass($actionEventClass->getClassName());
             }
         }
 
-        if( is_null($class)) {
-            $class = new \ReflectionClass("Thelia\Core\Event\DefaultActionEvent");
+        if (is_null($class)) {
+            $class = new \ReflectionClass($this->defaultClassName);
         }
 
         if ($class->isSubclassOf("Thelia\Core\Event\ActionEvent") === false) {
-
+            throw new \RuntimeException("%s must be a subclass of Thelia\Core\Event\ActionEvent", $class->getName());
         }
 
         return $class->newInstance($this->request, $this->action);
     }
-
-
-
 }
