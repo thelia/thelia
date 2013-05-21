@@ -34,6 +34,11 @@ class ActionEventFactory
     protected $action;
     protected $dispatcher;
 
+    /**
+     * @todo : delegate to config for creating associating value
+     *
+     * @var array
+     */
     protected $className = array(
         "addArticle" => "Thelia\Core\Event\CartEvent",
         "deleteArticle" => "Thelia\Core\Event\CartEvent",
@@ -57,15 +62,6 @@ class ActionEventFactory
 
             // return $class->newInstance($this->request, $this->action);
         } else {
-            $actionEventClass = new ActionEventClass($this->action);
-            $this->dispatcher->dispatch("action.searchClass", $actionEventClass);
-
-            if ($actionEventClass->hasClassName()) {
-                $class = new \ReflectionClass($actionEventClass->getClassName());
-            }
-        }
-
-        if (is_null($class)) {
             $class = new \ReflectionClass($this->defaultClassName);
         }
 
