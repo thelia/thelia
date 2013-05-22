@@ -60,7 +60,6 @@ class ActionEventFactory
 
     public function createActionEvent()
     {
-        $class = null;
         if (array_key_exists($this->action, $this->className)) {
             $class = new \ReflectionClass($this->className[$this->action]);
 
