@@ -48,7 +48,7 @@ class ControllerListener implements EventSubscriberInterface
         $request = $event->getRequest();
         if (false !== $action = $request->get("action")) {
            //search corresponding action
-            $event = new ActionEventFactory($request, $action, $event->getDispatcher(), $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
+            $event = new ActionEventFactory($request, $action, $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
             $dispatcher->dispatch("action.".$action, $event->createActionEvent());
         }
 

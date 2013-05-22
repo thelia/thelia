@@ -32,7 +32,6 @@ class ActionEventFactory
 
     protected $request;
     protected $action;
-    protected $dispatcher;
 
     /**
      * @todo : delegate to config for creating associating value
@@ -43,11 +42,10 @@ class ActionEventFactory
 
     protected $defaultClassName = "Thelia\Core\Event\DefaultActionEvent";
 
-    public function __construct(Request $request, $action, EventDispatcherInterface $dispatcher, $className)
+    public function __construct(Request $request, $action, $className)
     {
         $this->request = $request;
         $this->action = $action;
-        $this->dispatcher = $dispatcher;
         $this->className = $className;
     }
 
