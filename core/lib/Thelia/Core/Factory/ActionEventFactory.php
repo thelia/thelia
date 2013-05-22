@@ -30,13 +30,22 @@ use Thelia\Core\Event\ActionEventClass;
 class ActionEventFactory
 {
 
+    /**
+     * @var \Symfony\Component\HttpFoundation\Request
+     */
     protected $request;
+
+    /**
+     * @var string
+     */
     protected $action;
 
     /**
-     * @todo : delegate to config for creating associating value
+     * array(
+     *  "action.addCart" => "Thelia\Core\Event\CartAction"
+     * )
      *
-     * @var array
+     * @var array key are action name and value the Event class to dispatch
      */
     protected $className;
 
