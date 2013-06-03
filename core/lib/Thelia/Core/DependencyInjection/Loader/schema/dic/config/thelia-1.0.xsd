@@ -64,6 +64,16 @@
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 
+    <xsd:complexType name="commands">
+        <xsd:choice minOccurs="1" maxOccurs="unbounded" >
+            <xsd:element name="loop" type="command"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="command">
+        <xsd:attribute name="class" type="xsd:string" use="required" />
+    </xsd:complexType>
+
     <xsd:complexType name="filters">
         <xsd:choice minOccurs="1" maxOccurs="unbounded">
             <xsd:element name="filter" type="filter" />

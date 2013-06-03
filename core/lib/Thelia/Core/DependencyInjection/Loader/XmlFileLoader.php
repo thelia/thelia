@@ -63,7 +63,27 @@ class XmlFileLoader extends FileLoader
 
         $this->parseParameters($xml);
 
+        $this->parseCommands($xml);
+
         $this->parseDefinitions($xml, $path);
+    }
+
+    protected function parseCommands(SimpleXMLElement $xml)
+    {
+        if (false === $commands = $xml->xpath('//config:commands/config:command')) {
+            return;
+        }
+        try {
+            $commandConfig = $this->container->getParameter("command.definition");
+        } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
+            $commandConfig = array();
+        }
+
+        foreach ($commands as $command) {
+            array_push($commandConfig, $command->getAttributeAsPhp("class"));
+        }
+
+        $this->container->setParameter("command.definition", $commandConfig);
     }
 
     /**
