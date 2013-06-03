@@ -36,7 +36,7 @@ class ClearCacheCommand extends Command
     protected function configure()
     {
         $this
-            ->setName("clear:cache")
+            ->setName("cache:clear")
             ->setDescription("Invalidate all caches");
     }
 
@@ -49,7 +49,16 @@ class ClearCacheCommand extends Command
             throw new \RuntimeException(sprintf('Unable to write in the "%s" directory', $cacheDir));
         }
 
+        $output->writeln(sprintf("Clearing cache in <info>%s</info> directory", $cacheDir));
+
         $fs = new Filesystem();
-        $fs->remove($this->getApplication()->getKernel()->getContainer()->getParameter("kernel.cache_dir"));
+        try {
+            $fs->remove($cacheDir);
+
+            $output->writeln("<info>cache clear successfully</info>");
+        } catch(IOException $e) {
+            $output->writeln(sprintf("error during clearing cache : %s", $e->getMessage()));
+        }
+
     }
 }
