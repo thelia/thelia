@@ -13,7 +13,7 @@
     </loops>
 
     <commands>
-        <command class="Thelia\Command\ClearCacheCommand"/>
+        <command class="Thelia\Command\CacheClear"/>
     </commands>
 
     <services>

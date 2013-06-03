@@ -31,7 +31,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Filesystem\Exception\IOException;
 
-class ClearCacheCommand extends Command
+class CacheClear extends Command
 {
     protected function configure()
     {
