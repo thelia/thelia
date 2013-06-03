@@ -57,6 +57,8 @@ use PropelConfiguration;
 class Thelia extends Kernel
 {
 
+    const THELIA_VERSION = 0.1;
+
     protected $tpexConfig;
     
     public function init()

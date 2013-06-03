@@ -15,6 +15,7 @@
             <xsd:element name="testLoops" type="testLoops" />
             <xsd:element name="services" type="services" />
             <xsd:element name="parameters" type="parameters"/>
+            <xsd:element name="commands" type="commands"/>
         </xsd:choice>
     </xsd:complexType>
 
@@ -66,7 +67,7 @@
 
     <xsd:complexType name="commands">
         <xsd:choice minOccurs="1" maxOccurs="unbounded" >
-            <xsd:element name="loop" type="command"/>
+            <xsd:element name="command" type="command"/>
         </xsd:choice>
     </xsd:complexType>
 
