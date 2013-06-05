@@ -20,12 +20,14 @@ $ cd thelia
 $ wget http://getcomposer.org/composer.phar
 $ php composer.phar install
 ```
-Create a mysql database and import sql dump files located in the install folder : thelia.sql first, then insert.sql.
 
-Configure mysql connection : 
+Finish the installation using cli tools :
 
-* rename ```local/config/database.yml.sample"``` into ```local/config/database.yml```
-* edit ```local/config/database.yml``` file and add needed information
+``` bash
+$ php Thelia thelia:install
+```
+
+You just have to follow all instructions.
 
 Usage
 -----
