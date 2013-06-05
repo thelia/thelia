@@ -51,11 +51,9 @@ class Install extends ContainerAwareCommand
             ''
         ));
 
-        $connectionInfo = $this->getConnectionInfo($input, $output);
-
-        if (false === $connection = $this->tryConnection($connectionInfo)) {
-            throw new \RuntimeException("Wrong information, impossible to connect to database");
-        }
+        do {
+            $connectionInfo = $this->getConnectionInfo($input, $output);
+        } while(false === $connection = $this->tryConnection($connectionInfo, $output));
 
         $this->createDatabase($connection, $connectionInfo["dbName"]);
 
@@ -153,7 +151,7 @@ class Install extends ContainerAwareCommand
         );
     }
 
-    protected function tryConnection($connectionInfo)
+    protected function tryConnection($connectionInfo, OutputInterface $output)
     {
 
         $dsn = "mysql:host=%s";
@@ -165,6 +163,9 @@ class Install extends ContainerAwareCommand
                 $connectionInfo["password"]
             );
         } catch (\PDOException $e) {
+            $output->writeln(array(
+                "<error>Wrong connection information</error>"
+            ));
             return false;
         }
 
