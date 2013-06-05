@@ -26,6 +26,7 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\Tests\Compiler\CheckExceptionOnInvalidReferenceBehaviorPassTest;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
 use Thelia\Core\Event\TheliaEvents;
@@ -38,6 +39,7 @@ class Install extends ContainerAwareCommand
         $this
             ->setName("thelia:install")
             ->setDescription("Install thelia using cli tools. For now Thelia only use mysql database")
+            ->setHelp("The <info>thelia:install</info> command install Thelia database and create config file needed.")
         ;
 
     }
