@@ -14,6 +14,7 @@
 
     <commands>
         <command class="Thelia\Command\CacheClear"/>
+        <command class="Thelia\Command\Install"/>
     </commands>
 
     <services>
