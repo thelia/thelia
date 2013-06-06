@@ -26,14 +26,15 @@ namespace Thelia\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\Tests\Compiler\CheckExceptionOnInvalidReferenceBehaviorPassTest;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
-use Thelia\Core\Event\TheliaEvents;
 
 
 class Install extends ContainerAwareCommand
 {
+    /**
+     * Configure the command
+     */
     protected function configure()
     {
         $this
@@ -84,6 +85,11 @@ class Install extends ContainerAwareCommand
         ));
     }
 
+    /**
+     * Test if needed directories have write permission
+     *
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     */
     protected function checkPermission(OutputInterface $output)
     {
         $output->writeln(array(
@@ -128,6 +134,11 @@ class Install extends ContainerAwareCommand
 
     }
 
+    /**
+     * rename database config file and complete it
+     *
+     * @param array $connectionInfo
+     */
     protected function createConfigFile($connectionInfo)
     {
         $fs = new Filesystem();
@@ -158,6 +169,12 @@ class Install extends ContainerAwareCommand
 
     }
 
+    /**
+     * Insert all sql needed in database
+     *
+     * @param \PDO $connection
+     * @param $dbName
+     */
     protected function insertSql(\PDO $connection, $dbName)
     {
         $connection->query(sprintf("use %s", $dbName));
@@ -173,6 +190,12 @@ class Install extends ContainerAwareCommand
         }
     }
 
+    /**
+     * Separate each sql instruction in an array
+     *
+     * @param $sql
+     * @return array
+     */
     protected function prepareSql($sql)
     {
         $sql = str_replace(";',", "-CODE-", $sql);
@@ -189,6 +212,12 @@ class Install extends ContainerAwareCommand
         return $query;
     }
 
+    /**
+     * create database if not exists
+     *
+     * @param \PDO $connection
+     * @param $dbName
+     */
     protected function createDatabase(\PDO $connection, $dbName)
     {
         $connection->query(
@@ -199,6 +228,13 @@ class Install extends ContainerAwareCommand
         );
     }
 
+    /**
+     * test database access
+     *
+     * @param $connectionInfo
+     * @param OutputInterface $output
+     * @return bool|\PDO
+     */
     protected function tryConnection($connectionInfo, OutputInterface $output)
     {
 
@@ -222,6 +258,13 @@ class Install extends ContainerAwareCommand
         return $connection;
     }
 
+    /**
+     * Ask to user all needed information
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return array
+     */
     protected function getConnectionInfo(InputInterface $input, OutputInterface $output)
     {
         $dialog = $this->getHelperSet()->get('dialog');
