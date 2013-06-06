@@ -153,7 +153,7 @@ class Install extends ContainerAwareCommand
 
         $fs->remove($sampleConfigFile);
 
-
+        $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
 
 
     }
