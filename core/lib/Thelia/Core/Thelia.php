@@ -118,18 +118,20 @@ class Thelia extends Kernel
         $loader->load("config.xml");
         $loader->load("routing.xml");
         $loader->load("action.xml");
+        if (defined("THELIA_INSTALL_MODE") === false) {
+            $modules = \Thelia\Model\ModuleQuery::getActivated();
 
-        $modules = \Thelia\Model\ModuleQuery::getActivated();
+            foreach ($modules as $module) {
 
-        foreach ($modules as $module) {
+                try {
+                    $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
+                    $loader->load("config.xml");
+                } catch(\InvalidArgumentException $e) {
 
-            try {
-                $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
-                $loader->load("config.xml");
-            } catch(\InvalidArgumentException $e) {
-
+                }
             }
         }
+
     }
     
     /**

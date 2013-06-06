@@ -53,6 +53,8 @@ class Install extends ContainerAwareCommand
             ''
         ));
 
+        $this->checkPermission($output);
+
         do {
             $connectionInfo = $this->getConnectionInfo($input, $output);
         } while(false === $connection = $this->tryConnection($connectionInfo, $output));
@@ -80,6 +82,50 @@ class Install extends ContainerAwareCommand
             "<info>Config file created with success. Your thelia is installed</info>",
             ""
         ));
+    }
+
+    protected function checkPermission(OutputInterface $output)
+    {
+        $output->writeln(array(
+            "Checking some permissions"
+        ));
+
+        $confDir = THELIA_ROOT . "local/config";
+        $cacheDir = THELIA_ROOT . "cache";
+        $logDir = THELIA_ROOT . "log";
+
+        $conf   = is_writable($confDir);
+        $cache  = is_writable($cacheDir);
+        $log    = is_writable($logDir);
+
+        $output->writeln(array(
+           sprintf(
+               "<info>config directory(%s)...</info> %s",
+               $confDir,
+               $conf ? "<info>Ok</info>" : "<error>Fail</error>"
+           ),
+           sprintf(
+               "<info>cache directory(%s)...</info> %s"
+               ,$cacheDir,
+               $cache ? "<info>Ok</info>" : "<error>Fail</error>"
+           ),
+           sprintf(
+               "<info>log directory(%s)...</info> %s",
+               $logDir,
+               $log ? "<info>Ok</info>" : "<error>Fail</error>"
+           ),
+        ));
+
+        if ($conf === false || $cache === false || $log === false) {
+           $output->writeln(array(
+              "",
+              "<error>Please put correct permission and reload install process</error>"
+           ));
+            exit;
+        }
+
+
+
     }
 
     protected function createConfigFile($connectionInfo)
