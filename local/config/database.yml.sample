@@ -1,0 +1,6 @@
+database:
+  connection:
+    driver: %DRIVER%
+    user: %USERNAME%
+    password: %PASSWORD%
+    dsn: %DSN%
