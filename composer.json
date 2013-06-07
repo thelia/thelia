@@ -20,7 +20,13 @@
         "symfony/http-kernel" : "2.2.*",
         "symfony/routing" : "2.2.*",
         "symfony/yaml" : "2.2.*",
-        "symfony-cmf/routing": "1.0.0"
+        "symfony-cmf/routing": "1.0.0",
+
+        "symfony/form": "2.2.*",
+        "symfony/validator": "2.2.*",
+        "symfony/security": "2.2.*",
+        "symfony/templating": "2.2.*",
+        "noiselabs/smarty-bundle": "dev-master"
     },
     "require-dev" : {
         "fzaninotto/faker": "dev-master"
@@ -31,7 +37,7 @@
         "bin-dir" : "bin"
     },
     "autoload": {
-        "psr-0": { 
+        "psr-0": {
             "": "local/modules/",
             "Thelia" : "core/lib/"
         }

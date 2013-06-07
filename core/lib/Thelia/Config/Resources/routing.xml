@@ -44,7 +44,7 @@
 
         <service id="router.admin" class="%router.class%">
             <argument type="service" id="router.admin.xmlLoader"/>
-            <argument>routing.xml</argument>
+            <argument>admin.xml</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
