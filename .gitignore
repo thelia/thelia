@@ -11,3 +11,4 @@ bin/*
 local/session/*
 coverage
 .idea
+composer.lock
