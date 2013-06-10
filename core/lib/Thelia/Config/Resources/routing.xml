@@ -56,10 +56,12 @@
             <call method="setContext">
                 <argument type="service" id="request.context"/>
             </call>
+<!--
             <call method="add">
                 <argument type="service" id="router.default_route"/>
                 <argument>-255</argument>
             </call>
+-->
             <call method="add">
                 <argument type="service" id="router.admin"/>
                 <argument>0</argument>

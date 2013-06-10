@@ -79,19 +79,19 @@ class ViewListener implements EventSubscriberInterface
         } catch(ResourceNotFoundException $e) {
             $event->setResponse(new Response($e->getMessage(), 404));
         }
-        
+
     }
-    
+
     public function beforeKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $this->container->get('request');
-        
+
         if (!$view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
         }
-        
+
     }
-    
+
     public function findView(Request $request)
     {
         if (! $view = $request->query->get('view')) {
@@ -100,7 +100,7 @@ class ViewListener implements EventSubscriberInterface
                 $view = $request->request->get('view');
             }
         }
-        
+
         return $view;
     }
 
@@ -117,7 +117,7 @@ class ViewListener implements EventSubscriberInterface
             KernelEvents::VIEW =>array(
                 array('onKernelView', 0),
                 array('beforeKernelView', 5)
-            ) 
+            )
         );
     }
 }

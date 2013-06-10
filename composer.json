@@ -26,7 +26,8 @@
         "symfony/validator": "2.2.*",
         "symfony/security": "2.2.*",
         "symfony/templating": "2.2.*",
-        "noiselabs/smarty-bundle": "dev-master"
+
+        "smarty/smarty": "v3.1.13"
     },
     "require-dev" : {
         "fzaninotto/faker": "dev-master"
