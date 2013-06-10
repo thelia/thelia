@@ -44,7 +44,7 @@
 
         <service id="router.admin" class="%router.class%">
             <argument type="service" id="router.admin.xmlLoader"/>
-            <argument>routing.xml</argument>
+            <argument>admin.xml</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
@@ -56,10 +56,12 @@
             <call method="setContext">
                 <argument type="service" id="request.context"/>
             </call>
+<!--
             <call method="add">
                 <argument type="service" id="router.default_route"/>
                 <argument>-255</argument>
             </call>
+-->
             <call method="add">
                 <argument type="service" id="router.admin"/>
                 <argument>0</argument>
