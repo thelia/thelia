@@ -11,3 +11,7 @@ bin/*
 local/session/*
 coverage
 .idea
+.buildpath
+.project
+.settings/
+local/cache/*
