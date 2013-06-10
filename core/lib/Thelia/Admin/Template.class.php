@@ -37,7 +37,7 @@ class Template extends Smarty
         $cache_dir = THELIA_LOCAL_DIR . 'cache/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
-        $this->setTemplateDir(THELIA_TEMPLATE_DIR . 'admin/');
+        $this->setTemplateDir(__DIR__.'/template/');
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
@@ -83,13 +83,7 @@ class Template extends Smarty
          * Too learn more see {@link http://www.smarty.net/docs/en/api.fetch.tpl}
          */
 
-         try {
-            return $this->smarty->fetch($realTemplateName);
-        } catch (\SmartyException $e) {
-            throw RuntimeException::createFromPrevious($e, $templateName);
-        } catch (\ErrorException $e) {
-            throw RuntimeException::createFromPrevious($e, $templateName);
-        }
+         return $this->smarty->fetch($realTemplateName);
      }
 }
 ?>
