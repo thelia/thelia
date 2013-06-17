@@ -24,4 +24,4 @@ $response = $thelia->handle($request)->prepare($request)->send();
 
 $thelia->terminate($request, $response);
 
-echo "page parsed in : " . (microtime(true) - $thelia->getStartTime());
+echo "<!-- page parsed in : " . (microtime(true) - $thelia->getStartTime())." s. -->";

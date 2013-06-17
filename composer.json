@@ -28,7 +28,9 @@
         "symfony/security": "2.2.*",
         "symfony/templating": "2.2.*",
 
-        "smarty/smarty": "v3.1.13"
+        "smarty/smarty": "v3.1.13",
+        "kriswallsmith/assetic": "1.2.*@dev",
+        "leafo/lessphp": "0.3.*@dev"
     },
     "require-dev" : {
         "fzaninotto/faker": "dev-master"

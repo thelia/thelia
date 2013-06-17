@@ -23,7 +23,8 @@
 namespace Thelia\Admin\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Thelia\Admin\Template;
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Admin\Templating\Template;
 
 /**
  *
@@ -46,9 +47,11 @@ class BaseAdminController
 
     public function indexAction()
     {
-        echo "called";
+         $rep = new Response();
 
-     	return $this->render('login');
+        $rep->setContent($this->render('login'));
+
+        return $rep;
    }
 }
 ?>
