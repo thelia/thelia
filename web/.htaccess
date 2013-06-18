@@ -5,6 +5,8 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
 	RewriteEngine on
 
-	RewriteBase /thelia2
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
 	RewriteRule ^admin(/.*)?$ index_dev.php/admin/$1 [L,QSA]
 </IfModule>
