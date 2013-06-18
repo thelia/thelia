@@ -34,14 +34,14 @@ class Template extends Smarty
     {
         parent::__construct();
 
-        $compile_dir = THELIA_LOCAL_DIR . 'cache/smarty/compile';
+        $compile_dir = THELIA_ROOT . 'cache/smarty/compile';
         if (! is_dir($compile_dir)) @mkdir($compile_dir, 0777, true);
 
-        $cache_dir = THELIA_LOCAL_DIR . 'cache/smarty/cache';
+        $cache_dir = THELIA_ROOT . 'cache/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
         $web_root  = THELIA_WEB_DIR;
-        $asset_dir_from_web_root = 'assets/admin/default';
+        $asset_dir_from_web_root = 'assets/admin/default'; // FIXME
 
         $this->asset_manager = new AssetsManager($web_root, $asset_dir_from_web_root);
 

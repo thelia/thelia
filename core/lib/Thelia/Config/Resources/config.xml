@@ -28,8 +28,11 @@
 
         <service id="controller_resolver" class="Symfony\Component\HttpKernel\Controller\ControllerResolver"/>
 
-        <service id="parser" class="Thelia\Core\Template\Parser">
+        <service id="parser" class="Thelia\Core\Template\SmartyParser">
             <argument type="service" id="service_container"/>
+            <call method="setLoopList">
+                <argument>%tpex.loop%</argument>
+            </call>
         </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
