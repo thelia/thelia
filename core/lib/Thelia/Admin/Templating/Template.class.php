@@ -41,7 +41,7 @@ class Template extends Smarty
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
         $web_root  = THELIA_WEB_DIR;
-        $asset_dir_from_web_root = 'assets/admin/default';
+        $asset_dir_from_web_root = '/assets/admin/default';
 
         $this->asset_manager = new AssetsManager($web_root, $asset_dir_from_web_root);
 
