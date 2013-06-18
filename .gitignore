@@ -16,3 +16,4 @@ coverage
 .settings/
 local/cache/*
 composer.lock
+web/assets/*
