@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    </head>
+    <body>
+        <div>
+	        <p>Category loop example</p>
+	        {loop type="category" name="catloop1"}
+	            {$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE} <br />
+	            nb child : {$NB_CHILD} <br /><br />
+	        {/loop}
+		</div>
+
+       <div>
+	        <p>Conditional example #1</p>
+
+	        {notempty name="catloop2"}
+	        	Loop catloop2 is not empty: <ul>
+		        {loop type="category" name="catloop2" parent="12"}
+		            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+		        {/loop}
+		        </ul>
+	        {/notempty}
+
+	        {empty name="catloop2"}
+	        	<p>Loop catloop2 is empty</p>
+	        {/empty}
+
+		</div>
+
+       <div>
+	        <p>Conditional example #2</p>
+
+	        {notempty name="catloop3"}
+	        	Loop catloop3 is not empty: <ul>
+		        {loop type="category" name="catloop3" parent="0"}
+		            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+		        {/loop}
+		        </ul>
+	        {/notempty}
+
+	        {empty name="catloop3"}
+	        	<p>Loop catloop3 is empty</p>
+	        {/empty}
+
+	        {empty name="catloop2"}
+	        	<p>... but catloop2 is still empty :-)</p>
+	        {/empty}
+
+		</div>
+
+		<div>
+			<p>Traditional for loop</p>
+        	{for $index=5 to 12 step 1}
+            	Compteur = {$index}<br />
+        	{/for}
+        </div>
+    </body>
+</html>
