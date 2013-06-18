@@ -28,11 +28,15 @@
 
         <service id="controller_resolver" class="Symfony\Component\HttpKernel\Controller\ControllerResolver"/>
 
-        <service id="parser" class="Thelia\Core\Template\SmartyParser">
+        <service id="smarty" class="Thelia\Core\Template\SmartyParser">
             <argument type="service" id="service_container"/>
             <call method="setLoopList">
                 <argument>%tpex.loop%</argument>
             </call>
+        </service>
+
+        <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\AsseticManager" >
+            <tag name="smarty.register_plugin"/>
         </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">

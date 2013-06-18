@@ -23,7 +23,7 @@
 
 namespace Thelia\Admin\Templating\Smarty;
 
-use Thelia\Template\Assets\AsseticManager;
+use Thelia\Core\Template\Assets\AsseticManager;
 
 class AssetsManager extends AsseticManager {
 

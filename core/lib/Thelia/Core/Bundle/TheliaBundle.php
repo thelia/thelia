@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Scope;
 
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterSmartyPluginPass;
 
 /**
  * First Bundle use in Thelia
@@ -56,5 +57,6 @@ class TheliaBundle extends Bundle
         $container->addScope(new Scope('request'));
 
         $container->addCompilerPass(new RegisterListenersPass());
+        $container->addCompilerPass(new RegisterSmartyPluginPass());
     }
 }

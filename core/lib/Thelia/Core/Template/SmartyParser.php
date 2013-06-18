@@ -6,8 +6,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Template\ParserInterface;
 use \Smarty;
 use Thelia\Core\Template\Loop\Category;
+use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 
 class SmartyParser extends Smarty implements ParserInterface {
+
+    public $plugins;
 
     /**
      * @var Symfony\Component\DependencyInjection\ContainerInterface
@@ -75,6 +78,33 @@ class SmartyParser extends Smarty implements ParserInterface {
 
     		$this->loopDefinition[$name] = $className;
     	}
+    }
+
+    public function addPlugins(SmartyPluginInterface $plugin)
+    {
+        $this->plugins[] = $plugin;
+    }
+
+    public function registerPlugins()
+    {
+        foreach ($this->plugins as $register_plugin) {
+            $plugins = $register_plugin->registerPlugins();
+
+            if(!is_array($plugins)) {
+                $plugins = array($plugins);
+            }
+
+            foreach ($plugins as $plugin) {
+                $this->registerPlugin(
+                    $plugin->type,
+                    $plugin->name,
+                    array(
+                        $plugin->class,
+                        $plugin->method
+                    )
+                );
+            }
+        }
     }
 
     private function extractParam($loop, $smartyParam)
@@ -242,6 +272,7 @@ class SmartyParser extends Smarty implements ParserInterface {
      */
     public function getContent()
     {
+        $this->registerPlugins();
         return $this->fetch($this->getTemplateFilePath());
     }
 
