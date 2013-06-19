@@ -28,6 +28,14 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
+/**
+ *
+ * This compiler allow adding plugins in smarty parser using config files
+ *
+ * Class RegisterSmartyPluginPass
+ * @package Thelia\Core\DependencyInjection\Compiler
+ */
+
 class RegisterSmartyPluginPass implements CompilerPassInterface {
 
     /**
