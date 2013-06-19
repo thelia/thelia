@@ -60,5 +60,7 @@ class RegisterSmartyPluginPass implements CompilerPassInterface {
                 ));
             }*/
         }
+
+        $smarty->addMethodCall("registerPlugins");
     }
 }

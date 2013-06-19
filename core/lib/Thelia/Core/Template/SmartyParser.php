@@ -235,8 +235,6 @@ class SmartyParser extends Smarty implements ParserInterface {
 	 */
 	public function getContent()
 	{
-	    $this->registerPlugins();
-
 		return $this->fetch($this->getTemplateFilePath());
 	}
 
