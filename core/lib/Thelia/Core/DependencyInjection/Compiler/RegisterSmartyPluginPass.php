@@ -35,30 +35,6 @@ class RegisterSmartyPluginPass implements CompilerPassInterface {
 
             $smarty->addMethodCall("addPlugins", array(new Reference($id)));
 
-            /*$register_plugin = $container->get($id);
-
-            $reflectionObject = new \ReflectionObject($register_plugin);
-            $interface = "Thelia\Core\Template\Smarty\SmartyPluginInterface";
-            if (!$reflectionObject->implementsInterface($interface)) {
-                throw new \RuntimeException(sprintf("%s class must implement %s interface",$reflectionObject->getName(), $interface));
-            }
-
-            $plugins = $register_plugin->registerPlugins();
-
-            if(!is_array($plugins)) {
-                $plugins = array($plugins);
-            }
-
-            foreach($plugins as $plugin) {
-                $smarty->addMethodCall("registerPlugin", array(
-                    $plugin->type,
-                    $plugin->name,
-                    array(
-                        $plugin->class,
-                        $plugin->method
-                    )
-                ));
-            }*/
         }
 
         $smarty->addMethodCall("registerPlugins");
