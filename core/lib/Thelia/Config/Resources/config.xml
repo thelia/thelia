@@ -18,6 +18,7 @@
     </commands>
 
     <services>
+
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
         </service>
@@ -26,9 +27,23 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="controller_resolver" class="Symfony\Component\HttpKernel\Controller\ControllerResolver"/>
+		<!--
+		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
+		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
+		We use it here to inject the servi ce container in the admin base controller.
+		-->
+        <service id="controller_resolver" class="Thelia\Core\Controller\ControllerResolver">
+        	<argument type="service" id="service_container"/>
+        </service>
 
-        <service id="parser" class="Thelia\Core\Template\SmartyParser">
+        <service id="thelia.parser" class="Thelia\Core\Template\SmartyParser">
+            <argument type="service" id="service_container"/>
+            <call method="setLoopList">
+                <argument>%tpex.loop%</argument>
+            </call>
+        </service>
+
+        <service id="thelia.admin.parser" class="Thelia\Admin\Template\AdminSmartyParser">
             <argument type="service" id="service_container"/>
             <call method="setLoopList">
                 <argument>%tpex.loop%</argument>

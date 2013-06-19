@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,40 +20,27 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Admin\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Admin\Templating\Template;
+namespace Thelia\Admin\Template;
+
 use Thelia\Core\Template\SmartyParser;
-use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
- *
- * The defaut administration controller. Basically, display the login form if
- * user is not yet logged in, or back-office home page if the user is logged in.
- *
- * @author Franck Allimant <franck@cqfdev.fr>
- */
-
-class BaseAdminController extends ContainerAware
+// smarty configuration
+class AdminSmartyParser extends SmartyParser
 {
-    protected function render($templateName, $args = array()) {
+    public function __construct(ContainerInterface $container, $template = false)
+    {
+        $this->template = $template == false ? 'admin/default' : $template;
 
-        $parser = $this->container->get('thelia.admin.parser');
-
-        $args = array('lang' => 'fr');
-
-        return $parser->render($templateName, $args);
+        parent::__construct($container, $template);
     }
 
-    public function indexAction()
-    {
-        $resp = new Response();
+    public function render($realTemplateName, $parameters) {
 
-        $resp->setContent($this->render('login.html'));
+    	$this->assign($parameters);
 
-        return $resp;
-   }
+    	return $this->fetch($realTemplateName);
+    }
 }
+?>

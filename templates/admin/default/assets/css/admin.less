@@ -54,12 +54,37 @@ a {
 	font-weight: bold;
 }
 
+// Bootstrap Adjustements ------------------------------------------------------
+
+.btn-primary, .row h3 .btn-large, .row-fluid h3 .btn-large, .row-fluid h4 .btn-large {
+  background: -moz-linear-gradient(center bottom , #E3530B 0%, #F39922 100%) repeat scroll 0 0 #E9730F;
+  box-shadow: 0 0 2px rgba(250, 250, 250, 0.5) inset, 0 1px 3px rgba(0, 0, 0, 0.2);
+  color: white;
+}
+
 // -- Brandbar ----------------------------------------------------------------
 
 /* --- BRAND BAR ---*/
+
+.loginpage {
+	.brandbar {
+		width: 100%;
+	}
+
+	.hero-unit {
+    	background-color: transparent !important;
+	}
+
+	.well {
+  		background-color: #E4E3DE;
+  		border: 1px solid rgba(0, 0, 0, 0.2);
+  		box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.05) inset;
+	}
+}
+
 .brandbar {
 
-	background: url("images/header.jpg") repeat-x;
+	background: url("img/header.jpg") repeat-x;
 	height: 90px;
 
 	a.brand {
@@ -67,7 +92,7 @@ a {
 		display: block;
 		float: left;
 		margin-right: 20px;
-		background: url("images/logo.png") 0px 12px no-repeat;
+		background: url("img/logo.png") 0px 12px no-repeat;
 		width: 124px;
 		height: 63px;
 	}
@@ -75,7 +100,7 @@ a {
 	.breadcrumb {
 		border-radius: 0px;
 		padding: 25px 0px 25px 30px;
-		background: url("images/logo-light.png") left center no-repeat;
+		background: url("img/logo-light.png") left center no-repeat;
 		float: left;
 		margin: 12px 0px 0px 0px;
 
@@ -114,7 +139,7 @@ a {
 		a {
 			text-indent: -13337px;
 			display: block;
-			background: url("images/deconnexion.png") no-repeat;
+			background: url("img/deconnexion.png") no-repeat;
 			width: 23px;
 			height: 24px;
 		}

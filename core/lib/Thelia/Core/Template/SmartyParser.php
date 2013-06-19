@@ -3,15 +3,20 @@
 namespace Thelia\Core\Template;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Core\Template\ParserInterface;
-use \Smarty;
-use Thelia\Core\Template\Loop\Category;
 
+use \Smarty;
+
+use Thelia\Core\Template\ParserInterface;
+use Thelia\Core\Template\Loop\Category;
+use Thelia\Tpex\Element\Loop\BaseLoop;
+use Thelia\Core\Template\Assets\SmartyAssetsManager;
+
+/**
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
 class SmartyParser extends Smarty implements ParserInterface {
 
-    /**
-     * @var Symfony\Component\DependencyInjection\ContainerInterface
-     */
     protected $container;
 
     protected $template = "smarty-sample";
@@ -20,11 +25,18 @@ class SmartyParser extends Smarty implements ParserInterface {
 
     protected $loopDefinition = array();
 
-    public function __construct(ContainerInterface $container)
+    protected $asset_manager = null; // Lazy loading
+
+    /**
+     * @var Symfony\Component\DependencyInjection\ContainerInterface
+     */
+    public function __construct(ContainerInterface $container, $template = false)
     {
         parent::__construct();
 
         $this->container = $container;
+
+        // Configure basic Smarty parameters
 
         $compile_dir = THELIA_ROOT . 'cache/smarty/compile';
         if (! is_dir($compile_dir)) @mkdir($compile_dir, 0777, true);
@@ -32,25 +44,252 @@ class SmartyParser extends Smarty implements ParserInterface {
         $cache_dir = THELIA_ROOT . 'cache/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
+        if ($template != false) $this->template = $template;
+
         $this->setTemplateDir(THELIA_TEMPLATE_DIR.$this->template);
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
-        $this->registerPlugin('block', 'loop', array($this, 'theliaLoop'));
-        $this->registerPlugin('block', 'empty', array($this, 'theliaEmpty'));
-        $this->registerPlugin('block', 'notempty', array($this, 'theliaNotEmpty'));
-
-
-        // Prevent ErrorException: Notice: Undefined index
+        // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
+        // The default HTTP status
         $this->status = 200;
+
+        // Register Thelia base block plugins
+        $this->registerPlugin('block', 'loop'     , array($this, 'theliaLoop'));
+        $this->registerPlugin('block', 'elseloop' , array($this, 'theliaElseloop'));
+        $this->registerPlugin('block', 'ifloop'   , array($this, 'theliaIfLoop'));
+
+        // Register translation function 'intl'
+        $this->registerPlugin('function', 'intl', array($this, 'theliaTranslate'));
+
+        // Register Thelia modules inclusion function 'thelia_module'
+        $this->registerPlugin('function', 'thelia_module', array($this, 'theliaModule'));
+
+        // Register asset management block plugins
+        $this->registerPlugin('block', 'stylesheets', array($this, 'theliaBlockStylesheets'));
+        $this->registerPlugin('block', 'javascripts', array($this, 'theliaBlockJavascripts'));
+        $this->registerPlugin('block', 'images'     , array($this, 'theliaBlockImages'));
     }
 
     /**
+     * Process {loop name="loop name" type="loop type" ... } ... {/loop} block
      *
-     * associative array containing information for loop execution
+     * @param unknown $params
+     * @param unknown $content
+     * @param unknown $template
+     * @param unknown $repeat
+     * @throws \InvalidArgumentException
+     * @return string
+     */
+    public function theliaLoop($params, $content, $template, &$repeat) {
+
+    	if (empty($params['name']))
+    		throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
+
+    	if (empty($params['type']))
+    		throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
+
+    	$name = $params['name'];
+
+    	if ($content === null) {
+
+    		$loop = $this->createLoopInstance(strtolower($params['type']));
+
+    		$this->getLoopArgument($loop, $params);
+
+    		$loopResults = $loop->exec();
+
+    		$template->assignByRef($name, $loopResults);
+    	}
+    	else {
+
+    		$loopResults = $template->getTemplateVars($name);
+
+    		$loopResults->next();
+    	}
+
+    	if ($loopResults->valid()) {
+
+    		$loopResultRow = $loopResults->current();
+
+    		foreach($loopResultRow->getVarVal() as $var => $val) {
+
+    			$template->assign(substr($var, 1), $val);
+
+    			$template->assign('__COUNT__', 1 + $loopResults->key());
+    			$template->assign('__TOTAL__', $loopResults->getCount());
+    		}
+
+    		$repeat = $loopResults->valid();
+    	}
+
+    	if ($content !== null) {
+
+    		if ($loopResults->isEmpty()) $content = "";
+
+    		return $content;
+    	}
+    }
+
+
+    /**
+     * Process {elseloop rel="loopname"} ... {/elseloop} block
+     *
+     * @param unknown $params
+     * @param unknown $content
+     * @param unknown $template
+     * @param unknown $repeat
+     * @return Ambigous <string, unknown>
+     */
+    public function theliaElseloop($params, $content, $template, &$repeat) {
+
+    	// When encoutering close tag, check if loop has results.
+    	if ($repeat === false) {
+    		return $this->checkEmptyLoop($params, $template) ? $content : '';
+    	}
+    }
+
+
+    /**
+     * Process {ifloop rel="loopname"} ... {/ifloop} block
+     *
+     * @param unknown $params
+     * @param unknown $content
+     * @param unknown $template
+     * @param unknown $repeat
+     * @return Ambigous <string, unknown>
+     */
+    public function theliaIfLoop($params, $content, $template, &$repeat) {
+
+    	// When encountering close tag, check if loop has results.
+    	if ($repeat === false) {
+    		return $this->checkEmptyLoop($params, $template) ? '' : $content;
+    	}
+    }
+
+    /**
+     * Process translate function
+     *
+     * @param unknown $params
+     * @param unknown $smarty
+     * @return string
+     */
+    public function theliaTranslate($params, &$smarty)
+    {
+    	if (isset($params['l'])) {
+    		$string = str_replace('\'', '\\\'', $params['l']);
+    	}
+    	else {
+    		$string = '';
+    	}
+
+    	// TODO
+
+    	return "[$string]";
+    }
+
+
+    /**
+     * Process theliaModule template inclusion function
+     *
+     * @param unknown $params
+     * @param unknown $smarty
+     * @return string
+     */
+    public function theliaModule($params, &$smarty)
+    {
+        // TODO
+        return "";
+    }
+
+
+	public function theliaBlockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)
+	{
+	    return $this->getAssetManager()->processSmartyPluginCall('js', $params, $content, $template, $repeat);
+	}
+
+	public function theliaBlockImages($params, $content, \Smarty_Internal_Template $template, &$repeat)
+	{
+	    return $this->getAssetManager()->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
+	}
+
+	public function theliaBlockStylesheets($params, $content, \Smarty_Internal_Template $template, &$repeat)
+	{
+	    return $this->getAssetManager()->processSmartyPluginCall('css', $params, $content, $template, $repeat);
+	}
+
+	/**
+	 *
+	 * This method must return a Symfony\Component\HttpFoudation\Response instance or the content of the response
+	 *
+	 */
+	public function getContent()
+	{
+		return $this->fetch($this->getTemplateFilePath());
+	}
+
+	/**
+	 *
+	 * set $content with the body of the response or the Response object directly
+	 *
+	 * @param string|Symfony\Component\HttpFoundation\Response $content
+	 */
+	public function setContent($content)
+	{
+		$this->content = $content;
+	}
+
+	/**
+	 *
+	 * @return type the status of the response
+	 */
+	public function getStatus()
+	{
+		return $this->status;
+	}
+
+	/**
+	 *
+	 * status HTTP of the response
+	 *
+	 * @param int $status
+	 */
+	public function setStatus($status)
+	{
+		$this->status = $status;
+	}
+
+	/**
+	 * Check if a loop has returned results. The loop shoud have been executed before, or an
+	 * InvalidArgumentException is thrown
+	 *
+	 * @param unknown $params
+	 * @param unknown $template
+	 * @throws \InvalidArgumentException
+	 */
+    protected function checkEmptyLoop($params, $template) {
+        if (empty($params['rel']))
+        	throw new \InvalidArgumentException("Missing 'rel' parameter in ifloop/elseloop arguments");
+
+        $loopName = $params['rel'];
+
+         // Find loop results in the current template vars
+         $loopResults = $template->getTemplateVars($loopName);
+
+         if (empty($loopResults)) {
+             throw new \InvalidArgumentException("Loop $loopName is not defined.");
+         }
+
+         return $loopResults->isEmpty();
+    }
+
+
+    /**
+     *
+     * Injects an associative array containing information for loop execution
      *
      * key is loop name
      * value is the class implementing/extending base loop classes
@@ -77,16 +316,23 @@ class SmartyParser extends Smarty implements ParserInterface {
     	}
     }
 
-    private function extractParam($loop, $smartyParam)
+    /**
+     * Returns the value of a loop argument.
+     *
+     * @param unknown $loop a BaseLoop instance
+     * @param unknown $smartyParam
+     * @throws \InvalidArgumentException
+     */
+    protected function getLoopArgument(BaseLoop $loop, $smartyParam)
     {
     	$defaultItemsParams = array('required' => true);
-    	$shortcutItemParams = array(
-    			'optional' => array('required' => false)
-    	);
+
+    	$shortcutItemParams = array('optional' => array('required' => false));
 
     	$errorCode = 0;
     	$faultActor = array();
     	$faultDetails = array();
+
     	foreach($loop->defineArgs() as $name => $param){
     		if(is_integer($name)){
     			$name = $param;
@@ -124,88 +370,6 @@ class SmartyParser extends Smarty implements ParserInterface {
     	}
     }
 
-    public function theliaEmpty($params, $content, $template, &$repeat) {
-
-    	// When encoutering close tag, check if loop has results.
-    	if ($repeat === false) {
-    		return $this->checkEmptyLoop($params, $template) ? $content : '';
-    	}
-    }
-
-    public function theliaNotEmpty($params, $content, $template, &$repeat) {
-
-    	// When encoutering close tag, check if loop has results.
-    	if ($repeat === false) {
-    		return $this->checkEmptyLoop($params, $template) ? '' : $content;
-    	}
-    }
-
-    private function checkEmptyLoop($params, $template) {
-        if (empty($params['name']))
-        	throw new \InvalidArgumentException("Missing 'name' parameter in conditional loop arguments");
-
-        $loopName = $params['name'];
-
-         // Find loop results in the current template vars
-         $loopResults = $template->getTemplateVars($loopName);
-
-         if (empty($loopResults)) {
-             throw new \InvalidArgumentException("Loop $loopName is not dfined.");
-         }
-
-         return $loopResults->isEmpty();
-    }
-
-    public function theliaLoop($params, $content, $template, &$repeat) {
-
-        if (empty($params['name']))
-            throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
-
-        if (empty($params['type']))
-        	throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
-
-        $name = $params['name'];
-
-        if ($content === null) {
-
-            $loop = $this->createLoopInstance(strtolower($params['type']));
-
-            $this->extractParam($loop, $params);
-
-            $loopResults = $loop->exec();
-
-            $template->assignByRef($name, $loopResults);
-        }
-        else {
-
-            $loopResults = $template->getTemplateVars($name);
-
-            $loopResults->next();
-        }
-
-        if ($loopResults->valid()) {
-
-            $loopResultRow = $loopResults->current();
-
-            foreach($loopResultRow->getVarVal() as $var => $val) {
-
-                $template->assign(substr($var, 1), $val);
-
-                $template->assign('__COUNT__', 1 + $loopResults->key());
-                $template->assign('__TOTAL__', $loopResults->getCount());
-            }
-
-            $repeat = $loopResults->valid();
-        }
-
-        if ($content !== null) {
-
-            if ($loopResults->isEmpty()) $content = "";
-
-            return $content;
-        }
-    }
-
     /**
      *
      * find the loop class with his name and construct an instance of this class
@@ -235,57 +399,6 @@ class SmartyParser extends Smarty implements ParserInterface {
         );
     }
 
-    /**
-     *
-     * This method must return a Symfony\Component\HttpFoudation\Response instance or the content of the response
-     *
-     */
-    public function getContent()
-    {
-        return $this->fetch($this->getTemplateFilePath());
-    }
-
-    /**
-     *
-     * set $content with the body of the response or the Response object directly
-     *
-     * @param string|Symfony\Component\HttpFoundation\Response $content
-     */
-    public function setContent($content)
-    {
-        $this->content = $content;
-    }
-
-    /**
-     *
-     * @return type the status of the response
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     *
-     * status HTTP of the response
-     *
-     * @param int $status
-     */
-    public function setStatus($status)
-    {
-        $this->status = $status;
-    }
-
-    /**
-     * Main parser function, load the parser
-     */
-    public function loadParser()
-    {
-        $file = $this->getTemplateFilePath();
-
-    	echo  "f=$file";
-    }
-
     protected function getTemplateFilePath()
     {
         $request = $this->container->get('request');
@@ -299,4 +412,11 @@ class SmartyParser extends Smarty implements ParserInterface {
     	throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
     }
 
+    protected function getAssetManager() {
+
+        if ($this->asset_manager == null)
+            $this->asset_manager = new SmartyAssetsManager(THELIA_WEB_DIR, "assets/$this->template");
+
+        return $this->asset_manager;
+    }
 }

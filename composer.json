@@ -21,6 +21,8 @@
         "symfony/routing" : "2.2.*",
         "symfony/filesystem" : "2.2.*",
         "symfony/yaml" : "2.2.*",
+        "symfony/translation" : "2.2.*",
+
         "symfony-cmf/routing": "1.0.0",
 
         "symfony/form": "2.2.*",
@@ -30,7 +32,8 @@
 
         "smarty/smarty": "v3.1.13",
         "kriswallsmith/assetic": "1.2.*@dev",
-        "leafo/lessphp": "0.3.*@dev"
+        "leafo/lessphp": "0.3.*@dev",
+        "ptachoire/cssembed": "dev-master"
     },
     "require-dev" : {
         "fzaninotto/faker": "dev-master"

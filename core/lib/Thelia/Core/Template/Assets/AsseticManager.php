@@ -34,13 +34,6 @@ use Assetic\Cache\FilesystemCache;
 
 class AsseticManager {
 
-    protected $options;
-
-    public function __construct($_options = array()) {
-
-        $this->options = $_options;
-    }
-
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
