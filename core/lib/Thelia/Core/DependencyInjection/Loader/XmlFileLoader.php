@@ -57,9 +57,7 @@ class XmlFileLoader extends FileLoader
 
         $this->parseFilters($xml);
 
-        $this->parseBaseParams($xml);
-
-        $this->parseTestLoops($xml);
+        $this->parseTemplateDirectives($xml);
 
         $this->parseParameters($xml);
 
@@ -112,7 +110,7 @@ class XmlFileLoader extends FileLoader
             return;
         }
         try {
-            $loopConfig = $this->container->getParameter("Tpex.loop");
+            $loopConfig = $this->container->getParameter("Thelia.parser.loops");
         } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
             $loopConfig = array();
         }
@@ -121,7 +119,7 @@ class XmlFileLoader extends FileLoader
             $loopConfig[$loop->getAttributeAsPhp("name")] = $loop->getAttributeAsPhp("class");
         }
 
-        $this->container->setParameter("Tpex.loop", $loopConfig);
+        $this->container->setParameter("Thelia.parser.loops", $loopConfig);
     }
 
     /**
@@ -135,7 +133,7 @@ class XmlFileLoader extends FileLoader
             return;
         }
         try {
-            $filterConfig = $this->container->getParameter("Tpex.filter");
+            $filterConfig = $this->container->getParameter("Thelia.parser.filters");
         } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
             $filterConfig = array();
         }
@@ -144,7 +142,7 @@ class XmlFileLoader extends FileLoader
             $filterConfig[$filter->getAttributeAsPhp("name")] = $filter->getAttributeAsPhp("class");
         }
 
-        $this->container->setParameter("Tpex.filter", $filterConfig);
+        $this->container->setParameter("Thelia.parser.filters", $filterConfig);
     }
 
     /**
@@ -152,13 +150,13 @@ class XmlFileLoader extends FileLoader
      *
      * @param SimpleXMLElement $xml
      */
-    protected function parseBaseParams(SimpleXMLElement $xml)
+    protected function parseTemplateDirectives(SimpleXMLElement $xml)
     {
-        if (false === $baseParams = $xml->xpath('//config:baseParams/config:baseParam')) {
+        if (false === $baseParams = $xml->xpath('//config:templateDirectives/config:templateDirective')) {
             return;
         }
         try {
-            $baseParamConfig = $this->container->getParameter("Tpex.baseParam");
+            $baseParamConfig = $this->container->getParameter("Thelia.parser.templateDirectives");
         } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
             $baseParamConfig = array();
         }
@@ -167,30 +165,7 @@ class XmlFileLoader extends FileLoader
             $baseParamConfig[$baseParam->getAttributeAsPhp("name")] = $baseParam->getAttributeAsPhp("class");
         }
 
-        $this->container->setParameter("Tpex.baseParam", $baseParamConfig);
-    }
-
-    /**
-     * parse testLoops property
-     *
-     * @param SimpleXMLElement $xml
-     */
-    protected function parseTestLoops(SimpleXMLElement $xml)
-    {
-        if (false === $testLoops = $xml->xpath('//config:testLoops/config:testLoop')) {
-            return;
-        }
-        try {
-            $baseParamConfig = $this->container->getParameter("Tpex.baseParam");
-        } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
-            $baseParamConfig = array();
-        }
-
-        foreach ($testLoops as $testLoop) {
-            $baseParamConfig[$testLoop->getAttributeAsPhp("name")] = $testLoop->getAttributeAsPhp("class");
-        }
-
-        $this->container->setParameter("Tpex.testLoop", $baseParamConfig);
+        $this->container->setParameter("Thelia.parser.templateDirectives", $baseParamConfig);
     }
 
     /**
