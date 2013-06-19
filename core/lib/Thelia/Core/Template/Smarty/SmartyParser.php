@@ -61,12 +61,6 @@ class SmartyParser extends Smarty implements ParserInterface {
 
         // The default HTTP status
         $this->status = 200;
-
-        // Register translation function 'intl'
-        $this->registerPlugin('function', 'intl', array($this, 'theliaTranslate'));
-
-        // Register Thelia modules inclusion function 'thelia_module'
-        $this->registerPlugin('function', 'thelia_module', array($this, 'theliaModule'));
     }
 
     public function setTemplate($template_path_from_template_base) {
@@ -92,41 +86,6 @@ class SmartyParser extends Smarty implements ParserInterface {
     	$this->assign($parameters);
 
     	return $this->fetch($realTemplateName);
-    }
-
-    /**
-     * Process translate function
-     *
-     * @param unknown $params
-     * @param unknown $smarty
-     * @return string
-     */
-    public function theliaTranslate($params, &$smarty)
-    {
-    	if (isset($params['l'])) {
-    		$string = str_replace('\'', '\\\'', $params['l']);
-    	}
-    	else {
-    		$string = '';
-    	}
-
-    	// TODO
-
-    	return "[$string]";
-    }
-
-
-    /**
-     * Process theliaModule template inclusion function
-     *
-     * @param unknown $params
-     * @param unknown $smarty
-     * @return string
-     */
-    public function theliaModule($params, &$smarty)
-    {
-        // TODO
-        return "";
     }
 
 	/**

@@ -10,9 +10,8 @@
     <xsd:complexType name="config">
         <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="loops" type="loops" />
-            <xsd:element name="filters" type="filter" />
-            <xsd:element name="baseParams" type="baseParams" />
-            <xsd:element name="testLoops" type="testLoops" />
+            <xsd:element name="filters" type="filters" />
+            <xsd:element name="templateDirectives" type="templateDirectives" />
             <xsd:element name="services" type="services" />
             <xsd:element name="parameters" type="parameters"/>
             <xsd:element name="commands" type="commands"/>
@@ -55,7 +54,7 @@
     </xsd:simpleType>
 
     <xsd:complexType name="loops">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded" >
+        <xsd:choice minOccurs="0" maxOccurs="unbounded" >
             <xsd:element name="loop" type="loop"/>
         </xsd:choice>
     </xsd:complexType>
@@ -66,7 +65,7 @@
     </xsd:complexType>
 
     <xsd:complexType name="commands">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded" >
+        <xsd:choice minOccurs="0" maxOccurs="unbounded" >
             <xsd:element name="command" type="command"/>
         </xsd:choice>
     </xsd:complexType>
@@ -76,34 +75,23 @@
     </xsd:complexType>
 
     <xsd:complexType name="filters">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
             <xsd:element name="filter" type="filter" />
         </xsd:choice>
     </xsd:complexType>
-    
+
     <xsd:complexType name="filter">
         <xsd:attribute name="class" type="xsd:string" use="required" />
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>
 
-    <xsd:complexType name="baseParams">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="baseParam" type="baseParam" />
+    <xsd:complexType name="templateDirectives">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="templateDirective" type="templateDirective" />
         </xsd:choice>
     </xsd:complexType>
 
-    <xsd:complexType name="baseParam">
-        <xsd:attribute name="class" type="xsd:string" use="required" />
-        <xsd:attribute name="name" type="xsd:string" use="required" />
-    </xsd:complexType>
-
-    <xsd:complexType name="testLoops">
-        <xsd:choice minOccurs="1" maxOccurs="unbounded">
-            <xsd:element name="testLoop" type="testLoop" />
-        </xsd:choice>
-    </xsd:complexType>
-
-    <xsd:complexType name="testLoop">
+    <xsd:complexType name="templateDirective">
         <xsd:attribute name="class" type="xsd:string" use="required" />
         <xsd:attribute name="name" type="xsd:string" use="required" />
     </xsd:complexType>

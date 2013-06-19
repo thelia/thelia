@@ -4,13 +4,23 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <testLoops>
-        <testLoop name="equal" class="Thelia\Core\Template\TestLoop\Equal"/>
-    </testLoops>
-
     <loops>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
     </loops>
+
+
+    <filters>
+    	<!-- Sample definition
+        <filter class="Thelia\Core\Template\Filter\SomeFilterClass" name="my_filter"/>
+    	-->
+    </filters>
+
+    <templateDirectives>
+    	<!-- Sample definition
+        <templateDirectives class="Thelia\Core\Template\Filter\SomeFilterClass" name="my_filter"/>
+    	-->
+    </templateDirectives>
+
 
     <commands>
         <command class="Thelia\Command\CacheClear"/>
@@ -55,16 +65,23 @@
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
             <call method="setLoopList">
-                <argument>%tpex.loop%</argument>
+                <argument>%thelia.parser.loops%</argument>
             </call>
        </service>
+
+        <service id="smarty.plugin.translation" class="Thelia\Core\Template\Smarty\Plugins\Translation" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
+        <service id="smarty.plugin.module" class="Thelia\Core\Template\Smarty\Plugins\Module" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
         </service>
-
 
         <service id="request" scope="request" synthetic="true" />
 
