@@ -45,7 +45,7 @@ class BaseAdminController
 
         $this->parser = $parser;
 
-        // FIXME: should be red from config
+        // FIXME: should be read from config
         $this->parser->setTemplate('admin/default');
     }
 
