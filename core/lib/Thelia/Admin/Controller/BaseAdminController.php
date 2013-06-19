@@ -37,15 +37,23 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 
-class BaseAdminController extends ContainerAware
+class BaseAdminController
 {
-    protected function render($templateName, $args = array()) {
+    protected $parser;
 
-        $parser = $this->container->get('thelia.admin.parser');
+    public function __construct($parser) {
+
+        $this->parser = $parser;
+
+        // FIXME: should be red from config
+        $this->parser->setTemplate('admin/default');
+    }
+
+    protected function render($templateName, $args = array()) {
 
         $args = array('lang' => 'fr');
 
-        return $parser->render($templateName, $args);
+        return $this->parser->render($templateName, $args);
     }
 
     public function indexAction()

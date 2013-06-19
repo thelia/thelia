@@ -36,15 +36,9 @@
         	<argument type="service" id="service_container"/>
         </service>
 
-        <service id="thelia.parser" class="Thelia\Core\Template\SmartyParser">
-            <argument type="service" id="service_container"/>
-            <call method="setLoopList">
-                <argument>%tpex.loop%</argument>
-            </call>
-        </service>
-
-        <service id="thelia.admin.parser" class="Thelia\Admin\Template\AdminSmartyParser">
-            <argument type="service" id="service_container"/>
+        <service id="thelia.parser" class="Thelia\Core\Template\SmartyParser" scope="request">
+            <argument type="service" id="request" />
+            <argument type="service" id="event_dispatcher"/>
             <call method="setLoopList">
                 <argument>%tpex.loop%</argument>
             </call>

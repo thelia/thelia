@@ -20,8 +20,8 @@
 
         <service id="controller.default" class="Thelia\Controller\DefaultController"/>
 
-        <service id="thelia.admin.base_controller" class="Thelia\Admin\Controller\BaseAdminController">
-       		<argument type="service" id="service_container"/>
+        <service id="thelia.admin.base_controller" class="Thelia\Admin\Controller\BaseAdminController" scope="request">
+       		<argument type="service" id="thelia.parser"/>
         </service>
 
         <service id="matcher.default" class="Thelia\Routing\Matcher\DefaultMatcher">

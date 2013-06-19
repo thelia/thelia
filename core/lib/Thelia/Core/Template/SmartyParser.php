@@ -2,7 +2,8 @@
 
 namespace Thelia\Core\Template;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use \Symfony\Component\HttpFoundation\Request;
+use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use \Smarty;
 
@@ -19,9 +20,9 @@ class SmartyParser extends Smarty implements ParserInterface {
 
     public $plugins = array();
 
-    protected $container;
+    protected $request, $dispatcher;
 
-    protected $template = "smarty-sample";
+    protected $template = "";
 
     protected $status = 200;
 
@@ -30,13 +31,15 @@ class SmartyParser extends Smarty implements ParserInterface {
     protected $asset_manager = null; // Lazy loading
 
     /**
-     * @var Symfony\Component\DependencyInjection\ContainerInterface
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      */
-    public function __construct(ContainerInterface $container, $template = false)
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false)
     {
         parent::__construct();
 
-        $this->container = $container;
+        $this->request = $request;
+        $this->dispatcher = $dispatcher;
 
         // Configure basic Smarty parameters
 
@@ -46,9 +49,7 @@ class SmartyParser extends Smarty implements ParserInterface {
         $cache_dir = THELIA_ROOT . 'cache/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
-        if ($template != false) $this->template = $template;
-
-        $this->setTemplateDir(THELIA_TEMPLATE_DIR.$this->template);
+        $this->setTemplate($template != false ? $template : 'smarty-sample');
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
@@ -69,6 +70,31 @@ class SmartyParser extends Smarty implements ParserInterface {
 
         // Register Thelia modules inclusion function 'thelia_module'
         $this->registerPlugin('function', 'thelia_module', array($this, 'theliaModule'));
+    }
+
+    public function setTemplate($template_path_from_template_base) {
+
+        $this->template = $template_path_from_template_base;
+
+        $this->setTemplateDir(THELIA_TEMPLATE_DIR.$this->template);
+    }
+
+    public function getTemplate() {
+    	return $this->template;
+    }
+
+    /**
+     * Return a rendered template file
+     *
+     * @param string $realTemplateName the template name (from the template directory)
+     * @param array $parameters an associative array of names / value pairs
+     * @return string the rendered template text
+     */
+    public function render($realTemplateName, array $parameters) {
+
+    	$this->assign($parameters);
+
+    	return $this->fetch($realTemplateName);
     }
 
     /**
@@ -405,16 +431,14 @@ class SmartyParser extends Smarty implements ParserInterface {
         }
 
         return $class->newInstance(
-            $this->container->get('request'),
-            $this->container->get('event_dispatcher')
+            $this->request,
+            $this->dispatcher
         );
     }
 
     protected function getTemplateFilePath()
     {
-        $request = $this->container->get('request');
-
-    	$file = $request->attributes->get('_view');
+     	$file = $this->request->attributes->get('_view');
 
     	$fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file . ".html";
 
