@@ -67,7 +67,9 @@ class ViewListener implements EventSubscriberInterface
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
+
         $parser = $this->container->get('thelia.parser');
+
         try {
             $content = $parser->getContent();
 

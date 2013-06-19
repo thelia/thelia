@@ -8,14 +8,16 @@ use \Smarty;
 
 use Thelia\Core\Template\ParserInterface;
 use Thelia\Core\Template\Loop\Category;
-use Thelia\Tpex\Element\Loop\BaseLoop;
-use Thelia\Core\Template\Assets\SmartyAssetsManager;
+
+use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 
 /**
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class SmartyParser extends Smarty implements ParserInterface {
+
+    public $plugins = array();
 
     protected $container;
 
@@ -67,11 +69,6 @@ class SmartyParser extends Smarty implements ParserInterface {
 
         // Register Thelia modules inclusion function 'thelia_module'
         $this->registerPlugin('function', 'thelia_module', array($this, 'theliaModule'));
-
-        // Register asset management block plugins
-        $this->registerPlugin('block', 'stylesheets', array($this, 'theliaBlockStylesheets'));
-        $this->registerPlugin('block', 'javascripts', array($this, 'theliaBlockJavascripts'));
-        $this->registerPlugin('block', 'images'     , array($this, 'theliaBlockImages'));
     }
 
     /**
@@ -205,22 +202,6 @@ class SmartyParser extends Smarty implements ParserInterface {
         return "";
     }
 
-
-	public function theliaBlockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)
-	{
-	    return $this->getAssetManager()->processSmartyPluginCall('js', $params, $content, $template, $repeat);
-	}
-
-	public function theliaBlockImages($params, $content, \Smarty_Internal_Template $template, &$repeat)
-	{
-	    return $this->getAssetManager()->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
-	}
-
-	public function theliaBlockStylesheets($params, $content, \Smarty_Internal_Template $template, &$repeat)
-	{
-	    return $this->getAssetManager()->processSmartyPluginCall('css', $params, $content, $template, $repeat);
-	}
-
 	/**
 	 *
 	 * This method must return a Symfony\Component\HttpFoudation\Response instance or the content of the response
@@ -228,6 +209,8 @@ class SmartyParser extends Smarty implements ParserInterface {
 	 */
 	public function getContent()
 	{
+	    $this->registerPlugins();
+
 		return $this->fetch($this->getTemplateFilePath());
 	}
 
@@ -316,6 +299,34 @@ class SmartyParser extends Smarty implements ParserInterface {
     	}
     }
 
+    public function addPlugins(SmartyPluginInterface $plugin)
+    {
+    	$this->plugins[] = $plugin;
+    }
+
+    public function registerPlugins()
+    {
+    	foreach ($this->plugins as $register_plugin) {
+    		$plugins = $register_plugin->registerPlugins();
+
+    		if(!is_array($plugins)) {
+    			$plugins = array($plugins);
+    		}
+
+    		foreach ($plugins as $plugin) {
+    			$this->registerPlugin(
+    					$plugin->type,
+    					$plugin->name,
+    					array(
+    							$plugin->class,
+    							$plugin->method
+    					)
+    			);
+    		}
+    	}
+    }
+
+
     /**
      * Returns the value of a loop argument.
      *
@@ -323,7 +334,7 @@ class SmartyParser extends Smarty implements ParserInterface {
      * @param unknown $smartyParam
      * @throws \InvalidArgumentException
      */
-    protected function getLoopArgument(BaseLoop $loop, $smartyParam)
+    protected function getLoopArgument($loop, $smartyParam)
     {
     	$defaultItemsParams = array('required' => true);
 

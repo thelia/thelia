@@ -50,6 +50,10 @@
             </call>
         </service>
 
+        <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
+            <tag name="smarty.register_plugin"/>
+        </service>
+
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
