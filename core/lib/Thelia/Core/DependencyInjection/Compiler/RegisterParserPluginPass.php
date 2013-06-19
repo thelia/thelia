@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,27 +17,45 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\Template;
+
+namespace Thelia\Core\DependencyInjection\Compiler;
+
+
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
 
 /**
+ * Register parser plugins. These plugins shouild be tagged thelia.parser.register_plugin
+ * in the configuration.
  *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Franck Allimant <franck@cqfdev.fr>
  *
  */
+class RegisterParserPluginPass implements CompilerPassInterface {
 
-interface ParserInterface
-{
     /**
+     * You can modify the container here before it is dumped to PHP code.
      *
+     * @param ContainerBuilder $container
+     *
+     * @api
      */
-    public function getContent();
+    public function process(ContainerBuilder $container)
+    {
+        if (!$container->hasDefinition("thelia.parser")) {
+            return;
+        }
 
-    public function setContent($content);
+        $smarty = $container->getDefinition("thelia.parser");
 
-    public function getStatus();
+        foreach ($container->findTaggedServiceIds("thelia.parser.register_plugin") as $id => $plugin) {
+            $smarty->addMethodCall("addPlugins", array(new Reference($id)));
+        }
 
-    public function setStatus($status);
+        $smarty->addMethodCall("registerPlugins");
+    }
 }
