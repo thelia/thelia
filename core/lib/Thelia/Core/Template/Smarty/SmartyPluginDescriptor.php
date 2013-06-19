@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,27 +17,71 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\Template;
 
-/**
- *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- *
- */
+namespace Thelia\Core\Template\Smarty;
 
-interface ParserInterface
-{
+class SmartyPluginDescriptor {
+
     /**
-     *
+     * @var string Smarty plugin type (block, function, etc.)
      */
-    public function getContent();
+    protected $type;
 
-    public function setContent($content);
+    /**
+     * @var string Smarty plugin name. This name will be used in Smarty templates.
+     */
+    protected $name;
 
-    public function getStatus();
+    /**
+     * @var SmartyPluginInterface plugin implmentation class
+     */
+    protected $class;
 
-    public function setStatus($status);
+    /**
+     * @var string plugin implmentation method in $class
+     */
+    protected $method;
+
+    public function __construct($type, $name, $class, $method)
+    {
+        $this->type = $type;
+        $this->name = $name;
+        $this->class = $class;
+        $this->method = $method;
+    }
+
+    public function setType($type) {
+    	$this->type = $type;
+    }
+
+    public function getType() {
+        return $this->type;
+    }
+
+    public function setName($name) {
+    	$this->name = $name;
+    }
+
+    public function getName() {
+        return $this->name;
+    }
+
+    public function setClass($class) {
+    	$this->class = $class;
+    }
+
+    public function getClass() {
+        return $this->class;
+    }
+
+    public function setMethod($method) {
+    	$this->method = $method;
+    }
+
+    public function getMethod() {
+        return $this->method;
+    }
 }

@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
@@ -32,14 +32,12 @@ use Assetic\AssetWriter;
 use Assetic\Asset\AssetCache;
 use Assetic\Cache\FilesystemCache;
 
-class AsseticManager {
-
-    protected $options;
-
-    public function __construct($_options = array()) {
-
-        $this->options = $_options;
-    }
+/**
+ * This class is a simple helper for generating assets using Assetic.
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class AsseticHelper {
 
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
@@ -50,7 +48,7 @@ class AsseticManager {
      * @param unknown $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
      * @param unknown $filters a list of filters, as defined below (see switch($filter_name) ...)
      * @param unknown $debug true / false
-     * @throws \Exception
+     * @throws \InvalidArgumentException if an invalid filter name is found
      * @return string The URL to the generated asset file.
      */
     public function asseticize($asset_path, $output_path, $output_url, $asset_type, $filters, $debug) {
@@ -90,7 +88,7 @@ class AsseticManager {
                         break;
 
                     default :
-                        throw new \Exception("Unsupported Assetic filter: '$filter_name'");
+                        throw new \InvalidArgumentException("Unsupported Assetic filter: '$filter_name'");
                         break;
                 }
             }

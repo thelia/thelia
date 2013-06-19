@@ -17,13 +17,13 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Assets;
+namespace Thelia\Core\Template\Smarty\Assets;
 
-use Thelia\Core\Template\Assets\AsseticManager;
+use Thelia\Core\Template\Assets\AsseticHelper;
 
 class SmartyAssetsManager {
 
@@ -35,6 +35,7 @@ class SmartyAssetsManager {
     private $path_relative_to_web_root;
 
     /**
+     * Creates a new SmartyAssetsManager instance
      *
      * @param string $web_root                     the disk path to the web root
      * @param string $path_relative_to_web_root    the path (relative to web root) where the assets will be generated
@@ -44,7 +45,7 @@ class SmartyAssetsManager {
         $this->web_root = $web_root;
         $this->path_relative_to_web_root = $path_relative_to_web_root;
 
-        $this->assetic_manager = new AsseticManager();
+        $this->assetic_manager = new AsseticHelper();
     }
 
     public function processSmartyPluginCall($assetType, $params, $content, \Smarty_Internal_Template $template, &$repeat) {
