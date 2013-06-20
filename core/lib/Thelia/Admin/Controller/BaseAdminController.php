@@ -22,10 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Admin\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Admin\Templating\Template;
-use Thelia\Core\Template\SmartyParser;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\DependencyInjection\ContainerAware;
 

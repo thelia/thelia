@@ -30,6 +30,7 @@ class SmartyParser extends Smarty implements ParserInterface {
     /**
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param bool $template
      */
     public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false)
     {
