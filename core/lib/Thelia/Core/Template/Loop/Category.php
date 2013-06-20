@@ -25,9 +25,9 @@
 namespace Thelia\Core\Template\Loop;
 
 
-use Thelia\Tpex\Element\Loop\BaseLoop;
-use Thelia\Tpex\Element\Loop\LoopResult;
-use Thelia\Tpex\Element\Loop\LoopResultRow;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Model\CategoryQuery;
 
 /**
@@ -94,7 +94,7 @@ class Category extends BaseLoop {
     /**
      *
      *
-     * @return \Thelia\Tpex\Element\Loop\LoopResult
+     * @return \Thelia\Core\Template\Element\LoopResult
      */
     public function exec()
     {

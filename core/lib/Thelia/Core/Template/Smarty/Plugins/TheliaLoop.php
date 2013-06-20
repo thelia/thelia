@@ -26,6 +26,9 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
+use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
+use Thelia\Core\Template\Element\Exception\InvalidElementException;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
@@ -167,7 +170,7 @@ class TheliaLoop implements SmartyPluginInterface {
      * find the loop class with his name and construct an instance of this class
      *
      * @param  string $name
-     * @return \Thelia\Tpex\Element\Loop\BaseLoop
+     * @return \Thelia\Core\Template\Element\BaseLoop
      * @throws \Thelia\Tpex\Exception\InvalidElementException
      * @throws \Thelia\Tpex\Exception\ElementNotFoundException
      */
@@ -180,8 +183,8 @@ class TheliaLoop implements SmartyPluginInterface {
 
     	$class = new \ReflectionClass($this->loopDefinition[$name]);
 
-    	if ($class->isSubclassOf("Thelia\Tpex\Element\Loop\BaseLoop") === false) {
-    		throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Tpex\Element\Loop\BaseLoop",
+    	if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
+    		throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Core\Template\Element\BaseLoop",
     				$name));
     	}
 
