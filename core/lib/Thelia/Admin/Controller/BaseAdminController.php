@@ -35,33 +35,50 @@ use Symfony\Component\DependencyInjection\ContainerAware;
  * user is not yet logged in, or back-office home page if the user is logged in.
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class BaseAdminController
+class BaseAdminController extends ContainerAware
 {
-    protected $parser;
 
-    public function __construct($parser) {
-
-        $this->parser = $parser;
-
-        // FIXME: should be read from config
-        $this->parser->setTemplate('admin/default');
-    }
-
-    protected function render($templateName, $args = array()) {
-
+    /**
+     * @param $templateName
+     * @param array $args
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function render($templateName, $args = array())
+    {
         $args = array('lang' => 'fr');
 
-        return $this->parser->render($templateName, $args);
+        $response = new Response();
+
+        return $response->setContent($this->renderRaw($templateName, $args));
     }
 
-    public function indexAction()
+    public function renderRaw($templateName, $args = array())
     {
-        $resp = new Response();
+        $args = array('lang' => 'fr');
 
-        $resp->setContent($this->render('login.html'));
+        return $this->getParser()->render($templateName, $args);
+    }
 
-        return $resp;
-   }
+    /**
+     * @return \Symfony\Component\HttpFoundation\Request
+     */
+    public function getRequest()
+    {
+        return $this->container->get('request');
+    }
+
+    public function getParser()
+    {
+        $parser = $this->container->get("thelia.parser");
+
+        // FIXME: should be read from config
+        $parser->setTemplate('admin/default');
+
+        return $parser;
+    }
+
+
 }
