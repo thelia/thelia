@@ -31,6 +31,7 @@ class SmartyParser extends Smarty implements ParserInterface {
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      * @param bool $template
+     * @param string $env Environment define for the kernel application. Used for the cache directory
      */
     public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod")
     {
@@ -165,6 +166,6 @@ class SmartyParser extends Smarty implements ParserInterface {
 
     	if (file_exists($fileName)) return $fileName;
 
-    	throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+    	throw new \RuntimeException(sprintf("%s file not found in %s template", $file, $this->template));
     }
 }
