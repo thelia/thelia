@@ -33,7 +33,7 @@ class SmartyParser extends Smarty implements ParserInterface {
      * @param bool $template
      * @param string $env Environment define for the kernel application. Used for the cache directory
      */
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod")
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod", $debug = false)
     {
         parent::__construct();
 
@@ -52,6 +52,8 @@ class SmartyParser extends Smarty implements ParserInterface {
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
+
+        $this->debugging = $debug;
 
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
