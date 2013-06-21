@@ -12,6 +12,7 @@ use Thelia\Core\Template\Loop\Category;
 
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 /**
  *
@@ -168,6 +169,6 @@ class SmartyParser extends Smarty implements ParserInterface {
 
     	if (file_exists($fileName)) return $fileName;
 
-    	throw new \RuntimeException(sprintf("%s file not found in %s template", $file, $this->template));
+    	throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
     }
 }
