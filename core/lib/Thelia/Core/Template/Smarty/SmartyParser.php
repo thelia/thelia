@@ -32,7 +32,7 @@ class SmartyParser extends Smarty implements ParserInterface {
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      * @param bool $template
      */
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false)
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod")
     {
         parent::__construct();
 
@@ -41,13 +41,13 @@ class SmartyParser extends Smarty implements ParserInterface {
 
         // Configure basic Smarty parameters
 
-        $compile_dir = THELIA_ROOT . 'cache/smarty/compile';
+        $compile_dir = THELIA_ROOT . 'cache/'. $env .'/smarty/compile';
         if (! is_dir($compile_dir)) @mkdir($compile_dir, 0777, true);
 
-        $cache_dir = THELIA_ROOT . 'cache/smarty/cache';
+        $cache_dir = THELIA_ROOT . 'cache/'. $env .'/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
-        $this->setTemplate($template != false ? $template : 'smarty-sample');
+        $this->setTemplate($template ?: 'smarty-sample');
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
