@@ -28,6 +28,7 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 
 /**
@@ -101,7 +102,7 @@ class Category extends BaseLoop {
         $search = CategoryQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById($this->id, \Criteria::IN);
+            $search->filterById(explode(',', $this->id), \Criteria::IN);
         }
 
         if(!is_null($this->parent)) {
@@ -110,7 +111,7 @@ class Category extends BaseLoop {
 
         if($this->current == 1) {
             $search->filterById($this->request->get("category_id"));
-        } else if ($this->current == 0) {
+        } else if (null !== $this->current && $this->current == 0) {
             $search->filterById($this->request->get("category_id"), \Criteria::NOT_IN);
         }
 
