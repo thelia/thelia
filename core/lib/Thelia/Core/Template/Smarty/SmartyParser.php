@@ -62,6 +62,13 @@ class SmartyParser extends Smarty implements ParserInterface {
 
         // The default HTTP status
         $this->status = 200;
+
+        $this->registerFilter("pre", array($this, 'prefunc'));
+    }
+
+    public function prefunc($tpl_source, \Smarty_Internal_Template $template)
+    {
+        exit($tpl_source);
     }
 
     public function setTemplate($template_path_from_template_base) {
