@@ -8,10 +8,8 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use \Smarty;
 
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\Loop\Category;
 
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
-use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 /**
@@ -62,7 +60,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
         // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
-        if($debug == false) {
+        if($debug === false) {
             $this->caching        = Smarty::CACHING_LIFETIME_CURRENT;
             $this->cache_lifetime = 300;
             $this->compile_check  = true;
