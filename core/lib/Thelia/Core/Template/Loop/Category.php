@@ -26,7 +26,14 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Log\Tlog;
+
 use Thelia\Model\CategoryQuery;
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
 
 /**
  *
@@ -74,18 +81,83 @@ class Category extends BaseLoop
 
     public function defineArgs()
     {
-        return array(
-            "id" => "optional",
-            "parent" => "optional",
-            "current" => "optional",
-            "not_empty" => 0,
-            "visible" => 1,
-            "link" => "optional",
-            "order" => "optional",
-            "random" => 0,
-            "exclude" => "optional",
-            "limit" => 10,
-            "offset" => 0,
+        return new ArgumentCollection(
+            new Argument(
+                'id',
+                new TypeCollection(
+                    new Type\AnyType()
+                )
+            ),
+            new Argument(
+                'parent',
+                new TypeCollection(
+                    new Type\AnyType()
+                )
+            ),
+            new Argument(
+                'current',
+                new TypeCollection(
+                    new Type\AnyType()
+                )
+            ),
+            new Argument(
+                'not_empty',
+                new TypeCollection(
+                    new Type\AnyType()
+                ),
+                false,
+                0
+            ),
+            new Argument(
+                'visible',
+                new TypeCollection(
+                    new Type\AnyType()
+                ),
+                false,
+                1
+            ),
+            new Argument(
+                'link',
+                new TypeCollection(
+                    new Type\AnyType()
+                )
+            ),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\AnyType()
+                )
+            ),
+            new Argument(
+                'random',
+                new TypeCollection(
+                    new Type\AnyType()
+                ),
+                false,
+                0
+            ),
+            new Argument(
+                'exclude',
+                new TypeCollection(
+                    new Type\AnyType()
+                )
+            ),
+            new Argument(
+                'limit',
+                new TypeCollection(
+                    new Type\AnyType()
+                ),
+                false,
+                10
+            ),
+            new Argument(
+                'offset',
+                new TypeCollection(
+                    new Type\AnyType()
+                ),
+                false,
+                0
+            )
         );
     }
 
