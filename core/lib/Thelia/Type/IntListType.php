@@ -28,15 +28,20 @@ namespace Thelia\Type;
  *
  */
 
-class AnyType implements TypeInterface
+class IntListType implements TypeInterface
 {
     public function getType()
     {
-        return 'Any type';
+        return 'Int list type';
     }
 
-    public function isValid($value)
+    public function isValid($values)
     {
+        foreach(explode(',', $values) as $value) {
+            if(filter_var($value, FILTER_VALIDATE_INT) === false)
+                return false;
+        }
+
         return true;
     }
 }

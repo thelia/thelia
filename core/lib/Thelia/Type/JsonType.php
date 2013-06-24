@@ -28,15 +28,16 @@ namespace Thelia\Type;
  *
  */
 
-class AnyType implements TypeInterface
+class JsonType implements TypeInterface
 {
     public function getType()
     {
-        return 'Any type';
+        return 'Json type';
     }
 
     public function isValid($value)
     {
-        return true;
+        json_decode($value);
+        return (json_last_error() == JSON_ERROR_NONE);
     }
 }

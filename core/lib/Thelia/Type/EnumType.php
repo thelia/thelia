@@ -28,15 +28,23 @@ namespace Thelia\Type;
  *
  */
 
-class AnyType implements TypeInterface
+class EnumType implements TypeInterface
 {
+    protected $values = array();
+
+    public function __construct($values = array())
+    {
+        if(is_array($values))
+            $this->values = $values;
+    }
+
     public function getType()
     {
-        return 'Any type';
+        return 'Enum type';
     }
 
     public function isValid($value)
     {
-        return true;
+        return in_array($value, $this->values);
     }
 }

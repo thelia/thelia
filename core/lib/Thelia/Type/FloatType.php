@@ -28,15 +28,15 @@ namespace Thelia\Type;
  *
  */
 
-class AnyType implements TypeInterface
+class FloatType implements TypeInterface
 {
     public function getType()
     {
-        return 'Any type';
+        return 'Float type';
     }
 
     public function isValid($value)
     {
-        return true;
+        return filter_var($value, FILTER_VALIDATE_FLOAT) === false ? false : true;
     }
 }

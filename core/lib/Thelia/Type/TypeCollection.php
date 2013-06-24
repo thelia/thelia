@@ -65,7 +65,7 @@ class TypeCollection implements \Iterator
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
      * @link http://php.net/manual/en/iterator.current.php
-     * @return \Thelia\Core\Template\Element\LoopResultRow
+     * @return \Thelia\Type\TypeInterface
      */
     public function current()
     {
@@ -80,7 +80,7 @@ class TypeCollection implements \Iterator
      */
     public function next()
     {
-        ++$this->types;
+        $this->position++;
     }
 
     /**
@@ -91,7 +91,7 @@ class TypeCollection implements \Iterator
      */
     public function key()
     {
-        return $this->types;
+        return $this->position;
     }
 
     /**
@@ -115,5 +115,26 @@ class TypeCollection implements \Iterator
     public function rewind()
     {
         $this->position = 0;
+    }
+
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public function isValid($value)
+    {
+        $this->rewind();
+        while ($this->valid()) {
+            $type = $this->current();
+
+            if($type->isValid($value)) {
+                return true;
+            }
+
+            $this->next();
+        }
+
+        return false;
     }
 }

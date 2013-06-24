@@ -91,4 +91,11 @@ An image from asset directory :
     {/for}
 </div>
 
+<div>
+    <p>Loops also work with #</p>
+    {loop type="category" name="catloop1"}
+        #TITLE : {#DESCRIPTION|upper} #NOTATAG<br />
+    {/loop}
+</div>
+
 {include file="includes/footer.html"}
