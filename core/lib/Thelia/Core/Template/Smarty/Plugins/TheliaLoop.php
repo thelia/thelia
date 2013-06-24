@@ -237,7 +237,15 @@ class TheliaLoop implements SmartyPluginInterface {
                 continue;
             }
 
-            /* check default */
+            /* check type */
+            if($value !== null && !$argument->type->isValid($value)) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('Invalid value for "%s" argument', $argument->name);
+                continue;
+            }
+
+            /* set default */
+            /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
             if($value === null) {
                 $value = $argument->default;
             }
