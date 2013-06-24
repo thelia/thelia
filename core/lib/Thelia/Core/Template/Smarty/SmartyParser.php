@@ -12,6 +12,7 @@ use Thelia\Core\Template\Loop\Category;
 
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 /**
  *
@@ -31,8 +32,9 @@ class SmartyParser extends Smarty implements ParserInterface {
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      * @param bool $template
+     * @param string $env Environment define for the kernel application. Used for the cache directory
      */
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod")
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod", $debug = false)
     {
         parent::__construct();
 
@@ -52,23 +54,33 @@ class SmartyParser extends Smarty implements ParserInterface {
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
 
+        $this->debugging = $debug;
+
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
-        // Activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
-        $this->caching        = 1;
-        $this->cache_lifetime = 300;
-        $this->compile_check  = true;
+        // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
+        if($debug == false) {
+            $this->caching        = Smarty::CACHING_LIFETIME_CURRENT;
+            $this->cache_lifetime = 300;
+            $this->compile_check  = true;
+        } else {
+            $this->caching       = Smarty::CACHING_OFF;
+        }
 
         // The default HTTP status
         $this->status = 200;
 
-        $this->registerFilter("pre", array($this, 'prefunc'));
+        $this->registerFilter('pre', array($this, "pretest"));
     }
 
-    public function prefunc($tpl_source, \Smarty_Internal_Template $template)
+    public function pretest($tpl_source, \Smarty_Internal_Template $template)
     {
-        exit($tpl_source);
+        echo 1;
+
+        return $tpl_source;
+
+        //return $tpl_source;
     }
 
     public function setTemplate($template_path_from_template_base) {
