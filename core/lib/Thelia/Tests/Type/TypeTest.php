@@ -20,23 +20,63 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Tests\Type;
+
+use Thelia\Type;
+use Thelia\Type\TypeCollection;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-
-class AnyType implements TypeInterface
+class TypeTest extends \PHPUnit_Framework_TestCase
 {
-    public function getType()
+    function testTypeCollectionConstruction()
     {
-        return 'Any type';
+        $collection = new TypeCollection(
+            new Type\AnyType(),
+            new Type\AnyType()
+        );
+
+        $collection->addType(
+            new Type\AnyType()
+        );
+
+        $this->assertAttributeEquals(
+            array(
+                new Type\AnyType(),
+                new Type\AnyType(),
+                new Type\AnyType(),
+            ),
+            'types',
+            $collection
+        );
     }
 
-    public function isValid($value)
+    function testTypeCollectionFetch()
     {
-        return true;
+        $collection = new TypeCollection(
+            new Type\AnyType(),
+            new Type\AnyType(),
+            new Type\AnyType()
+        );
+
+
+        $types = \PHPUnit_Framework_Assert::readAttribute($collection, 'types');
+
+        $collection->rewind();
+        while ($collection->valid()) {
+
+            $type = $collection->current();
+
+            $this->assertEquals(
+                $type,
+                $types[$collection->key()]
+            );
+
+            $collection->next();
+        }
     }
 }

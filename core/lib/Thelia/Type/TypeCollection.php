@@ -80,7 +80,7 @@ class TypeCollection implements \Iterator
      */
     public function next()
     {
-        ++$this->types;
+        $this->position++;
     }
 
     /**
@@ -91,7 +91,7 @@ class TypeCollection implements \Iterator
      */
     public function key()
     {
-        return $this->types;
+        return $this->position;
     }
 
     /**
