@@ -137,7 +137,7 @@ class XmlFileLoader extends FileLoader
         }
 
         foreach ($forms as $form) {
-            $formConfig[$form->getAttributeAsPhp('name')] = $formConfig->getAttributeAsPhp('class');
+            $formConfig[$form->getAttributeAsPhp('name')] = $form->getAttributeAsPhp('class');
         }
 
         $this->container->setParameter('Thelia.parser.forms', $formConfig);

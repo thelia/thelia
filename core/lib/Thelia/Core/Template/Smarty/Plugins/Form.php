@@ -22,6 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Thelia\Form\BaseForm;
+use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
@@ -30,11 +32,13 @@ class Form implements SmartyPluginInterface
 {
 
     protected $request;
+    protected $form;
     protected $formDefinition = array();
 
     public function __construct(Request $request)
     {
         $this->request = $request;
+
     }
 
     public function setFormDefinition($formDefinition)
@@ -51,7 +55,29 @@ class Form implements SmartyPluginInterface
 
     public function generateForm($params, $content, $template, &$repeat)
     {
+        if (empty($params['name'])) {
+            throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
+        }
 
+        $form = new BaseForm($this->request);
+        $formBuilder = $form->getFormBuilder()->createBuilder();
+
+        $instance = $this->getInstance($params['name']);
+        $instance = $instance->buildForm($formBuilder, array());
+
+        var_dump($instance->getForm()->createView()); exit;
+        $template->assign("form", $instance->getForm()->createView());
+
+    }
+
+    public function getInstance($name)
+    {
+        if (!isset($this->formDefinition[$name])) {
+            throw new ElementNotFoundException(sprintf("%s form does not exists", $name));
+        }
+
+
+        return new $this->formDefinition[$name];
     }
 
     /**

@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                          */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -22,27 +22,38 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
+use Thelia\Model\ConfigQuery;
 
+class BaseForm {
 
-class CustomerCreation extends AbstractType
-{
+    protected $request;
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function __construct(Request $request)
     {
-        return $builder->add("name", "text")
-            ->add("email", "email")
-            ->add('age', 'integer');
+        $this->request = $request;
     }
 
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName()
+
+    public function getFormBuilder()
     {
-        return "customer creation";
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new HttpFoundationExtension())
+            ->addExtension(
+                new CsrfExtension(
+                    new SessionCsrfProvider(
+                        $this->request->getSession(),
+                        ConfigQuery::read("form.secret", md5(__DIR__))
+                    )
+                )
+            )->getFormFactory();
+
+        return $form;
     }
 }
+
