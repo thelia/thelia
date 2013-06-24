@@ -27,6 +27,7 @@ use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Log\Tlog;
 
 class Form implements SmartyPluginInterface
 {
@@ -53,21 +54,42 @@ class Form implements SmartyPluginInterface
         }
     }
 
-    public function generateForm($params, $content, $template, &$repeat)
+    public function generateForm($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        if (empty($params['name'])) {
-            throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
+        if ($repeat) {
+            if (empty($params['name'])) {
+                throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
+            }
+
+            $form = new BaseForm($this->request);
+            $formBuilder = $form->getFormBuilder()->createBuilder();
+
+            $instance = $this->getInstance($params['name']);
+            $instance = $instance->buildForm($formBuilder, array());
+
+            $template->assign("form", $instance->getForm()->createView());
+        } else {
+            return $content;
         }
+    }
 
-        $form = new BaseForm($this->request);
-        $formBuilder = $form->getFormBuilder()->createBuilder();
+    public function formRender($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    {
+        if ($repeat) {
 
-        $instance = $this->getInstance($params['name']);
-        $instance = $instance->buildForm($formBuilder, array());
+            $form = $params["form"];
 
-        var_dump($instance->getForm()->createView()); exit;
-        $template->assign("form", $instance->getForm()->createView());
+            if (! $form instanceof \Symfony\Component\Form\FormView) {
+                throw new \InvalidArgumentException("form parameter in form_render block must be an instance of
+                Symfony\Component\Form\FormView");
+            }
 
+            $template->assign("name", $form->vars["name"]);
+            $template->assign("value", $form->vars["data"]);
+
+        } else {
+            return $content;
+        }
     }
 
     public function getInstance($name)
@@ -86,7 +108,8 @@ class Form implements SmartyPluginInterface
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor("block", "form", $this, "generateForm")
+            new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
+            new SmartyPluginDescriptor("block", "form_render", $this, "formRender")
         );
     }
 }
