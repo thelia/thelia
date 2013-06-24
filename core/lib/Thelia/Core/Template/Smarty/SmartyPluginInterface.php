@@ -23,6 +23,13 @@
 
 namespace Thelia\Core\Template\Smarty;
 
+/**
+ *
+ * this interface must be implements when you want to add plugin to smarty using config process
+ *
+ * Interface SmartyPluginInterface
+ * @package Thelia\Core\Template\Smarty
+ */
 interface SmartyPluginInterface {
     /**
      * @return an array of SmartyPluginDescriptor

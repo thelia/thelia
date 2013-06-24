@@ -17,8 +17,10 @@ use Thelia\Core\Template\Exception\ResourceNotFoundException;
 /**
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class SmartyParser extends Smarty implements ParserInterface {
+class SmartyParser extends Smarty implements ParserInterface
+{
 
     public $plugins = array();
 
@@ -66,6 +68,7 @@ class SmartyParser extends Smarty implements ParserInterface {
             $this->compile_check  = true;
         } else {
             $this->caching       = Smarty::CACHING_OFF;
+            $this->force_compile = true;
         }
 
         // The default HTTP status
@@ -76,11 +79,10 @@ class SmartyParser extends Smarty implements ParserInterface {
 
     public function pretest($tpl_source, \Smarty_Internal_Template $template)
     {
-        echo 1;
+        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
+        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|default:\'#$1\'}', $new_source);
 
-        return $tpl_source;
-
-        //return $tpl_source;
+        return $new_source;
     }
 
     public function setTemplate($template_path_from_template_base) {

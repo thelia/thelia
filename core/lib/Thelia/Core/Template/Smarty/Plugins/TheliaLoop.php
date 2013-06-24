@@ -91,12 +91,11 @@ class TheliaLoop implements SmartyPluginInterface
     		$loopResultRow = $loopResults->current();
 
     		foreach($loopResultRow->getVarVal() as $var => $val) {
-
     			$template->assign(substr($var, 1), $val);
-
-    			$template->assign('__COUNT__', 1 + $loopResults->key());
-    			$template->assign('__TOTAL__', $loopResults->getCount());
     		}
+
+            $template->assign('__COUNT__', 1 + $loopResults->key());
+            $template->assign('__TOTAL__', $loopResults->getCount());
 
     		$repeat = $loopResults->valid();
     	}
