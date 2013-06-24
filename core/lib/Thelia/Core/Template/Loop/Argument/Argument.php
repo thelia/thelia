@@ -29,12 +29,13 @@ namespace Thelia\Core\Template\Loop\Argument;
  */
 class Argument
 {
-    protected $name;
-    protected $type;
-    protected $mandatory;
-    protected $default;
+    public $name;
+    public $type;
+    public $default;
+    public $mandatory;
+    public $empty;
 
-    public function __construct($name, \Thelia\Type\TypeCollection $type, $mandatory = false, $default = null)
+    public function __construct($name, \Thelia\Type\TypeCollection $type,  $default = null, $mandatory = false, $empty = true)
     {
         $this->name         = $name;
         $this->type         = $type;

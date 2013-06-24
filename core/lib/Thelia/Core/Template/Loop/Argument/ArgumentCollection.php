@@ -65,7 +65,7 @@ class ArgumentCollection implements \Iterator
      * (PHP 5 &gt;= 5.0.0)<br/>
      * Return the current element
      * @link http://php.net/manual/en/iterator.current.php
-     * @return \Thelia\Core\Template\Element\LoopResultRow
+     * @return Argument
      */
     public function current()
     {
@@ -80,7 +80,7 @@ class ArgumentCollection implements \Iterator
      */
     public function next()
     {
-        ++$this->arguments;
+        $this->position++;
     }
 
     /**
@@ -91,7 +91,7 @@ class ArgumentCollection implements \Iterator
      */
     public function key()
     {
-        return $this->arguments;
+        return $this->position;
     }
 
     /**

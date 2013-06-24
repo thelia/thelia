@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
@@ -202,7 +203,7 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $smartyParam
      * @throws \InvalidArgumentException
      */
-    protected function getLoopArgument($loop, $smartyParam)
+    protected function getLoopArgument(BaseLoop $loop, $smartyParam)
     {
     	$defaultItemsParams = array('required' => true);
 
@@ -212,35 +213,37 @@ class TheliaLoop implements SmartyPluginInterface {
     	$faultActor = array();
     	$faultDetails = array();
 
-    	foreach($loop->defineArgs() as $name => $param){
-    		if(is_integer($name)){
-    			$name = $param;
-    			$param = $defaultItemsParams;
-    		}
+        $argumentsCollection = $loop->defineArgs();
+        $argumentsCollection->rewind();
 
-    		if(is_string($param) && array_key_exists($param, $shortcutItemParams)){
-    			$param = $shortcutItemParams[$param];
-    		}
+        while ($argumentsCollection->valid()) {
 
-    		if(!is_array($param)){
-    			$param = array('default' => $param);
-    		}
+            $argument = $argumentsCollection->current();
+            $argumentsCollection->next();
 
-    		$value = isset($smartyParam[$name]) ? $smartyParam[$name] : null;
+            $value = isset($smartyParam[$argument->name]) ? $smartyParam[$argument->name] : null;
 
-    		if($value == null){
-    			if(isset($param['default'])){
-    				$value = $param['default'];
-    			}
-    			else if($param['required'] === true){
-    				$faultActor[] = $name;
-    				$faultDetails[] = sprintf('"%s" parameter is missing', $name);
-    				continue;
-    			}
-    		}
+            /* check if mandatory */
+            if($value === null && $argument->mandatory) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('"%s" parameter is missing', $argument->name);
+                continue;
+            }
 
-    		$loop->{$name} = $value;
-    	}
+            /* check if empty */
+            if($value === '' && !$argument->empty) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('"%s" parameter cannot be empty', $argument->name);
+                continue;
+            }
+
+            /* check default */
+            if($value === null) {
+                $value = $argument->default;
+            }
+
+            $loop->{$argument->name} = $value;
+        }
 
     	if(!empty($faultActor)){
 

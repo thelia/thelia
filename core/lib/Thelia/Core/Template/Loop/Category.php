@@ -105,7 +105,6 @@ class Category extends BaseLoop {
                 new TypeCollection(
                     new Type\AnyType()
                 ),
-                false,
                 0
             ),
             new Argument(
@@ -113,7 +112,6 @@ class Category extends BaseLoop {
                 new TypeCollection(
                     new Type\AnyType()
                 ),
-                false,
                 1
             ),
             new Argument(
@@ -133,7 +131,6 @@ class Category extends BaseLoop {
                 new TypeCollection(
                     new Type\AnyType()
                 ),
-                false,
                 0
             ),
             new Argument(
@@ -147,7 +144,6 @@ class Category extends BaseLoop {
                 new TypeCollection(
                     new Type\AnyType()
                 ),
-                false,
                 10
             ),
             new Argument(
@@ -155,7 +151,6 @@ class Category extends BaseLoop {
                 new TypeCollection(
                     new Type\AnyType()
                 ),
-                false,
                 0
             )
         );
