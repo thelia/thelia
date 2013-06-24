@@ -33,7 +33,8 @@ use Thelia\Core\Template\Element\Exception\InvalidElementException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class TheliaLoop implements SmartyPluginInterface {
+class TheliaLoop implements SmartyPluginInterface
+{
 
     protected $loopDefinition = array();
 
@@ -41,7 +42,8 @@ class TheliaLoop implements SmartyPluginInterface {
 
     protected $dispatcher;
 
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher) {
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher)
+    {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
     }
@@ -56,7 +58,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function theliaLoop($params, $content, $template, &$repeat) {
+    public function theliaLoop($params, $content, $template, &$repeat)
+    {
 
     	if (empty($params['name']))
     		throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
@@ -116,7 +119,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $repeat
      * @return Ambigous <string, unknown>
      */
-    public function theliaElseloop($params, $content, $template, &$repeat) {
+    public function theliaElseloop($params, $content, $template, &$repeat)
+    {
 
     	// When encoutering close tag, check if loop has results.
     	if ($repeat === false) {
@@ -134,7 +138,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $repeat
      * @return Ambigous <string, unknown>
      */
-    public function theliaIfLoop($params, $content, $template, &$repeat) {
+    public function theliaIfLoop($params, $content, $template, &$repeat)
+    {
 
     	// When encountering close tag, check if loop has results.
     	if ($repeat === false) {
@@ -150,7 +155,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $template
      * @throws \InvalidArgumentException
      */
-    protected function checkEmptyLoop($params, $template) {
+    protected function checkEmptyLoop($params, $template)
+    {
     	if (empty($params['rel']))
     		throw new \InvalidArgumentException("Missing 'rel' parameter in ifloop/elseloop arguments");
 
@@ -299,7 +305,7 @@ class TheliaLoop implements SmartyPluginInterface {
         return array(
     		new SmartyPluginDescriptor('block', 'loop'     , $this, 'theliaLoop'),
     		new SmartyPluginDescriptor('block', 'elseloop' , $this, 'theliaElseloop'),
-    		new SmartyPluginDescriptor('block', 'ifloop'   , $this, 'theliaIfLoop')
+    		new SmartyPluginDescriptor('block', 'ifloop'   , $this, 'theliaIfLoop'),
         );
      }
 }
