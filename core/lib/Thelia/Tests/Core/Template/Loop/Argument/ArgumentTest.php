@@ -35,7 +35,7 @@ use Thelia\Type\TypeCollection;
  */
 class ArgumentTest extends \PHPUnit_Framework_TestCase
 {
-    function testArgumentCollectionConstruction()
+    public function testArgumentCollectionConstruction()
     {
         $collection = new ArgumentCollection(
             new Argument(
@@ -87,7 +87,7 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    function testArgumentCollectionFetch()
+    public function testArgumentCollectionFetch()
     {
         $collection = new ArgumentCollection(
             new Argument(

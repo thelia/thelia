@@ -85,32 +85,32 @@ class Category extends BaseLoop {
             new Argument(
                 'id',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntListType()
                 )
             ),
             new Argument(
                 'parent',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntType()
                 )
             ),
             new Argument(
                 'current',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntType()
                 )
             ),
             new Argument(
                 'not_empty',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntType()
                 ),
                 0
             ),
             new Argument(
                 'visible',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntType()
                 ),
                 1
             ),
@@ -123,7 +123,7 @@ class Category extends BaseLoop {
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\EnumType('alpha', 'alpha_reverse', 'reverse')
                 )
             ),
             new Argument(
@@ -136,20 +136,20 @@ class Category extends BaseLoop {
             new Argument(
                 'exclude',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntListType()
                 )
             ),
             new Argument(
                 'limit',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntType()
                 ),
                 10
             ),
             new Argument(
                 'offset',
                 new TypeCollection(
-                    new Type\AnyType()
+                    new Type\IntType()
                 ),
                 0
             )
