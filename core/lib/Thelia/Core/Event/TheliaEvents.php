@@ -24,26 +24,26 @@
 namespace Thelia\Core\Event;
 
 /**
- * 
+ *
  * Class containing all Thelia events name using in Thelia Core
- * 
- * 
+ *
+ *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
 final class TheliaEvents
 {
-    
+
     /**
      * ACTION event
-     * 
+     *
      * Send if no action are already present in Thelia action process ( see Thelia\Routing\Matcher\ActionMatcher)
      */
     const ACTION = "thelia.action";
-    
+
     /**
      * INCLUDE event
-     * 
+     *
      * Send before starting thelia inclusion
      */
     const INCLUSION = "thelia.include";

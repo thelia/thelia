@@ -78,7 +78,7 @@ class ViewListener implements EventSubscriberInterface
             } else {
                 $event->setResponse(new Response($content, $parser->getStatus() ?: 200));
             }
-        } catch(ResourceNotFoundException $e) {
+        } catch (ResourceNotFoundException $e) {
             $event->setResponse(new Response($e->getMessage(), 404));
         }
 

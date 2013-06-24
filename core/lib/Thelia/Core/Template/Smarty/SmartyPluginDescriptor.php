@@ -29,8 +29,8 @@ namespace Thelia\Core\Template\Smarty;
  * Class SmartyPluginDescriptor
  * @package Thelia\Core\Template\Smarty
  */
-class SmartyPluginDescriptor {
-
+class SmartyPluginDescriptor
+{
     /**
      * @var string Smarty plugin type (block, function, etc.)
      */
@@ -59,35 +59,43 @@ class SmartyPluginDescriptor {
         $this->method = $method;
     }
 
-    public function setType($type) {
-    	$this->type = $type;
+    public function setType($type)
+    {
+        $this->type = $type;
     }
 
-    public function getType() {
+    public function getType()
+    {
         return $this->type;
     }
 
-    public function setName($name) {
-    	$this->name = $name;
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setClass($class) {
-    	$this->class = $class;
+    public function setClass($class)
+    {
+        $this->class = $class;
     }
 
-    public function getClass() {
+    public function getClass()
+    {
         return $this->class;
     }
 
-    public function setMethod($method) {
-    	$this->method = $method;
+    public function setMethod($method)
+    {
+        $this->method = $method;
     }
 
-    public function getMethod() {
+    public function getMethod()
+    {
         return $this->method;
     }
 }

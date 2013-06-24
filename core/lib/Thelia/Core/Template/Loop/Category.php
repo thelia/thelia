@@ -21,14 +21,11 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Template\Loop;
-
 
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
-use Thelia\Log\Tlog;
 use Thelia\Model\CategoryQuery;
 
 /**
@@ -61,8 +58,8 @@ use Thelia\Model\CategoryQuery;
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Category extends BaseLoop {
-
+class Category extends BaseLoop
+{
     public $id;
     public $parent;
     public $current;
@@ -105,13 +102,13 @@ class Category extends BaseLoop {
             $search->filterById(explode(',', $this->id), \Criteria::IN);
         }
 
-        if(!is_null($this->parent)) {
+        if (!is_null($this->parent)) {
             $search->filterByParent($this->parent);
         }
 
-        if($this->current == 1) {
+        if ($this->current == 1) {
             $search->filterById($this->request->get("category_id"));
-        } else if (null !== $this->current && $this->current == 0) {
+        } elseif (null !== $this->current && $this->current == 0) {
             $search->filterById($this->request->get("category_id"), \Criteria::NOT_IN);
         }
 
@@ -123,14 +120,13 @@ class Category extends BaseLoop {
             $search->filterByLink($this->link);
         }
 
-        if($this->limit > -1) {
+        if ($this->limit > -1) {
             $search->limit($this->limit);
         }
         $search->filterByVisible($this->visible);
         $search->offset($this->offset);
 
-
-        switch($this->order) {
+        switch ($this->order) {
             case "alpha":
                 $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
                 break;
@@ -145,7 +141,7 @@ class Category extends BaseLoop {
                 break;
         }
 
-        if($this->random == 1) {
+        if ($this->random == 1) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }

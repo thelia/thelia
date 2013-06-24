@@ -22,7 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Exception;
 
-
-class ResourceNotFoundException extends \RuntimeException {
-
+class ResourceNotFoundException extends \RuntimeException
+{
 }

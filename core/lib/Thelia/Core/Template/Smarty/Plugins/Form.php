@@ -20,32 +20,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Core\Template\Smarty\Plugins;
 
-namespace Thelia\Core\Template\TestLoop;
+use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 
-use Thelia\Tpex\Element\TestLoop\BaseTestLoop;
-
-/**
- *
- * TestLoop equal, test if value and variable are equal
- *
- * example :
- *
- * <TEST_equal test="equal" variable="3" value="1">
- *      Result display here if variable and value are equal
- * </TEST_equal>
- *      Result display here if variable and value are not equal
- * <//TEST_equal>
- *
- * Class Equal
- * @package Thelia\Core\Template\TestLoop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class Equal extends BaseTestLoop
+class Form implements SmartyPluginInterface
 {
 
-    public function exec($variable, $value)
+    protected $request;
+    protected $formDefinition = array();
+
+    public function __construct(Request $request)
     {
-        return $variable == $value;
+        $this->request = $request;
+    }
+
+    public function setFormDefinition($formDefinition)
+    {
+        foreach ($formDefinition as $name => $className) {
+            if (array_key_exists($name, $this->formDefinition)) {
+                throw new \InvalidArgumentException(sprintf("%s form name already exists for %s class", $name,
+                    $className));
+            }
+
+            $this->formDefinition[$name] = $className;
+        }
+    }
+
+    public function generateForm($params, $content, $template, &$repeat)
+    {
+
+    }
+
+    /**
+     * @return an array of SmartyPluginDescriptor
+     */
+    public function getPluginDescriptors()
+    {
+        return array(
+            new SmartyPluginDescriptor("block", "form", $this, "generateForm")
+        );
     }
 }

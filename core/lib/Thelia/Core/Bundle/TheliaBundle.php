@@ -24,7 +24,6 @@ namespace Thelia\Core\Bundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Scope;
 
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;

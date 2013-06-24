@@ -24,8 +24,6 @@
 namespace Thelia\Core\Factory;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Event\ActionEventClass;
 
 class ActionEventFactory
 {

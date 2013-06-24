@@ -24,7 +24,6 @@
 namespace Thelia\Core\DependencyInjection\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader as XmlLoader;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -334,7 +333,7 @@ EOF
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param mixed $resource A resource
+     * @param mixed  $resource A resource
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise

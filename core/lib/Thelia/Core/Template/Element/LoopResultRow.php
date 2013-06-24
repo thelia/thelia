@@ -23,9 +23,8 @@
 
 namespace Thelia\Core\Template\Element;
 
-
-class LoopResultRow {
-
+class LoopResultRow
+{
     protected $substitution = array();
 
     public function set($key, $value)
