@@ -12,11 +12,11 @@ An image from asset directory :
 
     {form_field_hidden form=$form}
     {form_field form=$form.email}
-        {intl l='email'} : <input type="text" name="{$name}">
+        {intl l='{$label}'} : <input type="text" name="{$name}" {$attr} >
     {/form_field}
 
     {form_field form=$form.name}
-        {intl l='name'} : <input type="text" name="{$name}">
+        {intl l='name'} : <input type="text" name="{$name}" >
     {/form_field}
     {form_field form=$form.age}
     {intl l='age'} : <input type="text" name="{$name}">

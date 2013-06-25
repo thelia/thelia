@@ -68,6 +68,7 @@ class Form implements SmartyPluginInterface
 
             $instance = $this->getInstance($params['name']);
             $instance = $instance->buildForm($formBuilder, array());
+
             $template->assign("form", $instance->getForm()->createView());
         } else {
             return $content;
@@ -86,8 +87,15 @@ class Form implements SmartyPluginInterface
             }
 
 
+            $template->assign("options", $form->vars);
             $template->assign("name", $form->vars["name"]);
             $template->assign("value", $form->vars["value"]);
+            $template->assign("label", $form->vars["label"]);
+            $attr = array();
+            foreach ($form->vars["attr"] as $key => $value) {
+                $attr[] = sprintf('%s="%s"', $key, $value);
+            }
+            $template->assign("attr", implode(" ", $attr));
 
             $form->setRendered();
 
@@ -110,7 +118,7 @@ class Form implements SmartyPluginInterface
         $return = "";
 
         foreach ($form->getIterator() as $row) {
-            if ($this->isHidden($row)) {
+            if ($this->isHidden($row) && $row->isRendered() === false) {
                 $return .= sprintf($field, $row->vars["name"], $row->vars["value"]);
             }
         }

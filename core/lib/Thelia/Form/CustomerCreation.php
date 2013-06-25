@@ -32,7 +32,13 @@ class CustomerCreation extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         return $builder->add("name", "text")
-            ->add("email", "email")
+            ->add("email", "email", array(
+                    "attr" => array(
+                        "class" => "field"
+                    ),
+                    "label" => "toto"
+                )
+            )
             ->add('age', 'integer');
     }
 
