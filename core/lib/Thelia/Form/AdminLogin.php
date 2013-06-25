@@ -20,37 +20,28 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Admin\Controller;
 
-use Thelia\Form\AdminLogin;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 
-class AdminController extends BaseAdminController {
+class AdminLogin extends AbstractType {
 
-    public function indexAction()
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        return $builder
+            ->add("username", "text")
+            ->add("password", "password");
+    }
 
-        $form = $this->getFormBuilder();
-
-        $adminLogin = new AdminLogin();
-
-        $form = $adminLogin->buildForm($form, array())->getForm();
-
-        $request = $this->getRequest();
-
-        if($request->isMethod("POST")) {
-            $form->bind($request);
-
-            if($form->isValid()) {
-                //TODO
-
-            } else {
-                //TODO
-            }
-        }
-
-        return $this->render("login.html", array(
-            "form" => $form->createView()
-        ));
+    /**
+     * Returns the name of this type.
+     *
+     * @return string The name of this type
+     */
+    public function getName()
+    {
+        return "admin_login";
     }
 }
