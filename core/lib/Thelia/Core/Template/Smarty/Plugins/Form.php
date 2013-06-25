@@ -22,6 +22,7 @@
 /*************************************************************************************/
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Symfony\Component\Form\FormView;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
@@ -57,16 +58,16 @@ class Form implements SmartyPluginInterface
     public function generateForm($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
+
             if (empty($params['name'])) {
                 throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
             }
 
-            $form = new BaseForm($this->request);
-            $formBuilder = $form->getFormBuilder()->createBuilder();
+            $form = BaseForm::getFormFactory($this->request);
+            $formBuilder = $form->createBuilder('form');
 
             $instance = $this->getInstance($params['name']);
             $instance = $instance->buildForm($formBuilder, array());
-
             $template->assign("form", $instance->getForm()->createView());
         } else {
             return $content;
@@ -80,16 +81,45 @@ class Form implements SmartyPluginInterface
             $form = $params["form"];
 
             if (! $form instanceof \Symfony\Component\Form\FormView) {
-                throw new \InvalidArgumentException("form parameter in form_render block must be an instance of
+                throw new \InvalidArgumentException("form parameter in form_field block must be an instance of
                 Symfony\Component\Form\FormView");
             }
 
             $template->assign("name", $form->vars["name"]);
-            $template->assign("value", $form->vars["data"]);
+            $template->assign("value", $form->vars["value"]);
+
+            $form->setRendered();
 
         } else {
             return $content;
         }
+    }
+
+    public function formRenderHidden($params, $template)
+    {
+        $form = $params["form"];
+
+        $field = '<input type="hidden" name="%s" value="%s">';
+
+        if (! $form instanceof \Symfony\Component\Form\FormView) {
+            throw new \InvalidArgumentException("form parameter in form_field_hidden function must be an instance of
+                Symfony\Component\Form\FormView");
+        }
+
+        $return = "";
+
+        foreach ($form->getIterator() as $row) {
+            if ($this->isHidden($row)) {
+                $return .= sprintf($field, $row->vars["name"], $row->vars["value"]);
+            }
+        }
+
+        return $return;
+    }
+
+    protected function isHidden(FormView $formView)
+    {
+        return array_search("hidden", $formView->vars["block_prefixes"]);
     }
 
     public function getInstance($name)
@@ -109,7 +139,8 @@ class Form implements SmartyPluginInterface
     {
         return array(
             new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
-            new SmartyPluginDescriptor("block", "form_render", $this, "formRender")
+            new SmartyPluginDescriptor("block", "form_field", $this, "formRender"),
+            new SmartyPluginDescriptor("function", "form_field_hidden", $this, "formRenderHidden")
         );
     }
 }

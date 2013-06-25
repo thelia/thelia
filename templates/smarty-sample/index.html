@@ -9,17 +9,17 @@ An image from asset directory :
 </div>
 <form method="post" action="index_dev.php" >
 {form name="thelia.customer.creation"}
-    {form_render form=$form._token}
-        <input type="hidden" name="{$name}" value="{$value}">
-    {/form_render}
-
-    {form_render form=$form.email}
+    {form_field_hidden form=$form}
+    {form_field form=$form.email}
         {intl l='email'} : <input type="text" name="{$name}">
-    {/form_render}
+    {/form_field}
 
-    {form_render form=$form.name}
+    {form_field form=$form.name}
         {intl l='name'} : <input type="text" name="{$name}">
-    {/form_render}
+    {/form_field}
+    {form_field form=$form.age}
+    {intl l='age'} : <input type="text" name="{$name}">
+    {/form_field}
 {/form}
 </form>
 <div>

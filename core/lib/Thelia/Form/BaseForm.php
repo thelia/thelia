@@ -32,22 +32,18 @@ use Thelia\Model\ConfigQuery;
 
 class BaseForm {
 
-    protected $request;
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
-
-    public function getFormBuilder()
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\Form\FormFactoryInterface
+     */
+    public static function getFormFactory(Request $request)
     {
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
             ->addExtension(
                 new CsrfExtension(
                     new SessionCsrfProvider(
-                        $this->request->getSession(),
+                        $request->getSession(),
                         ConfigQuery::read("form.secret", md5(__DIR__))
                     )
                 )

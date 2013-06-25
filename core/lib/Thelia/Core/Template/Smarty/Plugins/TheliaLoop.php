@@ -86,9 +86,9 @@ class TheliaLoop implements SmartyPluginInterface
         }
 
         if ($loopResults->valid()) {
+            $loopResultRow = $loopResults->current();
 
-
-    		foreach($loopResultRow->getVarVal() as $var => $val) {
+            foreach($loopResultRow->getVarVal() as $var => $val) {
     			$template->assign(substr($var, 1), $val);
     		}
 

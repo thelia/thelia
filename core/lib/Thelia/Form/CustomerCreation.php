@@ -33,7 +33,8 @@ class CustomerCreation extends AbstractType
     {
         return $builder->add("name", "text")
             ->add("email", "email")
-            ->add('age', 'integer');
+            ->add('age', 'integer')
+            ;
     }
 
     /**
