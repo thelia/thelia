@@ -124,15 +124,10 @@ class TypeCollection implements \Iterator
      */
     public function isValid($value)
     {
-        $this->rewind();
-        while ($this->valid()) {
-            $type = $this->current();
-
+        foreach($this as $type) {
             if($type->isValid($value)) {
                 return true;
             }
-
-            $this->next();
         }
 
         return false;

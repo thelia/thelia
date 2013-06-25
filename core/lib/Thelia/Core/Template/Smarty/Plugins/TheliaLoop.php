@@ -219,12 +219,7 @@ class TheliaLoop implements SmartyPluginInterface
     	$faultDetails = array();
 
         $argumentsCollection = $loop->defineArgs();
-        $argumentsCollection->rewind();
-
-        while ($argumentsCollection->valid()) {
-
-            $argument = $argumentsCollection->current();
-            $argumentsCollection->next();
+        foreach( $argumentsCollection as $argument ) {
 
             $value = isset($smartyParam[$argument->name]) ? $smartyParam[$argument->name] : null;
 
