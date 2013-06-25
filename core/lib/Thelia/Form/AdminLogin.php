@@ -25,13 +25,20 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class AdminLogin extends AbstractType {
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         return $builder
-            ->add("username", "text")
+            ->add("username", "text", array(
+                "constraints" => array(
+                    new NotBlank(),
+                    new Length(array("min" => 3))
+                )
+            ))
             ->add("password", "password");
     }
 

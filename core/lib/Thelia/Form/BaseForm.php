@@ -22,12 +22,14 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
+use Symfony\Component\Validator\Validation;
 use Thelia\Model\ConfigQuery;
 
 class BaseForm {
@@ -38,6 +40,8 @@ class BaseForm {
      */
     public static function getFormFactory(Request $request, $secret = null)
     {
+        $validator = Validation::createValidator();
+
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
             ->addExtension(
@@ -47,7 +51,9 @@ class BaseForm {
                         $secret ?: ConfigQuery::read("form.secret", md5(__DIR__))
                     )
                 )
-            )->getFormFactory();
+            )
+            ->addExtension(new ValidatorExtension($validator))
+            ->getFormFactory();
 
         return $form;
     }
