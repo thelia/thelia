@@ -7,8 +7,9 @@ An image from asset directory :
 <div>
 {intl l='An internationalized string'}
 </div>
-<form method="post" action="index_dev.php" >
 {form name="thelia.customer.creation"}
+<form method="post" action="index_dev.php" {form_enctype form=$form} >
+
     {form_field_hidden form=$form}
     {form_field form=$form.email}
         {intl l='email'} : <input type="text" name="{$name}">
@@ -20,8 +21,8 @@ An image from asset directory :
     {form_field form=$form.age}
     {intl l='age'} : <input type="text" name="{$name}">
     {/form_field}
-{/form}
 </form>
+{/form}
 <div>
 	jQuery data: <span id="jquery_block"></span>
 </div>

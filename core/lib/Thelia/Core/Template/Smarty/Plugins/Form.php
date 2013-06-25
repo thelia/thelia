@@ -85,6 +85,7 @@ class Form implements SmartyPluginInterface
                 Symfony\Component\Form\FormView");
             }
 
+
             $template->assign("name", $form->vars["name"]);
             $template->assign("value", $form->vars["value"]);
 
@@ -95,7 +96,7 @@ class Form implements SmartyPluginInterface
         }
     }
 
-    public function formRenderHidden($params, $template)
+    public function formRenderHidden($params, \Smarty_Internal_Template $template)
     {
         $form = $params["form"];
 
@@ -122,6 +123,20 @@ class Form implements SmartyPluginInterface
         return array_search("hidden", $formView->vars["block_prefixes"]);
     }
 
+    public function formEnctype($params, \Smarty_Internal_Template $template)
+    {
+        $form = $params["form"];
+
+        if (! $form instanceof \Symfony\Component\Form\FormView) {
+            throw new \InvalidArgumentException("form parameter in form_field block must be an instance of
+                Symfony\Component\Form\FormView");
+        }
+
+        if ($form->vars["multipart"]) {
+            return sprintf('%s="%s"',"enctype", "multipart/form-data");
+        }
+    }
+
     public function getInstance($name)
     {
         if (!isset($this->formDefinition[$name])) {
@@ -140,7 +155,8 @@ class Form implements SmartyPluginInterface
         return array(
             new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
             new SmartyPluginDescriptor("block", "form_field", $this, "formRender"),
-            new SmartyPluginDescriptor("function", "form_field_hidden", $this, "formRenderHidden")
+            new SmartyPluginDescriptor("function", "form_field_hidden", $this, "formRenderHidden"),
+            new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype")
         );
     }
 }
