@@ -36,7 +36,7 @@ class BaseForm {
      * @param Request $request
      * @return \Symfony\Component\Form\FormFactoryInterface
      */
-    public static function getFormFactory(Request $request)
+    public static function getFormFactory(Request $request, $secret = null)
     {
         $form = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
@@ -44,7 +44,7 @@ class BaseForm {
                 new CsrfExtension(
                     new SessionCsrfProvider(
                         $request->getSession(),
-                        ConfigQuery::read("form.secret", md5(__DIR__))
+                        $secret ?: ConfigQuery::read("form.secret", md5(__DIR__))
                     )
                 )
             )->getFormFactory();

@@ -88,7 +88,7 @@ class Form implements SmartyPluginInterface
 
 
             $template->assign("options", $form->vars);
-            $template->assign("name", $form->vars["name"]);
+            $template->assign("name", $form->vars["full_name"]);
             $template->assign("value", $form->vars["value"]);
             $template->assign("label", $form->vars["label"]);
             $attr = array();
@@ -119,7 +119,7 @@ class Form implements SmartyPluginInterface
 
         foreach ($form->getIterator() as $row) {
             if ($this->isHidden($row) && $row->isRendered() === false) {
-                $return .= sprintf($field, $row->vars["name"], $row->vars["value"]);
+                $return .= sprintf($field, $row->vars["full_name"], $row->vars["value"]);
             }
         }
 
@@ -136,7 +136,7 @@ class Form implements SmartyPluginInterface
         $form = $params["form"];
 
         if (! $form instanceof \Symfony\Component\Form\FormView) {
-            throw new \InvalidArgumentException("form parameter in form_field block must be an instance of
+            throw new \InvalidArgumentException("form parameter in form_enctype function must be an instance of
                 Symfony\Component\Form\FormView");
         }
 
