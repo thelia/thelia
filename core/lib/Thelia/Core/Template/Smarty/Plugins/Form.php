@@ -145,6 +145,33 @@ class Form implements SmartyPluginInterface
         }
     }
 
+    public function formError($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    {
+
+        $form = $params["form"];
+        if (! $form instanceof \Symfony\Component\Form\FormView) {
+            throw new \InvalidArgumentException("form parameter in form_error block must be an instance of
+                Symfony\Component\Form\FormView");
+        }
+
+        if (empty($form->vars["errors"])) {
+            return "";
+        }
+
+        if ($repeat) {
+
+            $error = $form->vars["errors"];
+
+            $template->assign("message", $error[0]->getMessage());
+            $template->assign("parameters", $error[0]->getMessageParameters());
+            $template->assign("pluralization", $error[0]->getMessagePluralization());
+
+
+        } else {
+            return $content;
+        }
+    }
+
     public function getInstance($name)
     {
         if (!isset($this->formDefinition[$name])) {
@@ -164,7 +191,8 @@ class Form implements SmartyPluginInterface
             new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
             new SmartyPluginDescriptor("block", "form_field", $this, "formRender"),
             new SmartyPluginDescriptor("function", "form_field_hidden", $this, "formRenderHidden"),
-            new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype")
+            new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
+            new SmartyPluginDescriptor("block", "form_error", $this, "formError")
         );
     }
 }

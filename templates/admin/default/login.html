@@ -18,6 +18,9 @@
 			<form action="/admin" method="post" class="well form-inline" {form_enctype form=$form}>
                 {form_field_hidden form=$form}
                 {form_field form=$form.username}
+                    {form_error form=$form.username}
+                        {$message}
+                    {/form_error}
 				    <input type="text" class="input" placeholder="{intl l='E-mail address'}" name="{$name}" />
                 {/form_field}
                 {form_field form=$form.password}

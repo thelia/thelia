@@ -30,11 +30,7 @@ class AdminController extends BaseAdminController {
     public function indexAction()
     {
 
-        $form = $this->getFormBuilder();
-
-        $adminLogin = new AdminLogin();
-
-        $form = $adminLogin->buildForm($form, array())->getForm();
+        $form = $this->getLoginForm();
 
         $request = $this->getRequest();
 
@@ -42,15 +38,21 @@ class AdminController extends BaseAdminController {
             $form->bind($request);
 
             if($form->isValid()) {
-                //TODO
-
-            } else {
-                //TODO
+                echo "valid"; exit;
             }
         }
 
         return $this->render("login.html", array(
             "form" => $form->createView()
         ));
+    }
+
+    protected function getLoginForm()
+    {
+        $form = $this->getFormBuilder();
+
+        $adminLogin = new AdminLogin();
+
+        return $adminLogin->buildForm($form, array())->getForm();
     }
 }
