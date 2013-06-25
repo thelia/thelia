@@ -36,7 +36,7 @@ class CustomerCreation extends AbstractType
                     "attr" => array(
                         "class" => "field"
                     ),
-                    "label" => "toto"
+                    "label" => "email"
                 )
             )
             ->add('age', 'integer');
