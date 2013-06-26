@@ -49,7 +49,7 @@ class SmartyParser extends Smarty implements ParserInterface {
         $cache_dir = THELIA_ROOT . 'cache/'. $env .'/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
-        $this->setTemplate($template ?: 'smarty-sample');
+        $this->setTemplate($template ?: 'smarty-sample'); // FIXME: put this in configuration
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
@@ -59,7 +59,8 @@ class SmartyParser extends Smarty implements ParserInterface {
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
-        // Activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
+        // Activate caching, with a 15mn lifetime, and check template sources modifications.
+        // FIXME: put this in configuration
         $this->caching        = 1;
         $this->cache_lifetime = 300;
         $this->compile_check  = true;
