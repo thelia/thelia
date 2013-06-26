@@ -79,80 +79,23 @@ class Category extends BaseLoop {
     public $limit;
     public $offset;
 
-    public function defineArgs()
+    protected function defineArgs()
     {
         return new ArgumentCollection(
-            new Argument(
-                'id',
-                new TypeCollection(
-                    new Type\IntListType()
-                )
-            ),
-            new Argument(
-                'parent',
-                new TypeCollection(
-                    new Type\IntType()
-                )
-            ),
-            new Argument(
-                'current',
-                new TypeCollection(
-                    new Type\IntType()
-                )
-            ),
-            new Argument(
-                'not_empty',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                0
-            ),
-            new Argument(
-                'visible',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                1
-            ),
-            new Argument(
-                'link',
-                new TypeCollection(
-                    new Type\AnyType()
-                )
-            ),
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntTypeArgument('parent'),
+            Argument::createIntTypeArgument('current'),
+            Argument::createIntTypeArgument('not_empty', 0),
+            Argument::createIntTypeArgument('visible', 1),
+            Argument::createAnyTypeArgument('link'),
             new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumType('alpha', 'alpha_reverse', 'reverse')
                 )
             ),
-            new Argument(
-                'random',
-                new TypeCollection(
-                    new Type\AnyType()
-                ),
-                0
-            ),
-            new Argument(
-                'exclude',
-                new TypeCollection(
-                    new Type\IntListType()
-                )
-            ),
-            new Argument(
-                'limit',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                10
-            ),
-            new Argument(
-                'offset',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                0
-            )
+            Argument::createIntTypeArgument('random', 0),
+            Argument::createIntListTypeArgument('exclude')
         );
     }
 
@@ -187,11 +130,11 @@ class Category extends BaseLoop {
             $search->filterByLink($this->link);
         }
 
-        if($this->limit > -1) {
+        /*if($this->limit > -1) {
             $search->limit($this->limit);
-        }
+        }*/
         $search->filterByVisible($this->visible);
-        $search->offset($this->offset);
+        //$search->offset($this->offset);
 
 
         switch($this->order) {
@@ -221,7 +164,8 @@ class Category extends BaseLoop {
          */
         $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
 
-        $categories = $search->find();
+        //$categories = $search->find();
+        $categories = $search->paginate($page = 2, $maxPerPage = 2);
 
         $loopResult = new LoopResult();
 

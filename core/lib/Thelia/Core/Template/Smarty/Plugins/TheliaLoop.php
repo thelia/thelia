@@ -177,8 +177,8 @@ class TheliaLoop implements SmartyPluginInterface
      *
      * @param  string $name
      * @return \Thelia\Core\Template\Element\BaseLoop
-     * @throws \Thelia\Tpex\Exception\InvalidElementException
-     * @throws \Thelia\Tpex\Exception\ElementNotFoundException
+     * @throws InvalidElementException
+     * @throws ElementNotFoundException
      */
     protected function createLoopInstance($name)
     {
@@ -204,8 +204,8 @@ class TheliaLoop implements SmartyPluginInterface
     /**
      * Returns the value of a loop argument.
      *
-     * @param unknown $loop a BaseLoop instance
-     * @param unknown $smartyParam
+     * @param BaseLoop $loop a BaseLoop instance
+     * @param  $smartyParam
      * @throws \InvalidArgumentException
      */
     protected function getLoopArgument(BaseLoop $loop, $smartyParam)
@@ -218,7 +218,7 @@ class TheliaLoop implements SmartyPluginInterface
     	$faultActor = array();
     	$faultDetails = array();
 
-        $argumentsCollection = $loop->defineArgs();
+        $argumentsCollection = $loop->getArgs();
         foreach( $argumentsCollection as $argument ) {
 
             $value = isset($smartyParam[$argument->name]) ? $smartyParam[$argument->name] : null;
@@ -275,7 +275,7 @@ class TheliaLoop implements SmartyPluginInterface
      *  "myLoop" => "My\Own\Loop"
      * );
      *
-     * @param  array                     $loops
+     * @param  array                     $loopDefinition
      * @throws \InvalidArgumentException if loop name already exists
      */
     public function setLoopList(array $loopDefinition)

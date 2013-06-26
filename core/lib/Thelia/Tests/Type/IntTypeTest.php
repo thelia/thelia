@@ -20,68 +20,23 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\Template\Loop\Argument;
 
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
+namespace Thelia\Tests\Type;
+
+use Thelia\Type\IntType;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class Argument
+class IntTypeTest extends \PHPUnit_Framework_TestCase
 {
-    public $name;
-    public $type;
-    public $default;
-    public $mandatory;
-    public $empty;
-
-    public function __construct($name, \Thelia\Type\TypeCollection $type,  $default = null, $mandatory = false, $empty = true)
+    public function testIntType()
     {
-        $this->name         = $name;
-        $this->type         = $type;
-        $this->mandatory    = $mandatory ? true : false;
-        $this->default      = $default;
-    }
-
-    public static function createAnyTypeArgument($name, $default=null, $mandatory=false, $empty=true)
-    {
-        return new Argument(
-            $name,
-            new TypeCollection(
-                new Type\AnyType()
-            ),
-            $default,
-            $mandatory,
-            $empty
-        );
-    }
-
-    public static function createIntTypeArgument($name, $default=null, $mandatory=false, $empty=true)
-    {
-        return new Argument(
-            $name,
-            new TypeCollection(
-                new Type\IntType()
-            ),
-            $default,
-            $mandatory,
-            $empty
-        );
-    }
-
-    public static function createIntListTypeArgument($name, $default=null, $mandatory=false, $empty=true)
-    {
-        return new Argument(
-            $name,
-            new TypeCollection(
-                new Type\IntListType()
-            ),
-            $default,
-            $mandatory,
-            $empty
-        );
+        $intType = new IntType();
+        $this->assertTrue($intType->isValid('1'));
+        $this->assertTrue($intType->isValid(2));
+        $this->assertFalse($intType->isValid('3.3'));
     }
 }

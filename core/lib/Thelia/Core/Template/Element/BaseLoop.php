@@ -26,6 +26,7 @@ namespace Thelia\Core\Template\Element;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
 
 /**
  *
@@ -44,6 +45,14 @@ abstract class BaseLoop
      */
     public $dispatcher;
 
+    protected function getDefaultArgs()
+    {
+        return array(
+            Argument::createIntTypeArgument('offset'),
+            Argument::createIntTypeArgument('limit'),
+        );
+    }
+
     /**
      * @param \Symfony\Component\HttpFoundation\Request                   $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -52,6 +61,11 @@ abstract class BaseLoop
     {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+    }
+
+    public function getArgs()
+    {
+        return $this->defineArgs()->addArguments($this->getDefaultArgs());
     }
 
     /**
@@ -99,6 +113,6 @@ abstract class BaseLoop
      *
      * @return ArgumentCollection
      */
-    abstract public function defineArgs();
+    abstract protected function defineArgs();
 
 }

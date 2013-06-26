@@ -113,17 +113,11 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
 
         $arguments = \PHPUnit_Framework_Assert::readAttribute($collection, 'arguments');
 
-        $collection->rewind();
-        while ($collection->valid()) {
-
-            $argument = $collection->current();
-
+        foreach($collection as $key => $argument) {
             $this->assertEquals(
                 $argument,
-                $arguments[$collection->key()]
+                $arguments[$key]
             );
-
-            $collection->next();
         }
     }
 }
