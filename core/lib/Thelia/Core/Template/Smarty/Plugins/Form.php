@@ -91,6 +91,7 @@ class Form implements SmartyPluginInterface
             $template->assign("name", $form->vars["full_name"]);
             $template->assign("value", $form->vars["value"]);
             $template->assign("label", $form->vars["label"]);
+            $template->assign("error", empty($form->vars["errors"]) ? false : true);
             $attr = array();
             foreach ($form->vars["attr"] as $key => $value) {
                 $attr[] = sprintf('%s="%s"', $key, $value);
