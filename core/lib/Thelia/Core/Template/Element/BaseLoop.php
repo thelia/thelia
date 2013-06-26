@@ -25,6 +25,7 @@ namespace Thelia\Core\Template\Element;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
 /**
  *
@@ -96,7 +97,7 @@ abstract class BaseLoop
      *          )
      * );
      *
-     * @return array
+     * @return ArgumentCollection
      */
     abstract public function defineArgs();
 

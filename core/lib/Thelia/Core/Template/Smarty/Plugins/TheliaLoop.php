@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
+use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
@@ -32,7 +33,8 @@ use Thelia\Core\Template\Element\Exception\InvalidElementException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-class TheliaLoop implements SmartyPluginInterface {
+class TheliaLoop implements SmartyPluginInterface
+{
 
     protected $loopDefinition = array();
 
@@ -40,7 +42,8 @@ class TheliaLoop implements SmartyPluginInterface {
 
     protected $dispatcher;
 
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher) {
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher)
+    {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
     }
@@ -55,7 +58,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @throws \InvalidArgumentException
      * @return string
      */
-    public function theliaLoop($params, $content, $template, &$repeat) {
+    public function theliaLoop($params, $content, $template, &$repeat)
+    {
 
     	if (empty($params['name']))
     		throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
@@ -87,12 +91,11 @@ class TheliaLoop implements SmartyPluginInterface {
     		$loopResultRow = $loopResults->current();
 
     		foreach($loopResultRow->getVarVal() as $var => $val) {
-
     			$template->assign(substr($var, 1), $val);
-
-    			$template->assign('__COUNT__', 1 + $loopResults->key());
-    			$template->assign('__TOTAL__', $loopResults->getCount());
     		}
+
+            $template->assign('__COUNT__', 1 + $loopResults->key());
+            $template->assign('__TOTAL__', $loopResults->getCount());
 
     		$repeat = $loopResults->valid();
     	}
@@ -115,7 +118,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $repeat
      * @return Ambigous <string, unknown>
      */
-    public function theliaElseloop($params, $content, $template, &$repeat) {
+    public function theliaElseloop($params, $content, $template, &$repeat)
+    {
 
     	// When encoutering close tag, check if loop has results.
     	if ($repeat === false) {
@@ -133,7 +137,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $repeat
      * @return Ambigous <string, unknown>
      */
-    public function theliaIfLoop($params, $content, $template, &$repeat) {
+    public function theliaIfLoop($params, $content, $template, &$repeat)
+    {
 
     	// When encountering close tag, check if loop has results.
     	if ($repeat === false) {
@@ -149,7 +154,8 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $template
      * @throws \InvalidArgumentException
      */
-    protected function checkEmptyLoop($params, $template) {
+    protected function checkEmptyLoop($params, $template)
+    {
     	if (empty($params['rel']))
     		throw new \InvalidArgumentException("Missing 'rel' parameter in ifloop/elseloop arguments");
 
@@ -202,7 +208,7 @@ class TheliaLoop implements SmartyPluginInterface {
      * @param unknown $smartyParam
      * @throws \InvalidArgumentException
      */
-    protected function getLoopArgument($loop, $smartyParam)
+    protected function getLoopArgument(BaseLoop $loop, $smartyParam)
     {
     	$defaultItemsParams = array('required' => true);
 
@@ -212,35 +218,40 @@ class TheliaLoop implements SmartyPluginInterface {
     	$faultActor = array();
     	$faultDetails = array();
 
-    	foreach($loop->defineArgs() as $name => $param){
-    		if(is_integer($name)){
-    			$name = $param;
-    			$param = $defaultItemsParams;
-    		}
+        $argumentsCollection = $loop->defineArgs();
+        foreach( $argumentsCollection as $argument ) {
 
-    		if(is_string($param) && array_key_exists($param, $shortcutItemParams)){
-    			$param = $shortcutItemParams[$param];
-    		}
+            $value = isset($smartyParam[$argument->name]) ? $smartyParam[$argument->name] : null;
 
-    		if(!is_array($param)){
-    			$param = array('default' => $param);
-    		}
+            /* check if mandatory */
+            if($value === null && $argument->mandatory) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('"%s" parameter is missing', $argument->name);
+                continue;
+            }
 
-    		$value = isset($smartyParam[$name]) ? $smartyParam[$name] : null;
+            /* check if empty */
+            if($value === '' && !$argument->empty) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('"%s" parameter cannot be empty', $argument->name);
+                continue;
+            }
 
-    		if($value == null){
-    			if(isset($param['default'])){
-    				$value = $param['default'];
-    			}
-    			else if($param['required'] === true){
-    				$faultActor[] = $name;
-    				$faultDetails[] = sprintf('"%s" parameter is missing', $name);
-    				continue;
-    			}
-    		}
+            /* check type */
+            if($value !== null && !$argument->type->isValid($value)) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('Invalid value for "%s" argument', $argument->name);
+                continue;
+            }
 
-    		$loop->{$name} = $value;
-    	}
+            /* set default */
+            /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
+            if($value === null) {
+                $value = $argument->default;
+            }
+
+            $loop->{$argument->name} = $value;
+        }
 
     	if(!empty($faultActor)){
 
@@ -288,7 +299,7 @@ class TheliaLoop implements SmartyPluginInterface {
         return array(
     		new SmartyPluginDescriptor('block', 'loop'     , $this, 'theliaLoop'),
     		new SmartyPluginDescriptor('block', 'elseloop' , $this, 'theliaElseloop'),
-    		new SmartyPluginDescriptor('block', 'ifloop'   , $this, 'theliaIfLoop')
+    		new SmartyPluginDescriptor('block', 'ifloop'   , $this, 'theliaIfLoop'),
         );
      }
 }

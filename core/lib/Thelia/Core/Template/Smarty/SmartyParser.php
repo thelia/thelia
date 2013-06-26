@@ -8,17 +8,17 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use \Smarty;
 
 use Thelia\Core\Template\ParserInterface;
-use Thelia\Core\Template\Loop\Category;
 
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
-use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 
 /**
  *
  * @author Franck Allimant <franck@cqfdev.fr>
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class SmartyParser extends Smarty implements ParserInterface {
+class SmartyParser extends Smarty implements ParserInterface
+{
 
     public $plugins = array();
 
@@ -59,14 +59,28 @@ class SmartyParser extends Smarty implements ParserInterface {
         // Prevent smarty ErrorException: Notice: Undefined index bla bla bla...
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
-        // Activate caching, with a 15mn lifetime, and check template sources modifications.
-        // FIXME: put this in configuration
-        $this->caching        = 1;
-        $this->cache_lifetime = 300;
-        $this->compile_check  = true;
+        // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
+        if($debug === false) {
+            $this->caching        = Smarty::CACHING_LIFETIME_CURRENT;
+            $this->cache_lifetime = 300;
+            $this->compile_check  = true;
+        } else {
+            $this->caching       = Smarty::CACHING_OFF;
+            $this->force_compile = true;
+        }
 
         // The default HTTP status
         $this->status = 200;
+
+        $this->registerFilter('pre', array($this, "pretest"));
+    }
+
+    public function pretest($tpl_source, \Smarty_Internal_Template $template)
+    {
+        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
+        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|default:\'#$1\'}', $new_source);
+
+        return $new_source;
     }
 
     public function setTemplate($template_path_from_template_base) {
