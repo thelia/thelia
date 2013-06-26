@@ -49,7 +49,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $cache_dir = THELIA_ROOT . 'cache/'. $env .'/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
-        $this->setTemplate($template ?: 'smarty-sample');
+        $this->setTemplate($template ?: 'smarty-sample'); // FIXME: put this in configuration
 
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
