@@ -23,6 +23,7 @@
 
 namespace Thelia\Admin\Controller;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\AdminLogin;
 
 class AdminController extends BaseAdminController {
@@ -54,5 +55,13 @@ class AdminController extends BaseAdminController {
         $adminLogin = new AdminLogin();
 
         return $adminLogin->buildForm($form, array())->getForm();
+    }
+
+    public function lostAction()
+    {
+        return new Response(
+            $this->renderRaw("404.html"),
+            404
+        );
     }
 }

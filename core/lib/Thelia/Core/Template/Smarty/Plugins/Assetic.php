@@ -35,7 +35,7 @@ class Assetic implements SmartyPluginInterface
     {
         $web_root  = THELIA_WEB_DIR;
 
-        $asset_dir_from_web_root = 'assets/admin/default'; // FIXME
+        $asset_dir_from_web_root = '/assets/admin/default'; // FIXME
 
         $this->asset_manager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root);
     }
