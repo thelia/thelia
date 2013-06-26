@@ -51,46 +51,44 @@ class TheliaLoop implements SmartyPluginInterface
     /**
      * Process {loop name="loop name" type="loop type" ... } ... {/loop} block
      *
-     * @param unknown $params
-     * @param unknown $content
-     * @param unknown $template
-     * @param unknown $repeat
+     * @param  unknown                   $params
+     * @param  unknown                   $content
+     * @param  unknown                   $template
+     * @param  unknown                   $repeat
      * @throws \InvalidArgumentException
      * @return string
      */
     public function theliaLoop($params, $content, $template, &$repeat)
     {
+        if (empty($params['name']))
+            throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
 
-    	if (empty($params['name']))
-    		throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
 
-    	if (empty($params['type']))
-    		throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
+        if (empty($params['type']))
+            throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
 
-    	$name = $params['name'];
+        $name = $params['name'];
 
-    	if ($content === null) {
+        if ($content === null) {
 
-    		$loop = $this->createLoopInstance(strtolower($params['type']));
+            $loop = $this->createLoopInstance(strtolower($params['type']));
 
-    		$this->getLoopArgument($loop, $params);
+            $this->getLoopArgument($loop, $params);
 
-    		$loopResults = $loop->exec();
+            $loopResults = $loop->exec();
 
-    		$template->assignByRef($name, $loopResults);
-    	}
-    	else {
+            $template->assignByRef($name, $loopResults);
+        } else {
 
-    		$loopResults = $template->getTemplateVars($name);
+            $loopResults = $template->getTemplateVars($name);
 
-    		$loopResults->next();
-    	}
+            $loopResults->next();
+        }
 
-    	if ($loopResults->valid()) {
+        if ($loopResults->valid()) {
+            $loopResultRow = $loopResults->current();
 
-    		$loopResultRow = $loopResults->current();
-
-    		foreach($loopResultRow->getVarVal() as $var => $val) {
+            foreach($loopResultRow->getVarVal() as $var => $val) {
     			$template->assign(substr($var, 1), $val);
     		}
 
@@ -100,22 +98,21 @@ class TheliaLoop implements SmartyPluginInterface
     		$repeat = $loopResults->valid();
     	}
 
-    	if ($content !== null) {
 
-    		if ($loopResults->isEmpty()) $content = "";
+        if ($content !== null) {
 
-    		return $content;
-    	}
+            if ($loopResults->isEmpty()) $content = "";
+            return $content;
+        }
     }
-
 
     /**
      * Process {elseloop rel="loopname"} ... {/elseloop} block
      *
-     * @param unknown $params
-     * @param unknown $content
-     * @param unknown $template
-     * @param unknown $repeat
+     * @param  unknown  $params
+     * @param  unknown  $content
+     * @param  unknown  $template
+     * @param  unknown  $repeat
      * @return Ambigous <string, unknown>
      */
     public function theliaElseloop($params, $content, $template, &$repeat)
@@ -127,14 +124,13 @@ class TheliaLoop implements SmartyPluginInterface
     	}
     }
 
-
     /**
      * Process {ifloop rel="loopname"} ... {/ifloop} block
      *
-     * @param unknown $params
-     * @param unknown $content
-     * @param unknown $template
-     * @param unknown $repeat
+     * @param  unknown  $params
+     * @param  unknown  $content
+     * @param  unknown  $template
+     * @param  unknown  $repeat
      * @return Ambigous <string, unknown>
      */
     public function theliaIfLoop($params, $content, $template, &$repeat)
@@ -150,32 +146,33 @@ class TheliaLoop implements SmartyPluginInterface
      * Check if a loop has returned results. The loop shoud have been executed before, or an
      * InvalidArgumentException is thrown
      *
-     * @param unknown $params
-     * @param unknown $template
+     * @param  unknown                   $params
+     * @param  unknown                   $template
      * @throws \InvalidArgumentException
      */
     protected function checkEmptyLoop($params, $template)
     {
+
     	if (empty($params['rel']))
     		throw new \InvalidArgumentException("Missing 'rel' parameter in ifloop/elseloop arguments");
 
-    	$loopName = $params['rel'];
+        $loopName = $params['rel'];
 
-    	// Find loop results in the current template vars
-    	$loopResults = $template->getTemplateVars($loopName);
+        // Find loop results in the current template vars
+        $loopResults = $template->getTemplateVars($loopName);
 
-    	if (empty($loopResults)) {
-    		throw new \InvalidArgumentException("Loop $loopName is not defined.");
-    	}
+        if (empty($loopResults)) {
+            throw new \InvalidArgumentException("Loop $loopName is not defined.");
+        }
 
-    	return $loopResults->isEmpty();
+        return $loopResults->isEmpty();
     }
 
     /**
      *
      * find the loop class with his name and construct an instance of this class
      *
-     * @param  string $name
+     * @param  string                                          $name
      * @return \Thelia\Core\Template\Element\BaseLoop
      * @throws \Thelia\Tpex\Exception\InvalidElementException
      * @throws \Thelia\Tpex\Exception\ElementNotFoundException
@@ -183,40 +180,40 @@ class TheliaLoop implements SmartyPluginInterface
     protected function createLoopInstance($name)
     {
 
-    	if (! isset($this->loopDefinition[$name])) {
-    		throw new ElementNotFoundException(sprintf("%s loop does not exists", $name));
-    	}
+        if (! isset($this->loopDefinition[$name])) {
+            throw new ElementNotFoundException(sprintf("%s loop does not exists", $name));
+        }
 
-    	$class = new \ReflectionClass($this->loopDefinition[$name]);
+        $class = new \ReflectionClass($this->loopDefinition[$name]);
 
-    	if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
-    		throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Core\Template\Element\BaseLoop",
-    				$name));
-    	}
+        if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
+            throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Core\Template\Element\BaseLoop",
+                    $name));
+        }
 
-    	return $class->newInstance(
-    			$this->request,
-    			$this->dispatcher
-    	);
+        return $class->newInstance(
+                $this->request,
+                $this->dispatcher
+        );
     }
-
 
     /**
      * Returns the value of a loop argument.
      *
-     * @param unknown $loop a BaseLoop instance
-     * @param unknown $smartyParam
+     * @param  unknown                   $loop        a BaseLoop instance
+     * @param  unknown                   $smartyParam
      * @throws \InvalidArgumentException
      */
     protected function getLoopArgument(BaseLoop $loop, $smartyParam)
     {
-    	$defaultItemsParams = array('required' => true);
+        $defaultItemsParams = array('required' => true);
 
-    	$shortcutItemParams = array('optional' => array('required' => false));
+        $shortcutItemParams = array('optional' => array('required' => false));
 
-    	$errorCode = 0;
-    	$faultActor = array();
-    	$faultDetails = array();
+        $errorCode = 0;
+        $faultActor = array();
+        $faultDetails = array();
+
 
         $argumentsCollection = $loop->defineArgs();
         foreach( $argumentsCollection as $argument ) {
@@ -253,11 +250,11 @@ class TheliaLoop implements SmartyPluginInterface
             $loop->{$argument->name} = $value;
         }
 
-    	if(!empty($faultActor)){
+        if (!empty($faultActor)) {
 
-    		$complement = sprintf('[%s]', implode(', ', $faultDetails));
-    		throw new \InvalidArgumentException($complement);
-    	}
+            $complement = sprintf('[%s]', implode(', ', $faultDetails));
+            throw new \InvalidArgumentException($complement);
+        }
     }
 
     /**
@@ -280,13 +277,13 @@ class TheliaLoop implements SmartyPluginInterface
      */
     public function setLoopList(array $loopDefinition)
     {
-    	foreach ($loopDefinition as $name => $className) {
-    		if (array_key_exists($name, $this->loopDefinition)) {
-    			throw new \InvalidArgumentException(sprintf("%s loop name already exists for %s class name", $name, $className));
-    		}
+        foreach ($loopDefinition as $name => $className) {
+            if (array_key_exists($name, $this->loopDefinition)) {
+                throw new \InvalidArgumentException(sprintf("%s loop name already exists for %s class name", $name, $className));
+            }
 
-    		$this->loopDefinition[$name] = $className;
-    	}
+            $this->loopDefinition[$name] = $className;
+        }
     }
 
     /**
@@ -297,6 +294,7 @@ class TheliaLoop implements SmartyPluginInterface
     public function getPluginDescriptors()
     {
         return array(
+
     		new SmartyPluginDescriptor('block', 'loop'     , $this, 'theliaLoop'),
     		new SmartyPluginDescriptor('block', 'elseloop' , $this, 'theliaElseloop'),
     		new SmartyPluginDescriptor('block', 'ifloop'   , $this, 'theliaIfLoop'),

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Thelia\Core\Controller;
 
 use Symfony\Component\HttpKernel\Controller\ControllerResolver as BaseControllerResolver;
@@ -21,14 +20,14 @@ class ControllerResolver extends BaseControllerResolver
     /**
      * Constructor.
      *
-     * @param ContainerInterface   $container A ContainerInterface instance
-     * @param LoggerInterface      $logger    A LoggerInterface instance
+     * @param ContainerInterface $container A ContainerInterface instance
+     * @param LoggerInterface    $logger    A LoggerInterface instance
      */
     public function __construct(ContainerInterface $container, LoggerInterface $logger = null)
     {
-    	$this->container = $container;
+        $this->container = $container;
 
-    	parent::__construct($logger);
+        parent::__construct($logger);
     }
 
     /**
@@ -38,7 +37,7 @@ class ControllerResolver extends BaseControllerResolver
      *
      * @return mixed A PHP callable
      *
-     * @throws \LogicException When the name could not be parsed
+     * @throws \LogicException           When the name could not be parsed
      * @throws \InvalidArgumentException When the controller class does not exist
      */
     protected function createController($controller)

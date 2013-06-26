@@ -23,32 +23,28 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 
-class Translation implements SmartyPluginInterface {
-
-
+class Translation implements SmartyPluginInterface
+{
     /**
      * Process translate function
      *
-     * @param unknown $params
-     * @param unknown $smarty
+     * @param  unknown $params
+     * @param  unknown $smarty
      * @return string
      */
     public function theliaTranslate($params, &$smarty)
     {
-    	if (isset($params['l'])) {
-    		$string = str_replace('\'', '\\\'', $params['l']);
-    	}
-    	else {
-    		$string = '';
-    	}
+        if (isset($params['l'])) {
+            $string = str_replace('\'', '\\\'', $params['l']);
+        } else {
+            $string = '';
+        }
 
-    	// TODO
-
-    	return "[$string]";
+        // TODO
+        return "[$string]";
     }
 
     /**

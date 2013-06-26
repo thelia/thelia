@@ -21,6 +21,10 @@
     	-->
     </templateDirectives>
 
+    <forms>
+        <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
+    </forms>
+
 
     <commands>
         <command class="Thelia\Command\CacheClear"/>
@@ -71,6 +75,15 @@
                 <argument>%thelia.parser.loops%</argument>
             </call>
        </service>
+
+        <service id="smart.plugin.form" class="Thelia\Core\Template\Smarty\Plugins\Form" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+
+            <argument type="service" id="request"/>
+            <call method="setFormDefinition">
+                <argument>%thelia.parser.forms%</argument>
+            </call>
+        </service>
 
         <service id="smarty.plugin.translation" class="Thelia\Core\Template\Smarty\Plugins\Translation" >
             <tag name="thelia.parser.register_plugin"/>

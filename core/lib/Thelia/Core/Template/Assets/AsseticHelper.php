@@ -37,22 +37,22 @@ use Assetic\Cache\FilesystemCache;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class AsseticHelper {
-
+class AsseticHelper
+{
     /**
      * Generates assets from $asset_path in $output_path, using $filters.
      *
-     * @param string $asset_path the full path to the asset file (or file collection)
-     * @param unknown $output_path the full disk path to the output directory (shoud be visible to web server)
-     * @param unknown $output_url the URL to the generated asset directory
-     * @param unknown $asset_type the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
-     * @param unknown $filters a list of filters, as defined below (see switch($filter_name) ...)
-     * @param unknown $debug true / false
+     * @param  string                    $asset_path  the full path to the asset file (or file collection)
+     * @param  unknown                   $output_path the full disk path to the output directory (shoud be visible to web server)
+     * @param  unknown                   $output_url  the URL to the generated asset directory
+     * @param  unknown                   $asset_type  the asset type: css, js, ... The generated files will have this extension. Pass an empty string to use the asset source extension.
+     * @param  unknown                   $filters     a list of filters, as defined below (see switch($filter_name) ...)
+     * @param  unknown                   $debug       true / false
      * @throws \InvalidArgumentException if an invalid filter name is found
-     * @return string The URL to the generated asset file.
+     * @return string                    The URL to the generated asset file.
      */
-    public function asseticize($asset_path, $output_path, $output_url, $asset_type, $filters, $debug) {
-
+    public function asseticize($asset_path, $output_path, $output_url, $asset_type, $filters, $debug)
+    {
         $asset_name = basename($asset_path);
         $asset_dir = dirname($asset_path);
 
@@ -62,11 +62,11 @@ class AsseticHelper {
         if (! empty($filters)) {
             $filter_list = explode(',', $filters);
 
-            foreach($filter_list as $filter_name) {
+            foreach ($filter_list as $filter_name) {
 
                 $filter_name = trim($filter_name);
 
-                switch($filter_name) {
+                switch ($filter_name) {
                     case 'less' :
                         $fm->set('less', new Filter\LessphpFilter());
                         break;
@@ -92,8 +92,7 @@ class AsseticHelper {
                         break;
                 }
             }
-        }
-        else {
+        } else {
             $filter_list = array();
         }
 

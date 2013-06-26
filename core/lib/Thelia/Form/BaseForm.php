@@ -20,32 +20,42 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Template\TestLoop;
+use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
+use Symfony\Component\Form\Forms;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
+use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
+use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
+use Symfony\Component\Validator\Validation;
+use Thelia\Model\ConfigQuery;
 
-use Thelia\Tpex\Element\TestLoop\BaseTestLoop;
+class BaseForm {
 
-/**
- *
- * TestLoop equal, test if value and variable are equal
- *
- * example :
- *
- * <TEST_equal test="equal" variable="3" value="1">
- *      Result display here if variable and value are equal
- * </TEST_equal>
- *      Result display here if variable and value are not equal
- * <//TEST_equal>
- *
- * Class Equal
- * @package Thelia\Core\Template\TestLoop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class Equal extends BaseTestLoop
-{
-
-    public function exec($variable, $value)
+    /**
+     * @param Request $request
+     * @return \Symfony\Component\Form\FormFactoryInterface
+     */
+    public static function getFormFactory(Request $request, $secret = null)
     {
-        return $variable == $value;
+        $validator = Validation::createValidator();
+
+        $form = Forms::createFormFactoryBuilder()
+            ->addExtension(new HttpFoundationExtension())
+            ->addExtension(
+                new CsrfExtension(
+                    new SessionCsrfProvider(
+                        $request->getSession(),
+                        $secret ?: ConfigQuery::read("form.secret", md5(__DIR__))
+                    )
+                )
+            )
+            ->addExtension(new ValidatorExtension($validator))
+            ->getFormFactory();
+
+        return $form;
     }
 }
+

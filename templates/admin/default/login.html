@@ -15,9 +15,17 @@
 	   	<div class="hero-unit">
 	        <h1>{intl l='Thelia Back Office'}</h1>
 
-			<form action="/admin/login" method="post" class="well form-inline">
-				<input type="text" class="input" placeholder="{intl l='E-mail address'}" name="username" />
-				<input type="password" class="input" placeholder="{intl l='Password'}" name="password" />
+			<form action="/admin" method="post" class="well form-inline" {form_enctype form=$form}>
+                {form_field_hidden form=$form}
+                {form_field form=$form.username}
+                    {form_error form=$form.username}
+                        {$message}
+                    {/form_error}
+				    <input type="text" class="input" placeholder="{intl l='E-mail address'}" name="{$name}" />
+                {/form_field}
+                {form_field form=$form.password}
+				    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" />
+                {/form_field}
 
 				<label class="checkbox"> <input type="checkbox" name="remember" value="yes"> {intl l='Remember me'}</label>
 

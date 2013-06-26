@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*	email : info@thelia.net                                                          */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,32 +20,35 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Form;
 
-namespace Thelia\Core\Template\TestLoop;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\FormBuilderInterface;
 
-use Thelia\Tpex\Element\TestLoop\BaseTestLoop;
 
-/**
- *
- * TestLoop equal, test if value and variable are equal
- *
- * example :
- *
- * <TEST_equal test="equal" variable="3" value="1">
- *      Result display here if variable and value are equal
- * </TEST_equal>
- *      Result display here if variable and value are not equal
- * <//TEST_equal>
- *
- * Class Equal
- * @package Thelia\Core\Template\TestLoop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class Equal extends BaseTestLoop
+class CustomerCreation extends AbstractType
 {
 
-    public function exec($variable, $value)
+    public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        return $variable == $value;
+        return $builder->add("name", "text")
+            ->add("email", "email", array(
+                    "attr" => array(
+                        "class" => "field"
+                    ),
+                    "label" => "email"
+                )
+            )
+            ->add('age', 'integer');
+    }
+
+    /**
+     * Returns the name of this type.
+     *
+     * @return string The name of this type
+     */
+    public function getName()
+    {
+        return "customer creation";
     }
 }

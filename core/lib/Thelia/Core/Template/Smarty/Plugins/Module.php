@@ -23,17 +23,16 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 
-class Module implements SmartyPluginInterface {
-
+class Module implements SmartyPluginInterface
+{
     /**
      * Process theliaModule template inclusion function
      *
-     * @param unknown $params
-     * @param unknown $smarty
+     * @param  unknown $params
+     * @param  unknown $smarty
      * @return string
      */
     public function theliaModule($params, &$smarty)

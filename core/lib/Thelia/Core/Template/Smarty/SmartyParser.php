@@ -29,10 +29,10 @@ class SmartyParser extends Smarty implements ParserInterface
     protected $status = 200;
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param \Symfony\Component\HttpFoundation\Request                   $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-     * @param bool $template
-     * @param string $env Environment define for the kernel application. Used for the cache directory
+     * @param bool                                                        $template
+     * @param string                                                      $env        Environment define for the kernel application. Used for the cache directory
      */
     public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod", $debug = false)
     {
@@ -83,107 +83,108 @@ class SmartyParser extends Smarty implements ParserInterface
         return $new_source;
     }
 
-    public function setTemplate($template_path_from_template_base) {
-
+    public function setTemplate($template_path_from_template_base)
+    {
         $this->template = $template_path_from_template_base;
 
         $this->setTemplateDir(THELIA_TEMPLATE_DIR.$this->template);
     }
 
-    public function getTemplate() {
-    	return $this->template;
+    public function getTemplate()
+    {
+        return $this->template;
     }
 
     /**
      * Return a rendered template file
      *
-     * @param string $realTemplateName the template name (from the template directory)
-     * @param array $parameters an associative array of names / value pairs
+     * @param  string $realTemplateName the template name (from the template directory)
+     * @param  array  $parameters       an associative array of names / value pairs
      * @return string the rendered template text
      */
-    public function render($realTemplateName, array $parameters) {
+    public function render($realTemplateName, array $parameters)
+    {
+        $this->assign($parameters);
 
-    	$this->assign($parameters);
-
-    	return $this->fetch($realTemplateName);
+        return $this->fetch($realTemplateName);
     }
 
-	/**
-	 *
-	 * This method must return a Symfony\Component\HttpFoudation\Response instance or the content of the response
-	 *
-	 */
-	public function getContent()
-	{
-		return $this->fetch($this->getTemplateFilePath());
-	}
+    /**
+     *
+     * This method must return a Symfony\Component\HttpFoudation\Response instance or the content of the response
+     *
+     */
+    public function getContent()
+    {
+        return $this->fetch($this->getTemplateFilePath());
+    }
 
-	/**
-	 *
-	 * set $content with the body of the response or the Response object directly
-	 *
-	 * @param string|Symfony\Component\HttpFoundation\Response $content
-	 */
-	public function setContent($content)
-	{
-		$this->content = $content;
-	}
+    /**
+     *
+     * set $content with the body of the response or the Response object directly
+     *
+     * @param string|Symfony\Component\HttpFoundation\Response $content
+     */
+    public function setContent($content)
+    {
+        $this->content = $content;
+    }
 
-	/**
-	 *
-	 * @return type the status of the response
-	 */
-	public function getStatus()
-	{
-		return $this->status;
-	}
+    /**
+     *
+     * @return type the status of the response
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
 
-	/**
-	 *
-	 * status HTTP of the response
-	 *
-	 * @param int $status
-	 */
-	public function setStatus($status)
-	{
-		$this->status = $status;
-	}
+    /**
+     *
+     * status HTTP of the response
+     *
+     * @param int $status
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    }
 
     public function addPlugins(SmartyPluginInterface $plugin)
     {
-    	$this->plugins[] = $plugin;
+        $this->plugins[] = $plugin;
     }
 
     public function registerPlugins()
     {
-    	foreach ($this->plugins as $register_plugin) {
-    		$plugins = $register_plugin->getPluginDescriptors();
+        foreach ($this->plugins as $register_plugin) {
+            $plugins = $register_plugin->getPluginDescriptors();
 
-    		if(!is_array($plugins)) {
-    			$plugins = array($plugins);
-    		}
+            if (!is_array($plugins)) {
+                $plugins = array($plugins);
+            }
 
-    		foreach ($plugins as $plugin) {
-    			$this->registerPlugin(
-    					$plugin->getType(),
-    					$plugin->getName(),
-    					array(
-    						$plugin->getClass(),
-    						$plugin->getMethod()
-    					)
-    			);
-    		}
-    	}
+            foreach ($plugins as $plugin) {
+                $this->registerPlugin(
+                        $plugin->getType(),
+                        $plugin->getName(),
+                        array(
+                            $plugin->getClass(),
+                            $plugin->getMethod()
+                        )
+                );
+            }
+        }
     }
 
     protected function getTemplateFilePath()
     {
-     	$file = $this->request->attributes->get('_view');
+         $file = $this->request->attributes->get('_view');
 
-    	$fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file . ".html";
+        $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file . ".html";
 
-    	if (file_exists($fileName)) return $fileName;
+        if (file_exists($fileName)) return $fileName;
 
-    	throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+        throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
     }
 }

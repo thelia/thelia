@@ -24,12 +24,12 @@
 namespace Thelia\Core\DependencyInjection\Loader;
 
 use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader as XmlLoader;
 use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\DependencyInjection\DefinitionDecorator;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\SimpleXMLElement;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -63,6 +63,8 @@ class XmlFileLoader extends FileLoader
 
         $this->parseCommands($xml);
 
+        $this->parseForms($xml);
+
         $this->parseDefinitions($xml, $path);
     }
 
@@ -73,7 +75,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $commandConfig = $this->container->getParameter("command.definition");
-        } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException $e) {
             $commandConfig = array();
         }
 
@@ -111,7 +113,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $loopConfig = $this->container->getParameter("Thelia.parser.loops");
-        } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException $e) {
             $loopConfig = array();
         }
 
@@ -120,6 +122,25 @@ class XmlFileLoader extends FileLoader
         }
 
         $this->container->setParameter("Thelia.parser.loops", $loopConfig);
+    }
+
+    protected function parseForms(SimpleXMLElement $xml)
+    {
+        if (false === $forms = $xml->xpath('//config:forms/config:form')) {
+            return;
+        }
+
+        try {
+            $formConfig = $this->container->getParameter("Thelia.parser.forms");
+        } catch (ParameterNotFoundException $e) {
+            $formConfig = array();
+        }
+
+        foreach ($forms as $form) {
+            $formConfig[$form->getAttributeAsPhp('name')] = $form->getAttributeAsPhp('class');
+        }
+
+        $this->container->setParameter('Thelia.parser.forms', $formConfig);
     }
 
     /**
@@ -134,7 +155,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $filterConfig = $this->container->getParameter("Thelia.parser.filters");
-        } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException $e) {
             $filterConfig = array();
         }
 
@@ -157,7 +178,7 @@ class XmlFileLoader extends FileLoader
         }
         try {
             $baseParamConfig = $this->container->getParameter("Thelia.parser.templateDirectives");
-        } catch (\Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException $e) {
+        } catch (ParameterNotFoundException $e) {
             $baseParamConfig = array();
         }
 
@@ -334,7 +355,7 @@ EOF
     /**
      * Returns true if this class supports the given resource.
      *
-     * @param mixed $resource A resource
+     * @param mixed  $resource A resource
      * @param string $type     The resource type
      *
      * @return Boolean true if this class supports the given resource, false otherwise

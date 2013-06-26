@@ -30,7 +30,8 @@ namespace Thelia\Core\Template\Smarty;
  * Interface SmartyPluginInterface
  * @package Thelia\Core\Template\Smarty
  */
-interface SmartyPluginInterface {
+interface SmartyPluginInterface
+{
     /**
      * @return an array of SmartyPluginDescriptor
      */

@@ -23,25 +23,22 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 
-
-class Assetic implements SmartyPluginInterface {
-
+class Assetic implements SmartyPluginInterface
+{
     public $asset_manager;
 
     public function __construct()
     {
         $web_root  = THELIA_WEB_DIR;
 
-        $asset_dir_from_web_root = 'assets/admin/default'; // FIXME
+        $asset_dir_from_web_root = '/assets/admin/default'; // FIXME
 
         $this->asset_manager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root);
     }
-
 
     public function theliaBlockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {

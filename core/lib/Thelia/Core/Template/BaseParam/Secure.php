@@ -31,10 +31,9 @@ class Secure extends BaseParam
     public function exec()
     {
         $request = $this->getRequest();
-        
+
         if (!$request->getSession()->get('connected') && $this->baseParamValue) {
             Redirect::unauthorize();
         }
     }
 }
-

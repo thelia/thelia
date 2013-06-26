@@ -7,4 +7,11 @@
     <route id="admin" path="/admin">
         <default key="_controller">Thelia\Admin\Controller\AdminController::indexAction</default>
     </route>
+    <route id="admin.login" path="/admin/login">
+        <default key="_controller">Thelia\Admin\Controller\AdminController::loginAction</default>
+    </route>
+    <route id="admin.lost" path="/admin/{everything}">
+        <default key="_controller">Thelia\Admin\Controller\AdminController::lostAction</default>
+        <requirement key="everything">.*</requirement>
+    </route>
 </routes>

@@ -1,4 +1,4 @@
-Options +FollowSymlinks
+Options +FollowSymlinks -Indexes
 
 AddDefaultCharset UTF-8
 
@@ -8,5 +8,5 @@ AddDefaultCharset UTF-8
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
 
-	RewriteRule ^admin(/.*)?$ index_dev.php/admin/$1 [L,QSA]
+	RewriteRule ^(.*)$ index_dev.php [L,QSA]
 </IfModule>

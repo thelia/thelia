@@ -15,6 +15,7 @@
             <xsd:element name="services" type="services" />
             <xsd:element name="parameters" type="parameters"/>
             <xsd:element name="commands" type="commands"/>
+            <xsd:element name="forms" type="forms" />
         </xsd:choice>
     </xsd:complexType>
 
@@ -71,6 +72,17 @@
     </xsd:complexType>
 
     <xsd:complexType name="command">
+        <xsd:attribute name="class" type="xsd:string" use="required" />
+    </xsd:complexType>
+
+    <xsd:complexType name="forms">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded" >
+            <xsd:element name="form" type="form" />
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="form">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
         <xsd:attribute name="class" type="xsd:string" use="required" />
     </xsd:complexType>
 
