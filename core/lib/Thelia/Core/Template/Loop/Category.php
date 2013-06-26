@@ -51,8 +51,6 @@ use Thelia\Type;
  *      * by default results are sorting by position ascending
  * - random : if 1, random results. Default value is 0
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
- * - limit : number of results. Default value is 10
- * - offset : at witch id start the search
  *
  * example :
  *
@@ -76,8 +74,6 @@ class Category extends BaseLoop {
     public $order;
     public $random;
     public $exclude;
-    public $limit;
-    public $offset;
 
     protected function defineArgs()
     {
@@ -130,11 +126,7 @@ class Category extends BaseLoop {
             $search->filterByLink($this->link);
         }
 
-        /*if($this->limit > -1) {
-            $search->limit($this->limit);
-        }*/
         $search->filterByVisible($this->visible);
-        //$search->offset($this->offset);
 
 
         switch($this->order) {
@@ -164,8 +156,7 @@ class Category extends BaseLoop {
          */
         $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
 
-        //$categories = $search->find();
-        $categories = $search->paginate($page = 2, $maxPerPage = 2);
+        $categories = $this->search($search);
 
         $loopResult = new LoopResult();
 

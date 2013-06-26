@@ -45,11 +45,16 @@ abstract class BaseLoop
      */
     public $dispatcher;
 
+    public $limit;
+    public $page;
+    public $offset;
+
     protected function getDefaultArgs()
     {
         return array(
-            Argument::createIntTypeArgument('offset'),
-            Argument::createIntTypeArgument('limit'),
+            Argument::createIntTypeArgument('offset', 0),
+            Argument::createIntTypeArgument('page'),
+            Argument::createIntTypeArgument('limit', 10),
         );
     }
 
@@ -66,6 +71,30 @@ abstract class BaseLoop
     public function getArgs()
     {
         return $this->defineArgs()->addArguments($this->getDefaultArgs());
+    }
+
+    public function search(\ModelCriteria $search)
+    {
+        if($this->page !== null) {
+            return $this->searchWithPagination($search);
+        } else {
+            return $this->searchWithOffset($search);
+        }
+    }
+
+    public function searchWithOffset(\ModelCriteria $search)
+    {
+        if($this->limit >= 0) {
+            $search->limit($this->limit);
+        }
+        $search->offset($this->offset);
+
+        return $search->find();
+    }
+
+    public function searchWithPagination(\ModelCriteria $search)
+    {
+        return $search->paginate($this->page, $this->limit);
     }
 
     /**

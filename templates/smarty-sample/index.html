@@ -84,4 +84,20 @@ An image from asset directory :
     {/loop}
 </div>
 
+<div>
+    <p>Some pagination</p>
+    <p>PAGE 1</p>
+    <ul>
+        {loop type="category" name="catloopwithpagination" limit="2" page="1"}
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+    <p>PAGE 2</p>
+    <ul>
+        {loop type="category" name="catloopwithpagination" limit="2" page="2"}
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+</div>
+
 {include file="includes/footer.html"}
