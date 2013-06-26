@@ -4,13 +4,27 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
-    <testLoops>
-        <testLoop name="equal" class="Thelia\Core\Template\TestLoop\Equal"/>
-    </testLoops>
-
     <loops>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
     </loops>
+
+
+    <filters>
+    	<!-- Sample definition
+        <filter class="Thelia\Core\Template\Filter\SomeFilterClass" name="my_filter"/>
+    	-->
+    </filters>
+
+    <templateDirectives>
+    	<!-- Sample definition
+        <templateDirectives class="Thelia\Core\Template\Filter\SomeFilterClass" name="my_filter"/>
+    	-->
+    </templateDirectives>
+
+    <forms>
+        <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
+    </forms>
+
 
     <commands>
         <command class="Thelia\Command\CacheClear"/>
@@ -18,6 +32,7 @@
     </commands>
 
     <services>
+
         <service id="event_dispatcher" class="Symfony\Component\EventDispatcher\ContainerAwareEventDispatcher">
             <argument type="service" id="service_container" />
         </service>
@@ -26,33 +41,62 @@
             <tag name="kernel.event_subscriber"/>
         </service>
 
-        <service id="controller_resolver" class="Symfony\Component\HttpKernel\Controller\ControllerResolver"/>
+		<!--
+		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
+		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
+		We use it here to inject the servi ce container in the admin base controller.
+		-->
+        <service id="controller_resolver" class="Thelia\Core\Controller\ControllerResolver">
+        	<argument type="service" id="service_container"/>
+        </service>
 
-        <service id="parser" class="Thelia\Core\Template\Parser">
-            <argument type="service" id="service_container"/>
+		<!-- Parser configuration -->
+
+        <service id="thelia.parser" class="Thelia\Core\Template\Smarty\SmartyParser" scope="request">
+            <argument type="service" id="request" />
+            <argument type="service" id="event_dispatcher"/>
+            <argument >false</argument>
+            <argument >%kernel.environment%</argument>
+            <argument >%kernel.debug%</argument>
+        </service>
+
+		<!-- Smarty parser plugins -->
+
+        <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
+        <service id="smarty.plugin.thelialoop" class="Thelia\Core\Template\Smarty\Plugins\TheliaLoop" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+
+            <argument type="service" id="request" />
+            <argument type="service" id="event_dispatcher"/>
+            <call method="setLoopList">
+                <argument>%thelia.parser.loops%</argument>
+            </call>
+       </service>
+
+        <service id="smart.plugin.form" class="Thelia\Core\Template\Smarty\Plugins\Form" scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+
+            <argument type="service" id="request"/>
+            <call method="setFormDefinition">
+                <argument>%thelia.parser.forms%</argument>
+            </call>
+        </service>
+
+        <service id="smarty.plugin.translation" class="Thelia\Core\Template\Smarty\Plugins\Translation" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
+        <service id="smarty.plugin.module" class="Thelia\Core\Template\Smarty\Plugins\Module" >
+            <tag name="thelia.parser.register_plugin"/>
         </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
             <argument type="service" id="event_dispatcher" />
             <argument type="service" id="service_container" />
             <argument type="service" id="controller_resolver" />
-        </service>
-
-        <service id="template" class="Thelia\Tpex\Tpex" scope="request">
-            <argument type="service" id="request" />
-            <argument type="service" id="event_dispatcher"/>
-            <call method="setLoop">
-                <argument>%tpex.loop%</argument>
-            </call>
-            <call method="setFilter">
-                <argument>%tpex.filter%</argument>
-            </call>
-            <call method="setBaseParams">
-                <argument>%tpex.baseParam%</argument>
-            </call>
-            <call method="setTestLoop">
-                <argument>%tpex.testLoop%</argument>
-            </call>
         </service>
 
         <service id="request" scope="request" synthetic="true" />

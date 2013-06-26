@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 namespace Thelia\Core;
@@ -121,32 +121,31 @@ class TheliaHttpKernel extends HttpKernel
     {
 
     }
-    
+
     protected function initSession(Request $request)
     {
-        
+
         $storage = new Session\Storage\NativeSessionStorage();
-        
+
         if (Model\ConfigQuery::read("session_config.default")) {
             $storage->setSaveHandler(new Session\Storage\Handler\NativeFileSessionHandler(Model\ConfigQuery::read("session_config.save_path", THELIA_ROOT . '/local/session/')));
         } else {
             $handlerString = Model\ConfigQuery::read("session_config.handlers");
-            
+
             $handler = new $handlerString;
-            
+
             $storage->setSaveHandler($handler);
         }
-        
+
         if (Model\ConfigQuery::read("session_config.config", null)) {
-           $storage->setOptions(json_decode(Model\ConfigQuery::read("session_config.config"))); 
+           $storage->setOptions(json_decode(Model\ConfigQuery::read("session_config.config")));
         }
-        
-        
+
         $session = new Session\Session($storage);
         $session->start();
-        
+
         $request->setSession($session);
-        
+
         return $request;
     }
 }

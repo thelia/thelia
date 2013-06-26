@@ -1,5 +1,4 @@
 <?php
-
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Thelia;
 
@@ -25,4 +24,4 @@ $response = $thelia->handle($request)->prepare($request)->send();
 
 $thelia->terminate($request, $response);
 
-echo "page parsed in : " . (microtime(true) - $thelia->getStartTime());
+echo "<!-- page parsed in : " . (microtime(true) - $thelia->getStartTime())." s. -->";

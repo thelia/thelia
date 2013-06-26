@@ -20,6 +20,10 @@
 
         <service id="controller.default" class="Thelia\Controller\DefaultController"/>
 
+        <service id="thelia.admin.base_controller" class="Thelia\Admin\Controller\BaseAdminController" scope="request">
+       		<argument type="service" id="thelia.parser"/>
+        </service>
+
         <service id="matcher.default" class="Thelia\Routing\Matcher\DefaultMatcher">
             <argument type="service" id="controller.default"/>
         </service>
@@ -44,7 +48,7 @@
 
         <service id="router.admin" class="%router.class%">
             <argument type="service" id="router.admin.xmlLoader"/>
-            <argument>routing.xml</argument>
+            <argument>admin.xml</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>

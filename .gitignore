@@ -11,3 +11,9 @@ bin/*
 local/session/*
 coverage
 .idea
+.buildpath
+.project
+.settings/
+local/cache/*
+composer.lock
+web/assets/*

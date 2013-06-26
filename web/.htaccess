@@ -1,0 +1,12 @@
+Options +FollowSymlinks -Indexes
+
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+	RewriteEngine on
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+	RewriteRule ^(.*)$ index_dev.php [L,QSA]
+</IfModule>

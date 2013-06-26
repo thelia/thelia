@@ -25,9 +25,7 @@ namespace Thelia\Core\EventListener;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
-use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Factory\ActionEventFactory;
-
 
 /**
  *
@@ -40,7 +38,6 @@ use Thelia\Core\Factory\ActionEventFactory;
  */
 class ControllerListener implements EventSubscriberInterface
 {
-
 
     public function onKernelController(FilterControllerEvent $event)
     {

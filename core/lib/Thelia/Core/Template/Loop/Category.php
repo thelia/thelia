@@ -21,14 +21,19 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Template\Loop;
 
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 
-use Thelia\Tpex\Element\Loop\BaseLoop;
-use Thelia\Tpex\Element\Loop\LoopResult;
-use Thelia\Tpex\Element\Loop\LoopResultRow;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Log\Tlog;
+
 use Thelia\Model\CategoryQuery;
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
 
 /**
  *
@@ -60,8 +65,8 @@ use Thelia\Model\CategoryQuery;
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
-class Category extends BaseLoop {
-
+class Category extends BaseLoop
+{
     public $id;
     public $parent;
     public $current;
@@ -76,41 +81,101 @@ class Category extends BaseLoop {
 
     public function defineArgs()
     {
-        return array(
-            "id" => "optional",
-            "parent" => "optional",
-            "current" => "optional",
-            "not_empty" => 0,
-            "visible" => 1,
-            "link" => "optional",
-            "order" => "optional",
-            "random" => 0,
-            "exclude" => "optional",
-            "limit" => 10,
-            "offset" => 0,
+        return new ArgumentCollection(
+            new Argument(
+                'id',
+                new TypeCollection(
+                    new Type\IntListType()
+                )
+            ),
+            new Argument(
+                'parent',
+                new TypeCollection(
+                    new Type\IntType()
+                )
+            ),
+            new Argument(
+                'current',
+                new TypeCollection(
+                    new Type\IntType()
+                )
+            ),
+            new Argument(
+                'not_empty',
+                new TypeCollection(
+                    new Type\IntType()
+                ),
+                0
+            ),
+            new Argument(
+                'visible',
+                new TypeCollection(
+                    new Type\IntType()
+                ),
+                1
+            ),
+            new Argument(
+                'link',
+                new TypeCollection(
+                    new Type\AnyType()
+                )
+            ),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumType('alpha', 'alpha_reverse', 'reverse')
+                )
+            ),
+            new Argument(
+                'random',
+                new TypeCollection(
+                    new Type\AnyType()
+                ),
+                0
+            ),
+            new Argument(
+                'exclude',
+                new TypeCollection(
+                    new Type\IntListType()
+                )
+            ),
+            new Argument(
+                'limit',
+                new TypeCollection(
+                    new Type\IntType()
+                ),
+                10
+            ),
+            new Argument(
+                'offset',
+                new TypeCollection(
+                    new Type\IntType()
+                ),
+                0
+            )
         );
     }
 
     /**
      *
      *
-     * @return \Thelia\Tpex\Element\Loop\LoopResult
+     * @return \Thelia\Core\Template\Element\LoopResult
      */
     public function exec()
     {
         $search = CategoryQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById($this->id, \Criteria::IN);
+            $search->filterById(explode(',', $this->id), \Criteria::IN);
         }
 
-        if(!is_null($this->parent)) {
+        if (!is_null($this->parent)) {
             $search->filterByParent($this->parent);
         }
 
-        if($this->current == 1) {
+        if ($this->current == 1) {
             $search->filterById($this->request->get("category_id"));
-        } else if ($this->current == 0) {
+        } elseif (null !== $this->current && $this->current == 0) {
             $search->filterById($this->request->get("category_id"), \Criteria::NOT_IN);
         }
 
@@ -122,14 +187,13 @@ class Category extends BaseLoop {
             $search->filterByLink($this->link);
         }
 
-        if($this->limit > -1) {
+        if ($this->limit > -1) {
             $search->limit($this->limit);
         }
         $search->filterByVisible($this->visible);
         $search->offset($this->offset);
 
-
-        switch($this->order) {
+        switch ($this->order) {
             case "alpha":
                 $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
                 break;
@@ -144,7 +208,7 @@ class Category extends BaseLoop {
                 break;
         }
 
-        if($this->random == 1) {
+        if ($this->random == 1) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }

@@ -26,48 +26,49 @@ namespace Thelia\Core\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
 /**
- * 
+ *
  * Class thrown on Thelia.action event
- * 
+ *
  * call setAction if action match yours
- * 
+ *
  */
 abstract class ActionEvent extends Event
 {
-    
+
     /**
      *
      * @var Symfony\Component\HttpFoundation\Request
      */
     protected $request;
-    
+
     /**
      *
      * @var string
      */
     protected $action;
-    
+
     /**
-     * 
+     *
      * @param \Symfony\Component\HttpFoundation\Request $request
-     * @param string $action
+     * @param string                                    $action
      */
-    public function __construct(Request $request, $action) {
+    public function __construct(Request $request, $action)
+    {
         $this->request = $request;
         $this->action = $action;
     }
-    
+
     /**
-     * 
+     *
      * @return string
      */
     public function getAction()
     {
         return $this->action;
     }
-    
+
     /**
-     * 
+     *
      * @return \Symfony\Component\HttpFoundation\Request
      */
     public function getRequest()

@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,17 +17,17 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 namespace Thelia\Core\Bundle;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\Scope;
 
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterParserPluginPass;
 
 /**
  * First Bundle use in Thelia
@@ -56,5 +56,6 @@ class TheliaBundle extends Bundle
         $container->addScope(new Scope('request'));
 
         $container->addCompilerPass(new RegisterListenersPass());
+        $container->addCompilerPass(new RegisterParserPluginPass());
     }
 }

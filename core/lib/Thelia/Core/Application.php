@@ -29,7 +29,6 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-
 class Application extends BaseApplication
 {
 
@@ -68,15 +67,13 @@ class Application extends BaseApplication
 
         $container = $this->kernel->getContainer();
 
-        foreach($container->getParameter("command.definition") as $command)
-        {
+        foreach ($container->getParameter("command.definition") as $command) {
             $r = new \ReflectionClass($command);
 
             if ($r->isSubclassOf('Symfony\\Component\\Console\\Command\\Command') && !$r->isAbstract()) {
                 $this->add($r->newInstance());
             }
         }
-
 
     }
 }

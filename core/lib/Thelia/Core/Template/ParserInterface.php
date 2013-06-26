@@ -24,8 +24,6 @@ namespace Thelia\Core\Template;
 
 /**
  *
- *
- *
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  *
  */

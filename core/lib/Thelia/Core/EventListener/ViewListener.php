@@ -28,7 +28,7 @@ use Symfony\Component\HttpKernel\Event\GetResponseForControllerResultEvent;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Exception\ResourceNotFoundException;
+use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
 
 /**
@@ -67,7 +67,9 @@ class ViewListener implements EventSubscriberInterface
      */
     public function onKernelView(GetResponseForControllerResultEvent $event)
     {
-        $parser = $this->container->get('parser');
+
+        $parser = $this->container->get('thelia.parser');
+
         try {
             $content = $parser->getContent();
 
@@ -76,22 +78,22 @@ class ViewListener implements EventSubscriberInterface
             } else {
                 $event->setResponse(new Response($content, $parser->getStatus() ?: 200));
             }
-        } catch(ResourceNotFoundException $e) {
+        } catch (ResourceNotFoundException $e) {
             $event->setResponse(new Response($e->getMessage(), 404));
         }
-        
+
     }
-    
+
     public function beforeKernelView(GetResponseForControllerResultEvent $event)
     {
         $request = $this->container->get('request');
-        
+
         if (!$view = $request->attributes->get('_view')) {
             $request->attributes->set('_view', $this->findView($request));
         }
-        
+
     }
-    
+
     public function findView(Request $request)
     {
         if (! $view = $request->query->get('view')) {
@@ -100,7 +102,7 @@ class ViewListener implements EventSubscriberInterface
                 $view = $request->request->get('view');
             }
         }
-        
+
         return $view;
     }
 
@@ -117,7 +119,7 @@ class ViewListener implements EventSubscriberInterface
             KernelEvents::VIEW =>array(
                 array('onKernelView', 0),
                 array('beforeKernelView', 5)
-            ) 
+            )
         );
     }
 }

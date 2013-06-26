@@ -35,13 +35,8 @@ namespace Thelia\Core;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel;
 use Symfony\Component\Config\Loader\LoaderInterface;
-use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Config\ConfigCache;
-use Symfony\Component\Config\Resource\FileResource;
-use Symfony\Component\Config\Util\XmlUtils;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
-
 
 use Thelia\Core\Bundle;
 use Thelia\Log\Tlog;
@@ -60,23 +55,23 @@ class Thelia extends Kernel
     const THELIA_VERSION = 0.1;
 
     protected $tpexConfig;
-    
+
     public function init()
     {
         parent::init();
-        if($this->debug) {
+        if ($this->debug) {
             ini_set('display_errors', 1);
         }
         $this->initPropel();
     }
-    
+
     protected function initPropel()
     {
         if (file_exists(THELIA_ROOT . '/local/config/database.yml') === false) {
             return ;
         }
 
-        if(! Propel::isInit()) {
+        if (! Propel::isInit()) {
 
             $definePropel = new DefinePropel(new DatabaseConfiguration(),
                 Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
@@ -106,10 +101,10 @@ class Thelia extends Kernel
     }
 
     /**
-     * 
-     * Load some configuration 
+     *
+     * Load some configuration
      * Initialize all plugins
-     * 
+     *
      */
     protected function loadConfiguration(ContainerBuilder $container)
     {
@@ -126,20 +121,19 @@ class Thelia extends Kernel
                 try {
                     $loader = new XmlFileLoader($container, new FileLocator(THELIA_MODULE_DIR . "/" . ucfirst($module->getCode()) . "/Config"));
                     $loader->load("config.xml");
-                } catch(\InvalidArgumentException $e) {
-
+                } catch (\InvalidArgumentException $e) {
+                    // FIXME: process module configuration exception
                 }
             }
         }
-
     }
-    
+
     /**
-     * 
+     *
      * initialize session in Request object
-     * 
+     *
      * All param must be change in Config table
-     * 
+     *
      * @param \Symfony\Component\HttpFoundation\Request $request
      */
 
@@ -166,6 +160,7 @@ class Thelia extends Kernel
 
         $this->loadConfiguration($container);
         $container->customCompile();
+
         return $container;
     }
 
@@ -229,7 +224,7 @@ class Thelia extends Kernel
     {
         $bundles = array(
             /* TheliaBundle contain all the dependency injection description */
-            new Bundle\TheliaBundle()
+            new Bundle\TheliaBundle(),
         );
 
         /**

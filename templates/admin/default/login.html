@@ -1,0 +1,62 @@
+{$page_title={intl l='Thelia'}}
+{include file='includes/header.inc.html'}
+
+<div class="loginpage">
+
+   	<div class="brandbar container">
+       	<a class="brand" href="index.php">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
+    </div>
+
+    <div id="wrapper" class="container">
+        {*
+	    {thelia_module action='index_top'}
+        *}
+
+	   	<div class="hero-unit">
+	        <h1>{intl l='Thelia Back Office'}</h1>
+
+			<form action="/admin" method="post" class="well form-inline" {form_enctype form=$form}>
+                {form_field_hidden form=$form}
+                {form_field form=$form.username}
+                    {form_error form=$form.username}
+                        {$message}
+                    {/form_error}
+				    <input type="text" class="input" placeholder="{intl l='E-mail address'}" name="{$name}" />
+                {/form_field}
+                {form_field form=$form.password}
+				    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" />
+                {/form_field}
+
+				<label class="checkbox"> <input type="checkbox" name="remember" value="yes"> {intl l='Remember me'}</label>
+
+				<button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play"></i></button>
+			</form>
+		</div>
+
+		<div class="row-fluid">
+
+		</div>
+
+		<div>
+			<h2>We DO display loops in back-office !</h2>
+		     <ul>
+		     {loop type="category" name="catloop1"}
+		         <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}, children: {$NB_CHILD}
+		          {ifloop rel="inner1"}
+		          	<ul>
+		          	{loop type="category" name="inner1" parent="{$ID}"}
+		          		<li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
+		          	{/loop}
+		          	</ul>
+		          {/ifloop}
+		         </li>
+		     {/loop}
+		     </ul>
+		</div>
+	</div>
+    {*
+	{thelia_module action='index_bottom'}
+    *}
+</div>
+
+{include file='includes/footer.inc.html'}

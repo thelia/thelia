@@ -1,0 +1,102 @@
+{include file="includes/header.html"}
+<div>
+An image from asset directory :
+{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}
+</div>
+
+<div>
+{intl l='An internationalized string'}
+</div>
+{form name="thelia.customer.creation"}
+<form method="post" action="index_dev.php" {form_enctype form=$form} >
+
+    {form_field_hidden form=$form}
+    {form_field form=$form.email}
+        {intl l="{$label}"} : <input type="text" name="{$name}" {$attr} >
+    {/form_field}
+
+    {form_field form=$form.name}
+        {intl l='name'} : <input type="text" name="{$name}" >
+    {/form_field}
+    {form_field form=$form.age}
+    {intl l='age'} : <input type="text" name="{$name}">
+    {/form_field}
+</form>
+{/form}
+<div>
+	jQuery data: <span id="jquery_block"></span>
+</div>
+
+<div>
+     <p>Category loop example</p>
+     <ul>
+     {loop type="category" name="catloop1"}
+         <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}, children: {$NB_CHILD}
+          {ifloop rel="inner1"}
+          	<ul>
+          	{loop type="category" name="inner1" parent="{$ID}"}
+          		<li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
+          	{/loop}
+          	</ul>
+          {/ifloop}
+         </li>
+     {/loop}
+     </ul>
+</div>
+
+<div>
+	<p>Conditional example #1</p>
+
+  	{ifloop rel="catloop2"}
+  		Hey ! Loop catloop2 is not empty:
+  		<ul>
+   		{loop type="category" name="catloop2" parent="12"}
+       		<li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+   		{/loop}
+   		</ul>
+  	{/ifloop}
+
+  	{elseloop rel="catloop2"}
+  		<p>Loop catloop2 is empty</p>
+  	{/elseloop}
+</div>
+
+<div>
+	<p>Conditional example #2</p>
+
+	{ifloop rel="catloop3"}
+		Loop catloop3 is not empty:
+		<ul>
+		{loop type="category" name="catloop3" parent="0"}
+	    	<li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+	 	{/loop}
+	 	</ul>
+	{/ifloop}
+
+	{elseloop rel="catloop3"}
+		<p>Loop catloop3 is empty</p>
+	{/elseloop}
+
+	{elseloop rel="catloop2"}
+		<p>... but catloop2 is still empty :-)</p>
+	{/elseloop}
+	{ifloop rel="catloop1"}
+		<p>... and catloop1 is still NOT empty :-)</p>
+	{/ifloop}
+</div>
+
+<div>
+	<p>Traditional for loop</p>
+    {for $index=5 to 12 step 1}
+    	Compteur = {$index}<br />
+    {/for}
+</div>
+
+<div>
+    <p>Loops also work with #</p>
+    {loop type="category" name="catloop1"}
+        #TITLE : {#DESCRIPTION|upper} #NOTATAG<br />
+    {/loop}
+</div>
+
+{include file="includes/footer.html"}
