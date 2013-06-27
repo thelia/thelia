@@ -25,7 +25,6 @@ namespace Thelia\Core\Template\Element;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
 /**
@@ -73,10 +72,10 @@ abstract class BaseLoop
         return $this->defineArgs()->addArguments($this->getDefaultArgs());
     }
 
-    public function search(\ModelCriteria $search)
+    public function search(\ModelCriteria $search, &$pagination = null)
     {
         if($this->page !== null) {
-            return $this->searchWithPagination($search);
+            return $this->searchWithPagination($search, $pagination);
         } else {
             return $this->searchWithOffset($search);
         }
@@ -92,9 +91,19 @@ abstract class BaseLoop
         return $search->find();
     }
 
-    public function searchWithPagination(\ModelCriteria $search)
+    public function searchWithPagination(\ModelCriteria $search, &$pagination)
     {
-        return $search->paginate($this->page, $this->limit);
+        $pagination = $search->paginate($this->page, $this->limit);
+
+        //$toto = $pagination->haveToPaginate();
+        //$toto = $pagination->getNbResults();
+        //$toto2 = $pagination->count();
+
+        if($this->page > $pagination->getLastPage()) {
+            return array();
+        } else {
+            return $pagination;
+        }
     }
 
     /**
@@ -121,7 +130,7 @@ abstract class BaseLoop
      *
      * @return mixed
      */
-    abstract public function exec();
+    abstract public function exec(&$pagination);
 
     /**
      *
@@ -140,7 +149,7 @@ abstract class BaseLoop
      *          )
      * );
      *
-     * @return ArgumentCollection
+     * @return \Thelia\Core\Template\Element\LoopResult
      */
     abstract protected function defineArgs();
 

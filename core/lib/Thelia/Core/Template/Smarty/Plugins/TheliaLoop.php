@@ -35,6 +35,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TheliaLoop implements SmartyPluginInterface
 {
+    protected static $pagination = null;
 
     protected $loopDefinition = array();
 
@@ -46,6 +47,20 @@ class TheliaLoop implements SmartyPluginInterface
     {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param $loopId
+     *
+     * @return \PropelModelPager
+     */
+    public static function getPagination($loopId)
+    {
+        if(!empty(self::$pagination[$loopId])) {
+            return self::$pagination[$loopId];
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -75,11 +90,13 @@ class TheliaLoop implements SmartyPluginInterface
 
     		$this->getLoopArgument($loop, $params);
 
-    		$loopResults = $loop->exec();
+            self::$pagination[$name] = null;
+
+    		$loopResults = $loop->exec(self::$pagination[$name]);
 
     		$template->assignByRef($name, $loopResults);
-    	}
-    	else {
+
+    	} else {
 
     		$loopResults = $template->getTemplateVars($name);
 
@@ -97,7 +114,8 @@ class TheliaLoop implements SmartyPluginInterface
             $template->assign('__COUNT__', 1 + $loopResults->key());
             $template->assign('__TOTAL__', $loopResults->getCount());
 
-    		$repeat = $loopResults->valid();
+            //$repeat = $loopResults->valid();
+            $repeat = true;
     	}
 
     	if ($content !== null) {
@@ -139,11 +157,60 @@ class TheliaLoop implements SmartyPluginInterface
      */
     public function theliaIfLoop($params, $content, $template, &$repeat)
     {
-
     	// When encountering close tag, check if loop has results.
     	if ($repeat === false) {
     		return $this->checkEmptyLoop($params, $template) ? '' : $content;
     	}
+    }
+
+    /**
+     * Process {pageloop rel="loopname"} ... {/pageloop} block
+     *
+     * @param $params
+     * @param $content
+     * @param $template
+     * @param $repeat
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function theliaPageLoop($params, $content, $template, &$repeat)
+    {
+        if (empty($params['rel']))
+            throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
+
+        $loopName = $params['rel'];
+
+        // Find loop results in the current template vars
+        $loopResults = $template->getTemplateVars($loopName);
+        if (empty($loopResults)) {
+            throw new \InvalidArgumentException("Loop $loopName is not defined.");
+        }
+
+        // Find pagination
+        $pagination = self::getPagination($loopName);
+        if ($pagination === null) {
+            throw new \InvalidArgumentException("Loop $loopName : no pagination found.");
+        }
+
+        if ($content === null) {
+            $page = 1;
+        } else {
+            $page = $template->getTemplateVars('PAGE');
+            $page++;
+        }
+
+        if ($page <= $pagination->getLastPage()) {
+            $template->assign('PAGE', $page);
+            $template->assign('CURRENT', $pagination->getPage());
+            $template->assign('LAST', $pagination->getLastPage());
+
+            $repeat = true;
+        }
+
+        if ($content !== null) {
+            return $content;
+        }
     }
 
     /**
@@ -210,11 +277,6 @@ class TheliaLoop implements SmartyPluginInterface
      */
     protected function getLoopArgument(BaseLoop $loop, $smartyParam)
     {
-    	$defaultItemsParams = array('required' => true);
-
-    	$shortcutItemParams = array('optional' => array('required' => false));
-
-    	$errorCode = 0;
     	$faultActor = array();
     	$faultDetails = array();
 
@@ -300,6 +362,7 @@ class TheliaLoop implements SmartyPluginInterface
     		new SmartyPluginDescriptor('block', 'loop'     , $this, 'theliaLoop'),
     		new SmartyPluginDescriptor('block', 'elseloop' , $this, 'theliaElseloop'),
     		new SmartyPluginDescriptor('block', 'ifloop'   , $this, 'theliaIfLoop'),
+    		new SmartyPluginDescriptor('block', 'pageloop'   , $this, 'theliaPageLoop'),
         );
      }
 }

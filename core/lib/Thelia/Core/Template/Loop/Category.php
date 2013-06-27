@@ -100,7 +100,7 @@ class Category extends BaseLoop {
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
-    public function exec()
+    public function exec(&$pagination)
     {
         $search = CategoryQuery::create();
 
@@ -156,7 +156,7 @@ class Category extends BaseLoop {
          */
         $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
 
-        $categories = $this->search($search);
+        $categories = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
