@@ -24,31 +24,25 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 
-class CustomerCreation extends AbstractType
+class CustomerCreation extends BaseForm
 {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    protected function buildForm()
     {
-        return $builder->add("name", "text")
+        $this->form->add("name", "text")
             ->add("email", "email", array(
                     "attr" => array(
                         "class" => "field"
                     ),
-                    "label" => "email"
+                    "label" => "email",
+                    "constraints" => array(
+                        new NotBlank()
+                    )
                 )
             )
             ->add('age', 'integer');
-    }
-
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName()
-    {
-        return "customer creation";
     }
 }

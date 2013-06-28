@@ -32,30 +32,43 @@ use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Validator\Validation;
 use Thelia\Model\ConfigQuery;
 
-class BaseForm {
-
+abstract class BaseForm {
     /**
-     * @param Request $request
-     * @return \Symfony\Component\Form\FormFactoryInterface
+     * @var \Symfony\Component\Form\FormFactoryInterface
      */
-    public static function getFormFactory(Request $request, $secret = null)
+    protected $form;
+
+    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
         $validator = Validation::createValidator();
 
-        $form = Forms::createFormFactoryBuilder()
+        $this->form = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
             ->addExtension(
                 new CsrfExtension(
                     new SessionCsrfProvider(
                         $request->getSession(),
-                        $secret ?: ConfigQuery::read("form.secret", md5(__DIR__))
+                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
                     )
                 )
             )
             ->addExtension(new ValidatorExtension($validator))
-            ->getFormFactory();
+            ->getFormFactory()
+            ->createBuilder($type, $data, $options);
+        ;
 
-        return $form;
+            $this->buildForm();
     }
+
+    /**
+     * @return \Symfony\Component\Form\Form
+     */
+    public function getForm()
+    {
+        return $this->form->getForm();
+    }
+
+    abstract protected function buildForm();
+
 }
 
