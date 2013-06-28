@@ -30,7 +30,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 class CustomerCreation extends BaseForm
 {
 
-    public function buildForm()
+    protected function buildForm()
     {
         $this->form->add("name", "text")
             ->add("email", "email", array(
