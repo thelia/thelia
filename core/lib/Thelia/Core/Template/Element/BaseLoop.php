@@ -25,7 +25,7 @@ namespace Thelia\Core\Template\Element;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
 
 /**
  *
@@ -44,6 +44,19 @@ abstract class BaseLoop
      */
     public $dispatcher;
 
+    public $limit;
+    public $page;
+    public $offset;
+
+    protected function getDefaultArgs()
+    {
+        return array(
+            Argument::createIntTypeArgument('offset', 0),
+            Argument::createIntTypeArgument('page'),
+            Argument::createIntTypeArgument('limit', 10),
+        );
+    }
+
     /**
      * @param \Symfony\Component\HttpFoundation\Request                   $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -52,6 +65,45 @@ abstract class BaseLoop
     {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+    }
+
+    public function getArgs()
+    {
+        return $this->defineArgs()->addArguments($this->getDefaultArgs());
+    }
+
+    public function search(\ModelCriteria $search, &$pagination = null)
+    {
+        if($this->page !== null) {
+            return $this->searchWithPagination($search, $pagination);
+        } else {
+            return $this->searchWithOffset($search);
+        }
+    }
+
+    public function searchWithOffset(\ModelCriteria $search)
+    {
+        if($this->limit >= 0) {
+            $search->limit($this->limit);
+        }
+        $search->offset($this->offset);
+
+        return $search->find();
+    }
+
+    public function searchWithPagination(\ModelCriteria $search, &$pagination)
+    {
+        $pagination = $search->paginate($this->page, $this->limit);
+
+        //$toto = $pagination->haveToPaginate();
+        //$toto = $pagination->getNbResults();
+        //$toto2 = $pagination->count();
+
+        if($this->page > $pagination->getLastPage()) {
+            return array();
+        } else {
+            return $pagination;
+        }
     }
 
     /**
@@ -78,7 +130,7 @@ abstract class BaseLoop
      *
      * @return mixed
      */
-    abstract public function exec();
+    abstract public function exec(&$pagination);
 
     /**
      *
@@ -97,8 +149,8 @@ abstract class BaseLoop
      *          )
      * );
      *
-     * @return ArgumentCollection
+     * @return \Thelia\Core\Template\Element\LoopResult
      */
-    abstract public function defineArgs();
+    abstract protected function defineArgs();
 
 }

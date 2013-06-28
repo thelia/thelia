@@ -99,4 +99,61 @@ An image from asset directory :
     {/loop}
 </div>
 
+<div>
+    <p>Some pagination</p>
+    <p>PAGE 1</p>
+    <ul>
+        {loop type="category" name="catloopwithpagination1" limit="2" page="1"}
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+    <p>PAGE 2</p>
+    <ul>
+        {loop type="category" name="catloopwithpagination2" limit="2" page="2"}
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+    <p>PAGE 1000</p>
+    <ul>
+
+        {loop type="category" name="catloopwithpagination1000" limit="2" page="1000"}
+            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        {/loop}
+
+        {elseloop rel="catloopwithpagination1000"}
+            NO RESULTS
+        {/elseloop}
+    </ul>
+</div>
+
+<div>
+    <p>Some pagination with page choice</p>
+    {assign var=current_page value=2}
+    <p>PAGE {$current_page} :</p>
+    <ul>
+        {loop type="category" name="catloopwithpaginationchoice" limit="2" page="{$current_page}"}
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+    <p>page choice</p>
+    {pageloop rel="catloopwithpaginationchoice"}
+        {if ${PAGE} != {$current_page}}
+            {if {$PAGE} > {$current_page}-10 AND {$PAGE} < {$current_page}+10}
+                {$PAGE}
+            {/if}
+            {if {$PAGE} == {$current_page}-10 OR {$PAGE} == {$current_page}+10}
+                ...
+            {/if}
+            {if ({$PAGE} < {$current_page}-10 OR {$PAGE} > {$current_page}+10) AND ({$PAGE}%10 == 0 OR ${PAGE} == {$LAST} OR ${PAGE} == 1)}
+                {$PAGE}
+            {/if}
+        {else}
+            { {$PAGE} }
+        {/if}
+        {if {$PAGE} != {$LAST}}
+            -
+        {/if}
+    {/pageloop}
+</div>
+
 {include file="includes/footer.html"}
