@@ -24,7 +24,8 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\ConfigQuery;
 
 
 class CustomerCreation extends BaseForm
@@ -32,18 +33,47 @@ class CustomerCreation extends BaseForm
 
     protected function buildForm()
     {
-        $this->form->add("name", "text")
-            ->add("email", "email", array(
-                    "attr" => array(
-                        "class" => "field"
-                    ),
-                    "label" => "email",
-                    "constraints" => array(
-                        new NotBlank()
-                    )
+        $this->form
+            ->add("firstname", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
                 )
-            )
-            ->add('age', 'integer');
+            ))
+            ->add("lastname", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                )
+            ))
+            ->add("email", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email()
+                )
+            ))
+            ->add("address1", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                )
+            ))
+            ->add("address2", "text")
+            ->add("address3", "text")
+            ->add("zipcode", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                )
+            ))
+            ->add("country", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                )
+            ))
+            ->add("password", "password", array(
+                "constraints" => array(
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
+                )
+            ))
+
+        ;
     }
 
     public function getName()

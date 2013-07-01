@@ -25,6 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerCreation;
 
@@ -33,6 +34,9 @@ class Customer implements EventSubscriberInterface
 
     public function create(ActionEvent $event)
     {
+
+        $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
+
         $request = $event->getRequest();
 
         $customerForm = new CustomerCreation($request);
@@ -49,6 +53,8 @@ class Customer implements EventSubscriberInterface
                 $event->setFormError($form);
             }
         }
+
+        $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $event);
     }
 
     public function modify(ActionEvent $event)
