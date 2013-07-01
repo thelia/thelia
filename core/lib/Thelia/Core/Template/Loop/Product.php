@@ -62,7 +62,6 @@ use Thelia\Type;
  * Class Category
  * @package Thelia\Core\Template\Loop
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class Category extends BaseLoop
 {

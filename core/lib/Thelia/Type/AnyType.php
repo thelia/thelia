@@ -39,4 +39,9 @@ class AnyType implements TypeInterface
     {
         return true;
     }
+
+    public function getFormatedValue($value)
+    {
+        return $value;
+    }
 }

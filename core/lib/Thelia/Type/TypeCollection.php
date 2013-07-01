@@ -132,4 +132,14 @@ class TypeCollection implements \Iterator
 
         return false;
     }
+
+    public function getFormatedValue($value) {
+        foreach($this as $type) {
+            if($type->isValid($value)) {
+                return $type->getFormatedValue($value);
+            }
+        }
+
+        return null;
+    }
 }

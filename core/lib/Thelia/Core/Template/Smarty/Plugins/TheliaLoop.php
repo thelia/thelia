@@ -308,7 +308,7 @@ class TheliaLoop implements SmartyPluginInterface
                 $value = $argument->default;
             }
 
-            $loop->{$argument->name} = $value;
+            $loop->{$argument->name} = $value === null ? null : $argument->type->getFormatedValue($value);
         }
 
         if (!empty($faultActor)) {

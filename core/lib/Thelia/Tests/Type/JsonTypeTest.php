@@ -38,4 +38,11 @@ class JsonTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($jsonType->isValid('{"k0":"v0","k1":"v1","k2":"v2"}'));
         $this->assertFalse($jsonType->isValid('1,2,3'));
     }
+
+    public function testFormatJsonType()
+    {
+        $jsonType = new JsonType();
+        $this->assertTrue(is_array($jsonType->getFormatedValue('{"k0":"v0","k1":"v1","k2":"v2"}')));
+        $this->assertNull($jsonType->getFormatedValue('foo'));
+    }
 }
