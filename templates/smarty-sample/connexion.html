@@ -9,7 +9,7 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} >
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
     {/form_field}
 
     {form_field form=$form.lastname}
@@ -17,7 +17,53 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} >
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+    {/form_field}
+
+    {form_field form=$form.address1}
+        {form_error form=$form.address1}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+    {/form_field}
+
+    {form_field form=$form.address2}
+        {form_error form=$form.address2}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+    {/form_field}
+
+    {form_field form=$form.address3}
+        {form_error form=$form.address3}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+    {/form_field}
+
+    {form_field form=$form.zipcode}
+        {form_error form=$form.zipcode}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+    {/form_field}
+
+    {form_field form=$form.country}
+        {form_error form=$form.country}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+            <select name="{$name}">
+                <option value="1">France</option>
+                <option value="2">Belgium</option>
+
+            </select>
+        <br />
     {/form_field}
 
 <input type="submit" value="valider">
