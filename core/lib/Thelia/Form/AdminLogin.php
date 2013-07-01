@@ -41,4 +41,9 @@ class AdminLogin extends BaseForm {
             ->add("password", "password");
     }
 
+    public function getName()
+    {
+        return "admin_login";
+    }
+
 }

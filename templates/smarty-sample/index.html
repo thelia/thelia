@@ -27,6 +27,21 @@ An image from asset directory :
         <input type="submit" value="valider">
 </form>
 {/form}
+
+<br />
+
+{form name="thelia.admin_login"}
+        <form method="post" action="#" {form_enctype form=$form} >
+       {form_field_hidden form=$form}
+       {form_field form=$form.username}
+            username : <input type="text" name="{$name}" {$attr}>
+       {/form_field}
+
+       {form_field form=$form.password}
+            password : <input type="password" name="{$name}" {$attr}>
+       {/form_field}
+        </form>
+{/form}
 <div>
 	jQuery data: <span id="jquery_block"></span>
 </div>

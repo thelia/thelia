@@ -23,6 +23,7 @@
 
     <forms>
         <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
+        <form name="thelia.admin_login" class="Thelia\Form\AdminLogin"/>
     </forms>
 
 

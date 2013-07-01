@@ -61,7 +61,7 @@ abstract class BaseForm {
             )
             ->addExtension(new ValidatorExtension($validator))
             ->getFormFactory()
-            ->createBuilder($type, $data, $options);
+            ->createNamedBuilder($this->getName(), $type, $data, $options);
         ;
 
 
