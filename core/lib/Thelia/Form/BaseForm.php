@@ -30,6 +30,7 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Validator\Validation;
+use Thelia\Form\Extension\NameFormExtension;
 use Thelia\Model\ConfigQuery;
 
 abstract class BaseForm {
@@ -38,9 +39,15 @@ abstract class BaseForm {
      */
     protected $form;
 
+    public $name;
+
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
         $validator = Validation::createValidator();
+
+        if(!isset($options["attr"]["name"])) {
+            $options["attr"]["thelia_name"] = $this->getName();
+        }
 
         $this->form = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
@@ -48,7 +55,7 @@ abstract class BaseForm {
                 new CsrfExtension(
                     new SessionCsrfProvider(
                         $request->getSession(),
-                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
+                        isset($options["secret"]) ? $options["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
                     )
                 )
             )
@@ -56,6 +63,8 @@ abstract class BaseForm {
             ->getFormFactory()
             ->createBuilder($type, $data, $options);
         ;
+
+
 
             $this->buildForm();
     }
@@ -69,6 +78,6 @@ abstract class BaseForm {
     }
 
     abstract protected function buildForm();
-
+    abstract public function getName();
 }
 

@@ -45,4 +45,9 @@ class CustomerCreation extends BaseForm
             )
             ->add('age', 'integer');
     }
+
+    public function getName()
+    {
+        return "customerCreation";
+    }
 }

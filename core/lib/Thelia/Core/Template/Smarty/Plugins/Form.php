@@ -88,8 +88,14 @@ class Form implements SmartyPluginInterface
             }
 
             $instance = $this->getInstance($params['name']);
+            $form = $instance->getForm();
 
-            $template->assign("form", $instance->getForm()->createView());
+            if (true === $this->request->getSession()->get("form_error", false) && $this->request->getSession()->get
+                    ("form_name") == $instance->getName()) {
+                $form->bind($this->request);
+            }
+
+            $template->assign("form", $form->createView());
         } else {
             return $content;
         }
@@ -202,7 +208,10 @@ class Form implements SmartyPluginInterface
         $class = new \ReflectionClass($this->formDefinition[$name]);
 
 
-        return $class->newInstance($this->request);
+        return $class->newInstance(
+            $this->request,
+            "form"
+        );
     }
 
     /**

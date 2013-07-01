@@ -47,6 +47,8 @@ abstract class ActionEvent extends Event
      */
     protected $action;
 
+    protected $form;
+
     /**
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
@@ -75,4 +77,21 @@ abstract class ActionEvent extends Event
     {
         return $this->request;
     }
+
+    public function setFormError($form)
+    {
+        $this->form = $form;
+        $this->stopPropagation();
+    }
+
+    public function getForm()
+    {
+        return $this->form;
+    }
+
+    public function hasFormError()
+    {
+        return $this->form !== null;
+    }
+
 }

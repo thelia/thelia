@@ -12,6 +12,9 @@ An image from asset directory :
 
     {form_field_hidden form=$form}
     {form_field form=$form.email}
+        {form_error form=$form.email}
+        {$message}
+        {/form_error}
         {intl l="{$label}"} : <input type="text" name="{$name}" {$attr} >
     {/form_field}
 
