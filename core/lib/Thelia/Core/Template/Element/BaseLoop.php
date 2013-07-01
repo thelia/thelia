@@ -72,6 +72,12 @@ abstract class BaseLoop
         return $this->defineArgs()->addArguments($this->getDefaultArgs());
     }
 
+    /**
+     * @param \ModelCriteria $search
+     * @param null           $pagination
+     *
+     * @return array|mixed|\PropelModelPager|\PropelObjectCollection
+     */
     public function search(\ModelCriteria $search, &$pagination = null)
     {
         if($this->page !== null) {
@@ -81,6 +87,11 @@ abstract class BaseLoop
         }
     }
 
+    /**
+     * @param \ModelCriteria $search
+     *
+     * @return array|mixed|\PropelObjectCollection
+     */
     public function searchWithOffset(\ModelCriteria $search)
     {
         if($this->limit >= 0) {
@@ -91,13 +102,15 @@ abstract class BaseLoop
         return $search->find();
     }
 
+    /**
+     * @param \ModelCriteria $search
+     * @param                $pagination
+     *
+     * @return array|\PropelModelPager
+     */
     public function searchWithPagination(\ModelCriteria $search, &$pagination)
     {
         $pagination = $search->paginate($this->page, $this->limit);
-
-        //$toto = $pagination->haveToPaginate();
-        //$toto = $pagination->getNbResults();
-        //$toto2 = $pagination->count();
 
         if($this->page > $pagination->getLastPage()) {
             return array();
@@ -128,9 +141,10 @@ abstract class BaseLoop
      *
      * you can retrieve ref value using $this->ref
      *
+     * @param $pagination
+     *
      * @return mixed
-     */
-    abstract public function exec(&$pagination);
+     */abstract public function exec(&$pagination);
 
     /**
      *
@@ -149,7 +163,7 @@ abstract class BaseLoop
      *          )
      * );
      *
-     * @return \Thelia\Core\Template\Element\LoopResult
+     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
     abstract protected function defineArgs();
 

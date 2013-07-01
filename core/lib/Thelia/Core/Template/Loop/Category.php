@@ -75,6 +75,9 @@ class Category extends BaseLoop
     public $random;
     public $exclude;
 
+    /**
+     * @return ArgumentCollection
+     */
     protected function defineArgs()
     {
         return new ArgumentCollection(
@@ -96,7 +99,7 @@ class Category extends BaseLoop
     }
 
     /**
-     *
+     * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
