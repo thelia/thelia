@@ -24,31 +24,70 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints;
+use Thelia\Model\ConfigQuery;
 
 
-class CustomerCreation extends AbstractType
+class CustomerCreation extends BaseForm
 {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    protected function buildForm()
     {
-        return $builder->add("name", "text")
+        $this->form
+            ->add("firstname", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => "firstname"
+            ))
+            ->add("lastname", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => "lastname"
+            ))
             ->add("email", "email", array(
-                    "attr" => array(
-                        "class" => "field"
-                    ),
-                    "label" => "email"
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email()
+                ),
+                "label" => "email"
+            ))
+            ->add("address1", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => "address"
+            ))
+            ->add("address2", "text", array(
+                "label" => "Address Line 2"
+            ))
+            ->add("address3", "text", array(
+                "label" => "Address Line 3"
+            ))
+            ->add("zipcode", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => "zipcode"
+            ))
+            ->add("country", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => "country"
+            ))
+            ->add("password", "password", array(
+                "constraints" => array(
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
                 )
-            )
-            ->add('age', 'integer');
+            ))
+
+        ;
     }
 
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
     public function getName()
     {
-        return "customer creation";
+        return "customerCreation";
     }
 }

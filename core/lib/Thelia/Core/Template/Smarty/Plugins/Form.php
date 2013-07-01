@@ -30,6 +30,30 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Log\Tlog;
 
+/**
+ *
+ * Plugin for smarty defining blocks and functions for using Form display.
+ *
+ * blocks :
+ *  - {form name="myForm"} ... {/form} => find form named myForm,
+ * create an instance and assign this instanciation into smarty variable. Form must be declare into
+ * config using <forms> tag
+ *
+ *  - {form_field form=$form.fieldName} {/form_field} This block find info into the Form field containing by
+ * the form paramter. This field must be an instance of FormView. fieldName is the name of your field. This block
+ * can output these info :
+ *      * $name => name of yout input
+ *      * $value => value for your input
+ *      * $label => label for your input
+ *      * $error => boolean for know if there is error for this field
+ *      * $attr => all your attribute for your input (define when you construct programmatically you form)
+ *
+ *  - {form_error form=$form.fieldName} ... {/form_error} Display this block if there are errors on this field.
+ * fieldName is the name of your field
+ *
+ * Class Form
+ * @package Thelia\Core\Template\Smarty\Plugins
+ */
 class Form implements SmartyPluginInterface
 {
 
@@ -63,13 +87,18 @@ class Form implements SmartyPluginInterface
                 throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
             }
 
-            $form = BaseForm::getFormFactory($this->request);
-            $formBuilder = $form->createBuilder('form');
-
             $instance = $this->getInstance($params['name']);
-            $instance = $instance->buildForm($formBuilder, array());
+            $form = $instance->getForm();
 
-            $template->assign("form", $instance->getForm()->createView());
+            if (
+                true === $this->request->getSession()->get("form_error", false) &&
+                $this->request->getSession()->get("form_name") == $instance->getName())
+            {
+                $form->bind($this->request);
+                $this->request->getSession()->set("form_error", false);
+            }
+
+            $template->assign("form", $form->createView());
         } else {
             return $content;
         }
@@ -179,8 +208,13 @@ class Form implements SmartyPluginInterface
             throw new ElementNotFoundException(sprintf("%s form does not exists", $name));
         }
 
+        $class = new \ReflectionClass($this->formDefinition[$name]);
 
-        return new $this->formDefinition[$name];
+
+        return $class->newInstance(
+            $this->request,
+            "form"
+        );
     }
 
     /**

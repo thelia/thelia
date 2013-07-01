@@ -50,11 +50,9 @@ class AdminController extends BaseAdminController {
 
     protected function getLoginForm()
     {
-        $form = $this->getFormBuilder();
+        $adminLogin = new AdminLogin($this->getRequest());
 
-        $adminLogin = new AdminLogin();
-
-        return $adminLogin->buildForm($form, array())->getForm();
+        return $adminLogin->getForm();
     }
 
     public function lostAction()
