@@ -77,7 +77,31 @@ abstract class BaseForm {
         return $this->form->getForm();
     }
 
+    /**
+     *
+     * in this function you add all the fields you need for your Form.
+     * Form this you have to call add method on $this->form attribute :
+     *
+     * $this->form->add("name", "text")
+     *   ->add("email", "email", array(
+     *           "attr" => array(
+     *               "class" => "field"
+     *           ),
+     *           "label" => "email",
+     *           "constraints" => array(
+     *               new NotBlank()
+     *           )
+     *       )
+     *   )
+     *   ->add('age', 'integer');
+     *
+     * @return null
+     */
     abstract protected function buildForm();
+
+    /**
+     * @return string the name of you form. This name must be unique
+     */
     abstract public function getName();
 }
 
