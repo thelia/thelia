@@ -93,6 +93,7 @@ class Form implements SmartyPluginInterface
             if (true === $this->request->getSession()->get("form_error", false) && $this->request->getSession()->get
                     ("form_name") == $instance->getName()) {
                 $form->bind($this->request);
+                $this->request->getSession()->set("form_error", false);
             }
 
             $template->assign("form", $form->createView());
