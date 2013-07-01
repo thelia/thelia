@@ -1,0 +1,27 @@
+{include file="includes/header.html"}
+
+{form name="thelia.customer.creation"}
+<form method="post" action="index_dev.php?action=createCustomer" {form_enctype form=$form} >
+
+    {form_field_hidden form=$form}
+    {form_field form=$form.firstname}
+        {form_error form=$form.firstname}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} >
+    {/form_field}
+
+    {form_field form=$form.lastname}
+        {form_error form=$form.lastname}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} >
+    {/form_field}
+
+<input type="submit" value="valider">
+</form>
+{/form}
+
+{include file="includes/footer.html"}

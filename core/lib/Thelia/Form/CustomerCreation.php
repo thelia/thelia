@@ -37,26 +37,34 @@ class CustomerCreation extends BaseForm
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
-                )
+                ),
+                "label" => "firstname"
             ))
             ->add("lastname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
-                )
+                ),
+                "label" => "lastname"
             ))
             ->add("email", "email", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
                     new Constraints\Email()
-                )
+                ),
+                "label" => "email"
             ))
             ->add("address1", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
-                )
+                ),
+                "label" => "address"
             ))
-            ->add("address2", "text")
-            ->add("address3", "text")
+            ->add("address2", "text", array(
+                "label" => "Address Line 2"
+            ))
+            ->add("address3", "text", array(
+                "label" => "Address Line 3"
+            ))
             ->add("zipcode", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
