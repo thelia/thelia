@@ -31,7 +31,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CategoryQuery;
+use Thelia\Model\ProductQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -59,18 +59,22 @@ use Thelia\Type;
  * </THELIA_cat>
  *
  *
- * Class Category
+ * Class Product
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseLoop
+class Product extends BaseLoop
 {
     public $id;
-    public $parent;
-    public $current;
-    public $not_empty;
+    public $ref;
+    public $category;
+    public $price;
+    public $price2;
+    public $promo;
+    public $newness;
     public $visible;
-    public $link;
+    public $weight;
+    public $current;
     public $order;
     public $random;
     public $exclude;
@@ -82,15 +86,30 @@ class Category extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntTypeArgument('parent'),
+            new Argument(
+                'ref',
+                new TypeCollection(
+                    new Type\JsonType()
+                )
+            ),
+            Argument::createIntListTypeArgument('category'),
+            Argument::createBooleanTypeArgument('new'),
+            Argument::createIntTypeArgument('promo'),
+            Argument::createIntTypeArgument('max_prix'),
+            Argument::createIntTypeArgument('min_price'),
+            Argument::createIntTypeArgument('min_stock'),
+            Argument::createIntTypeArgument('min_weight'),
+            Argument::createIntTypeArgument('max_weight'),
             Argument::createIntTypeArgument('current'),
+            Argument::createIntTypeArgument('current_category'),
+            Argument::createIntTypeArgument('depth'),
             Argument::createIntTypeArgument('not_empty', 0),
             Argument::createIntTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('link'),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumType('alpha', 'alpha_reverse', 'reverse')
+                    new Type\EnumType('title_alpha', 'title_alpha_reverse', 'reverse', 'min_price', 'max_price', 'category', 'manual', 'ref', 'promo')
                 )
             ),
             Argument::createIntTypeArgument('random', 0),
