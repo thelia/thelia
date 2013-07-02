@@ -4,6 +4,7 @@ namespace Thelia\Model;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CustomRefEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Model\om\BaseCustomer;
 
 
@@ -53,7 +54,7 @@ class Customer extends BaseCustomer
     {
         $customerRef = new CustomRefEvent($this);
         if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch("customer.creation.customref", $customerRef);
+            $this->dispatcher->dispatch(TheliaEvents::CREATECUSTOMER_CUSTOMREF, $customerRef);
         }
 
         $this->setRef($customerRef->hasRef()? $customerRef->getRef() : $this->generateRef());
