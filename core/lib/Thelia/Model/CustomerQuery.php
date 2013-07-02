@@ -18,4 +18,5 @@ use Thelia\Model\om\BaseCustomerQuery;
  */
 class CustomerQuery extends BaseCustomerQuery
 {
+
 }

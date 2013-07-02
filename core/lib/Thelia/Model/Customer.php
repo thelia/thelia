@@ -18,4 +18,5 @@ use Thelia\Model\om\BaseCustomer;
  */
 class Customer extends BaseCustomer
 {
+
 }

@@ -1,7 +1,7 @@
 {include file="includes/header.html"}
 
 {form name="thelia.customer.creation"}
-<form method="post" action="index_dev.php?action=createCustomer" {form_enctype form=$form} >
+<form method="post" action="index_dev.php?action=createCustomer&view=connexion" {form_enctype form=$form} >
 
     {form_field_hidden form=$form}
     {form_field form=$form.firstname}
@@ -64,6 +64,34 @@
 
             </select>
         <br />
+    {/form_field}
+
+    {form_field form=$form.email}
+        {form_error form=$form.email}
+            {#message}
+        {/form_error}
+        <label><span>{intl l="{$label}"}</span></label><input type="email" name="{$name}" {$attr} ><br />
+    {/form_field}
+
+    {form_field form=$form.email_confirm}
+        {form_error form=$form.email_confirm}
+            {#message}
+        {/form_error}
+        <label><span>{intl l="{$label}"}</span></label><input type="email" name="{$name}" {$attr} ><br />
+    {/form_field}
+
+    {form_field form=$form.password}
+        {form_error form=$form.password}
+            {#message}
+        {/form_error}
+        <label><span>{intl l="{$label}"}</span></label><input type="password" name="{$name}" {$attr} ><br />
+    {/form_field}
+
+    {form_field form=$form.password_confirm}
+        {form_error form=$form.password_confirm}
+            {#message}
+        {/form_error}
+        <label><span>{intl l="{$label}"}</span></label><input type="password" name="{$name}" {$attr} ><br />
     {/form_field}
 
 <input type="submit" value="valider">

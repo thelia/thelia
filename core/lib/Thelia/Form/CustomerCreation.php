@@ -25,7 +25,10 @@ namespace Thelia\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints;
+use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\CustomerQuery;
 
 
 class CustomerCreation extends BaseForm
@@ -45,13 +48,6 @@ class CustomerCreation extends BaseForm
                     new Constraints\NotBlank()
                 ),
                 "label" => "lastname"
-            ))
-            ->add("email", "email", array(
-                "constraints" => array(
-                    new Constraints\NotBlank(),
-                    new Constraints\Email()
-                ),
-                "label" => "email"
             ))
             ->add("address1", "text", array(
                 "constraints" => array(
@@ -77,13 +73,72 @@ class CustomerCreation extends BaseForm
                 ),
                 "label" => "country"
             ))
+            ->add("email", "email", array(
+                "constraints" => array(
+                    new Constraints\NotBlank(),
+                    new Constraints\Email(),
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            $this,
+                            "verifyExistingEmail"
+                        )
+                    ))
+                ),
+                "label" => "email"
+            ))
+            ->add("email_confirm", "email", array(
+                "constraints" => array(
+                    new Constraints\Callback(array(
+                        "methods" => array(
+                            $this,
+                            "verifyEmailField"
+                        )
+                    ))
+                ),
+                "label" => "email confirmation"
+            ))
             ->add("password", "password", array(
                 "constraints" => array(
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
-                )
+                ),
+                "label" => "password"
+            ))
+            ->add("password_confirm", "password", array(
+                "constraints" => array(
+                    new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
+                    new Constraints\Callback(array("methods" => array(
+                        array($this, "verifyPasswordField")
+                    )))
+                ),
+                "label" => "password confirmation"
             ))
 
         ;
+    }
+
+    public function verifyPasswordField($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if ($data["password"] != $data["password_confirm"]) {
+            $context->addViolation("password confirmation is not the same as password field");
+        }
+    }
+
+    public function verifyEmailField($value, ExecutionContextInterface $context)
+    {
+        $data = $context->getRoot()->getData();
+
+        if ($data["email"] != $data["email_confirm"]) {
+            $context->addViolation("email confirmation is not the same as email field");
+        }
+    }
+
+    public function verifyExistingEmail($value, ExecutionContextInterface $context)
+    {
+        if (CustomerQuery::create()->filterByEmail($value)->exists()) {
+            $context->addViolation("This email already exists");
+        }
     }
 
     public function getName()

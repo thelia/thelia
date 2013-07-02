@@ -50,6 +50,7 @@ class Customer implements EventSubscriberInterface
             if ($form->isValid()) {
                 echo "ok"; exit;
             } else {
+
                 $event->setFormError($form);
             }
         }
