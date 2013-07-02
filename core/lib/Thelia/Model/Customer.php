@@ -51,13 +51,12 @@ class Customer extends BaseCustomer
 
     public function preInsert(\PropelPDO $con = null)
     {
-        $customeRef = new CustomRefEvent($this);
+        $customerRef = new CustomRefEvent($this);
         if (!is_null($this->dispatcher)) {
-            $customeRef = new CustomRefEvent($this);
-            $this->dispatcher->dispatch("customer.creation.customref", $customeRef);
+            $this->dispatcher->dispatch("customer.creation.customref", $customerRef);
         }
 
-        $this->setRef($customeRef->hasRef()? $customeRef->getRef() : $this->generateRef());
+        $this->setRef($customerRef->hasRef()? $customerRef->getRef() : $this->generateRef());
 
         return false;
     }
