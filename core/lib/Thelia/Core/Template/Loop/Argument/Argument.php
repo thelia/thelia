@@ -72,12 +72,25 @@ class Argument
         );
     }
 
+    public static function createFloatTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    {
+        return new Argument(
+            $name,
+            new TypeCollection(
+                new Type\FloatType()
+            ),
+            $default,
+            $mandatory,
+            $empty
+        );
+    }
+
     public static function createBooleanTypeArgument($name, $default=null, $mandatory=false, $empty=true)
     {
         return new Argument(
             $name,
             new TypeCollection(
-                new Type\BoolType()
+                new Type\BooleanType()
             ),
             $default,
             $mandatory,

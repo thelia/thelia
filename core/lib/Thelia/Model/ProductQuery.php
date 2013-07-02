@@ -18,4 +18,15 @@ use Thelia\Model\om\BaseProductQuery;
  */
 class ProductQuery extends BaseProductQuery
 {
+    public function filterByPriceDependingOnPromo($minPrice = null, $maxPrice = null)
+    {
+        if ($minPrice !== null) {
+            $this->where(ProductPeer::getPriceDependingOnPromoExpression() . ' ' . \Criteria::GREATER_EQUAL . ' ?', $minPrice);
+        }
+        if ($maxPrice !== null) {
+            $this->where(ProductPeer::getPriceDependingOnPromoExpression() . ' ' . \Criteria::LESS_EQUAL . ' ?', $maxPrice);
+        }
+
+        return $this;
+    }
 }

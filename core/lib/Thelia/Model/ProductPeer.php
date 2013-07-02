@@ -18,4 +18,8 @@ use Thelia\Model\om\BaseProductPeer;
  */
 class ProductPeer extends BaseProductPeer
 {
+    public static function getPriceDependingOnPromoExpression()
+    {
+        return 'IF(' . self::PROMO . '=1, ' . self::PRICE2 . ', ' . self::PRICE . ')';
+    }
 }

@@ -84,9 +84,9 @@ class Category extends BaseLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntTypeArgument('parent'),
-            Argument::createIntTypeArgument('current'),
-            Argument::createIntTypeArgument('not_empty', 0),
-            Argument::createIntTypeArgument('visible', 1),
+            Argument::createBooleanTypeArgument('current'),
+            Argument::createBooleanTypeArgument('not_empty', 0),
+            Argument::createBooleanTypeArgument('visible', 1),
             Argument::createAnyTypeArgument('link'),
             new Argument(
                 'order',
@@ -94,7 +94,7 @@ class Category extends BaseLoop
                     new Type\EnumType('alpha', 'alpha_reverse', 'reverse')
                 )
             ),
-            Argument::createIntTypeArgument('random', 0),
+            Argument::createBooleanTypeArgument('random', 0),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -109,28 +109,28 @@ class Category extends BaseLoop
         $search = CategoryQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById(explode(',', $this->id), \Criteria::IN);
+            $search->filterById($this->id, \Criteria::IN);
         }
 
         if (!is_null($this->parent)) {
             $search->filterByParent($this->parent);
         }
 
-        if ($this->current == 1) {
+        if ($this->current === true) {
             $search->filterById($this->request->get("category_id"));
-        } elseif (null !== $this->current && $this->current == 0) {
+        } elseif ($this->current === false) {
             $search->filterById($this->request->get("category_id"), \Criteria::NOT_IN);
         }
 
         if (!is_null($this->exclude)) {
-            $search->filterById(explode(",", $this->exclude), \Criteria::NOT_IN);
+            $search->filterById($this->exclude, \Criteria::NOT_IN);
         }
 
         if (!is_null($this->link)) {
             $search->filterByLink($this->link);
         }
 
-        $search->filterByVisible($this->visible);
+        $search->filterByVisible($this->visible ? 1 : 0);
 
         switch ($this->order) {
             case "alpha":
@@ -147,7 +147,7 @@ class Category extends BaseLoop
                 break;
         }
 
-        if ($this->random == 1) {
+        if ($this->random === true) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }

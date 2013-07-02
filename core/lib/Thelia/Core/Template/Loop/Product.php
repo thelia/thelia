@@ -31,6 +31,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\CategoryQuery;
+use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -68,13 +70,17 @@ class Product extends BaseLoop
     public $id;
     public $ref;
     public $category;
-    public $price;
-    public $price2;
+    public $new;
     public $promo;
-    public $newness;
-    public $visible;
-    public $weight;
+    public $min_price;
+    public $max_price;
+    public $min_stock;
+    public $min_weight;
+    public $max_weight;
     public $current;
+    public $current_category;
+    public $depth;
+    public $visible;
     public $order;
     public $random;
     public $exclude;
@@ -94,25 +100,23 @@ class Product extends BaseLoop
             ),
             Argument::createIntListTypeArgument('category'),
             Argument::createBooleanTypeArgument('new'),
-            Argument::createIntTypeArgument('promo'),
-            Argument::createIntTypeArgument('max_prix'),
-            Argument::createIntTypeArgument('min_price'),
+            Argument::createBooleanTypeArgument('promo'),
+            Argument::createFloatTypeArgument('min_price'),
+            Argument::createFloatTypeArgument('max_prix'),
             Argument::createIntTypeArgument('min_stock'),
-            Argument::createIntTypeArgument('min_weight'),
-            Argument::createIntTypeArgument('max_weight'),
-            Argument::createIntTypeArgument('current'),
-            Argument::createIntTypeArgument('current_category'),
+            Argument::createFloatTypeArgument('min_weight'),
+            Argument::createFloatTypeArgument('max_weight'),
+            Argument::createBooleanTypeArgument('current'),
+            Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth'),
-            Argument::createIntTypeArgument('not_empty', 0),
-            Argument::createIntTypeArgument('visible', 1),
-            Argument::createAnyTypeArgument('link'),
+            Argument::createBooleanTypeArgument('visible', 1),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumType('title_alpha', 'title_alpha_reverse', 'reverse', 'min_price', 'max_price', 'category', 'manual', 'ref', 'promo')
+                    new Type\EnumType('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'category', 'manual', 'manual_reverse', 'ref', 'promo', 'new')
                 )
             ),
-            Argument::createIntTypeArgument('random', 0),
+            Argument::createBooleanTypeArgument('random', 0),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -124,28 +128,65 @@ class Product extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CategoryQuery::create();
+        $search = ProductQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById(explode(',', $this->id), \Criteria::IN);
+            $search->filterById($this->id, \Criteria::IN);
         }
 
-        if (!is_null($this->parent)) {
-            $search->filterByParent($this->parent);
+        if (!is_null($this->ref)) {
+            $search->filterByRef($this->ref, \Criteria::IN);
         }
 
-        if ($this->current == 1) {
-            $search->filterById($this->request->get("category_id"));
-        } elseif (null !== $this->current && $this->current == 0) {
-            $search->filterById($this->request->get("category_id"), \Criteria::NOT_IN);
+        if (!is_null($this->category)) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterById($this->category, \Criteria::IN)->find(),
+                \Criteria::IN
+            );
         }
 
-        if (!is_null($this->exclude)) {
-            $search->filterById(explode(",", $this->exclude), \Criteria::NOT_IN);
+        if ($this->new === true) {
+            $search->filterByNewness(1, \Criteria::EQUAL);
+        } else if($this->new === false) {
+            $search->filterByNewness(0, \Criteria::EQUAL);
         }
 
-        if (!is_null($this->link)) {
-            $search->filterByLink($this->link);
+        if ($this->promo === true) {
+            $search->filterByPromo(1, \Criteria::EQUAL);
+        } else if($this->promo === false) {
+            $search->filterByNewness(0, \Criteria::EQUAL);
+        }
+
+        $search->filterByPriceDependingOnPromo($this->min_price, $this->max_price); //@todo review
+
+        if ($this->current === true) {
+            $search->filterById($this->request->get("product_id"));
+        } elseif($this->current === false) {
+            $search->filterById($this->request->get("product_id"), \Criteria::NOT_IN);
+        }
+
+        if ($this->current_category === true) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterByProduct(
+                    ProductCategoryQuery::create()->filterByProductId(
+                        $this->request->get("product_id"),
+                        \Criteria::EQUAL
+                    )->find(),
+                    \Criteria::IN
+                )->find(),
+                \Criteria::IN
+            );
+        } elseif($this->current_category === false) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterByProduct(
+                    ProductCategoryQuery::create()->filterByProductId(
+                        $this->request->get("product_id"),
+                        \Criteria::EQUAL
+                    )->find(),
+                    \Criteria::IN
+                )->find(),
+                \Criteria::NOT_IN
+            );
         }
 
         $search->filterByVisible($this->visible);
@@ -160,14 +201,42 @@ class Product extends BaseLoop
             case "reverse":
                 $search->orderByPosition(\Criteria::DESC);
                 break;
+            /*case "min_price":
+                $search->orderByPosition(\Criteria::DESC);
+                break;
+            case "max_price":
+                $search->orderByPosition(\Criteria::DESC);
+                break;
+            case "category":
+                $search->orderByPosition(\Criteria::DESC);
+                break;*/
+            case "manual":
+                $search->addAscendingOrderByColumn(\Thelia\Model\ProductPeer::POSITION);
+                break;
+            case "manual_reverse":
+                $search->addDescendingOrderByColumn(\Thelia\Model\ProductPeer::POSITION);
+                break;
+            case "ref":
+                $search->addAscendingOrderByColumn(\Thelia\Model\ProductPeer::REF);
+                break;
+            case "promo":
+                $search->addDescendingOrderByColumn(\Thelia\Model\ProductPeer::PROMO);
+                break;
+            case "new":
+                $search->addDescendingOrderByColumn(\Thelia\Model\ProductPeer::NEWNESS);
+                break;
             default:
                 $search->orderByPosition();
                 break;
         }
 
-        if ($this->random == 1) {
+        if ($this->random === true) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
+        }
+
+        if (!is_null($this->exclude)) {
+            $search->filterById($this->exclude, \Criteria::NOT_IN);
         }
 
         /**
@@ -177,24 +246,21 @@ class Product extends BaseLoop
          */
         $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
 
-        $categories = $this->search($search, $pagination);
+        $products = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($categories as $category) {
-
-            if ($this->not_empty && $category->countAllProducts() == 0) continue;
-
+        foreach ($products as $product) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("TITLE",$category->getTitle());
-            $loopResultRow->set("CHAPO", $category->getChapo());
-            $loopResultRow->set("DESCRIPTION", $category->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $category->getPostscriptum());
-            $loopResultRow->set("PARENT", $category->getParent());
-            $loopResultRow->set("ID", $category->getId());
-            $loopResultRow->set("URL", $category->getUrl());
-            $loopResultRow->set("LINK", $category->getLink());
-            $loopResultRow->set("NB_CHILD", $category->countChild());
+            $loopResultRow->set("ID", $product->getId());
+            $loopResultRow->set("REF",$product->getRef());
+            $loopResultRow->set("TITLE",$product->getTitle());
+            $loopResultRow->set("CHAPO", $product->getChapo());
+            $loopResultRow->set("DESCRIPTION", $product->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $product->getPostscriptum());
+            //$loopResultRow->set("CATEGORY", $product->getCategory());
+
+            //$loopResultRow->set("URL", $product->getUrl());
 
             $loopResult->addRow($loopResultRow);
         }

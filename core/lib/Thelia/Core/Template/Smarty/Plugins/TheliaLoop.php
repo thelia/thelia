@@ -78,7 +78,6 @@ class TheliaLoop implements SmartyPluginInterface
         if (empty($params['name']))
             throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
 
-
         if (empty($params['type']))
             throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
 
@@ -279,7 +278,7 @@ class TheliaLoop implements SmartyPluginInterface
         $argumentsCollection = $loop->getArgs();
         foreach( $argumentsCollection as $argument ) {
 
-            $value = isset($smartyParam[$argument->name]) ? $smartyParam[$argument->name] : null;
+            $value = isset($smartyParam[$argument->name]) ? (string)$smartyParam[$argument->name] : null;
 
             /* check if mandatory */
             if($value === null && $argument->mandatory) {
@@ -304,11 +303,13 @@ class TheliaLoop implements SmartyPluginInterface
 
             /* set default */
             /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
-            if($value === null) {
-                $value = $argument->default;
+            if($value === null && $argument->default !== null) {
+                $value = (string)$argument->default;
             }
 
-            $loop->{$argument->name} = $value === null ? null : $argument->type->getFormatedValue($value);
+            $test = $argument->type->getFormatedValue($value);
+
+            $loop->{$argument->name} = $value === null ? null : $test;
         }
 
         if (!empty($faultActor)) {
