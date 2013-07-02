@@ -27,6 +27,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Choice;
 
 class AdminLogin extends AbstractType {
 
@@ -39,7 +40,12 @@ class AdminLogin extends AbstractType {
                     new Length(array("min" => 3))
                 )
             ))
-            ->add("password", "password");
+            ->add("password", "password", array(
+                "constraints" => array(
+                	new NotBlank()
+                )
+            ))
+            ->add("remember_me", "checkbox");
     }
 
     /**
