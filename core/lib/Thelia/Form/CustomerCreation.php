@@ -61,11 +61,23 @@ class CustomerCreation extends BaseForm
             ->add("address3", "text", array(
                 "label" => "Address Line 3"
             ))
+            ->add("phone", "text", array(
+                "label" => "phone"
+            ))
+            ->add("cellphone", "text", array(
+                "label" => "cellphone"
+            ))
             ->add("zipcode", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),
                 "label" => "zipcode"
+            ))
+            ->add("city", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => "city"
             ))
             ->add("country", "text", array(
                 "constraints" => array(
@@ -79,8 +91,8 @@ class CustomerCreation extends BaseForm
                     new Constraints\Email(),
                     new Constraints\Callback(array(
                         "methods" => array(
-                            $this,
-                            "verifyExistingEmail"
+                            array($this,
+                            "verifyExistingEmail")
                         )
                     ))
                 ),
@@ -90,8 +102,8 @@ class CustomerCreation extends BaseForm
                 "constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array(
-                            $this,
-                            "verifyEmailField"
+                            array($this,
+                            "verifyEmailField")
                         )
                     ))
                 ),

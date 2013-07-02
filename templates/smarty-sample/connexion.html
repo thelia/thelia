@@ -9,7 +9,7 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr} > <br />
     {/form_field}
 
     {form_field form=$form.lastname}
@@ -17,7 +17,7 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr} > <br />
     {/form_field}
 
     {form_field form=$form.address1}
@@ -25,7 +25,7 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr} > <br />
     {/form_field}
 
     {form_field form=$form.address2}
@@ -33,7 +33,7 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr} > <br />
     {/form_field}
 
     {form_field form=$form.address3}
@@ -41,7 +41,7 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr} > <br />
     {/form_field}
 
     {form_field form=$form.zipcode}
@@ -49,7 +49,15 @@
             {$message}
         {/form_error}
 
-        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" {$attr} > <br />
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr} > <br />
+    {/form_field}
+
+    {form_field form=$form.city}
+        {form_error form=$form.city}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr} > <br />
     {/form_field}
 
     {form_field form=$form.country}
@@ -66,11 +74,25 @@
         <br />
     {/form_field}
 
+    {form_field form=$form.phone}
+        {form_error form=$form.phone}
+            {$message}
+        {/form_error}
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr}> <br />
+    {/form_field}
+
+    {form_field form=$form.cellphone}
+        {form_error form=$form.cellphone}
+            {$message}
+        {/form_error}
+        <label> <span>{intl l="{$label}"} : </span></label><input type="text" name="{$name}" value="{$value}" {$attr}> <br />
+    {/form_field}
+
     {form_field form=$form.email}
         {form_error form=$form.email}
             {#message}
         {/form_error}
-        <label><span>{intl l="{$label}"}</span></label><input type="email" name="{$name}" {$attr} ><br />
+        <label><span>{intl l="{$label}"}</span></label><input type="email" name="{$name}" value="{$value}" {$attr} ><br />
     {/form_field}
 
     {form_field form=$form.email_confirm}
