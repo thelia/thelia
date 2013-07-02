@@ -2,6 +2,8 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Event\CustomRefEvent;
 use Thelia\Model\om\BaseCustomer;
 
 
@@ -18,6 +20,12 @@ use Thelia\Model\om\BaseCustomer;
  */
 class Customer extends BaseCustomer
 {
+
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    protected $dispatcher;
+
     public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword, $reseller = 0, $sponsor = null, $discount = 0 )
     {
         $this
@@ -41,9 +49,32 @@ class Customer extends BaseCustomer
 
     }
 
+    public function preInsert(\PropelPDO $con = null)
+    {
+        $customeRef = new CustomRefEvent($this);
+        if (!is_null($this->dispatcher)) {
+            $customeRef = new CustomRefEvent($this);
+            $this->dispatcher->dispatch("customer.creation.customref", $customeRef);
+        }
+
+        $this->setRef($customeRef->hasRef()? $customeRef->getRef() : $this->generateRef());
+
+        return false;
+    }
+
+    protected function generateRef()
+    {
+        return date("YmdHI");
+    }
+
     public function setPassword($password)
     {
         $this->setAlgo("PASSWORD_BCRYPT");
         return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
+    }
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 }

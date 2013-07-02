@@ -51,4 +51,6 @@ final class TheliaEvents
     const BEFORE_CREATECUSTOMER = "action.before_createcustomer";
 
     const AFTER_CREATECUSTOMER = "action.after_createcustomer";
+
+    const CREATECUSTOMER_CUSTOMREF = "customer.creation.customref";
 }
