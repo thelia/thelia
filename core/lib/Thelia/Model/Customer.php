@@ -3,6 +3,8 @@
 namespace Thelia\Model;
 
 use Thelia\Model\om\BaseCustomer;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Security\Core\Role\Role;
 
 
 /**
@@ -16,6 +18,29 @@ use Thelia\Model\om\BaseCustomer;
  *
  * @package    propel.generator.Thelia.Model
  */
-class Customer extends BaseCustomer
+class Customer extends BaseCustomer implements UserInterface
 {
+    /**
+     * {@inheritDoc}
+     */
+
+    public function getUsername() {
+        return $this->getEmail();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function eraseCredentials() {
+        $this->setPassword(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRoles() {
+        return array(new Role('USER_CUSTOMER'));
+    }
 }
+
+

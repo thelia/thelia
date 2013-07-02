@@ -42,6 +42,9 @@ class TheliaLoop implements SmartyPluginInterface
 
     protected $dispatcher;
 
+    protected $loopstack = array();
+    protected $varstack = array();
+
     public function __construct(Request $request, EventDispatcherInterface $dispatcher)
     {
         $this->request = $request;
@@ -71,37 +74,75 @@ class TheliaLoop implements SmartyPluginInterface
 
         if ($content === null) {
 
+            // Check if a loop with the same name exists in the current scope, and abort if it's the case.
+            if (array_key_exists($name, $this->varstack)) {
+            	throw new \InvalidArgumentException("A loop named '$name' already exists in the current scope.");
+            }
+
             $loop = $this->createLoopInstance(strtolower($params['type']));
 
             $this->getLoopArgument($loop, $params);
 
             $loopResults = $loop->exec();
 
-            $template->assignByRef($name, $loopResults);
+            $this->loopstack[$name] = $loopResults;
+
         } else {
 
-            $loopResults = $template->getTemplateVars($name);
+            $loopResults = $this->loopstack[$name];
 
             $loopResults->next();
         }
 
         if ($loopResults->valid()) {
+
             $loopResultRow = $loopResults->current();
 
+            // On first iteration, save variables that may be overwritten by this loop
+            if (! isset($this->varstack[$name])) {
+
+                $saved_vars = array();
+
+                $varlist = $loopResultRow->getVars();
+                $varlist[] = 'LOOP_COUNT';
+                $varlist[] = 'LOOP_TOTAL';
+
+                foreach($varlist as $var) {
+                    $saved_vars[$var] = $template->getTemplateVars($var);
+                }
+
+                $this->varstack[$name] = $saved_vars;
+            }
+
             foreach($loopResultRow->getVarVal() as $var => $val) {
-    			$template->assign(substr($var, 1), $val);
+    			$template->assign($var, $val);
     		}
 
-            $template->assign('__COUNT__', 1 + $loopResults->key());
-            $template->assign('__TOTAL__', $loopResults->getCount());
+    		// Assign meta information
+            $template->assign('LOOP_COUNT', 1 + $loopResults->key());
+            $template->assign('LOOP_TOTAL', $loopResults->getCount());
 
     		$repeat = $loopResults->valid();
     	}
 
+    	// Loop is terminated. Cleanup.
+    	if (! $repeat) {
+
+    	    // Restore previous variables values before terminating
+    	    if (isset($this->varstack[$name])) {
+
+    		    foreach($this->varstack[$name] as $var => $value) {
+    			    $template->assign($var, $value);
+    		    }
+
+    		    unset($this->varstack[$name]);
+    	    }
+    	}
 
         if ($content !== null) {
 
             if ($loopResults->isEmpty()) $content = "";
+
             return $content;
         }
     }
@@ -158,14 +199,11 @@ class TheliaLoop implements SmartyPluginInterface
 
         $loopName = $params['rel'];
 
-        // Find loop results in the current template vars
-        $loopResults = $template->getTemplateVars($loopName);
-
-        if (empty($loopResults)) {
+        if (! isset($this->loopstack[$loopName])) {
             throw new \InvalidArgumentException("Loop $loopName is not defined.");
         }
 
-        return $loopResults->isEmpty();
+        return $this->loopstack[$loopName]->isEmpty();
     }
 
     /**

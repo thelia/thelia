@@ -1,10 +1,11 @@
 <?php
+
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*	email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,30 +22,28 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Element;
+namespace Thelia\Tests\Security;
 
-class LoopResultRow
+use Thelia\Core\Security\SecurityManager;
+/**
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ */
+class SecurityManagerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $substitution = array();
-
-    public function set($key, $value)
+    public function testGetSetToken()
     {
-        $this->substitution[$key] = $value;
-    }
+        /*
+        $context = new SecurityManager($authProvider)(
+            $this->getMock('AuthenticationProviderInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
+        );
+        $this->assertNull($context->getToken());
 
-    public function get($key)
-    {
-        return $this->substitution[$key];
+        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+        $this->assertSame($token, $context->getToken());
+        */
+       // $this->assertFalse(1==1, "faux !");
     }
-
-    public function getVarVal()
-    {
-        return $this->substitution;
-    }
-
-    public function getVars()
-    {
-    	return array_keys($this->substitution);
-    }
-
 }
