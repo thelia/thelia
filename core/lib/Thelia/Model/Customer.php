@@ -58,7 +58,7 @@ class Customer extends BaseCustomer
 
         $this->setRef($customerRef->hasRef()? $customerRef->getRef() : $this->generateRef());
 
-        return false;
+        return true;
     }
 
     protected function generateRef()
