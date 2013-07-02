@@ -4,6 +4,21 @@
 <form method="post" action="index_dev.php?action=createCustomer&view=connexion" {form_enctype form=$form} >
 
     {form_field_hidden form=$form}
+
+    {form_field form=$form.title}
+        {form_error form=$form.title}
+            {$message}
+        {/form_error}
+
+        <label> <span>{intl l="{$label}"} : </span></label>
+        <select name="{$name}">
+            <option value="1">M.</option>
+            <option value="2">Mme.</option>
+
+        </select>
+        <br />
+    {/form_field}
+
     {form_field form=$form.firstname}
         {form_error form=$form.firstname}
             {$message}

@@ -28,6 +28,7 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerCreation;
+use Thelia\Log\Tlog;
 
 class Customer implements EventSubscriberInterface
 {
@@ -48,6 +49,26 @@ class Customer implements EventSubscriberInterface
             $form->bind($request);
 
             if ($form->isValid()) {
+                $data = $form->getData();
+                $customer = new \Thelia\Model\Customer();
+                try {
+                    $customer->createOrUpdate(
+                        $data["title"],
+                        $data["firstname"],
+                        $data["lastname"],
+                        $data["address1"],
+                        $data["address2"],
+                        $data["address3"],
+                        $data["phone"],
+                        $data["cellphone"],
+                        $data["zipcode"],
+                        $data["country"],
+                        $data["email"],
+                        $data["password"]
+                    );
+                } catch (\PropelException $e) {
+                    Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
+                }
 
                 echo "ok"; exit;
             } else {

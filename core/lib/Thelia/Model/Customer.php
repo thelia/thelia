@@ -18,9 +18,10 @@ use Thelia\Model\om\BaseCustomer;
  */
 class Customer extends BaseCustomer
 {
-    public function create($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword, $reseller = 0, $sponsor = null, $discount = 0 )
+    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword, $reseller = 0, $sponsor = null, $discount = 0 )
     {
         $this
+            ->setCustomerTitleId($titleId)
             ->setFirstname($firstname)
             ->setLastname($lastname)
             ->setAddress1($address1)
@@ -35,6 +36,7 @@ class Customer extends BaseCustomer
             ->setReseller($reseller)
             ->setSponsor($sponsor)
             ->setDiscount($discount)
+            ->save()
         ;
 
     }

@@ -85,6 +85,12 @@ class CustomerCreation extends BaseForm
                 ),
                 "label" => "country"
             ))
+            ->add("title", "text", array(
+                "constraints" => array(
+                    new Constraints\NotBlank()
+                ),
+                "label" => "title"
+            ))
             ->add("email", "email", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
