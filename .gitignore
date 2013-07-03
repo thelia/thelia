@@ -17,3 +17,4 @@ coverage
 local/cache/*
 composer.lock
 web/assets/*
+web/.htaccess

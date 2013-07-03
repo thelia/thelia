@@ -1,4 +1,5 @@
 <?php
+
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -21,72 +22,28 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Action;
+namespace Thelia\Tests\Security;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\ActionEvent;
-use Thelia\Form\BaseForm;
-use Thelia\Form\CustomerCreation;
-
-class Customer implements EventSubscriberInterface
+use Thelia\Core\Security\SecurityManager;
+/**
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ */
+class SecurityManagerTest extends \PHPUnit_Framework_TestCase
 {
-
-    public function create(ActionEvent $event)
+    public function testGetSetToken()
     {
-        $request = $event->getRequest();
-
-        $customerForm = new CustomerCreation($request);
-
-        $form = $customerForm->getForm();
-
-
-        if ($request->isMethod("post")) {
-            $form->bind($request);
-
-            if ($form->isValid()) {
-                echo "ok"; exit;
-            } else {
-                echo "ko"; exit;
-            }
-        }
-    }
-
-    public function modify(ActionEvent $event)
-    {
-
-    }
-
-    public function modifyPassword(ActionEvent $event)
-    {
-
-    }
-
-    /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(
-            "action.createCustomer" => array("create", 128),
-            "action.modifyCustomer" => array("modify", 128)
+        /*
+        $context = new SecurityManager($authProvider)(
+            $this->getMock('AuthenticationProviderInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
         );
-    }
+        $this->assertNull($context->getToken());
 
+        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+        $this->assertSame($token, $context->getToken());
+        */
+       // $this->assertFalse(1==1, "faux !");
+    }
 }

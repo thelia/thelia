@@ -20,55 +20,62 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
-use Symfony\Component\Validator\Validation;
-use Thelia\Model\ConfigQuery;
+namespace Thelia\Core\Security\Token;
 
-abstract class BaseForm {
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    protected $form;
+/**
+ * TokenInterface is the interface for the user authentication information.
+ *
+ * Parts borrowed from Symfony Security Framework (Fabien Potencier <fabien@symfony.com> / Johannes M. Schmitt <schmittjoh@gmail.com>)
+ */
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
-    {
-        $validator = Validation::createValidator();
+interface TokenInterface extends \Serializable
+{
+	/**
+	 * Returns the user credentials.
+	 *
+	 * @return mixed The user credentials
+	*/
+	public function getCredentials();
 
-        $this->form = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-            ->addExtension(
-                new CsrfExtension(
-                    new SessionCsrfProvider(
-                        $request->getSession(),
-                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                    )
-                )
-            )
-            ->addExtension(new ValidatorExtension($validator))
-            ->getFormFactory()
-            ->createBuilder($type, $data, $options);
-        ;
+	/**
+	 * Returns a user representation.
+	 *
+	 * @return mixed either returns an object which implements __toString(), or
+	 * a primitive string is returned.
+	*/
+	public function getUser();
 
-            $this->buildForm();
-    }
+	/**
+	 * Sets a user instance
+	 *
+	 * @param mixed $user
+	*/
+	public function setUser($user);
 
-    /**
-     * @return \Symfony\Component\Form\Form
-     */
-    public function getForm()
-    {
-        return $this->form->getForm();
-    }
+	/**
+	 * Returns the username.
+	 *
+	 * @return string
+	*/
+	public function getUsername();
 
-    abstract protected function buildForm();
+	/**
+	 * Returns whether the user is authenticated or not.
+	 *
+	 * @return Boolean true if the token has been authenticated, false otherwise
+	*/
+	public function isAuthenticated();
 
+	/**
+	 * Sets the authenticated flag.
+	 *
+	 * @param Boolean $isAuthenticated The authenticated flag
+	*/
+	public function setAuthenticated($isAuthenticated);
+
+	/**
+	 * Removes sensitive information from the token.
+	*/
+	public function eraseCredentials();
 }
-

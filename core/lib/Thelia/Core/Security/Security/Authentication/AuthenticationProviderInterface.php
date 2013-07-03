@@ -20,55 +20,41 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
-use Symfony\Component\Validator\Validation;
-use Thelia\Model\ConfigQuery;
+namespace Thelia\Core\Security\Authentication;
 
-abstract class BaseForm {
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    protected $form;
+use Thelia\Core\Security\UserNotFoundException;
+use Thelia\Core\Security\IncorrectPasswordException;
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
-    {
-        $validator = Validation::createValidator();
-
-        $this->form = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-            ->addExtension(
-                new CsrfExtension(
-                    new SessionCsrfProvider(
-                        $request->getSession(),
-                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                    )
-                )
-            )
-            ->addExtension(new ValidatorExtension($validator))
-            ->getFormFactory()
-            ->createBuilder($type, $data, $options);
-        ;
-
-            $this->buildForm();
-    }
+/**
+ * Aunthentication providers are in charge or retrieving users, and check their
+ * credentials.
+ *
+ * @author Franck
+ *
+ */
+interface AuthenticationProviderInterface {
 
     /**
-     * @return \Symfony\Component\Form\Form
+     * Set the authentication token
+     *
+     * @param TokenInterface $token the authentication token
      */
-    public function getForm()
-    {
-        return $this->form->getForm();
-    }
+    public function setToken(TokenInterface $token);
 
-    abstract protected function buildForm();
 
+    /**
+     * Set the authentication token
+     *
+     * @param unknown $key
+     */
+    public function supportsToken(TokenInterface $token);
+
+    /**
+     * Authenticate the token
+     *
+     *@throws Exception if authentication was not successful
+     */
+    public function authenticate();
 }
-
+?>

@@ -8,7 +8,7 @@ An image from asset directory :
 {intl l='An internationalized string'}
 </div>
 {form name="thelia.customer.creation"}
-<form method="post" action="index_dev.php" {form_enctype form=$form} >
+<form method="post" action="index_dev.php?action=createCustomer" {form_enctype form=$form} >
 
     {form_field_hidden form=$form}
     {form_field form=$form.email}
@@ -21,6 +21,7 @@ An image from asset directory :
     {form_field form=$form.age}
     {intl l='age'} : <input type="text" name="{$name}">
     {/form_field}
+        <input type="submit" value="valider">
 </form>
 {/form}
 <div>

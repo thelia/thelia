@@ -1,8 +1,39 @@
+{include file="included.html"}
+
 {loop name="category0" type="category" parent="0"}
-    <h2>1 - CATEGORY : #TITLE</h2>
-    <hr /><hr />
+    <h2>Out before - CATEGORY : #TITLE (#LOOP_COUNT / #LOOP_TOTAL)</h2>
     {loop name="category1" type="category" parent="#ID"}
-        <h3>2 - SUBCATEGORY : #TITLE</h3>
+        <h3>Inner - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
     {/loop}
-    <h2>1bis - CATEGORY : #TITLE</h2>
+
+	{#myid=#ID}
+
+    {loop name="category2" type="category" parent="#ID"}
+        <h3>Inner 2 before - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+
+	    {loop name="category3" type="category" parent="#myid"}
+	        <h3>Inner inner 2 - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+	    {/loop}
+
+        <h3>Inner 2 after - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+    {/loop}
+
+    <h2>Out after  - CATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h2>
+    <hr />
+
+    {ifloop rel="category2"}
+    	<p>Hey, y'a d'la categorie 2 !</p>
+    {/ifloop}
+
+     {elseloop rel="category2"}
+    	<p>Hey, y'a PAS de categorie 2 !</p>
+    {/elseloop}
+
+    {loop name="category2" type="category" parent="#myid"}
+        <h3>Exter 2 - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+    {/loop}
+{/loop}
+
+{loop name="category2" type="category" parent="1"}
+    <h3>Final Exter 2 - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
 {/loop}

@@ -28,17 +28,23 @@ use Thelia\Form\AdminLogin;
 
 class AdminController extends BaseAdminController {
 
-    public function indexAction()
+    public function loginAction()
     {
-
         $form = $this->getLoginForm();
 
         $request = $this->getRequest();
 
         if($request->isMethod("POST")) {
+
             $form->bind($request);
 
-            if($form->isValid()) {
+            if ($form->isValid()) {
+
+                $this->container->get('request')->authenticate(
+                    $form->get('username')->getData(),
+                    $form->get('password')->getData()
+                );
+
                 echo "valid"; exit;
             }
         }
@@ -48,13 +54,20 @@ class AdminController extends BaseAdminController {
         ));
     }
 
+    public function indexAction()
+    {
+    	$form = $this->getLoginForm();
+
+    	return $this->render("login.html", array(
+    			"form" => $form->createView()
+    	));
+    }
+
     protected function getLoginForm()
     {
-        $form = $this->getFormBuilder();
+        $adminLogin = new AdminLogin($this->getRequest());
 
-        $adminLogin = new AdminLogin();
-
-        return $adminLogin->buildForm($form, array())->getForm();
+        return $adminLogin->getForm();
     }
 
     public function lostAction()

@@ -1,4 +1,5 @@
 <?php
+
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -20,55 +21,47 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
-use Symfony\Component\Validator\Validation;
-use Thelia\Model\ConfigQuery;
+namespace Thelia\Core\Security\Authentication;
 
-abstract class BaseForm {
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    protected $form;
+use Thelia\Core\Security\Authentication\AuthenticationProviderInterface;
+use Thelia\Core\Security\Encoder\PasswordEncoderInterface;
+use Thelia\Core\Security\User\UserProviderInterface;
+use Thelia\Security\Token\TokenInterface;
+use Thelia\Core\Security\Exception\IncorrectPasswordException;
+use Thelia\Core\Security\Token\UsernamePasswordToken;
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
-    {
-        $validator = Validation::createValidator();
+class UsernamePasswordAuthenticator implements AuthenticationProviderInterface {
 
-        $this->form = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-            ->addExtension(
-                new CsrfExtension(
-                    new SessionCsrfProvider(
-                        $request->getSession(),
-                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                    )
-                )
-            )
-            ->addExtension(new ValidatorExtension($validator))
-            ->getFormFactory()
-            ->createBuilder($type, $data, $options);
-        ;
+    protected $userProvider;
+    protected $encoder;
 
-            $this->buildForm();
+    private $token;
+
+    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder) {
+        $this->userProvider = $userProvider;
+        $this->encoder = $encoder;
     }
 
-    /**
-     * @return \Symfony\Component\Form\Form
-     */
-    public function getForm()
-    {
-        return $this->form->getForm();
+    public function supportsToken(TokenInterface $token) {
+
+    	return $token instanceof UsernamePasswordToken;
     }
 
-    abstract protected function buildForm();
+    public function authenticate($token) {
 
+        if (!$this->supports($token)) {
+        	return null;
+        }
+
+        // Retreive user
+        $user = $this->userProvider->getUser($this->token->getUsername());
+
+        // Check password
+        $authOk = $this->encoder->isEqual($password, $user->getPassword(), $user->getAlgo(), $user->getSalt()) === true;
+
+        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $authOk);
+
+        return $authenticatedToken;
+    }
 }
-

@@ -20,55 +20,33 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
-use Symfony\Component\Validator\Validation;
-use Thelia\Model\ConfigQuery;
+namespace Thelia\Core\Security\Encoder;
 
-abstract class BaseForm {
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    protected $form;
+/**
+ * This interface defines a password encoder.
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ */
+interface PasswordEncoderInterface {
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
-    {
-        $validator = Validation::createValidator();
+	/**
+	 * Encode a string.
+	 *
+	 * @param  string    $password    the password to encode
+	 * @param  string    $algorithm   the hash() algorithm
+	 * @return string    $salt        the salt
+	 */
+	public function encode($password, $algorithm, $salt);
 
-        $this->form = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-            ->addExtension(
-                new CsrfExtension(
-                    new SessionCsrfProvider(
-                        $request->getSession(),
-                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                    )
-                )
-            )
-            ->addExtension(new ValidatorExtension($validator))
-            ->getFormFactory()
-            ->createBuilder($type, $data, $options);
-        ;
-
-            $this->buildForm();
-    }
-
-    /**
-     * @return \Symfony\Component\Form\Form
-     */
-    public function getForm()
-    {
-        return $this->form->getForm();
-    }
-
-    abstract protected function buildForm();
-
+	/**
+	 * Check a string against an encoded password.
+	 *
+	 * @param  string    $string      the string to compare against password
+	 * @param  string    $password    the encoded password
+	 * @param  string    $algorithm   the hash() algorithm
+	 * @return string    $salt        the salt
+	 */
+	public function isEqual($string, $password, $algorithm, $salt);
 }
-

@@ -23,32 +23,28 @@
 namespace Thelia\Form;
 
 
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Choice;
 
-class AdminLogin extends AbstractType {
+class AdminLogin extends BaseForm {
 
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    protected function buildForm()
     {
-        return $builder
+        $this->form
             ->add("username", "text", array(
                 "constraints" => array(
                     new NotBlank(),
                     new Length(array("min" => 3))
                 )
             ))
-            ->add("password", "password");
+            ->add("password", "password", array(
+                "constraints" => array(
+                	new NotBlank()
+                )
+            ))
+            ->add("remember_me", "checkbox");
     }
 
-    /**
-     * Returns the name of this type.
-     *
-     * @return string The name of this type
-     */
-    public function getName()
-    {
-        return "admin_login";
-    }
 }

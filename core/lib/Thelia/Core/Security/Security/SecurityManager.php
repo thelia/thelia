@@ -20,55 +20,62 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
-use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
-use Symfony\Component\Form\Forms;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
-use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
-use Symfony\Component\Validator\Validation;
-use Thelia\Model\ConfigQuery;
+namespace Thelia\Core\Security;
 
-abstract class BaseForm {
-    /**
-     * @var \Symfony\Component\Form\FormFactoryInterface
-     */
-    protected $form;
+use Thelia\Core\Security\Authentication\AuthenticationProviderInterface;
+use Thelia\Core\Security\Exception\AuthenticationTokenNotFoundException;
 
-    public function __construct(Request $request, $type= "form", $data = array(), $options = array())
-    {
-        $validator = Validation::createValidator();
+/**
+ * A simple security manager, in charge of authenticating users using various authentication systems.
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class SecurityManager {
 
-        $this->form = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-            ->addExtension(
-                new CsrfExtension(
-                    new SessionCsrfProvider(
-                        $request->getSession(),
-                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
-                    )
-                )
-            )
-            ->addExtension(new ValidatorExtension($validator))
-            ->getFormFactory()
-            ->createBuilder($type, $data, $options);
-        ;
+    protected $authProvider;
 
-            $this->buildForm();
+    public function __construct(AuthenticationProviderInterface $authProvider) {
+        $this->authProvider = $authProvider;
     }
 
     /**
-     * @return \Symfony\Component\Form\Form
-     */
-    public function getForm()
+    * Checks if the current token is authenticated
+    *
+    * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
+    *
+    * @return Boolean
+    */
+    final public function isGranted()
     {
-        return $this->form->getForm();
+        if (null === $this->token) {
+            throw new AuthenticationTokenNotFoundException('The security context contains no authentication token.');
+        }
+
+        if (!$this->token->isAuthenticated()) {
+            $this->token = $this->authProvider->authenticate($this->token);
+        }
+
+        return $this->token->isAuthenticated();
     }
 
-    abstract protected function buildForm();
+    /**
+    * Gets the currently authenticated token.
+    *
+    * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+    */
+    public function getToken()
+    {
+        return $this->token;
+    }
 
+    /**
+    * Sets the  token.
+    *
+    * @param TokenInterface $token A TokenInterface token, or null if no further authentication information should be stored
+    */
+    public function setToken(TokenInterface $token = null)
+    {
+        $this->token = $token;
+    }
 }
-

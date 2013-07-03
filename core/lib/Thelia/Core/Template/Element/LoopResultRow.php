@@ -29,17 +29,22 @@ class LoopResultRow
 
     public function set($key, $value)
     {
-        $this->substitution["#".$key] = $value;
+        $this->substitution[$key] = $value;
     }
 
     public function get($key)
     {
-        return $this->substitution["#".$key];
+        return $this->substitution[$key];
     }
 
     public function getVarVal()
     {
         return $this->substitution;
+    }
+
+    public function getVars()
+    {
+    	return array_keys($this->substitution);
     }
 
 }
