@@ -68,9 +68,11 @@ class Customer implements EventSubscriberInterface
                     );
                 } catch (\PropelException $e) {
                     Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
+                    $event->setFormError($form);
                 }
 
-                echo "ok"; exit;
+                //Customer is create, he is automatically connected
+
             } else {
 
                 $event->setFormError($form);
