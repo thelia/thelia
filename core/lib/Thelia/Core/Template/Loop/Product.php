@@ -95,6 +95,7 @@ class Product extends BaseLoop
             new Argument(
                 'ref',
                 new TypeCollection(
+                    new Type\AlphaNumStringType(),
                     new Type\JsonType()
                 )
             ),
@@ -139,6 +140,11 @@ class Product extends BaseLoop
         }
 
         if (!is_null($this->category)) {
+
+            if(null !== $this->depth) {
+
+            }
+
             $search->filterByCategory(
                 CategoryQuery::create()->filterById($this->category, \Criteria::IN)->find(),
                 \Criteria::IN

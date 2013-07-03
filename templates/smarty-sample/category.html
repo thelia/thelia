@@ -1,39 +1,25 @@
-{include file="included.html"}
-
 {loop name="category0" type="category" parent="0"}
-    <h2>Out before - CATEGORY : #TITLE (#LOOP_COUNT / #LOOP_TOTAL)</h2>
+    <h2>CATEGORY : #TITLE</h2>
     {loop name="category1" type="category" parent="#ID"}
-        <h3>Inner - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+        <hr />
+        <h3>SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+        {loop name="product" type="product" category="#ID"}
+            <h3>PRODUCT : #REF / #TITLE</h3>
+            #PRICE €
+        {/loop}
+        <hr />
+        <hr />
     {/loop}
 
-	{#myid=#ID}
-
-    {loop name="category2" type="category" parent="#ID"}
-        <h3>Inner 2 before - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
-
-	    {loop name="category3" type="category" parent="#myid"}
-	        <h3>Inner inner 2 - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
-	    {/loop}
-
-        <h3>Inner 2 after - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+	{loop name="product" type="product" category="#ID"}
+        <h3>PRODUCT : #REF / #TITLE</h3>
+        #PRICE €
     {/loop}
-
-    <h2>Out after  - CATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h2>
     <hr />
-
-    {ifloop rel="category2"}
-    	<p>Hey, y'a d'la categorie 2 !</p>
-    {/ifloop}
-
-     {elseloop rel="category2"}
-    	<p>Hey, y'a PAS de categorie 2 !</p>
-    {/elseloop}
-
-    {loop name="category2" type="category" parent="#myid"}
-        <h3>Exter 2 - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
-    {/loop}
+    <hr />
 {/loop}
-
-{loop name="category2" type="category" parent="1"}
-    <h3>Final Exter 2 - SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+<h2>PRODUCTS selected by ref</h2>
+{loop name="product" type="product" ref='REF1,REF2'}
+    <h3>PRODUCT : #REF / #TITLE</h3>
+    #PRICE €
 {/loop}

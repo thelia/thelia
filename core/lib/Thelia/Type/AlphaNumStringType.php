@@ -20,30 +20,28 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-
-namespace Thelia\Tests\Type;
-
-use Thelia\Type\IntListType;
+namespace Thelia\Type;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class IntListTypeTest extends \PHPUnit_Framework_TestCase
+
+class AlphaNumStringType implements TypeInterface
 {
-    public function testIntListType()
+    public function getType()
     {
-        $intListType = new IntListType();
-        $this->assertTrue($intListType->isValid('1'));
-        $this->assertTrue($intListType->isValid('1,2,3'));
-        $this->assertFalse($intListType->isValid('1,2,3.3'));
+        return 'Alphanumeric string type';
     }
 
-    public function testFormatIntListType()
+    public function isValid($value)
     {
-        $intListType = new IntListType();
-        $this->assertTrue(is_array($intListType->getFormatedValue('1,2,3')));
-        $this->assertNull($intListType->getFormatedValue('foo'));
+        return preg_match('#^[a-zA-Z0-9\-_]+$#', $value) ? true : false;
+    }
+
+    public function getFormatedValue($value)
+    {
+        return $this->isValid($value) ? $value : null;
     }
 }

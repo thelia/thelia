@@ -23,27 +23,21 @@
 
 namespace Thelia\Tests\Type;
 
-use Thelia\Type\IntListType;
+use Thelia\Type\AlphaNumStringType;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class IntListTypeTest extends \PHPUnit_Framework_TestCase
+class AlphaNumStringTypeTest extends \PHPUnit_Framework_TestCase
 {
-    public function testIntListType()
+    public function testAlphaNumStringType()
     {
-        $intListType = new IntListType();
-        $this->assertTrue($intListType->isValid('1'));
-        $this->assertTrue($intListType->isValid('1,2,3'));
-        $this->assertFalse($intListType->isValid('1,2,3.3'));
-    }
-
-    public function testFormatIntListType()
-    {
-        $intListType = new IntListType();
-        $this->assertTrue(is_array($intListType->getFormatedValue('1,2,3')));
-        $this->assertNull($intListType->getFormatedValue('foo'));
+        $type = new AlphaNumStringType();
+        $this->assertTrue($type->isValid('azs_qs-0-9ds'));
+        $this->assertFalse($type->isValid('3.3'));
+        $this->assertFalse($type->isValid('3 3'));
+        $this->assertFalse($type->isValid('3€3'));
     }
 }
