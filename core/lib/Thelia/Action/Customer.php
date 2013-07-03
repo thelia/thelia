@@ -55,6 +55,7 @@ class Customer implements EventSubscriberInterface
                 $data = $form->getData();
                 $customer = new CustomerModel();
                 try {
+                    \Thelia\Log\Tlog::getInstance()->debug($data);
                     $customer->createOrUpdate(
                         $data["title"],
                         $data["firstname"],

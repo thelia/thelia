@@ -117,12 +117,14 @@ class CustomerCreation extends BaseForm
             ))
             ->add("password", "password", array(
                 "constraints" => array(
+                    new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4)))
                 ),
                 "label" => "password"
             ))
             ->add("password_confirm", "password", array(
                 "constraints" => array(
+                    new Constraints\NotBlank(),
                     new Constraints\Length(array("min" => ConfigQuery::read("password.length", 4))),
                     new Constraints\Callback(array("methods" => array(
                         array($this, "verifyPasswordField")

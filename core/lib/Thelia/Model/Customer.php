@@ -87,6 +87,7 @@ class Customer extends BaseCustomer
 
     public function setPassword($password)
     {
+        \Thelia\Log\Tlog::getInstance()->debug($password);
         if ($this->isNew() && ($password === null || trim($password) == "")) {
             throw new InvalidArgumentException("customer password is mandatory on creation");
         }
