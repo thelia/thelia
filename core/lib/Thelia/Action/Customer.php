@@ -28,7 +28,10 @@ use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerCreation;
+use Thelia\Form\CustomerModification;
+use Thelia\Model\Customer as CustomerModel;
 use Thelia\Log\Tlog;
+use Thelia\Model\CustomerQuery;
 
 class Customer implements EventSubscriberInterface
 {
@@ -50,7 +53,7 @@ class Customer implements EventSubscriberInterface
 
             if ($form->isValid()) {
                 $data = $form->getData();
-                $customer = new \Thelia\Model\Customer();
+                $customer = new CustomerModel();
                 try {
                     $customer->createOrUpdate(
                         $data["title"],
@@ -84,6 +87,41 @@ class Customer implements EventSubscriberInterface
 
     public function modify(ActionEvent $event)
     {
+        $request = $event->getRequest();
+
+        $customerModification = new CustomerModification($request);
+
+        $form = $customerModification->getForm();
+
+        if ($request->isMethod("post")) {
+            $form->bind($request);
+
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                $customer = CustomerQuery::create()->findPk(1);
+                try {
+                    $data = $form->getData();
+                    $customer->createOrUpdate(
+                        $data["title"],
+                        $data["firstname"],
+                        $data["lastname"],
+                        $data["address1"],
+                        $data["address2"],
+                        $data["address3"],
+                        $data["phone"],
+                        $data["cellphone"],
+                        $data["zipcode"],
+                        $data["country"]
+                    );
+                } catch(\PropelException $e) {
+                    Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
+                    $event->setFormError($form);
+                }
+            } else {
+                $event->setFormError($form);
+            }
+        }
 
     }
 

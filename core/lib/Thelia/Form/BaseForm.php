@@ -89,7 +89,7 @@ abstract class BaseForm {
      *           ),
      *           "label" => "email",
      *           "constraints" => array(
-     *               new NotBlank()
+     *               new \Symfony\Component\Validator\Constraints\NotBlank()
      *           )
      *       )
      *   )
