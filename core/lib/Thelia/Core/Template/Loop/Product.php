@@ -33,6 +33,7 @@ use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ProductCategoryQuery;
+use Thelia\Model\ProductPeer;
 use Thelia\Model\ProductQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -95,15 +96,14 @@ class Product extends BaseLoop
             new Argument(
                 'ref',
                 new TypeCollection(
-                    new Type\AlphaNumStringType(),
-                    new Type\JsonType()
+                    new Type\AlphaNumStringListType()
                 )
             ),
             Argument::createIntListTypeArgument('category'),
             Argument::createBooleanTypeArgument('new'),
             Argument::createBooleanTypeArgument('promo'),
             Argument::createFloatTypeArgument('min_price'),
-            Argument::createFloatTypeArgument('max_prix'),
+            Argument::createFloatTypeArgument('max_price'),
             Argument::createIntTypeArgument('min_stock'),
             Argument::createFloatTypeArgument('min_weight'),
             Argument::createFloatTypeArgument('max_weight'),
@@ -114,7 +114,7 @@ class Product extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumType('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'category', 'manual', 'manual_reverse', 'ref', 'promo', 'new')
+                    new Type\EnumType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'category', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
                 )
             ),
             Argument::createBooleanTypeArgument('random', 0),
@@ -140,13 +140,16 @@ class Product extends BaseLoop
         }
 
         if (!is_null($this->category)) {
+            $categories = CategoryQuery::create()->filterById($this->category, \Criteria::IN)->find();
 
             if(null !== $this->depth) {
-
+                foreach(CategoryQuery::findAllChild($this->category, $this->depth) as $subCategory) {
+                    $categories->prepend($subCategory);
+                }
             }
 
             $search->filterByCategory(
-                CategoryQuery::create()->filterById($this->category, \Criteria::IN)->find(),
+                $categories,
                 \Criteria::IN
             );
         }
@@ -163,7 +166,45 @@ class Product extends BaseLoop
             $search->filterByNewness(0, \Criteria::EQUAL);
         }
 
-        $search->filterByPriceDependingOnPromo($this->min_price, $this->max_price); //@todo review
+        if (null != $this->min_stock) {
+            $search->filterByQuantity($this->min_stock, \Criteria::GREATER_EQUAL);
+        }
+
+        if(null !== $this->min_price) {
+            $search->condition('in_promo', ProductPeer::PROMO . \Criteria::EQUAL . '1')
+                    ->condition('not_in_promo', ProductPeer::PROMO . \Criteria::NOT_EQUAL . '1')
+                    ->condition('min_price2', ProductPeer::PRICE2 . \Criteria::GREATER_EQUAL . '?', $this->min_price)
+                    ->condition('min_price', ProductPeer::PRICE . \Criteria::GREATER_EQUAL . '?', $this->min_price)
+                    ->combine(array('in_promo', 'min_price2'), \Criteria::LOGICAL_AND, 'in_promo_min_price')
+                    ->combine(array('not_in_promo', 'min_price'), \Criteria::LOGICAL_AND, 'not_in_promo_min_price')
+                    ->where(array('not_in_promo_min_price', 'in_promo_min_price'), \Criteria::LOGICAL_OR);
+        }
+
+        if(null !== $this->max_price) {
+            $search->condition('in_promo', ProductPeer::PROMO . \Criteria::EQUAL . '1')
+                    ->condition('not_in_promo', ProductPeer::PROMO . \Criteria::NOT_EQUAL . '1')
+                    ->condition('max_price2', ProductPeer::PRICE2 . \Criteria::LESS_EQUAL . '?', $this->max_price)
+                    ->condition('max_price', ProductPeer::PRICE . \Criteria::LESS_EQUAL . '?', $this->max_price)
+                    ->combine(array('in_promo', 'max_price2'), \Criteria::LOGICAL_AND, 'in_promo_max_price')
+                    ->combine(array('not_in_promo', 'max_price'), \Criteria::LOGICAL_AND, 'not_in_promo_max_price')
+                    ->where(array('not_in_promo_max_price', 'in_promo_max_price'), \Criteria::LOGICAL_OR);
+        }
+
+        /*if(null !== $this->min_weight) {
+            $search->condition('min_price2', ProductPeer::PRICE2 . \Criteria::GREATER_EQUAL . '?', $this->min_price)
+                   ->condition('min_price', ProductPeer::PRICE . \Criteria::GREATER_EQUAL . '?', $this->min_price)
+                   ->combine(array('in_promo', 'min_price2'), \Criteria::LOGICAL_AND, 'in_promo_min_price')
+                   ->combine(array('not_in_promo', 'min_price'), \Criteria::LOGICAL_AND, 'not_in_promo_min_price')
+                   ->where(array('not_in_promo_min_price', 'in_promo_min_price'), \Criteria::LOGICAL_OR);
+        }
+
+        if(null !== $this->max_weight) {
+            $search->condition('min_price2', ProductPeer::PRICE2 . \Criteria::GREATER_EQUAL . '?', $this->min_price)
+                   ->condition('min_price', ProductPeer::PRICE . \Criteria::GREATER_EQUAL . '?', $this->min_price)
+                   ->combine(array('in_promo', 'min_price2'), \Criteria::LOGICAL_AND, 'in_promo_min_price')
+                   ->combine(array('not_in_promo', 'min_price'), \Criteria::LOGICAL_AND, 'not_in_promo_min_price')
+                   ->where(array('not_in_promo_min_price', 'in_promo_min_price'), \Criteria::LOGICAL_OR);
+        }*/
 
         if ($this->current === true) {
             $search->filterById($this->request->get("product_id"));
@@ -264,7 +305,10 @@ class Product extends BaseLoop
             $loopResultRow->set("CHAPO", $product->getChapo());
             $loopResultRow->set("DESCRIPTION", $product->getDescription());
             $loopResultRow->set("POSTSCRIPTUM", $product->getPostscriptum());
-            //$loopResultRow->set("CATEGORY", $product->getCategory());
+            $loopResultRow->set("PRICE", $product->getPrice());
+            $loopResultRow->set("PROMO_PRICE", $product->getPrice2() ? : 0);
+            $loopResultRow->set("PROMO", $product->getPromo());
+            $loopResultRow->set("NEW", $product->getNewness());
 
             //$loopResultRow->set("URL", $product->getUrl());
 

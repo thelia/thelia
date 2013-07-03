@@ -1,4 +1,4 @@
-{loop name="category0" type="category" parent="0"}
+{*loop name="category0" type="category" parent="0"}
     <h2>CATEGORY : #TITLE</h2>
     {loop name="category1" type="category" parent="#ID"}
         <hr />
@@ -17,9 +17,11 @@
     {/loop}
     <hr />
     <hr />
-{/loop}
-<h2>PRODUCTS selected by ref</h2>
-{loop name="product" type="product" ref='REF1,REF2'}
+{/loop*}
+<h2>PRODUCTS</h2>
+{loop name="product" type="product" min_price="200" max_price="1000"}
     <h3>PRODUCT : #REF / #TITLE</h3>
-    #PRICE €
+    price : #PRICE €<br />
+    promo price : #PROMO_PRICE €<br />
+    is promo : #PROMO<br />
 {/loop}

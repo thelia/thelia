@@ -35,7 +35,7 @@ class CategoryQuery extends BaseCategoryQuery
      *
      * find all category children for a given category. an array of \Thelia\Model\Category is return
      *
-     * @param $categoryId the category id
+     * @param $categoryId the category id or an array of id
      * @param int $depth max depth you want to search
      * @param int $currentPos don't change this param, it is used for recursion
      * @return \Thelia\Model\Category[]
@@ -43,17 +43,25 @@ class CategoryQuery extends BaseCategoryQuery
     public static function findAllChild($categoryId, $depth = 0, $currentPos = 0)
     {
         $result = array();
-        $currentPos++;
 
-        if($depth == $currentPos && $depth != 0) return;
+        if(is_array($categoryId)) {
+            foreach($categoryId as $categorySingleId) {
+                $result = array_merge($result, (array) self::findAllChild($categorySingleId, $depth, $currentPos));
+            }
+        } else {
+            $currentPos++;
 
-        $categories = self::create()
-            ->filterByParent($categoryId)
-            ->find();
+            if($depth == $currentPos && $depth != 0) return;
 
-        foreach ($categories as $category) {
-            array_push($result, $category);
-            $result = array_merge($result, (array) self::findAllChild($category->getId(), $depth, $currentPos));
+            $categories = self::create()
+                ->filterByParent($categoryId)
+                ->find();
+
+
+            foreach ($categories as $category) {
+                array_push($result, $category);
+                $result = array_merge($result, (array) self::findAllChild($category->getId(), $depth, $currentPos));
+            }
         }
 
         return $result;
