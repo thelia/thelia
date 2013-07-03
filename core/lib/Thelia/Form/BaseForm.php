@@ -30,7 +30,6 @@ use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Validator\Validation;
-use Thelia\Form\Extension\NameFormExtension;
 use Thelia\Model\ConfigQuery;
 
 abstract class BaseForm {
