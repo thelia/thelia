@@ -190,21 +190,13 @@ class Product extends BaseLoop
                     ->where(array('not_in_promo_max_price', 'in_promo_max_price'), \Criteria::LOGICAL_OR);
         }
 
-        /*if(null !== $this->min_weight) {
-            $search->condition('min_price2', ProductPeer::PRICE2 . \Criteria::GREATER_EQUAL . '?', $this->min_price)
-                   ->condition('min_price', ProductPeer::PRICE . \Criteria::GREATER_EQUAL . '?', $this->min_price)
-                   ->combine(array('in_promo', 'min_price2'), \Criteria::LOGICAL_AND, 'in_promo_min_price')
-                   ->combine(array('not_in_promo', 'min_price'), \Criteria::LOGICAL_AND, 'not_in_promo_min_price')
-                   ->where(array('not_in_promo_min_price', 'in_promo_min_price'), \Criteria::LOGICAL_OR);
+        if(null !== $this->min_weight) {
+            $search->filterByWeight($this->min_weight, \Criteria::GREATER_EQUAL);
         }
 
         if(null !== $this->max_weight) {
-            $search->condition('min_price2', ProductPeer::PRICE2 . \Criteria::GREATER_EQUAL . '?', $this->min_price)
-                   ->condition('min_price', ProductPeer::PRICE . \Criteria::GREATER_EQUAL . '?', $this->min_price)
-                   ->combine(array('in_promo', 'min_price2'), \Criteria::LOGICAL_AND, 'in_promo_min_price')
-                   ->combine(array('not_in_promo', 'min_price'), \Criteria::LOGICAL_AND, 'not_in_promo_min_price')
-                   ->where(array('not_in_promo_min_price', 'in_promo_min_price'), \Criteria::LOGICAL_OR);
-        }*/
+            $search->filterByWeight($this->max_weight, \Criteria::LESS_EQUAL);
+        }
 
         if ($this->current === true) {
             $search->filterById($this->request->get("product_id"));
@@ -306,7 +298,8 @@ class Product extends BaseLoop
             $loopResultRow->set("DESCRIPTION", $product->getDescription());
             $loopResultRow->set("POSTSCRIPTUM", $product->getPostscriptum());
             $loopResultRow->set("PRICE", $product->getPrice());
-            $loopResultRow->set("PROMO_PRICE", $product->getPrice2() ? : 0);
+            $loopResultRow->set("PROMO_PRICE", $product->getPrice2());
+            $loopResultRow->set("WEIGHT", $product->getWeight());
             $loopResultRow->set("PROMO", $product->getPromo());
             $loopResultRow->set("NEW", $product->getNewness());
 

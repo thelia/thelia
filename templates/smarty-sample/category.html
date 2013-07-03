@@ -19,9 +19,10 @@
     <hr />
 {/loop*}
 <h2>PRODUCTS</h2>
-{loop name="product" type="product" min_price="200" max_price="1000"}
+{loop name="product" type="product" min_weight="2.5" max_weight="10"}
     <h3>PRODUCT : #REF / #TITLE</h3>
     price : #PRICE €<br />
     promo price : #PROMO_PRICE €<br />
     is promo : #PROMO<br />
+    weight : #WEIGHT<br />
 {/loop}
