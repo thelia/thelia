@@ -67,6 +67,10 @@
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
+        <service id="smarty.plugin.theliasyntax" class="Thelia\Core\Template\Smarty\Plugins\TheliaSyntax" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
         <service id="smarty.plugin.thelialoop" class="Thelia\Core\Template\Smarty\Plugins\TheliaLoop" scope="request">
             <tag name="thelia.parser.register_plugin"/>
 

@@ -17,34 +17,38 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Core\Template\Smarty\Plugins;
 
-namespace Thelia\Core\Template\Element;
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 
-class LoopResultRow
+/**
+ * Class TheliaSyntax
+ * @package Thelia\Core\Template\Smarty\Plugins
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ */
+class TheliaSyntax implements SmartyPluginInterface
 {
-    protected $substitution = array();
-
-    public function set($key, $value)
+    public function dieseCancel($value, $diese)
     {
-        $this->substitution[$key] = $value === null ? '' : $value;
+        if($value === null) {
+            return $diese;
+        }
+
+        return $value;
     }
 
-    public function get($key)
+    /**
+     * @return SmartyPluginDescriptor[]
+     */
+    public function getPluginDescriptors()
     {
-        return $this->substitution[$key];
+        return array(
+            new SmartyPluginDescriptor("modifier", "dieseCanceller", $this, "dieseCancel")
+        );
     }
-
-    public function getVarVal()
-    {
-        return $this->substitution;
-    }
-
-    public function getVars()
-    {
-    	return array_keys($this->substitution);
-    }
-
 }
