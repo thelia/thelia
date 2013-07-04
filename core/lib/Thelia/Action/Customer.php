@@ -68,7 +68,8 @@ class Customer implements EventSubscriberInterface
                         $data["zipcode"],
                         $data["country"],
                         $data["email"],
-                        $data["password"]
+                        $data["password"],
+                        $request->getSession()->get("lang")
                     );
                 } catch (\PropelException $e) {
                     Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));

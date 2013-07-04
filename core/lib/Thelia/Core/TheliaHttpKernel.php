@@ -76,6 +76,7 @@ class TheliaHttpKernel extends HttpKernel
     {
         //$request->headers->set('X-Php-Ob-Level', ob_get_level());
         $request = $this->initSession($request);
+        $this->initParam($request);
         $this->container->enterScope('request');
         $this->container->set('request', $request, 'request');
 

@@ -45,7 +45,7 @@ class Customer extends BaseCustomer
      * @param null $sponsor
      * @param int $discount
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword = null, $reseller = 0, $sponsor = null, $discount = 0 )
+    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
     {
         $this
             ->setCustomerTitleId($titleId)
@@ -63,8 +63,13 @@ class Customer extends BaseCustomer
             ->setReseller($reseller)
             ->setSponsor($sponsor)
             ->setDiscount($discount)
-            ->save()
         ;
+
+        if(!is_null($lang)) {
+            $this->setLang($lang);
+        }
+
+        $this->save();
 
     }
 
