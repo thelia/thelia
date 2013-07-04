@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCategoryI18nQuery;
+use Thelia\Model\Base\CategoryI18nQuery as BaseCategoryI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseCategoryI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class CategoryI18nQuery extends BaseCategoryI18nQuery
-{
-}
+class CategoryI18nQuery extends BaseCategoryI18nQuery {
+
+} // CategoryI18nQuery

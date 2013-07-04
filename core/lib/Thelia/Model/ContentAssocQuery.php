@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseContentAssocQuery;
+use Thelia\Model\Base\ContentAssocQuery as BaseContentAssocQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseContentAssocQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class ContentAssocQuery extends BaseContentAssocQuery
-{
-}
+class ContentAssocQuery extends BaseContentAssocQuery {
+
+} // ContentAssocQuery

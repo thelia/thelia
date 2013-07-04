@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseLangQuery;
+use Thelia\Model\Base\LangQuery as BaseLangQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseLangQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class LangQuery extends BaseLangQuery
-{
-}
+class LangQuery extends BaseLangQuery {
+
+} // LangQuery

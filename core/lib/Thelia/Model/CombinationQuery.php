@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCombinationQuery;
+use Thelia\Model\Base\CombinationQuery as BaseCombinationQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseCombinationQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class CombinationQuery extends BaseCombinationQuery
-{
-}
+class CombinationQuery extends BaseCombinationQuery {
+
+} // CombinationQuery

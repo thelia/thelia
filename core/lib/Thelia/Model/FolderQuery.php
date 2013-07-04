@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseFolderQuery;
+use Thelia\Model\Base\FolderQuery as BaseFolderQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseFolderQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class FolderQuery extends BaseFolderQuery
-{
-}
+class FolderQuery extends BaseFolderQuery {
+
+} // FolderQuery

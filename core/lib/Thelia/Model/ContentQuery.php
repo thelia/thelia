@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseContentQuery;
+use Thelia\Model\Base\ContentQuery as BaseContentQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseContentQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class ContentQuery extends BaseContentQuery
-{
-}
+class ContentQuery extends BaseContentQuery {
+
+} // ContentQuery

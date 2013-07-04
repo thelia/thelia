@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseOrderStatusI18nQuery;
+use Thelia\Model\Base\OrderStatusI18nQuery as BaseOrderStatusI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseOrderStatusI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class OrderStatusI18nQuery extends BaseOrderStatusI18nQuery
-{
-}
+class OrderStatusI18nQuery extends BaseOrderStatusI18nQuery {
+
+} // OrderStatusI18nQuery

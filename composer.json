@@ -10,7 +10,7 @@
         "php": ">=5.3",
         "ezyang/htmlpurifier": "dev-master",
         "ircmaxell/password-compat": "dev-master",
-        "propel/propel1" : "1.6.*",
+        "propel/propel": "2.0.0-alpha1",
         "psr/log" : "1.0",
         "symfony/class-loader": "2.2.*",
         "symfony/config" : "2.2.*",

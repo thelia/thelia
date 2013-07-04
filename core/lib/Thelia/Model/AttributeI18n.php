@@ -2,20 +2,8 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseAttributeI18n;
+use Thelia\Model\Base\AttributeI18n as BaseAttributeI18n;
 
+class AttributeI18n extends BaseAttributeI18n {
 
-/**
- * Skeleton subclass for representing a row from the 'attribute_i18n' table.
- *
- *
- *
- * You should add additional methods to this class to meet the
- * application requirements.  This class will only be generated as
- * long as it does not already exist in the output directory.
- *
- * @package    propel.generator.Thelia.Model
- */
-class AttributeI18n extends BaseAttributeI18n
-{
 }

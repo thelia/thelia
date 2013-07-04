@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseAdminGroupQuery;
+use Thelia\Model\Base\AdminGroupQuery as BaseAdminGroupQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseAdminGroupQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class AdminGroupQuery extends BaseAdminGroupQuery
-{
-}
+class AdminGroupQuery extends BaseAdminGroupQuery {
+
+} // AdminGroupQuery

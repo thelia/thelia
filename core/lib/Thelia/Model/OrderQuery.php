@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseOrderQuery;
+use Thelia\Model\Base\OrderQuery as BaseOrderQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseOrderQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class OrderQuery extends BaseOrderQuery
-{
-}
+class OrderQuery extends BaseOrderQuery {
+
+} // OrderQuery

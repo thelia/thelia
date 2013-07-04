@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseAttributeAvI18nQuery;
+use Thelia\Model\Base\AttributeAvI18nQuery as BaseAttributeAvI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseAttributeAvI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class AttributeAvI18nQuery extends BaseAttributeAvI18nQuery
-{
-}
+class AttributeAvI18nQuery extends BaseAttributeAvI18nQuery {
+
+} // AttributeAvI18nQuery

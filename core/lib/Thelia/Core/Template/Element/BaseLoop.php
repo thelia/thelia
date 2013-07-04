@@ -26,6 +26,7 @@ namespace Thelia\Core\Template\Element;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 /**
  *
@@ -78,7 +79,7 @@ abstract class BaseLoop
      *
      * @return array|mixed|\PropelModelPager|\PropelObjectCollection
      */
-    public function search(\ModelCriteria $search, &$pagination = null)
+    public function search(ModelCriteria $search, &$pagination = null)
     {
         if($this->page !== null) {
             return $this->searchWithPagination($search, $pagination);
@@ -92,7 +93,7 @@ abstract class BaseLoop
      *
      * @return array|mixed|\PropelObjectCollection
      */
-    public function searchWithOffset(\ModelCriteria $search)
+    public function searchWithOffset(ModelCriteria $search)
     {
         if($this->limit >= 0) {
             $search->limit($this->limit);
@@ -108,7 +109,7 @@ abstract class BaseLoop
      *
      * @return array|\PropelModelPager
      */
-    public function searchWithPagination(\ModelCriteria $search, &$pagination)
+    public function searchWithPagination(ModelCriteria $search, &$pagination)
     {
         $pagination = $search->paginate($this->page, $this->limit);
 

@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCountryQuery;
+use Thelia\Model\Base\CountryQuery as BaseCountryQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseCountryQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class CountryQuery extends BaseCountryQuery
-{
-}
+class CountryQuery extends BaseCountryQuery {
+
+} // CountryQuery

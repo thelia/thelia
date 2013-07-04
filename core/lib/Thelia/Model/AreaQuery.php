@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseAreaQuery;
+use Thelia\Model\Base\AreaQuery as BaseAreaQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseAreaQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class AreaQuery extends BaseAreaQuery
-{
-}
+class AreaQuery extends BaseAreaQuery {
+
+} // AreaQuery

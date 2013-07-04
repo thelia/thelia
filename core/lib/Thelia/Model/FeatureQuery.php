@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseFeatureQuery;
+use Thelia\Model\Base\FeatureQuery as BaseFeatureQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseFeatureQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class FeatureQuery extends BaseFeatureQuery
-{
-}
+class FeatureQuery extends BaseFeatureQuery {
+
+} // FeatureQuery

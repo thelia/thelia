@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseConfigI18nQuery;
+use Thelia\Model\Base\ConfigI18nQuery as BaseConfigI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseConfigI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class ConfigI18nQuery extends BaseConfigI18nQuery
-{
-}
+class ConfigI18nQuery extends BaseConfigI18nQuery {
+
+} // ConfigI18nQuery

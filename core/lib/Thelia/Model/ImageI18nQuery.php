@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseImageI18nQuery;
+use Thelia\Model\Base\ImageI18nQuery as BaseImageI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseImageI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class ImageI18nQuery extends BaseImageI18nQuery
-{
-}
+class ImageI18nQuery extends BaseImageI18nQuery {
+
+} // ImageI18nQuery

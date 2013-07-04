@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseMessageVersionQuery;
+use Thelia\Model\Base\MessageVersionQuery as BaseMessageVersionQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseMessageVersionQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class MessageVersionQuery extends BaseMessageVersionQuery
-{
-}
+class MessageVersionQuery extends BaseMessageVersionQuery {
+
+} // MessageVersionQuery

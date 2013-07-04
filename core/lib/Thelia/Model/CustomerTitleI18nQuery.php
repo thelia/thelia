@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCustomerTitleI18nQuery;
+use Thelia\Model\Base\CustomerTitleI18nQuery as BaseCustomerTitleI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseCustomerTitleI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class CustomerTitleI18nQuery extends BaseCustomerTitleI18nQuery
-{
-}
+class CustomerTitleI18nQuery extends BaseCustomerTitleI18nQuery {
+
+} // CustomerTitleI18nQuery
