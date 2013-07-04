@@ -107,6 +107,13 @@ class Thelia extends Kernel
         $manager = new ConnectionManagerSingle();
         $manager->setConfiguration($definePropel->getConfig());
         $serviceContainer->setConnectionManager('thelia', $manager);
+
+        if ($this->isDebug()) {
+            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
+
+            $con = Propel::getConnection("thelia");
+            $con->useDebug(true);
+        }
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\Customer as BaseCustomer;
+
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CustomRefEvent;
