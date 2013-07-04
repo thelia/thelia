@@ -119,6 +119,59 @@ class TheliaHttpKernel extends HttpKernel
      */
     protected function initParam(Request $request)
     {
+        $lang = $this->detectLang($request);
+
+        if ($lang) {
+            $request->getSession()->set("lang", $lang->getCode());
+            $request->getSession()->set("locale", $lang->getLocale());
+        }
+    }
+
+    /**
+     * @param Request $request
+     * @return null|\Thelia\Model\Lang
+     */
+    protected function detectLang(Request $request)
+    {
+        $lang = null;
+        //first priority => lang parameter present in request (get or post)
+        if($request->query->has("lang")) {
+            $lang = Model\LangQuery::create()->findOneByCode($request->query->get("lang"));
+
+            if(is_null($lang)) {
+                return;
+            }
+
+            //if each lang had is own domain, we redirect the user to the good one.
+            if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+                //if lang domain is different from actuel domain, redirect to the good one
+                if (rtrim($lang->getUrl(), "/") != $request->getSchemeAndHttpHost()) {
+                    // TODO : search if http status 302 is the good one.
+                    $redirect = new RedirectResponse($lang->getUrl(), 302);
+                    $redirect->send();
+                    exit;
+                } else {
+                    //the user is actually on the good domain, nothing to change
+                    return null;
+                }
+            } else {
+                //one domain for all languages, the lang is set into session
+                return $lang;
+            }
+        }
+
+        //check if lang is not defined. If not we have to search the good one.
+        if (null === $request->getSession()->get("lang")) {
+
+            if (Model\ConfigQuery::read("one_domain_foreach_lang", false) == 1) {
+                //find lang with domain
+                return Model\LangQuery::create()->filterByUrl($request->getSchemeAndHttpHost(), \Criteria::LIKE)->findOne();
+            }
+
+            //find default lang
+            return Model\LangQuery::create()->findOneByByDefault(1);
+
+        }
 
     }
 
