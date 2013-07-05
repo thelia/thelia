@@ -240,10 +240,11 @@ class Product extends BaseLoop
             case "reverse":
                 $search->orderByPosition(\Criteria::DESC);
                 break;
-            /*case "min_price":
-                $search->orderByPosition(\Criteria::DESC);
+            case "min_price":
+                //$search->order
+                //$search->orderByPosition(\Criteria::DESC);
                 break;
-            case "max_price":
+            /*case "max_price":
                 $search->orderByPosition(\Criteria::DESC);
                 break;
             case "category":
