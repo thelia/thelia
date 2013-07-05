@@ -43,6 +43,9 @@ class TheliaLoop implements SmartyPluginInterface
 
     protected $dispatcher;
 
+    protected $loopstack = array();
+    protected $varstack = array();
+
     public function __construct(Request $request, EventDispatcherInterface $dispatcher)
     {
         $this->request = $request;
@@ -78,13 +81,16 @@ class TheliaLoop implements SmartyPluginInterface
         if (empty($params['name']))
             throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
 
-
         if (empty($params['type']))
             throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
 
         $name = $params['name'];
 
         if ($content === null) {
+            // Check if a loop with the same name exists in the current scope, and abort if it's the case.
+            if (array_key_exists($name, $this->varstack)) {
+            	throw new \InvalidArgumentException("A loop named '$name' already exists in the current scope.");
+            }
 
             $loop = $this->createLoopInstance(strtolower($params['type']));
 
@@ -93,11 +99,10 @@ class TheliaLoop implements SmartyPluginInterface
             self::$pagination[$name] = null;
 
     		$loopResults = $loop->exec(self::$pagination[$name]);
+            $this->loopstack[$name] = $loopResults;
 
-    		$template->assignByRef($name, $loopResults);
-
-    	} else {
-            $loopResults = $template->getTemplateVars($name);
+        } else {
+            $loopResults = $this->loopstack[$name];
 
             $loopResults->next();
         }
@@ -105,21 +110,50 @@ class TheliaLoop implements SmartyPluginInterface
         if ($loopResults->valid()) {
             $loopResultRow = $loopResults->current();
 
+            // On first iteration, save variables that may be overwritten by this loop
+            if (! isset($this->varstack[$name])) {
+
+                $saved_vars = array();
+
+                $varlist = $loopResultRow->getVars();
+                $varlist[] = 'LOOP_COUNT';
+                $varlist[] = 'LOOP_TOTAL';
+
+                foreach($varlist as $var) {
+                    $saved_vars[$var] = $template->getTemplateVars($var);
+                }
+
+                $this->varstack[$name] = $saved_vars;
+            }
+
             foreach($loopResultRow->getVarVal() as $var => $val) {
-    			$template->assign(substr($var, 1), $val);
+    			$template->assign($var, $val);
     		}
 
-            $template->assign('__COUNT__', 1 + $loopResults->key());
-            $template->assign('__TOTAL__', $loopResults->getCount());
-
-            //$repeat = $loopResults->valid();
-            $repeat = true;
+    		$repeat = true;
     	}
 
+        // Assign meta information
+        $template->assign('LOOP_COUNT', 1 + $loopResults->key());
+        $template->assign('LOOP_TOTAL', $loopResults->getCount());
+
+    	// Loop is terminated. Cleanup.
+    	if (! $repeat) {
+    	    // Restore previous variables values before terminating
+    	    if (isset($this->varstack[$name])) {
+    		    foreach($this->varstack[$name] as $var => $value) {
+    			    $template->assign($var, $value);
+    		    }
+
+    		    unset($this->varstack[$name]);
+    	    }
+    	}
 
         if ($content !== null) {
+            if ($loopResults->isEmpty()) {
+                $content = "";
+            }
 
-            if ($loopResults->isEmpty()) $content = "";
             return $content;
         }
     }
@@ -178,10 +212,10 @@ class TheliaLoop implements SmartyPluginInterface
         $loopName = $params['rel'];
 
         // Find loop results in the current template vars
-        $loopResults = $template->getTemplateVars($loopName);
+        /* $loopResults = $template->getTemplateVars($loopName);
         if (empty($loopResults)) {
             throw new \InvalidArgumentException("Loop $loopName is not defined.");
-        }
+        }*/
 
         // Find pagination
         $pagination = self::getPagination($loopName);
@@ -225,14 +259,11 @@ class TheliaLoop implements SmartyPluginInterface
 
         $loopName = $params['rel'];
 
-        // Find loop results in the current template vars
-        $loopResults = $template->getTemplateVars($loopName);
-
-        if (empty($loopResults)) {
+        if (! isset($this->loopstack[$loopName])) {
             throw new \InvalidArgumentException("Loop $loopName is not defined.");
         }
 
-        return $loopResults->isEmpty();
+        return $this->loopstack[$loopName]->isEmpty();
     }
 
     /**
@@ -279,7 +310,7 @@ class TheliaLoop implements SmartyPluginInterface
         $argumentsCollection = $loop->getArgs();
         foreach( $argumentsCollection as $argument ) {
 
-            $value = isset($smartyParam[$argument->name]) ? $smartyParam[$argument->name] : null;
+            $value = isset($smartyParam[$argument->name]) ? (string)$smartyParam[$argument->name] : null;
 
             /* check if mandatory */
             if($value === null && $argument->mandatory) {
@@ -304,11 +335,11 @@ class TheliaLoop implements SmartyPluginInterface
 
             /* set default */
             /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
-            if($value === null) {
-                $value = $argument->default;
+            if($value === null && $argument->default !== null) {
+                $value = (string)$argument->default;
             }
 
-            $loop->{$argument->name} = $value;
+            $loop->{$argument->name} = $value === null ? null : $argument->type->getFormatedValue($value);
         }
 
         if (!empty($faultActor)) {

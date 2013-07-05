@@ -44,7 +44,7 @@ class Translation implements SmartyPluginInterface
         }
 
         // TODO
-        return "[$string]";
+        return "$string";
     }
 
     /**

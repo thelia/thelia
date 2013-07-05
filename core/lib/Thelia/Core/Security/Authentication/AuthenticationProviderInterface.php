@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,39 +17,44 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Core\Security\Authentication;
+
+use Thelia\Core\Security\UserNotFoundException;
+use Thelia\Core\Security\IncorrectPasswordException;
 
 /**
+ * Aunthentication providers are in charge or retrieving users, and check their
+ * credentials.
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Franck
  *
  */
+interface AuthenticationProviderInterface {
 
-class EnumType implements TypeInterface
-{
-    protected $values = array();
+    /**
+     * Set the authentication token
+     *
+     * @param TokenInterface $token the authentication token
+     */
+    public function setToken(TokenInterface $token);
 
-    public function __construct($values = array())
-    {
-        if(is_array($values))
-            $this->values = $values;
-    }
 
-    public function getType()
-    {
-        return 'Enum type';
-    }
+    /**
+     * Set the authentication token
+     *
+     * @param unknown $key
+     */
+    public function supportsToken(TokenInterface $token);
 
-    public function isValid($value)
-    {
-        return in_array($value, $this->values);
-    }
-
-    public function getFormatedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
-    }
+    /**
+     * Authenticate the token
+     *
+     *@throws Exception if authentication was not successful
+     */
+    public function authenticate();
 }
+?>

@@ -29,10 +29,11 @@ class SmartyParser extends Smarty implements ParserInterface
     protected $status = 200;
 
     /**
-     * @param \Symfony\Component\HttpFoundation\Request                   $request
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-     * @param bool                                                        $template
-     * @param string                                                      $env        Environment define for the kernel application. Used for the cache directory
+     * @param Request                  $request
+     * @param EventDispatcherInterface $dispatcher
+     * @param bool                     $template
+     * @param string                   $env
+     * @param bool                     $debug
      */
     public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod", $debug = false)
     {
@@ -72,13 +73,13 @@ class SmartyParser extends Smarty implements ParserInterface
         // The default HTTP status
         $this->status = 200;
 
-        $this->registerFilter('pre', array($this, "pretest"));
+        $this->registerFilter('pre', array($this, "preThelia"));
     }
 
-    public function pretest($tpl_source, \Smarty_Internal_Template $template)
+    public function preThelia($tpl_source, \Smarty_Internal_Template $template)
     {
         $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
-        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|default:\'#$1\'}', $new_source);
+        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
 
         return $new_source;
     }

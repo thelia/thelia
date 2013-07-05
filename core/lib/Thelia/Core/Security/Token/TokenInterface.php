@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,39 +17,65 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Core\Security\Token;
 
 /**
+ * TokenInterface is the interface for the user authentication information.
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
+ * Parts borrowed from Symfony Security Framework (Fabien Potencier <fabien@symfony.com> / Johannes M. Schmitt <schmittjoh@gmail.com>)
  */
 
-class EnumType implements TypeInterface
+interface TokenInterface extends \Serializable
 {
-    protected $values = array();
+	/**
+	 * Returns the user credentials.
+	 *
+	 * @return mixed The user credentials
+	*/
+	public function getCredentials();
 
-    public function __construct($values = array())
-    {
-        if(is_array($values))
-            $this->values = $values;
-    }
+	/**
+	 * Returns a user representation.
+	 *
+	 * @return mixed either returns an object which implements __toString(), or
+	 * a primitive string is returned.
+	*/
+	public function getUser();
 
-    public function getType()
-    {
-        return 'Enum type';
-    }
+	/**
+	 * Sets a user instance
+	 *
+	 * @param mixed $user
+	*/
+	public function setUser($user);
 
-    public function isValid($value)
-    {
-        return in_array($value, $this->values);
-    }
+	/**
+	 * Returns the username.
+	 *
+	 * @return string
+	*/
+	public function getUsername();
 
-    public function getFormatedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
-    }
+	/**
+	 * Returns whether the user is authenticated or not.
+	 *
+	 * @return Boolean true if the token has been authenticated, false otherwise
+	*/
+	public function isAuthenticated();
+
+	/**
+	 * Sets the authenticated flag.
+	 *
+	 * @param Boolean $isAuthenticated The authenticated flag
+	*/
+	public function setAuthenticated($isAuthenticated);
+
+	/**
+	 * Removes sensitive information from the token.
+	*/
+	public function eraseCredentials();
 }
