@@ -130,12 +130,12 @@ class TheliaLoop implements SmartyPluginInterface
     			$template->assign($var, $val);
     		}
 
-    		// Assign meta information
-            $template->assign('LOOP_COUNT', 1 + $loopResults->key());
-            $template->assign('LOOP_TOTAL', $loopResults->getCount());
-
-            $repeat = true;
+    		$repeat = true;
     	}
+
+        // Assign meta information
+        $template->assign('LOOP_COUNT', 1 + $loopResults->key());
+        $template->assign('LOOP_TOTAL', $loopResults->getCount());
 
     	// Loop is terminated. Cleanup.
     	if (! $repeat) {
