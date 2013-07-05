@@ -8,6 +8,7 @@ use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Event\CustomRefEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Propel\Runtime\Connection\ConnectionInterface;
 
 class Customer extends BaseCustomer {
     /**
@@ -61,7 +62,7 @@ class Customer extends BaseCustomer {
 
     }
 
-    public function preInsert(\PropelPDO $con = null)
+    public function preInsert(ConnectionInterface $con = null)
     {
         $customerRef = new CustomRefEvent($this);
         if (!is_null($this->dispatcher)) {
