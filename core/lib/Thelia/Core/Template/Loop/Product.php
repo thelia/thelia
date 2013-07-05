@@ -37,31 +37,13 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductPeer;
 use Thelia\Model\ProductQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Category loop, all params available :
- *
- * - id : can be an id (eq : 3) or a "string list" (eg: 3, 4, 5)
- * - parent : categories having this parent id
- * - current : current id is used if you are on a category page
- * - not_empty : if value is 1, category and subcategories must have at least 1 product
- * - visible : default 1, if you want category not visible put 0
- * - order : all value available :
- *      * alpha : sorting by title alphabetical order
- *      * alpha_reverse : sorting by title alphabetical reverse order
- *      * reverse : sorting by position descending
- *      * by default results are sorting by position ascending
- * - random : if 1, random results. Default value is 0
- * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
- *
- * example :
- *
- * <THELIA_cat type="category" parent="3" limit="4">
- *      #TITLE : #ID
- * </THELIA_cat>
+ * Product loop
  *
  *
  * Class Product
@@ -286,7 +268,11 @@ class Product extends BaseLoop
          *
          * @todo : verify here if we want results for row without translations.
          */
-        $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), Criteria::INNER_JOIN);
+
+        $search->joinWithI18n(
+            $this->request->getSession()->get('locale', 'en_US'),
+            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
+        );
 
         $products = $this->search($search, $pagination);
 
