@@ -23,6 +23,8 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
+
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -132,15 +134,15 @@ class Product extends BaseLoop
         $search = ProductQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById($this->id, \Criteria::IN);
+            $search->filterById($this->id, Criteria::IN);
         }
 
         if (!is_null($this->ref)) {
-            $search->filterByRef($this->ref, \Criteria::IN);
+            $search->filterByRef($this->ref, Criteria::IN);
         }
 
         if (!is_null($this->category)) {
-            $categories = CategoryQuery::create()->filterById($this->category, \Criteria::IN)->find();
+            $categories = CategoryQuery::create()->filterById($this->category, Criteria::IN)->find();
 
             if(null !== $this->depth) {
                 foreach(CategoryQuery::findAllChild($this->category, $this->depth) as $subCategory) {
@@ -150,58 +152,58 @@ class Product extends BaseLoop
 
             $search->filterByCategory(
                 $categories,
-                \Criteria::IN
+                Criteria::IN
             );
         }
 
         if ($this->new === true) {
-            $search->filterByNewness(1, \Criteria::EQUAL);
+            $search->filterByNewness(1, Criteria::EQUAL);
         } else if($this->new === false) {
-            $search->filterByNewness(0, \Criteria::EQUAL);
+            $search->filterByNewness(0, Criteria::EQUAL);
         }
 
         if ($this->promo === true) {
-            $search->filterByPromo(1, \Criteria::EQUAL);
+            $search->filterByPromo(1, Criteria::EQUAL);
         } else if($this->promo === false) {
-            $search->filterByNewness(0, \Criteria::EQUAL);
+            $search->filterByNewness(0, Criteria::EQUAL);
         }
 
         if (null != $this->min_stock) {
-            $search->filterByQuantity($this->min_stock, \Criteria::GREATER_EQUAL);
+            $search->filterByQuantity($this->min_stock, Criteria::GREATER_EQUAL);
         }
 
         if(null !== $this->min_price) {
-            $search->condition('in_promo', ProductPeer::PROMO . \Criteria::EQUAL . '1')
-                    ->condition('not_in_promo', ProductPeer::PROMO . \Criteria::NOT_EQUAL . '1')
-                    ->condition('min_price2', ProductPeer::PRICE2 . \Criteria::GREATER_EQUAL . '?', $this->min_price)
-                    ->condition('min_price', ProductPeer::PRICE . \Criteria::GREATER_EQUAL . '?', $this->min_price)
-                    ->combine(array('in_promo', 'min_price2'), \Criteria::LOGICAL_AND, 'in_promo_min_price')
-                    ->combine(array('not_in_promo', 'min_price'), \Criteria::LOGICAL_AND, 'not_in_promo_min_price')
-                    ->where(array('not_in_promo_min_price', 'in_promo_min_price'), \Criteria::LOGICAL_OR);
+            $search->condition('in_promo', ProductPeer::PROMO . Criteria::EQUAL . '1')
+                    ->condition('not_in_promo', ProductPeer::PROMO . Criteria::NOT_EQUAL . '1')
+                    ->condition('min_price2', ProductPeer::PRICE2 . Criteria::GREATER_EQUAL . '?', $this->min_price)
+                    ->condition('min_price', ProductPeer::PRICE . Criteria::GREATER_EQUAL . '?', $this->min_price)
+                    ->combine(array('in_promo', 'min_price2'), Criteria::LOGICAL_AND, 'in_promo_min_price')
+                    ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
+                    ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
         }
 
         if(null !== $this->max_price) {
-            $search->condition('in_promo', ProductPeer::PROMO . \Criteria::EQUAL . '1')
-                    ->condition('not_in_promo', ProductPeer::PROMO . \Criteria::NOT_EQUAL . '1')
-                    ->condition('max_price2', ProductPeer::PRICE2 . \Criteria::LESS_EQUAL . '?', $this->max_price)
-                    ->condition('max_price', ProductPeer::PRICE . \Criteria::LESS_EQUAL . '?', $this->max_price)
-                    ->combine(array('in_promo', 'max_price2'), \Criteria::LOGICAL_AND, 'in_promo_max_price')
-                    ->combine(array('not_in_promo', 'max_price'), \Criteria::LOGICAL_AND, 'not_in_promo_max_price')
-                    ->where(array('not_in_promo_max_price', 'in_promo_max_price'), \Criteria::LOGICAL_OR);
+            $search->condition('in_promo', ProductPeer::PROMO . Criteria::EQUAL . '1')
+                    ->condition('not_in_promo', ProductPeer::PROMO . Criteria::NOT_EQUAL . '1')
+                    ->condition('max_price2', ProductPeer::PRICE2 . Criteria::LESS_EQUAL . '?', $this->max_price)
+                    ->condition('max_price', ProductPeer::PRICE . Criteria::LESS_EQUAL . '?', $this->max_price)
+                    ->combine(array('in_promo', 'max_price2'), Criteria::LOGICAL_AND, 'in_promo_max_price')
+                    ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
+                    ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
         }
 
         if(null !== $this->min_weight) {
-            $search->filterByWeight($this->min_weight, \Criteria::GREATER_EQUAL);
+            $search->filterByWeight($this->min_weight, Criteria::GREATER_EQUAL);
         }
 
         if(null !== $this->max_weight) {
-            $search->filterByWeight($this->max_weight, \Criteria::LESS_EQUAL);
+            $search->filterByWeight($this->max_weight, Criteria::LESS_EQUAL);
         }
 
         if ($this->current === true) {
             $search->filterById($this->request->get("product_id"));
         } elseif($this->current === false) {
-            $search->filterById($this->request->get("product_id"), \Criteria::NOT_IN);
+            $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
         }
 
         if ($this->current_category === true) {
@@ -209,22 +211,22 @@ class Product extends BaseLoop
                 CategoryQuery::create()->filterByProduct(
                     ProductCategoryQuery::create()->filterByProductId(
                         $this->request->get("product_id"),
-                        \Criteria::EQUAL
+                        Criteria::EQUAL
                     )->find(),
-                    \Criteria::IN
+                    Criteria::IN
                 )->find(),
-                \Criteria::IN
+                Criteria::IN
             );
         } elseif($this->current_category === false) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
                     ProductCategoryQuery::create()->filterByProductId(
                         $this->request->get("product_id"),
-                        \Criteria::EQUAL
+                        Criteria::EQUAL
                     )->find(),
-                    \Criteria::IN
+                    Criteria::IN
                 )->find(),
-                \Criteria::NOT_IN
+                Criteria::NOT_IN
             );
         }
 
@@ -238,17 +240,17 @@ class Product extends BaseLoop
                 $search->addDescendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
                 break;
             case "reverse":
-                $search->orderByPosition(\Criteria::DESC);
+                $search->orderByPosition(Criteria::DESC);
                 break;
             case "min_price":
                 //$search->order
-                //$search->orderByPosition(\Criteria::DESC);
+                //$search->orderByPosition(Criteria::DESC);
                 break;
             /*case "max_price":
-                $search->orderByPosition(\Criteria::DESC);
+                $search->orderByPosition(Criteria::DESC);
                 break;
             case "category":
-                $search->orderByPosition(\Criteria::DESC);
+                $search->orderByPosition(Criteria::DESC);
                 break;*/
             case "manual":
                 $search->addAscendingOrderByColumn(\Thelia\Model\ProductPeer::POSITION);
@@ -276,15 +278,15 @@ class Product extends BaseLoop
         }
 
         if (!is_null($this->exclude)) {
-            $search->filterById($this->exclude, \Criteria::NOT_IN);
+            $search->filterById($this->exclude, Criteria::NOT_IN);
         }
 
         /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
+         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
          *
          * @todo : verify here if we want results for row without translations.
          */
-        $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
+        $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), Criteria::INNER_JOIN);
 
         $products = $this->search($search, $pagination);
 
