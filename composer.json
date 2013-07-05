@@ -31,7 +31,9 @@
         "smarty/smarty": "v3.1.13",
         "kriswallsmith/assetic": "1.2.*@dev",
         "leafo/lessphp": "0.3.*@dev",
-        "ptachoire/cssembed": "dev-master"
+        "ptachoire/cssembed": "dev-master",
+
+        "simplepie/simplepie": "dev-master"
     },
     "require-dev" : {
         "fzaninotto/faker": "dev-master"
