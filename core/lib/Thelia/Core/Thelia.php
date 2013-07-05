@@ -83,7 +83,7 @@ class Thelia extends Kernel
         if ($this->isDebug()) {
             $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
 
-            $con = Propel::getConnection("thelia");
+            $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
             $con->useDebug(true);
         }
     }
