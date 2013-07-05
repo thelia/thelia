@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseFeatureI18nQuery;
+use Thelia\Model\Base\FeatureI18nQuery as BaseFeatureI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseFeatureI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class FeatureI18nQuery extends BaseFeatureI18nQuery
-{
-}
+class FeatureI18nQuery extends BaseFeatureI18nQuery {
+
+} // FeatureI18nQuery

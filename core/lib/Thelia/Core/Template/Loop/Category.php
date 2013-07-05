@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,6 +33,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -109,7 +111,7 @@ class Category extends BaseLoop
         $search = CategoryQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById($this->id, \Criteria::IN);
+            $search->filterById($this->id, Criteria::IN);
         }
 
         if (!is_null($this->parent)) {
@@ -119,11 +121,11 @@ class Category extends BaseLoop
         if ($this->current === true) {
             $search->filterById($this->request->get("category_id"));
         } elseif ($this->current === false) {
-            $search->filterById($this->request->get("category_id"), \Criteria::NOT_IN);
+            $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
 
         if (!is_null($this->exclude)) {
-            $search->filterById($this->exclude, \Criteria::NOT_IN);
+            $search->filterById($this->exclude, Criteria::NOT_IN);
         }
 
         if (!is_null($this->link)) {
@@ -157,7 +159,11 @@ class Category extends BaseLoop
          *
          * @todo : verify here if we want results for row without translations.
          */
-        $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
+
+        $search->joinWithI18n(
+            $this->request->getSession()->get('locale', 'en_US'),
+            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
+        );
 
         $categories = $this->search($search, $pagination);
 

@@ -48,7 +48,7 @@ class BaseAdminController extends ContainerAware
      */
     public function render($templateName, $args = array())
     {
-        $args = array_merge($args, array('lang' => 'fr')); // FIXME
+        $args = array_merge($args, array('lang' => 'fr'));
 
         $response = new Response();
 
@@ -57,7 +57,7 @@ class BaseAdminController extends ContainerAware
 
     public function renderRaw($templateName, $args = array())
     {
-        $args = array_merge($args, array('lang' => 'fr')); // FIXME
+        $args = array_merge($args, array('lang' => 'fr'));
 
         return $this->getParser()->render($templateName, $args);
     }
@@ -78,18 +78,5 @@ class BaseAdminController extends ContainerAware
         $parser->setTemplate('admin/default');
 
         return $parser;
-    }
-
-    public function getFormFactory()
-    {
-        return BaseForm::getFormFactory($this->getRequest(), ConfigQuery::read("form.secret.admin", md5(__DIR__)));
-    }
-
-    public function getFormBuilder()
-    {
-        return $this->getFormFactory()->createBuilder("form");
-    }
-
-    protected function isGranted() {
     }
 }

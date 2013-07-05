@@ -38,9 +38,15 @@ abstract class BaseForm {
      */
     protected $form;
 
+    public $name;
+
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
         $validator = Validation::createValidator();
+
+        if(!isset($options["attr"]["name"])) {
+            $options["attr"]["thelia_name"] = $this->getName();
+        }
 
         $this->form = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
@@ -48,14 +54,16 @@ abstract class BaseForm {
                 new CsrfExtension(
                     new SessionCsrfProvider(
                         $request->getSession(),
-                        isset($option["secret"]) ? $option["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
+                        isset($options["secret"]) ? $options["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
                     )
                 )
             )
             ->addExtension(new ValidatorExtension($validator))
             ->getFormFactory()
-            ->createBuilder($type, $data, $options);
+            ->createNamedBuilder($this->getName(), $type, $data, $options);
         ;
+
+
 
             $this->buildForm();
     }
@@ -68,7 +76,31 @@ abstract class BaseForm {
         return $this->form->getForm();
     }
 
+    /**
+     *
+     * in this function you add all the fields you need for your Form.
+     * Form this you have to call add method on $this->form attribute :
+     *
+     * $this->form->add("name", "text")
+     *   ->add("email", "email", array(
+     *           "attr" => array(
+     *               "class" => "field"
+     *           ),
+     *           "label" => "email",
+     *           "constraints" => array(
+     *               new \Symfony\Component\Validator\Constraints\NotBlank()
+     *           )
+     *       )
+     *   )
+     *   ->add('age', 'integer');
+     *
+     * @return null
+     */
     abstract protected function buildForm();
 
+    /**
+     * @return string the name of you form. This name must be unique
+     */
+    abstract public function getName();
 }
 

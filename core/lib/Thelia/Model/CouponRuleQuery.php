@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCouponRuleQuery;
+use Thelia\Model\Base\CouponRuleQuery as BaseCouponRuleQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseCouponRuleQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class CouponRuleQuery extends BaseCouponRuleQuery
-{
-}
+class CouponRuleQuery extends BaseCouponRuleQuery {
+
+} // CouponRuleQuery

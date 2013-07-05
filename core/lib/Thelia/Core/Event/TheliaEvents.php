@@ -47,4 +47,10 @@ final class TheliaEvents
      * Send before starting thelia inclusion
      */
     const INCLUSION = "thelia.include";
+
+    const BEFORE_CREATECUSTOMER = "action.before_createcustomer";
+
+    const AFTER_CREATECUSTOMER = "action.after_createcustomer";
+
+    const CREATECUSTOMER_CUSTOMREF = "customer.creation.customref";
 }

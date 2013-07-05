@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseAttributeQuery;
+use Thelia\Model\Base\AttributeQuery as BaseAttributeQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseAttributeQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class AttributeQuery extends BaseAttributeQuery
-{
-}
+class AttributeQuery extends BaseAttributeQuery {
+
+} // AttributeQuery

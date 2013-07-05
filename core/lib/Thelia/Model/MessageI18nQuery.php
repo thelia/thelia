@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseMessageI18nQuery;
+use Thelia\Model\Base\MessageI18nQuery as BaseMessageI18nQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseMessageI18nQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class MessageI18nQuery extends BaseMessageI18nQuery
-{
-}
+class MessageI18nQuery extends BaseMessageI18nQuery {
+
+} // MessageI18nQuery

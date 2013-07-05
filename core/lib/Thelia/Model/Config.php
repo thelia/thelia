@@ -2,20 +2,8 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseConfig;
+use Thelia\Model\Base\Config as BaseConfig;
 
+class Config extends BaseConfig {
 
-/**
- * Skeleton subclass for representing a row from the 'config' table.
- *
- *
- *
- * You should add additional methods to this class to meet the
- * application requirements.  This class will only be generated as
- * long as it does not already exist in the output directory.
- *
- * @package    propel.generator.Thelia.Model
- */
-class Config extends BaseConfig
-{
 }

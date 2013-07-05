@@ -46,8 +46,8 @@ use Thelia\Core\TheliaContainerBuilder;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-use Propel;
-use PropelConfiguration;
+use Propel\Runtime\Propel;
+use Propel\Runtime\Connection\ConnectionManagerSingle;
 
 class Thelia extends Kernel
 {
@@ -71,7 +71,7 @@ class Thelia extends Kernel
             return ;
         }
 
-        if (! Propel::isInit()) {
+/*        if (! Propel::isInit()) {
 
             $definePropel = new DefinePropel(new DatabaseConfiguration(),
                 Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
@@ -97,6 +97,22 @@ class Thelia extends Kernel
             }
 
             Propel::initialize();
+        }*/
+
+        $definePropel = new DefinePropel(new DatabaseConfiguration(),
+            Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
+        $propelConfig = $definePropel->getConfig();
+        $serviceContainer = Propel::getServiceContainer();
+        $serviceContainer->setAdapterClass('thelia', 'mysql');
+        $manager = new ConnectionManagerSingle();
+        $manager->setConfiguration($definePropel->getConfig());
+        $serviceContainer->setConnectionManager('thelia', $manager);
+
+        if ($this->isDebug()) {
+            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
+
+            $con = Propel::getConnection("thelia");
+            $con->useDebug(true);
         }
     }
 

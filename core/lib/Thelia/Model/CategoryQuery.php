@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCategoryQuery;
+use Thelia\Model\Base\CategoryQuery as BaseCategoryQuery;
 
 
 /**
@@ -14,14 +14,11 @@ use Thelia\Model\om\BaseCategoryQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class CategoryQuery extends BaseCategoryQuery
-{
-
+class CategoryQuery extends BaseCategoryQuery {
     /**
      *
-     *  count how many direct children have a category
+     * count how many direct children have a category
      *
      * @param int $parent category parent id
      * @return int
@@ -66,4 +63,4 @@ class CategoryQuery extends BaseCategoryQuery
 
         return $result;
     }
-}
+} // CategoryQuery

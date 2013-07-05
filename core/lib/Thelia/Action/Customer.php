@@ -25,14 +25,22 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerCreation;
+use Thelia\Form\CustomerModification;
+use Thelia\Model\Customer as CustomerModel;
+use Thelia\Log\Tlog;
+use Thelia\Model\CustomerQuery;
 
 class Customer implements EventSubscriberInterface
 {
 
     public function create(ActionEvent $event)
     {
+
+        $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
+
         $request = $event->getRequest();
 
         $customerForm = new CustomerCreation($request);
@@ -44,15 +52,78 @@ class Customer implements EventSubscriberInterface
             $form->bind($request);
 
             if ($form->isValid()) {
-                echo "ok"; exit;
+                $data = $form->getData();
+                $customer = new CustomerModel();
+                try {
+                    \Thelia\Log\Tlog::getInstance()->debug($data);
+                    $customer->createOrUpdate(
+                        $data["title"],
+                        $data["firstname"],
+                        $data["lastname"],
+                        $data["address1"],
+                        $data["address2"],
+                        $data["address3"],
+                        $data["phone"],
+                        $data["cellphone"],
+                        $data["zipcode"],
+                        $data["country"],
+                        $data["email"],
+                        $data["password"],
+                        $request->getSession()->get("lang")
+                    );
+                } catch (\PropelException $e) {
+                    Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
+                    $event->setFormError($form);
+                }
+
+                //Customer is create, he is automatically connected
+
             } else {
-                echo "ko"; exit;
+
+                $event->setFormError($form);
             }
         }
+
+        $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $event);
     }
 
     public function modify(ActionEvent $event)
     {
+        $request = $event->getRequest();
+
+        $customerModification = new CustomerModification($request);
+
+        $form = $customerModification->getForm();
+
+        if ($request->isMethod("post")) {
+            $form->bind($request);
+
+            if ($form->isValid()) {
+                $data = $form->getData();
+
+                $customer = CustomerQuery::create()->findPk(1);
+                try {
+                    $data = $form->getData();
+                    $customer->createOrUpdate(
+                        $data["title"],
+                        $data["firstname"],
+                        $data["lastname"],
+                        $data["address1"],
+                        $data["address2"],
+                        $data["address3"],
+                        $data["phone"],
+                        $data["cellphone"],
+                        $data["zipcode"],
+                        $data["country"]
+                    );
+                } catch(\PropelException $e) {
+                    Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
+                    $event->setFormError($form);
+                }
+            } else {
+                $event->setFormError($form);
+            }
+        }
 
     }
 

@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseGroupResourceQuery;
+use Thelia\Model\Base\GroupResourceQuery as BaseGroupResourceQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseGroupResourceQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class GroupResourceQuery extends BaseGroupResourceQuery
-{
-}
+class GroupResourceQuery extends BaseGroupResourceQuery {
+
+} // GroupResourceQuery

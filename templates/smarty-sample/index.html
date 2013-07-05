@@ -7,43 +7,31 @@ An image from asset directory :
 <div>
 {intl l='An internationalized string'}
 </div>
-{form name="thelia.customer.creation"}
-<form method="post" action="index_dev.php?action=createCustomer" {form_enctype form=$form} >
 
-    {form_field_hidden form=$form}
-    {form_field form=$form.email}
-        {intl l="{$label}"} : <input type="text" name="{$name}" {$attr} >
-    {/form_field}
 
-    {form_field form=$form.name}
-        {intl l='name'} : <input type="text" name="{$name}" >
-    {/form_field}
-    {form_field form=$form.age}
-    {intl l='age'} : <input type="text" name="{$name}">
-    {/form_field}
-        <input type="submit" value="valider">
-</form>
-{/form}
 <div>
 	jQuery data: <span id="jquery_block"></span>
 </div>
 
 <div>
-     <p>Category loop example</p>
-     <ul>
-     {loop type="category" name="catloop1"}
-         <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}, children: {$NB_CHILD}
-          {ifloop rel="inner1"}
-          	<ul>
-          	{loop type="category" name="inner1" parent="{$ID}"}
-          		<li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
-          	{/loop}
-          	</ul>
-          {/ifloop}
-         </li>
-     {/loop}
-     </ul>
+    <p>Category loop example</p>
+    <ul>
+        {loop type="category" name="catloop1"}
+            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}, children: {$NB_CHILD}
+                {ifloop rel="inner1"}
+                    <ul>
+                        {loop type="category" name="inner1" parent="{$ID}"}
+                            <li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
+                        {/loop}
+                    </ul>
+                {/ifloop}
+            </li>
+        {/loop}
+    </ul>
 </div>
+
+
+
 
 <div>
 	<p>Conditional example #1</p>
@@ -52,7 +40,7 @@ An image from asset directory :
   		Hey ! Loop catloop2 is not empty:
   		<ul>
    		{loop type="category" name="catloop2" parent="12"}
-       		<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+       		<li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
    		{/loop}
    		</ul>
   	{/ifloop}
@@ -69,7 +57,7 @@ An image from asset directory :
 		Loop catloop3 is not empty:
 		<ul>
 		{loop type="category" name="catloop3" parent="0"}
-	    	<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+	    	<li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
 	 	{/loop}
 	 	</ul>
 	{/ifloop}
@@ -81,9 +69,7 @@ An image from asset directory :
 	{elseloop rel="catloop2"}
 		<p>... but catloop2 is still empty :-)</p>
 	{/elseloop}
-	{ifloop rel="catloop1"}
-		<p>... and catloop1 is still NOT empty :-)</p>
-	{/ifloop}
+
 </div>
 
 <div>
@@ -93,32 +79,27 @@ An image from asset directory :
     {/for}
 </div>
 
-<div>
-    <p>Loops also work with #</p>
-    {loop type="category" name="catloop1"}
-        #TITLE : {#DESCRIPTION|upper} #NOTATAG<br />
-    {/loop}
-</div>
+
 
 <div>
     <p>Some pagination</p>
     <p>PAGE 1</p>
     <ul>
         {loop type="category" name="catloopwithpagination1" limit="2" page="1"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
         {/loop}
     </ul>
     <p>PAGE 2</p>
     <ul>
         {loop type="category" name="catloopwithpagination2" limit="2" page="2"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
         {/loop}
     </ul>
     <p>PAGE 1000</p>
     <ul>
 
         {loop type="category" name="catloopwithpagination1000" limit="2" page="1000"}
-            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
         {/loop}
 
         {elseloop rel="catloopwithpagination1000"}
@@ -133,7 +114,7 @@ An image from asset directory :
     <p>PAGE {$current_page} :</p>
     <ul>
         {loop type="category" name="catloopwithpaginationchoice" limit="2" page="{$current_page}"}
-        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
         {/loop}
     </ul>
     <p>page choice</p>
