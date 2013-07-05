@@ -28,6 +28,7 @@ class Customer extends BaseCustomer {
      * @param int $countryId customer country id (from Country table)
      * @param string $email customer email, must be unique
      * @param string $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
+     * @param string $lang
      * @param int $reseller
      * @param null $sponsor
      * @param int $discount

@@ -13,9 +13,24 @@ An image from asset directory :
 	jQuery data: <span id="jquery_block"></span>
 </div>
 
-{loop type="category" name="catloop1" }
-    <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
-{/loop}
+<div>
+    <p>Category loop example</p>
+    <ul>
+        {loop type="category" name="catloop1"}
+            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}, children: {$NB_CHILD}
+                {ifloop rel="inner1"}
+                    <ul>
+                        {loop type="category" name="inner1" parent="{$ID}"}
+                            <li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
+                        {/loop}
+                    </ul>
+                {/ifloop}
+            </li>
+        {/loop}
+    </ul>
+</div>
+
+
 
 
 <div>
