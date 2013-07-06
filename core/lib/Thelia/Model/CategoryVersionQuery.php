@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCategoryVersionQuery;
+use Thelia\Model\Base\CategoryVersionQuery as BaseCategoryVersionQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseCategoryVersionQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class CategoryVersionQuery extends BaseCategoryVersionQuery
-{
-}
+class CategoryVersionQuery extends BaseCategoryVersionQuery {
+
+} // CategoryVersionQuery

@@ -46,8 +46,8 @@ use Thelia\Core\TheliaContainerBuilder;
 use Thelia\Core\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Config\FileLocator;
 
-use Propel;
-use PropelConfiguration;
+use Propel\Runtime\Propel;
+use Propel\Runtime\Connection\ConnectionManagerSingle;
 
 class Thelia extends Kernel
 {
@@ -71,32 +71,20 @@ class Thelia extends Kernel
             return ;
         }
 
-        if (! Propel::isInit()) {
+        $definePropel = new DefinePropel(new DatabaseConfiguration(),
+            Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
+        $propelConfig = $definePropel->getConfig();
+        $serviceContainer = Propel::getServiceContainer();
+        $serviceContainer->setAdapterClass('thelia', 'mysql');
+        $manager = new ConnectionManagerSingle();
+        $manager->setConfiguration($definePropel->getConfig());
+        $serviceContainer->setConnectionManager('thelia', $manager);
 
-            $definePropel = new DefinePropel(new DatabaseConfiguration(),
-                Yaml::parse(THELIA_ROOT . '/local/config/database.yml'));
+        if ($this->isDebug()) {
+            $serviceContainer->setLogger('defaultLogger', Tlog::getInstance());
 
-            Propel::setConfiguration($definePropel->getConfig());
-
-            if ($this->isDebug()) {
-                Propel::setLogger(Tlog::getInstance());
-                $config = Propel::getConfiguration(PropelConfiguration::TYPE_OBJECT);
-                $config->setParameter('debugpdo.logging.methods', array(
-                    'PropelPDO::exec',
-                    'PropelPDO::query',
-                    'PropelPDO::prepare',
-                    'DebugPDOStatement::execute',
-                ), false);
-                $config->setParameter('debugpdo.logging.details', array(
-                    'time' => array('enabled' => true),
-                    'mem' => array('enabled' => true),
-                    'connection' => array('enabled' => true),
-                ));
-                $con = Propel::getConnection("thelia");
-                $con->useDebug(true);
-            }
-
-            Propel::initialize();
+            $con = Propel::getConnection(\Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+            $con->useDebug(true);
         }
     }
 

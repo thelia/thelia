@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseFolderVersionQuery;
+use Thelia\Model\Base\FolderVersionQuery as BaseFolderVersionQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseFolderVersionQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class FolderVersionQuery extends BaseFolderVersionQuery
-{
-}
+class FolderVersionQuery extends BaseFolderVersionQuery {
+
+} // FolderVersionQuery

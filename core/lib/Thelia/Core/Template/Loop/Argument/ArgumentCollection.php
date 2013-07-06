@@ -35,14 +35,26 @@ class ArgumentCollection implements \Iterator
 
     public function __construct()
     {
-        foreach(func_get_args() as $argument) {
-            $this->addArgument($argument);
-        }
+        $this->addArguments(func_get_args());
     }
 
     public function isEmpty()
     {
         return count($this->arguments) == 0;
+    }
+
+    /**
+     * @param array $argumentList
+     *
+     * @return ArgumentCollection
+     */
+    public function addArguments(array $argumentList)
+    {
+        foreach($argumentList as $argument) {
+            $this->addArgument($argument);
+        }
+
+        return $this;
     }
 
     /**

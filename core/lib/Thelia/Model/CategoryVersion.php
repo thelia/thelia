@@ -2,20 +2,8 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseCategoryVersion;
+use Thelia\Model\Base\CategoryVersion as BaseCategoryVersion;
 
+class CategoryVersion extends BaseCategoryVersion {
 
-/**
- * Skeleton subclass for representing a row from the 'category_version' table.
- *
- *
- *
- * You should add additional methods to this class to meet the
- * application requirements.  This class will only be generated as
- * long as it does not already exist in the output directory.
- *
- * @package    propel.generator.Thelia.Model
- */
-class CategoryVersion extends BaseCategoryVersion
-{
 }

@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseProductVersionQuery;
+use Thelia\Model\Base\ProductVersionQuery as BaseProductVersionQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseProductVersionQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class ProductVersionQuery extends BaseProductVersionQuery
-{
-}
+class ProductVersionQuery extends BaseProductVersionQuery {
+
+} // ProductVersionQuery

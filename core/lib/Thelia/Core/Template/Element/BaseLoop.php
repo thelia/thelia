@@ -25,7 +25,8 @@ namespace Thelia\Core\Template\Element;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
+use Propel\Runtime\ActiveQuery\ModelCriteria;
 
 /**
  *
@@ -44,6 +45,19 @@ abstract class BaseLoop
      */
     public $dispatcher;
 
+    public $limit;
+    public $page;
+    public $offset;
+
+    protected function getDefaultArgs()
+    {
+        return array(
+            Argument::createIntTypeArgument('offset', 0),
+            Argument::createIntTypeArgument('page'),
+            Argument::createIntTypeArgument('limit', 10),
+        );
+    }
+
     /**
      * @param \Symfony\Component\HttpFoundation\Request                   $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
@@ -52,6 +66,58 @@ abstract class BaseLoop
     {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+    }
+
+    public function getArgs()
+    {
+        return $this->defineArgs()->addArguments($this->getDefaultArgs());
+    }
+
+    /**
+     * @param \ModelCriteria $search
+     * @param null           $pagination
+     *
+     * @return array|mixed|\PropelModelPager|\PropelObjectCollection
+     */
+    public function search(ModelCriteria $search, &$pagination = null)
+    {
+        if($this->page !== null) {
+            return $this->searchWithPagination($search, $pagination);
+        } else {
+            return $this->searchWithOffset($search);
+        }
+    }
+
+    /**
+     * @param \ModelCriteria $search
+     *
+     * @return array|mixed|\PropelObjectCollection
+     */
+    public function searchWithOffset(ModelCriteria $search)
+    {
+        if($this->limit >= 0) {
+            $search->limit($this->limit);
+        }
+        $search->offset($this->offset);
+
+        return $search->find();
+    }
+
+    /**
+     * @param \ModelCriteria $search
+     * @param                $pagination
+     *
+     * @return array|\PropelModelPager
+     */
+    public function searchWithPagination(ModelCriteria $search, &$pagination)
+    {
+        $pagination = $search->paginate($this->page, $this->limit);
+
+        if($this->page > $pagination->getLastPage()) {
+            return array();
+        } else {
+            return $pagination;
+        }
     }
 
     /**
@@ -76,9 +142,10 @@ abstract class BaseLoop
      *
      * you can retrieve ref value using $this->ref
      *
+     * @param $pagination
+     *
      * @return mixed
-     */
-    abstract public function exec();
+     */abstract public function exec(&$pagination);
 
     /**
      *
@@ -97,8 +164,8 @@ abstract class BaseLoop
      *          )
      * );
      *
-     * @return ArgumentCollection
+     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    abstract public function defineArgs();
+    abstract protected function defineArgs();
 
 }

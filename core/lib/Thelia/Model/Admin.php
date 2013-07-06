@@ -2,8 +2,8 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseAdmin;
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Model\Base\Admin as BaseAdmin;
 
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
@@ -38,5 +38,4 @@ class Admin extends BaseAdmin implements UserInterface
     public function getRoles() {
     	return array(new Role('USER_ADMIN'));
     }
-
 }

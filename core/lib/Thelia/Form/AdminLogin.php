@@ -47,4 +47,9 @@ class AdminLogin extends BaseForm {
             ->add("remember_me", "checkbox");
     }
 
+    public function getName()
+    {
+        return "admin_login";
+    }
+
 }

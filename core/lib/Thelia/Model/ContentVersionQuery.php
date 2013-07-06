@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseContentVersionQuery;
+use Thelia\Model\Base\ContentVersionQuery as BaseContentVersionQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseContentVersionQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class ContentVersionQuery extends BaseContentVersionQuery
-{
-}
+class ContentVersionQuery extends BaseContentVersionQuery {
+
+} // ContentVersionQuery

@@ -23,6 +23,7 @@
 
 namespace Thelia\Core\Template\Loop;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,6 +33,7 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -51,8 +53,6 @@ use Thelia\Type;
  *      * by default results are sorting by position ascending
  * - random : if 1, random results. Default value is 0
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
- * - limit : number of results. Default value is 10
- * - offset : at witch id start the search
  *
  * example :
  *
@@ -76,97 +76,41 @@ class Category extends BaseLoop
     public $order;
     public $random;
     public $exclude;
-    public $limit;
-    public $offset;
 
-    public function defineArgs()
+    /**
+     * @return ArgumentCollection
+     */
+    protected function defineArgs()
     {
         return new ArgumentCollection(
-            new Argument(
-                'id',
-                new TypeCollection(
-                    new Type\IntListType()
-                )
-            ),
-            new Argument(
-                'parent',
-                new TypeCollection(
-                    new Type\IntType()
-                )
-            ),
-            new Argument(
-                'current',
-                new TypeCollection(
-                    new Type\IntType()
-                )
-            ),
-            new Argument(
-                'not_empty',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                0
-            ),
-            new Argument(
-                'visible',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                1
-            ),
-            new Argument(
-                'link',
-                new TypeCollection(
-                    new Type\AnyType()
-                )
-            ),
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntTypeArgument('parent'),
+            Argument::createIntTypeArgument('current'),
+            Argument::createIntTypeArgument('not_empty', 0),
+            Argument::createIntTypeArgument('visible', 1),
+            Argument::createAnyTypeArgument('link'),
             new Argument(
                 'order',
                 new TypeCollection(
                     new Type\EnumType('alpha', 'alpha_reverse', 'reverse')
                 )
             ),
-            new Argument(
-                'random',
-                new TypeCollection(
-                    new Type\AnyType()
-                ),
-                0
-            ),
-            new Argument(
-                'exclude',
-                new TypeCollection(
-                    new Type\IntListType()
-                )
-            ),
-            new Argument(
-                'limit',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                10
-            ),
-            new Argument(
-                'offset',
-                new TypeCollection(
-                    new Type\IntType()
-                ),
-                0
-            )
+            Argument::createIntTypeArgument('random', 0),
+            Argument::createIntListTypeArgument('exclude')
         );
     }
 
     /**
-     *
+     * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
-    public function exec()
+    public function exec(&$pagination)
     {
         $search = CategoryQuery::create();
 
         if (!is_null($this->id)) {
-            $search->filterById(explode(',', $this->id), \Criteria::IN);
+            $search->filterById(explode(',', $this->id), Criteria::IN);
         }
 
         if (!is_null($this->parent)) {
@@ -176,22 +120,18 @@ class Category extends BaseLoop
         if ($this->current == 1) {
             $search->filterById($this->request->get("category_id"));
         } elseif (null !== $this->current && $this->current == 0) {
-            $search->filterById($this->request->get("category_id"), \Criteria::NOT_IN);
+            $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
 
         if (!is_null($this->exclude)) {
-            $search->filterById(explode(",", $this->exclude), \Criteria::NOT_IN);
+            $search->filterById(explode(",", $this->exclude), Criteria::NOT_IN);
         }
 
         if (!is_null($this->link)) {
             $search->filterByLink($this->link);
         }
 
-        if ($this->limit > -1) {
-            $search->limit($this->limit);
-        }
         $search->filterByVisible($this->visible);
-        $search->offset($this->offset);
 
         switch ($this->order) {
             case "alpha":
@@ -218,9 +158,13 @@ class Category extends BaseLoop
          *
          * @todo : verify here if we want results for row without translations.
          */
-        $search->joinWithI18n($this->request->getSession()->get('locale', 'en_US'), \Criteria::INNER_JOIN);
 
-        $categories = $search->find();
+        $search->joinWithI18n(
+            $this->request->getSession()->get('locale', 'en_US'),
+            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
+        );
+
+        $categories = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 

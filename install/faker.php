@@ -5,7 +5,7 @@ $thelia = new Thelia\Core\Thelia("dev", true);
 
 $faker = Faker\Factory::create();
 
-$con = \Propel::getConnection(Thelia\Model\ProductPeer::DATABASE_NAME);
+$con = \Propel\Runtime\Propel::getConnection(Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
 $con->beginTransaction();
 try {
 

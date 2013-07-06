@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseAddressQuery;
+use Thelia\Model\Base\AddressQuery as BaseAddressQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseAddressQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class AddressQuery extends BaseAddressQuery
-{
-}
+class AddressQuery extends BaseAddressQuery {
+
+} // AddressQuery

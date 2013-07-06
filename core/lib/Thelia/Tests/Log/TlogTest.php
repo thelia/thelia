@@ -33,9 +33,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {   
-        if (!\Propel::isInit()){
-            \Propel::init(THELIA_ROOT . "/local/config/config_thelia.php");
-        }
+
         
         self::$logger = Tlog::getInstance();
         

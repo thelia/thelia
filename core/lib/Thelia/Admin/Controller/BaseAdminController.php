@@ -89,7 +89,4 @@ class BaseAdminController extends ContainerAware
     {
         return $this->getFormFactory()->createBuilder("form");
     }
-
-    protected function isGranted() {
-    }
 }

@@ -477,8 +477,8 @@ CREATE TABLE `customer`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
-    INDEX `idx_ customer_customer_title_id` (`customer_title_id`),
-    CONSTRAINT `fk_ customer_customer_title_id`
+    INDEX `idx_customer_customer_title_id` (`customer_title_id`),
+    CONSTRAINT `fk_customer_customer_title_id`
         FOREIGN KEY (`customer_title_id`)
         REFERENCES `customer_title` (`id`)
         ON UPDATE RESTRICT

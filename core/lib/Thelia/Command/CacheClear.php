@@ -55,7 +55,7 @@ class CacheClear extends ContainerAwareCommand
         try {
             $fs->remove($cacheDir);
 
-            $output->writeln("<info>cache clear successfully</info>");
+            $output->writeln("<info>cache cleared successfully</info>");
         } catch(IOException $e) {
             $output->writeln(sprintf("error during clearing cache : %s", $e->getMessage()));
         }

@@ -41,20 +41,10 @@ class DefinePropel {
     {
         $connection = $this->processorConfig["connection"];
         return $conf = array(
-            "datasources" =>
-                array(
-                    "thelia" =>
-                        array(
-                            "adapter" => $connection["driver"],
-                            "connection" =>
-                                array(
-                                    "dsn" => $connection["dsn"],
-                                    "user" => $connection["user"],
-                                    "password" => $connection["password"],
-                                    "classname" => $connection["classname"]
-                                )
-                        )
-                )
+            "dsn" => $connection["dsn"],
+            "user" => $connection["user"],
+            "password" => $connection["password"],
+            //"classname" => $connection["classname"]
         );
     }
 }

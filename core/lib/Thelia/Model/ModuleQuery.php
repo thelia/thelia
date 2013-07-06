@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseModuleQuery;
+use Thelia\Model\Base\ModuleQuery as BaseModuleQuery;
 
 
 /**
@@ -14,11 +14,8 @@ use Thelia\Model\om\BaseModuleQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class ModuleQuery extends BaseModuleQuery
-{
-
+class ModuleQuery extends BaseModuleQuery {
     /**
      * @return array|mixed|\PropelObjectCollection
      */
@@ -26,7 +23,6 @@ class ModuleQuery extends BaseModuleQuery
     {
         return self::create()
             ->filterByActivate(1)
-            ->find()
-            ;
+            ->find();
     }
-}
+} // ModuleQuery

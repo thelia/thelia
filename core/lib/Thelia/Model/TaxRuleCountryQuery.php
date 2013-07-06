@@ -2,7 +2,7 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\om\BaseTaxRuleCountryQuery;
+use Thelia\Model\Base\TaxRuleCountryQuery as BaseTaxRuleCountryQuery;
 
 
 /**
@@ -14,8 +14,7 @@ use Thelia\Model\om\BaseTaxRuleCountryQuery;
  * application requirements.  This class will only be generated as
  * long as it does not already exist in the output directory.
  *
- * @package    propel.generator.Thelia.Model
  */
-class TaxRuleCountryQuery extends BaseTaxRuleCountryQuery
-{
-}
+class TaxRuleCountryQuery extends BaseTaxRuleCountryQuery {
+
+} // TaxRuleCountryQuery
