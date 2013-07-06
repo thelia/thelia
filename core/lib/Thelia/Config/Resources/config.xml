@@ -6,6 +6,7 @@
 
     <loops>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
+        <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
     </loops>
 
 

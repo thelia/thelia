@@ -3,8 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\om\BaseCustomer;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\Role\Role;
+use Thelia\Core\Security\User\UserInterface;
 
 
 /**

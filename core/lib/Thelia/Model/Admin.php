@@ -3,7 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\om\BaseAdmin;
-use Symfony\Component\Security\Core\User\UserInterface;
+use Thelia\Core\Security\User\UserInterface;
 
 /**
  * Skeleton subclass for representing a row from the 'admin' table.
@@ -36,7 +36,7 @@ class Admin extends BaseAdmin implements UserInterface
      * {@inheritDoc}
      */
     public function getRoles() {
-    	return array(new Role('USER_CUSTOMER'));
+    	return array(new Role('USER_ADMIN'));
     }
 
 }
