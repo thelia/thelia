@@ -17,7 +17,7 @@ An image from asset directory :
     <p>Category loop example</p>
     <ul>
         {loop type="category" name="catloop1"}
-            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}, children: {$NB_CHILD}
+            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}, children: {$NB_CHILD}
                 {ifloop rel="inner1"}
                     <ul>
                         {loop type="category" name="inner1" parent="{$ID}"}
@@ -40,7 +40,7 @@ An image from asset directory :
   		Hey ! Loop catloop2 is not empty:
   		<ul>
    		{loop type="category" name="catloop2" parent="12"}
-       		<li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+       		<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
    		{/loop}
    		</ul>
   	{/ifloop}
@@ -57,7 +57,7 @@ An image from asset directory :
 		Loop catloop3 is not empty:
 		<ul>
 		{loop type="category" name="catloop3" parent="0"}
-	    	<li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+	    	<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
 	 	{/loop}
 	 	</ul>
 	{/ifloop}
@@ -86,20 +86,20 @@ An image from asset directory :
     <p>PAGE 1</p>
     <ul>
         {loop type="category" name="catloopwithpagination1" limit="2" page="1"}
-        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
         {/loop}
     </ul>
     <p>PAGE 2</p>
     <ul>
         {loop type="category" name="catloopwithpagination2" limit="2" page="2"}
-        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
         {/loop}
     </ul>
     <p>PAGE 1000</p>
     <ul>
 
         {loop type="category" name="catloopwithpagination1000" limit="2" page="1000"}
-            <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
         {/loop}
 
         {elseloop rel="catloopwithpagination1000"}
@@ -114,7 +114,7 @@ An image from asset directory :
     <p>PAGE {$current_page} :</p>
     <ul>
         {loop type="category" name="catloopwithpaginationchoice" limit="2" page="{$current_page}"}
-        <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}</li>
+        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
         {/loop}
     </ul>
     <p>page choice</p>

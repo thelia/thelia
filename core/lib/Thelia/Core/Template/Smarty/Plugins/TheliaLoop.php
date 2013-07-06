@@ -43,6 +43,10 @@ class TheliaLoop implements SmartyPluginInterface
 
     protected $dispatcher;
 
+    protected $varstack = array();
+    protected $loopstack = array();
+
+
     public function __construct(Request $request, EventDispatcherInterface $dispatcher)
     {
         $this->request = $request;
@@ -62,7 +66,7 @@ class TheliaLoop implements SmartyPluginInterface
     		return null;
     	}
     }
-    
+
     /**
      * Process {loop name="loop name" type="loop type" ... } ... {/loop} block
      *
@@ -98,7 +102,7 @@ class TheliaLoop implements SmartyPluginInterface
             self::$pagination[$name] = null;
 
     		$loopResults = $loop->exec(self::$pagination[$name]);
-            
+
 
             $this->loopstack[$name] = $loopResults;
 
@@ -197,7 +201,7 @@ class TheliaLoop implements SmartyPluginInterface
     		return $this->checkEmptyLoop($params, $template) ? '' : $content;
     	}
     }
-    
+
     /**
      * Process {pageloop rel="loopname"} ... {/pageloop} block
      *
@@ -213,41 +217,42 @@ class TheliaLoop implements SmartyPluginInterface
     {
     	if (empty($params['rel']))
     		throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
-    
+
     	$loopName = $params['rel'];
-    
+
     	// Find loop results in the current template vars
-    	$loopResults = $template->getTemplateVars($loopName);
+    	$loopResults = $this->loopstack[$loopName];
+
     	if (empty($loopResults)) {
     		throw new \InvalidArgumentException("Loop $loopName is not defined.");
     	}
-    
+
     	// Find pagination
     	$pagination = self::getPagination($loopName);
     	if ($pagination === null) {
     		throw new \InvalidArgumentException("Loop $loopName : no pagination found.");
     	}
-    
+
     	if ($content === null) {
     		$page = 1;
     	} else {
     		$page = $template->getTemplateVars('PAGE');
     		$page++;
     	}
-    
+
     	if ($page <= $pagination->getLastPage()) {
     		$template->assign('PAGE', $page);
     		$template->assign('CURRENT', $pagination->getPage());
     		$template->assign('LAST', $pagination->getLastPage());
-    
+
     		$repeat = true;
     	}
-    
+
     	if ($content !== null) {
     		return $content;
     	}
     }
-    
+
     /**
      * Check if a loop has returned results. The loop shoud have been executed before, or an
      * InvalidArgumentException is thrown
@@ -317,7 +322,7 @@ class TheliaLoop implements SmartyPluginInterface
         $faultDetails = array();
 
         $argumentsCollection = $loop->getArgs();
-        
+
         foreach( $argumentsCollection as $argument ) {
 
             $value = isset($smartyParam[$argument->name]) ? $smartyParam[$argument->name] : null;
