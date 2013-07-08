@@ -68,6 +68,9 @@ abstract class BaseLoop
         $this->dispatcher = $dispatcher;
     }
 
+    /**
+     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
+     */
     public function getArgs()
     {
         return $this->defineArgs()->addArguments($this->getDefaultArgs());

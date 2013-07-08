@@ -1,4 +1,5 @@
 <?php
+
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -20,36 +21,29 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
 
+namespace Thelia\Tests\Security;
+
+use Thelia\Core\Security\SecurityManager;
 /**
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * @author Franck Allimant <franck@cqfdev.fr>
  *
  */
-
-class EnumType implements TypeInterface
+class SecurityManagerTest extends \PHPUnit_Framework_TestCase
 {
-    protected $values = array();
-
-    public function __construct($values = array())
+    public function testGetSetToken()
     {
-        if(is_array($values))
-            $this->values = $values;
-    }
+        /*
+        $context = new SecurityManager($authProvider)(
+            $this->getMock('AuthenticationProviderInterface'),
+            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
+        );
+        $this->assertNull($context->getToken());
 
-    public function getType()
-    {
-        return 'Enum type';
-    }
-
-    public function isValid($value)
-    {
-        return in_array($value, $this->values);
-    }
-
-    public function getFormatedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
+        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+        $this->assertSame($token, $context->getToken());
+        */
+       // $this->assertFalse(1==1, "faux !");
     }
 }

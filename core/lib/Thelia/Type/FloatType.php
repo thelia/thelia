@@ -39,4 +39,9 @@ class FloatType implements TypeInterface
     {
         return filter_var($value, FILTER_VALIDATE_FLOAT) === false ? false : true;
     }
+
+    public function getFormatedValue($value)
+    {
+        return $this->isValid($value) ? $value : null;
+    }
 }

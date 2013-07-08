@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,39 +17,50 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Core\Security\Encoder;
 
 /**
+ * This interface defines a hash based password encoder.
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
+ * @author Franck Allimant <franck@cqfdev.fr>
  */
 
-class EnumType implements TypeInterface
-{
-    protected $values = array();
+class PasswordHashEncoder implements PasswordEncoderInterface {
 
-    public function __construct($values = array())
-    {
-        if(is_array($values))
-            $this->values = $values;
-    }
+   /**
+    * {@inheritdoc}
+    */
+    public function encode($password, $algorithm, $salt)
+	{
+	    if (!in_array($algorithm, hash_algos(), true)) {
+	    	throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $algorithm));
+	    }
 
-    public function getType()
-    {
-        return 'Enum type';
-    }
+	    // Salt the string
+	    $salted = $password.$salt;
 
-    public function isValid($value)
-    {
-        return in_array($value, $this->values);
-    }
+	    // Create the hash
+	    $digest = hash($algorithm, $salted, true);
 
-    public function getFormatedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
-    }
+	    // "stretch" hash
+	    for ($i = 1; $i < 5000; $i++) {
+	    	$digest = hash($algorithm, $digest.$salted, true);
+	    }
+
+	    return base64_encode($digest);
+	}
+
+   /**
+    * {@inheritdoc}
+    */
+	public function isEqual($string, $password, $algorithm, $salt)
+	{
+	    $encoded = $this->encode($password, $algorithm, $salt);
+
+	    return $encoded == $string;
+	}
 }

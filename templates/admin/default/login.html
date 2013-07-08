@@ -2,7 +2,7 @@
 {include file='includes/header.inc.html'}
 
 <div class="loginpage">
-
+ {{intl l='abcd'}|capitalize}
    	<div class="brandbar container">
        	<a class="brand" href="index.php">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
     </div>
@@ -15,7 +15,7 @@
 	   	<div class="hero-unit">
 	        <h1>{intl l='Thelia Back Office'}</h1>
 
-			<form action="/admin" method="post" class="well form-inline" {form_enctype form=$form}>
+			<form action="admin/login" method="post" class="well form-inline" {form_enctype form=$form}>
                 {form_field_hidden form=$form}
                 {form_field form=$form.username}
                     {form_error form=$form.username}
@@ -27,7 +27,9 @@
 				    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" />
                 {/form_field}
 
+				{form_field form=$form.remember_me}
 				<label class="checkbox"> <input type="checkbox" name="remember" value="yes"> {intl l='Remember me'}</label>
+				{/form_field}
 
 				<button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play"></i></button>
 			</form>

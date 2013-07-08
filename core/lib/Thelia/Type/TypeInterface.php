@@ -33,4 +33,6 @@ interface TypeInterface
     public function getType();
 
     public function isValid($value);
+
+    public function getFormatedValue($value);
 }

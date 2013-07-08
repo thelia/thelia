@@ -20,36 +20,24 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Tests\Type;
+
+use Thelia\Type\AlphaNumStringType;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-
-class EnumType implements TypeInterface
+class AlphaNumStringTypeTest extends \PHPUnit_Framework_TestCase
 {
-    protected $values = array();
-
-    public function __construct($values = array())
+    public function testAlphaNumStringType()
     {
-        if(is_array($values))
-            $this->values = $values;
-    }
-
-    public function getType()
-    {
-        return 'Enum type';
-    }
-
-    public function isValid($value)
-    {
-        return in_array($value, $this->values);
-    }
-
-    public function getFormatedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
+        $type = new AlphaNumStringType();
+        $this->assertTrue($type->isValid('azs_qs-0-9ds'));
+        $this->assertFalse($type->isValid('3.3'));
+        $this->assertFalse($type->isValid('3 3'));
+        $this->assertFalse($type->isValid('3€3'));
     }
 }

@@ -6,6 +6,7 @@
 
     <loops>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
+        <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
     </loops>
 
 
@@ -65,6 +66,10 @@
 		<!-- Smarty parser plugins -->
 
         <service id="smarty.plugin.assetic" class="Thelia\Core\Template\Smarty\Plugins\Assetic" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
+        <service id="smarty.plugin.theliasyntax" class="Thelia\Core\Template\Smarty\Plugins\TheliaSyntax" >
             <tag name="thelia.parser.register_plugin"/>
         </service>
 

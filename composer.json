@@ -27,8 +27,6 @@
 
         "symfony/form": "2.2.*",
         "symfony/validator": "2.2.*",
-        "symfony/security": "2.2.*",
-        "symfony/templating": "2.2.*",
 
         "smarty/smarty": "v3.1.13",
         "kriswallsmith/assetic": "1.2.*@dev",

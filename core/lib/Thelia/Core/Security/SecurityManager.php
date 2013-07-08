@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                          */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,60 +21,61 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Admin\Controller;
+namespace Thelia\Core\Security;
 
-use Symfony\Component\HttpFoundation\Response;
-use Thelia\Form\AdminLogin;
+use Thelia\Core\Security\Authentication\AuthenticationProviderInterface;
+use Thelia\Core\Security\Exception\AuthenticationTokenNotFoundException;
 
-class AdminController extends BaseAdminController {
+/**
+ * A simple security manager, in charge of authenticating users using various authentication systems.
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class SecurityManager {
 
-    public function loginAction()
+    protected $authProvider;
+
+    public function __construct(AuthenticationProviderInterface $authProvider) {
+        $this->authProvider = $authProvider;
+    }
+
+    /**
+    * Checks if the current token is authenticated
+    *
+    * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
+    *
+    * @return Boolean
+    */
+    final public function isGranted()
     {
-        $form = $this->getLoginForm();
-
-        $request = $this->getRequest();
-
-        if($request->isMethod("POST")) {
-
-            $form->bind($request);
-
-            if ($form->isValid()) {
-
-                $this->container->get('request')->authenticate(
-                    $form->get('username')->getData(),
-                    $form->get('password')->getData()
-                );
-
-                echo "valid"; exit;
-            }
+        if (null === $this->token) {
+            throw new AuthenticationTokenNotFoundException('The security context contains no authentication token.');
         }
 
-        return $this->render("login.html", array(
-            "form" => $form->createView()
-        ));
+        if (!$this->token->isAuthenticated()) {
+            $this->token = $this->authProvider->authenticate($this->token);
+        }
+
+        return $this->token->isAuthenticated();
     }
 
-    public function indexAction()
+    /**
+    * Gets the currently authenticated token.
+    *
+    * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+    */
+    public function getToken()
     {
-    	$form = $this->getLoginForm();
-
-    	return $this->render("login.html", array(
-    			"form" => $form->createView()
-    	));
+        return $this->token;
     }
 
-    protected function getLoginForm()
+    /**
+    * Sets the  token.
+    *
+    * @param TokenInterface $token A TokenInterface token, or null if no further authentication information should be stored
+    */
+    public function setToken(TokenInterface $token = null)
     {
-        $adminLogin = new AdminLogin($this->getRequest());
-
-        return $adminLogin->getForm();
-    }
-
-    public function lostAction()
-    {
-        return new Response(
-            $this->renderRaw("404.html"),
-            404
-        );
+        $this->token = $token;
     }
 }

@@ -28,28 +28,25 @@ namespace Thelia\Type;
  *
  */
 
-class EnumType implements TypeInterface
+class AlphaNumStringListType implements TypeInterface
 {
-    protected $values = array();
-
-    public function __construct($values = array())
-    {
-        if(is_array($values))
-            $this->values = $values;
-    }
-
     public function getType()
     {
-        return 'Enum type';
+        return 'Alphanumeric string list type';
     }
 
-    public function isValid($value)
+    public function isValid($values)
     {
-        return in_array($value, $this->values);
+        foreach(explode(',', $values) as $value) {
+            if(!preg_match('#^[a-zA-Z0-9\-_]+$#', $value))
+                return false;
+        }
+
+        return true;
     }
 
-    public function getFormatedValue($value)
+    public function getFormatedValue($values)
     {
-        return $this->isValid($value) ? $value : null;
+        return $this->isValid($values) ? explode(',', $values) : null;
     }
 }
