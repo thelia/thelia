@@ -44,7 +44,7 @@ class DefinePropel {
             "dsn" => $connection["dsn"],
             "user" => $connection["user"],
             "password" => $connection["password"],
-            //"classname" => $connection["classname"]
+            "classname" => $connection["classname"]
         );
     }
 }
