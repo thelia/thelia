@@ -1,0 +1,20 @@
+{check_auth roles="ADMIN"}
+{$page_title={intl l='Home'}}
+{include file='includes/header.inc.html'}
+
+<div class="homepage">
+   	<div class="brandbar container">
+       	<a class="brand" href="index.php">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
+    </div>
+
+     <div id="wrapper" class="container">
+
+	    {module_include location='index_top'}
+
+welcome home !
+
+		{module_include location='home_bottom'}
+	</div>
+</div>
+
+{include file='includes/footer.inc.html'}

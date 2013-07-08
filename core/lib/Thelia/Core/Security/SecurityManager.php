@@ -32,21 +32,22 @@ use Thelia\Core\Security\Exception\AuthenticationTokenNotFoundException;
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class SecurityManager {
-
+/*
     protected $authProvider;
 
     public function __construct(AuthenticationProviderInterface $authProvider) {
         $this->authProvider = $authProvider;
     }
-
+*/
     /**
     * Checks if the current token is authenticated
     *
     * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
     *
     * @return Boolean
+    * @throws AuthenticationTokenNotFoundException if no thoken was found in context
     */
-    final public function isGranted()
+    final public function isGranted($roles, $permissions)
     {
         if (null === $this->token) {
             throw new AuthenticationTokenNotFoundException('The security context contains no authentication token.');
@@ -56,7 +57,11 @@ class SecurityManager {
             $this->token = $this->authProvider->authenticate($this->token);
         }
 
-        return $this->token->isAuthenticated();
+        if ($this->token->isAuthenticated()) {
+        	// Check user roles and permissions
+        }
+
+        return false;
     }
 
     /**

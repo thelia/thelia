@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                          */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -21,12 +21,61 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Admin\Controller;
+namespace Thelia\Core\Template\Smarty\Plugins;
 
-class AdminController extends BaseAdminController {
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
+use Thelia\Core\Security\SecurityManager;
 
-    public function indexAction()
+class Security implements SmartyPluginInterface
+{
+	private $securityManager;
+
+	public function __construct(SecurityManager $securityManager)
+	{
+		$this->securityManager = $securityManager;
+	}
+
+	private function _explode($commaSeparatedValues)
+	{
+
+    	$array = explode(',', $commaSeparatedValues);
+
+    	if (array_walk($array, function(&$item) {
+   				$item = strtoupper(trim($item));
+ 			})) {
+ 			return $array;
+ 		}
+
+ 		return array();
+	}
+
+    /**
+     * Process security check function
+     *
+     * @param  unknown $params
+     * @param  unknown $smarty
+     * @return string
+     */
+    public function checkAUth($params, &$smarty)
     {
-    	return $this->render("home.html");
+   		$roles = $this->_explode($params['role']);
+   		$permissions = $this->_explode($params['role']);
+
+   		$this->securityManager->isGranted($roles, $permissions);
+
+     }
+
+    /**
+     * Define the various smarty plugins hendled by this class
+     *
+     * @return an array of smarty plugin descriptors
+     */
+    public function getPluginDescriptors()
+    {
+        return array(
+            new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAUth'),
+        );
     }
 }

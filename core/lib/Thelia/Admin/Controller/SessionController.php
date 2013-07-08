@@ -23,10 +23,41 @@
 
 namespace Thelia\Admin\Controller;
 
-class AdminController extends BaseAdminController {
+use Symfony\Component\HttpFoundation\Response;
+use Thelia\Form\AdminLogin;
 
-    public function indexAction()
+class SessionController extends BaseAdminController {
+
+    public function loginAction()
     {
-    	return $this->render("home.html");
+        $form = $this->getLoginForm();
+
+        $request = $this->getRequest();
+
+        if($request->isMethod("POST")) {
+
+            $form->bind($request);
+
+            if ($form->isValid()) {
+
+                $this->container->get('request')->authenticate(
+                    $form->get('username')->getData(),
+                    $form->get('password')->getData()
+                );
+
+                echo "valid"; exit;
+            }
+        }
+
+        return $this->render("login.html", array(
+            "form" => $form->createView()
+        ));
+    }
+
+    protected function getLoginForm()
+    {
+        $adminLogin = new AdminLogin($this->getRequest());
+
+        return $adminLogin->getForm();
     }
 }

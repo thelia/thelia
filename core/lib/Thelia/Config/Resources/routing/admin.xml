@@ -8,10 +8,10 @@
         <default key="_controller">Thelia\Admin\Controller\AdminController::indexAction</default>
     </route>
     <route id="admin.login" path="/admin/login">
-        <default key="_controller">Thelia\Admin\Controller\AdminController::loginAction</default>
+        <default key="_controller">Thelia\Admin\Controller\SessionController::loginAction</default>
     </route>
-    <route id="admin.lost" path="/admin/{everything}">
-        <default key="_controller">Thelia\Admin\Controller\AdminController::lostAction</default>
+    <route id="admin.notfound" path="/admin/{everything}">
+        <default key="_controller">Thelia\Admin\Controller\AdminController::notFoundAction</default>
         <requirement key="everything">.*</requirement>
     </route>
 </routes>
