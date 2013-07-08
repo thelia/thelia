@@ -280,7 +280,6 @@ class TheliaLoop implements SmartyPluginInterface
      */
     protected function createLoopInstance($smartyParams)
     {
-
     	$type = strtolower($smartyParams['type']);
 
         if (! isset($this->loopDefinition[$type])) {
