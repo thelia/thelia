@@ -56,6 +56,19 @@ abstract class BaseLoop
         );
     }
 
+    public function __call($name, $arguments) {
+    	if (substr($name, 0, 3) == 'get') {
+
+    		$argName = strtolower(substr($name, 3));
+
+    		return $this->getArg($argName)->getValue();
+    	}
+
+    	throw new \InvalidArgumentException(sprintf("Unsupported magic method %s. only getArgname() is supported.", $name));
+
+    }
+
+
     /**
      * Create a new Loop
      *

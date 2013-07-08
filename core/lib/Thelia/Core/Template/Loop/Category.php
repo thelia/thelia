@@ -100,21 +100,20 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
-		$id = $this->getArgValue('id');
+		$id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
-
-        $parent = $this->getArgValue('parent');
+        $parent = $this->getParent();
 
         if (!is_null($parent)) {
             $search->filterByParent($parent);
         }
 
 
-		$current = $this->getArgValue('current');
+		$current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("category_id"));
@@ -123,22 +122,22 @@ class Category extends BaseLoop
         }
 
 
-         $exclude = $this->getArgValue('exclude');
+         $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
 
-        $link = $this->getArgValue('link');
+        $link = $this->getLink();
 
         if (!is_null($link)) {
             $search->filterByLink($link);
         }
 
-        $search->filterByVisible($this->getArgValue('visible') ? 1 : 0);
+        $search->filterByVisible($this->getVisible() ? 1 : 0);
 
-        switch ($this->getArgValue('order')) {
+        switch ($this->getOrder()) {
             case "alpha":
                 $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
                 break;
@@ -154,7 +153,7 @@ class Category extends BaseLoop
         }
 
 
-        if ($this->getArgValue('random') === true) {
+        if ($this->getRandom() === true) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }

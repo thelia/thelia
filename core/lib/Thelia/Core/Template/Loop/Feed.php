@@ -44,17 +44,8 @@ class Feed extends BaseLoop
     public function getArgDefinitions()
     {
         return new ArgumentCollection(
-            new Argument(
-                'url',
-                new TypeCollection(new Type\AnyType())
-            ),
-        	new Argument(
-        		'timeout',
-        		new TypeCollection(
-        			new Type\IntType()
-        		),
-        		10
-        	)
+        	Argument::createAnyTypeArgument('url', null, true),
+        	Argument::createIntTypeArgument('timeout', 10)
         );
     }
 
@@ -73,17 +64,17 @@ class Feed extends BaseLoop
     		}
     	}
 
-        $feed = new \SimplePie($this->getArgValue('url'), THELIA_ROOT . 'cache/feeds');
+        $feed = new \SimplePie($this->getUrl(), THELIA_ROOT . 'cache/feeds');
 
         $feed->init();
 
         $feed->handle_content_type();
 
-        $feed->set_timeout($this->getArgValue('timeout'));
+        $feed->set_timeout($this->getTimeout());
 
         $items = $feed->get_items();
 
-        $limit = min(count($items), $this->getArgValue('limit'));
+        $limit = min(count($items), $this->getLimit());
 
         $loopResult = new LoopResult();
 
