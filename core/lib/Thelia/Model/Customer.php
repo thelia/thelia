@@ -6,11 +6,26 @@ use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Thelia\Core\Event\CustomRefEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Security\User\UserInterface;
+
 use Propel\Runtime\Connection\ConnectionInterface;
 
-class Customer extends BaseCustomer {
+/**
+ * Skeleton subclass for representing a row from the 'customer' table.
+ *
+ *
+ *
+ * You should add additional methods to this class to meet the
+ * application requirements.  This class will only be generated as
+ * long as it does not already exist in the output directory.
+ *
+ * @package    propel.generator.Thelia.Model
+ */
+class Customer extends BaseCustomer implements UserInterface
+{
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
@@ -96,5 +111,27 @@ class Customer extends BaseCustomer {
     public function setDispatcher(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+
+    public function getUsername() {
+    	return $this->getEmail();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function eraseCredentials() {
+    	$this->setPassword(null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getRoles() {
+    	return array(new Role('USER_CUSTOMER'));
     }
 }

@@ -31,6 +31,20 @@ interface UserInterface {
     public function getAlgo();
 
     /**
+     * Returns the roles granted to the user.
+     *
+     * <code>
+     * public function getRoles()
+     * {
+     *     return array('ROLE_USER');
+     * }
+     * </code>
+     *
+     * @return Role[] The user roles
+     */
+    public function getRoles();
+
+    /**
      * Removes sensitive data from the user.
      *
      * This is important if, at any given point, sensitive information like

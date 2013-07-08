@@ -79,4 +79,14 @@ class BaseAdminController extends ContainerAware
 
         return $parser;
     }
+
+    public function getFormFactory()
+    {
+        return BaseForm::getFormFactory($this->getRequest(), ConfigQuery::read("form.secret.admin", md5(__DIR__)));
+    }
+
+    public function getFormBuilder()
+    {
+        return $this->getFormFactory()->createBuilder("form");
+    }
 }

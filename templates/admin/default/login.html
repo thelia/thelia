@@ -1,16 +1,14 @@
-{$page_title={intl l='Thelia'}}
+{$page_title={intl l='Welcome'}}
 {include file='includes/header.inc.html'}
 
 <div class="loginpage">
- {{intl l='abcd'}|capitalize}
    	<div class="brandbar container">
        	<a class="brand" href="index.php">{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}</a>
     </div>
 
     <div id="wrapper" class="container">
-        {*
-	    {thelia_module action='index_top'}
-        *}
+
+	    {module_include location='index_top'}
 
 	   	<div class="hero-unit">
 	        <h1>{intl l='Thelia Back Office'}</h1>
@@ -31,34 +29,26 @@
 				<label class="checkbox"> <input type="checkbox" name="remember" value="yes"> {intl l='Remember me'}</label>
 				{/form_field}
 
-				<button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play"></i></button>
+				<div class="pull-right"><button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play icon-white"></i></button></div>
 			</form>
 		</div>
 
-		<div class="row-fluid">
+		{module_include location='index_middle'}
 
-		</div>
-
-		<div>
-			<h2>We DO display loops in back-office !</h2>
-		     <ul>
-		     {loop type="category" name="catloop1"}
-		         <li>{$__COUNT__}/{$__TOTAL__} : {$ID} {$TITLE}, children: {$NB_CHILD}
-		          {ifloop rel="inner1"}
-		          	<ul>
-		          	{loop type="category" name="inner1" parent="{$ID}"}
-		          		<li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
-		          	{/loop}
-		          	</ul>
-		          {/ifloop}
-		         </li>
-		     {/loop}
-		     </ul>
+		<div class="row-fluid feed-list">
+			{loop type="feed" name="thelia_feeds" url="http://thelia.net/Flux-rss.html?id_rubrique=8" limit="3"}
+	        <div class="span4 feed-list-item">
+	            <h3>{$DATE}</h3>
+	            <h2><a href="#URL" target="_blank" title="{intl l='Lire la suite'}">{$TITLE|strip_tags}</a></h2>
+	            <p>{$DESCRIPTION|strip_tags|truncate:250:"...":true}</p>
+	            <p><a class="btn" href="#URL" target="_blank">{intl l='Lire la suite »'}</a></p>
+	        </div>
+			{/loop}
 		</div>
 	</div>
-    {*
-	{thelia_module action='index_bottom'}
-    *}
+
+	{module_include location='index_bottom'}
+
 </div>
 
 {include file='includes/footer.inc.html'}

@@ -38,16 +38,14 @@ abstract class BaseLoop
     /**
      * @var \Symfony\Component\HttpFoundation\Request
      */
-    public $request;
+    protected $request;
 
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
-    public $dispatcher;
+    protected $dispatcher;
 
-    public $limit;
-    public $page;
-    public $offset;
+    private $args;
 
     protected function getDefaultArgs()
     {
@@ -59,6 +57,8 @@ abstract class BaseLoop
     }
 
     /**
+     * Create a new Loop
+     *
      * @param \Symfony\Component\HttpFoundation\Request                   $request
      * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
      */
@@ -66,14 +66,94 @@ abstract class BaseLoop
     {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+
+        $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs());
     }
 
     /**
-     * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
+     * Initialize the loop arguments.
+     *
+     * @param array $nameValuePairs a array of name => value pairs. The name is the name of the argument.
+     *
+     * @throws \InvalidArgumentException if somùe argument values are missing, or invalid
      */
-    public function getArgs()
-    {
-        return $this->defineArgs()->addArguments($this->getDefaultArgs());
+    public function initializeArgs(array $nameValuePairs) {
+
+        $faultActor = array();
+        $faultDetails = array();
+
+        while (($argument = $this->args->current()) !== false) {
+
+            $value = isset($nameValuePairs[$argument->name]) ? $nameValuePairs[$argument->name] : null;
+
+            /* check if mandatory */
+            if($value === null && $argument->mandatory) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('"%s" parameter is missing', $argument->name);
+                continue;
+            }
+
+            /* check if empty */
+            if($value === '' && !$argument->empty) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('"%s" parameter cannot be empty', $argument->name);
+                continue;
+            }
+
+            /* check type */
+            if($value !== null && !$argument->type->isValid($value)) {
+                $faultActor[] = $argument->name;
+                $faultDetails[] = sprintf('Invalid value for "%s" argument', $argument->name);
+                continue;
+            }
+
+            /* set default */
+            /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
+            if($value === null) {
+                $value = $argument->default;
+            }
+
+            $argument->setValue($value);
+
+            $this->args->next();
+        }
+
+        if (!empty($faultActor)) {
+
+            $complement = sprintf('[%s]', implode(', ', $faultDetails));
+            throw new \InvalidArgumentException($complement);
+        }
+    }
+
+    /**
+     * Return a loop argument
+     *
+     * @param string $argumentName the argument name
+     *
+     * @throws \InvalidArgumentException if argument is not found in loop argument list
+     * @return Argument the loop argument.
+     */
+    public function getArg($argumentName) {
+
+    	$arg = $this->args->get($argumentName);
+
+    	if ($arg === null)
+    		throw new \InvalidArgumentException("Undefined loop argument '$argumentName'");
+
+    	return $arg;
+    }
+
+    /**
+     * Return a loop argument value
+     *
+     * @param string $argumentName the argument name
+     *
+     * @throws \InvalidArgumentException if argument is not found in loop argument list
+     * @return Argument the loop argument.
+     */
+    public function getArgValue($argumentName) {
+
+    	return $this->getArg($argumentName)->getValue();
     }
 
     /**
@@ -84,7 +164,7 @@ abstract class BaseLoop
      */
     public function search(ModelCriteria $search, &$pagination = null)
     {
-        if($this->page !== null) {
+        if($this->getArgValue('page') !== null) {
             return $this->searchWithPagination($search, $pagination);
         } else {
             return $this->searchWithOffset($search);
@@ -98,10 +178,10 @@ abstract class BaseLoop
      */
     public function searchWithOffset(ModelCriteria $search)
     {
-        if($this->limit >= 0) {
-            $search->limit($this->limit);
+        if($this->getArgValue('limit') >= 0) {
+            $search->limit($this->getArgValue('limit'));
         }
-        $search->offset($this->offset);
+        $search->offset($this->getArgValue('offset'));
 
         return $search->find();
     }
@@ -114,9 +194,9 @@ abstract class BaseLoop
      */
     public function searchWithPagination(ModelCriteria $search, &$pagination)
     {
-        $pagination = $search->paginate($this->page, $this->limit);
+        $pagination = $search->paginate($this->getArgValue('page'), $this->getArgValue('limit'));
 
-        if($this->page > $pagination->getLastPage()) {
+        if($this->getArgValue('page') > $pagination->getLastPage()) {
             return array();
         } else {
             return $pagination;
@@ -148,7 +228,8 @@ abstract class BaseLoop
      * @param $pagination
      *
      * @return mixed
-     */abstract public function exec(&$pagination);
+     */
+    abstract public function exec(&$pagination);
 
     /**
      *
@@ -169,6 +250,6 @@ abstract class BaseLoop
      *
      * @return \Thelia\Core\Template\Loop\Argument\ArgumentCollection
      */
-    abstract protected function defineArgs();
+    abstract protected function getArgDefinitions();
 
 }
