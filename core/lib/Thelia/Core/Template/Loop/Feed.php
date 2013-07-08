@@ -73,21 +73,21 @@ class Feed extends BaseLoop
     		}
     	}
 
-        $feed = new \SimplePie($this->url, THELIA_ROOT . 'cache/feeds');
+        $feed = new \SimplePie($this->getArgValue('url'), THELIA_ROOT . 'cache/feeds');
 
         $feed->init();
 
         $feed->handle_content_type();
 
-        $feed->set_timeout($this->timeout);
+        $feed->set_timeout($this->getArgValue('timeout'));
 
         $items = $feed->get_items();
 
-        $limit = min(count($tab), $this->limit);
+        $limit = min(count($items), $this->getArgValue('limit'));
 
         $loopResult = new LoopResult();
 
-        for($idx = 0; $idx < $this->limit; $idx++) {
+        for($idx = 0; $idx < $limit; $idx++) {
 
         	$item = $items[$idx];
 
