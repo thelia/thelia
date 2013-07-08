@@ -196,7 +196,7 @@ class TheliaHttpKernel extends HttpKernel
            $storage->setOptions(json_decode(Model\ConfigQuery::read("session_config.config")));
         }
 
-        $session = new \Thelia\Core\Session\Session($storage);
+        $session = new \Thelia\Core\HttpFoundation\Session\Session($storage);
         $session->start();
 
         $request->setSession($session);

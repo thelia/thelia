@@ -1,6 +1,6 @@
 <?php
-use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Thelia;
+use Thelia\Core\HttpFoundation\Request;
 
 //use Symfony\Component\DependencyInjection;
 
