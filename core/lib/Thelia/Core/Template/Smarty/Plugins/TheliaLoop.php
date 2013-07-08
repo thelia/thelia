@@ -92,9 +92,7 @@ class TheliaLoop implements SmartyPluginInterface
             	throw new \InvalidArgumentException("A loop named '$name' already exists in the current scope.");
             }
 
-            $loop = $this->createLoopInstance(strtolower($params['type']));
-
-            $this->getLoopArgument($loop, $params);
+            $loop = $this->createLoopInstance($params);
 
             self::$pagination[$name] = null;
 
@@ -279,78 +277,29 @@ class TheliaLoop implements SmartyPluginInterface
      * @throws InvalidElementException
      * @throws ElementNotFoundException
      */
-    protected function createLoopInstance($name)
+    protected function createLoopInstance($smartyParams)
     {
+		$type = strtolower($smartyParams['type']);
 
-        if (! isset($this->loopDefinition[$name])) {
-            throw new ElementNotFoundException(sprintf("%s loop does not exists", $name));
+        if (! isset($this->loopDefinition[$type])) {
+            throw new ElementNotFoundException(sprintf("%s loop does not exists", $type));
         }
 
-        $class = new \ReflectionClass($this->loopDefinition[$name]);
+        $class = new \ReflectionClass($this->loopDefinition[$type]);
 
         if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
             throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Core\Template\Element\BaseLoop",
-                    $name));
+                    $type));
         }
 
-        return $class->newInstance(
+        $loop = $class->newInstance(
                 $this->request,
                 $this->dispatcher
         );
-    }
 
-    /**
-     * Returns the value of a loop argument.
-     *
-     * @param BaseLoop $loop a BaseLoop instance
-     * @param  $smartyParam
-     * @throws \InvalidArgumentException
-     */
-    protected function getLoopArgument(BaseLoop $loop, $smartyParam)
-    {
-    	$faultActor = array();
-    	$faultDetails = array();
+        $loop->initializeArgs($smartyParams);
 
-        $argumentsCollection = $loop->getArgs();
-        foreach( $argumentsCollection as $argument ) {
-
-            $value = isset($smartyParam[$argument->name]) ? (string)$smartyParam[$argument->name] : null;
-
-            /* check if mandatory */
-            if($value === null && $argument->mandatory) {
-                $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('"%s" parameter is missing', $argument->name);
-                continue;
-            }
-
-            /* check if empty */
-            if($value === '' && !$argument->empty) {
-                $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('"%s" parameter cannot be empty', $argument->name);
-                continue;
-            }
-
-            /* check type */
-            if($value !== null && !$argument->type->isValid($value)) {
-                $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('Invalid value for "%s" argument', $argument->name);
-                continue;
-            }
-
-            /* set default */
-            /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
-            if($value === null && $argument->default !== null) {
-                $value = (string)$argument->default;
-            }
-
-            $loop->{$argument->name} = $value === null ? null : $argument->type->getFormatedValue($value);
-        }
-
-        if (!empty($faultActor)) {
-
-            $complement = sprintf('[%s]', implode(', ', $faultDetails));
-            throw new \InvalidArgumentException($complement);
-        }
+        return $loop;
     }
 
     /**
