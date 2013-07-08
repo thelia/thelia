@@ -38,12 +38,25 @@ class Argument
     public $mandatory;
     public $empty;
 
-    public function __construct($name, \Thelia\Type\TypeCollection $type,  $default = null, $mandatory = false, $empty = true)
+    private $value;
+
+    public function __construct($name, \Thelia\Type\TypeCollection $type,  $default = null, $mandatory = false, $empty = true, $value = null)
     {
         $this->name         = $name;
         $this->type         = $type;
         $this->mandatory    = $mandatory ? true : false;
         $this->default      = $default;
+        $this->empty        = $empty;
+
+        $this->setValue($value);
+    }
+
+    public function getValue() {
+    	return $this->value;
+    }
+
+    public function setValue($value) {
+    	$this->value = $value;
     }
 
     public static function createAnyTypeArgument($name, $default=null, $mandatory=false, $empty=true)

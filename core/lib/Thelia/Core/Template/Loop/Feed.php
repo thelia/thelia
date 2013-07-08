@@ -41,25 +41,13 @@ use Thelia\Type;
  */
 class Feed extends BaseLoop
 {
-
-   public $url;
-   public $limit;
-   public $timeout;
-
-    public function defineArgs()
+    public function getArgDefinitions()
     {
         return new ArgumentCollection(
             new Argument(
                 'url',
                 new TypeCollection(new Type\AnyType())
             ),
-        	new Argument(
-        		'limit',
-        		new TypeCollection(
-        			new Type\IntType()
-        		),
-        		3
-        	),
         	new Argument(
         		'timeout',
         		new TypeCollection(
@@ -75,7 +63,7 @@ class Feed extends BaseLoop
      *
      * @return \Thelia\Core\Template\Element\LoopResult
      */
-    public function exec()
+    public function exec(&$pagination)
     {
     	$cachedir = THELIA_ROOT . 'cache/feeds';
 
