@@ -54,6 +54,10 @@
         	<argument type="service" id="service_container"/>
         </service>
 
+		<!--  Security -->
+
+		<service id="thelia.security" class="Thelia\Core\Security\SecurityManager" />
+
 		<!-- Parser configuration -->
 
         <service id="thelia.parser" class="Thelia\Core\Template\Smarty\SmartyParser" scope="request">
@@ -99,6 +103,11 @@
 
         <service id="smarty.plugin.module" class="Thelia\Core\Template\Smarty\Plugins\Module" >
             <tag name="thelia.parser.register_plugin"/>
+        </service>
+
+        <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security" >
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="thelia.security" />
         </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">
