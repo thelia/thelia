@@ -33,4 +33,9 @@ class Session extends BaseSession {
         return $this->get("locale", "en_US");
     }
 
+    public function getLang()
+    {
+        return $this->get("lang", "en");
+    }
+
 }
