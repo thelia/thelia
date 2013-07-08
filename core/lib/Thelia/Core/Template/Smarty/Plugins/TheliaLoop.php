@@ -220,7 +220,11 @@ class TheliaLoop implements SmartyPluginInterface
         // Find pagination
         $pagination = self::getPagination($loopName);
         if ($pagination === null) {
-            throw new \InvalidArgumentException("Loop $loopName : no pagination found.");
+            throw new \InvalidArgumentException("Loop $loopName  is not defined");
+        }
+
+        if($pagination->getNbResults() == 0) {
+            return '';
         }
 
         if ($content === null) {
