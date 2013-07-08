@@ -126,7 +126,7 @@ class ImageTableMap extends TableMap
      *
      * @var string
      */
-    const DEFAULT_LOCALE = 'en_US';
+    const DEFAULT_LOCALE = 'en_EN';
 
     /**
      * holds an array of fieldnames

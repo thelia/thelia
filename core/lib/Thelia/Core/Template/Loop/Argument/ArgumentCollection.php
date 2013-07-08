@@ -30,12 +30,19 @@ namespace Thelia\Core\Template\Loop\Argument;
 
 class ArgumentCollection implements \Iterator
 {
-    private     $position;
-    protected   $arguments = array();
+    private $arguments = array();
 
     public function __construct()
     {
         $this->addArguments(func_get_args());
+    }
+
+    public function hasKey($key) {
+    	return isset($this->arguments[$key]);
+    }
+
+    public function get($key) {
+    	return $this->hasKey($key) ? $this->arguments[$key] : null;
     }
 
     public function isEmpty()
@@ -64,7 +71,8 @@ class ArgumentCollection implements \Iterator
      */
     public function addArgument(Argument $argument)
     {
-        $this->arguments[] = $argument;
+        $this->arguments[$argument->name] = $argument;
+
         return $this;
     }
 
@@ -81,7 +89,7 @@ class ArgumentCollection implements \Iterator
      */
     public function current()
     {
-        return $this->arguments[$this->position];
+        return current($this->arguments);
     }
 
     /**
@@ -92,7 +100,7 @@ class ArgumentCollection implements \Iterator
      */
     public function next()
     {
-        $this->position++;
+        next($this->arguments);
     }
 
     /**
@@ -103,7 +111,7 @@ class ArgumentCollection implements \Iterator
      */
     public function key()
     {
-        return $this->position;
+        return key($this->arguments);
     }
 
     /**
@@ -115,7 +123,7 @@ class ArgumentCollection implements \Iterator
      */
     public function valid()
     {
-        return isset($this->arguments[$this->position]);
+        return $this->key() !== null;
     }
 
     /**
@@ -126,6 +134,6 @@ class ArgumentCollection implements \Iterator
      */
     public function rewind()
     {
-        $this->position = 0;
+        reset($this->arguments);
     }
 }

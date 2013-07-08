@@ -68,20 +68,10 @@ use Thelia\Type;
  */
 class Category extends BaseLoop
 {
-    public $id;
-    public $parent;
-    public $current;
-    public $not_empty;
-    public $visible;
-    public $link;
-    public $order;
-    public $random;
-    public $exclude;
-
     /**
      * @return ArgumentCollection
      */
-    protected function defineArgs()
+    protected function getArgDefinitions()
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
@@ -110,31 +100,45 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
-        if (!is_null($this->id)) {
-            $search->filterById($this->id, Criteria::IN);
+		$id = $this->getArgValue('id');
+
+        if (!is_null($id)) {
+            $search->filterById($id, Criteria::IN);
         }
 
-        if (!is_null($this->parent)) {
-            $search->filterByParent($this->parent);
+
+        $parent = $this->getArgValue('parent');
+
+        if (!is_null($parent)) {
+            $search->filterByParent($parent);
         }
 
-        if ($this->current === true) {
+
+		$current = $this->getArgValue('current');
+
+        if ($current === true) {
             $search->filterById($this->request->get("category_id"));
-        } elseif ($this->current === false) {
+        } elseif ($current === false) {
             $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
 
-        if (!is_null($this->exclude)) {
-            $search->filterById($this->exclude, Criteria::NOT_IN);
+
+         $exclude = $this->getArgValue('exclude');
+
+        if (!is_null($exclude)) {
+            $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if (!is_null($this->link)) {
-            $search->filterByLink($this->link);
+
+        $link = $this->getArgValue('link');
+
+        if (!is_null($link)) {
+            $search->filterByLink($link);
         }
 
-        $search->filterByVisible($this->visible ? 1 : 0);
+        $search->filterByVisible($this->getArgValue('visible') ? 1 : 0);
 
-        switch ($this->order) {
+        switch ($this->getArgValue('order')) {
             case "alpha":
                 $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
                 break;
@@ -149,7 +153,8 @@ class Category extends BaseLoop
                 break;
         }
 
-        if ($this->random === true) {
+
+        if ($this->getArgValue('random') === true) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }
@@ -161,7 +166,7 @@ class Category extends BaseLoop
          */
 
         $search->joinWithI18n(
-            $this->request->getSession()->get('locale', 'en_US'),
+            $this->request->getSession()->getLocale(),
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
@@ -189,5 +194,4 @@ class Category extends BaseLoop
 
         return $loopResult;
     }
-
 }

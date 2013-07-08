@@ -56,15 +56,63 @@ a {
 
 // Bootstrap Adjustements ------------------------------------------------------
 
-.btn-primary, .row h3 .btn-large, .row-fluid h3 .btn-large, .row-fluid h4 .btn-large {
-  background: -moz-linear-gradient(center bottom , #E3530B 0%, #F39922 100%) repeat scroll 0 0 #E9730F;
-  box-shadow: 0 0 2px rgba(250, 250, 250, 0.5) inset, 0 1px 3px rgba(0, 0, 0, 0.2);
-  color: white;
+hr {
+	border: 0;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid rgba(250, 250, 250, 0.1);
+	width: 90%;
+	margin: 0 auto;
+	clear: both;
+	margin-top: 20px;
+}
+
+.btn-primary, .btn-large {
+	background: #e9730f;
+	background-image: linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(227,83,11)),
+		color-stop(1, rgb(243,153,34))
+	);
+	box-shadow: inset 0px 0px 2px rgba(250,250,250,0.5), 0px 1px 3px rgba(0,0,0,0.2);
+	color: white;
+}
+
+.btn-large:hover, .btn-primary:hover {
+	background: #e9730f;
+	background-image: linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -o-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -moz-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -webkit-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -ms-linear-gradient(bottom, rgb(227,83,11) 0%, rgb(243,153,34) 100%);
+	background-image: -webkit-gradient(
+		linear,
+		left bottom,
+		left top,
+		color-stop(0, rgb(227,83,11)),
+		color-stop(1, rgb(243,153,34))
+	);
+	box-shadow: inset 0px 0px 2px rgba(250,250,250,0.8), 0px 1px 3px rgba(0,0,0,0.2);
+	color: white;
+}
+
+.modal-footer {
+  background: none repeat scroll 0 0 transparent;
+  border: medium none;
+  box-shadow: none;
+  color: #7D756A;
+  margin-bottom: 0;
+  padding: 35px 15px 15px;
+  text-align: left;
 }
 
 // -- Brandbar ----------------------------------------------------------------
-
-/* --- BRAND BAR ---*/
 
 .loginpage {
 	.brandbar {
@@ -73,6 +121,10 @@ a {
 
 	.hero-unit {
     	background-color: transparent !important;
+
+    	h1 {
+    		margin-bottom: 25px;
+    	}
 	}
 
 	.well {
@@ -146,7 +198,33 @@ a {
 	}
 }
 
+// -- Feed list on home page --------------------------------------------------
 
+.feed-list {
+	h2 {
+		font-size: 24px;
+		line-height: 120%;
+		color: #E9730F;
+
+		a {
+			&:hover {
+				color: inherit;
+				text-decoration: none;
+			}
+		}
+	}
+
+	h3 {
+		margin-bottom: 0;
+		padding-bottom: 0;
+		font-size: 90%;
+		line-height: 100%;
+	}
+
+	.feed-list-item{
+		padding: 10px 20px;
+	}
+}
 // -- Login form --------------------------------------------------------------
 
 .form-signin {

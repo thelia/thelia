@@ -35,7 +35,7 @@ use Thelia\Type\TypeCollection;
  */
 class ArgumentTest extends \PHPUnit_Framework_TestCase
 {
-    public function testArgumentCollectionConstruction()
+    public function testArgumentCollectionCreateAndWalk()
     {
         $collection = new ArgumentCollection(
             new Argument(
@@ -61,30 +61,19 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-        $this->assertAttributeEquals(
-            array(
-                0 => new Argument(
-                    'arg0',
-                    new TypeCollection(
-                        new Type\AnyType()
-                    )
-                ),
-                1 => new Argument(
-                    'arg1',
-                    new TypeCollection(
-                        new Type\AnyType()
-                    )
-                ),
-                2 => new Argument(
-                    'arg2',
-                    new TypeCollection(
-                        new Type\AnyType()
-                    )
-                ),
-            ),
-            'arguments',
-            $collection
-        );
+        $this->assertTrue($collection->getCount() == 3);
+
+        $this->assertTrue($collection->key() == 'arg0');
+        $collection->next();
+        $this->assertTrue($collection->key() == 'arg1');
+        $collection->next();
+        $this->assertTrue($collection->key() == 'arg2');
+        $collection->next();
+
+        $this->assertFalse($collection->valid());
+
+        $collection->rewind();
+        $this->assertTrue($collection->key() == 'arg0');
     }
 
     public function testArgumentCollectionFetch()
