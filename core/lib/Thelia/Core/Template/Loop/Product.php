@@ -55,7 +55,7 @@ class Product extends BaseLoop
     /**
      * @return ArgumentCollection
      */
-    protected function defineArgs()
+    protected function getArgDefinitions()
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),

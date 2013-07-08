@@ -83,7 +83,7 @@ class BaseAdminController extends ContainerAware
         catch (AuthenticationTokenNotFoundException $ex) {
 
 			// No auth token -> perform login
-        	return new RedirectResponse($this->generateUrl('/admin/login'));
+        	return new RedirectResponse($this->generateUrl('admin/login'));
         }
 
         return $data;
@@ -134,7 +134,7 @@ class BaseAdminController extends ContainerAware
      */
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-    	return "$route";
+    	return "thelia2/$route";
 
     	//return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }
