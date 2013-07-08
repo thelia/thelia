@@ -35,7 +35,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class TheliaLoop implements SmartyPluginInterface
 {
-    protected $pagination = null;
+    protected static $pagination = null;
 
     protected $loopDefinition = array();
 
@@ -43,9 +43,8 @@ class TheliaLoop implements SmartyPluginInterface
 
     protected $dispatcher;
 
-    protected $varstack = array();
     protected $loopstack = array();
-
+    protected $varstack = array();
 
     public function __construct(Request $request, EventDispatcherInterface $dispatcher)
     {
@@ -58,13 +57,13 @@ class TheliaLoop implements SmartyPluginInterface
      *
      * @return \PropelModelPager
      */
-    protected function getPagination($loopId)
+    public static function getPagination($loopId)
     {
-    	if(!empty($this->pagination[$loopId])) {
-    		return $this->pagination[$loopId];
-    	} else {
-    		return null;
-    	}
+        if(!empty(self::$pagination[$loopId])) {
+            return self::$pagination[$loopId];
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -93,12 +92,13 @@ class TheliaLoop implements SmartyPluginInterface
             	throw new \InvalidArgumentException("A loop named '$name' already exists in the current scope.");
             }
 
-            $loop = $this->createLoopInstance($params);
+            $loop = $this->createLoopInstance(strtolower($params['type']));
 
-            $this->pagination[$name] = null;
+            $this->getLoopArgument($loop, $params);
 
-    		$loopResults = $loop->exec($this->pagination[$name]);
+            self::$pagination[$name] = null;
 
+    		$loopResults = $loop->exec(self::$pagination[$name]);
             $this->loopstack[$name] = $loopResults;
 
         } else {
@@ -130,12 +130,12 @@ class TheliaLoop implements SmartyPluginInterface
     			$template->assign($var, $val);
     		}
 
-    		// Assign meta information
-            $template->assign('LOOP_COUNT', 1 + $loopResults->key());
-            $template->assign('LOOP_TOTAL', $loopResults->getCount());
-
-    		$repeat = $loopResults->valid();
+    		$repeat = true;
     	}
+
+        // Assign meta information
+        $template->assign('LOOP_COUNT', 1 + $loopResults->key());
+        $template->assign('LOOP_TOTAL', $loopResults->getCount());
 
     	// Loop is terminated. Cleanup.
     	if (! $repeat) {
@@ -187,7 +187,6 @@ class TheliaLoop implements SmartyPluginInterface
      */
     public function theliaIfLoop($params, $content, $template, &$repeat)
     {
-
     	// When encountering close tag, check if loop has results.
     	if ($repeat === false) {
     		return $this->checkEmptyLoop($params, $template) ? '' : $content;
@@ -207,43 +206,45 @@ class TheliaLoop implements SmartyPluginInterface
      */
     public function theliaPageLoop($params, $content, $template, &$repeat)
     {
-    	if (empty($params['rel']))
-    		throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
+        if (empty($params['rel']))
+            throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
 
-    	$loopName = $params['rel'];
+        $loopName = $params['rel'];
 
-    	// Find loop results in the current template vars
-    	if (! isset($this->loopstack[$loopName])) {
-    		throw new \InvalidArgumentException("Loop $loopName is not defined.");
-    	}
+        // Find loop results in the current template vars
+        /* $loopResults = $template->getTemplateVars($loopName);
+        if (empty($loopResults)) {
+            throw new \InvalidArgumentException("Loop $loopName is not defined.");
+        }*/
 
-    	$loopResults = $this->loopstack[$loopName];
+        // Find pagination
+        $pagination = self::getPagination($loopName);
+        if ($pagination === null) {
+            throw new \InvalidArgumentException("Loop $loopName  is not defined");
+        }
 
-    	// Find pagination
-    	$pagination = $this->getPagination($loopName);
+        if($pagination->getNbResults() == 0) {
+            return '';
+        }
 
-    	if ($pagination === null) {
-    		throw new \InvalidArgumentException("Loop $loopName : no pagination found.");
-    	}
+        if ($content === null) {
+            $page = 1;
+        } else {
+            $page = $template->getTemplateVars('PAGE');
+            $page++;
+        }
 
-    	if ($content === null) {
-    		$page = 1;
-    	} else {
-    		$page = $template->getTemplateVars('PAGE');
-    		$page++;
-    	}
+        if ($page <= $pagination->getLastPage()) {
+            $template->assign('PAGE', $page);
+            $template->assign('CURRENT', $pagination->getPage());
+            $template->assign('LAST', $pagination->getLastPage());
 
-    	if ($page <= $pagination->getLastPage()) {
-    		$template->assign('PAGE', $page);
-    		$template->assign('CURRENT', $pagination->getPage());
-    		$template->assign('LAST', $pagination->getLastPage());
+            $repeat = true;
+        }
 
-    		$repeat = true;
-    	}
-
-    	if ($content !== null) {
-    		return $content;
-    	}
+        if ($content !== null) {
+            return $content;
+        }
     }
 
     /**
@@ -275,32 +276,27 @@ class TheliaLoop implements SmartyPluginInterface
      *
      * @param  string                                          $name
      * @return \Thelia\Core\Template\Element\BaseLoop
-     * @throws \Thelia\Tpex\Exception\InvalidElementException
-     * @throws \Thelia\Tpex\Exception\ElementNotFoundException
+     * @throws InvalidElementException
+     * @throws ElementNotFoundException
      */
-    protected function createLoopInstance($smartyParams)
+    protected function createLoopInstance($name)
     {
-    	$type = strtolower($smartyParams['type']);
 
-        if (! isset($this->loopDefinition[$type])) {
-            throw new ElementNotFoundException(sprintf("%s loop does not exists", $type));
+        if (! isset($this->loopDefinition[$name])) {
+            throw new ElementNotFoundException(sprintf("%s loop does not exists", $name));
         }
 
-        $class = new \ReflectionClass($this->loopDefinition[$type]);
+        $class = new \ReflectionClass($this->loopDefinition[$name]);
 
         if ($class->isSubclassOf("Thelia\Core\Template\Element\BaseLoop") === false) {
             throw new InvalidElementException(sprintf("%s Loop class have to extends Thelia\Core\Template\Element\BaseLoop",
-                    $type));
+                    $name));
         }
 
-        $loop = $class->newInstance(
+        return $class->newInstance(
                 $this->request,
                 $this->dispatcher
         );
-
-        $loop->initializeArgs($smartyParams);
-
-        return $loop;
     }
 
     /**
@@ -312,11 +308,10 @@ class TheliaLoop implements SmartyPluginInterface
      */
     protected function getLoopArgument(BaseLoop $loop, $smartyParam)
     {
-        $faultActor = array();
-        $faultDetails = array();
+    	$faultActor = array();
+    	$faultDetails = array();
 
         $argumentsCollection = $loop->getArgs();
-
         foreach( $argumentsCollection as $argument ) {
 
             $value = isset($smartyParam[$argument->name]) ? (string)$smartyParam[$argument->name] : null;
@@ -373,7 +368,7 @@ class TheliaLoop implements SmartyPluginInterface
      *  "myLoop" => "My\Own\Loop"
      * );
      *
-     * @param  array                     $loops
+     * @param  array                     $loopDefinition
      * @throws \InvalidArgumentException if loop name already exists
      */
     public function setLoopList(array $loopDefinition)

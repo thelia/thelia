@@ -21,7 +21,7 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Session;
+namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 
