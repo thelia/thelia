@@ -4,5 +4,10 @@ php:
   - "5.4"
   - "5.5"
 
+env:
+  - DB_USER=root
+
 before_script:
   - composer install
+  - sh -c "mysql -u$DB_USER -e 'SET FOREIGN_KEY_CHECKS = 0; DROP DATABASE IF EXISTS thelia;SET FOREIGN_KEY_CHECKS = 1;'; fi"
+  - php Thelia thelia:install --db_host=localhost --db_username=$DB_USER --db_name=thelia
