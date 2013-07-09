@@ -25,6 +25,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -34,8 +35,8 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
-use Thelia\Model\ProductPeer;
 use Thelia\Model\ProductQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
@@ -80,7 +81,7 @@ class Product extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'category', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
                 )
             ),
             Argument::createBooleanTypeArgument('random', 0),
@@ -96,6 +97,8 @@ class Product extends BaseLoop
     public function exec(&$pagination)
     {
         $search = ProductQuery::create();
+
+        $search->withColumn('CASE WHEN ' . ProductTableMap::PROMO . '=1 THEN ' . ProductTableMap::PRICE2 . ' ELSE ' . ProductTableMap::PRICE . ' END', 'real_price');
 
         $id = $this->getArgValue('id');
 
@@ -153,10 +156,15 @@ class Product extends BaseLoop
         $min_price = $this->getArgValue('min_price');
 
         if(null !== $min_price) {
-            $search->condition('in_promo', ProductPeer::PROMO . Criteria::EQUAL . '1')
-                    ->condition('not_in_promo', ProductPeer::PROMO . Criteria::NOT_EQUAL . '1')
-                    ->condition('min_price2', ProductPeer::PRICE2 . Criteria::GREATER_EQUAL . '?', $min_price)
-                    ->condition('min_price', ProductPeer::PRICE . Criteria::GREATER_EQUAL . '?', $min_price)
+            /**
+             * Following should work but does not :
+             *
+             *  $search->filterBy('real_price', $max_price, Criteria::GREATER_EQUAL);
+             */
+            $search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
+                    ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
+                    ->condition('min_price2', ProductTableMap::PRICE2 . Criteria::GREATER_EQUAL . '?', $min_price)
+                    ->condition('min_price', ProductTableMap::PRICE . Criteria::GREATER_EQUAL . '?', $min_price)
                     ->combine(array('in_promo', 'min_price2'), Criteria::LOGICAL_AND, 'in_promo_min_price')
                     ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
                     ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
@@ -165,10 +173,15 @@ class Product extends BaseLoop
         $max_price = $this->getArgValue('max_price');
 
         if(null !== $max_price) {
-            $search->condition('in_promo', ProductPeer::PROMO . Criteria::EQUAL . '1')
-                    ->condition('not_in_promo', ProductPeer::PROMO . Criteria::NOT_EQUAL . '1')
-                    ->condition('max_price2', ProductPeer::PRICE2 . Criteria::LESS_EQUAL . '?', $max_price)
-                    ->condition('max_price', ProductPeer::PRICE . Criteria::LESS_EQUAL . '?', $max_price)
+            /**
+             * Following should work but does not :
+             *
+             *  $search->filterBy('real_price', $max_price, Criteria::LESS_EQUAL);
+             */
+            $search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
+                    ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
+                    ->condition('max_price2', ProductTableMap::PRICE2 . Criteria::LESS_EQUAL . '?', $max_price)
+                    ->condition('max_price', ProductTableMap::PRICE . Criteria::LESS_EQUAL . '?', $max_price)
                     ->combine(array('in_promo', 'max_price2'), Criteria::LOGICAL_AND, 'in_promo_max_price')
                     ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
                     ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
@@ -222,47 +235,58 @@ class Product extends BaseLoop
 
         $search->filterByVisible($this->getArgValue('visible'));
 
-        switch ($this->getArgValue('order')) {
-            case "alpha":
-                $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                break;
-            case "alpha_reverse":
-                $search->addDescendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                break;
-            case "reverse":
-                $search->orderByPosition(Criteria::DESC);
-                break;
-            case "min_price":
-                //$search->order
-                //$search->orderByPosition(Criteria::DESC);
-                break;
-            /*case "max_price":
-                $search->orderByPosition(Criteria::DESC);
-                break;
-            case "category":
-                $search->orderByPosition(Criteria::DESC);
-                break;*/
-            case "manual":
-                $search->addAscendingOrderByColumn(\Thelia\Model\ProductPeer::POSITION);
-                break;
-            case "manual_reverse":
-                $search->addDescendingOrderByColumn(\Thelia\Model\ProductPeer::POSITION);
-                break;
-            case "ref":
-                $search->addAscendingOrderByColumn(\Thelia\Model\ProductPeer::REF);
-                break;
-            case "promo":
-                $search->addDescendingOrderByColumn(\Thelia\Model\ProductPeer::PROMO);
-                break;
-            case "new":
-                $search->addDescendingOrderByColumn(\Thelia\Model\ProductPeer::NEWNESS);
-                break;
-            default:
-                $search->orderByPosition();
-                break;
+        $orders  = $this->getArgValue('order');
+
+        if(null === $orders) {
+            $search->orderByPosition();
+        } else {
+            foreach($orders as $order) {
+                switch ($order) {
+                    case "alpha":
+                        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                        break;
+                    case "alpha_reverse":
+                        $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                        break;
+                    case "reverse":
+                        $search->orderByPosition(Criteria::DESC);
+                        break;
+                    case "min_price":
+                        $search->orderBy('real_price', Criteria::ASC);
+                        break;
+                    case "max_price":
+                        $search->orderBy('real_price', Criteria::DESC);
+                        break;
+                    case "manual":
+                        if(null === $this->category || count($this->category) != 1)
+                            throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                        $search->addAscendingOrderByColumn(ProductTableMap::POSITION);
+                        break;
+                    case "manual_reverse":
+                        if(null === $this->category || count($this->category) != 1)
+                            throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                        $search->addDescendingOrderByColumn(ProductTableMap::POSITION);
+                        break;
+                    case "ref":
+                        $search->addAscendingOrderByColumn(ProductTableMap::REF);
+                        break;
+                    case "promo":
+                        $search->addDescendingOrderByColumn(ProductTableMap::PROMO);
+                        break;
+                    case "new":
+                        $search->addDescendingOrderByColumn(ProductTableMap::NEWNESS);
+                        break;
+                    default:
+                        $search->orderByPosition();
+                        break;
+                }
+            }
         }
 
-        if ($this->getArgValue('random') === true) {
+        $random  = $this->getArgValue('random');
+
+        if ($random === true) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }

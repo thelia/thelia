@@ -52,11 +52,11 @@ class Argument
     }
 
     public function getValue() {
-    	return $this->value;
+    	return $this->type->getFormattedValue($this->value);
     }
 
     public function setValue($value) {
-    	$this->value = $value;
+    	$this->value = $value === null ? null : (string)$value;
     }
 
     public static function createAnyTypeArgument($name, $default=null, $mandatory=false, $empty=true)

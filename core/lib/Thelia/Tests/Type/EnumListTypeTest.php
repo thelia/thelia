@@ -20,41 +20,31 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Tests\Type;
+
+use Thelia\Type\EnumListType;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-
-class BooleanType implements TypeInterface
+class EnumListTypeTest extends \PHPUnit_Framework_TestCase
 {
-    protected $trueValuesArray = array(
-        '1',
-        'true',
-        'yes',
-        'y',
-    );
-    protected $falseValuesArray = array(
-        '0',
-        'false',
-        'no',
-        'n',
-    );
-
-    public function getType()
+    public function testEnumListType()
     {
-        return 'Boolean type';
+        $enumListType = new EnumListType(array("cat", "dog", "frog"));
+        $this->assertTrue($enumListType->isValid('cat'));
+        $this->assertTrue($enumListType->isValid('cat,dog'));
+        $this->assertFalse($enumListType->isValid('potato'));
+        $this->assertFalse($enumListType->isValid('cat,monkey'));
     }
 
-    public function isValid($value)
+    public function testFormatEnumListType()
     {
-        return in_array($value, $this->trueValuesArray) || in_array($value, $this->falseValuesArray);
-    }
-
-    public function getFormattedValue($value)
-    {
-        return $this->isValid($value) ? ( in_array($value, $this->trueValuesArray) ) : null;
+        $enumListType = new EnumListType(array("cat", "dog", "frog"));
+        $this->assertTrue(is_array($enumListType->getFormattedValue('cat,dog')));
+        $this->assertNull($enumListType->getFormattedValue('cat,monkey'));
     }
 }
