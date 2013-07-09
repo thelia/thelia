@@ -43,7 +43,7 @@ class IntToCombinedIntsList implements TypeInterface
                 return false;
             if(filter_var($parts[0], FILTER_VALIDATE_INT) === false)
                 return false;
-            if(!preg_match('#([0-9]+)|\*|&\*]+#', $parts[1]))
+            if(!preg_match('#^([0-9]+([\&\|]{1}[0-9]+)*|\*)$#', $parts[1]))
                 return false;
         }
 
@@ -52,6 +52,17 @@ class IntToCombinedIntsList implements TypeInterface
 
     public function getFormattedValue($values)
     {
-        return $this->isValid($values) ? explode(',', $values) : null;
+        if( $this->isValid($values) ) {
+            $return = '';
+
+            foreach(explode(',', $values) as $intToCombinedInts) {
+                $parts = explode(':', $intToCombinedInts);
+                $return[$parts[0]] = $parts[1];
+            }
+
+            return $return;
+        } else {
+            return null;
+        }
     }
 }

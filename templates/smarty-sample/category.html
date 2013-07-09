@@ -19,7 +19,15 @@
     <hr />
 {/loop*}
 <h2>PRODUCTS</h2>
-{loop name="product" type="product" order="promo,min_price" exclude_category="3"}
+{*loop name="product" type="product" order="promo,min_price" exclude_category="3"}
+    <h3>PRODUCT : #REF / #TITLE</h3>
+    price : #PRICE €<br />
+    promo price : #PROMO_PRICE €<br />
+    is promo : #PROMO<br />
+    is new : #NEW<br />
+    weight : #WEIGHT<br />
+{/loop*}
+{loop name="product" type="product" feature_available="15:1|2|3,12:5&8|6,6:*"}
     <h3>PRODUCT : #REF / #TITLE</h3>
     price : #PRICE €<br />
     promo price : #PROMO_PRICE €<br />

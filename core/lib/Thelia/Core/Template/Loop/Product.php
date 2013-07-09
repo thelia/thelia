@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,7 +33,11 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Base\FeatureProdQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\FeatureAvQuery;
+use Thelia\Model\FeatureQuery;
+use Thelia\Model\Map\FeatureProdTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -309,6 +314,58 @@ class Product extends BaseLoop
                 CategoryQuery::create()->filterById($exclude_category, Criteria::IN)->find(),
                 Criteria::NOT_IN
             );
+        }
+
+        $feature_available = $this->getFeature_available();
+
+        if(null !== $feature_available) {
+            //$search->joinFeatureProd('fa2', Criteria::LEFT_JOIN)->condition('foocond', '`fa2`.`product_id`=1')->setJoinCondition('fa2', 'foocond');
+            //$search->joinFeatureProd('fa3', Criteria::LEFT_JOIN)->condition('foocond2', 'fa3.product_id=?', 2)->setJoinCondition('fa3', 'foocond2');
+
+            /* fonctionne mais pas avec ?
+            $search->joinFeatureProd('fa3', Criteria::LEFT_JOIN)->addJoinCondition('fa3', "'fa3.PRODUCT_ID' = 4");
+            $search->joinFeatureProd('fa2', Criteria::LEFT_JOIN)->addJoinCondition('fa2', "'fa2.PRODUCT_ID' = 3");
+            */
+
+            $x = new Join();
+            $x->addExplicitCondition('product', 'id', null, 'feature_prod', 'PRODUCT_ID', 'fa0', Criteria::EQUAL);
+            $search->addJoinObject(
+                $x
+            );
+
+            /*
+             * ne marche pas de cette façon :
+             *
+             *
+            $search->filterByFeatureProd(
+                FeatureProdQuery::create('fa')
+                    ->filterByFeature(
+                        FeatureQuery::create('fq')
+                            ->filterById(array(1,2,3), Criteria::IN)
+                            ->find()
+                    )
+                    ->filterByFeatureAv(
+                        FeatureAvQuery::create()
+                            ->filterById(array(1,2,3), Criteria::IN)
+                            ->find()
+                    )
+                    ->find()
+            );
+
+            */
+
+            /*
+
+            CategoryQuery::create()->filterByProduct(
+                    ProductCategoryQuery::create()->filterByProductId(
+                        $this->request->get("product_id"),
+                        Criteria::EQUAL
+                    )->find(),
+                    Criteria::IN
+                )->find(),
+                Criteria::NOT_IN
+
+             */
         }
 
         /**
