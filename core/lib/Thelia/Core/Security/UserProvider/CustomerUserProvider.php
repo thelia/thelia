@@ -1,9 +1,6 @@
 <?php
-use Thelia\Core\Security\User\UserProviderInterface;
-use Thelia\Model\Customer;
-use Thelia\Model\CustomerQuery;
-use Thelia\Core\Security\UserNotFoundException;
-use Thelia\Core\Security\Encoder\PasswordEncoderInterface;
+namespace Thelia\Core\Security\User\UserProvider;
+
 
 class CustomerUserProvider implements UserProviderInterface {
 

@@ -8,6 +8,7 @@
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
+        <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
     </loops>
 
 
@@ -56,7 +57,7 @@
 
 		<!--  Security -->
 
-		<service id="thelia.security" class="Thelia\Core\Security\SecurityManager" />
+		<service id="thelia.security" class="Thelia\Core\Security\SecurityContext" />
 
 		<!-- Parser configuration -->
 
@@ -83,6 +84,8 @@
 
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="thelia.security"/>
+
             <call method="setLoopList">
                 <argument>%thelia.parser.loops%</argument>
             </call>

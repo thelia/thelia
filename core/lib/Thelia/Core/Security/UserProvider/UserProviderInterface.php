@@ -1,6 +1,6 @@
 <?php
 
-namespace Thelia\Core\Security\User;
+namespace Thelia\Core\Security\User\UserProvider;
 
 interface UserProviderInterface {
     /**

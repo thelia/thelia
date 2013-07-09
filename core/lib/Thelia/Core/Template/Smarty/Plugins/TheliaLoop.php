@@ -32,6 +32,7 @@ use Thelia\Core\Template\Element\Exception\InvalidElementException;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Thelia\Core\Security\SecurityContext;
 
 class TheliaLoop implements SmartyPluginInterface
 {
@@ -40,16 +41,17 @@ class TheliaLoop implements SmartyPluginInterface
     protected $loopDefinition = array();
 
     protected $request;
-
     protected $dispatcher;
+    protected $securityContext;
 
     protected $loopstack = array();
     protected $varstack = array();
 
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher)
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
     {
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+        $this->securityContext = $securityContext;
     }
 
     /**
@@ -294,7 +296,8 @@ class TheliaLoop implements SmartyPluginInterface
 
         $loop = $class->newInstance(
                 $this->request,
-                $this->dispatcher
+                $this->dispatcher,
+        		$this->securityContext
         );
 
         $loop->initializeArgs($smartyParams);
