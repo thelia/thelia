@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,39 +17,42 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+namespace Thelia\Core\Security\Encoder;
 
 /**
  *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ * use password api include in php 5.5 and available throw the password_compat library.
  *
+ * Class PasswordPhpCompatEncoder
+ * @package Thelia\Core\Security\Encoder
  */
+class PasswordPhpCompatEncoder implements PasswordEncoderInterface {
 
-class EnumType implements TypeInterface
-{
-    protected $values = array();
-
-    public function __construct($values = array())
+    /**
+     * Encode a string.
+     *
+     * @param  string $password    the password to encode
+     * @param  string $algorithm   the hash() algorithm
+     * @return string    $salt        the salt, the salt is not used here.
+     */
+    public function encode($password, $algorithm, $salt = null)
     {
-        if(is_array($values))
-            $this->values = $values;
+        return password_hash($password, $algorithm);
     }
 
-    public function getType()
+    /**
+     * Check a string against an encoded password.
+     *
+     * @param  string $string      the string to compare against password
+     * @param  string $password    the encoded password
+     * @param  string $algorithm   the hash() algorithm, not used here
+     * @return string    $salt        the salt, not used here
+     */
+    public function isEqual($string, $password, $algorithm = null, $salt = null)
     {
-        return 'Enum type';
-    }
-
-    public function isValid($value)
-    {
-        return in_array($value, $this->values);
-    }
-
-    public function getFormattedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
+        return password_verify($string, $password);
     }
 }
