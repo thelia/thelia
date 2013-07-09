@@ -21,60 +21,72 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Smarty\Plugins;
+namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
-use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
-use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 
-class Security implements SmartyPluginInterface
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
+
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+/**
+ *
+ * @package Thelia\Core\Template\Loop
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class Auth extends BaseLoop
 {
-	private $securityContext;
+    public function getArgDefinitions()
+    {
+        return new ArgumentCollection(
+        	Argument::createAnyTypeArgument('roles', null, true),
+        	Argument::createAnyTypeArgument('permissions')
+         );
+    }
 
-	public function __construct(SecurityContext $securityContext)
-	{
-		$this->securityContext = $securityContext;
-	}
-
-	private function _explode($commaSeparatedValues)
-	{
+    private function _explode($commaSeparatedValues)
+    {
 
     	$array = explode(',', $commaSeparatedValues);
 
     	if (array_walk($array, function(&$item) {
-   				$item = strtoupper(trim($item));
- 			})) {
- 			return $array;
- 		}
+    		$item = strtoupper(trim($item));
+    	})) {
+    		return $array;
+    	}
 
- 		return array();
-	}
-
-    /**
-     * Process security check function
-     *
-     * @param  array $params
-     * @param  unknown $smarty
-     * @return string no text is returned.
-     */
-    public function checkAuthFunction($params, &$smarty)
-    {
-   		$roles = $this->_explode($params['role']);
-   		$permissions = $this->_explode($params['permissions']);
-
-   		$this->securityContext->isGranted($roles, $permissions);
-     }
+    	return array();
+    }
 
     /**
-     * Define the various smarty plugins hendled by this class
      *
-     * @return an array of smarty plugin descriptors
+     *
+     * @return \Thelia\Core\Template\Element\LoopResult
      */
-    public function getPluginDescriptors()
+    public function exec(&$pagination)
     {
-        return array(
-            new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAuthFunction')
-        );
+    	$roles = $this->_explode($this->getRoles());
+    	$permissions = $this->_explode($this->getPermissions());
+
+    	$loopResult = new LoopResult();
+
+    	try {
+	    	$this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions);
+
+	    	// Create an empty row: loop is no longer empty :)
+            $loopResult->addRow(new LoopResultRow());
+    	}
+    	catch (\Exception $ex) {
+    		// Not granted, loop is empty
+    	}
+
+    	return $loopResult;
     }
 }

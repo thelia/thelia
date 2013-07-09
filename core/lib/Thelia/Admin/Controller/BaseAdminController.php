@@ -134,7 +134,7 @@ class BaseAdminController extends ContainerAware
      */
     public function generateUrl($route, $parameters = array(), $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
     {
-    	return "thelia2/$route";
+    	return "thelia2/$route"; //FIXME
 
     	//return $this->container->get('router')->generate($route, $parameters, $referenceType);
     }

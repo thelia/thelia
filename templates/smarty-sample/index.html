@@ -1,5 +1,14 @@
 {include file="includes/header.html"}
 <div>
+
+{loop type="auth" name="auth_test" roles="CUSTOMER"}
+<p>Customer is authentified :-)</p>
+{/loop}
+
+{elseloop rel="auth_test"}
+<p>Customer is not authentified :-(</p>
+{/elseloop}
+
 An image from asset directory :
 {images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}
 </div>

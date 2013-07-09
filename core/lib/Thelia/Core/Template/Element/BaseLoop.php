@@ -27,11 +27,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
+use Thelia\Core\Security\SecurityContext;
 
 /**
  *
  * Class BaseLoop
- * @package Thelia\Tpex\Element\Loop
+ * @package TThelia\Core\Template\Element
  */
 abstract class BaseLoop
 {
@@ -44,19 +45,53 @@ abstract class BaseLoop
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
+    /**
+     * @var Thelia\Core\Security\SecurityContext
+     */
+    protected $securityContext;
+
 
     private $args;
 
-    protected function getDefaultArgs()
+    /**
+     * Create a new Loop
+     *
+     * @param \Symfony\Component\HttpFoundation\Request                   $request
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     * @param Thelia\Core\Security\SecurityContext $securityContext
+     */
+    public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
     {
-        return array(
-            Argument::createIntTypeArgument('offset', 0),
-            Argument::createIntTypeArgument('page'),
-            Argument::createIntTypeArgument('limit', 10),
-        );
+        $this->request = $request;
+        $this->dispatcher = $dispatcher;
+        $this->securityContext = $securityContext;
+
+        $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs());
     }
 
+    /**
+     * Define common loop arguments
+     *
+     * @return an array ofL \Thelia\Core\Template\Loop\Argument\Argument
+     */
+    protected function getDefaultArgs()
+    {
+    	return array(
+    			Argument::createIntTypeArgument('offset', 0),
+    			Argument::createIntTypeArgument('page'),
+    			Argument::createIntTypeArgument('limit', 10),
+    	);
+    }
+
+    /**
+     * Provides a getter to loop parameters
+     *
+     * @param string $name the methode name (only getArgname is supported)
+     * @param mixed $arguments this parameter is ignored
+     * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported.
+     */
     public function __call($name, $arguments) {
+
     	if (substr($name, 0, 3) == 'get') {
 
     		$argName = strtolower(substr($name, 3));
@@ -65,22 +100,6 @@ abstract class BaseLoop
     	}
 
     	throw new \InvalidArgumentException(sprintf("Unsupported magic method %s. only getArgname() is supported.", $name));
-
-    }
-
-
-    /**
-     * Create a new Loop
-     *
-     * @param \Symfony\Component\HttpFoundation\Request                   $request
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-     */
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher)
-    {
-        $this->request = $request;
-        $this->dispatcher = $dispatcher;
-
-        $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs());
     }
 
     /**
@@ -103,30 +122,26 @@ abstract class BaseLoop
             if($value === null && $argument->mandatory) {
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('"%s" parameter is missing', $argument->name);
-                continue;
             }
-
-            /* check if empty */
-            if($value === '' && !$argument->empty) {
+			else  if($value === '' && !$argument->empty) {
+           		/* check if empty */
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('"%s" parameter cannot be empty', $argument->name);
-                continue;
             }
-
-            /* check type */
-            if($value !== null && !$argument->type->isValid($value)) {
+            else if($value !== null && !$argument->type->isValid($value)) {
+            	/* check type */
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('Invalid value for "%s" argument', $argument->name);
-                continue;
             }
+			else {
+	            /* set default */
+	            /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
+	            if($value === null) {
+	                $value = $argument->default;
+	            }
 
-            /* set default */
-            /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
-            if($value === null) {
-                $value = $argument->default;
-            }
-
-            $argument->setValue($value);
+	            $argument->setValue($value);
+			}
 
             $this->args->next();
         }
