@@ -24,8 +24,6 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-
-use Symfony\Component\Config\Definition\Exception\Exception;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -100,24 +98,24 @@ class Product extends BaseLoop
 
         $search->withColumn('CASE WHEN ' . ProductTableMap::PROMO . '=1 THEN ' . ProductTableMap::PRICE2 . ' ELSE ' . ProductTableMap::PRICE . ' END', 'real_price');
 
-        $id = $this->getArgValue('id');
+        $id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
-        $ref = $this->getArgValue('ref');
+        $ref = $this->getRef();
 
         if (!is_null($ref)) {
             $search->filterByRef($ref, Criteria::IN);
         }
 
-      	$category = $this->getArgValue('category');
+      	$category = $this->getCategory();
 
         if (!is_null($category)) {
             $categories = CategoryQuery::create()->filterById($category, Criteria::IN)->find();
 
-            $depth = $this->getArgValue('depth');
+            $depth = $this->getDepth();
 
             if(null !== $depth) {
                 foreach(CategoryQuery::findAllChild($category, $depth) as $subCategory) {
@@ -131,7 +129,7 @@ class Product extends BaseLoop
             );
         }
 
-        $new = $this->getArgValue('new');
+        $new = $this->getNew();
 
         if ($new === true) {
             $search->filterByNewness(1, Criteria::EQUAL);
@@ -139,7 +137,7 @@ class Product extends BaseLoop
             $search->filterByNewness(0, Criteria::EQUAL);
         }
 
-        $promo = $this->getArgValue('promo');
+        $promo = $this->getPromo();
 
         if ($promo === true) {
             $search->filterByPromo(1, Criteria::EQUAL);
@@ -147,13 +145,13 @@ class Product extends BaseLoop
             $search->filterByNewness(0, Criteria::EQUAL);
         }
 
-        $min_stock = $this->getArgValue('min_stock');
+        $min_stock = $this->getMin_stock();
 
         if (null != $min_stock) {
             $search->filterByQuantity($min_stock, Criteria::GREATER_EQUAL);
         }
 
-        $min_price = $this->getArgValue('min_price');
+        $min_price = $this->getMin_price();
 
         if(null !== $min_price) {
             /**
@@ -170,7 +168,7 @@ class Product extends BaseLoop
                     ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
         }
 
-        $max_price = $this->getArgValue('max_price');
+        $max_price = $this->getMax_price();
 
         if(null !== $max_price) {
             /**
@@ -187,19 +185,19 @@ class Product extends BaseLoop
                     ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
         }
 
-        $min_weight = $this->getArgValue('min_weight');
+        $min_weight = $this->getMin_weight();
 
         if(null !== $min_weight) {
             $search->filterByWeight($min_weight, Criteria::GREATER_EQUAL);
         }
 
-        $max_weight = $this->getArgValue('max_weight');
+        $max_weight = $this->getMax_weight();
 
         if(null !== $max_weight) {
             $search->filterByWeight($max_weight, Criteria::LESS_EQUAL);
         }
 
-        $current = $this->getArgValue('current');
+        $current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("product_id"));
@@ -207,7 +205,7 @@ class Product extends BaseLoop
             $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
         }
 
-        $current_category = $this->getArgValue('current_category');
+        $current_category = $this->getCurrent_category();
 
         if ($current_category === true) {
             $search->filterByCategory(
@@ -233,9 +231,9 @@ class Product extends BaseLoop
             );
         }
 
-        $search->filterByVisible($this->getArgValue('visible'));
+        $search->filterByVisible($this->getVisible());
 
-        $orders  = $this->getArgValue('order');
+        $orders  = $this->getOrder();
 
         if(null === $orders) {
             $search->orderByPosition();
@@ -284,14 +282,14 @@ class Product extends BaseLoop
             }
         }
 
-        $random  = $this->getArgValue('random');
+        $random  = $this->getRandom();
 
         if ($random === true) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }
 
-        $exclude = $this->getArgValue('exclude');
+        $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
