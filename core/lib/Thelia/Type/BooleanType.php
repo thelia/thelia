@@ -53,7 +53,7 @@ class BooleanType implements TypeInterface
         return in_array($value, $this->trueValuesArray) || in_array($value, $this->falseValuesArray);
     }
 
-    public function getFormatedValue($value)
+    public function getFormattedValue($value)
     {
         return $this->isValid($value) ? ( in_array($value, $this->trueValuesArray) ) : null;
     }

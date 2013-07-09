@@ -42,7 +42,7 @@ class AlphaNumStringListTypeTest extends \PHPUnit_Framework_TestCase
     public function testFormatAlphaNumStringListType()
     {
         $type = new AlphaNumStringListType();
-        $this->assertTrue(is_array($type->getFormatedValue('FOO1,FOO_2,FOO-3')));
-        $this->assertNull($type->getFormatedValue('5€'));
+        $this->assertTrue(is_array($type->getFormattedValue('FOO1,FOO_2,FOO-3')));
+        $this->assertNull($type->getFormattedValue('5€'));
     }
 }

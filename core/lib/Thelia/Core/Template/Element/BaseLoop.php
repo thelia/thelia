@@ -115,6 +115,7 @@ abstract class BaseLoop
         $faultDetails = array();
 
         while (($argument = $this->args->current()) !== false) {
+            $this->args->next();
 
             $value = isset($nameValuePairs[$argument->name]) ? $nameValuePairs[$argument->name] : null;
 

@@ -48,8 +48,8 @@ class BooleanTypeTest extends \PHPUnit_Framework_TestCase
     public function testFormatBooleanType()
     {
         $booleanType = new BooleanType();
-        $this->assertTrue($booleanType->getFormatedValue('yes'));
-        $this->assertFalse($booleanType->getFormatedValue('no'));
-        $this->assertNull($booleanType->getFormatedValue('foo'));
+        $this->assertTrue($booleanType->getFormattedValue('yes'));
+        $this->assertFalse($booleanType->getFormattedValue('no'));
+        $this->assertNull($booleanType->getFormattedValue('foo'));
     }
 }

@@ -28,7 +28,7 @@ namespace Thelia\Type;
  *
  */
 
-class EnumType implements TypeInterface
+class EnumListType implements TypeInterface
 {
     protected $values = array();
 
@@ -40,16 +40,26 @@ class EnumType implements TypeInterface
 
     public function getType()
     {
-        return 'Enum type';
+        return 'Enum list type';
     }
 
-    public function isValid($value)
+    public function isValid($values)
+    {
+        foreach(explode(',', $values) as $value) {
+            if(!$this->isSingleValueValid($value))
+                return false;
+        }
+
+        return true;
+    }
+
+    public function getFormattedValue($values)
+    {
+        return $this->isValid($values) ? explode(',', $values) : null;
+    }
+
+    public function isSingleValueValid($value)
     {
         return in_array($value, $this->values);
-    }
-
-    public function getFormattedValue($value)
-    {
-        return $this->isValid($value) ? $value : null;
     }
 }

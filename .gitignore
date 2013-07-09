@@ -15,6 +15,5 @@ coverage
 .project
 .settings/
 local/cache/*
-composer.lock
 web/assets/*
 web/.htaccess
