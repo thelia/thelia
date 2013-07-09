@@ -56,6 +56,19 @@ abstract class BaseLoop
         );
     }
 
+    public function __call($name, $arguments) {
+    	if (substr($name, 0, 3) == 'get') {
+
+    		$argName = strtolower(substr($name, 3));
+
+    		return $this->getArg($argName)->getValue();
+    	}
+
+    	throw new \InvalidArgumentException(sprintf("Unsupported magic method %s. only getArgname() is supported.", $name));
+
+    }
+
+
     /**
      * Create a new Loop
      *
@@ -83,6 +96,7 @@ abstract class BaseLoop
         $faultDetails = array();
 
         while (($argument = $this->args->current()) !== false) {
+            $this->args->next();
 
             $value = isset($nameValuePairs[$argument->name]) ? $nameValuePairs[$argument->name] : null;
 
@@ -114,8 +128,6 @@ abstract class BaseLoop
             }
 
             $argument->setValue($value);
-
-            $this->args->next();
         }
 
         if (!empty($faultActor)) {

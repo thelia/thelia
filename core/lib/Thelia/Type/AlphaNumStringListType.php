@@ -45,7 +45,7 @@ class AlphaNumStringListType implements TypeInterface
         return true;
     }
 
-    public function getFormatedValue($values)
+    public function getFormattedValue($values)
     {
         return $this->isValid($values) ? explode(',', $values) : null;
     }

@@ -48,7 +48,7 @@ class EnumType implements TypeInterface
         return in_array($value, $this->values);
     }
 
-    public function getFormatedValue($value)
+    public function getFogetFormattedValuermatedValue($value)
     {
         return $this->isValid($value) ? $value : null;
     }

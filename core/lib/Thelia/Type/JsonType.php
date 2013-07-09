@@ -41,7 +41,7 @@ class JsonType implements TypeInterface
         return (json_last_error() == JSON_ERROR_NONE);
     }
 
-    public function getFormatedValue($value)
+    public function getFormattedValue($value)
     {
         return $this->isValid($value) ? json_decode($value, true) : null;
     }

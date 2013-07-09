@@ -133,10 +133,10 @@ class TypeCollection implements \Iterator
         return false;
     }
 
-    public function getFormatedValue($value) {
+    public function getFormattedValue($value) {
         foreach($this as $type) {
             if($type->isValid($value)) {
-                return $type->getFormatedValue($value);
+                return $type->getFormattedValue($value);
             }
         }
 

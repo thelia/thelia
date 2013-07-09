@@ -43,7 +43,7 @@ class IntListTypeTest extends \PHPUnit_Framework_TestCase
     public function testFormatIntListType()
     {
         $intListType = new IntListType();
-        $this->assertTrue(is_array($intListType->getFormatedValue('1,2,3')));
-        $this->assertNull($intListType->getFormatedValue('foo'));
+        $this->assertTrue(is_array($intListType->getFormattedValue('1,2,3')));
+        $this->assertNull($intListType->getFormattedValue('foo'));
     }
 }

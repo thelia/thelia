@@ -40,7 +40,7 @@ class IntType implements TypeInterface
         return filter_var($value, FILTER_VALIDATE_INT) === false ? false : true;
     }
 
-    public function getFormatedValue($value)
+    public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
     }

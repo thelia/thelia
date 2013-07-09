@@ -28,33 +28,38 @@ namespace Thelia\Type;
  *
  */
 
-class BooleanType implements TypeInterface
+class EnumListType implements TypeInterface
 {
-    protected $trueValuesArray = array(
-        '1',
-        'true',
-        'yes',
-        'y',
-    );
-    protected $falseValuesArray = array(
-        '0',
-        'false',
-        'no',
-        'n',
-    );
+    protected $values = array();
+
+    public function __construct($values = array())
+    {
+        if(is_array($values))
+            $this->values = $values;
+    }
 
     public function getType()
     {
-        return 'Boolean type';
+        return 'Enum list type';
     }
 
-    public function isValid($value)
+    public function isValid($values)
     {
-        return in_array($value, $this->trueValuesArray) || in_array($value, $this->falseValuesArray);
+        foreach(explode(',', $values) as $value) {
+            if(!$this->isSingleValueValid($value))
+                return false;
+        }
+
+        return true;
     }
 
-    public function getFormattedValue($value)
+    public function getFormattedValue($values)
     {
-        return $this->isValid($value) ? ( in_array($value, $this->trueValuesArray) ) : null;
+        return $this->isValid($values) ? explode(',', $values) : null;
+    }
+
+    public function isSingleValueValid($value)
+    {
+        return in_array($value, $this->values);
     }
 }

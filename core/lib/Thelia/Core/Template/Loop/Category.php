@@ -83,7 +83,7 @@ class Category extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumType('alpha', 'alpha_reverse', 'reverse')
+                    new Type\EnumListType('alpha', 'alpha_reverse', 'reverse')
                 )
             ),
             Argument::createBooleanTypeArgument('random', 0),
@@ -100,21 +100,20 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
-		$id = $this->getArgValue('id');
+		$id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
         }
 
-
-        $parent = $this->getArgValue('parent');
+        $parent = $this->getParent();
 
         if (!is_null($parent)) {
             $search->filterByParent($parent);
         }
 
 
-		$current = $this->getArgValue('current');
+		$current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("category_id"));
@@ -123,38 +122,47 @@ class Category extends BaseLoop
         }
 
 
-         $exclude = $this->getArgValue('exclude');
+         $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
 
-        $link = $this->getArgValue('link');
+        $link = $this->getLink();
 
         if (!is_null($link)) {
             $search->filterByLink($link);
         }
 
-        $search->filterByVisible($this->getArgValue('visible') ? 1 : 0);
+        $search->filterByVisible($this->getVisible() ? 1 : 0);
 
-        switch ($this->getArgValue('order')) {
-            case "alpha":
-                $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                break;
-            case "alpha_reverse":
-                $search->addDescendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                break;
-            case "reverse":
-                $search->orderByPosition(\Criteria::DESC);
-                break;
-            default:
-                $search->orderByPosition();
-                break;
+        $orders  = $this->getOrder();
+
+        if(null === $orders) {
+            $search->orderByPosition();
+        } else {
+            foreach($orders as $order) {
+                switch ($order) {
+                    case "alpha":
+                        $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
+                        break;
+                    case "alpha_reverse":
+                        $search->addDescendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
+                        break;
+                    case "reverse":
+                        $search->orderByPosition(\Criteria::DESC);
+                        break;
+                    default:
+                        $search->orderByPosition();
+                        break;
+                }
+            }
         }
 
+        $random = $this->getRandom();
 
-        if ($this->getArgValue('random') === true) {
+        if ($random === true) {
             $search->clearOrderByColumns();
             $search->addAscendingOrderByColumn('RAND()');
         }

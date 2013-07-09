@@ -40,7 +40,7 @@ class AlphaNumStringType implements TypeInterface
         return preg_match('#^[a-zA-Z0-9\-_]+$#', $value) ? true : false;
     }
 
-    public function getFormatedValue($value)
+    public function getFormattedValue($value)
     {
         return $this->isValid($value) ? $value : null;
     }
