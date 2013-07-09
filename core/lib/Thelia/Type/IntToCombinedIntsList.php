@@ -28,28 +28,30 @@ namespace Thelia\Type;
  *
  */
 
-class EnumType implements TypeInterface
+class IntToCombinedIntsList implements TypeInterface
 {
-    protected $values = array();
-
-    public function __construct($values = array())
-    {
-        if(is_array($values))
-            $this->values = $values;
-    }
-
     public function getType()
     {
-        return 'Enum type';
+        return 'Int to combined ints list type';
     }
 
-    public function isValid($value)
+    public function isValid($values)
     {
-        return in_array($value, $this->values);
+        foreach(explode(',', $values) as $intToCombinedInts) {
+            $parts = explode(':', $intToCombinedInts);
+            if(count($parts) != 2)
+                return false;
+            if(filter_var($parts[0], FILTER_VALIDATE_INT) === false)
+                return false;
+            if(!preg_match('#([0-9]+)|\*|&\*]+#', $parts[1]))
+                return false;
+        }
+
+        return true;
     }
 
-    public function getFormattedValue($value)
+    public function getFormattedValue($values)
     {
-        return $this->isValid($value) ? $value : null;
+        return $this->isValid($values) ? explode(',', $values) : null;
     }
 }

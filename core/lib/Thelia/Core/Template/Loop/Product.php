@@ -83,7 +83,14 @@ class Product extends BaseLoop
                 )
             ),
             Argument::createBooleanTypeArgument('random', 0),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntListTypeArgument('exclude_category'),
+            new Argument(
+                'feature_available',
+                new TypeCollection(
+                    new Type\IntToCombinedIntsList(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
+                )
+            )
         );
     }
 
@@ -293,6 +300,15 @@ class Product extends BaseLoop
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $exclude_category = $this->getExclude_category();
+
+        if (!is_null($exclude_category)) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterById($exclude_category, Criteria::IN)->find(),
+                Criteria::NOT_IN
+            );
         }
 
         /**
