@@ -30,19 +30,6 @@ namespace Thelia\Type;
 
 class BooleanType implements TypeInterface
 {
-    protected $trueValuesArray = array(
-        '1',
-        'true',
-        'yes',
-        'y',
-    );
-    protected $falseValuesArray = array(
-        '0',
-        'false',
-        'no',
-        'n',
-    );
-
     public function getType()
     {
         return 'Boolean type';
@@ -50,11 +37,11 @@ class BooleanType implements TypeInterface
 
     public function isValid($value)
     {
-        return in_array($value, $this->trueValuesArray) || in_array($value, $this->falseValuesArray);
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
     }
 
     public function getFormattedValue($value)
     {
-        return $this->isValid($value) ? ( in_array($value, $this->trueValuesArray) ) : null;
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 }

@@ -327,11 +327,23 @@ class Product extends BaseLoop
             $search->joinFeatureProd('fa2', Criteria::LEFT_JOIN)->addJoinCondition('fa2', "'fa2.PRODUCT_ID' = 3");
             */
 
-            $x = new Join();
-            $x->addExplicitCondition('product', 'id', null, 'feature_prod', 'PRODUCT_ID', 'fa0', Criteria::EQUAL);
-            $search->addJoinObject(
-                $x
-            );
+            /* pas mieux
+            $x = new Join(ProductTableMap::ID, FeatureProdTableMap::PRODUCT_ID, Criteria::LEFT_JOIN);
+            $x->setRightTableAlias('fa0');
+            $search->addJoinObject($x, 'fa0')->addJoinCondition('fa0', "PRODUCT_ID = ?", 0);
+            */
+
+            foreach($feature_available as $feature => $feature_choice) {
+                foreach($feature_choice['values'] as $feature_av) {
+                    $featureAlias = 'fa_' . $feature . '_' . $feature_av;
+                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT)
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
+                }
+                $bigDealFeatureWhereCondition = str_replace('&', ' AND ', $feature_choice['values']);
+            }
+
+
 
             /*
              * ne marche pas de cette façon :

@@ -35,21 +35,23 @@ class BooleanTypeTest extends \PHPUnit_Framework_TestCase
     public function testBooleanType()
     {
         $booleanType = new BooleanType();
-        $this->assertTrue($booleanType->isValid('y'));
+        $this->assertTrue($booleanType->isValid('1'));
         $this->assertTrue($booleanType->isValid('yes'));
         $this->assertTrue($booleanType->isValid('true'));
         $this->assertTrue($booleanType->isValid('no'));
-        $this->assertTrue($booleanType->isValid('n'));
+        $this->assertTrue($booleanType->isValid('off'));
+        $this->assertTrue($booleanType->isValid(1));
         $this->assertTrue($booleanType->isValid('false'));
         $this->assertFalse($booleanType->isValid('foo'));
-        $this->assertFalse($booleanType->isValid(5));
+        $this->assertFalse($booleanType->isValid(2));
     }
 
     public function testFormatBooleanType()
     {
         $booleanType = new BooleanType();
-        $this->assertTrue($booleanType->getFormattedValue('yes'));
-        $this->assertFalse($booleanType->getFormattedValue('no'));
-        $this->assertNull($booleanType->getFormattedValue('foo'));
+        $this->assertTrue($booleanType->getFormattedValue('on'));
+        $this->assertFalse($booleanType->getFormattedValue('0'));
+        $this->assertFalse($booleanType->getFormattedValue(0));
+        $this->assertNull($booleanType->getFormattedValue(3));
     }
 }
