@@ -64,6 +64,13 @@ class ModuleGenerateCommand extends ContainerAwareCommand {
 
         $this->createDirectories();
         $this->createFiles();
+
+        $output->renderBlock(array(
+           '',
+           sprintf("module %s create with success", $this->module),
+           "You can now configure your module and complete plugin.xml file",
+           ''
+        ), "bg=green;fg=black");
     }
 
     private function createDirectories()

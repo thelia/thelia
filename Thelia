@@ -7,6 +7,7 @@ require __DIR__ . '/core/bootstrap.php';
 
 use Thelia\Core\Thelia;
 use Thelia\Core\Application;
+use Thelia\Command\Output\TheliaConsoleOutput;
 use Symfony\Component\Console\Input\ArgvInput;
 
 $input = new ArgvInput();
@@ -15,4 +16,4 @@ $debug = getenv('THELIA_DEBUG') !== '0' && !$input->hasParameterOption(array('--
 
 $thelia = new Thelia($env, $debug);
 $application = new Application($thelia);
-$application->run($input);
+$application->run($input, new TheliaConsoleOutput());
