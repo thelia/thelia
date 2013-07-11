@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,40 +17,39 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Command;
 
-namespace Thelia\Command\Output;
 
+ abstract class BaseModuleGenerate extends ContainerAwareCommand {
 
-use Symfony\Component\Console\Output\ConsoleOutput;
+     protected $module;
+     protected $moduleDirectory;
 
-class TheliaConsoleOutput extends ConsoleOutput{
+     protected $reservedKeyWords = array(
+         "thelia"
+     );
 
-    public function renderBlock(array $messages, $style = "info")
-    {
-        $strlen = function ($string) {
-            if (!function_exists('mb_strlen')) {
-                return strlen($string);
-            }
+     protected $neededDirectories = array(
+         "Config",
+         "Model",
+         "Loop"
+     );
 
-            if (false === $encoding = mb_detect_encoding($string)) {
-                return strlen($string);
-            }
+     protected function verifyExistingModule()
+     {
+         if (file_exists($this->moduleDirectory)) {
+             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
+         }
+     }
 
-            return mb_strlen($string, $encoding);
-        };
-        $length = 0;
-        foreach ($messages as $message) {
-            $length = ($strlen($message) > $length) ? $strlen($message) : $length;
-        }
-        $ouput = array();
-        foreach ($messages as $message) {
-            $output[] = "<" . $style . ">" . "  " . $message . str_repeat(' ', $length - $strlen($message)) . "  </" . $style . ">";
-        }
-
-        $this->writeln($output);
-    }
-
+     protected function formatModuleName($name)
+     {
+         if (in_array(strtolower($name), $this->reservedKeyWords)) {
+             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
+         }
+         return ucfirst($name);
+     }
 }

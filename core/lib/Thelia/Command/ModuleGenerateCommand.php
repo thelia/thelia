@@ -28,20 +28,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ModuleGenerateCommand extends ContainerAwareCommand {
+class ModuleGenerateCommand extends BaseModuleGenerate {
 
-    protected $module;
-    protected $moduleDirectory;
 
-    private $reservedKeyWords = array(
-        "thelia"
-    );
-
-    private $neededDirectories = array(
-        "Config",
-        "Model",
-        "Loop"
-    );
 
     protected function configure()
     {
@@ -64,13 +53,16 @@ class ModuleGenerateCommand extends ContainerAwareCommand {
 
         $this->createDirectories();
         $this->createFiles();
+        if(method_exists($this, "renderBlock")) {
+            //impossible to change output class in CommandTester...
+            $output->renderBlock(array(
+                '',
+                sprintf("module %s create with success", $this->module),
+                "You can now configure your module and complete plugin.xml file",
+                ''
+            ), "bg=green;fg=black");
+        }
 
-        $output->renderBlock(array(
-           '',
-           sprintf("module %s create with success", $this->module),
-           "You can now configure your module and complete plugin.xml file",
-           ''
-        ), "bg=green;fg=black");
     }
 
     private function createDirectories()
@@ -107,18 +99,5 @@ class ModuleGenerateCommand extends ContainerAwareCommand {
     }
 
 
-    private function verifyExistingModule()
-    {
-        if (file_exists($this->moduleDirectory)) {
-            throw new \RuntimeException(sprintf("%s module already exists", $this->module));
-        }
-    }
 
-    private function formatModuleName($name)
-    {
-        if (in_array(strtolower($name), $this->reservedKeyWords)) {
-            throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
-        }
-        return ucfirst($name);
-    }
 }
