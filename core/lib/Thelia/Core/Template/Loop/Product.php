@@ -319,65 +319,29 @@ class Product extends BaseLoop
         $feature_available = $this->getFeature_available();
 
         if(null !== $feature_available) {
-            //$search->joinFeatureProd('fa2', Criteria::LEFT_JOIN)->condition('foocond', '`fa2`.`product_id`=1')->setJoinCondition('fa2', 'foocond');
-            //$search->joinFeatureProd('fa3', Criteria::LEFT_JOIN)->condition('foocond2', 'fa3.product_id=?', 2)->setJoinCondition('fa3', 'foocond2');
-
-            /* fonctionne mais pas avec ?
-            $search->joinFeatureProd('fa3', Criteria::LEFT_JOIN)->addJoinCondition('fa3', "'fa3.PRODUCT_ID' = 4");
-            $search->joinFeatureProd('fa2', Criteria::LEFT_JOIN)->addJoinCondition('fa2', "'fa2.PRODUCT_ID' = 3");
-            */
-
-            /* pas mieux
-            $x = new Join(ProductTableMap::ID, FeatureProdTableMap::PRODUCT_ID, Criteria::LEFT_JOIN);
-            $x->setRightTableAlias('fa0');
-            $search->addJoinObject($x, 'fa0')->addJoinCondition('fa0', "PRODUCT_ID = ?", 0);
-            */
-
             foreach($feature_available as $feature => $feature_choice) {
                 foreach($feature_choice['values'] as $feature_av) {
-                    $featureAlias = 'fa_' . $feature . '_' . $feature_av;
+                    $featureAlias = 'fa_' . $feature;
+                    if($feature_av != '*')
+                        $featureAlias .= '_' . $feature_av;
                     $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
-                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT)
-                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
+                    if($feature_av != '*')
+                        $search->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
                 }
-                $bigDealFeatureWhereCondition = str_replace('&', ' AND ', $feature_choice['values']);
+
+                /* format for mysql */
+                $sqlWhereString = $feature_choice['expression'];
+                if($sqlWhereString == '*') {
+                    $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
+                } else {
+                    $sqlWhereString = preg_replace('#(^|[^0-9])([0-9]+)([^0-9]|$)#', '\1NOT ISNULL(`fa_' . $feature . '_' . '\2`.ID)\3', $sqlWhereString);
+                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                }
+
+                $search->where($sqlWhereString);
             }
-
-
-
-            /*
-             * ne marche pas de cette façon :
-             *
-             *
-            $search->filterByFeatureProd(
-                FeatureProdQuery::create('fa')
-                    ->filterByFeature(
-                        FeatureQuery::create('fq')
-                            ->filterById(array(1,2,3), Criteria::IN)
-                            ->find()
-                    )
-                    ->filterByFeatureAv(
-                        FeatureAvQuery::create()
-                            ->filterById(array(1,2,3), Criteria::IN)
-                            ->find()
-                    )
-                    ->find()
-            );
-
-            */
-
-            /*
-
-            CategoryQuery::create()->filterByProduct(
-                    ProductCategoryQuery::create()->filterByProductId(
-                        $this->request->get("product_id"),
-                        Criteria::EQUAL
-                    )->find(),
-                    Criteria::IN
-                )->find(),
-                Criteria::NOT_IN
-
-             */
         }
 
         /**
@@ -390,6 +354,8 @@ class Product extends BaseLoop
             $this->request->getSession()->getLocale(),
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
+
+        $search->groupBy(ProductTableMap::ID);
 
         $products = $this->search($search, $pagination);
 

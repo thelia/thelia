@@ -44,50 +44,10 @@ class IntToCombinedIntsList implements TypeInterface
             if(filter_var($parts[0], FILTER_VALIDATE_INT) === false)
                 return false;
 
-            /* delete  all spaces and parentheses */
-            $noSpaceString = preg_replace('#[\s]#', '', $parts[1]);
-            $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
-
-            if(!preg_match('#^([0-9]+([\&\|][0-9]+)*|\*)$#', $noParentheseString))
+            if(false === $this->checkLogicalFormat($parts[1]))
                 return false;
-
-            /* check parenteses use */
-            $openingParenthesesCount = 0;
-            $closingParenthesesCount = 0;
-
-            for($i=0; $i<strlen($noSpaceString); $i++) {
-                $char = $noSpaceString[$i];
-                if($char == '(') {
-                    /* must be :
-                     * - after a &| or () or at the begining of expression
-                     * - before a number or ()
-                     * must not be :
-                     * - at the end of expression
-                     */
-                    if(($i!=0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i-1])) || !isset($noSpaceString[$i+1]) || !preg_match('#[\(\)0-9]#', $noSpaceString[$i+1])) {
-                        return false;
-                    }
-                    $openingParenthesesCount++;
-                } elseif($char == ')') {
-                    /* must be :
-                     * - after a number or ()
-                     * - before a &| or () or at the end of expression
-                     * must not be :
-                     * - at the begining of expression
-                     * - if no ( remain unclose
-                     */
-                    if($i == 0 || !preg_match('#[\(\)0-9]#', $noSpaceString[$i-1]) || (isset($noSpaceString[$i+1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i+1])) || $openingParenthesesCount-$closingParenthesesCount==0) {
-                        return false;
-                    }
-                    $closingParenthesesCount++;
-                }
-            }
-
-            if($openingParenthesesCount != $closingParenthesesCount) {
-                return false;
-            }
         }
-
+        $x = 3;
         return true;
     }
 
@@ -96,24 +56,67 @@ class IntToCombinedIntsList implements TypeInterface
         if( $this->isValid($values) ) {
             $return = '';
 
+            $values = preg_replace('#[\s]#', '', $values);
             foreach(explode(',', $values) as $intToCombinedInts) {
                 $parts = explode(':', $intToCombinedInts);
 
-                /* delete  all spaces and parentheses */
-                $noParentheseString = preg_replace('#[\s\(\)]#', '', $parts[1]);
-
-                //$return[$parts[0]] = preg_match_all("#^([0-9]+([\&\|][0-9]+)*|\*)$#", $parts[1]);
-                /*array(
-                    "values"        =>  preg_split( "#(&|\|)#", $parts[1]),
-                    "expression"    =>  $parts[0],
-                );*/
-
-                $x = 1;
+                $return[trim($parts[0])] = array(
+                    "values"        =>  preg_split( "#(&|\|)#", preg_replace('#[\(\)]#', '', $parts[1])),
+                    "expression"    =>  $parts[1],
+                );
             }
 
             return $return;
         } else {
             return null;
         }
+    }
+
+    protected function checkLogicalFormat($string)
+    {
+        /* delete  all spaces and parentheses */
+        $noSpaceString = preg_replace('#[\s]#', '', $string);
+        $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
+
+        if(!preg_match('#^([0-9]+([\&\|][0-9]+)*|\*)$#', $noParentheseString))
+            return false;
+
+        /* check parenteses use */
+        $openingParenthesesCount = 0;
+        $closingParenthesesCount = 0;
+
+        for($i=0; $i<strlen($noSpaceString); $i++) {
+            $char = $noSpaceString[$i];
+            if($char == '(') {
+                /* must be :
+                 * - after a &| or () or at the begining of expression
+                 * - before a number or ()
+                 * must not be :
+                 * - at the end of expression
+                 */
+                if(($i!=0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i-1])) || !isset($noSpaceString[$i+1]) || !preg_match('#[\(\)0-9]#', $noSpaceString[$i+1])) {
+                    return false;
+                }
+                $openingParenthesesCount++;
+            } elseif($char == ')') {
+                /* must be :
+                 * - after a number or ()
+                 * - before a &| or () or at the end of expression
+                 * must not be :
+                 * - at the begining of expression
+                 * - if no ( remain unclose
+                 */
+                if($i == 0 || !preg_match('#[\(\)0-9]#', $noSpaceString[$i-1]) || (isset($noSpaceString[$i+1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i+1])) || $openingParenthesesCount-$closingParenthesesCount==0) {
+                    return false;
+                }
+                $closingParenthesesCount++;
+            }
+        }
+
+        if($openingParenthesesCount != $closingParenthesesCount) {
+            return false;
+        }
+
+        return true;
     }
 }

@@ -27,7 +27,8 @@
     is new : #NEW<br />
     weight : #WEIGHT<br />
 {/loop*}
-{loop name="product" type="product" feature_available="1: (1 | 2) , 2: 4"}
+
+{loop name="product" type="product" order="ref" feature_available="1:*"}
     <h3>PRODUCT : #REF / #TITLE</h3>
     price : #PRICE €<br />
     promo price : #PROMO_PRICE €<br />

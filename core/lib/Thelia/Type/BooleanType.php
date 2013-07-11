@@ -42,6 +42,6 @@ class BooleanType implements TypeInterface
 
     public function getFormattedValue($value)
     {
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        return $value === null ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 }
