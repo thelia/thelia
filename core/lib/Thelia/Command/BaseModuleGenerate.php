@@ -22,8 +22,11 @@
 /*************************************************************************************/
 namespace Thelia\Command;
 
+use Propel\Runtime\Propel;
+use Symfony\Component\Console\Application;
 
- abstract class BaseModuleGenerate extends ContainerAwareCommand {
+
+abstract class BaseModuleGenerate extends ContainerAwareCommand {
 
      protected $module;
      protected $moduleDirectory;
@@ -51,5 +54,10 @@ namespace Thelia\Command;
              throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
          }
          return ucfirst($name);
+     }
+
+     protected function getPropelApplication()
+     {
+        return new Application("Propel", Propel::VERSION);
      }
 }
