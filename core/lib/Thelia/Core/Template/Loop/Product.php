@@ -93,7 +93,7 @@ class Product extends BaseLoop
             new Argument(
                 'feature_available',
                 new TypeCollection(
-                    new Type\IntToCombinedIntsList(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
+                    new Type\IntToCombinedIntsListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
                 )
             )
         );
