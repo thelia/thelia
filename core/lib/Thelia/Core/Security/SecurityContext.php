@@ -31,7 +31,7 @@ use Thelia\Core\Security\Exception\AuthenticationTokenNotFoundException;
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class SecurityManager {
+class SecurityContext {
 /*
     protected $authProvider;
 

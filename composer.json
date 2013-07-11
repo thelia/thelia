@@ -36,6 +36,7 @@
         "simplepie/simplepie": "dev-master"
     },
     "require-dev" : {
+        "phpunit/phpunit": "3.7.*",
         "fzaninotto/faker": "dev-master"
     },
     "minimum-stability": "stable",

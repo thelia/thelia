@@ -105,7 +105,7 @@ class Customer extends BaseCustomer implements UserInterface
             $this->setAlgo("PASSWORD_BCRYPT");
             return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
-
+        return $this;
     }
 
     public function setDispatcher(EventDispatcherInterface $dispatcher)
@@ -132,6 +132,6 @@ class Customer extends BaseCustomer implements UserInterface
      * {@inheritDoc}
      */
     public function getRoles() {
-    	return array(new Role('USER_CUSTOMER'));
+    	return array(new Role('ROLE_CUSTOMER'));
     }
 }

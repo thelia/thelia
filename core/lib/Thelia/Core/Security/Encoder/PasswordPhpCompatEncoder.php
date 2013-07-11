@@ -1,11 +1,10 @@
 <?php
-
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -18,32 +17,42 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Core\Security\Encoder;
 
-namespace Thelia\Tests\Security;
-
-use Thelia\Core\Security\SecurityManager;
 /**
  *
- * @author Franck Allimant <franck@cqfdev.fr>
+ * use password api include in php 5.5 and available throw the password_compat library.
  *
+ * Class PasswordPhpCompatEncoder
+ * @package Thelia\Core\Security\Encoder
  */
-class SecurityManagerTest extends \PHPUnit_Framework_TestCase
-{
-    public function testGetSetToken()
-    {
-        /*
-        $context = new SecurityManager($authProvider)(
-            $this->getMock('AuthenticationProviderInterface'),
-            $this->getMock('Symfony\Component\Security\Core\Authorization\AccessDecisionManagerInterface')
-        );
-        $this->assertNull($context->getToken());
+class PasswordPhpCompatEncoder implements PasswordEncoderInterface {
 
-        $context->setToken($token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
-        $this->assertSame($token, $context->getToken());
-        */
-       // $this->assertFalse(1==1, "faux !");
+    /**
+     * Encode a string.
+     *
+     * @param  string $password    the password to encode
+     * @param  string $algorithm   the hash() algorithm
+     * @return string    $salt        the salt, the salt is not used here.
+     */
+    public function encode($password, $algorithm, $salt = null)
+    {
+        return password_hash($password, $algorithm);
+    }
+
+    /**
+     * Check a string against an encoded password.
+     *
+     * @param  string $string      the string to compare against password
+     * @param  string $password    the encoded password
+     * @param  string $algorithm   the hash() algorithm, not used here
+     * @return string    $salt        the salt, not used here
+     */
+    public function isEqual($string, $password, $algorithm = null, $salt = null)
+    {
+        return password_verify($string, $password);
     }
 }

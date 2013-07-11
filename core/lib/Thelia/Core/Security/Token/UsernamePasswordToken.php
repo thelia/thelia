@@ -21,12 +21,12 @@ class UsernamePasswordToken extends AbstractToken
      *
     * @throws \InvalidArgumentException
     */
-    public function __construct($username, $password, $authenticated = false)
+    public function __construct($username, $password, array $roles = array())
     {
         $this->setUser($username);
         $this->credentials = $password;
 
-        parent::setAuthenticated($authenticated);
+        parent::setAuthenticated(count($roles) > 0);
     }
 
     /**

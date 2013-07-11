@@ -41,6 +41,30 @@ class Install extends ContainerAwareCommand
             ->setName("thelia:install")
             ->setDescription("Install thelia using cli tools. For now Thelia only use mysql database")
             ->setHelp("The <info>thelia:install</info> command install Thelia database and create config file needed.")
+            ->addOption(
+                "db_host",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "host for your database"
+            )
+            ->addOption(
+                "db_username",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "username for your database"
+            )
+            ->addOption(
+                "db_password",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "password for your database"
+            )
+            ->addOption(
+                "db_name",
+                null,
+                InputOption::VALUE_OPTIONAL,
+                "database name"
+            )
         ;
 
     }
@@ -56,9 +80,19 @@ class Install extends ContainerAwareCommand
 
         $this->checkPermission($output);
 
-        do {
-            $connectionInfo = $this->getConnectionInfo($input, $output);
-        } while(false === $connection = $this->tryConnection($connectionInfo, $output));
+
+        $connectionInfo = array(
+            "host" => $input->getOption("db_host"),
+            "dbName" => $input->getOption("db_name"),
+            "username" => $input->getOption("db_username"),
+            "password" => $input->getOption("db_password")
+        );
+
+
+
+        while(false === $connection = $this->tryConnection($connectionInfo, $output)) {
+                $connectionInfo = $this->getConnectionInfo($input, $output);
+        }
 
         $this->createDatabase($connection, $connectionInfo["dbName"]);
 
