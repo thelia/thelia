@@ -36,6 +36,7 @@
         <command class="Thelia\Command\Install"/>
         <command class="Thelia\Command\ModuleGenerateCommand"/>
         <command class="Thelia\Command\ModuleGenerateModelCommand"/>
+        <command class="Thelia\Command\ModuleGenerateSqlCommand"/>
     </commands>
 
     <services>
