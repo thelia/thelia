@@ -28,6 +28,7 @@ use Propel\Generator\Command\ModelBuildCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Filesystem\Filesystem;
@@ -43,6 +44,12 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
                 "name",
                 InputArgument::REQUIRED,
                 "module name"
+            )
+            ->addOption(
+                "generate-sql",
+                null,
+                InputOption::VALUE_NONE,
+                "with this option generate sql file at the same time"
             )
         ;
 
@@ -63,7 +70,30 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
             throw new \RuntimeException("schema.xml not found in Config directory. Needed file for generating model");
         }
 
+        $this->generateModel();
 
+        if ($input->getOption("generate-sql")) {
+            $this->generateSql();
+        }
+    }
+
+    protected function generateSql()
+    {
+        $sqlBuild = new ModuleGenerateSqlCommand();
+        $sqlBuild->setApplication($this->getApplication());
+
+        $sqlBuild->run(
+            new ArrayInput(array(
+                "command" => $sqlBuild->getName(),
+                "name" => $this->module
+            )),
+            new StreamOutput(fopen('php://memory', 'w', false))
+        );
+    }
+
+    protected function generateModel()
+    {
+        $fs = new Filesystem();
         $moduleBuildPropel = new ModelBuildCommand();
         $moduleBuildPropel->setApplication($this->getApplication());
 
@@ -79,8 +109,6 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
         if ($fs->exists(THELIA_MODULE_DIR . DS . "Thelia")) {
             $fs->remove(THELIA_MODULE_DIR . DS . "Thelia");
         }
-
-
     }
 
 }
