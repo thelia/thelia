@@ -64,10 +64,8 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
         }
 
 
-        $propelApp = $this->getPropelApplication();
-
         $moduleBuildPropel = new ModelBuildCommand();
-        $moduleBuildPropel->setApplication($propelApp);
+        $moduleBuildPropel->setApplication($this->getApplication());
 
         $moduleBuildPropel->run(
             new ArrayInput(array(

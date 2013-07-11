@@ -55,9 +55,4 @@ abstract class BaseModuleGenerate extends ContainerAwareCommand {
          }
          return ucfirst($name);
      }
-
-     protected function getPropelApplication()
-     {
-        return new Application("Propel", Propel::VERSION);
-     }
 }
