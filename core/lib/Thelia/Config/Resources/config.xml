@@ -34,6 +34,7 @@
     <commands>
         <command class="Thelia\Command\CacheClear"/>
         <command class="Thelia\Command\Install"/>
+        <command class="Thelia\Command\ModuleGenerateCommand"/>
     </commands>
 
     <services>
