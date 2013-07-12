@@ -70,15 +70,21 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
             throw new \RuntimeException("schema.xml not found in Config directory. Needed file for generating model");
         }
 
-        $this->generateModel();
+        $this->generateModel($output);
 
+        $output->renderBlock(array(
+           '',
+           'Model generated successfuly',
+           ''
+        ), 'bg=green;fg=black');
 
         if ($input->getOption("generate-sql")) {
-            $this->generateSql();
+            $output->writeln(' ');
+            $this->generateSql($output);
         }
     }
 
-    protected function generateSql()
+    protected function generateSql(OutputInterface $output)
     {
 
         $command = $this->getApplication()->find("module:generate:sql");
@@ -88,11 +94,11 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
                 "command" => $command->getName(),
                 "name" => $this->module
             )),
-            new StreamOutput(fopen('php://memory', 'w', false))
+            $output
         );
     }
 
-    protected function generateModel()
+    protected function generateModel(OutputInterface $output)
     {
         $fs = new Filesystem();
         $moduleBuildPropel = new ModelBuildCommand();
@@ -104,7 +110,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
                 "--output-dir" => THELIA_MODULE_DIR,
                 "--input-dir" => $this->moduleDirectory . DS ."Config"
             )),
-            new StreamOutput(fopen('php://memory', 'w', false))
+            $output
         );
 
         $verifyDirectories = array(

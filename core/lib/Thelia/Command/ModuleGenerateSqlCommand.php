@@ -71,7 +71,15 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate {
                 "--output-dir" => $this->moduleDirectory . DS ."Config",
                 "--input-dir" => $this->moduleDirectory . DS ."Config"
             )),
-            new StreamOutput(fopen('php://memory', 'w', false))
+            $output
         );
+
+        $output->renderBlock(array(
+            '',
+            'Sql generated successfuly',
+            'File available in your module config directory',
+            ''
+        ), 'bg=green;fg=black');
+
     }
 }
