@@ -44,12 +44,12 @@ class AdminLogin extends BaseForm {
                 	new NotBlank()
                 )
             ))
-            ->add("remember_me", "checkbox");
+            ->add("remember_me", "checkbox")
+            ;
     }
 
     public function getName()
     {
         return "admin_login";
     }
-
 }

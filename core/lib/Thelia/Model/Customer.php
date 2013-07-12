@@ -113,12 +113,19 @@ class Customer extends BaseCustomer implements UserInterface
         $this->dispatcher = $dispatcher;
     }
 
+   /**
+     * {@inheritDoc}
+     */
+    public function getUsername() {
+    	return $this->getEmail();
+    }
+
     /**
      * {@inheritDoc}
      */
-
-    public function getUsername() {
-    	return $this->getEmail();
+    public function checkPassword($password)
+    {
+    	return password_verify($password, $this->password);
     }
 
     /**

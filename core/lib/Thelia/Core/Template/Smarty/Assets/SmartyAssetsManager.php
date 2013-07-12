@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Smarty\Assets;
 
 use Thelia\Core\Template\Assets\AsseticHelper;
+use Thelia\Model\ConfigQuery;
 
 class SmartyAssetsManager
 {
@@ -71,7 +72,7 @@ class SmartyAssetsManager
             $url = $this->assetic_manager->asseticize(
                     $asset_dir.'/'.$asset_file,
                     $this->web_root."/".$this->path_relative_to_web_root,
-                    $this->path_relative_to_web_root,
+                    ConfigQuery::read('base_url', '/') . $this->path_relative_to_web_root,
                     $assetType,
                     $filters,
                     $debug

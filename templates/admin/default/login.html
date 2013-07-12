@@ -13,23 +13,27 @@
 	   	<div class="hero-unit">
 	        <h1>{intl l='Thelia Back Office'}</h1>
 
-			<form action="admin/login" method="post" class="well form-inline" {form_enctype form=$form}>
+			<form action="checklogin" method="post" class="well form-inline" {form_enctype form=$form}>
+
+				{if isset($message)}<div class="alert alert-error">{$message}</div>{/if}
+
                 {form_field_hidden form=$form}
+
                 {form_field form=$form.username}
-                    {form_error form=$form.username}
-                        {$message}
-                    {/form_error}
+                    {form_error form=$form.username}{$message}{/form_error}
 				    <input type="text" class="input" placeholder="{intl l='E-mail address'}" name="{$name}" />
                 {/form_field}
+
                 {form_field form=$form.password}
+                    {form_error form=$form.password}{$message}{/form_error}
 				    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" />
                 {/form_field}
 
 				{form_field form=$form.remember_me}
-				<label class="checkbox"> <input type="checkbox" name="remember" value="yes"> {intl l='Remember me'}</label>
+				<label class="checkbox"> <input type="checkbox" name="remember" value="yes" /> {intl l='Remember me'}</label>
 				{/form_field}
 
-				<div class="pull-right"><button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play icon-white"></i></button></div>
+				<span class="pull-right"><button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play icon-white"></i></button></span>
 			</form>
 		</div>
 

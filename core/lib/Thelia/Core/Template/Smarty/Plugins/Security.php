@@ -27,6 +27,7 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Security\Exception\AuthenticationException;
 
 class Security implements SmartyPluginInterface
 {
@@ -39,7 +40,6 @@ class Security implements SmartyPluginInterface
 
 	private function _explode($commaSeparatedValues)
 	{
-
     	$array = explode(',', $commaSeparatedValues);
 
     	if (array_walk($array, function(&$item) {
@@ -60,10 +60,23 @@ class Security implements SmartyPluginInterface
      */
     public function checkAuthFunction($params, &$smarty)
     {
-   		$roles = $this->_explode($params['role']);
+    	// Context: 'front' or 'admin'
+   		$context = strtolower(trim($params['context']));
+
+   		$this->securityContext->setContext($context);
+
+   		$roles = $this->_explode($params['roles']);
    		$permissions = $this->_explode($params['permissions']);
 
-   		$this->securityContext->isGranted($roles, $permissions);
+   		if (! $this->securityContext->isGranted($roles, $permissions)) {
+   			throw new AuthenticationException(
+   					sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
+   							implode(',', $roles), implode(',', $permissions), $context
+   					)
+   			);
+   		}
+
+   		return '';
      }
 
     /**

@@ -49,15 +49,23 @@
 		<!--
 		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
 		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
-		We use it here to inject the servi ce container in the admin base controller.
+		We use it here to inject the service container in the admin base controller.
 		-->
         <service id="controller_resolver" class="Thelia\Core\Controller\ControllerResolver">
         	<argument type="service" id="service_container"/>
         </service>
 
-		<!--  Security -->
+		<!--  Translation and internationalisation -->
 
-		<service id="thelia.security" class="Thelia\Core\Security\SecurityContext" />
+		<service id="thelia.translator" class="Thelia\Core\Translation\Translator">
+			<argument type="string" id="en_US"></argument>
+		</service>
+
+		<!-- Security context for front and back office -->
+
+		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" scope="request">
+            <argument type="service" id="request" />
+		</service>
 
 		<!-- Parser configuration -->
 
@@ -84,7 +92,7 @@
 
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
-            <argument type="service" id="thelia.security"/>
+            <argument type="service" id="thelia.securityContext"/>
 
             <call method="setLoopList">
                 <argument>%thelia.parser.loops%</argument>
@@ -102,15 +110,16 @@
 
         <service id="smarty.plugin.translation" class="Thelia\Core\Template\Smarty\Plugins\Translation" >
             <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="thelia.translator" />
         </service>
 
         <service id="smarty.plugin.module" class="Thelia\Core\Template\Smarty\Plugins\Module" >
             <tag name="thelia.parser.register_plugin"/>
         </service>
 
-        <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security" >
+        <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security"  scope="request">
             <tag name="thelia.parser.register_plugin"/>
-            <argument type="service" id="thelia.security" />
+            <argument type="service" id="thelia.securityContext" />
         </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">

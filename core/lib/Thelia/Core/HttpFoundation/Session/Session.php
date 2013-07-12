@@ -24,6 +24,7 @@
 namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
+use Thelia\Core\Security\User\UserInterface;
 
 class Session extends BaseSession {
 
@@ -35,7 +36,31 @@ class Session extends BaseSession {
 
     public function getLang()
     {
-        return $this->get("lang", "en");
+        return substr($this->getLocale(), 0, 2);
     }
 
+    public function setCustomerUser(UserInterface $user) {
+    	$this->set('customer_user', $user);
+    }
+
+    public function getCustomerUser() {
+    	return $this->get('customer_user');
+    }
+
+    public function clearCustomerUser() {
+    	return $this->remove('customer_user');
+    }
+
+
+    public function setAdminUser(UserInterface $user) {
+    	$this->set('admin_user', $user);
+    }
+
+    public function getAdminUser() {
+    	return $this->get('admin_user');
+    }
+
+    public function clearAdminUser() {
+    	return $this->remove('admin_user');
+    }
 }

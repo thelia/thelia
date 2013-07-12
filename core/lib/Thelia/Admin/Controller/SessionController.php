@@ -25,33 +25,66 @@ namespace Thelia\Admin\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\AdminLogin;
+use Thelia\Core\Security\Token\UsernamePasswordToken;
+use Thelia\Core\Security\Authentication\UsernamePasswordAuthenticator;
+use Thelia\Core\Security\Encoder\PasswordPhpCompatEncoder;
+use Thelia\Core\Security\Token\TokenInterface;
+use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
+use Thelia\Model\AdminLog;
+use Thelia\Core\Security\Exception\AuthenticationException;
 
 class SessionController extends BaseAdminController {
 
-    public function loginAction()
+	public function showLoginAction()
+	{
+		$form = $this->getLoginForm();
+
+		return $this->render("login.html", array(
+				"form" => $form->createView()
+		));
+	}
+
+	public function checkLogoutAction()
+	{
+		$this->getSecurityContext()->clear();
+
+		// Go back to login page.
+		return $this->redirect($this->generateUrl('admin/login'));
+	}
+
+    public function checkLoginAction()
     {
-        $form = $this->getLoginForm();
+		$form = $this->getLoginForm();
 
-        $request = $this->getRequest();
+    	$request = $this->getRequest();
 
-        if($request->isMethod("POST")) {
+    	$authenticator = new AdminUsernamePasswordFormAuthenticator($request, $form);
 
-            $form->bind($request);
+    	try {
+    		$user = $authenticator->getAuthentifiedUser();
 
-            if ($form->isValid()) {
+    		// Success -> store user in security context
+    		$this->getSecurityContext()->setUser($user);
 
-                $this->container->get('request')->authenticate(
-                    $form->get('username')->getData(),
-                    $form->get('password')->getData()
-                );
+    		// Log authentication success
+    		AdminLog::append("Authentication successufull", $request, $user);
 
-                echo "valid"; exit;
-            }
-        }
+    		// Redirect to home page - FIXME: requested URL, if we come from another page ?
+    		return $this->redirect($this->generateUrl('admin'));
+     	}
+     	catch (AuthenticationException $ex) {
 
-        return $this->render("login.html", array(
-            "form" => $form->createView()
-        ));
+     		// Log authentication failure
+     		AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
+
+     		$message = "Login failed. Please check your username and password.";
+     	}
+
+     	// Display the login form again
+     	return $this->render("login.html", array(
+			"form" => $authenticator->getLoginForm()->createView(),
+     		"message" => $message
+     	));
     }
 
     protected function getLoginForm()

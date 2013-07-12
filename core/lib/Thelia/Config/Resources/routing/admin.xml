@@ -4,14 +4,28 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
 
+	<!-- Route to administration base -->
     <route id="admin" path="/admin">
         <default key="_controller">Thelia\Admin\Controller\AdminController::indexAction</default>
     </route>
+
+	<!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
-        <default key="_controller">Thelia\Admin\Controller\SessionController::loginAction</default>
+        <default key="_controller">Thelia\Admin\Controller\SessionController::showLoginAction</default>
     </route>
-    <route id="admin.notfound" path="/admin/{everything}">
-        <default key="_controller">Thelia\Admin\Controller\AdminController::notFoundAction</default>
+
+	<!-- Route to the administration logout page -->
+    <route id="admin.logout" path="/admin/logout">
+        <default key="_controller">Thelia\Admin\Controller\SessionController::checkLogoutAction</default>
+    </route>
+
+	<!-- Route to the login check controller -->
+    <route id="admin.checklogin" path="/admin/checklogin">
+        <default key="_controller">Thelia\Admin\Controller\SessionController::checkLoginAction</default>
+    </route>
+
+    <route id="admin.undefined" path="/admin/{everything}">
+        <default key="_controller">Thelia\Admin\Controller\AdminController::undefinedAction</default>
         <requirement key="everything">.*</requirement>
     </route>
 </routes>

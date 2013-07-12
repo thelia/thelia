@@ -21,14 +21,9 @@ interface UserInterface {
     public function getPassword();
 
     /**
-     * return the salt used to calculate the user password
+     * Check a string against a the user password
      */
-    public function getSalt();
-
-    /**
-     * return the algorithm used to calculate the user password
-     */
-    public function getAlgo();
+    public function checkPassword($password);
 
     /**
      * Returns the roles granted to the user.

@@ -3,6 +3,8 @@
 namespace Thelia\Model;
 
 use Thelia\Core\Security\User\UserInterface;
+use Thelia\Core\Security\Role\Role;
+
 use Thelia\Model\Base\Admin as BaseAdmin;
 
 /**
@@ -18,7 +20,32 @@ use Thelia\Model\Base\Admin as BaseAdmin;
  */
 class Admin extends BaseAdmin implements UserInterface
 {
+
+    public function setPassword($password)
+    {
+        \Thelia\Log\Tlog::getInstance()->debug($password);
+
+        if ($this->isNew() && ($password === null || trim($password) == "")) {
+            throw new InvalidArgumentException("customer password is mandatory on creation");
+        }
+
+        if($password !== null && trim($password) != "") {
+            $this->setAlgo("PASSWORD_BCRYPT");
+            return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
+        }
+
+        return $this;
+    }
+
     /**
+     * {@inheritDoc}
+     */
+    public function checkPassword($password)
+    {
+    	return password_verify($password, $this->password);
+    }
+
+	/**
      * {@inheritDoc}
      */
     public function getUsername() {
