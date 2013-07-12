@@ -35,6 +35,8 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery orderByCity($order = Criteria::ASC) Order by the city column
  * @method     ChildAddressQuery orderByCountryId($order = Criteria::ASC) Order by the country_id column
  * @method     ChildAddressQuery orderByPhone($order = Criteria::ASC) Order by the phone column
+ * @method     ChildAddressQuery orderByCellphone($order = Criteria::ASC) Order by the cellphone column
+ * @method     ChildAddressQuery orderByDefault($order = Criteria::ASC) Order by the default column
  * @method     ChildAddressQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAddressQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -52,6 +54,8 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery groupByCity() Group by the city column
  * @method     ChildAddressQuery groupByCountryId() Group by the country_id column
  * @method     ChildAddressQuery groupByPhone() Group by the phone column
+ * @method     ChildAddressQuery groupByCellphone() Group by the cellphone column
+ * @method     ChildAddressQuery groupByDefault() Group by the default column
  * @method     ChildAddressQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAddressQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -84,6 +88,8 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddress findOneByCity(string $city) Return the first ChildAddress filtered by the city column
  * @method     ChildAddress findOneByCountryId(int $country_id) Return the first ChildAddress filtered by the country_id column
  * @method     ChildAddress findOneByPhone(string $phone) Return the first ChildAddress filtered by the phone column
+ * @method     ChildAddress findOneByCellphone(string $cellphone) Return the first ChildAddress filtered by the cellphone column
+ * @method     ChildAddress findOneByDefault(int $default) Return the first ChildAddress filtered by the default column
  * @method     ChildAddress findOneByCreatedAt(string $created_at) Return the first ChildAddress filtered by the created_at column
  * @method     ChildAddress findOneByUpdatedAt(string $updated_at) Return the first ChildAddress filtered by the updated_at column
  *
@@ -101,6 +107,8 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     array findByCity(string $city) Return ChildAddress objects filtered by the city column
  * @method     array findByCountryId(int $country_id) Return ChildAddress objects filtered by the country_id column
  * @method     array findByPhone(string $phone) Return ChildAddress objects filtered by the phone column
+ * @method     array findByCellphone(string $cellphone) Return ChildAddress objects filtered by the cellphone column
+ * @method     array findByDefault(int $default) Return ChildAddress objects filtered by the default column
  * @method     array findByCreatedAt(string $created_at) Return ChildAddress objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAddress objects filtered by the updated_at column
  *
@@ -191,7 +199,7 @@ abstract class AddressQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TITLE, CUSTOMER_ID, CUSTOMER_TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CREATED_AT, UPDATED_AT FROM address WHERE ID = :p0';
+        $sql = 'SELECT ID, TITLE, CUSTOMER_ID, CUSTOMER_TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CELLPHONE, DEFAULT, CREATED_AT, UPDATED_AT FROM address WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -736,6 +744,76 @@ abstract class AddressQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AddressTableMap::PHONE, $phone, $comparison);
+    }
+
+    /**
+     * Filter the query on the cellphone column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCellphone('fooValue');   // WHERE cellphone = 'fooValue'
+     * $query->filterByCellphone('%fooValue%'); // WHERE cellphone LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $cellphone The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function filterByCellphone($cellphone = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($cellphone)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $cellphone)) {
+                $cellphone = str_replace('*', '%', $cellphone);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(AddressTableMap::CELLPHONE, $cellphone, $comparison);
+    }
+
+    /**
+     * Filter the query on the default column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByDefault(1234); // WHERE default = 1234
+     * $query->filterByDefault(array(12, 34)); // WHERE default IN (12, 34)
+     * $query->filterByDefault(array('min' => 12)); // WHERE default > 12
+     * </code>
+     *
+     * @param     mixed $default The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function filterByDefault($default = null, $comparison = null)
+    {
+        if (is_array($default)) {
+            $useMinMax = false;
+            if (isset($default['min'])) {
+                $this->addUsingAlias(AddressTableMap::DEFAULT, $default['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($default['max'])) {
+                $this->addUsingAlias(AddressTableMap::DEFAULT, $default['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AddressTableMap::DEFAULT, $default, $comparison);
     }
 
     /**
