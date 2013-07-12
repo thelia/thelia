@@ -72,6 +72,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
 
         $this->generateModel();
 
+
         if ($input->getOption("generate-sql")) {
             $this->generateSql();
         }
@@ -79,12 +80,12 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
 
     protected function generateSql()
     {
-        $sqlBuild = new ModuleGenerateSqlCommand();
-        $sqlBuild->setApplication($this->getApplication());
 
-        $sqlBuild->run(
+        $command = $this->getApplication()->find("module:generate:sql");
+
+        $command->run(
             new ArrayInput(array(
-                "command" => $sqlBuild->getName(),
+                "command" => $command->getName(),
                 "name" => $this->module
             )),
             new StreamOutput(fopen('php://memory', 'w', false))
@@ -106,9 +107,18 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
             new StreamOutput(fopen('php://memory', 'w', false))
         );
 
-        if ($fs->exists(THELIA_MODULE_DIR . DS . "Thelia")) {
-            $fs->remove(THELIA_MODULE_DIR . DS . "Thelia");
+        $verifyDirectories = array(
+            THELIA_MODULE_DIR . DS . "Thelia",
+            $this->moduleDirectory . DS . "Model" . DS . "Thelia"
+        );
+
+        foreach ($verifyDirectories as $directory) {
+            if ($fs->exists($directory)) {
+                $fs->remove($directory);
+            }
         }
+
+
     }
 
 }
