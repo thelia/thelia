@@ -55,7 +55,8 @@ class Customer extends BaseCustomer implements UserInterface
     public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
     {
         $this
-
+            ->setFirstname($firstname)
+            ->setLastname($lastname)
             ->setEmail($email)
             ->setPassword($plainPassword)
             ->setReseller($reseller)
