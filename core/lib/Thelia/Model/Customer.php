@@ -97,21 +97,6 @@ class Customer extends BaseCustomer implements UserInterface
             $con->rollback();
             throw $e;
         }
-
-
-        /**
-         * ->setCustomerTitleId($titleId)
-        ->setFirstname($firstname)
-        ->setLastname($lastname)
-        ->setAddress1($address1)
-        ->setAddress2($address2)
-        ->setAddress3($address3)
-        ->setPhone($phone)
-        ->setCellphone($cellphone)
-        ->setZipcode($zipcode)
-        ->setCountryId($countryId)
-         */
-
     }
 
     public function preInsert(ConnectionInterface $con = null)
