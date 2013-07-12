@@ -272,6 +272,10 @@ class Install extends ContainerAwareCommand
     protected function tryConnection($connectionInfo, OutputInterface $output)
     {
 
+        if (is_null($connectionInfo["dbName"])) {
+            return false;
+        }
+
         $dsn = "mysql:host=%s";
 
         try {
