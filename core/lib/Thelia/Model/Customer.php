@@ -94,6 +94,7 @@ class Customer extends BaseCustomer implements UserInterface
 
         } catch(Exception $e) {
             $con->rollback();
+            throw $e;
         }
 
 
