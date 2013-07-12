@@ -55,7 +55,7 @@ class ModuleGenerateSqlCommand extends BaseModuleGenerate {
         $fs = new Filesystem();
 
         if ($fs->exists($this->moduleDirectory) === false) {
-            throw new \RuntimeException(sprintf("%s module does not exists"));
+            throw new \RuntimeException(sprintf("%s module does not exists", $this->module));
         }
 
         if ($fs->exists($this->moduleDirectory . DS . "Config" . DS . "schema.xml") === false) {
