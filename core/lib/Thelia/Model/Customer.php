@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -12,6 +13,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Thelia\Model\Map\CustomerTableMap;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -52,16 +54,7 @@ class Customer extends BaseCustomer implements UserInterface
     public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
     {
         $this
-            ->setCustomerTitleId($titleId)
-            ->setFirstname($firstname)
-            ->setLastname($lastname)
-            ->setAddress1($address1)
-            ->setAddress2($address2)
-            ->setAddress3($address3)
-            ->setPhone($phone)
-            ->setCellphone($cellphone)
-            ->setZipcode($zipcode)
-            ->setCountryId($countryId)
+
             ->setEmail($email)
             ->setPassword($plainPassword)
             ->setReseller($reseller)
@@ -73,7 +66,49 @@ class Customer extends BaseCustomer implements UserInterface
             $this->setLang($lang);
         }
 
-        $this->save();
+
+        $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+        try {
+            $this->save($con);
+
+            $address = new Address();
+
+            $address
+                ->setCustomerTitleId($titleId)
+                ->setFirstname($firstname)
+                ->setLastname($lastname)
+                ->setAddress1($address1)
+                ->setAddress2($address2)
+                ->setAddress3($address3)
+                ->setPhone($phone)
+                ->setCellphone($cellphone)
+                ->setZipcode($zipcode)
+                ->setCountryId($countryId)
+                ->setDefault(1)
+                ->setCustomer($this)
+                ->save($con);
+
+            $con->commit();
+
+
+        } catch(Exception $e) {
+            $con->rollback();
+        }
+
+
+        /**
+         * ->setCustomerTitleId($titleId)
+        ->setFirstname($firstname)
+        ->setLastname($lastname)
+        ->setAddress1($address1)
+        ->setAddress2($address2)
+        ->setAddress3($address3)
+        ->setPhone($phone)
+        ->setCellphone($cellphone)
+        ->setZipcode($zipcode)
+        ->setCountryId($countryId)
+         */
 
     }
 
