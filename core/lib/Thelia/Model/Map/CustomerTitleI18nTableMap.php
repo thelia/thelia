@@ -141,7 +141,7 @@ class CustomerTitleI18nTableMap extends TableMap
         $this->setUseIdGenerator(false);
         // columns
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'customer_title', 'ID', true, null, null);
-        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
         $this->addColumn('SHORT', 'Short', 'VARCHAR', false, 10, null);
         $this->addColumn('LONG', 'Long', 'VARCHAR', false, 45, null);
     } // initialize()

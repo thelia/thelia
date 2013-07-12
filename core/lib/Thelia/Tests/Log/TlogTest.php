@@ -29,8 +29,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
 {
     protected static $logger;
 
-    //protected $regex = "/(\\d)(:)(\\s+)(%s)(\\s+)(\\[.*?\\])(\\s+)(\\{.*?\\})(\\s+)(\\d{4})(-)(\\d{2})(-)(\\d{2})(\\s+)(\\d{2})(:)(\\d{2})(:)(\\d{2})(:)(\\s+)(%s)([\n])/is";
-    protected $regex = "/[0-9]+:[\s](%s)+[\s]\[[a-zA-Z\.]+:[a-zA-Z]+\(\)\][\s]\{[0-9]+\}[\s][0-9]{4}-[0-9]{2}-[0-9]{2}[\s][0-9]{2}:[0-9]{2}:[0-9]{2}:[\s](%s).*$/is";
+    protected $regex = "/[0-9]+:[\s](%s)+[\s]\[[a-zA-Z\.]+:[a-zA-Z]+\(\)\][\s]\{[0-9]+\}[\s][0-9]{4}-[0-9]{2}-[0-9]{2}[\s][0-9]{1,2}:[0-9]{2}:[0-9]{2}:[\s](%s).*$/is";
 
     public static function setUpBeforeClass()
     {   

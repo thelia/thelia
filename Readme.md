@@ -1,8 +1,9 @@
 Readme
 ======
 
-Thelia 
+Thelia
 ------
+[![Build Status](https://travis-ci.org/thelia/thelia.png?branch=master)](https://travis-ci.org/thelia/thelia)
 
 Thelia is an open source tool for creating e-business websites and managing online content. This software is published under GPL.
 
