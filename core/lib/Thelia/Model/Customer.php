@@ -13,6 +13,7 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
 
 /**
