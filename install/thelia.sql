@@ -453,6 +453,8 @@ CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `ref` VARCHAR(50) NOT NULL,
+    `firstname` VARCHAR(255) NOT NULL,
+    `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(50),
     `password` VARCHAR(255),
     `algo` VARCHAR(128),

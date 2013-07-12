@@ -23,6 +23,8 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomerQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCustomerQuery orderByRef($order = Criteria::ASC) Order by the ref column
+ * @method     ChildCustomerQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
+ * @method     ChildCustomerQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
  * @method     ChildCustomerQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildCustomerQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method     ChildCustomerQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
@@ -35,6 +37,8 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomerQuery groupById() Group by the id column
  * @method     ChildCustomerQuery groupByRef() Group by the ref column
+ * @method     ChildCustomerQuery groupByFirstname() Group by the firstname column
+ * @method     ChildCustomerQuery groupByLastname() Group by the lastname column
  * @method     ChildCustomerQuery groupByEmail() Group by the email column
  * @method     ChildCustomerQuery groupByPassword() Group by the password column
  * @method     ChildCustomerQuery groupByAlgo() Group by the algo column
@@ -62,6 +66,8 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomer findOneById(int $id) Return the first ChildCustomer filtered by the id column
  * @method     ChildCustomer findOneByRef(string $ref) Return the first ChildCustomer filtered by the ref column
+ * @method     ChildCustomer findOneByFirstname(string $firstname) Return the first ChildCustomer filtered by the firstname column
+ * @method     ChildCustomer findOneByLastname(string $lastname) Return the first ChildCustomer filtered by the lastname column
  * @method     ChildCustomer findOneByEmail(string $email) Return the first ChildCustomer filtered by the email column
  * @method     ChildCustomer findOneByPassword(string $password) Return the first ChildCustomer filtered by the password column
  * @method     ChildCustomer findOneByAlgo(string $algo) Return the first ChildCustomer filtered by the algo column
@@ -74,6 +80,8 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     array findById(int $id) Return ChildCustomer objects filtered by the id column
  * @method     array findByRef(string $ref) Return ChildCustomer objects filtered by the ref column
+ * @method     array findByFirstname(string $firstname) Return ChildCustomer objects filtered by the firstname column
+ * @method     array findByLastname(string $lastname) Return ChildCustomer objects filtered by the lastname column
  * @method     array findByEmail(string $email) Return ChildCustomer objects filtered by the email column
  * @method     array findByPassword(string $password) Return ChildCustomer objects filtered by the password column
  * @method     array findByAlgo(string $algo) Return ChildCustomer objects filtered by the algo column
@@ -171,7 +179,7 @@ abstract class CustomerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, REF, EMAIL, PASSWORD, ALGO, RESELLER, LANG, SPONSOR, DISCOUNT, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
+        $sql = 'SELECT ID, REF, FIRSTNAME, LASTNAME, EMAIL, PASSWORD, ALGO, RESELLER, LANG, SPONSOR, DISCOUNT, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -328,6 +336,64 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::REF, $ref, $comparison);
+    }
+
+    /**
+     * Filter the query on the firstname column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByFirstname('fooValue');   // WHERE firstname = 'fooValue'
+     * $query->filterByFirstname('%fooValue%'); // WHERE firstname LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $firstname The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByFirstname($firstname = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($firstname)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $firstname)) {
+                $firstname = str_replace('*', '%', $firstname);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::FIRSTNAME, $firstname, $comparison);
+    }
+
+    /**
+     * Filter the query on the lastname column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByLastname('fooValue');   // WHERE lastname = 'fooValue'
+     * $query->filterByLastname('%fooValue%'); // WHERE lastname LIKE '%fooValue%'
+     * </code>
+     *
+     * @param     string $lastname The value to use as filter.
+     *              Accepts wildcards (* and % trigger a LIKE)
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByLastname($lastname = null, $comparison = null)
+    {
+        if (null === $comparison) {
+            if (is_array($lastname)) {
+                $comparison = Criteria::IN;
+            } elseif (preg_match('/[\%\*]/', $lastname)) {
+                $lastname = str_replace('*', '%', $lastname);
+                $comparison = Criteria::LIKE;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::LASTNAME, $lastname, $comparison);
     }
 
     /**
