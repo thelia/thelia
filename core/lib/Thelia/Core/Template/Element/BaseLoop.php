@@ -143,8 +143,6 @@ abstract class BaseLoop
 
 	            $argument->setValue($value);
 			}
-
-            $this->args->next();
         }
 
         if (!empty($faultActor)) {

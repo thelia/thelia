@@ -28,7 +28,7 @@
     weight : #WEIGHT<br />
 {/loop*}
 
-{loop name="product" type="product" order="ref" feature_available="1:*"}
+{loop name="product" type="product" order="ref" feature_available="1: (1 | 2) , 2: 4, 3: 433"}
     <h3>PRODUCT : #REF / #TITLE</h3>
     price : #PRICE €<br />
     promo price : #PROMO_PRICE €<br />

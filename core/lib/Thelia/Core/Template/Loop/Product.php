@@ -79,21 +79,20 @@ class Product extends BaseLoop
             Argument::createFloatTypeArgument('max_weight'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
-            Argument::createIntTypeArgument('depth'),
+            Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanTypeArgument('visible', 1),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random'))
                 )
             ),
-            Argument::createBooleanTypeArgument('random', 0),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_category'),
             new Argument(
                 'feature_available',
                 new TypeCollection(
-                    new Type\IntToCombinedIntsListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
+                    new Type\IntToCombinedIntsListType()
                 )
             )
         );
@@ -243,7 +242,9 @@ class Product extends BaseLoop
             );
         }
 
-        $search->filterByVisible($this->getVisible());
+        $visible = $this->getVisible();
+
+        $search->filterByVisible($visible);
 
         $orders  = $this->getOrder();
 
@@ -287,18 +288,15 @@ class Product extends BaseLoop
                     case "new":
                         $search->addDescendingOrderByColumn(ProductTableMap::NEWNESS);
                         break;
+                    case "random":
+                        $search->clearOrderByColumns();
+                        $search->addAscendingOrderByColumn('RAND()');
+                        break(2);
                     default:
                         $search->orderByPosition();
                         break;
                 }
             }
-        }
-
-        $random  = $this->getRandom();
-
-        if ($random === true) {
-            $search->clearOrderByColumns();
-            $search->addAscendingOrderByColumn('RAND()');
         }
 
         $exclude = $this->getExclude();
