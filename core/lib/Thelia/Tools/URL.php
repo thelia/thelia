@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,75 +17,41 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\HttpFoundation\Session;
+namespace Thelia\Tools;
 
-use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
-use Thelia\Core\Security\User\UserInterface;
-use Thelia\Form\BaseForm;
+use Thelia\Model\ConfigQuery;
 
-class Session extends BaseSession {
-
-
-    public function getLocale()
-    {
-        return $this->get("locale", "en_US");
-    }
-
-    public function getLang()
-    {
-        return substr($this->getLocale(), 0, 2);
-    }
-
-    public function setCustomerUser(UserInterface $user)
-    {
-    	$this->set('customer_user', $user);
-    }
-
-    public function getCustomerUser()
-    {
-    	return $this->get('customer_user');
-    }
-
-    public function clearCustomerUser()
-    {
-    	return $this->remove('customer_user');
-    }
-
-
-    public function setAdminUser(UserInterface $user)
-    {
-    	$this->set('admin_user', $user);
-    }
-
-    public function getAdminUser()
-    {
-    	return $this->get('admin_user');
-    }
-
-    public function clearAdminUser()
-    {
-    	return $this->remove('admin_user');
-    }
-
-    /**
-     * @param string $formName the form name
+class URL
+{
+	/**
+	 * Returns the Absolute URL for a given path relative to web root
+     *
+     * @param string         $path         the relative path
+     * @param mixed          $parameters    An array of parameters
+     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
+     *
+     * @return string The generated URL
      */
-    public function setErrorFormName($formName)
+    public static function absoluteUrl($path, array $parameters = array())
     {
-    	$this->set('error_form', $formName);
-    }
+    	// Already absolute ?
+    	if (substr($path, 0, 4) != 'http')
+    		$base = ConfigQuery::read('base_url', '/') . ltrim($path, '/');
+    	else
+    		$base = $path;
 
-    public function getErrorFormName()
-    {
-    	return $this->get('error_form', null);
-    }
+    	$queryString = '';
 
-    public function clearErrorFormName()
-    {
-    	return $this->remove('error_form');
+    	foreach($parameters as $name => $value) {
+    		$queryString = sprintf("%s=%s&", urlencode($name), urlencode($value));
+    	}
+
+    	if ('' !== $queryString = rtrim($queryString, "&")) $queryString = '?' . $queryString;
+
+    	return $base . $queryString;
     }
 }

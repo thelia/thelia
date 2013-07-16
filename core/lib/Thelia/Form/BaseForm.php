@@ -36,9 +36,14 @@ abstract class BaseForm {
     /**
      * @var \Symfony\Component\Form\FormFactoryInterface
      */
+    protected $formBuilder;
+
+    /**
+     * @var \Symfony\Component\Form\Form
+     */
     protected $form;
 
-    public $name;
+	private $view = null;
 
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
@@ -48,7 +53,7 @@ abstract class BaseForm {
             $options["attr"]["thelia_name"] = $this->getName();
         }
 
-        $this->form = Forms::createFormFactoryBuilder()
+        $this->formBuilder = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
             ->addExtension(
                 new CsrfExtension(
@@ -63,9 +68,19 @@ abstract class BaseForm {
             ->createNamedBuilder($this->getName(), $type, $data, $options);
         ;
 
+        $this->buildForm();
 
+        $this->form = $this->formBuilder->getForm();
+    }
 
-            $this->buildForm();
+    public function createView() {
+    	$this->view = $this->form->createView();
+    }
+
+    public function getView() {
+    	if ($this->view === null) throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
+
+    	return $this->view;
     }
 
     /**
@@ -73,13 +88,13 @@ abstract class BaseForm {
      */
     public function getForm()
     {
-        return $this->form->getForm();
+        return $this->form;
     }
 
     /**
      *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->form attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :
      *
      * $this->form->add("name", "text")
      *   ->add("email", "email", array(

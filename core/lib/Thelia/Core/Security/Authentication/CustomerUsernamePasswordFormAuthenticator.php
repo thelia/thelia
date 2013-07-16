@@ -30,11 +30,14 @@ use Thelia\Form\CustomerLogin;
 
 class CustomerUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuthenticator {
 
-	public function __construct(Request $request, AdminLogin $loginForm) {
+	public function __construct(Request $request, CustomerLogin $loginForm) {
 		parent::__construct(
 			$request,
 			$loginForm,
-			new AdminUserProvider(),
+			new CustomerUserProvider(),
+			array(
+				'username_field_name', 'email'
+			)
 		);
 	}
 }

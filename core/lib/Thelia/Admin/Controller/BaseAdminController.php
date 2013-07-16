@@ -34,6 +34,7 @@ use Thelia\Core\Security\Exception\AuthenticationTokenNotFoundException;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Tools\URL;
 
 /**
  *
@@ -93,7 +94,7 @@ class BaseAdminController extends ContainerAware
 
 			// User is not authenticated, and templates requires authentication -> redirect to login page
 			// (see Thelia\Core\Template\Smarty\Plugins\Security)
-        	return new RedirectResponse($this->generateUrl('admin/login')); // FIXME shoud be a parameter
+        	return new RedirectResponse(URL::absoluteUrl('admin/login')); // FIXME shoud be a parameter
         }
     }
 
@@ -153,32 +154,6 @@ class BaseAdminController extends ContainerAware
     protected function getFormBuilder()
     {
         return $this->getFormFactory()->createBuilder("form");
-    }
-
-    /**
-     * Generates a URL from the given parameters.
-     *
-     * @param string         $route         The name of the route
-     * @param mixed          $parameters    An array of parameters
-     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
-     *
-     * @return string The generated URL
-     *
-     * @see UrlGeneratorInterface
-     */
-    protected function generateUrl($path, array $parameters = array())
-    {
-    	$base = ConfigQuery::read("base_url", "/").$path; //FIXME
-
-    	$queryString = '';
-
-    	foreach($parameters as $name => $value) {
-    		$queryString = sprintf("%s=%s&", urlencode($name), urlencode($value));
-    	}
-
-    	if ('' !== $queryString = rtrim($queryString, "&")) $queryString = '?' . $queryString;
-
-    	return $base . $queryString;
     }
 
     /**

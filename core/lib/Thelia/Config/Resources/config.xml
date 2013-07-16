@@ -27,7 +27,7 @@
     <forms>
         <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
         <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
-        <form name="thelia.admin_login" class="Thelia\Form\AdminLogin"/>
+        <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
     </forms>
 
 
@@ -117,6 +117,10 @@
         </service>
 
         <service id="smarty.plugin.module" class="Thelia\Core\Template\Smarty\Plugins\Module" >
+            <tag name="thelia.parser.register_plugin"/>
+        </service>
+
+        <service id="smarty.url.module" class="Thelia\Core\Template\Smarty\Plugins\UrlGenerator" >
             <tag name="thelia.parser.register_plugin"/>
         </service>
 

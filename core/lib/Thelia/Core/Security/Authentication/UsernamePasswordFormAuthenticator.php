@@ -29,6 +29,8 @@ use Thelia\Core\Security\UserProvider\UserProviderInterface;
 use Symfony\Component\Form\Form;
 use Thelia\Core\Security\Exception\WrongPasswordException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Thelia\Form\BaseForm;
 
 class UsernamePasswordFormAuthenticator implements AuthenticatorInterface {
 
@@ -37,10 +39,12 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface {
 	protected $userProvider;
 	protected $options;
 
+	protected $baseLoginForm;
 
-	public function __construct(Request $request, Form $loginForm, UserProviderInterface $userProvider, array $options = array()) {
+	public function __construct(Request $request, BaseForm $loginForm, UserProviderInterface $userProvider, array $options = array()) {
 		$this->request = $request;
-		$this->loginForm = $loginForm;
+		$this->baseLoginForm = $loginForm;
+		$this->loginForm = $this->baseLoginForm->getForm();
 		$this->userProvider = $userProvider;
 
 		$defaults = array(
@@ -54,38 +58,38 @@ class UsernamePasswordFormAuthenticator implements AuthenticatorInterface {
 		$this->loginForm->bind($this->request);
 	}
 
-	public function getLoginForm() {
-		return $this->loginForm;
-	}
-
+	/**
+	 * @return string the username value
+	 */
 	public function getUsername() {
 		return $this->loginForm->get($this->options['username_field_name'])->getData();
 	}
 
+	/**
+	 * @see \Thelia\Core\Security\Authentication\AuthenticatorInterface::getAuthentifiedUser()
+	 */
 	public function getAuthentifiedUser() {
 
 		if ($this->request->isMethod($this->options['required_method'])) {
 
-			if ($this->loginForm->isValid()) {
+			if (! $this->loginForm->isValid()) throw new ValidatorException("Form is not valid.");
 
-				// Retreive user
-				$username = $this->getUsername();
-				$password = $this->loginForm->get($this->options['password_field_name'])->getData();
+			// Retreive user
+			$username = $this->getUsername();
+			$password = $this->loginForm->get($this->options['password_field_name'])->getData();
 
-				$user = $this->userProvider->getUser($username);
+			$user = $this->userProvider->getUser($username);
 
-				if ($user === null) throw new UsernameNotFoundException(sprintf("Username '%s' was not found.", $username));
+			if ($user === null) throw new UsernameNotFoundException(sprintf("Username '%s' was not found.", $username));
 
-				// Check user password
-				$authOk = $user->checkPassword($password) === true;
+			// Check user password
+			$authOk = $user->checkPassword($password) === true;
 
-				if ($authOk !== true) throw new WrongPasswordException(sprintf("Wrong password for user '%s'.", $username));
+			if ($authOk !== true) throw new WrongPasswordException(sprintf("Wrong password for user '%s'.", $username));
 
-				return $user;
-			}
+			return $user;
 		}
-		else {
-			throw new \RuntimeException("Invalid method.");
-		}
+
+		throw new \RuntimeException("Invalid method.");
 	}
 }

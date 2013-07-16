@@ -109,10 +109,51 @@ class SecurityContext {
     {
         if ($this->isAuthenticated() === true) {
 
-       		echo "TODO: check roles and permissions !";
+        	$user = $this->getUser();
 
-        	// TODO : check roles and permissions
-        	return true;
+        	// Check if user's roles matches required roles
+        	$userRoles = $user->getRoles();
+
+        	$roleFound = false;
+
+        	foreach($userRoles as $role) {
+        		if (in_array($role, $roles)) {
+        			$roleFound = true;
+
+        			break;
+        		}
+        	}
+
+        	if ($roleFound) {
+
+       			if (empty($permissions)) {
+       				return true;
+       			}
+
+	        	// Get permissions from profile
+	        	// $userPermissions = $user->getPermissions();
+
+       			echo "TODO: Finalize permissions system !";
+
+       			$userPermissions = array('*'); // FIXME !
+
+       			$permissionsFound = true;
+
+       			// User have all permissions ?
+       			if (in_array('*', $userPermissions))
+       				return true;
+
+       			// Check that user's permissions matches required permissions
+       			foreach($permissions as $permission) {
+       				if (! in_array($permission, $userPermissions)) {
+       					$permissionsFound = false;
+
+       					break;
+       				}
+       			}
+
+       			return $permissionsFound;
+        	}
         }
 
         return false;

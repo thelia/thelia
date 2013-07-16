@@ -52,7 +52,7 @@ class CustomerModification extends BaseForm {
     protected function buildForm()
     {
 
-        $this->form
+        $this->formBuilder
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()

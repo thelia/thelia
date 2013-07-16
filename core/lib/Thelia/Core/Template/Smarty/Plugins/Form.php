@@ -58,7 +58,6 @@ class Form implements SmartyPluginInterface
 {
 
     protected $request;
-    protected $form;
     protected $formDefinition = array();
 
     public function __construct(Request $request)
@@ -87,67 +86,74 @@ class Form implements SmartyPluginInterface
                 throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
             }
 
-            $instance = $this->getInstance($params['name']);
-            $form = $instance->getForm();
+            $instance = $this->createInstance($params['name']);
 
-            if (
-                true === $this->request->getSession()->get("form_error", false) &&
-                $this->request->getSession()->get("form_name") == $instance->getName())
-            {
-                $form->bind($this->request);
-                $this->request->getSession()->set("form_error", false);
+            // Check if session contains our form
+            $errorForm = $this->request->getSession()->getErrorFormName();
+
+            if ($errorForm == $instance->getName()) {
+
+            	// Bind form with current request to get error messages and field values.
+                $instance->getForm()->bind($this->request);
+
+                // Remove the form from the session
+                $this->request->getSession()->clearErrorFormName();
             }
 
-            $template->assign("form", $form->createView());
-        } else {
+            $instance->createView();
+
+            $template->assign("form", $instance);
+        }
+        else {
             return $content;
         }
     }
 
-    public function formRender($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    public function renderFormField($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
         if ($repeat) {
 
-            $form = $params["form"];
+	        $formFieldView = $this->getFormFieldView($params);
 
-            if (! $form instanceof \Symfony\Component\Form\FormView) {
-                throw new \InvalidArgumentException("form parameter in form_field block must be an instance of
-                Symfony\Component\Form\FormView");
+            $template->assign("options", $formFieldView->vars);
+            $template->assign("name", $formFieldView->vars["full_name"]);
+            $template->assign("value", $formFieldView->vars["value"]);
+            $template->assign("label", $formFieldView->vars["label"]);
+
+            $errors = $formFieldView->vars["errors"];
+
+            $template->assign("error", empty($errors) ? false : true);
+
+            if (! empty($errors)) {
+            	$this->assignFieldErrorVars($template, $errors);
             }
 
-
-            $template->assign("options", $form->vars);
-            $template->assign("name", $form->vars["full_name"]);
-            $template->assign("value", $form->vars["value"]);
-            $template->assign("label", $form->vars["label"]);
-            $template->assign("error", empty($form->vars["errors"]) ? false : true);
             $attr = array();
-            foreach ($form->vars["attr"] as $key => $value) {
+
+            foreach ($formFieldView->vars["attr"] as $key => $value) {
                 $attr[] = sprintf('%s="%s"', $key, $value);
             }
+
             $template->assign("attr", implode(" ", $attr));
 
-            $form->setRendered();
-
-        } else {
+            $formFieldView->setRendered();
+        }
+        else {
             return $content;
         }
     }
 
-    public function formRenderHidden($params, \Smarty_Internal_Template $template)
+    public function renderHiddenFormField($params, \Smarty_Internal_Template $template)
     {
-        $form = $params["form"];
-
         $field = '<input type="hidden" name="%s" value="%s">';
 
-        if (! $form instanceof \Symfony\Component\Form\FormView) {
-            throw new \InvalidArgumentException("form parameter in form_field_hidden function must be an instance of
-                Symfony\Component\Form\FormView");
-        }
+		$instance = $this->getInstanceFromParams($params);
+
+        $formView = $instance->getView();
 
         $return = "";
 
-        foreach ($form->getIterator() as $row) {
+        foreach ($formView->getIterator() as $row) {
             if ($this->isHidden($row) && $row->isRendered() === false) {
                 $return .= sprintf($field, $row->vars["full_name"], $row->vars["value"]);
             }
@@ -156,60 +162,85 @@ class Form implements SmartyPluginInterface
         return $return;
     }
 
-    protected function isHidden(FormView $formView)
-    {
-        return array_search("hidden", $formView->vars["block_prefixes"]);
-    }
-
     public function formEnctype($params, \Smarty_Internal_Template $template)
     {
-        $form = $params["form"];
+		$instance = $this->getInstanceFromParams($params);
 
-        if (! $form instanceof \Symfony\Component\Form\FormView) {
-            throw new \InvalidArgumentException("form parameter in form_enctype function must be an instance of
-                Symfony\Component\Form\FormView");
-        }
+        $formView = $instance->getForm();
 
-        if ($form->vars["multipart"]) {
+        if ($formView->vars["multipart"]) {
             return sprintf('%s="%s"',"enctype", "multipart/form-data");
         }
     }
 
     public function formError($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
+	    $formFieldView = $this->getFormFieldView($params);
 
-        $form = $params["form"];
-        if (! $form instanceof \Symfony\Component\Form\FormView) {
-            throw new \InvalidArgumentException("form parameter in form_error block must be an instance of
-                Symfony\Component\Form\FormView");
-        }
+	    $errors = $formFieldView->vars["errors"];
 
-        if (empty($form->vars["errors"])) {
+        if (empty($errors)) {
             return "";
         }
 
         if ($repeat) {
-
-            $error = $form->vars["errors"];
-
-            $template->assign("message", $error[0]->getMessage());
-            $template->assign("parameters", $error[0]->getMessageParameters());
-            $template->assign("pluralization", $error[0]->getMessagePluralization());
-
-
-        } else {
+        	$this->assignFieldErrorVars($template, $errors);
+        }
+        else {
             return $content;
         }
     }
 
-    public function getInstance($name)
+
+    protected function assignFieldErrorVars(\Smarty_Internal_Template $template, array $errors)
+    {
+    	$template->assign("message", $errors[0]->getMessage());
+    	$template->assign("parameters", $errors[0]->getMessageParameters());
+    	$template->assign("pluralization", $errors[0]->getMessagePluralization());
+    }
+
+    protected function isHidden(FormView $formView)
+    {
+    	return array_search("hidden", $formView->vars["block_prefixes"]);
+    }
+
+    protected function getFormFieldView($params) {
+		$instance = $this->getInstanceFromParams($params);
+
+		if (! isset($params['field']))
+			throw new \InvalidArgumentException("'field' parameter is missing");
+
+		$fieldName = $params['field'];
+
+        if (empty($instance->getView()[$fieldName]))
+        	throw new \InvalidArgumentException(sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName()));
+
+        return $instance->getView()[$fieldName];
+    }
+
+    protected function getInstanceFromParams($params) {
+
+    	if (empty($params['form'])) {
+    		throw new \InvalidArgumentException("Missing 'form' parameter in form arguments");
+    	}
+
+    	$instance = $params["form"];
+
+    	if (! $instance instanceof \Thelia\Form\BaseForm) {
+    		throw new \InvalidArgumentException(sprintf("form parameter in form_field block must be an instance of
+                \Thelia\Form\BaseForm, instance of %s found", get_class($instance)));
+    	}
+
+    	return $instance;
+    }
+
+    protected function createInstance($name)
     {
         if (!isset($this->formDefinition[$name])) {
             throw new ElementNotFoundException(sprintf("%s form does not exists", $name));
         }
 
         $class = new \ReflectionClass($this->formDefinition[$name]);
-
 
         return $class->newInstance(
             $this->request,
@@ -224,8 +255,8 @@ class Form implements SmartyPluginInterface
     {
         return array(
             new SmartyPluginDescriptor("block", "form", $this, "generateForm"),
-            new SmartyPluginDescriptor("block", "form_field", $this, "formRender"),
-            new SmartyPluginDescriptor("function", "form_field_hidden", $this, "formRenderHidden"),
+            new SmartyPluginDescriptor("block", "form_field", $this, "renderFormField"),
+            new SmartyPluginDescriptor("function", "form_hidden_fields", $this, "renderHiddenFormField"),
             new SmartyPluginDescriptor("function", "form_enctype", $this, "formEnctype"),
             new SmartyPluginDescriptor("block", "form_error", $this, "formError")
         );

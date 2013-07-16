@@ -1,7 +1,8 @@
 {include file="includes/header.html"}
 <div>
 
-{loop type="auth" name="auth_test" roles="CUSTOMER"}
+{loop type="auth" name="auth_test" context="front" roles="CUSTOMER"}
+
 <p>Customer is authentified :-)</p>
 {/loop}
 

@@ -50,9 +50,7 @@ class ControllerListener implements EventSubscriberInterface
             $dispatcher->dispatch("action.".$action, $actionEvent);
 
             if ($actionEvent->hasFormError()) {
-                $request->getSession()->set("form_error", true);
-                $request->getSession()->set("form_name", $actionEvent->getForm()->createView()
-                    ->vars["attr"]["thelia_name"]);
+                $request->getSession()->setErrorFormName($actionEvent->getFormError()->getName());
             }
         }
 

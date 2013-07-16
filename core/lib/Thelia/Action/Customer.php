@@ -43,10 +43,9 @@ class Customer implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        $customerForm = new CustomerCreation($request);
+        $customerCreation = new CustomerCreation($request);
 
-        $form = $customerForm->getForm();
-
+        $form = $customerCreation->getForm();
 
         if ($request->isMethod("post")) {
             $form->bind($request);
@@ -68,18 +67,18 @@ class Customer implements EventSubscriberInterface
                         $data["country"],
                         $data["email"],
                         $data["password"],
-                        $request->getSession()->get("lang")
+                        $request->getSession()->getLang()
                     );
                 } catch (\PropelException $e) {
                     Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
-                    $event->setFormError($form);
+                    $event->setFormError($customerCreation);
                 }
 
                 //Customer is create, he is automatically connected
 
             } else {
 
-                $event->setFormError($form);
+                $event->setFormError($customerCreation);
             }
         }
 
@@ -117,10 +116,10 @@ class Customer implements EventSubscriberInterface
                     );
                 } catch(\PropelException $e) {
                     Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
-                    $event->setFormError($form);
+                    $event->setFormError($customerModification);
                 }
             } else {
-                $event->setFormError($form);
+                $event->setFormError($customerModification);
             }
         }
 

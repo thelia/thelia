@@ -29,17 +29,15 @@ use Symfony\Component\Form\Form;
 
 use Thelia\Core\Security\UserProvider\AdminUserProvider;
 use Thelia\Core\Security\Authentication\UsernamePasswordFormAuthenticator;
+use Thelia\Form\AdminLogin;
 
 class AdminUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuthenticator {
 
-	public function __construct(Request $request, Form $loginForm) {
+	public function __construct(Request $request, AdminLogin $loginForm) {
 		parent::__construct(
 			$request,
 			$loginForm,
-			new AdminUserProvider(),
-			array(
-				'username_field_name', 'email'
-			)
+			new AdminUserProvider()
 		);
 	}
 }

@@ -32,16 +32,14 @@ use Thelia\Core\Security\Token\TokenInterface;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Thelia\Tools\URL;
 
 class SessionController extends BaseAdminController {
 
 	public function showLoginAction()
 	{
-		$form = $this->getLoginForm();
-
-		return $this->render("login.html", array(
-				"form" => $form->createView()
-		));
+		return $this->render("login.html");
 	}
 
 	public function checkLogoutAction()
@@ -49,12 +47,12 @@ class SessionController extends BaseAdminController {
 		$this->getSecurityContext()->clear();
 
 		// Go back to login page.
-		return $this->redirect($this->generateUrl('admin/login'));
+		return $this->redirect(URL::absoluteUrl('admin/login'));
 	}
 
     public function checkLoginAction()
     {
-		$form = $this->getLoginForm();
+		$form = new AdminLogin($this->getRequest());
 
     	$request = $this->getRequest();
 
@@ -69,8 +67,17 @@ class SessionController extends BaseAdminController {
     		// Log authentication success
     		AdminLog::append("Authentication successufull", $request, $user);
 
+    		// Get the success URL to redirect the user to
+    		$successUrl = $form->getForm()->get('success_url')->getData();
+
+    		if (null == $successUrl) $successUrl = 'admin/home';
+
     		// Redirect to home page - FIXME: requested URL, if we come from another page ?
-    		return $this->redirect($this->generateUrl('admin'));
+    		return $this->redirect(URL::absoluteUrl($successUrl));
+     	}
+         catch (ValidatorException $ex) {
+
+     		$message = "Missing or invalid information. Please check your input.";
      	}
      	catch (AuthenticationException $ex) {
 
@@ -80,17 +87,18 @@ class SessionController extends BaseAdminController {
      		$message = "Login failed. Please check your username and password.";
      	}
 
-     	// Display the login form again
-     	return $this->render("login.html", array(
-			"form" => $authenticator->getLoginForm()->createView(),
-     		"message" => $message
-     	));
-    }
+     	// Store the form in session (see Form Smlarty plugin to find usage of this parameter)
+     	$request->getSession()->setErrorFormName($form->getName());
 
-    protected function getLoginForm()
-    {
-        $adminLogin = new AdminLogin($this->getRequest());
-
-        return $adminLogin->getForm();
+      	if (empty($failureUrl)) {
+	     	// Display the login form again, with an error message if required
+    	 	return $this->render("login.html", array(
+     			"message" => $message
+     		));
+     	}
+     	else {
+     		// Redirect to the provided URL
+     		return $this->redirect(URL::absoluteUrl($failureUrl));
+     	}
     }
 }

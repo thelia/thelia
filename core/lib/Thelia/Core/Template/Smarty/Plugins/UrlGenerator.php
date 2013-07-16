@@ -1,10 +1,11 @@
 <?php
+use Thelia\Tools\URL;
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,75 +18,42 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\HttpFoundation\Session;
+namespace Thelia\Core\Template\Smarty\Plugins;
 
-use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
-use Thelia\Core\Security\User\UserInterface;
-use Thelia\Form\BaseForm;
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Tools\URL;
 
-class Session extends BaseSession {
-
-
-    public function getLocale()
+class UrlGenerator implements SmartyPluginInterface
+{
+    /**
+     * Process url generator function
+     *
+     * @param  array $params
+     * @param  unknown $smarty
+     * @return string no text is returned.
+     */
+    public function generateUrlFunction($params, &$smarty)
     {
-        return $this->get("locale", "en_US");
-    }
+    	// the path to process
+   		$path =trim($params['path']);
 
-    public function getLang()
-    {
-        return substr($this->getLocale(), 0, 2);
-    }
-
-    public function setCustomerUser(UserInterface $user)
-    {
-    	$this->set('customer_user', $user);
-    }
-
-    public function getCustomerUser()
-    {
-    	return $this->get('customer_user');
-    }
-
-    public function clearCustomerUser()
-    {
-    	return $this->remove('customer_user');
-    }
-
-
-    public function setAdminUser(UserInterface $user)
-    {
-    	$this->set('admin_user', $user);
-    }
-
-    public function getAdminUser()
-    {
-    	return $this->get('admin_user');
-    }
-
-    public function clearAdminUser()
-    {
-    	return $this->remove('admin_user');
-    }
+   		return URL::absoluteUrl($path);
+     }
 
     /**
-     * @param string $formName the form name
+     * Define the various smarty plugins hendled by this class
+     *
+     * @return an array of smarty plugin descriptors
      */
-    public function setErrorFormName($formName)
+    public function getPluginDescriptors()
     {
-    	$this->set('error_form', $formName);
-    }
-
-    public function getErrorFormName()
-    {
-    	return $this->get('error_form', null);
-    }
-
-    public function clearErrorFormName()
-    {
-    	return $this->remove('error_form');
+        return array(
+            new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction')
+        );
     }
 }

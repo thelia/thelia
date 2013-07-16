@@ -32,7 +32,7 @@ class CustomerLogin extends BaseForm {
 
     protected function buildForm()
     {
-        $this->form
+        $this->formBuilder
             ->add("username", "text", array(
                 "constraints" => array(
                     new NotBlank(),

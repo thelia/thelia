@@ -25,6 +25,7 @@ namespace Thelia\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
 use Symfony\Component\HttpFoundation\Request;
+use Thelia\Form\BaseForm;
 /**
  *
  * Class thrown on Thelia.action event
@@ -47,7 +48,7 @@ abstract class ActionEvent extends Event
      */
     protected $action;
 
-    protected $form;
+    protected $form = null;
 
     /**
      *
@@ -78,17 +79,30 @@ abstract class ActionEvent extends Event
         return $this->request;
     }
 
-    public function setFormError($form)
+    /**
+     * Store a form taht contains error, to pass it to the current session.
+     *
+     * @param BaseForm $form
+     */
+    public function setFormError(BaseForm $form)
     {
         $this->form = $form;
         $this->stopPropagation();
     }
 
-    public function getForm()
+    /**
+     * @return BaseForm the errored form, or null
+     */
+    public function getFormError()
     {
         return $this->form;
     }
 
+    /**
+     * Check if theis event contains a form with errors
+     *
+     * @return boolean
+     */
     public function hasFormError()
     {
         return $this->form !== null;
