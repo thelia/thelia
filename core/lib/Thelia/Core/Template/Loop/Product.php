@@ -94,6 +94,12 @@ class Product extends BaseLoop
                 new TypeCollection(
                     new Type\IntToCombinedIntsListType()
                 )
+            ),
+            new Argument(
+                'feature_values',
+                new TypeCollection(
+                    new Type\IntToCombinedStringsListType()
+                )
             )
         );
     }
@@ -333,12 +339,40 @@ class Product extends BaseLoop
                 if($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
                 } else {
-                    $sqlWhereString = preg_replace('#(^|[^0-9])([0-9]+)([^0-9]|$)#', '\1NOT ISNULL(`fa_' . $feature . '_' . '\2`.ID)\3', $sqlWhereString);
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
                     $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
                     $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
                 }
 
-                $search->where($sqlWhereString);
+                $search->where("(" . $sqlWhereString . ")");
+            }
+        }
+
+        $feature_values = $this->getFeature_values();
+
+        if(null !== $feature_values) {
+            foreach($feature_values as $feature => $feature_choice) {
+                foreach($feature_choice['values'] as $feature_value) {
+                    $featureAlias = 'fv_' . $feature;
+                    if($feature_value != '*')
+                        $featureAlias .= '_' . $feature_value;
+                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
+                    if($feature_value != '*')
+                        $search->addJoinCondition($featureAlias, "`$featureAlias`.BY_DEFAULT = ?", $feature_value, null, \PDO::PARAM_STR);
+                }
+
+                /* format for mysql */
+                $sqlWhereString = $feature_choice['expression'];
+                if($sqlWhereString == '*') {
+                    $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
+                } else {
+                    $sqlWhereString = preg_replace('#([a-zA-Z0-9_\-]+)#', 'NOT ISNULL(`fv_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                }
+
+                $search->where("(" . $sqlWhereString . ")");
             }
         }
 
@@ -372,8 +406,6 @@ class Product extends BaseLoop
             $loopResultRow->set("WEIGHT", $product->getWeight());
             $loopResultRow->set("PROMO", $product->getPromo());
             $loopResultRow->set("NEW", $product->getNewness());
-
-            //$loopResultRow->set("URL", $product->getUrl());
 
             $loopResult->addRow($loopResultRow);
         }
