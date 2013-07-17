@@ -74,14 +74,20 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->status = 200;
 
         $this->registerFilter('pre', array($this, "preThelia"));
+        $this->registerFilter('output', array($this, "removeBlankLines"));
     }
 
     public function preThelia($tpl_source, \Smarty_Internal_Template $template)
     {
-        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
-        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
+    	$new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
+    	$new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
 
-        return $new_source;
+    	return $new_source;
+    }
+
+    public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
+    {
+    	return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
     }
 
     public function setTemplate($template_path_from_template_base)
