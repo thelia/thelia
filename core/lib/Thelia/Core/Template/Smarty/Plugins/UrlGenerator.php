@@ -1,5 +1,4 @@
 <?php
-use Thelia\Tools\URL;
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -27,10 +26,18 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Tools\URL;
+use Thelia\Core\HttpFoundation\Request;
 
 class UrlGenerator implements SmartyPluginInterface
 {
-    /**
+    protected $request;
+
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
+
+	/**
      * Process url generator function
      *
      * @param  array $params
@@ -42,7 +49,49 @@ class UrlGenerator implements SmartyPluginInterface
     	// the path to process
    		$path =trim($params['path']);
 
-   		return URL::absoluteUrl($path);
+   		return URL::absoluteUrl($path, $this->getArgsFromParam($params));
+     }
+
+     /**
+      * Process view url generator function
+      *
+      * @param  array $params
+      * @param  unknown $smarty
+      * @return string no text is returned.
+      */
+     public function generateViewUrlFunction($params, &$smarty)
+     {
+     	// the path to process
+     	$view = trim($params['view']);
+
+     	return URL::viewUrl($view, $this->getArgsFromParam($params));
+     }
+
+     /**
+      * Get URL parameters array from a comma separated list or arguments in the
+      * parameters.
+      *
+      * @param array $params Smarty function params
+      * @return array the parameters array (either emply, of valued)
+      */
+     private function getArgsFromParam($params) {
+
+     	if (isset($params['args']))
+     		return explode($params['args'], ',');
+
+     	return array();
+     }
+
+     /**
+      * Process view url generator function
+      *
+      * @param  array $params
+      * @param  unknown $smarty
+      * @return string no text is returned.
+      */
+     public function generateReturnToUrl($params, &$smarty)
+     {
+		return URL::absoluteUrl($this->request->getSession()->getReturnToUrl());
      }
 
     /**
@@ -53,7 +102,9 @@ class UrlGenerator implements SmartyPluginInterface
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction')
+            new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction'),
+            new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateViewUrlFunction'),
+            new SmartyPluginDescriptor('function', 'return_to_url', $this, 'generateReturnToUrl')
         );
     }
 }

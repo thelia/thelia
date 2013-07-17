@@ -69,11 +69,17 @@ class Security implements SmartyPluginInterface
    		$permissions = $this->_explode($params['permissions']);
 
    		if (! $this->securityContext->isGranted($roles, $permissions)) {
-   			throw new AuthenticationException(
+   			$ex = new AuthenticationException(
    					sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
    							implode(',', $roles), implode(',', $permissions), $context
    					)
    			);
+
+   			if (! empty($params['login_tpl'])) {
+   				$ex->setLoginTemplate($params['login_tpl']);
+   			}
+
+   			throw $ex;
    		}
 
    		return '';

@@ -32,7 +32,6 @@ class URL
      *
      * @param string         $path         the relative path
      * @param mixed          $parameters    An array of parameters
-     * @param Boolean|string $referenceType The type of reference (one of the constants in UrlGeneratorInterface)
      *
      * @return string The generated URL
      */
@@ -54,4 +53,18 @@ class URL
 
     	return $base . $queryString;
     }
+
+	/**
+	 * Returns the Absolute URL to a view
+     *
+     * @param string         $viewName      the view name (e.g. login for login.html)
+     * @param mixed          $parameters    An array of parameters
+     *
+     * @return string The generated URL
+     */
+     public static function viewUrl($viewName, array $parameters = array()) {
+     	$path = sprintf("%s?view=%s", ConfigQuery::read('base_url', '/'), $viewName);
+
+     	return self::absoluteUrl($path, $parameters);
+     }
 }
