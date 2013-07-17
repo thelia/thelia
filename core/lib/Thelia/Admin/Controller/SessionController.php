@@ -44,7 +44,7 @@ class SessionController extends BaseAdminController {
 		$this->getSecurityContext()->clear();
 
 		// Go back to login page.
-		return Redirect::exec(URL::absoluteUrl('admin/login'));
+		return Redirect::exec(URL::absoluteUrl('/admin/login')); // FIXME - should be a parameter
 	}
 
     public function checkLoginAction()
@@ -62,15 +62,10 @@ class SessionController extends BaseAdminController {
     		$this->getSecurityContext()->setUser($user);
 
     		// Log authentication success
-    		AdminLog::append("Authentication successufull", $request, $user);
-
-    		// Get the success URL to redirect the user to
-    		$successUrl = $form->getForm()->get('success_url')->getData();
-
-    		if (null == $successUrl) $successUrl = 'admin/home';
+    		AdminLog::append("Authentication successuful", $request, $user);
 
     		// Redirect to the success URL
-    		return Redirect::exec(URL::absoluteUrl($successUrl));
+    		return Redirect::exec($form->getSuccessUrl());
      	}
          catch (ValidatorException $ex) {
 

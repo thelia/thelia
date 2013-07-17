@@ -58,15 +58,23 @@
             <argument type="service" id="request" />
 		</service>
 
+		<!--  Parser context -->
+
+        <service id="thelia.parser.context" class="Thelia\Core\Template\ParserContext" scope="request">
+        	<argument type="service" id="request" />
+        </service>
+
 		<!-- Parser configuration -->
 
         <service id="thelia.parser" class="Thelia\Core\Template\Smarty\SmartyParser" scope="request">
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
+            <argument type="service" id="thelia.parser.context"/>
             <argument >false</argument>
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
         </service>
+
 
 		<!-- Smarty parser plugins -->
 

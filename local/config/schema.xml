@@ -359,7 +359,7 @@
     <column name="country_id" required="true" type="INTEGER" />
     <column name="phone" size="20" type="VARCHAR" />
     <column name="cellphone" size="20" type="VARCHAR" />
-    <column defaultValue="0" name="default" type="TINYINT" />
+    <column defaultValue="0" name="is_default" type="TINYINT" />
     <foreign-key foreignTable="customer" name="fk_address_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>

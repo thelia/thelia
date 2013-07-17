@@ -94,8 +94,9 @@ class BaseAdminController extends ContainerAware
         catch (AuthenticationException $ex) {
 
 			// User is not authenticated, and templates requires authentication -> redirect to login page
-			// (see Thelia\Core\Template\Smarty\Plugins\Security)
-        	Redirect::exec(URL::absoluteUrl('admin/login')); // FIXME shoud be a parameter
+			// We user login_tpl as a path, not a template.
+
+        	Redirect::exec(URL::absoluteUrl($ex->getLoginTemplate()));
         }
     }
 

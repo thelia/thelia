@@ -47,7 +47,7 @@ class UrlGenerator implements SmartyPluginInterface
     public function generateUrlFunction($params, &$smarty)
     {
     	// the path to process
-   		$path =trim($params['path']);
+   		$path = trim($params['path']);
 
    		return URL::absoluteUrl($path, $this->getArgsFromParam($params));
      }
@@ -61,10 +61,17 @@ class UrlGenerator implements SmartyPluginInterface
       */
      public function generateViewUrlFunction($params, &$smarty)
      {
-     	// the path to process
+     	// the view name (without .html)
      	$view = trim($params['view']);
 
-     	return URL::viewUrl($view, $this->getArgsFromParam($params));
+      	// the related action (optionale)
+     	$action = trim($params['action']);
+
+     	$args = $this->getArgsFromParam($params);
+
+     	if (! empty($action)) $args['action'] = $action;
+
+     	return URL::viewUrl($view, $args);
      }
 
      /**
@@ -82,18 +89,6 @@ class UrlGenerator implements SmartyPluginInterface
      	return array();
      }
 
-     /**
-      * Process view url generator function
-      *
-      * @param  array $params
-      * @param  unknown $smarty
-      * @return string no text is returned.
-      */
-     public function generateReturnToUrl($params, &$smarty)
-     {
-		return URL::absoluteUrl($this->request->getSession()->getReturnToUrl());
-     }
-
     /**
      * Define the various smarty plugins hendled by this class
      *
@@ -103,8 +98,7 @@ class UrlGenerator implements SmartyPluginInterface
     {
         return array(
             new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction'),
-            new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateViewUrlFunction'),
-            new SmartyPluginDescriptor('function', 'return_to_url', $this, 'generateReturnToUrl')
+            new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateViewUrlFunction')
         );
     }
 }

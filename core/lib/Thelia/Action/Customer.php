@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
@@ -39,30 +39,28 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Redirect;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Security\Exception\UsernameNotFoundException;
 
 class Customer implements EventSubscriberInterface
 {
 	/**
 	 * @var Thelia\Core\Security\SecurityContext
 	 */
-	private $securityContext;
+	protected $securityContext;
 
-	public function __construct(SecurityContext $context) {
-		$this->securityContext = $context;
+	/**
+	 * @var Thelia\Core\Template\ParserContext
+	 */
+	protected $parserContext;
 
-		$context->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
+	public function __construct(SecurityContext $securityContext, ParserContext $parserContext) {
+		$this->securityContext = $securityContext;
+		$this->parserContext = $parserContext;
 	}
-
-
-    private function getSecurityContext($context) {
-    	$this->securityContext->setContext($context === false ? SecurityContext::CONTEXT_FRONT_OFFICE : $context);
-
-    	return $securityContext;
-    }
 
     public function create(ActionEvent $event)
     {
-
         $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
 
         $request = $event->getRequest();
@@ -94,25 +92,35 @@ class Customer implements EventSubscriberInterface
                         $data["password"],
                         $request->getSession()->getLang()
                     );
+
+                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $event);
+
+                	// Connect the newly created user,and redirect to the success URL
+                	$this->processSuccessfulLogin($event, $customer, $customerCreation, true);
+
                 } catch (\PropelException $e) {
                     Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
-                    $event->setFormError($customerCreation);
+
+                    $message = "Failed to create your account, please try again.";
                 }
-
-                //Customer is create, he is automatically connected
-
             }
             else {
-
-                $event->setFormError($customerCreation);
+            	$message = "Missing or invalid data";
             }
         }
+        else {
+        	$message = "Wrong form method !";
+        }
 
-        $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $event);
+        $this->parserContext->set('customer_creation_error_message', $message);
+
+    	$event->setFormError($customerCreation);
     }
 
     public function modify(ActionEvent $event)
     {
+    	$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $event);
+
         $request = $event->getRequest();
 
         $customerModification = new CustomerModification($request);
@@ -140,15 +148,44 @@ class Customer implements EventSubscriberInterface
                         $data["zipcode"],
                         $data["country"]
                     );
-                } catch(\PropelException $e) {
+
+                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $event);
+
+                    // Update the logged-in user, and redirect to the success URL (exits)
+                    // We don-t send the login event, as the customer si already logged.
+                    $this->processSuccessfulLogin($event, $customer, $customerModification);
+                 }
+                catch(\PropelException $e) {
+
                     Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
-                    $event->setFormError($customerModification);
+
+                    $message = "Failed to change your account, please try again.";
                 }
-            } else {
-                $event->setFormError($customerModification);
+            }
+            else {
+            	$message = "Missing or invalid data";
             }
         }
+        else {
+        	$message = "Wrong form method !";
+        }
 
+        $this->parserContext->set('customer_change_error_message', $message);
+
+    	$event->setFormError($customerModification);
+    }
+
+
+    /**
+     * Perform user logout. The user is redirected to the provided view, if any.
+     *
+     * @param ActionEvent $event
+     */
+    public function logout(ActionEvent $event)
+    {
+    	$event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
+
+    	$this->getSecurityContext()->clear();
     }
 
     /**
@@ -170,39 +207,33 @@ class Customer implements EventSubscriberInterface
     	try {
     		$user = $authenticator->getAuthentifiedUser();
 
-    		// Success -> store user in security context
-    		$this->getSecurityContext()->setUser($user);
-
-    		// Log authentication success
-    		AdminLog::append("Authentication successufull", $request, $user);
-
-    		// Get the success URL to redirect the user to
-    		$successUrl = $form->getForm()->get('success_url')->getData();
-
-    		if (null == $successUrl) $successUrl = ConfigQuery::read('base_url', '/');
-
-    		// Redirect to the success URL
-    		return Redirect::exec(URL::absoluteUrl($successUrl));
-    	}
+    		$this->processSuccessfulLogin($event, $user, $form);
+     	}
     	catch (ValidatorException $ex) {
     		$message = "Missing or invalid information. Please check your input.";
+    	}
+        catch (UsernameNotFoundException $ex) {
+    		$message = "This email address was not found.";
     	}
     	catch (AuthenticationException $ex) {
     		$message = "Login failed. Please check your username and password.";
     	}
     	catch (\Exception $ex) {
-    		$message = sprintf("Unable to process your request. Please try again (%s).", $ex->getMessage());
+    		$message = sprintf("Unable to process your request. Please try again (%s in %s).", $ex->getMessage(), $ex->getFile());
     	}
 
     	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
     	$request->getSession()->setErrorFormName($form->getName());
+
+    	// Put the message in the ParserContext to make it available to the template
+    	$this->parserContext->set('customer_login_error_message', $message);
 
     	// A this point, the same view is displayed again.
     }
 
     public function changePassword(ActionEvent $event)
     {
-
+		// TODO
     }
 
     /**
@@ -230,8 +261,36 @@ class Customer implements EventSubscriberInterface
         return array(
             "action.createCustomer" => array("create", 128),
             "action.modifyCustomer" => array("modify", 128),
-            "action.loginCustomer"  => array("login", 128)
+            "action.loginCustomer"  => array("login", 128),
+            "action.logoutCustomer" => array("logout", 128),
         );
     }
 
+    /**
+     * Stores the current user in the security context, and redirect to the
+     * success_url.
+     *
+     * @param CustomerModel $user the logged user
+     */
+    protected function processSuccessfulLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
+    {
+    	// Success -> store user in security context
+    	$this->getSecurityContext()->setUser($user);
+
+    	if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+
+    	// Redirect to the success URL
+    	return Redirect::exec($form->getSuccessUrl());
+    }
+
+    /**
+     * Return the security context, beeing sure that we're in the CONTEXT_FRONT_OFFICE context
+     *
+     * @return SecurityContext the security context
+     */
+    protected function getSecurityContext() {
+    	$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
+
+    	return $this->securityContext;
+    }
 }

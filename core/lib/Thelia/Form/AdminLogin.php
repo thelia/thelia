@@ -46,7 +46,6 @@ class AdminLogin extends BaseForm {
             ->add("remember_me", "checkbox", array(
             		'value' => 'yes'
             ))
-            ->add("success_url", "text")
             ;
     }
 

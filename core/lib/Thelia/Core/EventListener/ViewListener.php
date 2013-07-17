@@ -90,8 +90,6 @@ class ViewListener implements EventSubscriberInterface
         	// Redirect to the login template
         	$event->setResponse(Redirect::exec(URL::viewUrl($ex->getLoginTemplate())));
         }
-
-        throw new \Exception("toto !");
     }
 
     public function beforeKernelView(GetResponseForControllerResultEvent $event)

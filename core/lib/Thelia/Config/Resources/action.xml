@@ -20,7 +20,9 @@
 
         <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
             <tag name="kernel.event_subscriber"/>
+
             <argument type="service" id="thelia.securityContext"/>
+            <argument type="service" id="thelia.parser.context"/>
         </service>
 
     </services>

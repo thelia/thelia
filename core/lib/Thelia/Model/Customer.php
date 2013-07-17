@@ -15,6 +15,7 @@ use Thelia\Core\Security\User\UserInterface;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Core\Security\Role\Role;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -87,7 +88,7 @@ class Customer extends BaseCustomer implements UserInterface
                 ->setCellphone($cellphone)
                 ->setZipcode($zipcode)
                 ->setCountryId($countryId)
-                ->setDefault(1)
+                ->setIsDefault(1)
                 ->setCustomer($this)
                 ->save($con);
 
@@ -114,7 +115,7 @@ class Customer extends BaseCustomer implements UserInterface
 
     protected function generateRef()
     {
-        return date("YmdHI");
+        return date("YmdHisu");
     }
 
     public function setPassword($password)

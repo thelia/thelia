@@ -491,7 +491,7 @@ CREATE TABLE `address`
     `country_id` INTEGER NOT NULL,
     `phone` VARCHAR(20),
     `cellphone` VARCHAR(20),
-    `default` TINYINT DEFAULT 0,
+    `is_default` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

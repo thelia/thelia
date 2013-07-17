@@ -27,19 +27,30 @@ use Thelia\Model\ConfigQuery;
 
 class URL
 {
+	public static function getIndexPage() {
+		return ConfigQuery::read('base_url', '/') . "index_dev.php"; // FIXME !
+	}
+
 	/**
-	 * Returns the Absolute URL for a given path relative to web root
+	 * Returns the Absolute URL for a given path relative to web root. By default,
+	 * the index.php (or index_dev.php) script name is added to the URL, use
+	 * $path_only = true to get a path without the index script.
      *
-     * @param string         $path         the relative path
-     * @param mixed          $parameters    An array of parameters
+     * @param string    $path         the relative path
+     * @param array     $parameters   An array of parameters
+     * @param boolean	$path_only    if true, getIndexPage() will  not be added
      *
      * @return string The generated URL
      */
-    public static function absoluteUrl($path, array $parameters = array())
+    public static function absoluteUrl($path, array $parameters = array(), $path_only = false)
     {
     	// Already absolute ?
-    	if (substr($path, 0, 4) != 'http')
-    		$base = ConfigQuery::read('base_url', '/') . ltrim($path, '/');
+    	if (substr($path, 0, 4) != 'http') {
+
+    		$root = $path_only ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+
+    		$base = $root . $path;
+    	}
     	else
     		$base = $path;
 
@@ -49,7 +60,9 @@ class URL
     		$queryString = sprintf("%s=%s&", urlencode($name), urlencode($value));
     	}
 
-    	if ('' !== $queryString = rtrim($queryString, "&")) $queryString = '?' . $queryString;
+    	$sepChar = strstr($base, '?') === false ? '?' : '&';
+
+    	if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
 
     	return $base . $queryString;
     }
@@ -63,7 +76,8 @@ class URL
      * @return string The generated URL
      */
      public static function viewUrl($viewName, array $parameters = array()) {
-     	$path = sprintf("%s?view=%s", ConfigQuery::read('base_url', '/'), $viewName);
+
+     	$path = sprintf("%s?view=%s", self::getIndexPage(), $viewName);
 
      	return self::absoluteUrl($path, $parameters);
      }

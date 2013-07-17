@@ -1,7 +1,31 @@
 {include file="includes/header.html"}
 
 {form name="thelia.customer.creation"}
-<form method="post" action="index_dev.php?action=createCustomer&view=connexion" {form_enctype form=$form} >
+{* We use $index_page as form action to avoid mixing post and get data *}
+<form action="{$index_page}" method="post" {form_enctype form=$form}>
+	{*
+	The two fields below are not par of the Login form, they are here to defines
+	the action to process, and the view to render once the form is submited
+	*}
+	<input type="hidden" name="action" value="createCustomer" /> {* the action triggered by this form *}
+	<input type="hidden" name="view" value="connexion" /> 		{* the view to return to if the form cannot be validated *}
+
+	{*
+	This field is common to all BaseForm instances (thus, this one), and defines
+	the URL the customer is redirected to once the form has been successfully
+	processed
+	*}
+
+	{form_field form=$form field='success_url'}
+	<input type="hidden" name="{$name}" value="{$return_to_url}" /> {* the url the user is redirected to on login success *}
+	{/form_field}
+
+	{*
+	customer_creation_error_message is defined in Customer action processor class,
+	and passed the parser through the ParserContext service.
+	*}
+
+	{if isset($customer_creation_error_message)}<div class="alert alert-error">{$customer_creation_error_message}</div>{/if}
 
     {form_hidden_fields form=$form}
 

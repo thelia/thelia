@@ -27,6 +27,7 @@ use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Form\BaseForm;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 class Session extends BaseSession {
 
@@ -109,7 +110,7 @@ class Session extends BaseSession {
      */
     public function getReturnToUrl()
     {
-    	return $this->get('return_to_url', ConfigQuery::read('base_url'));
+    	return $this->get('return_to_url', URL::getIndexPage());
     }
 
 }

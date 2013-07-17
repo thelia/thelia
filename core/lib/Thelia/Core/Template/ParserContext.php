@@ -20,37 +20,43 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Form;
 
+namespace Thelia\Core\Template;
 
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Choice;
-use Symfony\Component\Validator\Constraints\Email;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Tools\URL;
+/**
+ * The parser context is an application-wide context, which stores var-value pairs.
+ * Theses pairs are injected in the parser and becomes available to the templates.
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class ParserContext implements \IteratorAggregate
+{
+	private $store = array();
 
-class CustomerLogin extends BaseForm {
+	public function __construct(Request $request) {
 
-    protected function buildForm()
-    {
-        $this->formBuilder
-            ->add("email", "text", array(
-                "constraints" => array(
-                    new NotBlank(),
-                    new Email()
-                )
-            ))
-            ->add("password", "password", array(
-                "constraints" => array(
-                	new NotBlank()
-                )
-            ))
-            ->add("remember_me", "checkbox")
-           ;
-    }
+		// Setup basic variables
+		$this
+			->set('base_url'		, ConfigQuery::read('base_url', '/'))
+			->set('index_page'		, URL::getIndexPage())
+			->set('return_to_url'	, URL::absoluteUrl($request->getSession()->getReturnToUrl()))
+		;
+	}
 
-    public function getName()
-    {
-        return "customer_login";
-    }
+	public function set($name, $value) {
+		$this->store[$name] = $value;
+
+		return $this;
+	}
+
+	public function get($name) {
+		return $this->store[$name];
+	}
+
+	public function getIterator() {
+		return new \ArrayIterator( $this->store );
+	}
 }

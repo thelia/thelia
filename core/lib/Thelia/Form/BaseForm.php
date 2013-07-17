@@ -31,6 +31,7 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Validator\Validation;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 abstract class BaseForm {
     /**
@@ -72,7 +73,7 @@ abstract class BaseForm {
 
         // If not already set, define the success_url field
         if (! $this->formBuilder->has('success_url')) {
-        	$this->formBuilder->add("success_url", "text")
+        	$this->formBuilder->add("success_url", "text");
         }
 
         $this->form = $this->formBuilder->getForm();
