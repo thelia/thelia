@@ -11,15 +11,16 @@
             <parameter key="deleteArticle">Thelia\Core\Event\CartEvent</parameter>
         </parameter>
     </parameters>
-    
+
     <services>
 
         <service id="thelia.action.cart" class="Thelia\Action\Cart">
             <tag name="kernel.event_subscriber"/>
         </service>
-        
-        <service id="thelia.action.customer" class="Thelia\Action\Customer">
+
+        <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">
             <tag name="kernel.event_subscriber"/>
+            <argument type="service" id="thelia.securityContext"/>
         </service>
 
     </services>

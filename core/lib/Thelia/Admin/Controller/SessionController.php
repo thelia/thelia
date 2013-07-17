@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                          */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -25,15 +25,12 @@ namespace Thelia\Admin\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\AdminLogin;
-use Thelia\Core\Security\Token\UsernamePasswordToken;
-use Thelia\Core\Security\Authentication\UsernamePasswordAuthenticator;
-use Thelia\Core\Security\Encoder\PasswordPhpCompatEncoder;
-use Thelia\Core\Security\Token\TokenInterface;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Model\AdminLog;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Tools\URL;
+use Thelia\Tools\Redirect;
 
 class SessionController extends BaseAdminController {
 
@@ -47,7 +44,7 @@ class SessionController extends BaseAdminController {
 		$this->getSecurityContext()->clear();
 
 		// Go back to login page.
-		return $this->redirect(URL::absoluteUrl('admin/login'));
+		return Redirect::exec(URL::absoluteUrl('admin/login'));
 	}
 
     public function checkLoginAction()
@@ -72,11 +69,12 @@ class SessionController extends BaseAdminController {
 
     		if (null == $successUrl) $successUrl = 'admin/home';
 
-    		// Redirect to home page - FIXME: requested URL, if we come from another page ?
-    		return $this->redirect(URL::absoluteUrl($successUrl));
+    		// Redirect to the success URL
+    		return Redirect::exec(URL::absoluteUrl($successUrl));
      	}
          catch (ValidatorException $ex) {
 
+         	// Validation problem
      		$message = "Missing or invalid information. Please check your input.";
      	}
      	catch (AuthenticationException $ex) {
@@ -86,19 +84,20 @@ class SessionController extends BaseAdminController {
 
      		$message = "Login failed. Please check your username and password.";
      	}
+     	catch (\Exception $ex) {
 
-     	// Store the form in session (see Form Smlarty plugin to find usage of this parameter)
+     		// Log authentication failure
+     		AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
+
+     		$message = "Unable to process your request. Please try again.";
+     	}
+
+     	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
      	$request->getSession()->setErrorFormName($form->getName());
 
-      	if (empty($failureUrl)) {
-	     	// Display the login form again, with an error message if required
-    	 	return $this->render("login.html", array(
-     			"message" => $message
-     		));
-     	}
-     	else {
-     		// Redirect to the provided URL
-     		return $this->redirect(URL::absoluteUrl($failureUrl));
-     	}
+      	// Display the login form again, with an error message if required
+    	return $this->render("login.html", array(
+     		"message" => $message
+     	));
     }
 }

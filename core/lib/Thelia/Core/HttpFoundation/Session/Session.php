@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
@@ -26,9 +26,11 @@ namespace Thelia\Core\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Form\BaseForm;
+use Thelia\Model\ConfigQuery;
 
 class Session extends BaseSession {
 
+	// -- Language ------------------------------------------------------------
 
     public function getLocale()
     {
@@ -39,6 +41,8 @@ class Session extends BaseSession {
     {
         return substr($this->getLocale(), 0, 2);
     }
+
+    // -- Customer user --------------------------------------------------------
 
     public function setCustomerUser(UserInterface $user)
     {
@@ -55,6 +59,7 @@ class Session extends BaseSession {
     	return $this->remove('customer_user');
     }
 
+    // -- Admin user -----------------------------------------------------------
 
     public function setAdminUser(UserInterface $user)
     {
@@ -70,6 +75,8 @@ class Session extends BaseSession {
     {
     	return $this->remove('admin_user');
     }
+
+    // -- Error form -----------------------------------------------------------
 
     /**
      * @param string $formName the form name
@@ -88,4 +95,21 @@ class Session extends BaseSession {
     {
     	return $this->remove('error_form');
     }
+
+    // -- Return page ----------------------------------------------------------
+
+    public function setReturnToUrl($url)
+    {
+    	$this->set('return_to_url', $url);
+    }
+
+    /**
+     *
+     * @return the return-to URL, or the index page if none is defined.
+     */
+    public function getReturnToUrl()
+    {
+    	return $this->get('return_to_url', ConfigQuery::read('base_url'));
+    }
+
 }

@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 namespace Thelia\Core\EventListener;
@@ -30,6 +30,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserInterface;
+use Thelia\Tools\Redirect;
+use Thelia\Tools\URL;
+use Thelia\Core\Security\Exception\AuthenticationException;
 
 /**
  *
@@ -78,10 +81,17 @@ class ViewListener implements EventSubscriberInterface
             } else {
                 $event->setResponse(new Response($content, $parser->getStatus() ?: 200));
             }
-        } catch (ResourceNotFoundException $e) {
+        }
+        catch (ResourceNotFoundException $e) {
             $event->setResponse(new Response($e->getMessage(), 404));
         }
+        catch (AuthenticationException $ex) {
 
+        	// Redirect to the login template
+        	$event->setResponse(Redirect::exec(URL::viewUrl($ex->getLoginTemplate())));
+        }
+
+        throw new \Exception("toto !");
     }
 
     public function beforeKernelView(GetResponseForControllerResultEvent $event)

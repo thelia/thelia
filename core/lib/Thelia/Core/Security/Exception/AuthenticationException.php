@@ -25,4 +25,24 @@ namespace Thelia\Core\Security\Exception;
 
 class AuthenticationException extends \Exception
 {
+	/**
+	 * @var string The login template name
+	 */
+	protected $loginTemplate = "login";
+
+	/**
+	 * @return string the login template name
+	 */
+	public function getLoginTemplate() {
+		return $this->loginTemplate;
+	}
+
+	/**
+	 * Set the login template name
+	 *
+	 * @param string $loginPath the login template name
+	 */
+	public function setLoginTemplate($loginTemplate) {
+		$this->loginTemplate = $loginTemplate;
+	}
 }

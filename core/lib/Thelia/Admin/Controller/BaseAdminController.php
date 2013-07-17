@@ -35,6 +35,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
+use Thelia\Tools\Redirect;
 
 /**
  *
@@ -94,7 +95,7 @@ class BaseAdminController extends ContainerAware
 
 			// User is not authenticated, and templates requires authentication -> redirect to login page
 			// (see Thelia\Core\Template\Smarty\Plugins\Security)
-        	return new RedirectResponse(URL::absoluteUrl('admin/login')); // FIXME shoud be a parameter
+        	Redirect::exec(URL::absoluteUrl('admin/login')); // FIXME shoud be a parameter
         }
     }
 
@@ -171,18 +172,5 @@ class BaseAdminController extends ContainerAware
     	$subRequest = $this->container->get('request')->duplicate($query, null, $path);
 
     	return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
-    }
-
-    /**
-     * Returns a RedirectResponse to the given URL.
-     *
-     * @param string  $url    The URL to redirect to
-     * @param integer $status The status code to use for the Response
-     *
-     * @return RedirectResponse
-     */
-    protected function redirect($url, $status = 302)
-    {
-    	return new RedirectResponse($url, $status);
     }
 }

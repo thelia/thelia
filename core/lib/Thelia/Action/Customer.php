@@ -32,9 +32,33 @@ use Thelia\Form\CustomerModification;
 use Thelia\Model\Customer as CustomerModel;
 use Thelia\Log\Tlog;
 use Thelia\Model\CustomerQuery;
+use Thelia\Form\CustomerLogin;
+use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
+use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\ConfigQuery;
+use Thelia\Tools\Redirect;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Thelia\Core\Security\Exception\AuthenticationException;
 
 class Customer implements EventSubscriberInterface
 {
+	/**
+	 * @var Thelia\Core\Security\SecurityContext
+	 */
+	private $securityContext;
+
+	public function __construct(SecurityContext $context) {
+		$this->securityContext = $context;
+
+		$context->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
+	}
+
+
+    private function getSecurityContext($context) {
+    	$this->securityContext->setContext($context === false ? SecurityContext::CONTEXT_FRONT_OFFICE : $context);
+
+    	return $securityContext;
+    }
 
     public function create(ActionEvent $event)
     {
@@ -48,6 +72,7 @@ class Customer implements EventSubscriberInterface
         $form = $customerCreation->getForm();
 
         if ($request->isMethod("post")) {
+
             $form->bind($request);
 
             if ($form->isValid()) {
@@ -76,7 +101,8 @@ class Customer implements EventSubscriberInterface
 
                 //Customer is create, he is automatically connected
 
-            } else {
+            }
+            else {
 
                 $event->setFormError($customerCreation);
             }
@@ -125,7 +151,56 @@ class Customer implements EventSubscriberInterface
 
     }
 
-    public function modifyPassword(ActionEvent $event)
+    /**
+     * Perform user login. On a successful login, the user is redirected to the URL
+     * found in the success_url form parameter, or / if none was found.
+     *
+     * If login is not successfull, the same view is dispolyed again.
+     *
+     * @param ActionEvent $event
+     */
+    public function login(ActionEvent $event)
+    {
+    	$request = $event->getRequest();
+
+    	$form = new CustomerLogin($request);
+
+    	$authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $form);
+
+    	try {
+    		$user = $authenticator->getAuthentifiedUser();
+
+    		// Success -> store user in security context
+    		$this->getSecurityContext()->setUser($user);
+
+    		// Log authentication success
+    		AdminLog::append("Authentication successufull", $request, $user);
+
+    		// Get the success URL to redirect the user to
+    		$successUrl = $form->getForm()->get('success_url')->getData();
+
+    		if (null == $successUrl) $successUrl = ConfigQuery::read('base_url', '/');
+
+    		// Redirect to the success URL
+    		return Redirect::exec(URL::absoluteUrl($successUrl));
+    	}
+    	catch (ValidatorException $ex) {
+    		$message = "Missing or invalid information. Please check your input.";
+    	}
+    	catch (AuthenticationException $ex) {
+    		$message = "Login failed. Please check your username and password.";
+    	}
+    	catch (\Exception $ex) {
+    		$message = sprintf("Unable to process your request. Please try again (%s).", $ex->getMessage());
+    	}
+
+    	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
+    	$request->getSession()->setErrorFormName($form->getName());
+
+    	// A this point, the same view is displayed again.
+    }
+
+    public function changePassword(ActionEvent $event)
     {
 
     }
@@ -154,7 +229,8 @@ class Customer implements EventSubscriberInterface
     {
         return array(
             "action.createCustomer" => array("create", 128),
-            "action.modifyCustomer" => array("modify", 128)
+            "action.modifyCustomer" => array("modify", 128),
+            "action.loginCustomer"  => array("login", 128)
         );
     }
 

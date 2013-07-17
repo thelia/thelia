@@ -27,6 +27,7 @@ namespace Thelia\Core\Security\Authentication;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Security\Authentication\UsernamePasswordFormAuthenticator;
 use Thelia\Form\CustomerLogin;
+use Thelia\Core\Security\UserProvider\CustomerUserProvider;
 
 class CustomerUsernamePasswordFormAuthenticator extends UsernamePasswordFormAuthenticator {
 

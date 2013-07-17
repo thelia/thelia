@@ -11,19 +11,6 @@
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
     </loops>
 
-
-    <filters>
-    	<!-- Sample definition
-        <filter class="Thelia\Core\Template\Filter\SomeFilterClass" name="my_filter"/>
-    	-->
-    </filters>
-
-    <templateDirectives>
-    	<!-- Sample definition
-        <templateDirectives class="Thelia\Core\Template\Filter\SomeFilterClass" name="my_filter"/>
-    	-->
-    </templateDirectives>
-
     <forms>
         <form name="thelia.customer.creation" class="Thelia\Form\CustomerCreation"/>
         <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
