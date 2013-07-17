@@ -70,7 +70,33 @@ abstract class BaseForm {
 
         $this->buildForm();
 
+        // If not already set, define the success_url field
+        if (! $this->formBuilder->has('success_url')) {
+        	$this->formBuilder->add("success_url", "text")
+        }
+
         $this->form = $this->formBuilder->getForm();
+    }
+
+    /**
+     * Returns the absolute URL to redirect the user to if the form is successfully processed.
+     *
+     * @param string $default the default URL. If not given, the configured base URL is used.
+     *
+     * @return string an absolute URL
+     */
+    public function getSuccessUrl($default = null) {
+
+    	$successUrl = $this->form->get('success_url')->getData();
+
+    	if (empty($successUrl)) {
+
+    		if ($default === null) $default = ConfigQuery::read('base_url', '/');
+
+    		$successUrl = $default;
+    	}
+
+    	return URL::absoluteUrl($successUrl);
     }
 
     public function createView() {
@@ -96,7 +122,7 @@ abstract class BaseForm {
      * in this function you add all the fields you need for your Form.
      * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->form->add("name", "text")
+     * $this->formBuilder->add("name", "text")
      *   ->add("email", "email", array(
      *           "attr" => array(
      *               "class" => "field"
