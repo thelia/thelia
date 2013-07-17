@@ -7,6 +7,7 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use \Smarty;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
@@ -123,7 +124,13 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function getContent()
     {
-        return $this->fetch($this->getTemplateFilePath());
+        try {
+            $templateFile = $this->getTemplateFilePath();
+        } catch(\RuntimeException $e) {
+            return new Response($e->getMessage(), "404");
+        }
+
+        return $this->fetch($templateFile);
     }
 
     /**
@@ -187,11 +194,23 @@ class SmartyParser extends Smarty implements ParserInterface
     protected function getTemplateFilePath()
     {
          $file = $this->request->attributes->get('_view');
+         $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file;
 
-        $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file . ".html";
+        $pathFileName = realpath(dirname(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file));
+        $templateDir = realpath(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
 
-        if (file_exists($fileName)) return $fileName;
+        if (strpos($pathFileName, $templateDir) !== 0) {
+            throw new ResourceNotFoundException(sprintf("%s view does not exists", $file));
+        }
 
-        throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+        if (!file_exists($fileName)) {
+            $fileName .= ".html";
+
+            if(!file_exists($fileName)) {
+                throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+            }
+        }
+
+        return $fileName;
     }
 }
