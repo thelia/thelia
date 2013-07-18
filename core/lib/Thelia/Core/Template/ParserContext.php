@@ -40,9 +40,9 @@ class ParserContext implements \IteratorAggregate
 
 		// Setup basic variables
 		$this
-			->set('base_url'		, ConfigQuery::read('base_url', '/'))
-			->set('index_page'		, URL::getIndexPage())
-			->set('return_to_url'	, URL::absoluteUrl($request->getSession()->getReturnToUrl()))
+			->set('BASE_URL'		, ConfigQuery::read('base_url', '/'))
+			->set('INDEX_PAGE'		, URL::getIndexPage())
+			->set('RETURN_TO_URL'	, URL::absoluteUrl($request->getSession()->getReturnToUrl()))
 		;
 	}
 

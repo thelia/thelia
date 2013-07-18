@@ -1,8 +1,8 @@
 {include file="includes/header.html"}
 
 {form name="thelia.customer.creation"}
-{* We use $index_page as form action to avoid mixing post and get data *}
-<form action="{$index_page}" method="post" {form_enctype form=$form}>
+{* We use $INDEX_PAGE as form action to avoid mixing post and get data *}
+<form action="{$INDEX_PAGE}" method="post" {form_enctype form=$form}>
 	{*
 	The two fields below are not par of the Login form, they are here to defines
 	the action to process, and the view to render once the form is submited
@@ -17,7 +17,7 @@
 	*}
 
 	{form_field form=$form field='success_url'}
-	<input type="hidden" name="{$name}" value="{$return_to_url}" /> {* the url the user is redirected to on login success *}
+	<input type="hidden" name="{$name}" value="{$RETURN_TO_URL}" /> {* the url the user is redirected to on login success *}
 	{/form_field}
 
 	{*
