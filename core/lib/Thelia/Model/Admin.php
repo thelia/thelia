@@ -63,6 +63,6 @@ class Admin extends BaseAdmin implements UserInterface
      * {@inheritDoc}
      */
     public function getRoles() {
-    	return array(new Role('ROLE_ADMIN'));
+    	return array(new Role('ADMIN'));
     }
 }

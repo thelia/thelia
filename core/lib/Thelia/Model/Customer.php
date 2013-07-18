@@ -164,6 +164,6 @@ class Customer extends BaseCustomer implements UserInterface
      * {@inheritDoc}
      */
     public function getRoles() {
-    	return array(new Role('ROLE_CUSTOMER'));
+    	return array(new Role('CUSTOMER'));
     }
 }
