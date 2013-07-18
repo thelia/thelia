@@ -57,7 +57,7 @@ class CustomerTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 13;
+    const NUM_COLUMNS = 14;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class CustomerTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 13;
+    const NUM_HYDRATE_COLUMNS = 14;
 
     /**
      * the column name for the ID field
@@ -78,6 +78,11 @@ class CustomerTableMap extends TableMap
      * the column name for the REF field
      */
     const REF = 'customer.REF';
+
+    /**
+     * the column name for the TITLE_ID field
+     */
+    const TITLE_ID = 'customer.TITLE_ID';
 
     /**
      * the column name for the FIRSTNAME field
@@ -146,12 +151,12 @@ class CustomerTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'Firstname', 'Lastname', 'Email', 'Password', 'Algo', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'firstname', 'lastname', 'email', 'password', 'algo', 'reseller', 'lang', 'sponsor', 'discount', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CustomerTableMap::ID, CustomerTableMap::REF, CustomerTableMap::FIRSTNAME, CustomerTableMap::LASTNAME, CustomerTableMap::EMAIL, CustomerTableMap::PASSWORD, CustomerTableMap::ALGO, CustomerTableMap::RESELLER, CustomerTableMap::LANG, CustomerTableMap::SPONSOR, CustomerTableMap::DISCOUNT, CustomerTableMap::CREATED_AT, CustomerTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'FIRSTNAME', 'LASTNAME', 'EMAIL', 'PASSWORD', 'ALGO', 'RESELLER', 'LANG', 'SPONSOR', 'DISCOUNT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'firstname', 'lastname', 'email', 'password', 'algo', 'reseller', 'lang', 'sponsor', 'discount', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        self::TYPE_PHPNAME       => array('Id', 'Ref', 'TitleId', 'Firstname', 'Lastname', 'Email', 'Password', 'Algo', 'Reseller', 'Lang', 'Sponsor', 'Discount', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'titleId', 'firstname', 'lastname', 'email', 'password', 'algo', 'reseller', 'lang', 'sponsor', 'discount', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CustomerTableMap::ID, CustomerTableMap::REF, CustomerTableMap::TITLE_ID, CustomerTableMap::FIRSTNAME, CustomerTableMap::LASTNAME, CustomerTableMap::EMAIL, CustomerTableMap::PASSWORD, CustomerTableMap::ALGO, CustomerTableMap::RESELLER, CustomerTableMap::LANG, CustomerTableMap::SPONSOR, CustomerTableMap::DISCOUNT, CustomerTableMap::CREATED_AT, CustomerTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'TITLE_ID', 'FIRSTNAME', 'LASTNAME', 'EMAIL', 'PASSWORD', 'ALGO', 'RESELLER', 'LANG', 'SPONSOR', 'DISCOUNT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'ref', 'title_id', 'firstname', 'lastname', 'email', 'password', 'algo', 'reseller', 'lang', 'sponsor', 'discount', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
     /**
@@ -161,12 +166,12 @@ class CustomerTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'Firstname' => 2, 'Lastname' => 3, 'Email' => 4, 'Password' => 5, 'Algo' => 6, 'Reseller' => 7, 'Lang' => 8, 'Sponsor' => 9, 'Discount' => 10, 'CreatedAt' => 11, 'UpdatedAt' => 12, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'firstname' => 2, 'lastname' => 3, 'email' => 4, 'password' => 5, 'algo' => 6, 'reseller' => 7, 'lang' => 8, 'sponsor' => 9, 'discount' => 10, 'createdAt' => 11, 'updatedAt' => 12, ),
-        self::TYPE_COLNAME       => array(CustomerTableMap::ID => 0, CustomerTableMap::REF => 1, CustomerTableMap::FIRSTNAME => 2, CustomerTableMap::LASTNAME => 3, CustomerTableMap::EMAIL => 4, CustomerTableMap::PASSWORD => 5, CustomerTableMap::ALGO => 6, CustomerTableMap::RESELLER => 7, CustomerTableMap::LANG => 8, CustomerTableMap::SPONSOR => 9, CustomerTableMap::DISCOUNT => 10, CustomerTableMap::CREATED_AT => 11, CustomerTableMap::UPDATED_AT => 12, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'FIRSTNAME' => 2, 'LASTNAME' => 3, 'EMAIL' => 4, 'PASSWORD' => 5, 'ALGO' => 6, 'RESELLER' => 7, 'LANG' => 8, 'SPONSOR' => 9, 'DISCOUNT' => 10, 'CREATED_AT' => 11, 'UPDATED_AT' => 12, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'firstname' => 2, 'lastname' => 3, 'email' => 4, 'password' => 5, 'algo' => 6, 'reseller' => 7, 'lang' => 8, 'sponsor' => 9, 'discount' => 10, 'created_at' => 11, 'updated_at' => 12, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'TitleId' => 2, 'Firstname' => 3, 'Lastname' => 4, 'Email' => 5, 'Password' => 6, 'Algo' => 7, 'Reseller' => 8, 'Lang' => 9, 'Sponsor' => 10, 'Discount' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'titleId' => 2, 'firstname' => 3, 'lastname' => 4, 'email' => 5, 'password' => 6, 'algo' => 7, 'reseller' => 8, 'lang' => 9, 'sponsor' => 10, 'discount' => 11, 'createdAt' => 12, 'updatedAt' => 13, ),
+        self::TYPE_COLNAME       => array(CustomerTableMap::ID => 0, CustomerTableMap::REF => 1, CustomerTableMap::TITLE_ID => 2, CustomerTableMap::FIRSTNAME => 3, CustomerTableMap::LASTNAME => 4, CustomerTableMap::EMAIL => 5, CustomerTableMap::PASSWORD => 6, CustomerTableMap::ALGO => 7, CustomerTableMap::RESELLER => 8, CustomerTableMap::LANG => 9, CustomerTableMap::SPONSOR => 10, CustomerTableMap::DISCOUNT => 11, CustomerTableMap::CREATED_AT => 12, CustomerTableMap::UPDATED_AT => 13, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'TITLE_ID' => 2, 'FIRSTNAME' => 3, 'LASTNAME' => 4, 'EMAIL' => 5, 'PASSWORD' => 6, 'ALGO' => 7, 'RESELLER' => 8, 'LANG' => 9, 'SPONSOR' => 10, 'DISCOUNT' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'title_id' => 2, 'firstname' => 3, 'lastname' => 4, 'email' => 5, 'password' => 6, 'algo' => 7, 'reseller' => 8, 'lang' => 9, 'sponsor' => 10, 'discount' => 11, 'created_at' => 12, 'updated_at' => 13, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, )
     );
 
     /**
@@ -187,6 +192,7 @@ class CustomerTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 50, null);
+        $this->addForeignKey('TITLE_ID', 'TitleId', 'INTEGER', 'customer_title', 'ID', false, null, null);
         $this->addColumn('FIRSTNAME', 'Firstname', 'VARCHAR', true, 255, null);
         $this->addColumn('LASTNAME', 'Lastname', 'VARCHAR', true, 255, null);
         $this->addColumn('EMAIL', 'Email', 'VARCHAR', false, 50, null);
@@ -205,6 +211,7 @@ class CustomerTableMap extends TableMap
      */
     public function buildRelations()
     {
+        $this->addRelation('CustomerTitle', '\\Thelia\\Model\\CustomerTitle', RelationMap::MANY_TO_ONE, array('title_id' => 'id', ), 'RESTRICT', 'RESTRICT');
         $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT', 'Addresses');
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'customer_id', ), 'CASCADE', 'RESTRICT', 'Orders');
     } // buildRelations()
@@ -372,6 +379,7 @@ class CustomerTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CustomerTableMap::ID);
             $criteria->addSelectColumn(CustomerTableMap::REF);
+            $criteria->addSelectColumn(CustomerTableMap::TITLE_ID);
             $criteria->addSelectColumn(CustomerTableMap::FIRSTNAME);
             $criteria->addSelectColumn(CustomerTableMap::LASTNAME);
             $criteria->addSelectColumn(CustomerTableMap::EMAIL);
@@ -386,6 +394,7 @@ class CustomerTableMap extends TableMap
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.REF');
+            $criteria->addSelectColumn($alias . '.TITLE_ID');
             $criteria->addSelectColumn($alias . '.FIRSTNAME');
             $criteria->addSelectColumn($alias . '.LASTNAME');
             $criteria->addSelectColumn($alias . '.EMAIL');

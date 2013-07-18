@@ -23,6 +23,7 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomerQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCustomerQuery orderByRef($order = Criteria::ASC) Order by the ref column
+ * @method     ChildCustomerQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
  * @method     ChildCustomerQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
  * @method     ChildCustomerQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
  * @method     ChildCustomerQuery orderByEmail($order = Criteria::ASC) Order by the email column
@@ -37,6 +38,7 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomerQuery groupById() Group by the id column
  * @method     ChildCustomerQuery groupByRef() Group by the ref column
+ * @method     ChildCustomerQuery groupByTitleId() Group by the title_id column
  * @method     ChildCustomerQuery groupByFirstname() Group by the firstname column
  * @method     ChildCustomerQuery groupByLastname() Group by the lastname column
  * @method     ChildCustomerQuery groupByEmail() Group by the email column
@@ -53,6 +55,10 @@ use Thelia\Model\Map\CustomerTableMap;
  * @method     ChildCustomerQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildCustomerQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
+ * @method     ChildCustomerQuery leftJoinCustomerTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitle relation
+ * @method     ChildCustomerQuery rightJoinCustomerTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitle relation
+ * @method     ChildCustomerQuery innerJoinCustomerTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitle relation
+ *
  * @method     ChildCustomerQuery leftJoinAddress($relationAlias = null) Adds a LEFT JOIN clause to the query using the Address relation
  * @method     ChildCustomerQuery rightJoinAddress($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Address relation
  * @method     ChildCustomerQuery innerJoinAddress($relationAlias = null) Adds a INNER JOIN clause to the query using the Address relation
@@ -66,6 +72,7 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomer findOneById(int $id) Return the first ChildCustomer filtered by the id column
  * @method     ChildCustomer findOneByRef(string $ref) Return the first ChildCustomer filtered by the ref column
+ * @method     ChildCustomer findOneByTitleId(int $title_id) Return the first ChildCustomer filtered by the title_id column
  * @method     ChildCustomer findOneByFirstname(string $firstname) Return the first ChildCustomer filtered by the firstname column
  * @method     ChildCustomer findOneByLastname(string $lastname) Return the first ChildCustomer filtered by the lastname column
  * @method     ChildCustomer findOneByEmail(string $email) Return the first ChildCustomer filtered by the email column
@@ -80,6 +87,7 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     array findById(int $id) Return ChildCustomer objects filtered by the id column
  * @method     array findByRef(string $ref) Return ChildCustomer objects filtered by the ref column
+ * @method     array findByTitleId(int $title_id) Return ChildCustomer objects filtered by the title_id column
  * @method     array findByFirstname(string $firstname) Return ChildCustomer objects filtered by the firstname column
  * @method     array findByLastname(string $lastname) Return ChildCustomer objects filtered by the lastname column
  * @method     array findByEmail(string $email) Return ChildCustomer objects filtered by the email column
@@ -179,7 +187,7 @@ abstract class CustomerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, REF, FIRSTNAME, LASTNAME, EMAIL, PASSWORD, ALGO, RESELLER, LANG, SPONSOR, DISCOUNT, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
+        $sql = 'SELECT ID, REF, TITLE_ID, FIRSTNAME, LASTNAME, EMAIL, PASSWORD, ALGO, RESELLER, LANG, SPONSOR, DISCOUNT, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -336,6 +344,49 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::REF, $ref, $comparison);
+    }
+
+    /**
+     * Filter the query on the title_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByTitleId(1234); // WHERE title_id = 1234
+     * $query->filterByTitleId(array(12, 34)); // WHERE title_id IN (12, 34)
+     * $query->filterByTitleId(array('min' => 12)); // WHERE title_id > 12
+     * </code>
+     *
+     * @see       filterByCustomerTitle()
+     *
+     * @param     mixed $titleId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByTitleId($titleId = null, $comparison = null)
+    {
+        if (is_array($titleId)) {
+            $useMinMax = false;
+            if (isset($titleId['min'])) {
+                $this->addUsingAlias(CustomerTableMap::TITLE_ID, $titleId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($titleId['max'])) {
+                $this->addUsingAlias(CustomerTableMap::TITLE_ID, $titleId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CustomerTableMap::TITLE_ID, $titleId, $comparison);
     }
 
     /**
@@ -707,6 +758,81 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::UPDATED_AT, $updatedAt, $comparison);
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\CustomerTitle object
+     *
+     * @param \Thelia\Model\CustomerTitle|ObjectCollection $customerTitle The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function filterByCustomerTitle($customerTitle, $comparison = null)
+    {
+        if ($customerTitle instanceof \Thelia\Model\CustomerTitle) {
+            return $this
+                ->addUsingAlias(CustomerTableMap::TITLE_ID, $customerTitle->getId(), $comparison);
+        } elseif ($customerTitle instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(CustomerTableMap::TITLE_ID, $customerTitle->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCustomerTitle() only accepts arguments of type \Thelia\Model\CustomerTitle or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CustomerTitle relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCustomerQuery The current query, for fluid interface
+     */
+    public function joinCustomerTitle($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CustomerTitle');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CustomerTitle');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CustomerTitle relation CustomerTitle object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CustomerTitleQuery A secondary query class using the current class as primary query
+     */
+    public function useCustomerTitleQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCustomerTitle($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CustomerTitle', '\Thelia\Model\CustomerTitleQuery');
     }
 
     /**

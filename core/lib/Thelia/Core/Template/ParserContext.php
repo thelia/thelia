@@ -46,17 +46,20 @@ class ParserContext implements \IteratorAggregate
 		;
 	}
 
-	public function set($name, $value) {
+	public function set($name, $value)
+	{
 		$this->store[$name] = $value;
 
 		return $this;
 	}
 
-	public function get($name) {
+	public function get($name)
+	{
 		return $this->store[$name];
 	}
 
-	public function getIterator() {
+	public function getIterator()
+	{
 		return new \ArrayIterator( $this->store );
 	}
 }

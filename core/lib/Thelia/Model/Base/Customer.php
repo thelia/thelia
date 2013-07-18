@@ -21,6 +21,8 @@ use Thelia\Model\Address as ChildAddress;
 use Thelia\Model\AddressQuery as ChildAddressQuery;
 use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
+use Thelia\Model\CustomerTitle as ChildCustomerTitle;
+use Thelia\Model\CustomerTitleQuery as ChildCustomerTitleQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\Map\CustomerTableMap;
@@ -70,6 +72,12 @@ abstract class Customer implements ActiveRecordInterface
      * @var        string
      */
     protected $ref;
+
+    /**
+     * The value for the title_id field.
+     * @var        int
+     */
+    protected $title_id;
 
     /**
      * The value for the firstname field.
@@ -136,6 +144,11 @@ abstract class Customer implements ActiveRecordInterface
      * @var        string
      */
     protected $updated_at;
+
+    /**
+     * @var        CustomerTitle
+     */
+    protected $aCustomerTitle;
 
     /**
      * @var        ObjectCollection|ChildAddress[] Collection to store aggregation of ChildAddress objects.
@@ -446,6 +459,17 @@ abstract class Customer implements ActiveRecordInterface
     }
 
     /**
+     * Get the [title_id] column value.
+     *
+     * @return   int
+     */
+    public function getTitleId()
+    {
+
+        return $this->title_id;
+    }
+
+    /**
      * Get the [firstname] column value.
      *
      * @return   string
@@ -625,6 +649,31 @@ abstract class Customer implements ActiveRecordInterface
 
         return $this;
     } // setRef()
+
+    /**
+     * Set the value of [title_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Customer The current object (for fluent API support)
+     */
+    public function setTitleId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->title_id !== $v) {
+            $this->title_id = $v;
+            $this->modifiedColumns[] = CustomerTableMap::TITLE_ID;
+        }
+
+        if ($this->aCustomerTitle !== null && $this->aCustomerTitle->getId() !== $v) {
+            $this->aCustomerTitle = null;
+        }
+
+
+        return $this;
+    } // setTitleId()
 
     /**
      * Set the value of [firstname] column.
@@ -900,40 +949,43 @@ abstract class Customer implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CustomerTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
             $this->ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerTableMap::translateFieldName('Firstname', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CustomerTableMap::translateFieldName('TitleId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->title_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerTableMap::translateFieldName('Firstname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->firstname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CustomerTableMap::translateFieldName('Lastname', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerTableMap::translateFieldName('Lastname', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lastname = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CustomerTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerTableMap::translateFieldName('Email', TableMap::TYPE_PHPNAME, $indexType)];
             $this->email = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CustomerTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CustomerTableMap::translateFieldName('Password', TableMap::TYPE_PHPNAME, $indexType)];
             $this->password = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CustomerTableMap::translateFieldName('Algo', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CustomerTableMap::translateFieldName('Algo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->algo = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CustomerTableMap::translateFieldName('Reseller', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CustomerTableMap::translateFieldName('Reseller', TableMap::TYPE_PHPNAME, $indexType)];
             $this->reseller = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CustomerTableMap::translateFieldName('Lang', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CustomerTableMap::translateFieldName('Lang', TableMap::TYPE_PHPNAME, $indexType)];
             $this->lang = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : CustomerTableMap::translateFieldName('Sponsor', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CustomerTableMap::translateFieldName('Sponsor', TableMap::TYPE_PHPNAME, $indexType)];
             $this->sponsor = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : CustomerTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CustomerTableMap::translateFieldName('Discount', TableMap::TYPE_PHPNAME, $indexType)];
             $this->discount = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : CustomerTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CustomerTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : CustomerTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : CustomerTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -946,7 +998,7 @@ abstract class Customer implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 13; // 13 = CustomerTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 14; // 14 = CustomerTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Customer object", 0, $e);
@@ -968,6 +1020,9 @@ abstract class Customer implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aCustomerTitle !== null && $this->title_id !== $this->aCustomerTitle->getId()) {
+            $this->aCustomerTitle = null;
+        }
     } // ensureConsistency
 
     /**
@@ -1007,6 +1062,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aCustomerTitle = null;
             $this->collAddresses = null;
 
             $this->collOrders = null;
@@ -1133,6 +1189,18 @@ abstract class Customer implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aCustomerTitle !== null) {
+                if ($this->aCustomerTitle->isModified() || $this->aCustomerTitle->isNew()) {
+                    $affectedRows += $this->aCustomerTitle->save($con);
+                }
+                $this->setCustomerTitle($this->aCustomerTitle);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -1210,6 +1278,9 @@ abstract class Customer implements ActiveRecordInterface
         if ($this->isColumnModified(CustomerTableMap::REF)) {
             $modifiedColumns[':p' . $index++]  = 'REF';
         }
+        if ($this->isColumnModified(CustomerTableMap::TITLE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'TITLE_ID';
+        }
         if ($this->isColumnModified(CustomerTableMap::FIRSTNAME)) {
             $modifiedColumns[':p' . $index++]  = 'FIRSTNAME';
         }
@@ -1259,6 +1330,9 @@ abstract class Customer implements ActiveRecordInterface
                         break;
                     case 'REF':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
+                        break;
+                    case 'TITLE_ID':
+                        $stmt->bindValue($identifier, $this->title_id, PDO::PARAM_INT);
                         break;
                     case 'FIRSTNAME':
                         $stmt->bindValue($identifier, $this->firstname, PDO::PARAM_STR);
@@ -1362,36 +1436,39 @@ abstract class Customer implements ActiveRecordInterface
                 return $this->getRef();
                 break;
             case 2:
-                return $this->getFirstname();
+                return $this->getTitleId();
                 break;
             case 3:
-                return $this->getLastname();
+                return $this->getFirstname();
                 break;
             case 4:
-                return $this->getEmail();
+                return $this->getLastname();
                 break;
             case 5:
-                return $this->getPassword();
+                return $this->getEmail();
                 break;
             case 6:
-                return $this->getAlgo();
+                return $this->getPassword();
                 break;
             case 7:
-                return $this->getReseller();
+                return $this->getAlgo();
                 break;
             case 8:
-                return $this->getLang();
+                return $this->getReseller();
                 break;
             case 9:
-                return $this->getSponsor();
+                return $this->getLang();
                 break;
             case 10:
-                return $this->getDiscount();
+                return $this->getSponsor();
                 break;
             case 11:
-                return $this->getCreatedAt();
+                return $this->getDiscount();
                 break;
             case 12:
+                return $this->getCreatedAt();
+                break;
+            case 13:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1425,17 +1502,18 @@ abstract class Customer implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getRef(),
-            $keys[2] => $this->getFirstname(),
-            $keys[3] => $this->getLastname(),
-            $keys[4] => $this->getEmail(),
-            $keys[5] => $this->getPassword(),
-            $keys[6] => $this->getAlgo(),
-            $keys[7] => $this->getReseller(),
-            $keys[8] => $this->getLang(),
-            $keys[9] => $this->getSponsor(),
-            $keys[10] => $this->getDiscount(),
-            $keys[11] => $this->getCreatedAt(),
-            $keys[12] => $this->getUpdatedAt(),
+            $keys[2] => $this->getTitleId(),
+            $keys[3] => $this->getFirstname(),
+            $keys[4] => $this->getLastname(),
+            $keys[5] => $this->getEmail(),
+            $keys[6] => $this->getPassword(),
+            $keys[7] => $this->getAlgo(),
+            $keys[8] => $this->getReseller(),
+            $keys[9] => $this->getLang(),
+            $keys[10] => $this->getSponsor(),
+            $keys[11] => $this->getDiscount(),
+            $keys[12] => $this->getCreatedAt(),
+            $keys[13] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1444,6 +1522,9 @@ abstract class Customer implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->aCustomerTitle) {
+                $result['CustomerTitle'] = $this->aCustomerTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collAddresses) {
                 $result['Addresses'] = $this->collAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1491,36 +1572,39 @@ abstract class Customer implements ActiveRecordInterface
                 $this->setRef($value);
                 break;
             case 2:
-                $this->setFirstname($value);
+                $this->setTitleId($value);
                 break;
             case 3:
-                $this->setLastname($value);
+                $this->setFirstname($value);
                 break;
             case 4:
-                $this->setEmail($value);
+                $this->setLastname($value);
                 break;
             case 5:
-                $this->setPassword($value);
+                $this->setEmail($value);
                 break;
             case 6:
-                $this->setAlgo($value);
+                $this->setPassword($value);
                 break;
             case 7:
-                $this->setReseller($value);
+                $this->setAlgo($value);
                 break;
             case 8:
-                $this->setLang($value);
+                $this->setReseller($value);
                 break;
             case 9:
-                $this->setSponsor($value);
+                $this->setLang($value);
                 break;
             case 10:
-                $this->setDiscount($value);
+                $this->setSponsor($value);
                 break;
             case 11:
-                $this->setCreatedAt($value);
+                $this->setDiscount($value);
                 break;
             case 12:
+                $this->setCreatedAt($value);
+                break;
+            case 13:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1549,17 +1633,18 @@ abstract class Customer implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setFirstname($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setLastname($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setEmail($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPassword($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setAlgo($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setReseller($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setLang($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setSponsor($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setDiscount($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setCreatedAt($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setUpdatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[2], $arr)) $this->setTitleId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setFirstname($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setLastname($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setEmail($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPassword($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setAlgo($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setReseller($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setLang($arr[$keys[9]]);
+        if (array_key_exists($keys[10], $arr)) $this->setSponsor($arr[$keys[10]]);
+        if (array_key_exists($keys[11], $arr)) $this->setDiscount($arr[$keys[11]]);
+        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
+        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
     }
 
     /**
@@ -1573,6 +1658,7 @@ abstract class Customer implements ActiveRecordInterface
 
         if ($this->isColumnModified(CustomerTableMap::ID)) $criteria->add(CustomerTableMap::ID, $this->id);
         if ($this->isColumnModified(CustomerTableMap::REF)) $criteria->add(CustomerTableMap::REF, $this->ref);
+        if ($this->isColumnModified(CustomerTableMap::TITLE_ID)) $criteria->add(CustomerTableMap::TITLE_ID, $this->title_id);
         if ($this->isColumnModified(CustomerTableMap::FIRSTNAME)) $criteria->add(CustomerTableMap::FIRSTNAME, $this->firstname);
         if ($this->isColumnModified(CustomerTableMap::LASTNAME)) $criteria->add(CustomerTableMap::LASTNAME, $this->lastname);
         if ($this->isColumnModified(CustomerTableMap::EMAIL)) $criteria->add(CustomerTableMap::EMAIL, $this->email);
@@ -1648,6 +1734,7 @@ abstract class Customer implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setRef($this->getRef());
+        $copyObj->setTitleId($this->getTitleId());
         $copyObj->setFirstname($this->getFirstname());
         $copyObj->setLastname($this->getLastname());
         $copyObj->setEmail($this->getEmail());
@@ -1705,6 +1792,57 @@ abstract class Customer implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCustomerTitle object.
+     *
+     * @param                  ChildCustomerTitle $v
+     * @return                 \Thelia\Model\Customer The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCustomerTitle(ChildCustomerTitle $v = null)
+    {
+        if ($v === null) {
+            $this->setTitleId(NULL);
+        } else {
+            $this->setTitleId($v->getId());
+        }
+
+        $this->aCustomerTitle = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCustomerTitle object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCustomer($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCustomerTitle object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCustomerTitle The associated ChildCustomerTitle object.
+     * @throws PropelException
+     */
+    public function getCustomerTitle(ConnectionInterface $con = null)
+    {
+        if ($this->aCustomerTitle === null && ($this->title_id !== null)) {
+            $this->aCustomerTitle = ChildCustomerTitleQuery::create()->findPk($this->title_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCustomerTitle->addCustomers($this);
+             */
+        }
+
+        return $this->aCustomerTitle;
     }
 
 
@@ -2294,6 +2432,7 @@ abstract class Customer implements ActiveRecordInterface
     {
         $this->id = null;
         $this->ref = null;
+        $this->title_id = null;
         $this->firstname = null;
         $this->lastname = null;
         $this->email = null;
@@ -2344,6 +2483,7 @@ abstract class Customer implements ActiveRecordInterface
             $this->collOrders->clearIterator();
         }
         $this->collOrders = null;
+        $this->aCustomerTitle = null;
     }
 
     /**
