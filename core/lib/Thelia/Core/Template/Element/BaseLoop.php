@@ -51,7 +51,7 @@ abstract class BaseLoop
     protected $securityContext;
 
 
-    private $args;
+    protected $args;
 
     /**
      * Create a new Loop

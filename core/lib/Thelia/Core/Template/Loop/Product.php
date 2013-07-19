@@ -84,8 +84,9 @@ class Product extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random'))
-                )
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
+                ),
+                'manual'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_category'),
@@ -254,54 +255,56 @@ class Product extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        if(null === $orders) {
-            $search->orderByPosition();
-        } else {
-            foreach($orders as $order) {
-                switch ($order) {
-                    case "alpha":
-                        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
-                        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
-                        break;
-                    case "alpha_reverse":
-                        $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
-                        break;
-                    case "reverse":
-                        $search->orderByPosition(Criteria::DESC);
-                        break;
-                    case "min_price":
-                        $search->orderBy('real_price', Criteria::ASC);
-                        break;
-                    case "max_price":
-                        $search->orderBy('real_price', Criteria::DESC);
-                        break;
-                    case "manual":
-                        if(null === $this->category || count($this->category) != 1)
-                            throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
-                        $search->addAscendingOrderByColumn(ProductTableMap::POSITION);
-                        break;
-                    case "manual_reverse":
-                        if(null === $this->category || count($this->category) != 1)
-                            throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
-                        $search->addDescendingOrderByColumn(ProductTableMap::POSITION);
-                        break;
-                    case "ref":
-                        $search->addAscendingOrderByColumn(ProductTableMap::REF);
-                        break;
-                    case "promo":
-                        $search->addDescendingOrderByColumn(ProductTableMap::PROMO);
-                        break;
-                    case "new":
-                        $search->addDescendingOrderByColumn(ProductTableMap::NEWNESS);
-                        break;
-                    case "random":
-                        $search->clearOrderByColumns();
-                        $search->addAscendingOrderByColumn('RAND()');
-                        break(2);
-                    default:
-                        $search->orderByPosition();
-                        break;
-                }
+
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
+                    break;
+                case "reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "min_price":
+                    $search->orderBy('real_price', Criteria::ASC);
+                    break;
+                case "max_price":
+                    $search->orderBy('real_price', Criteria::DESC);
+                    break;
+                case "manual":
+                    if(null === $this->category || count($this->category) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    if(null === $this->category || count($this->category) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "ref":
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case "promo":
+                    $search->orderByPromo(Criteria::DESC);
+                    break;
+                case "new":
+                    $search->orderByNewness(Criteria::DESC);
+                    break;
+                case "given_id":
+                    if (!is_null($id)) {
+                        foreach($id as $singleId) {
+                            $givenIdMatched = 'given_id_matched_' . $singleId;
+                            $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
+                            $search->orderBy($givenIdMatched, Criteria::DESC);
+                        }
+                    }
+                    break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
             }
         }
 

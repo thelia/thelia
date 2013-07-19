@@ -5,6 +5,7 @@
         xsi:schemaLocation="http://thelia.net/schema/dic/config http://thelia.net/schema/dic/config/thelia-1.0.xsd">
 
     <loops>
+        <loop class="Thelia\Core\Template\Loop\Accessory" name="accessory"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>

@@ -83,8 +83,9 @@ class Category extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType('alpha', 'alpha_reverse', 'reverse')
-                )
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual-reverse', 'random'))
+                ),
+                'manual'
             ),
             Argument::createBooleanTypeArgument('random', 0),
             Argument::createIntListTypeArgument('exclude')
@@ -139,32 +140,26 @@ class Category extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        if(null === $orders) {
-            $search->orderByPosition();
-        } else {
-            foreach($orders as $order) {
-                switch ($order) {
-                    case "alpha":
-                        $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                        break;
-                    case "alpha_reverse":
-                        $search->addDescendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                        break;
-                    case "reverse":
-                        $search->orderByPosition(\Criteria::DESC);
-                        break;
-                    default:
-                        $search->orderByPosition();
-                        break;
-                }
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    break;
+                case "manual-reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
+                    break;
             }
-        }
-
-        $random = $this->getRandom();
-
-        if ($random === true) {
-            $search->clearOrderByColumns();
-            $search->addAscendingOrderByColumn('RAND()');
         }
 
         /**
