@@ -293,12 +293,12 @@ class Product extends BaseLoop
                     $search->orderByNewness(Criteria::DESC);
                     break;
                 case "given_id":
-                    if (!is_null($id)) {
-                        foreach($id as $singleId) {
-                            $givenIdMatched = 'given_id_matched_' . $singleId;
-                            $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
-                            $search->orderBy($givenIdMatched, Criteria::DESC);
-                        }
+                    if(null === $id)
+                        throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
+                    foreach($id as $singleId) {
+                        $givenIdMatched = 'given_id_matched_' . $singleId;
+                        $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
+                        $search->orderBy($givenIdMatched, Criteria::DESC);
                     }
                     break;
                 case "random":
