@@ -13,24 +13,36 @@
 	   	<div class="hero-unit">
 	        <h1>{intl l='Thelia Back Office'}</h1>
 
-			<form action="admin/login" method="post" class="well form-inline" {form_enctype form=$form}>
-                {form_field_hidden form=$form}
-                {form_field form=$form.username}
-                    {form_error form=$form.username}
-                        {$message}
-                    {/form_error}
-				    <input type="text" class="input" placeholder="{intl l='E-mail address'}" name="{$name}" />
-                {/form_field}
-                {form_field form=$form.password}
-				    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" />
-                {/form_field}
+			{form name="thelia.admin.login" success_url="home" error_url="login"}
+			<form action="{url path='/admin/checklogin'}" method="post" class="well form-inline" {form_enctype form=$form}>
 
-				{form_field form=$form.remember_me}
-				<label class="checkbox"> <input type="checkbox" name="remember" value="yes"> {intl l='Remember me'}</label>
+				{if isset($message)}<div class="alert alert-error">{$message}</div>{/if}
+
+                {form_hidden_fields form=$form}
+
+				{form_field form=$form field='success_url'}
+				<input type="hidden" name="{$name}" value="{url path='/admin'}" /> {* on success, redirect to /admin *}
 				{/form_field}
 
-				<div class="pull-right"><button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play icon-white"></i></button></div>
+                {form_field form=$form field='username'}
+                <span {if $error}class="error"{/if}>
+				    <input type="text" class="input" placeholder="{intl l='User name'}" name="{$name}" value="{$value}" {$attr} />
+				</span>
+                {/form_field}
+
+                {form_field form=$form field='password'}
+                <span {if $error}class="error"{/if}>
+				    <input type="password" class="input" placeholder="{intl l='Password'}" name="{$name}" {$attr} />
+				</span>
+                {/form_field}
+
+				{form_field form=$form field='remember_me'}
+				<label class="checkbox"> <input type="checkbox" name="{$name}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {intl l='Remember me'}</label>
+				{/form_field}
+
+				<span class="pull-right"><button type="submit" class="btn btn-primary">{intl l='Login'} <i class="icon-play icon-white"></i></button></span>
 			</form>
+			{/form}
 		</div>
 
 		{module_include location='index_middle'}

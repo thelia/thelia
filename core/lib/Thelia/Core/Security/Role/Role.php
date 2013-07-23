@@ -9,7 +9,7 @@
  * file that was distributed with this source code.
  */
 
-namespace use Thelia\Core\Security\Role;
+namespace Thelia\Core\Security\Role;
 
 /**
  * Role is a simple implementation of a RoleInterface where the role is a
@@ -37,5 +37,9 @@ class Role implements RoleInterface
     public function getRole()
     {
         return $this->role;
+    }
+
+    public function __toString() {
+    	return $this->role;
     }
 }

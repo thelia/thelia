@@ -20,47 +20,39 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Command;
 
-namespace Thelia\Core\Security\Encoder;
+use Propel\Runtime\Propel;
+use Symfony\Component\Console\Application;
 
-/**
- * This interface defines a hash based password encoder.
- *
- * @author Franck Allimant <franck@cqfdev.fr>
- */
 
-class PasswordHashEncoder implements PasswordEncoderInterface {
+abstract class BaseModuleGenerate extends ContainerAwareCommand {
 
-   /**
-    * {@inheritdoc}
-    */
-    public function encode($password, $algorithm, $salt)
-	{
-	    if (!in_array($algorithm, hash_algos(), true)) {
-	    	throw new \LogicException(sprintf('The algorithm "%s" is not supported.', $algorithm));
-	    }
+     protected $module;
+     protected $moduleDirectory;
 
-	    // Salt the string
-	    $salted = $password.$salt;
+     protected $reservedKeyWords = array(
+         "thelia"
+     );
 
-	    // Create the hash
-	    $digest = hash($algorithm, $salted, true);
+     protected $neededDirectories = array(
+         "Config",
+         "Model",
+         "Loop"
+     );
 
-	    // "stretch" hash
-	    for ($i = 1; $i < 5000; $i++) {
-	    	$digest = hash($algorithm, $digest.$salted, true);
-	    }
+     protected function verifyExistingModule()
+     {
+         if (file_exists($this->moduleDirectory)) {
+             throw new \RuntimeException(sprintf("%s module already exists", $this->module));
+         }
+     }
 
-	    return base64_encode($digest);
-	}
-
-   /**
-    * {@inheritdoc}
-    */
-	public function isEqual($string, $password, $algorithm, $salt)
-	{
-	    $encoded = $this->encode($password, $algorithm, $salt);
-
-	    return $encoded == $string;
-	}
+     protected function formatModuleName($name)
+     {
+         if (in_array(strtolower($name), $this->reservedKeyWords)) {
+             throw new \RuntimeException(sprintf("%s module name is a reserved keyword", $name));
+         }
+         return ucfirst($name);
+     }
 }

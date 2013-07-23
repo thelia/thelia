@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 namespace Thelia\Core\EventListener;
@@ -29,7 +29,7 @@ use Thelia\Core\Factory\ActionEventFactory;
 
 /**
  *
- * Action are dispatch here.
+ * Action are dispatched here.
  *
  * A factory is used for creating appropriate action object
  *
@@ -43,6 +43,7 @@ class ControllerListener implements EventSubscriberInterface
     {
         $dispatcher = $event->getDispatcher();
         $request = $event->getRequest();
+
         if (false !== $action = $request->get("action")) {
            //search corresponding action
             $event = new ActionEventFactory($request, $action, $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
@@ -50,12 +51,9 @@ class ControllerListener implements EventSubscriberInterface
             $dispatcher->dispatch("action.".$action, $actionEvent);
 
             if ($actionEvent->hasFormError()) {
-                $request->getSession()->set("form_error", true);
-                $request->getSession()->set("form_name", $actionEvent->getForm()->createView()
-                    ->vars["attr"]["thelia_name"]);
+                $request->getSession()->setErrorFormName($actionEvent->getFormError()->getName());
             }
         }
-
     }
 
    public static function getSubscribedEvents()

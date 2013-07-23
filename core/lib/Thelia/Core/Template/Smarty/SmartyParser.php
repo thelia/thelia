@@ -7,10 +7,13 @@ use \Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use \Smarty;
 
+use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
+use Thelia\Core\Template\ParserContext;
+use Thelia\Model\ConfigQuery;
 
 /**
  *
@@ -22,7 +25,9 @@ class SmartyParser extends Smarty implements ParserInterface
 
     public $plugins = array();
 
-    protected $request, $dispatcher;
+    protected $request;
+    protected $dispatcher;
+    protected $parserContext;
 
     protected $template = "";
 
@@ -35,12 +40,15 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param string                   $env
      * @param bool                     $debug
      */
-    public function __construct(Request $request, EventDispatcherInterface $dispatcher, $template = false, $env = "prod", $debug = false)
+    public function __construct(
+    		Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
+    		$template = false, $env = "prod", $debug = false)
     {
         parent::__construct();
 
         $this->request = $request;
         $this->dispatcher = $dispatcher;
+        $this->parserContext = $parserContext;
 
         // Configure basic Smarty parameters
 
@@ -50,10 +58,10 @@ class SmartyParser extends Smarty implements ParserInterface
         $cache_dir = THELIA_ROOT . 'cache/'. $env .'/smarty/cache';
         if (! is_dir($cache_dir)) @mkdir($cache_dir, 0777, true);
 
-        $this->setTemplate($template ?: 'smarty-sample'); // FIXME: put this in configuration
-
         $this->setCompileDir($compile_dir);
         $this->setCacheDir($cache_dir);
+
+        $this->setTemplate($template ?: ConfigQuery::read('active-template', 'default'));
 
         $this->debugging = $debug;
 
@@ -74,14 +82,20 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->status = 200;
 
         $this->registerFilter('pre', array($this, "preThelia"));
+        $this->registerFilter('output', array($this, "removeBlankLines"));
     }
 
     public function preThelia($tpl_source, \Smarty_Internal_Template $template)
     {
-        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
-        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
+    	$new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
+    	$new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
 
-        return $new_source;
+    	return $new_source;
+    }
+
+    public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
+    {
+    	return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
     }
 
     public function setTemplate($template_path_from_template_base)
@@ -103,8 +117,13 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param  array  $parameters       an associative array of names / value pairs
      * @return string the rendered template text
      */
-    public function render($realTemplateName, array $parameters)
+    public function render($realTemplateName, array $parameters = array())
     {
+    	// Assign the parserContext variables
+    	foreach($this->parserContext as $var => $value) {
+    		$this->assign($var, $value);
+    	}
+
         $this->assign($parameters);
 
         return $this->fetch($realTemplateName);
@@ -117,7 +136,14 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function getContent()
     {
-        return $this->fetch($this->getTemplateFilePath());
+        try {
+            $templateFile = $this->getTemplateFilePath();
+        }
+        catch(\RuntimeException $e) {
+            return new Response($e->getMessage(), "404");
+        }
+
+        return $this->render($templateFile);
     }
 
     /**
@@ -181,11 +207,23 @@ class SmartyParser extends Smarty implements ParserInterface
     protected function getTemplateFilePath()
     {
          $file = $this->request->attributes->get('_view');
+         $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file;
 
-        $fileName = THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file . ".html";
+        $pathFileName = realpath(dirname(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/" . $file));
+        $templateDir = realpath(THELIA_TEMPLATE_DIR . rtrim($this->template, "/") . "/");
 
-        if (file_exists($fileName)) return $fileName;
+        if (strpos($pathFileName, $templateDir) !== 0) {
+            throw new ResourceNotFoundException(sprintf("%s view does not exists", $file));
+        }
 
-        throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+        if (!file_exists($fileName)) {
+            $fileName .= ".html";
+
+            if(!file_exists($fileName)) {
+                throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
+            }
+        }
+
+        return $fileName;
     }
 }

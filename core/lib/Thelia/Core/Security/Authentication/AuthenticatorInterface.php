@@ -21,8 +21,12 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Security\Exception;
+namespace Thelia\Core\Security\Authentication;
 
-class AuthenticationTokenNotFoundException extends \Exception
-{
+interface AuthenticatorInterface {
+
+	/**
+	 * Returns a UserInterface instance, authentified using the authenticator specific method
+	 */
+	public function getAuthentifiedUser();
 }

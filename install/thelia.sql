@@ -453,22 +453,11 @@ CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `ref` VARCHAR(50) NOT NULL,
-    `customer_title_id` INTEGER,
-    `company` VARCHAR(255),
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
-    `address1` VARCHAR(255) NOT NULL,
-    `address2` VARCHAR(255) COMMENT '    ',
-    `address3` VARCHAR(255),
-    `zipcode` VARCHAR(10),
-    `city` VARCHAR(255) NOT NULL,
-    `country_id` INTEGER NOT NULL,
-    `phone` VARCHAR(20),
-    `cellphone` VARCHAR(20),
     `email` VARCHAR(50),
     `password` VARCHAR(255),
     `algo` VARCHAR(128),
-    `salt` VARCHAR(128),
     `reseller` TINYINT,
     `lang` VARCHAR(10),
     `sponsor` VARCHAR(50),
@@ -476,13 +465,7 @@ CREATE TABLE `customer`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `ref_UNIQUE` (`ref`),
-    INDEX `idx_customer_customer_title_id` (`customer_title_id`),
-    CONSTRAINT `fk_customer_customer_title_id`
-        FOREIGN KEY (`customer_title_id`)
-        REFERENCES `customer_title` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE SET NULL
+    UNIQUE INDEX `ref_UNIQUE` (`ref`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -507,6 +490,8 @@ CREATE TABLE `address`
     `city` VARCHAR(255) NOT NULL,
     `country_id` INTEGER NOT NULL,
     `phone` VARCHAR(20),
+    `cellphone` VARCHAR(20),
+    `is_default` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1040,11 +1025,11 @@ DROP TABLE IF EXISTS `admin_group`;
 CREATE TABLE `admin_group`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `group_id` INTEGER,
-    `admin_id` INTEGER,
+    `group_id` INTEGER NOT NULL,
+    `admin_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
+    PRIMARY KEY (`id`,`group_id`,`admin_id`),
     INDEX `idx_admin_group_group_id` (`group_id`),
     INDEX `idx_admin_group_admin_id` (`admin_id`),
     CONSTRAINT `fk_admin_group_group_id`
@@ -1074,8 +1059,8 @@ CREATE TABLE `group_resource`
     `write` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `id_idx` (`group_id`),
+    PRIMARY KEY (`id`,`group_id`,`resource_id`),
+    INDEX `id_group_resource_group_id` (`group_id`),
     INDEX `idx_group_resource_resource_id` (`resource_id`),
     CONSTRAINT `fk_group_resource_group_id`
         FOREIGN KEY (`group_id`)

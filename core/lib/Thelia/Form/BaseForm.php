@@ -31,14 +31,20 @@ use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfProvider\SessionCsrfProvider;
 use Symfony\Component\Validator\Validation;
 use Thelia\Model\ConfigQuery;
+use Thelia\Tools\URL;
 
 abstract class BaseForm {
     /**
      * @var \Symfony\Component\Form\FormFactoryInterface
      */
+    protected $formBuilder;
+
+    /**
+     * @var \Symfony\Component\Form\Form
+     */
     protected $form;
 
-    public $name;
+	private $view = null;
 
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
@@ -48,7 +54,7 @@ abstract class BaseForm {
             $options["attr"]["thelia_name"] = $this->getName();
         }
 
-        $this->form = Forms::createFormFactoryBuilder()
+        $this->formBuilder = Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension())
             ->addExtension(
                 new CsrfExtension(
@@ -63,9 +69,45 @@ abstract class BaseForm {
             ->createNamedBuilder($this->getName(), $type, $data, $options);
         ;
 
+        $this->buildForm();
 
+        // If not already set, define the success_url field
+        if (! $this->formBuilder->has('success_url')) {
+        	$this->formBuilder->add("success_url", "text");
+        }
 
-            $this->buildForm();
+        $this->form = $this->formBuilder->getForm();
+    }
+
+    /**
+     * Returns the absolute URL to redirect the user to if the form is successfully processed.
+     *
+     * @param string $default the default URL. If not given, the configured base URL is used.
+     *
+     * @return string an absolute URL
+     */
+    public function getSuccessUrl($default = null) {
+
+    	$successUrl = $this->form->get('success_url')->getData();
+
+    	if (empty($successUrl)) {
+
+    		if ($default === null) $default = ConfigQuery::read('base_url', '/');
+
+    		$successUrl = $default;
+    	}
+
+    	return URL::absoluteUrl($successUrl);
+    }
+
+    public function createView() {
+    	$this->view = $this->form->createView();
+    }
+
+    public function getView() {
+    	if ($this->view === null) throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
+
+    	return $this->view;
     }
 
     /**
@@ -73,15 +115,15 @@ abstract class BaseForm {
      */
     public function getForm()
     {
-        return $this->form->getForm();
+        return $this->form;
     }
 
     /**
      *
      * in this function you add all the fields you need for your Form.
-     * Form this you have to call add method on $this->form attribute :
+     * Form this you have to call add method on $this->formBuilder attribute :
      *
-     * $this->form->add("name", "text")
+     * $this->formBuilder->add("name", "text")
      *   ->add("email", "email", array(
      *           "attr" => array(
      *               "class" => "field"

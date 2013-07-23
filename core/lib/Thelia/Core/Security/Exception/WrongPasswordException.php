@@ -1,5 +1,4 @@
 <?php
-
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -22,46 +21,8 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Security\Authentication;
+namespace Thelia\Core\Security\Exception;
 
-use Thelia\Core\Security\Authentication\AuthenticationProviderInterface;
-use Thelia\Core\Security\Encoder\PasswordEncoderInterface;
-use Thelia\Core\Security\User\UserProviderInterface;
-use Thelia\Security\Token\TokenInterface;
-use Thelia\Core\Security\Exception\IncorrectPasswordException;
-use Thelia\Core\Security\Token\UsernamePasswordToken;
-
-class UsernamePasswordAuthenticator implements AuthenticationProviderInterface {
-
-    protected $userProvider;
-    protected $encoder;
-
-    private $token;
-
-    public function __construct(UserProviderInterface $userProvider, PasswordEncoderInterface $encoder) {
-        $this->userProvider = $userProvider;
-        $this->encoder = $encoder;
-    }
-
-    public function supportsToken(TokenInterface $token) {
-
-    	return $token instanceof UsernamePasswordToken;
-    }
-
-    public function authenticate($token) {
-
-        if (!$this->supports($token)) {
-        	return null;
-        }
-
-        // Retreive user
-        $user = $this->userProvider->getUser($this->token->getUsername());
-
-        // Check password
-        $authOk = $this->encoder->isEqual($password, $user->getPassword(), $user->getAlgo(), $user->getSalt()) === true;
-
-        $authenticatedToken = new UsernamePasswordToken($user, $token->getCredentials(), $authOk);
-
-        return $authenticatedToken;
-    }
+class WrongPasswordException extends AuthenticationException
+{
 }

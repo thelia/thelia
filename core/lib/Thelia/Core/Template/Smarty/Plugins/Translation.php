@@ -25,9 +25,16 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class Translation implements SmartyPluginInterface
 {
+	protected $translator;
+
+	public function __construct(TranslatorInterface $translator) {
+		$this->translator = $translator;
+	}
+
     /**
      * Process translate function
      *
@@ -35,16 +42,9 @@ class Translation implements SmartyPluginInterface
      * @param  unknown $smarty
      * @return string
      */
-    public function theliaTranslate($params, &$smarty)
+    public function translate($params, &$smarty)
     {
-        if (isset($params['l'])) {
-            $string = str_replace('\'', '\\\'', $params['l']);
-        } else {
-            $string = '';
-        }
-
-        // TODO
-        return "$string";
+    	return $this->translator->trans($params['l'], isset($params['p']) ? $params['p'] : array());
     }
 
     /**
@@ -55,7 +55,7 @@ class Translation implements SmartyPluginInterface
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('function', 'intl', $this, 'theliaTranslate'),
+            new SmartyPluginDescriptor('function', 'intl', $this, 'translate'),
         );
     }
 }

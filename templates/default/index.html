@@ -1,26 +1,151 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <title></title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    </head>
-    <body>
-        <div>TODO write content<br />
-            <THELIA_cat type="category">
-            #__COUNT__ - #TITLE <br />
-            nb child : #NB_CHILD <br /><br />
-        </THELIA_cat>
+{include file="includes/header.html"}
+<div>
 
-        <TEST_equal test="equal" variable="3" value="1">
-            test vrai
-        </TEST_equal>
-            test faux
-        <//TEST_equal>
-        <br />
-        <REPEAT_loopy start="6" end="12" increment="1">
-            Compteur = #INDEX<br />
-        </REPEAT_loopy>
+{loop type="auth" name="auth_test" context="front" roles="CUSTOMER"}
 
-        </div>
-    </body>
-</html>
+<p>Customer is authentified :-)</p>
+{/loop}
+
+{elseloop rel="auth_test"}
+<p>Customer is not authentified :-(</p>
+{/elseloop}
+
+An image from asset directory :
+{images file='assets/img/logo-thelia-34px.png'}<img src="{$asset_url}" alt="{intl l='Thelia, solution e-commerce libre'}" />{/images}
+</div>
+
+<div>
+{intl l='An internationalized string'}
+</div>
+
+
+<div>
+	jQuery data: <span id="jquery_block"></span>
+</div>
+
+<div>
+    <p>Category loop example</p>
+    <ul>
+        {loop type="category" name="catloop1"}
+            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}, children: {$NB_CHILD}
+                {ifloop rel="inner1"}
+                    <ul>
+                        {loop type="category" name="inner1" parent="{$ID}"}
+                            <li>Sub cat {$ID} (parent is {$PARENT}): {$TITLE}</li>
+                        {/loop}
+                    </ul>
+                {/ifloop}
+            </li>
+        {/loop}
+    </ul>
+</div>
+
+
+
+
+<div>
+	<p>Conditional example #1</p>
+
+  	{ifloop rel="catloop2"}
+  		Hey ! Loop catloop2 is not empty:
+  		<ul>
+   		{loop type="category" name="catloop2" parent="12"}
+       		<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+   		{/loop}
+   		</ul>
+  	{/ifloop}
+
+  	{elseloop rel="catloop2"}
+  		<p>Loop catloop2 is empty</p>
+  	{/elseloop}
+</div>
+
+<div>
+	<p>Conditional example #2</p>
+
+	{ifloop rel="catloop3"}
+		Loop catloop3 is not empty:
+		<ul>
+		{loop type="category" name="catloop3" parent="0"}
+	    	<li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+	 	{/loop}
+	 	</ul>
+	{/ifloop}
+
+	{elseloop rel="catloop3"}
+		<p>Loop catloop3 is empty</p>
+	{/elseloop}
+
+	{elseloop rel="catloop2"}
+		<p>... but catloop2 is still empty :-)</p>
+	{/elseloop}
+
+</div>
+
+<div>
+	<p>Traditional for loop</p>
+    {for $index=5 to 12 step 1}
+    	Compteur = {$index}<br />
+    {/for}
+</div>
+
+
+
+<div>
+    <p>Some pagination</p>
+    <p>PAGE 1</p>
+    <ul>
+        {loop type="category" name="catloopwithpagination1" limit="2" page="1"}
+        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+    <p>PAGE 2</p>
+    <ul>
+        {loop type="category" name="catloopwithpagination2" limit="2" page="2"}
+        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+    <p>PAGE 1000</p>
+    <ul>
+
+        {loop type="category" name="catloopwithpagination1000" limit="2" page="1000"}
+            <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+        {/loop}
+
+        {elseloop rel="catloopwithpagination1000"}
+            NO RESULTS
+        {/elseloop}
+    </ul>
+</div>
+
+<div>
+    <p>Some pagination with page choice</p>
+    {assign var=current_page value=2}
+    <p>PAGE {$current_page} :</p>
+    <ul>
+        {loop type="category" name="catloopwithpaginationchoice" limit="2" page="{$current_page}"}
+        <li>{$LOOP_COUNT}/{$LOOP_TOTAL} : {$ID} {$TITLE}</li>
+        {/loop}
+    </ul>
+    <p>page choice</p>
+    {pageloop rel="catloopwithpaginationchoice"}
+        {if ${PAGE} != {$current_page}}
+            {if {$PAGE} > {$current_page}-10 AND {$PAGE} < {$current_page}+10}
+                {$PAGE}
+            {/if}
+            {if {$PAGE} == {$current_page}-10 OR {$PAGE} == {$current_page}+10}
+                ...
+            {/if}
+            {if ({$PAGE} < {$current_page}-10 OR {$PAGE} > {$current_page}+10) AND ({$PAGE}%10 == 0 OR ${PAGE} == {$LAST} OR ${PAGE} == 1)}
+                {$PAGE}
+            {/if}
+        {else}
+            { {$PAGE} }
+        {/if}
+        {if {$PAGE} != {$LAST}}
+            -
+        {/if}
+    {/pageloop}
+</div>
+
+{include file="includes/footer.html"}

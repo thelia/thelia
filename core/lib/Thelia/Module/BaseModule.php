@@ -1,4 +1,5 @@
 <?php
+
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -20,39 +21,23 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\Security\Encoder;
 
-/**
- *
- * use password api include in php 5.5 and available throw the password_compat library.
- *
- * Class PasswordPhpCompatEncoder
- * @package Thelia\Core\Security\Encoder
- */
-class PasswordPhpCompatEncoder implements PasswordEncoderInterface {
+namespace Thelia\Module;
 
-    /**
-     * Encode a string.
-     *
-     * @param  string $password    the password to encode
-     * @param  string $algorithm   the hash() algorithm
-     * @return string    $salt        the salt, the salt is not used here.
-     */
-    public function encode($password, $algorithm, $salt = null)
+abstract class BaseModule
+{
+
+    public function __construct()
     {
-        return password_hash($password, $algorithm);
+
     }
 
-    /**
-     * Check a string against an encoded password.
-     *
-     * @param  string $string      the string to compare against password
-     * @param  string $password    the encoded password
-     * @param  string $algorithm   the hash() algorithm, not used here
-     * @return string    $salt        the salt, not used here
-     */
-    public function isEqual($string, $password, $algorithm = null, $salt = null)
+    protected function activate()
     {
-        return password_verify($string, $password);
+
     }
+
+    abstract public function install();
+    abstract public function destroy();
+
 }

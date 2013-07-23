@@ -1,0 +1,52 @@
+{include file="includes/header.html"}
+
+<h1>{intl l='Please login'}</h1>
+
+{form name="thelia.customer.login" }
+{* We use $INDEX_PAGE as form action to avoid mixing post and get data *}
+<form action="{$INDEX_PAGE}" method="post" {form_enctype form=$form}>
+
+	{*
+	The two fields below are not par of the Login form, they are here to defines
+	the action to process, and the view to render once the form is submited
+	*}
+	<input type="hidden" name="action" value="loginCustomer" /> {* the action triggered by this form *}
+	<input type="hidden" name="view" value="login" /> 			{* the view to return to if the form cannot be validated *}
+
+	{*
+	This field is common to all BaseForm instances (thus, this one), and defines
+	the URL the customer is redirected to once the form has been successfully
+	processed
+	*}
+
+	{form_field form=$form field='success_url'}
+	<input type="hidden" name="{$name}" value="{$RETURN_TO_URL}" /> {* the url the user is redirected to on login success *}
+	{/form_field}
+
+	{*
+	customer_login_error_message is defined in Customer action processor class,
+	and passed the parser through the ParserContext service.
+	*}
+
+	{if isset($customer_login_error_message)}<div class="alert alert-error">{$customer_login_error_message}</div>{/if}
+
+    {form_hidden_fields form=$form}
+
+    {form_field form=$form field="email"}
+        {if #error}{#message}{/if}
+        <label>{intl l="Your e-mail address"}: </label><input type="email" name="{$name}" {$attr} ><br />
+    {/form_field}
+
+    {form_field form=$form field='password'}
+    <label>{intl l="Your password"}: </label><input type="password" name="{$name}" {$attr}> <br />
+    {/form_field}
+
+	{form_field form=$form field='remember_me'}
+	<label class="checkbox"> <input type="checkbox" name="{$name}" value="{$value}" {$attr} {if $options.checked}checked="checked"{/if}/> {intl l='Remember me'}</label>
+	{/form_field}
+
+	<button type="submit">{intl l='Login'}</button>
+</form>
+{/form}
+
+{include file='includes/footer.html'}

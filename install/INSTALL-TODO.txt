@@ -1,0 +1,10 @@
+A faire dans la procédure d'install
+-----------------------------------
+
+Variables Config à initialiser:
+
+- base_url : url de base de la boutique avec / final (ex. http://www.boutique.com/, ou http://www.boutique.com/path/to/thelia2/ )
+- base_admin_template : chemin du template admin relatif au repertoire template (ex. admin/default)
+- default_locale : la locale par défaut (ex. en_US), à utiliser pour les fichiers de traduction
+- asset_dir_from_web_root : le chemin relatif à /web du repertoires des assets (ex. assets)
+- active_template: chemin du template front relatif au repertoire template (ex. default)

@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,7 +17,7 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
@@ -48,9 +48,14 @@ final class TheliaEvents
      */
     const INCLUSION = "thelia.include";
 
-    const BEFORE_CREATECUSTOMER = "action.before_createcustomer";
+    const CUSTOMER_LOGOUT = "action.customer_logout";
+    const CUSTOMER_LOGIN  = "action.customer_login";
 
-    const AFTER_CREATECUSTOMER = "action.after_createcustomer";
+    const BEFORE_CREATECUSTOMER = "action.before_createcustomer";
+    const AFTER_CREATECUSTOMER 	= "action.after_createcustomer";
+
+    const BEFORE_CHANGECUSTOMER = "action.before_changecustomer";
+    const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
 
     const CREATECUSTOMER_CUSTOMREF = "customer.creation.customref";
 }

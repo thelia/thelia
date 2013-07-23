@@ -2,6 +2,7 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -12,6 +13,9 @@ use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\Security\User\UserInterface;
 
 use Propel\Runtime\Connection\ConnectionInterface;
+use Propel\Runtime\Propel;
+use Thelia\Model\Map\CustomerTableMap;
+use Thelia\Core\Security\Role\Role;
 
 /**
  * Skeleton subclass for representing a row from the 'customer' table.
@@ -52,16 +56,9 @@ class Customer extends BaseCustomer implements UserInterface
     public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
     {
         $this
-            ->setCustomerTitleId($titleId)
+        	->setTitleId($titleId)
             ->setFirstname($firstname)
             ->setLastname($lastname)
-            ->setAddress1($address1)
-            ->setAddress2($address2)
-            ->setAddress3($address3)
-            ->setPhone($phone)
-            ->setCellphone($cellphone)
-            ->setZipcode($zipcode)
-            ->setCountryId($countryId)
             ->setEmail($email)
             ->setPassword($plainPassword)
             ->setReseller($reseller)
@@ -73,8 +70,36 @@ class Customer extends BaseCustomer implements UserInterface
             $this->setLang($lang);
         }
 
-        $this->save();
 
+        $con = Propel::getWriteConnection(CustomerTableMap::DATABASE_NAME);
+        $con->beginTransaction();
+        try {
+            $this->save($con);
+
+            $address = new Address();
+
+            $address
+                ->setCustomerTitleId($titleId)
+                ->setFirstname($firstname)
+                ->setLastname($lastname)
+                ->setAddress1($address1)
+                ->setAddress2($address2)
+                ->setAddress3($address3)
+                ->setPhone($phone)
+                ->setCellphone($cellphone)
+                ->setZipcode($zipcode)
+                ->setCountryId($countryId)
+                ->setIsDefault(1)
+                ->setCustomer($this)
+                ->save($con);
+
+            $con->commit();
+
+
+        } catch(Exception $e) {
+            $con->rollback();
+            throw $e;
+        }
     }
 
     public function preInsert(ConnectionInterface $con = null)
@@ -91,7 +116,7 @@ class Customer extends BaseCustomer implements UserInterface
 
     protected function generateRef()
     {
-        return date("YmdHI");
+        return date("YmdHisu");
     }
 
     public function setPassword($password)
@@ -113,12 +138,19 @@ class Customer extends BaseCustomer implements UserInterface
         $this->dispatcher = $dispatcher;
     }
 
+   /**
+     * {@inheritDoc}
+     */
+    public function getUsername() {
+    	return $this->getEmail();
+    }
+
     /**
      * {@inheritDoc}
      */
-
-    public function getUsername() {
-    	return $this->getEmail();
+    public function checkPassword($password)
+    {
+    	return password_verify($password, $this->password);
     }
 
     /**
@@ -132,6 +164,6 @@ class Customer extends BaseCustomer implements UserInterface
      * {@inheritDoc}
      */
     public function getRoles() {
-    	return array(new Role('ROLE_CUSTOMER'));
+    	return array(new Role('CUSTOMER'));
     }
 }

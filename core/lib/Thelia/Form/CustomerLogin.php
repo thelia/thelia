@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,41 +20,37 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-
-namespace Thelia\Core\Security\Authentication;
-
-use Thelia\Core\Security\UserNotFoundException;
-use Thelia\Core\Security\IncorrectPasswordException;
-
-/**
- * Aunthentication providers are in charge or retrieving users, and check their
- * credentials.
- *
- * @author Franck
- *
- */
-interface AuthenticationProviderInterface {
-
-    /**
-     * Set the authentication token
-     *
-     * @param TokenInterface $token the authentication token
-     */
-    public function setToken(TokenInterface $token);
+namespace Thelia\Form;
 
 
-    /**
-     * Set the authentication token
-     *
-     * @param unknown $key
-     */
-    public function supportsToken(TokenInterface $token);
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Choice;
+use Symfony\Component\Validator\Constraints\Email;
 
-    /**
-     * Authenticate the token
-     *
-     *@throws Exception if authentication was not successful
-     */
-    public function authenticate();
+class CustomerLogin extends BaseForm {
+
+    protected function buildForm()
+    {
+        $this->formBuilder
+            ->add("email", "text", array(
+                "constraints" => array(
+                    new NotBlank(),
+                    new Email()
+                )
+            ))
+            ->add("password", "password", array(
+                "constraints" => array(
+                	new NotBlank()
+                )
+            ))
+            ->add("remember_me", "checkbox")
+           ;
+    }
+
+    public function getName()
+    {
+        return "customer_login";
+    }
 }
-?>

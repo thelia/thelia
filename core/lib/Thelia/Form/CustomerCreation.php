@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                          */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -33,7 +33,7 @@ class CustomerCreation extends BaseForm
 
     protected function buildForm()
     {
-        $this->form
+        $this->formBuilder
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()

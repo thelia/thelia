@@ -47,7 +47,8 @@ class Auth extends BaseLoop
     {
         return new ArgumentCollection(
         	Argument::createAnyTypeArgument('roles', null, true),
-        	Argument::createAnyTypeArgument('permissions')
+        	Argument::createAnyTypeArgument('permissions'),
+        	Argument::createAnyTypeArgument('context', 'front', false)
          );
     }
 
@@ -72,16 +73,20 @@ class Auth extends BaseLoop
      */
     public function exec(&$pagination)
     {
+    	$context = $this->getContext();
     	$roles = $this->_explode($this->getRoles());
     	$permissions = $this->_explode($this->getPermissions());
 
     	$loopResult = new LoopResult();
 
     	try {
-	    	$this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions);
+    		$this->securityContext->setContext($context);
 
-	    	// Create an empty row: loop is no longer empty :)
-            $loopResult->addRow(new LoopResultRow());
+	    	if (true === $this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions)) {
+
+	    		// Create an empty row: loop is no longer empty :)
+            	$loopResult->addRow(new LoopResultRow());
+	    	}
     	}
     	catch (\Exception $ex) {
     		// Not granted, loop is empty

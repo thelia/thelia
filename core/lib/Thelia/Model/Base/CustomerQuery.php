@@ -23,22 +23,12 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomerQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCustomerQuery orderByRef($order = Criteria::ASC) Order by the ref column
- * @method     ChildCustomerQuery orderByCustomerTitleId($order = Criteria::ASC) Order by the customer_title_id column
- * @method     ChildCustomerQuery orderByCompany($order = Criteria::ASC) Order by the company column
+ * @method     ChildCustomerQuery orderByTitleId($order = Criteria::ASC) Order by the title_id column
  * @method     ChildCustomerQuery orderByFirstname($order = Criteria::ASC) Order by the firstname column
  * @method     ChildCustomerQuery orderByLastname($order = Criteria::ASC) Order by the lastname column
- * @method     ChildCustomerQuery orderByAddress1($order = Criteria::ASC) Order by the address1 column
- * @method     ChildCustomerQuery orderByAddress2($order = Criteria::ASC) Order by the address2 column
- * @method     ChildCustomerQuery orderByAddress3($order = Criteria::ASC) Order by the address3 column
- * @method     ChildCustomerQuery orderByZipcode($order = Criteria::ASC) Order by the zipcode column
- * @method     ChildCustomerQuery orderByCity($order = Criteria::ASC) Order by the city column
- * @method     ChildCustomerQuery orderByCountryId($order = Criteria::ASC) Order by the country_id column
- * @method     ChildCustomerQuery orderByPhone($order = Criteria::ASC) Order by the phone column
- * @method     ChildCustomerQuery orderByCellphone($order = Criteria::ASC) Order by the cellphone column
  * @method     ChildCustomerQuery orderByEmail($order = Criteria::ASC) Order by the email column
  * @method     ChildCustomerQuery orderByPassword($order = Criteria::ASC) Order by the password column
  * @method     ChildCustomerQuery orderByAlgo($order = Criteria::ASC) Order by the algo column
- * @method     ChildCustomerQuery orderBySalt($order = Criteria::ASC) Order by the salt column
  * @method     ChildCustomerQuery orderByReseller($order = Criteria::ASC) Order by the reseller column
  * @method     ChildCustomerQuery orderByLang($order = Criteria::ASC) Order by the lang column
  * @method     ChildCustomerQuery orderBySponsor($order = Criteria::ASC) Order by the sponsor column
@@ -48,22 +38,12 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomerQuery groupById() Group by the id column
  * @method     ChildCustomerQuery groupByRef() Group by the ref column
- * @method     ChildCustomerQuery groupByCustomerTitleId() Group by the customer_title_id column
- * @method     ChildCustomerQuery groupByCompany() Group by the company column
+ * @method     ChildCustomerQuery groupByTitleId() Group by the title_id column
  * @method     ChildCustomerQuery groupByFirstname() Group by the firstname column
  * @method     ChildCustomerQuery groupByLastname() Group by the lastname column
- * @method     ChildCustomerQuery groupByAddress1() Group by the address1 column
- * @method     ChildCustomerQuery groupByAddress2() Group by the address2 column
- * @method     ChildCustomerQuery groupByAddress3() Group by the address3 column
- * @method     ChildCustomerQuery groupByZipcode() Group by the zipcode column
- * @method     ChildCustomerQuery groupByCity() Group by the city column
- * @method     ChildCustomerQuery groupByCountryId() Group by the country_id column
- * @method     ChildCustomerQuery groupByPhone() Group by the phone column
- * @method     ChildCustomerQuery groupByCellphone() Group by the cellphone column
  * @method     ChildCustomerQuery groupByEmail() Group by the email column
  * @method     ChildCustomerQuery groupByPassword() Group by the password column
  * @method     ChildCustomerQuery groupByAlgo() Group by the algo column
- * @method     ChildCustomerQuery groupBySalt() Group by the salt column
  * @method     ChildCustomerQuery groupByReseller() Group by the reseller column
  * @method     ChildCustomerQuery groupByLang() Group by the lang column
  * @method     ChildCustomerQuery groupBySponsor() Group by the sponsor column
@@ -92,22 +72,12 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     ChildCustomer findOneById(int $id) Return the first ChildCustomer filtered by the id column
  * @method     ChildCustomer findOneByRef(string $ref) Return the first ChildCustomer filtered by the ref column
- * @method     ChildCustomer findOneByCustomerTitleId(int $customer_title_id) Return the first ChildCustomer filtered by the customer_title_id column
- * @method     ChildCustomer findOneByCompany(string $company) Return the first ChildCustomer filtered by the company column
+ * @method     ChildCustomer findOneByTitleId(int $title_id) Return the first ChildCustomer filtered by the title_id column
  * @method     ChildCustomer findOneByFirstname(string $firstname) Return the first ChildCustomer filtered by the firstname column
  * @method     ChildCustomer findOneByLastname(string $lastname) Return the first ChildCustomer filtered by the lastname column
- * @method     ChildCustomer findOneByAddress1(string $address1) Return the first ChildCustomer filtered by the address1 column
- * @method     ChildCustomer findOneByAddress2(string $address2) Return the first ChildCustomer filtered by the address2 column
- * @method     ChildCustomer findOneByAddress3(string $address3) Return the first ChildCustomer filtered by the address3 column
- * @method     ChildCustomer findOneByZipcode(string $zipcode) Return the first ChildCustomer filtered by the zipcode column
- * @method     ChildCustomer findOneByCity(string $city) Return the first ChildCustomer filtered by the city column
- * @method     ChildCustomer findOneByCountryId(int $country_id) Return the first ChildCustomer filtered by the country_id column
- * @method     ChildCustomer findOneByPhone(string $phone) Return the first ChildCustomer filtered by the phone column
- * @method     ChildCustomer findOneByCellphone(string $cellphone) Return the first ChildCustomer filtered by the cellphone column
  * @method     ChildCustomer findOneByEmail(string $email) Return the first ChildCustomer filtered by the email column
  * @method     ChildCustomer findOneByPassword(string $password) Return the first ChildCustomer filtered by the password column
  * @method     ChildCustomer findOneByAlgo(string $algo) Return the first ChildCustomer filtered by the algo column
- * @method     ChildCustomer findOneBySalt(string $salt) Return the first ChildCustomer filtered by the salt column
  * @method     ChildCustomer findOneByReseller(int $reseller) Return the first ChildCustomer filtered by the reseller column
  * @method     ChildCustomer findOneByLang(string $lang) Return the first ChildCustomer filtered by the lang column
  * @method     ChildCustomer findOneBySponsor(string $sponsor) Return the first ChildCustomer filtered by the sponsor column
@@ -117,22 +87,12 @@ use Thelia\Model\Map\CustomerTableMap;
  *
  * @method     array findById(int $id) Return ChildCustomer objects filtered by the id column
  * @method     array findByRef(string $ref) Return ChildCustomer objects filtered by the ref column
- * @method     array findByCustomerTitleId(int $customer_title_id) Return ChildCustomer objects filtered by the customer_title_id column
- * @method     array findByCompany(string $company) Return ChildCustomer objects filtered by the company column
+ * @method     array findByTitleId(int $title_id) Return ChildCustomer objects filtered by the title_id column
  * @method     array findByFirstname(string $firstname) Return ChildCustomer objects filtered by the firstname column
  * @method     array findByLastname(string $lastname) Return ChildCustomer objects filtered by the lastname column
- * @method     array findByAddress1(string $address1) Return ChildCustomer objects filtered by the address1 column
- * @method     array findByAddress2(string $address2) Return ChildCustomer objects filtered by the address2 column
- * @method     array findByAddress3(string $address3) Return ChildCustomer objects filtered by the address3 column
- * @method     array findByZipcode(string $zipcode) Return ChildCustomer objects filtered by the zipcode column
- * @method     array findByCity(string $city) Return ChildCustomer objects filtered by the city column
- * @method     array findByCountryId(int $country_id) Return ChildCustomer objects filtered by the country_id column
- * @method     array findByPhone(string $phone) Return ChildCustomer objects filtered by the phone column
- * @method     array findByCellphone(string $cellphone) Return ChildCustomer objects filtered by the cellphone column
  * @method     array findByEmail(string $email) Return ChildCustomer objects filtered by the email column
  * @method     array findByPassword(string $password) Return ChildCustomer objects filtered by the password column
  * @method     array findByAlgo(string $algo) Return ChildCustomer objects filtered by the algo column
- * @method     array findBySalt(string $salt) Return ChildCustomer objects filtered by the salt column
  * @method     array findByReseller(int $reseller) Return ChildCustomer objects filtered by the reseller column
  * @method     array findByLang(string $lang) Return ChildCustomer objects filtered by the lang column
  * @method     array findBySponsor(string $sponsor) Return ChildCustomer objects filtered by the sponsor column
@@ -227,7 +187,7 @@ abstract class CustomerQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, REF, CUSTOMER_TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CELLPHONE, EMAIL, PASSWORD, ALGO, SALT, RESELLER, LANG, SPONSOR, DISCOUNT, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
+        $sql = 'SELECT ID, REF, TITLE_ID, FIRSTNAME, LASTNAME, EMAIL, PASSWORD, ALGO, RESELLER, LANG, SPONSOR, DISCOUNT, CREATED_AT, UPDATED_AT FROM customer WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -387,18 +347,18 @@ abstract class CustomerQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the customer_title_id column
+     * Filter the query on the title_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByCustomerTitleId(1234); // WHERE customer_title_id = 1234
-     * $query->filterByCustomerTitleId(array(12, 34)); // WHERE customer_title_id IN (12, 34)
-     * $query->filterByCustomerTitleId(array('min' => 12)); // WHERE customer_title_id > 12
+     * $query->filterByTitleId(1234); // WHERE title_id = 1234
+     * $query->filterByTitleId(array(12, 34)); // WHERE title_id IN (12, 34)
+     * $query->filterByTitleId(array('min' => 12)); // WHERE title_id > 12
      * </code>
      *
      * @see       filterByCustomerTitle()
      *
-     * @param     mixed $customerTitleId The value to use as filter.
+     * @param     mixed $titleId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -406,16 +366,16 @@ abstract class CustomerQuery extends ModelCriteria
      *
      * @return ChildCustomerQuery The current query, for fluid interface
      */
-    public function filterByCustomerTitleId($customerTitleId = null, $comparison = null)
+    public function filterByTitleId($titleId = null, $comparison = null)
     {
-        if (is_array($customerTitleId)) {
+        if (is_array($titleId)) {
             $useMinMax = false;
-            if (isset($customerTitleId['min'])) {
-                $this->addUsingAlias(CustomerTableMap::CUSTOMER_TITLE_ID, $customerTitleId['min'], Criteria::GREATER_EQUAL);
+            if (isset($titleId['min'])) {
+                $this->addUsingAlias(CustomerTableMap::TITLE_ID, $titleId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($customerTitleId['max'])) {
-                $this->addUsingAlias(CustomerTableMap::CUSTOMER_TITLE_ID, $customerTitleId['max'], Criteria::LESS_EQUAL);
+            if (isset($titleId['max'])) {
+                $this->addUsingAlias(CustomerTableMap::TITLE_ID, $titleId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -426,36 +386,7 @@ abstract class CustomerQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CustomerTableMap::CUSTOMER_TITLE_ID, $customerTitleId, $comparison);
-    }
-
-    /**
-     * Filter the query on the company column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCompany('fooValue');   // WHERE company = 'fooValue'
-     * $query->filterByCompany('%fooValue%'); // WHERE company LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $company The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByCompany($company = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($company)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $company)) {
-                $company = str_replace('*', '%', $company);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::COMPANY, $company, $comparison);
+        return $this->addUsingAlias(CustomerTableMap::TITLE_ID, $titleId, $comparison);
     }
 
     /**
@@ -514,250 +445,6 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::LASTNAME, $lastname, $comparison);
-    }
-
-    /**
-     * Filter the query on the address1 column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByAddress1('fooValue');   // WHERE address1 = 'fooValue'
-     * $query->filterByAddress1('%fooValue%'); // WHERE address1 LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $address1 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByAddress1($address1 = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($address1)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $address1)) {
-                $address1 = str_replace('*', '%', $address1);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::ADDRESS1, $address1, $comparison);
-    }
-
-    /**
-     * Filter the query on the address2 column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByAddress2('fooValue');   // WHERE address2 = 'fooValue'
-     * $query->filterByAddress2('%fooValue%'); // WHERE address2 LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $address2 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByAddress2($address2 = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($address2)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $address2)) {
-                $address2 = str_replace('*', '%', $address2);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::ADDRESS2, $address2, $comparison);
-    }
-
-    /**
-     * Filter the query on the address3 column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByAddress3('fooValue');   // WHERE address3 = 'fooValue'
-     * $query->filterByAddress3('%fooValue%'); // WHERE address3 LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $address3 The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByAddress3($address3 = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($address3)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $address3)) {
-                $address3 = str_replace('*', '%', $address3);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::ADDRESS3, $address3, $comparison);
-    }
-
-    /**
-     * Filter the query on the zipcode column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByZipcode('fooValue');   // WHERE zipcode = 'fooValue'
-     * $query->filterByZipcode('%fooValue%'); // WHERE zipcode LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $zipcode The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByZipcode($zipcode = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($zipcode)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $zipcode)) {
-                $zipcode = str_replace('*', '%', $zipcode);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::ZIPCODE, $zipcode, $comparison);
-    }
-
-    /**
-     * Filter the query on the city column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCity('fooValue');   // WHERE city = 'fooValue'
-     * $query->filterByCity('%fooValue%'); // WHERE city LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $city The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByCity($city = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($city)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $city)) {
-                $city = str_replace('*', '%', $city);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::CITY, $city, $comparison);
-    }
-
-    /**
-     * Filter the query on the country_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCountryId(1234); // WHERE country_id = 1234
-     * $query->filterByCountryId(array(12, 34)); // WHERE country_id IN (12, 34)
-     * $query->filterByCountryId(array('min' => 12)); // WHERE country_id > 12
-     * </code>
-     *
-     * @param     mixed $countryId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByCountryId($countryId = null, $comparison = null)
-    {
-        if (is_array($countryId)) {
-            $useMinMax = false;
-            if (isset($countryId['min'])) {
-                $this->addUsingAlias(CustomerTableMap::COUNTRY_ID, $countryId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($countryId['max'])) {
-                $this->addUsingAlias(CustomerTableMap::COUNTRY_ID, $countryId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::COUNTRY_ID, $countryId, $comparison);
-    }
-
-    /**
-     * Filter the query on the phone column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPhone('fooValue');   // WHERE phone = 'fooValue'
-     * $query->filterByPhone('%fooValue%'); // WHERE phone LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $phone The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByPhone($phone = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($phone)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $phone)) {
-                $phone = str_replace('*', '%', $phone);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::PHONE, $phone, $comparison);
-    }
-
-    /**
-     * Filter the query on the cellphone column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCellphone('fooValue');   // WHERE cellphone = 'fooValue'
-     * $query->filterByCellphone('%fooValue%'); // WHERE cellphone LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $cellphone The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterByCellphone($cellphone = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($cellphone)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $cellphone)) {
-                $cellphone = str_replace('*', '%', $cellphone);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::CELLPHONE, $cellphone, $comparison);
     }
 
     /**
@@ -845,35 +532,6 @@ abstract class CustomerQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CustomerTableMap::ALGO, $algo, $comparison);
-    }
-
-    /**
-     * Filter the query on the salt column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterBySalt('fooValue');   // WHERE salt = 'fooValue'
-     * $query->filterBySalt('%fooValue%'); // WHERE salt LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $salt The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCustomerQuery The current query, for fluid interface
-     */
-    public function filterBySalt($salt = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($salt)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $salt)) {
-                $salt = str_replace('*', '%', $salt);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CustomerTableMap::SALT, $salt, $comparison);
     }
 
     /**
@@ -1114,14 +772,14 @@ abstract class CustomerQuery extends ModelCriteria
     {
         if ($customerTitle instanceof \Thelia\Model\CustomerTitle) {
             return $this
-                ->addUsingAlias(CustomerTableMap::CUSTOMER_TITLE_ID, $customerTitle->getId(), $comparison);
+                ->addUsingAlias(CustomerTableMap::TITLE_ID, $customerTitle->getId(), $comparison);
         } elseif ($customerTitle instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CustomerTableMap::CUSTOMER_TITLE_ID, $customerTitle->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CustomerTableMap::TITLE_ID, $customerTitle->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCustomerTitle() only accepts arguments of type \Thelia\Model\CustomerTitle or Collection');
         }

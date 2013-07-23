@@ -21,32 +21,8 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Security\Encoder;
+namespace Thelia\Core\Security\Exception;
 
-/**
- * This interface defines a password encoder.
- *
- * @author Franck Allimant <franck@cqfdev.fr>
- *
- */
-interface PasswordEncoderInterface {
-
-	/**
-	 * Encode a string.
-	 *
-	 * @param  string    $password    the password to encode
-	 * @param  string    $algorithm   the hash() algorithm
-	 * @return string    $salt        the salt
-	 */
-	public function encode($password, $algorithm, $salt);
-
-	/**
-	 * Check a string against an encoded password.
-	 *
-	 * @param  string    $string      the string to compare against password
-	 * @param  string    $password    the encoded password
-	 * @param  string    $algorithm   the hash() algorithm
-	 * @return string    $salt        the salt
-	 */
-	public function isEqual($string, $password, $algorithm, $salt);
+class UsernameNotFoundException extends AuthenticationException
+{
 }

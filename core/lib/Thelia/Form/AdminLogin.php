@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                          */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -23,7 +23,6 @@
 namespace Thelia\Form;
 
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Choice;
@@ -32,7 +31,7 @@ class AdminLogin extends BaseForm {
 
     protected function buildForm()
     {
-        $this->form
+        $this->formBuilder
             ->add("username", "text", array(
                 "constraints" => array(
                     new NotBlank(),
@@ -44,12 +43,14 @@ class AdminLogin extends BaseForm {
                 	new NotBlank()
                 )
             ))
-            ->add("remember_me", "checkbox");
+            ->add("remember_me", "checkbox", array(
+            		'value' => 'yes'
+            ))
+            ;
     }
 
     public function getName()
     {
-        return "admin_login";
+        return "adminLogin";
     }
-
 }

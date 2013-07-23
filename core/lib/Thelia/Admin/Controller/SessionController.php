@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	email : info@thelia.net                                                          */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -25,39 +25,74 @@ namespace Thelia\Admin\Controller;
 
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\AdminLogin;
+use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
+use Thelia\Model\AdminLog;
+use Thelia\Core\Security\Exception\AuthenticationException;
+use Symfony\Component\Validator\Exception\ValidatorException;
+use Thelia\Tools\URL;
+use Thelia\Tools\Redirect;
 
 class SessionController extends BaseAdminController {
 
-    public function loginAction()
+	public function showLoginAction()
+	{
+		return $this->render("login.html");
+	}
+
+	public function checkLogoutAction()
+	{
+		$this->getSecurityContext()->clear();
+
+		// Go back to login page.
+		return Redirect::exec(URL::absoluteUrl('/admin/login')); // FIXME - should be a parameter
+	}
+
+    public function checkLoginAction()
     {
-        $form = $this->getLoginForm();
+		$form = new AdminLogin($this->getRequest());
 
-        $request = $this->getRequest();
+    	$request = $this->getRequest();
 
-        if($request->isMethod("POST")) {
+    	$authenticator = new AdminUsernamePasswordFormAuthenticator($request, $form);
 
-            $form->bind($request);
+    	try {
+    		$user = $authenticator->getAuthentifiedUser();
 
-            if ($form->isValid()) {
+    		// Success -> store user in security context
+    		$this->getSecurityContext()->setUser($user);
 
-                $this->container->get('request')->authenticate(
-                    $form->get('username')->getData(),
-                    $form->get('password')->getData()
-                );
+    		// Log authentication success
+    		AdminLog::append("Authentication successuful", $request, $user);
 
-                echo "valid"; exit;
-            }
-        }
+    		// Redirect to the success URL
+    		return Redirect::exec($form->getSuccessUrl());
+     	}
+         catch (ValidatorException $ex) {
 
-        return $this->render("login.html", array(
-            "form" => $form->createView()
-        ));
-    }
+         	// Validation problem
+     		$message = "Missing or invalid information. Please check your input.";
+     	}
+     	catch (AuthenticationException $ex) {
 
-    protected function getLoginForm()
-    {
-        $adminLogin = new AdminLogin($this->getRequest());
+     		// Log authentication failure
+     		AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
-        return $adminLogin->getForm();
+     		$message = "Login failed. Please check your username and password.";
+     	}
+     	catch (\Exception $ex) {
+
+     		// Log authentication failure
+     		AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
+
+     		$message = "Unable to process your request. Please try again.";
+     	}
+
+     	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
+     	$request->getSession()->setErrorFormName($form->getName());
+
+      	// Display the login form again, with an error message if required
+    	return $this->render("login.html", array(
+     		"message" => $message
+     	));
     }
 }

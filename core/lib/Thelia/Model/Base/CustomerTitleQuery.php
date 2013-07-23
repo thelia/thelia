@@ -450,7 +450,7 @@ abstract class CustomerTitleQuery extends ModelCriteria
     {
         if ($customer instanceof \Thelia\Model\Customer) {
             return $this
-                ->addUsingAlias(CustomerTitleTableMap::ID, $customer->getCustomerTitleId(), $comparison);
+                ->addUsingAlias(CustomerTitleTableMap::ID, $customer->getTitleId(), $comparison);
         } elseif ($customer instanceof ObjectCollection) {
             return $this
                 ->useCustomerQuery()

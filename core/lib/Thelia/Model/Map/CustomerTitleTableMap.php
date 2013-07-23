@@ -106,7 +106,7 @@ class CustomerTitleTableMap extends TableMap
      *
      * @var string
      */
-    const DEFAULT_LOCALE = 'en_EN';
+    const DEFAULT_LOCALE = 'en_US';
 
     /**
      * holds an array of fieldnames
@@ -166,7 +166,7 @@ class CustomerTitleTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'SET NULL', 'RESTRICT', 'Customers');
+        $this->addRelation('Customer', '\\Thelia\\Model\\Customer', RelationMap::ONE_TO_MANY, array('id' => 'title_id', ), 'RESTRICT', 'RESTRICT', 'Customers');
         $this->addRelation('Address', '\\Thelia\\Model\\Address', RelationMap::ONE_TO_MANY, array('id' => 'customer_title_id', ), 'RESTRICT', 'RESTRICT', 'Addresses');
         $this->addRelation('CustomerTitleI18n', '\\Thelia\\Model\\CustomerTitleI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CustomerTitleI18ns');
     } // buildRelations()
@@ -191,7 +191,6 @@ class CustomerTitleTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                CustomerTableMap::clearInstancePool();
                 CustomerTitleI18nTableMap::clearInstancePool();
             }
 

@@ -21,61 +21,64 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Security\Token;
+namespace Thelia\Tools;
 
-/**
- * TokenInterface is the interface for the user authentication information.
- *
- * Parts borrowed from Symfony Security Framework (Fabien Potencier <fabien@symfony.com> / Johannes M. Schmitt <schmittjoh@gmail.com>)
- */
+use Thelia\Model\ConfigQuery;
 
-interface TokenInterface extends \Serializable
+class URL
 {
-	/**
-	 * Returns the user credentials.
-	 *
-	 * @return mixed The user credentials
-	*/
-	public function getCredentials();
+	public static function getIndexPage() {
+		return ConfigQuery::read('base_url', '/') . "index_dev.php"; // FIXME !
+	}
 
 	/**
-	 * Returns a user representation.
-	 *
-	 * @return mixed either returns an object which implements __toString(), or
-	 * a primitive string is returned.
-	*/
-	public function getUser();
+	 * Returns the Absolute URL for a given path relative to web root. By default,
+	 * the index.php (or index_dev.php) script name is added to the URL, use
+	 * $path_only = true to get a path without the index script.
+     *
+     * @param string    $path         the relative path
+     * @param array     $parameters   An array of parameters
+     * @param boolean	$path_only    if true, getIndexPage() will  not be added
+     *
+     * @return string The generated URL
+     */
+    public static function absoluteUrl($path, array $parameters = array(), $path_only = false)
+    {
+    	// Already absolute ?
+    	if (substr($path, 0, 4) != 'http') {
+
+    		$root = $path_only ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+
+    		$base = $root . $path;
+    	}
+    	else
+    		$base = $path;
+
+    	$queryString = '';
+
+    	foreach($parameters as $name => $value) {
+    		$queryString = sprintf("%s=%s&", urlencode($name), urlencode($value));
+    	}
+
+    	$sepChar = strstr($base, '?') === false ? '?' : '&';
+
+    	if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
+
+    	return $base . $queryString;
+    }
 
 	/**
-	 * Sets a user instance
-	 *
-	 * @param mixed $user
-	*/
-	public function setUser($user);
+	 * Returns the Absolute URL to a view
+     *
+     * @param string         $viewName      the view name (e.g. login for login.html)
+     * @param mixed          $parameters    An array of parameters
+     *
+     * @return string The generated URL
+     */
+     public static function viewUrl($viewName, array $parameters = array()) {
 
-	/**
-	 * Returns the username.
-	 *
-	 * @return string
-	*/
-	public function getUsername();
+     	$path = sprintf("%s?view=%s", self::getIndexPage(), $viewName);
 
-	/**
-	 * Returns whether the user is authenticated or not.
-	 *
-	 * @return Boolean true if the token has been authenticated, false otherwise
-	*/
-	public function isAuthenticated();
-
-	/**
-	 * Sets the authenticated flag.
-	 *
-	 * @param Boolean $isAuthenticated The authenticated flag
-	*/
-	public function setAuthenticated($isAuthenticated);
-
-	/**
-	 * Removes sensitive information from the token.
-	*/
-	public function eraseCredentials();
+     	return self::absoluteUrl($path, $parameters);
+     }
 }

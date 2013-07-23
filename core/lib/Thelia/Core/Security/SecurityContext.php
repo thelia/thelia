@@ -25,62 +25,166 @@ namespace Thelia\Core\Security;
 
 use Thelia\Core\Security\Authentication\AuthenticationProviderInterface;
 use Thelia\Core\Security\Exception\AuthenticationTokenNotFoundException;
+use Thelia\Core\Security\Token\TokenInterface;
+use Thelia\Core\Security\User\UserInterface;
+use Thelia\Core\HttpFoundation\Request;
 
 /**
- * A simple security manager, in charge of authenticating users using various authentication systems.
+ * A simple security manager, in charge of checking user
  *
  * @author Franck Allimant <franck@cqfdev.fr>
  */
 class SecurityContext {
-/*
-    protected $authProvider;
 
-    public function __construct(AuthenticationProviderInterface $authProvider) {
-        $this->authProvider = $authProvider;
-    }
-*/
+	const CONTEXT_FRONT_OFFICE = 'front';
+	const CONTEXT_BACK_OFFICE  = 'admin';
+
+	private $request;
+	private $context;
+
+	public function __construct(Request $request) {
+
+		$this->request = $request;
+
+		$this->context = null;
+	}
+
+	public function setContext($context) {
+		if ($context !== self::CONTEXT_FRONT_OFFICE && $context !== self::CONTEXT_BACK_OFFICE)  {
+			throw new \InvalidArgumentException(sprintf("Invalid or empty context identifier '%s'", $context));
+		}
+
+		$this->context = $context;
+	}
+
+	public function getContext($exception_if_context_undefined = false) {
+		if (null === $this->context && $exception_if_context_undefined === true)
+			throw new \LogicException("No context defined. Please use setContext() first.");
+
+		return $this->context;
+	}
+
+	private function getSession() {
+		$session = $this->request->getSession();
+
+		if ($session === null)
+			throw new \LogicException("No session found.");
+
+		return $session;
+	}
+
     /**
-    * Checks if the current token is authenticated
+    * Gets the currently authenticated user in  the current context, or null if none is defined
     *
-    * @throws AuthenticationCredentialsNotFoundException when the security context has no authentication token.
+    * @return UserInterface|null A UserInterface instance or null if no user is available
+    */
+	public function getUser() {
+		$context = $this->getContext(true);
+
+		if ($context === self::CONTEXT_FRONT_OFFICE)
+			$user = $this->getSession()->getCustomerUser();
+		else if ($context == self::CONTEXT_BACK_OFFICE)
+			$user = $this->getSession()->getAdminUser();
+		else
+			$user = null;
+
+		return $user;
+	}
+
+	final public function isAuthenticated()
+	{
+		if (null !== $this->getUser()) {
+			return true;
+		}
+
+		return false;
+	}
+
+    /**
+    * Checks if the current user is allowed
     *
     * @return Boolean
-    * @throws AuthenticationTokenNotFoundException if no thoken was found in context
     */
     final public function isGranted($roles, $permissions)
     {
-        if (null === $this->token) {
-            throw new AuthenticationTokenNotFoundException('The security context contains no authentication token.');
-        }
+        if ($this->isAuthenticated() === true) {
 
-        if (!$this->token->isAuthenticated()) {
-            $this->token = $this->authProvider->authenticate($this->token);
-        }
+        	$user = $this->getUser();
 
-        if ($this->token->isAuthenticated()) {
-        	// Check user roles and permissions
+        	// Check if user's roles matches required roles
+        	$userRoles = $user->getRoles();
+
+        	$roleFound = false;
+
+        	foreach($userRoles as $role) {
+        		if (in_array($role, $roles)) {
+        			$roleFound = true;
+
+        			break;
+        		}
+        	}
+
+        	if ($roleFound) {
+
+       			if (empty($permissions)) {
+       				return true;
+       			}
+
+	        	// Get permissions from profile
+	        	// $userPermissions = $user->getPermissions();
+
+       			echo "TODO: Finalize permissions system !";
+
+       			$userPermissions = array('*'); // FIXME !
+
+       			$permissionsFound = true;
+
+       			// User have all permissions ?
+       			if (in_array('*', $userPermissions))
+       				return true;
+
+       			// Check that user's permissions matches required permissions
+       			foreach($permissions as $permission) {
+       				if (! in_array($permission, $userPermissions)) {
+       					$permissionsFound = false;
+
+       					break;
+       				}
+       			}
+
+       			return $permissionsFound;
+        	}
         }
 
         return false;
     }
 
     /**
-    * Gets the currently authenticated token.
+    * Sets the authenticated user.
     *
-    * @return TokenInterface|null A TokenInterface instance or null if no authentication information is available
+    * @param UserInterface $user A UserInterface, or null if no further user should be stored
     */
-    public function getToken()
+    public function setUser(UserInterface $user)
     {
-        return $this->token;
+		$context = $this->getContext(true);
+
+		$user->eraseCredentials();
+
+		if ($context === self::CONTEXT_FRONT_OFFICE)
+			$this->getSession()->setCustomerUser($user);
+		else if ($context == self::CONTEXT_BACK_OFFICE)
+			$this->getSession()->setAdminUser($user);
     }
 
     /**
-    * Sets the  token.
-    *
-    * @param TokenInterface $token A TokenInterface token, or null if no further authentication information should be stored
-    */
-    public function setToken(TokenInterface $token = null)
-    {
-        $this->token = $token;
+     * Clear the user from the security context
+     */
+    public function clear() {
+		$context = $this->getContext(true);
+
+		if ($context === self::CONTEXT_FRONT_OFFICE)
+			$this->getSession()->clearCustomerUser();
+		else if ($context == self::CONTEXT_BACK_OFFICE)
+			$this->getSession()->clearAdminUser();
     }
 }
