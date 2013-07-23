@@ -453,7 +453,7 @@ CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `ref` VARCHAR(50) NOT NULL,
-    `title_id` INTEGER,
+    `title_id` INTEGER NOT NULL,
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(50),
@@ -467,7 +467,7 @@ CREATE TABLE `customer`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
-    INDEX `FI_customer_customer_title_id` (`title_id`),
+    INDEX `idx_customer_customer_title_id` (`title_id`),
     CONSTRAINT `fk_customer_customer_title_id`
         FOREIGN KEY (`title_id`)
         REFERENCES `customer_title` (`id`)
@@ -498,7 +498,7 @@ CREATE TABLE `address`
     `country_id` INTEGER NOT NULL,
     `phone` VARCHAR(20),
     `cellphone` VARCHAR(20),
-    `is_default` TINYINT DEFAULT 0,
+    `default` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

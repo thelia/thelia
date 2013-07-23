@@ -329,7 +329,7 @@
   <table name="customer" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="ref" required="true" size="50" type="VARCHAR" />
-    <column name="title_id" type="INTEGER" />
+    <column name="title_id" required="true" type="INTEGER" />
     <column name="firstname" required="true" size="255" type="VARCHAR" />
     <column name="lastname" required="true" size="255" type="VARCHAR" />
     <column name="email" size="50" type="VARCHAR" />
@@ -345,6 +345,9 @@
     <unique name="ref_UNIQUE">
       <unique-column name="ref" />
     </unique>
+    <index name="idx_customer_customer_title_id">
+      <index-column name="title_id" />
+    </index>
     <behavior name="timestampable" />
   </table>
   <table name="address" namespace="Thelia\Model">
@@ -363,7 +366,7 @@
     <column name="country_id" required="true" type="INTEGER" />
     <column name="phone" size="20" type="VARCHAR" />
     <column name="cellphone" size="20" type="VARCHAR" />
-    <column defaultValue="0" name="is_default" type="TINYINT" />
+    <column defaultValue="0" name="default" type="TINYINT" />
     <foreign-key foreignTable="customer" name="fk_address_customer_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="customer_id" />
     </foreign-key>
