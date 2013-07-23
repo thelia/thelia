@@ -102,6 +102,10 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
  * @method     ChildProductQuery innerJoinRewriting($relationAlias = null) Adds a INNER JOIN clause to the query using the Rewriting relation
  *
+ * @method     ChildProductQuery leftJoinCartItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartItem relation
+ * @method     ChildProductQuery rightJoinCartItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartItem relation
+ * @method     ChildProductQuery innerJoinCartItem($relationAlias = null) Adds a INNER JOIN clause to the query using the CartItem relation
+ *
  * @method     ChildProductQuery leftJoinProductI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductI18n relation
  * @method     ChildProductQuery rightJoinProductI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductI18n relation
  * @method     ChildProductQuery innerJoinProductI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductI18n relation
@@ -1743,6 +1747,79 @@ abstract class ProductQuery extends ModelCriteria
         return $this
             ->joinRewriting($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Rewriting', '\Thelia\Model\RewritingQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\CartItem object
+     *
+     * @param \Thelia\Model\CartItem|ObjectCollection $cartItem  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function filterByCartItem($cartItem, $comparison = null)
+    {
+        if ($cartItem instanceof \Thelia\Model\CartItem) {
+            return $this
+                ->addUsingAlias(ProductTableMap::ID, $cartItem->getProductId(), $comparison);
+        } elseif ($cartItem instanceof ObjectCollection) {
+            return $this
+                ->useCartItemQuery()
+                ->filterByPrimaryKeys($cartItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCartItem() only accepts arguments of type \Thelia\Model\CartItem or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CartItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildProductQuery The current query, for fluid interface
+     */
+    public function joinCartItem($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CartItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CartItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CartItem relation CartItem object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CartItemQuery A secondary query class using the current class as primary query
+     */
+    public function useCartItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCartItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CartItem', '\Thelia\Model\CartItemQuery');
     }
 
     /**

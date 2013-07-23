@@ -47,6 +47,10 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery rightJoinOrder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Order relation
  * @method     ChildCurrencyQuery innerJoinOrder($relationAlias = null) Adds a INNER JOIN clause to the query using the Order relation
  *
+ * @method     ChildCurrencyQuery leftJoinCart($relationAlias = null) Adds a LEFT JOIN clause to the query using the Cart relation
+ * @method     ChildCurrencyQuery rightJoinCart($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Cart relation
+ * @method     ChildCurrencyQuery innerJoinCart($relationAlias = null) Adds a INNER JOIN clause to the query using the Cart relation
+ *
  * @method     ChildCurrency findOne(ConnectionInterface $con = null) Return the first ChildCurrency matching the query
  * @method     ChildCurrency findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCurrency matching the query, or a new ChildCurrency object populated from the query conditions when no match is found
  *
@@ -611,6 +615,79 @@ abstract class CurrencyQuery extends ModelCriteria
         return $this
             ->joinOrder($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Order', '\Thelia\Model\OrderQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Cart object
+     *
+     * @param \Thelia\Model\Cart|ObjectCollection $cart  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function filterByCart($cart, $comparison = null)
+    {
+        if ($cart instanceof \Thelia\Model\Cart) {
+            return $this
+                ->addUsingAlias(CurrencyTableMap::ID, $cart->getCurrencyId(), $comparison);
+        } elseif ($cart instanceof ObjectCollection) {
+            return $this
+                ->useCartQuery()
+                ->filterByPrimaryKeys($cart->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCart() only accepts arguments of type \Thelia\Model\Cart or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Cart relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function joinCart($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Cart');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Cart');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the Cart relation Cart object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
+     */
+    public function useCartQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCart($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Cart', '\Thelia\Model\CartQuery');
     }
 
     /**

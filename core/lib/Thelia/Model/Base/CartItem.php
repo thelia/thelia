@@ -16,20 +16,22 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Cart as ChildCart;
+use Thelia\Model\CartItem as ChildCartItem;
+use Thelia\Model\CartItemQuery as ChildCartItemQuery;
+use Thelia\Model\CartQuery as ChildCartQuery;
 use Thelia\Model\Combination as ChildCombination;
 use Thelia\Model\CombinationQuery as ChildCombinationQuery;
 use Thelia\Model\Product as ChildProduct;
 use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
-use Thelia\Model\Map\StockTableMap;
+use Thelia\Model\Map\CartItemTableMap;
 
-abstract class Stock implements ActiveRecordInterface
+abstract class CartItem implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\StockTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\CartItemTableMap';
 
 
     /**
@@ -65,10 +67,10 @@ abstract class Stock implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the combination_id field.
+     * The value for the cart_id field.
      * @var        int
      */
-    protected $combination_id;
+    protected $cart_id;
 
     /**
      * The value for the product_id field.
@@ -77,16 +79,17 @@ abstract class Stock implements ActiveRecordInterface
     protected $product_id;
 
     /**
-     * The value for the increase field.
-     * @var        double
-     */
-    protected $increase;
-
-    /**
      * The value for the quantity field.
+     * Note: this column has a database default value of: 1
      * @var        double
      */
     protected $quantity;
+
+    /**
+     * The value for the combination_id field.
+     * @var        int
+     */
+    protected $combination_id;
 
     /**
      * The value for the created_at field.
@@ -101,14 +104,19 @@ abstract class Stock implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        Combination
+     * @var        Cart
      */
-    protected $aCombination;
+    protected $aCart;
 
     /**
      * @var        Product
      */
     protected $aProduct;
+
+    /**
+     * @var        Combination
+     */
+    protected $aCombination;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -119,10 +127,23 @@ abstract class Stock implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\Stock object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->quantity = 1;
+    }
+
+    /**
+     * Initializes internal state of Thelia\Model\Base\CartItem object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -214,9 +235,9 @@ abstract class Stock implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Stock</code> instance.  If
-     * <code>obj</code> is an instance of <code>Stock</code>, delegates to
-     * <code>equals(Stock)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>CartItem</code> instance.  If
+     * <code>obj</code> is an instance of <code>CartItem</code>, delegates to
+     * <code>equals(CartItem)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -297,7 +318,7 @@ abstract class Stock implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return Stock The current object, for fluid interface
+     * @return CartItem The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -329,7 +350,7 @@ abstract class Stock implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return Stock The current object, for fluid interface
+     * @return CartItem The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -384,14 +405,14 @@ abstract class Stock implements ActiveRecordInterface
     }
 
     /**
-     * Get the [combination_id] column value.
+     * Get the [cart_id] column value.
      *
      * @return   int
      */
-    public function getCombinationId()
+    public function getCartId()
     {
 
-        return $this->combination_id;
+        return $this->cart_id;
     }
 
     /**
@@ -406,17 +427,6 @@ abstract class Stock implements ActiveRecordInterface
     }
 
     /**
-     * Get the [increase] column value.
-     *
-     * @return   double
-     */
-    public function getIncrease()
-    {
-
-        return $this->increase;
-    }
-
-    /**
      * Get the [quantity] column value.
      *
      * @return   double
@@ -425,6 +435,17 @@ abstract class Stock implements ActiveRecordInterface
     {
 
         return $this->quantity;
+    }
+
+    /**
+     * Get the [combination_id] column value.
+     *
+     * @return   int
+     */
+    public function getCombinationId()
+    {
+
+        return $this->combination_id;
     }
 
     /**
@@ -471,7 +492,7 @@ abstract class Stock implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -481,7 +502,7 @@ abstract class Stock implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = StockTableMap::ID;
+            $this->modifiedColumns[] = CartItemTableMap::ID;
         }
 
 
@@ -489,35 +510,35 @@ abstract class Stock implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [combination_id] column.
+     * Set the value of [cart_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
-    public function setCombinationId($v)
+    public function setCartId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->combination_id !== $v) {
-            $this->combination_id = $v;
-            $this->modifiedColumns[] = StockTableMap::COMBINATION_ID;
+        if ($this->cart_id !== $v) {
+            $this->cart_id = $v;
+            $this->modifiedColumns[] = CartItemTableMap::CART_ID;
         }
 
-        if ($this->aCombination !== null && $this->aCombination->getId() !== $v) {
-            $this->aCombination = null;
+        if ($this->aCart !== null && $this->aCart->getId() !== $v) {
+            $this->aCart = null;
         }
 
 
         return $this;
-    } // setCombinationId()
+    } // setCartId()
 
     /**
      * Set the value of [product_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
     public function setProductId($v)
     {
@@ -527,7 +548,7 @@ abstract class Stock implements ActiveRecordInterface
 
         if ($this->product_id !== $v) {
             $this->product_id = $v;
-            $this->modifiedColumns[] = StockTableMap::PRODUCT_ID;
+            $this->modifiedColumns[] = CartItemTableMap::PRODUCT_ID;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
@@ -539,31 +560,10 @@ abstract class Stock implements ActiveRecordInterface
     } // setProductId()
 
     /**
-     * Set the value of [increase] column.
-     *
-     * @param      double $v new value
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
-     */
-    public function setIncrease($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->increase !== $v) {
-            $this->increase = $v;
-            $this->modifiedColumns[] = StockTableMap::INCREASE;
-        }
-
-
-        return $this;
-    } // setIncrease()
-
-    /**
      * Set the value of [quantity] column.
      *
      * @param      double $v new value
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
     public function setQuantity($v)
     {
@@ -573,7 +573,7 @@ abstract class Stock implements ActiveRecordInterface
 
         if ($this->quantity !== $v) {
             $this->quantity = $v;
-            $this->modifiedColumns[] = StockTableMap::QUANTITY;
+            $this->modifiedColumns[] = CartItemTableMap::QUANTITY;
         }
 
 
@@ -581,11 +581,36 @@ abstract class Stock implements ActiveRecordInterface
     } // setQuantity()
 
     /**
+     * Set the value of [combination_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
+     */
+    public function setCombinationId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->combination_id !== $v) {
+            $this->combination_id = $v;
+            $this->modifiedColumns[] = CartItemTableMap::COMBINATION_ID;
+        }
+
+        if ($this->aCombination !== null && $this->aCombination->getId() !== $v) {
+            $this->aCombination = null;
+        }
+
+
+        return $this;
+    } // setCombinationId()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -593,7 +618,7 @@ abstract class Stock implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = StockTableMap::CREATED_AT;
+                $this->modifiedColumns[] = CartItemTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -606,7 +631,7 @@ abstract class Stock implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
+     * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -614,7 +639,7 @@ abstract class Stock implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = StockTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = CartItemTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -632,6 +657,10 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->quantity !== 1) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -659,28 +688,28 @@ abstract class Stock implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : StockTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CartItemTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : StockTableMap::translateFieldName('CombinationId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->combination_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CartItemTableMap::translateFieldName('CartId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->cart_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : StockTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CartItemTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : StockTableMap::translateFieldName('Increase', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->increase = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : StockTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CartItemTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->quantity = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : StockTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CartItemTableMap::translateFieldName('CombinationId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->combination_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CartItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : StockTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CartItemTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -693,10 +722,10 @@ abstract class Stock implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = StockTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 7; // 7 = CartItemTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\Stock object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\CartItem object", 0, $e);
         }
     }
 
@@ -715,11 +744,14 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aCombination !== null && $this->combination_id !== $this->aCombination->getId()) {
-            $this->aCombination = null;
+        if ($this->aCart !== null && $this->cart_id !== $this->aCart->getId()) {
+            $this->aCart = null;
         }
         if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
             $this->aProduct = null;
+        }
+        if ($this->aCombination !== null && $this->combination_id !== $this->aCombination->getId()) {
+            $this->aCombination = null;
         }
     } // ensureConsistency
 
@@ -744,13 +776,13 @@ abstract class Stock implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CartItemTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildStockQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildCartItemQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -760,8 +792,9 @@ abstract class Stock implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aCombination = null;
+            $this->aCart = null;
             $this->aProduct = null;
+            $this->aCombination = null;
         } // if (deep)
     }
 
@@ -771,8 +804,8 @@ abstract class Stock implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Stock::setDeleted()
-     * @see Stock::isDeleted()
+     * @see CartItem::setDeleted()
+     * @see CartItem::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -781,12 +814,12 @@ abstract class Stock implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CartItemTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildStockQuery::create()
+            $deleteQuery = ChildCartItemQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -823,7 +856,7 @@ abstract class Stock implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CartItemTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -833,16 +866,16 @@ abstract class Stock implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(StockTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(CartItemTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(StockTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(CartItemTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(StockTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(CartItemTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -854,7 +887,7 @@ abstract class Stock implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                StockTableMap::addInstanceToPool($this);
+                CartItemTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -889,11 +922,11 @@ abstract class Stock implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aCombination !== null) {
-                if ($this->aCombination->isModified() || $this->aCombination->isNew()) {
-                    $affectedRows += $this->aCombination->save($con);
+            if ($this->aCart !== null) {
+                if ($this->aCart->isModified() || $this->aCart->isNew()) {
+                    $affectedRows += $this->aCart->save($con);
                 }
-                $this->setCombination($this->aCombination);
+                $this->setCart($this->aCart);
             }
 
             if ($this->aProduct !== null) {
@@ -901,6 +934,13 @@ abstract class Stock implements ActiveRecordInterface
                     $affectedRows += $this->aProduct->save($con);
                 }
                 $this->setProduct($this->aProduct);
+            }
+
+            if ($this->aCombination !== null) {
+                if ($this->aCombination->isModified() || $this->aCombination->isNew()) {
+                    $affectedRows += $this->aCombination->save($con);
+                }
+                $this->setCombination($this->aCombination);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -934,36 +974,36 @@ abstract class Stock implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = StockTableMap::ID;
+        $this->modifiedColumns[] = CartItemTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . StockTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CartItemTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(StockTableMap::ID)) {
+        if ($this->isColumnModified(CartItemTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(StockTableMap::COMBINATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'COMBINATION_ID';
+        if ($this->isColumnModified(CartItemTableMap::CART_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'CART_ID';
         }
-        if ($this->isColumnModified(StockTableMap::PRODUCT_ID)) {
+        if ($this->isColumnModified(CartItemTableMap::PRODUCT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
-        if ($this->isColumnModified(StockTableMap::INCREASE)) {
-            $modifiedColumns[':p' . $index++]  = 'INCREASE';
-        }
-        if ($this->isColumnModified(StockTableMap::QUANTITY)) {
+        if ($this->isColumnModified(CartItemTableMap::QUANTITY)) {
             $modifiedColumns[':p' . $index++]  = 'QUANTITY';
         }
-        if ($this->isColumnModified(StockTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(CartItemTableMap::COMBINATION_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'COMBINATION_ID';
+        }
+        if ($this->isColumnModified(CartItemTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(StockTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(CartItemTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO stock (%s) VALUES (%s)',
+            'INSERT INTO cart_item (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -975,17 +1015,17 @@ abstract class Stock implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'COMBINATION_ID':
-                        $stmt->bindValue($identifier, $this->combination_id, PDO::PARAM_INT);
+                    case 'CART_ID':
+                        $stmt->bindValue($identifier, $this->cart_id, PDO::PARAM_INT);
                         break;
                     case 'PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case 'INCREASE':
-                        $stmt->bindValue($identifier, $this->increase, PDO::PARAM_STR);
-                        break;
                     case 'QUANTITY':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
+                        break;
+                    case 'COMBINATION_ID':
+                        $stmt->bindValue($identifier, $this->combination_id, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1039,7 +1079,7 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = StockTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CartItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1059,16 +1099,16 @@ abstract class Stock implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getCombinationId();
+                return $this->getCartId();
                 break;
             case 2:
                 return $this->getProductId();
                 break;
             case 3:
-                return $this->getIncrease();
+                return $this->getQuantity();
                 break;
             case 4:
-                return $this->getQuantity();
+                return $this->getCombinationId();
                 break;
             case 5:
                 return $this->getCreatedAt();
@@ -1099,17 +1139,17 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Stock'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CartItem'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Stock'][$this->getPrimaryKey()] = true;
-        $keys = StockTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['CartItem'][$this->getPrimaryKey()] = true;
+        $keys = CartItemTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getCombinationId(),
+            $keys[1] => $this->getCartId(),
             $keys[2] => $this->getProductId(),
-            $keys[3] => $this->getIncrease(),
-            $keys[4] => $this->getQuantity(),
+            $keys[3] => $this->getQuantity(),
+            $keys[4] => $this->getCombinationId(),
             $keys[5] => $this->getCreatedAt(),
             $keys[6] => $this->getUpdatedAt(),
         );
@@ -1120,11 +1160,14 @@ abstract class Stock implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aCombination) {
-                $result['Combination'] = $this->aCombination->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aCart) {
+                $result['Cart'] = $this->aCart->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aProduct) {
                 $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCombination) {
+                $result['Combination'] = $this->aCombination->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1144,7 +1187,7 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = StockTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CartItemTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1164,16 +1207,16 @@ abstract class Stock implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setCombinationId($value);
+                $this->setCartId($value);
                 break;
             case 2:
                 $this->setProductId($value);
                 break;
             case 3:
-                $this->setIncrease($value);
+                $this->setQuantity($value);
                 break;
             case 4:
-                $this->setQuantity($value);
+                $this->setCombinationId($value);
                 break;
             case 5:
                 $this->setCreatedAt($value);
@@ -1203,13 +1246,13 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = StockTableMap::getFieldNames($keyType);
+        $keys = CartItemTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setCombinationId($arr[$keys[1]]);
+        if (array_key_exists($keys[1], $arr)) $this->setCartId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setProductId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setIncrease($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setQuantity($arr[$keys[4]]);
+        if (array_key_exists($keys[3], $arr)) $this->setQuantity($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCombinationId($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
@@ -1221,15 +1264,15 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(StockTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CartItemTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(StockTableMap::ID)) $criteria->add(StockTableMap::ID, $this->id);
-        if ($this->isColumnModified(StockTableMap::COMBINATION_ID)) $criteria->add(StockTableMap::COMBINATION_ID, $this->combination_id);
-        if ($this->isColumnModified(StockTableMap::PRODUCT_ID)) $criteria->add(StockTableMap::PRODUCT_ID, $this->product_id);
-        if ($this->isColumnModified(StockTableMap::INCREASE)) $criteria->add(StockTableMap::INCREASE, $this->increase);
-        if ($this->isColumnModified(StockTableMap::QUANTITY)) $criteria->add(StockTableMap::QUANTITY, $this->quantity);
-        if ($this->isColumnModified(StockTableMap::CREATED_AT)) $criteria->add(StockTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(StockTableMap::UPDATED_AT)) $criteria->add(StockTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CartItemTableMap::ID)) $criteria->add(CartItemTableMap::ID, $this->id);
+        if ($this->isColumnModified(CartItemTableMap::CART_ID)) $criteria->add(CartItemTableMap::CART_ID, $this->cart_id);
+        if ($this->isColumnModified(CartItemTableMap::PRODUCT_ID)) $criteria->add(CartItemTableMap::PRODUCT_ID, $this->product_id);
+        if ($this->isColumnModified(CartItemTableMap::QUANTITY)) $criteria->add(CartItemTableMap::QUANTITY, $this->quantity);
+        if ($this->isColumnModified(CartItemTableMap::COMBINATION_ID)) $criteria->add(CartItemTableMap::COMBINATION_ID, $this->combination_id);
+        if ($this->isColumnModified(CartItemTableMap::CREATED_AT)) $criteria->add(CartItemTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(CartItemTableMap::UPDATED_AT)) $criteria->add(CartItemTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1244,8 +1287,8 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(StockTableMap::DATABASE_NAME);
-        $criteria->add(StockTableMap::ID, $this->id);
+        $criteria = new Criteria(CartItemTableMap::DATABASE_NAME);
+        $criteria->add(CartItemTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1286,17 +1329,17 @@ abstract class Stock implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Stock (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\CartItem (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setCombinationId($this->getCombinationId());
+        $copyObj->setCartId($this->getCartId());
         $copyObj->setProductId($this->getProductId());
-        $copyObj->setIncrease($this->getIncrease());
         $copyObj->setQuantity($this->getQuantity());
+        $copyObj->setCombinationId($this->getCombinationId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1314,7 +1357,7 @@ abstract class Stock implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Stock Clone of current object.
+     * @return                 \Thelia\Model\CartItem Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1328,26 +1371,26 @@ abstract class Stock implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildCombination object.
+     * Declares an association between this object and a ChildCart object.
      *
-     * @param                  ChildCombination $v
-     * @return                 \Thelia\Model\Stock The current object (for fluent API support)
+     * @param                  ChildCart $v
+     * @return                 \Thelia\Model\CartItem The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCombination(ChildCombination $v = null)
+    public function setCart(ChildCart $v = null)
     {
         if ($v === null) {
-            $this->setCombinationId(NULL);
+            $this->setCartId(NULL);
         } else {
-            $this->setCombinationId($v->getId());
+            $this->setCartId($v->getId());
         }
 
-        $this->aCombination = $v;
+        $this->aCart = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCombination object, it will not be re-added.
+        // If this object has already been added to the ChildCart object, it will not be re-added.
         if ($v !== null) {
-            $v->addStock($this);
+            $v->addCartItem($this);
         }
 
 
@@ -1356,33 +1399,33 @@ abstract class Stock implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildCombination object
+     * Get the associated ChildCart object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCombination The associated ChildCombination object.
+     * @return                 ChildCart The associated ChildCart object.
      * @throws PropelException
      */
-    public function getCombination(ConnectionInterface $con = null)
+    public function getCart(ConnectionInterface $con = null)
     {
-        if ($this->aCombination === null && ($this->combination_id !== null)) {
-            $this->aCombination = ChildCombinationQuery::create()->findPk($this->combination_id, $con);
+        if ($this->aCart === null && ($this->cart_id !== null)) {
+            $this->aCart = ChildCartQuery::create()->findPk($this->cart_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCombination->addStocks($this);
+                $this->aCart->addCartItems($this);
              */
         }
 
-        return $this->aCombination;
+        return $this->aCart;
     }
 
     /**
      * Declares an association between this object and a ChildProduct object.
      *
      * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\Stock The current object (for fluent API support)
+     * @return                 \Thelia\Model\CartItem The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(ChildProduct $v = null)
@@ -1398,7 +1441,7 @@ abstract class Stock implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildProduct object, it will not be re-added.
         if ($v !== null) {
-            $v->addStock($this);
+            $v->addCartItem($this);
         }
 
 
@@ -1422,11 +1465,62 @@ abstract class Stock implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProduct->addStocks($this);
+                $this->aProduct->addCartItems($this);
              */
         }
 
         return $this->aProduct;
+    }
+
+    /**
+     * Declares an association between this object and a ChildCombination object.
+     *
+     * @param                  ChildCombination $v
+     * @return                 \Thelia\Model\CartItem The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCombination(ChildCombination $v = null)
+    {
+        if ($v === null) {
+            $this->setCombinationId(NULL);
+        } else {
+            $this->setCombinationId($v->getId());
+        }
+
+        $this->aCombination = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCombination object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCartItem($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCombination object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCombination The associated ChildCombination object.
+     * @throws PropelException
+     */
+    public function getCombination(ConnectionInterface $con = null)
+    {
+        if ($this->aCombination === null && ($this->combination_id !== null)) {
+            $this->aCombination = ChildCombinationQuery::create()->findPk($this->combination_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCombination->addCartItems($this);
+             */
+        }
+
+        return $this->aCombination;
     }
 
     /**
@@ -1435,14 +1529,15 @@ abstract class Stock implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->combination_id = null;
+        $this->cart_id = null;
         $this->product_id = null;
-        $this->increase = null;
         $this->quantity = null;
+        $this->combination_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1462,8 +1557,9 @@ abstract class Stock implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aCombination = null;
+        $this->aCart = null;
         $this->aProduct = null;
+        $this->aCombination = null;
     }
 
     /**
@@ -1473,7 +1569,7 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(StockTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(CartItemTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1481,11 +1577,11 @@ abstract class Stock implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildStock The current object (for fluent API support)
+     * @return     ChildCartItem The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = StockTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = CartItemTableMap::UPDATED_AT;
 
         return $this;
     }

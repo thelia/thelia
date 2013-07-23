@@ -19,6 +19,8 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\AttributeCombination as ChildAttributeCombination;
 use Thelia\Model\AttributeCombinationQuery as ChildAttributeCombinationQuery;
+use Thelia\Model\CartItem as ChildCartItem;
+use Thelia\Model\CartItemQuery as ChildCartItemQuery;
 use Thelia\Model\Combination as ChildCombination;
 use Thelia\Model\CombinationQuery as ChildCombinationQuery;
 use Thelia\Model\Stock as ChildStock;
@@ -96,6 +98,12 @@ abstract class Combination implements ActiveRecordInterface
     protected $collStocksPartial;
 
     /**
+     * @var        ObjectCollection|ChildCartItem[] Collection to store aggregation of ChildCartItem objects.
+     */
+    protected $collCartItems;
+    protected $collCartItemsPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -114,6 +122,12 @@ abstract class Combination implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $stocksScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $cartItemsScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\Combination object.
@@ -642,6 +656,8 @@ abstract class Combination implements ActiveRecordInterface
 
             $this->collStocks = null;
 
+            $this->collCartItems = null;
+
         } // if (deep)
     }
 
@@ -804,6 +820,24 @@ abstract class Combination implements ActiveRecordInterface
 
                 if ($this->collStocks !== null) {
             foreach ($this->collStocks as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->cartItemsScheduledForDeletion !== null) {
+                if (!$this->cartItemsScheduledForDeletion->isEmpty()) {
+                    foreach ($this->cartItemsScheduledForDeletion as $cartItem) {
+                        // need to save related object because we set the relation to null
+                        $cartItem->save($con);
+                    }
+                    $this->cartItemsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCartItems !== null) {
+            foreach ($this->collCartItems as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -992,6 +1026,9 @@ abstract class Combination implements ActiveRecordInterface
             if (null !== $this->collStocks) {
                 $result['Stocks'] = $this->collStocks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collCartItems) {
+                $result['CartItems'] = $this->collCartItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1165,6 +1202,12 @@ abstract class Combination implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getCartItems() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCartItem($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1211,6 +1254,9 @@ abstract class Combination implements ActiveRecordInterface
         }
         if ('Stock' == $relationName) {
             return $this->initStocks();
+        }
+        if ('CartItem' == $relationName) {
+            return $this->initCartItems();
         }
     }
 
@@ -1729,6 +1775,274 @@ abstract class Combination implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collCartItems collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCartItems()
+     */
+    public function clearCartItems()
+    {
+        $this->collCartItems = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCartItems collection loaded partially.
+     */
+    public function resetPartialCartItems($v = true)
+    {
+        $this->collCartItemsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCartItems collection.
+     *
+     * By default this just sets the collCartItems collection to an empty array (like clearcollCartItems());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCartItems($overrideExisting = true)
+    {
+        if (null !== $this->collCartItems && !$overrideExisting) {
+            return;
+        }
+        $this->collCartItems = new ObjectCollection();
+        $this->collCartItems->setModel('\Thelia\Model\CartItem');
+    }
+
+    /**
+     * Gets an array of ChildCartItem objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCombination is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCartItem[] List of ChildCartItem objects
+     * @throws PropelException
+     */
+    public function getCartItems($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCartItemsPartial && !$this->isNew();
+        if (null === $this->collCartItems || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCartItems) {
+                // return empty collection
+                $this->initCartItems();
+            } else {
+                $collCartItems = ChildCartItemQuery::create(null, $criteria)
+                    ->filterByCombination($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCartItemsPartial && count($collCartItems)) {
+                        $this->initCartItems(false);
+
+                        foreach ($collCartItems as $obj) {
+                            if (false == $this->collCartItems->contains($obj)) {
+                                $this->collCartItems->append($obj);
+                            }
+                        }
+
+                        $this->collCartItemsPartial = true;
+                    }
+
+                    $collCartItems->getInternalIterator()->rewind();
+
+                    return $collCartItems;
+                }
+
+                if ($partial && $this->collCartItems) {
+                    foreach ($this->collCartItems as $obj) {
+                        if ($obj->isNew()) {
+                            $collCartItems[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCartItems = $collCartItems;
+                $this->collCartItemsPartial = false;
+            }
+        }
+
+        return $this->collCartItems;
+    }
+
+    /**
+     * Sets a collection of CartItem objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $cartItems A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCombination The current object (for fluent API support)
+     */
+    public function setCartItems(Collection $cartItems, ConnectionInterface $con = null)
+    {
+        $cartItemsToDelete = $this->getCartItems(new Criteria(), $con)->diff($cartItems);
+
+
+        $this->cartItemsScheduledForDeletion = $cartItemsToDelete;
+
+        foreach ($cartItemsToDelete as $cartItemRemoved) {
+            $cartItemRemoved->setCombination(null);
+        }
+
+        $this->collCartItems = null;
+        foreach ($cartItems as $cartItem) {
+            $this->addCartItem($cartItem);
+        }
+
+        $this->collCartItems = $cartItems;
+        $this->collCartItemsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CartItem objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CartItem objects.
+     * @throws PropelException
+     */
+    public function countCartItems(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCartItemsPartial && !$this->isNew();
+        if (null === $this->collCartItems || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCartItems) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCartItems());
+            }
+
+            $query = ChildCartItemQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCombination($this)
+                ->count($con);
+        }
+
+        return count($this->collCartItems);
+    }
+
+    /**
+     * Method called to associate a ChildCartItem object to this object
+     * through the ChildCartItem foreign key attribute.
+     *
+     * @param    ChildCartItem $l ChildCartItem
+     * @return   \Thelia\Model\Combination The current object (for fluent API support)
+     */
+    public function addCartItem(ChildCartItem $l)
+    {
+        if ($this->collCartItems === null) {
+            $this->initCartItems();
+            $this->collCartItemsPartial = true;
+        }
+
+        if (!in_array($l, $this->collCartItems->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCartItem($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CartItem $cartItem The cartItem object to add.
+     */
+    protected function doAddCartItem($cartItem)
+    {
+        $this->collCartItems[]= $cartItem;
+        $cartItem->setCombination($this);
+    }
+
+    /**
+     * @param  CartItem $cartItem The cartItem object to remove.
+     * @return ChildCombination The current object (for fluent API support)
+     */
+    public function removeCartItem($cartItem)
+    {
+        if ($this->getCartItems()->contains($cartItem)) {
+            $this->collCartItems->remove($this->collCartItems->search($cartItem));
+            if (null === $this->cartItemsScheduledForDeletion) {
+                $this->cartItemsScheduledForDeletion = clone $this->collCartItems;
+                $this->cartItemsScheduledForDeletion->clear();
+            }
+            $this->cartItemsScheduledForDeletion[]= $cartItem;
+            $cartItem->setCombination(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Combination is new, it will return
+     * an empty collection; or if this Combination has previously
+     * been saved, it will retrieve related CartItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Combination.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCartItem[] List of ChildCartItem objects
+     */
+    public function getCartItemsJoinCart($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCartItemQuery::create(null, $criteria);
+        $query->joinWith('Cart', $joinBehavior);
+
+        return $this->getCartItems($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Combination is new, it will return
+     * an empty collection; or if this Combination has previously
+     * been saved, it will retrieve related CartItems from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Combination.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCartItem[] List of ChildCartItem objects
+     */
+    public function getCartItemsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCartItemQuery::create(null, $criteria);
+        $query->joinWith('Product', $joinBehavior);
+
+        return $this->getCartItems($query, $con);
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1766,6 +2080,11 @@ abstract class Combination implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collCartItems) {
+                foreach ($this->collCartItems as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         if ($this->collAttributeCombinations instanceof Collection) {
@@ -1776,6 +2095,10 @@ abstract class Combination implements ActiveRecordInterface
             $this->collStocks->clearIterator();
         }
         $this->collStocks = null;
+        if ($this->collCartItems instanceof Collection) {
+            $this->collCartItems->clearIterator();
+        }
+        $this->collCartItems = null;
     }
 
     /**

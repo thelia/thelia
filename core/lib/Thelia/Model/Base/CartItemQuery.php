@@ -12,92 +12,96 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
-use Thelia\Model\Map\StockTableMap;
+use Thelia\Model\CartItem as ChildCartItem;
+use Thelia\Model\CartItemQuery as ChildCartItemQuery;
+use Thelia\Model\Map\CartItemTableMap;
 
 /**
- * Base class that represents a query for the 'stock' table.
+ * Base class that represents a query for the 'cart_item' table.
  *
  *
  *
- * @method     ChildStockQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildStockQuery orderByCombinationId($order = Criteria::ASC) Order by the combination_id column
- * @method     ChildStockQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
- * @method     ChildStockQuery orderByIncrease($order = Criteria::ASC) Order by the increase column
- * @method     ChildStockQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
- * @method     ChildStockQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildStockQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildCartItemQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildCartItemQuery orderByCartId($order = Criteria::ASC) Order by the cart_id column
+ * @method     ChildCartItemQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
+ * @method     ChildCartItemQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
+ * @method     ChildCartItemQuery orderByCombinationId($order = Criteria::ASC) Order by the combination_id column
+ * @method     ChildCartItemQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildCartItemQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildStockQuery groupById() Group by the id column
- * @method     ChildStockQuery groupByCombinationId() Group by the combination_id column
- * @method     ChildStockQuery groupByProductId() Group by the product_id column
- * @method     ChildStockQuery groupByIncrease() Group by the increase column
- * @method     ChildStockQuery groupByQuantity() Group by the quantity column
- * @method     ChildStockQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildStockQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildCartItemQuery groupById() Group by the id column
+ * @method     ChildCartItemQuery groupByCartId() Group by the cart_id column
+ * @method     ChildCartItemQuery groupByProductId() Group by the product_id column
+ * @method     ChildCartItemQuery groupByQuantity() Group by the quantity column
+ * @method     ChildCartItemQuery groupByCombinationId() Group by the combination_id column
+ * @method     ChildCartItemQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildCartItemQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildStockQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildStockQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildStockQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildCartItemQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildCartItemQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildCartItemQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildStockQuery leftJoinCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the Combination relation
- * @method     ChildStockQuery rightJoinCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Combination relation
- * @method     ChildStockQuery innerJoinCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the Combination relation
+ * @method     ChildCartItemQuery leftJoinCart($relationAlias = null) Adds a LEFT JOIN clause to the query using the Cart relation
+ * @method     ChildCartItemQuery rightJoinCart($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Cart relation
+ * @method     ChildCartItemQuery innerJoinCart($relationAlias = null) Adds a INNER JOIN clause to the query using the Cart relation
  *
- * @method     ChildStockQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method     ChildStockQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method     ChildStockQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method     ChildCartItemQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
+ * @method     ChildCartItemQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
+ * @method     ChildCartItemQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
  *
- * @method     ChildStock findOne(ConnectionInterface $con = null) Return the first ChildStock matching the query
- * @method     ChildStock findOneOrCreate(ConnectionInterface $con = null) Return the first ChildStock matching the query, or a new ChildStock object populated from the query conditions when no match is found
+ * @method     ChildCartItemQuery leftJoinCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the Combination relation
+ * @method     ChildCartItemQuery rightJoinCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Combination relation
+ * @method     ChildCartItemQuery innerJoinCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the Combination relation
  *
- * @method     ChildStock findOneById(int $id) Return the first ChildStock filtered by the id column
- * @method     ChildStock findOneByCombinationId(int $combination_id) Return the first ChildStock filtered by the combination_id column
- * @method     ChildStock findOneByProductId(int $product_id) Return the first ChildStock filtered by the product_id column
- * @method     ChildStock findOneByIncrease(double $increase) Return the first ChildStock filtered by the increase column
- * @method     ChildStock findOneByQuantity(double $quantity) Return the first ChildStock filtered by the quantity column
- * @method     ChildStock findOneByCreatedAt(string $created_at) Return the first ChildStock filtered by the created_at column
- * @method     ChildStock findOneByUpdatedAt(string $updated_at) Return the first ChildStock filtered by the updated_at column
+ * @method     ChildCartItem findOne(ConnectionInterface $con = null) Return the first ChildCartItem matching the query
+ * @method     ChildCartItem findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCartItem matching the query, or a new ChildCartItem object populated from the query conditions when no match is found
  *
- * @method     array findById(int $id) Return ChildStock objects filtered by the id column
- * @method     array findByCombinationId(int $combination_id) Return ChildStock objects filtered by the combination_id column
- * @method     array findByProductId(int $product_id) Return ChildStock objects filtered by the product_id column
- * @method     array findByIncrease(double $increase) Return ChildStock objects filtered by the increase column
- * @method     array findByQuantity(double $quantity) Return ChildStock objects filtered by the quantity column
- * @method     array findByCreatedAt(string $created_at) Return ChildStock objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildStock objects filtered by the updated_at column
+ * @method     ChildCartItem findOneById(int $id) Return the first ChildCartItem filtered by the id column
+ * @method     ChildCartItem findOneByCartId(int $cart_id) Return the first ChildCartItem filtered by the cart_id column
+ * @method     ChildCartItem findOneByProductId(int $product_id) Return the first ChildCartItem filtered by the product_id column
+ * @method     ChildCartItem findOneByQuantity(double $quantity) Return the first ChildCartItem filtered by the quantity column
+ * @method     ChildCartItem findOneByCombinationId(int $combination_id) Return the first ChildCartItem filtered by the combination_id column
+ * @method     ChildCartItem findOneByCreatedAt(string $created_at) Return the first ChildCartItem filtered by the created_at column
+ * @method     ChildCartItem findOneByUpdatedAt(string $updated_at) Return the first ChildCartItem filtered by the updated_at column
+ *
+ * @method     array findById(int $id) Return ChildCartItem objects filtered by the id column
+ * @method     array findByCartId(int $cart_id) Return ChildCartItem objects filtered by the cart_id column
+ * @method     array findByProductId(int $product_id) Return ChildCartItem objects filtered by the product_id column
+ * @method     array findByQuantity(double $quantity) Return ChildCartItem objects filtered by the quantity column
+ * @method     array findByCombinationId(int $combination_id) Return ChildCartItem objects filtered by the combination_id column
+ * @method     array findByCreatedAt(string $created_at) Return ChildCartItem objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildCartItem objects filtered by the updated_at column
  *
  */
-abstract class StockQuery extends ModelCriteria
+abstract class CartItemQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\StockQuery object.
+     * Initializes internal state of \Thelia\Model\Base\CartItemQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Stock', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\CartItem', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildStockQuery object.
+     * Returns a new ChildCartItemQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildStockQuery
+     * @return ChildCartItemQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\StockQuery) {
+        if ($criteria instanceof \Thelia\Model\CartItemQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\StockQuery();
+        $query = new \Thelia\Model\CartItemQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -120,19 +124,19 @@ abstract class StockQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildStock|array|mixed the result, formatted by the current formatter
+     * @return ChildCartItem|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = StockTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = CartItemTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CartItemTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -151,11 +155,11 @@ abstract class StockQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildStock A model object, or null if the key is not found
+     * @return   ChildCartItem A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, COMBINATION_ID, PRODUCT_ID, INCREASE, QUANTITY, CREATED_AT, UPDATED_AT FROM stock WHERE ID = :p0';
+        $sql = 'SELECT ID, CART_ID, PRODUCT_ID, QUANTITY, COMBINATION_ID, CREATED_AT, UPDATED_AT FROM cart_item WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -166,9 +170,9 @@ abstract class StockQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildStock();
+            $obj = new ChildCartItem();
             $obj->hydrate($row);
-            StockTableMap::addInstanceToPool($obj, (string) $key);
+            CartItemTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -181,7 +185,7 @@ abstract class StockQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildStock|array|mixed the result, formatted by the current formatter
+     * @return ChildCartItem|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -223,12 +227,12 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(StockTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(CartItemTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -236,12 +240,12 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(StockTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(CartItemTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -260,18 +264,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(StockTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(StockTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -282,39 +286,39 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::ID, $id, $comparison);
     }
 
     /**
-     * Filter the query on the combination_id column
+     * Filter the query on the cart_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByCombinationId(1234); // WHERE combination_id = 1234
-     * $query->filterByCombinationId(array(12, 34)); // WHERE combination_id IN (12, 34)
-     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
+     * $query->filterByCartId(1234); // WHERE cart_id = 1234
+     * $query->filterByCartId(array(12, 34)); // WHERE cart_id IN (12, 34)
+     * $query->filterByCartId(array('min' => 12)); // WHERE cart_id > 12
      * </code>
      *
-     * @see       filterByCombination()
+     * @see       filterByCart()
      *
-     * @param     mixed $combinationId The value to use as filter.
+     * @param     mixed $cartId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function filterByCombinationId($combinationId = null, $comparison = null)
+    public function filterByCartId($cartId = null, $comparison = null)
     {
-        if (is_array($combinationId)) {
+        if (is_array($cartId)) {
             $useMinMax = false;
-            if (isset($combinationId['min'])) {
-                $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId['min'], Criteria::GREATER_EQUAL);
+            if (isset($cartId['min'])) {
+                $this->addUsingAlias(CartItemTableMap::CART_ID, $cartId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($combinationId['max'])) {
-                $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId['max'], Criteria::LESS_EQUAL);
+            if (isset($cartId['max'])) {
+                $this->addUsingAlias(CartItemTableMap::CART_ID, $cartId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -325,7 +329,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::CART_ID, $cartId, $comparison);
     }
 
     /**
@@ -346,18 +350,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterByProductId($productId = null, $comparison = null)
     {
         if (is_array($productId)) {
             $useMinMax = false;
             if (isset($productId['min'])) {
-                $this->addUsingAlias(StockTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($productId['max'])) {
-                $this->addUsingAlias(StockTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -368,48 +372,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::PRODUCT_ID, $productId, $comparison);
-    }
-
-    /**
-     * Filter the query on the increase column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIncrease(1234); // WHERE increase = 1234
-     * $query->filterByIncrease(array(12, 34)); // WHERE increase IN (12, 34)
-     * $query->filterByIncrease(array('min' => 12)); // WHERE increase > 12
-     * </code>
-     *
-     * @param     mixed $increase The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildStockQuery The current query, for fluid interface
-     */
-    public function filterByIncrease($increase = null, $comparison = null)
-    {
-        if (is_array($increase)) {
-            $useMinMax = false;
-            if (isset($increase['min'])) {
-                $this->addUsingAlias(StockTableMap::INCREASE, $increase['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($increase['max'])) {
-                $this->addUsingAlias(StockTableMap::INCREASE, $increase['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(StockTableMap::INCREASE, $increase, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::PRODUCT_ID, $productId, $comparison);
     }
 
     /**
@@ -428,18 +391,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterByQuantity($quantity = null, $comparison = null)
     {
         if (is_array($quantity)) {
             $useMinMax = false;
             if (isset($quantity['min'])) {
-                $this->addUsingAlias(StockTableMap::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($quantity['max'])) {
-                $this->addUsingAlias(StockTableMap::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -450,7 +413,50 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::QUANTITY, $quantity, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::QUANTITY, $quantity, $comparison);
+    }
+
+    /**
+     * Filter the query on the combination_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByCombinationId(1234); // WHERE combination_id = 1234
+     * $query->filterByCombinationId(array(12, 34)); // WHERE combination_id IN (12, 34)
+     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
+     * </code>
+     *
+     * @see       filterByCombination()
+     *
+     * @param     mixed $combinationId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCartItemQuery The current query, for fluid interface
+     */
+    public function filterByCombinationId($combinationId = null, $comparison = null)
+    {
+        if (is_array($combinationId)) {
+            $useMinMax = false;
+            if (isset($combinationId['min'])) {
+                $this->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combinationId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($combinationId['max'])) {
+                $this->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combinationId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combinationId, $comparison);
     }
 
     /**
@@ -471,18 +477,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(StockTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(StockTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -493,7 +499,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -514,18 +520,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(StockTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(StockTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CartItemTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -536,46 +542,46 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Combination object
+     * Filter the query by a related \Thelia\Model\Cart object
      *
-     * @param \Thelia\Model\Combination|ObjectCollection $combination The related object(s) to use as filter
+     * @param \Thelia\Model\Cart|ObjectCollection $cart The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function filterByCombination($combination, $comparison = null)
+    public function filterByCart($cart, $comparison = null)
     {
-        if ($combination instanceof \Thelia\Model\Combination) {
+        if ($cart instanceof \Thelia\Model\Cart) {
             return $this
-                ->addUsingAlias(StockTableMap::COMBINATION_ID, $combination->getId(), $comparison);
-        } elseif ($combination instanceof ObjectCollection) {
+                ->addUsingAlias(CartItemTableMap::CART_ID, $cart->getId(), $comparison);
+        } elseif ($cart instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(StockTableMap::COMBINATION_ID, $combination->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CartItemTableMap::CART_ID, $cart->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByCombination() only accepts arguments of type \Thelia\Model\Combination or Collection');
+            throw new PropelException('filterByCart() only accepts arguments of type \Thelia\Model\Cart or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Combination relation
+     * Adds a JOIN clause to the query using the Cart relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function joinCombination($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinCart($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Combination');
+        $relationMap = $tableMap->getRelation('Cart');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -590,14 +596,14 @@ abstract class StockQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Combination');
+            $this->addJoinObject($join, 'Cart');
         }
 
         return $this;
     }
 
     /**
-     * Use the Combination relation Combination object
+     * Use the Cart relation Cart object
      *
      * @see useQuery()
      *
@@ -605,13 +611,13 @@ abstract class StockQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CombinationQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
      */
-    public function useCombinationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useCartQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinCombination($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Combination', '\Thelia\Model\CombinationQuery');
+            ->joinCart($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Cart', '\Thelia\Model\CartQuery');
     }
 
     /**
@@ -620,20 +626,20 @@ abstract class StockQuery extends ModelCriteria
      * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function filterByProduct($product, $comparison = null)
     {
         if ($product instanceof \Thelia\Model\Product) {
             return $this
-                ->addUsingAlias(StockTableMap::PRODUCT_ID, $product->getId(), $comparison);
+                ->addUsingAlias(CartItemTableMap::PRODUCT_ID, $product->getId(), $comparison);
         } elseif ($product instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(StockTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CartItemTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByProduct() only accepts arguments of type \Thelia\Model\Product or Collection');
         }
@@ -645,7 +651,7 @@ abstract class StockQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
     public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -690,23 +696,98 @@ abstract class StockQuery extends ModelCriteria
     }
 
     /**
-     * Exclude object from result
+     * Filter the query by a related \Thelia\Model\Combination object
      *
-     * @param   ChildStock $stock Object to remove from the list of results
+     * @param \Thelia\Model\Combination|ObjectCollection $combination The related object(s) to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function prune($stock = null)
+    public function filterByCombination($combination, $comparison = null)
     {
-        if ($stock) {
-            $this->addUsingAlias(StockTableMap::ID, $stock->getId(), Criteria::NOT_EQUAL);
+        if ($combination instanceof \Thelia\Model\Combination) {
+            return $this
+                ->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combination->getId(), $comparison);
+        } elseif ($combination instanceof ObjectCollection) {
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+
+            return $this
+                ->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combination->toKeyValue('PrimaryKey', 'Id'), $comparison);
+        } else {
+            throw new PropelException('filterByCombination() only accepts arguments of type \Thelia\Model\Combination or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the Combination relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCartItemQuery The current query, for fluid interface
+     */
+    public function joinCombination($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('Combination');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'Combination');
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the stock table.
+     * Use the Combination relation Combination object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CombinationQuery A secondary query class using the current class as primary query
+     */
+    public function useCombinationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCombination($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Combination', '\Thelia\Model\CombinationQuery');
+    }
+
+    /**
+     * Exclude object from result
+     *
+     * @param   ChildCartItem $cartItem Object to remove from the list of results
+     *
+     * @return ChildCartItemQuery The current query, for fluid interface
+     */
+    public function prune($cartItem = null)
+    {
+        if ($cartItem) {
+            $this->addUsingAlias(CartItemTableMap::ID, $cartItem->getId(), Criteria::NOT_EQUAL);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Deletes all rows from the cart_item table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -714,7 +795,7 @@ abstract class StockQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CartItemTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -725,8 +806,8 @@ abstract class StockQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            StockTableMap::clearInstancePool();
-            StockTableMap::clearRelatedInstancePool();
+            CartItemTableMap::clearInstancePool();
+            CartItemTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -738,9 +819,9 @@ abstract class StockQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildStock or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildCartItem or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildStock object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildCartItem object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -751,13 +832,13 @@ abstract class StockQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CartItemTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(StockTableMap::DATABASE_NAME);
+        $criteria->setDbName(CartItemTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -767,10 +848,10 @@ abstract class StockQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        StockTableMap::removeInstanceFromPool($criteria);
+        CartItemTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            StockTableMap::clearRelatedInstancePool();
+            CartItemTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -787,11 +868,11 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildCartItemQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(StockTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CartItemTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -799,51 +880,51 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildCartItemQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(StockTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CartItemTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildCartItemQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(StockTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(CartItemTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildCartItemQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(StockTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(CartItemTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildCartItemQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(StockTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(CartItemTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildCartItemQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(StockTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(CartItemTableMap::CREATED_AT);
     }
 
-} // StockQuery
+} // CartItemQuery

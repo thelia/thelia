@@ -10,6 +10,7 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
+use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
@@ -18,6 +19,8 @@ use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Address as ChildAddress;
 use Thelia\Model\AddressQuery as ChildAddressQuery;
+use Thelia\Model\Cart as ChildCart;
+use Thelia\Model\CartQuery as ChildCartQuery;
 use Thelia\Model\Customer as ChildCustomer;
 use Thelia\Model\CustomerQuery as ChildCustomerQuery;
 use Thelia\Model\CustomerTitle as ChildCustomerTitle;
@@ -149,11 +152,11 @@ abstract class Address implements ActiveRecordInterface
     protected $cellphone;
 
     /**
-     * The value for the is_default field.
+     * The value for the default field.
      * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $is_default;
+    protected $default;
 
     /**
      * The value for the created_at field.
@@ -178,12 +181,36 @@ abstract class Address implements ActiveRecordInterface
     protected $aCustomerTitle;
 
     /**
+     * @var        ObjectCollection|ChildCart[] Collection to store aggregation of ChildCart objects.
+     */
+    protected $collCartsRelatedByAddressDeliveryId;
+    protected $collCartsRelatedByAddressDeliveryIdPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCart[] Collection to store aggregation of ChildCart objects.
+     */
+    protected $collCartsRelatedByAddressInvoiceId;
+    protected $collCartsRelatedByAddressInvoiceIdPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
      * @var boolean
      */
     protected $alreadyInSave = false;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $cartsRelatedByAddressDeliveryIdScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $cartsRelatedByAddressInvoiceIdScheduledForDeletion = null;
 
     /**
      * Applies default values to this object.
@@ -193,7 +220,7 @@ abstract class Address implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->is_default = 0;
+        $this->default = 0;
     }
 
     /**
@@ -618,14 +645,14 @@ abstract class Address implements ActiveRecordInterface
     }
 
     /**
-     * Get the [is_default] column value.
+     * Get the [default] column value.
      *
      * @return   int
      */
-    public function getIsDefault()
+    public function getDefault()
     {
 
-        return $this->is_default;
+        return $this->default;
     }
 
     /**
@@ -992,25 +1019,25 @@ abstract class Address implements ActiveRecordInterface
     } // setCellphone()
 
     /**
-     * Set the value of [is_default] column.
+     * Set the value of [default] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\Address The current object (for fluent API support)
      */
-    public function setIsDefault($v)
+    public function setDefault($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->is_default !== $v) {
-            $this->is_default = $v;
-            $this->modifiedColumns[] = AddressTableMap::IS_DEFAULT;
+        if ($this->default !== $v) {
+            $this->default = $v;
+            $this->modifiedColumns[] = AddressTableMap::DEFAULT;
         }
 
 
         return $this;
-    } // setIsDefault()
+    } // setDefault()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1064,7 +1091,7 @@ abstract class Address implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->is_default !== 0) {
+            if ($this->default !== 0) {
                 return false;
             }
 
@@ -1140,8 +1167,8 @@ abstract class Address implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : AddressTableMap::translateFieldName('Cellphone', TableMap::TYPE_PHPNAME, $indexType)];
             $this->cellphone = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : AddressTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->is_default = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : AddressTableMap::translateFieldName('Default', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->default = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : AddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -1231,6 +1258,10 @@ abstract class Address implements ActiveRecordInterface
 
             $this->aCustomer = null;
             $this->aCustomerTitle = null;
+            $this->collCartsRelatedByAddressDeliveryId = null;
+
+            $this->collCartsRelatedByAddressInvoiceId = null;
+
         } // if (deep)
     }
 
@@ -1383,6 +1414,42 @@ abstract class Address implements ActiveRecordInterface
                 $this->resetModified();
             }
 
+            if ($this->cartsRelatedByAddressDeliveryIdScheduledForDeletion !== null) {
+                if (!$this->cartsRelatedByAddressDeliveryIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->cartsRelatedByAddressDeliveryIdScheduledForDeletion as $cartRelatedByAddressDeliveryId) {
+                        // need to save related object because we set the relation to null
+                        $cartRelatedByAddressDeliveryId->save($con);
+                    }
+                    $this->cartsRelatedByAddressDeliveryIdScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCartsRelatedByAddressDeliveryId !== null) {
+            foreach ($this->collCartsRelatedByAddressDeliveryId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->cartsRelatedByAddressInvoiceIdScheduledForDeletion !== null) {
+                if (!$this->cartsRelatedByAddressInvoiceIdScheduledForDeletion->isEmpty()) {
+                    foreach ($this->cartsRelatedByAddressInvoiceIdScheduledForDeletion as $cartRelatedByAddressInvoiceId) {
+                        // need to save related object because we set the relation to null
+                        $cartRelatedByAddressInvoiceId->save($con);
+                    }
+                    $this->cartsRelatedByAddressInvoiceIdScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCartsRelatedByAddressInvoiceId !== null) {
+            foreach ($this->collCartsRelatedByAddressInvoiceId as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
             $this->alreadyInSave = false;
 
         }
@@ -1454,8 +1521,8 @@ abstract class Address implements ActiveRecordInterface
         if ($this->isColumnModified(AddressTableMap::CELLPHONE)) {
             $modifiedColumns[':p' . $index++]  = 'CELLPHONE';
         }
-        if ($this->isColumnModified(AddressTableMap::IS_DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
+        if ($this->isColumnModified(AddressTableMap::DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = 'DEFAULT';
         }
         if ($this->isColumnModified(AddressTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1519,8 +1586,8 @@ abstract class Address implements ActiveRecordInterface
                     case 'CELLPHONE':
                         $stmt->bindValue($identifier, $this->cellphone, PDO::PARAM_STR);
                         break;
-                    case 'IS_DEFAULT':
-                        $stmt->bindValue($identifier, $this->is_default, PDO::PARAM_INT);
+                    case 'DEFAULT':
+                        $stmt->bindValue($identifier, $this->default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1636,7 +1703,7 @@ abstract class Address implements ActiveRecordInterface
                 return $this->getCellphone();
                 break;
             case 15:
-                return $this->getIsDefault();
+                return $this->getDefault();
                 break;
             case 16:
                 return $this->getCreatedAt();
@@ -1688,7 +1755,7 @@ abstract class Address implements ActiveRecordInterface
             $keys[12] => $this->getCountryId(),
             $keys[13] => $this->getPhone(),
             $keys[14] => $this->getCellphone(),
-            $keys[15] => $this->getIsDefault(),
+            $keys[15] => $this->getDefault(),
             $keys[16] => $this->getCreatedAt(),
             $keys[17] => $this->getUpdatedAt(),
         );
@@ -1704,6 +1771,12 @@ abstract class Address implements ActiveRecordInterface
             }
             if (null !== $this->aCustomerTitle) {
                 $result['CustomerTitle'] = $this->aCustomerTitle->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->collCartsRelatedByAddressDeliveryId) {
+                $result['CartsRelatedByAddressDeliveryId'] = $this->collCartsRelatedByAddressDeliveryId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCartsRelatedByAddressInvoiceId) {
+                $result['CartsRelatedByAddressInvoiceId'] = $this->collCartsRelatedByAddressInvoiceId->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1785,7 +1858,7 @@ abstract class Address implements ActiveRecordInterface
                 $this->setCellphone($value);
                 break;
             case 15:
-                $this->setIsDefault($value);
+                $this->setDefault($value);
                 break;
             case 16:
                 $this->setCreatedAt($value);
@@ -1832,7 +1905,7 @@ abstract class Address implements ActiveRecordInterface
         if (array_key_exists($keys[12], $arr)) $this->setCountryId($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setPhone($arr[$keys[13]]);
         if (array_key_exists($keys[14], $arr)) $this->setCellphone($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setIsDefault($arr[$keys[15]]);
+        if (array_key_exists($keys[15], $arr)) $this->setDefault($arr[$keys[15]]);
         if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
         if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
     }
@@ -1861,7 +1934,7 @@ abstract class Address implements ActiveRecordInterface
         if ($this->isColumnModified(AddressTableMap::COUNTRY_ID)) $criteria->add(AddressTableMap::COUNTRY_ID, $this->country_id);
         if ($this->isColumnModified(AddressTableMap::PHONE)) $criteria->add(AddressTableMap::PHONE, $this->phone);
         if ($this->isColumnModified(AddressTableMap::CELLPHONE)) $criteria->add(AddressTableMap::CELLPHONE, $this->cellphone);
-        if ($this->isColumnModified(AddressTableMap::IS_DEFAULT)) $criteria->add(AddressTableMap::IS_DEFAULT, $this->is_default);
+        if ($this->isColumnModified(AddressTableMap::DEFAULT)) $criteria->add(AddressTableMap::DEFAULT, $this->default);
         if ($this->isColumnModified(AddressTableMap::CREATED_AT)) $criteria->add(AddressTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AddressTableMap::UPDATED_AT)) $criteria->add(AddressTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1941,9 +2014,29 @@ abstract class Address implements ActiveRecordInterface
         $copyObj->setCountryId($this->getCountryId());
         $copyObj->setPhone($this->getPhone());
         $copyObj->setCellphone($this->getCellphone());
-        $copyObj->setIsDefault($this->getIsDefault());
+        $copyObj->setDefault($this->getDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
+
+        if ($deepCopy) {
+            // important: temporarily setNew(false) because this affects the behavior of
+            // the getter/setter methods for fkey referrer objects.
+            $copyObj->setNew(false);
+
+            foreach ($this->getCartsRelatedByAddressDeliveryId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCartRelatedByAddressDeliveryId($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCartsRelatedByAddressInvoiceId() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCartRelatedByAddressInvoiceId($relObj->copy($deepCopy));
+                }
+            }
+
+        } // if ($deepCopy)
+
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -2074,6 +2167,561 @@ abstract class Address implements ActiveRecordInterface
         return $this->aCustomerTitle;
     }
 
+
+    /**
+     * Initializes a collection based on the name of a relation.
+     * Avoids crafting an 'init[$relationName]s' method name
+     * that wouldn't work when StandardEnglishPluralizer is used.
+     *
+     * @param      string $relationName The name of the relation to initialize
+     * @return void
+     */
+    public function initRelation($relationName)
+    {
+        if ('CartRelatedByAddressDeliveryId' == $relationName) {
+            return $this->initCartsRelatedByAddressDeliveryId();
+        }
+        if ('CartRelatedByAddressInvoiceId' == $relationName) {
+            return $this->initCartsRelatedByAddressInvoiceId();
+        }
+    }
+
+    /**
+     * Clears out the collCartsRelatedByAddressDeliveryId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCartsRelatedByAddressDeliveryId()
+     */
+    public function clearCartsRelatedByAddressDeliveryId()
+    {
+        $this->collCartsRelatedByAddressDeliveryId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCartsRelatedByAddressDeliveryId collection loaded partially.
+     */
+    public function resetPartialCartsRelatedByAddressDeliveryId($v = true)
+    {
+        $this->collCartsRelatedByAddressDeliveryIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collCartsRelatedByAddressDeliveryId collection.
+     *
+     * By default this just sets the collCartsRelatedByAddressDeliveryId collection to an empty array (like clearcollCartsRelatedByAddressDeliveryId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCartsRelatedByAddressDeliveryId($overrideExisting = true)
+    {
+        if (null !== $this->collCartsRelatedByAddressDeliveryId && !$overrideExisting) {
+            return;
+        }
+        $this->collCartsRelatedByAddressDeliveryId = new ObjectCollection();
+        $this->collCartsRelatedByAddressDeliveryId->setModel('\Thelia\Model\Cart');
+    }
+
+    /**
+     * Gets an array of ChildCart objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildAddress is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCart[] List of ChildCart objects
+     * @throws PropelException
+     */
+    public function getCartsRelatedByAddressDeliveryId($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCartsRelatedByAddressDeliveryIdPartial && !$this->isNew();
+        if (null === $this->collCartsRelatedByAddressDeliveryId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCartsRelatedByAddressDeliveryId) {
+                // return empty collection
+                $this->initCartsRelatedByAddressDeliveryId();
+            } else {
+                $collCartsRelatedByAddressDeliveryId = ChildCartQuery::create(null, $criteria)
+                    ->filterByAddressRelatedByAddressDeliveryId($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCartsRelatedByAddressDeliveryIdPartial && count($collCartsRelatedByAddressDeliveryId)) {
+                        $this->initCartsRelatedByAddressDeliveryId(false);
+
+                        foreach ($collCartsRelatedByAddressDeliveryId as $obj) {
+                            if (false == $this->collCartsRelatedByAddressDeliveryId->contains($obj)) {
+                                $this->collCartsRelatedByAddressDeliveryId->append($obj);
+                            }
+                        }
+
+                        $this->collCartsRelatedByAddressDeliveryIdPartial = true;
+                    }
+
+                    $collCartsRelatedByAddressDeliveryId->getInternalIterator()->rewind();
+
+                    return $collCartsRelatedByAddressDeliveryId;
+                }
+
+                if ($partial && $this->collCartsRelatedByAddressDeliveryId) {
+                    foreach ($this->collCartsRelatedByAddressDeliveryId as $obj) {
+                        if ($obj->isNew()) {
+                            $collCartsRelatedByAddressDeliveryId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCartsRelatedByAddressDeliveryId = $collCartsRelatedByAddressDeliveryId;
+                $this->collCartsRelatedByAddressDeliveryIdPartial = false;
+            }
+        }
+
+        return $this->collCartsRelatedByAddressDeliveryId;
+    }
+
+    /**
+     * Sets a collection of CartRelatedByAddressDeliveryId objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $cartsRelatedByAddressDeliveryId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildAddress The current object (for fluent API support)
+     */
+    public function setCartsRelatedByAddressDeliveryId(Collection $cartsRelatedByAddressDeliveryId, ConnectionInterface $con = null)
+    {
+        $cartsRelatedByAddressDeliveryIdToDelete = $this->getCartsRelatedByAddressDeliveryId(new Criteria(), $con)->diff($cartsRelatedByAddressDeliveryId);
+
+
+        $this->cartsRelatedByAddressDeliveryIdScheduledForDeletion = $cartsRelatedByAddressDeliveryIdToDelete;
+
+        foreach ($cartsRelatedByAddressDeliveryIdToDelete as $cartRelatedByAddressDeliveryIdRemoved) {
+            $cartRelatedByAddressDeliveryIdRemoved->setAddressRelatedByAddressDeliveryId(null);
+        }
+
+        $this->collCartsRelatedByAddressDeliveryId = null;
+        foreach ($cartsRelatedByAddressDeliveryId as $cartRelatedByAddressDeliveryId) {
+            $this->addCartRelatedByAddressDeliveryId($cartRelatedByAddressDeliveryId);
+        }
+
+        $this->collCartsRelatedByAddressDeliveryId = $cartsRelatedByAddressDeliveryId;
+        $this->collCartsRelatedByAddressDeliveryIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Cart objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Cart objects.
+     * @throws PropelException
+     */
+    public function countCartsRelatedByAddressDeliveryId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCartsRelatedByAddressDeliveryIdPartial && !$this->isNew();
+        if (null === $this->collCartsRelatedByAddressDeliveryId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCartsRelatedByAddressDeliveryId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCartsRelatedByAddressDeliveryId());
+            }
+
+            $query = ChildCartQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAddressRelatedByAddressDeliveryId($this)
+                ->count($con);
+        }
+
+        return count($this->collCartsRelatedByAddressDeliveryId);
+    }
+
+    /**
+     * Method called to associate a ChildCart object to this object
+     * through the ChildCart foreign key attribute.
+     *
+     * @param    ChildCart $l ChildCart
+     * @return   \Thelia\Model\Address The current object (for fluent API support)
+     */
+    public function addCartRelatedByAddressDeliveryId(ChildCart $l)
+    {
+        if ($this->collCartsRelatedByAddressDeliveryId === null) {
+            $this->initCartsRelatedByAddressDeliveryId();
+            $this->collCartsRelatedByAddressDeliveryIdPartial = true;
+        }
+
+        if (!in_array($l, $this->collCartsRelatedByAddressDeliveryId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCartRelatedByAddressDeliveryId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CartRelatedByAddressDeliveryId $cartRelatedByAddressDeliveryId The cartRelatedByAddressDeliveryId object to add.
+     */
+    protected function doAddCartRelatedByAddressDeliveryId($cartRelatedByAddressDeliveryId)
+    {
+        $this->collCartsRelatedByAddressDeliveryId[]= $cartRelatedByAddressDeliveryId;
+        $cartRelatedByAddressDeliveryId->setAddressRelatedByAddressDeliveryId($this);
+    }
+
+    /**
+     * @param  CartRelatedByAddressDeliveryId $cartRelatedByAddressDeliveryId The cartRelatedByAddressDeliveryId object to remove.
+     * @return ChildAddress The current object (for fluent API support)
+     */
+    public function removeCartRelatedByAddressDeliveryId($cartRelatedByAddressDeliveryId)
+    {
+        if ($this->getCartsRelatedByAddressDeliveryId()->contains($cartRelatedByAddressDeliveryId)) {
+            $this->collCartsRelatedByAddressDeliveryId->remove($this->collCartsRelatedByAddressDeliveryId->search($cartRelatedByAddressDeliveryId));
+            if (null === $this->cartsRelatedByAddressDeliveryIdScheduledForDeletion) {
+                $this->cartsRelatedByAddressDeliveryIdScheduledForDeletion = clone $this->collCartsRelatedByAddressDeliveryId;
+                $this->cartsRelatedByAddressDeliveryIdScheduledForDeletion->clear();
+            }
+            $this->cartsRelatedByAddressDeliveryIdScheduledForDeletion[]= $cartRelatedByAddressDeliveryId;
+            $cartRelatedByAddressDeliveryId->setAddressRelatedByAddressDeliveryId(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Address is new, it will return
+     * an empty collection; or if this Address has previously
+     * been saved, it will retrieve related CartsRelatedByAddressDeliveryId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Address.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCart[] List of ChildCart objects
+     */
+    public function getCartsRelatedByAddressDeliveryIdJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCartQuery::create(null, $criteria);
+        $query->joinWith('Customer', $joinBehavior);
+
+        return $this->getCartsRelatedByAddressDeliveryId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Address is new, it will return
+     * an empty collection; or if this Address has previously
+     * been saved, it will retrieve related CartsRelatedByAddressDeliveryId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Address.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCart[] List of ChildCart objects
+     */
+    public function getCartsRelatedByAddressDeliveryIdJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCartQuery::create(null, $criteria);
+        $query->joinWith('Currency', $joinBehavior);
+
+        return $this->getCartsRelatedByAddressDeliveryId($query, $con);
+    }
+
+    /**
+     * Clears out the collCartsRelatedByAddressInvoiceId collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCartsRelatedByAddressInvoiceId()
+     */
+    public function clearCartsRelatedByAddressInvoiceId()
+    {
+        $this->collCartsRelatedByAddressInvoiceId = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCartsRelatedByAddressInvoiceId collection loaded partially.
+     */
+    public function resetPartialCartsRelatedByAddressInvoiceId($v = true)
+    {
+        $this->collCartsRelatedByAddressInvoiceIdPartial = $v;
+    }
+
+    /**
+     * Initializes the collCartsRelatedByAddressInvoiceId collection.
+     *
+     * By default this just sets the collCartsRelatedByAddressInvoiceId collection to an empty array (like clearcollCartsRelatedByAddressInvoiceId());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCartsRelatedByAddressInvoiceId($overrideExisting = true)
+    {
+        if (null !== $this->collCartsRelatedByAddressInvoiceId && !$overrideExisting) {
+            return;
+        }
+        $this->collCartsRelatedByAddressInvoiceId = new ObjectCollection();
+        $this->collCartsRelatedByAddressInvoiceId->setModel('\Thelia\Model\Cart');
+    }
+
+    /**
+     * Gets an array of ChildCart objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildAddress is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCart[] List of ChildCart objects
+     * @throws PropelException
+     */
+    public function getCartsRelatedByAddressInvoiceId($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCartsRelatedByAddressInvoiceIdPartial && !$this->isNew();
+        if (null === $this->collCartsRelatedByAddressInvoiceId || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCartsRelatedByAddressInvoiceId) {
+                // return empty collection
+                $this->initCartsRelatedByAddressInvoiceId();
+            } else {
+                $collCartsRelatedByAddressInvoiceId = ChildCartQuery::create(null, $criteria)
+                    ->filterByAddressRelatedByAddressInvoiceId($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCartsRelatedByAddressInvoiceIdPartial && count($collCartsRelatedByAddressInvoiceId)) {
+                        $this->initCartsRelatedByAddressInvoiceId(false);
+
+                        foreach ($collCartsRelatedByAddressInvoiceId as $obj) {
+                            if (false == $this->collCartsRelatedByAddressInvoiceId->contains($obj)) {
+                                $this->collCartsRelatedByAddressInvoiceId->append($obj);
+                            }
+                        }
+
+                        $this->collCartsRelatedByAddressInvoiceIdPartial = true;
+                    }
+
+                    $collCartsRelatedByAddressInvoiceId->getInternalIterator()->rewind();
+
+                    return $collCartsRelatedByAddressInvoiceId;
+                }
+
+                if ($partial && $this->collCartsRelatedByAddressInvoiceId) {
+                    foreach ($this->collCartsRelatedByAddressInvoiceId as $obj) {
+                        if ($obj->isNew()) {
+                            $collCartsRelatedByAddressInvoiceId[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCartsRelatedByAddressInvoiceId = $collCartsRelatedByAddressInvoiceId;
+                $this->collCartsRelatedByAddressInvoiceIdPartial = false;
+            }
+        }
+
+        return $this->collCartsRelatedByAddressInvoiceId;
+    }
+
+    /**
+     * Sets a collection of CartRelatedByAddressInvoiceId objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $cartsRelatedByAddressInvoiceId A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildAddress The current object (for fluent API support)
+     */
+    public function setCartsRelatedByAddressInvoiceId(Collection $cartsRelatedByAddressInvoiceId, ConnectionInterface $con = null)
+    {
+        $cartsRelatedByAddressInvoiceIdToDelete = $this->getCartsRelatedByAddressInvoiceId(new Criteria(), $con)->diff($cartsRelatedByAddressInvoiceId);
+
+
+        $this->cartsRelatedByAddressInvoiceIdScheduledForDeletion = $cartsRelatedByAddressInvoiceIdToDelete;
+
+        foreach ($cartsRelatedByAddressInvoiceIdToDelete as $cartRelatedByAddressInvoiceIdRemoved) {
+            $cartRelatedByAddressInvoiceIdRemoved->setAddressRelatedByAddressInvoiceId(null);
+        }
+
+        $this->collCartsRelatedByAddressInvoiceId = null;
+        foreach ($cartsRelatedByAddressInvoiceId as $cartRelatedByAddressInvoiceId) {
+            $this->addCartRelatedByAddressInvoiceId($cartRelatedByAddressInvoiceId);
+        }
+
+        $this->collCartsRelatedByAddressInvoiceId = $cartsRelatedByAddressInvoiceId;
+        $this->collCartsRelatedByAddressInvoiceIdPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Cart objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Cart objects.
+     * @throws PropelException
+     */
+    public function countCartsRelatedByAddressInvoiceId(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCartsRelatedByAddressInvoiceIdPartial && !$this->isNew();
+        if (null === $this->collCartsRelatedByAddressInvoiceId || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCartsRelatedByAddressInvoiceId) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCartsRelatedByAddressInvoiceId());
+            }
+
+            $query = ChildCartQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByAddressRelatedByAddressInvoiceId($this)
+                ->count($con);
+        }
+
+        return count($this->collCartsRelatedByAddressInvoiceId);
+    }
+
+    /**
+     * Method called to associate a ChildCart object to this object
+     * through the ChildCart foreign key attribute.
+     *
+     * @param    ChildCart $l ChildCart
+     * @return   \Thelia\Model\Address The current object (for fluent API support)
+     */
+    public function addCartRelatedByAddressInvoiceId(ChildCart $l)
+    {
+        if ($this->collCartsRelatedByAddressInvoiceId === null) {
+            $this->initCartsRelatedByAddressInvoiceId();
+            $this->collCartsRelatedByAddressInvoiceIdPartial = true;
+        }
+
+        if (!in_array($l, $this->collCartsRelatedByAddressInvoiceId->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCartRelatedByAddressInvoiceId($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CartRelatedByAddressInvoiceId $cartRelatedByAddressInvoiceId The cartRelatedByAddressInvoiceId object to add.
+     */
+    protected function doAddCartRelatedByAddressInvoiceId($cartRelatedByAddressInvoiceId)
+    {
+        $this->collCartsRelatedByAddressInvoiceId[]= $cartRelatedByAddressInvoiceId;
+        $cartRelatedByAddressInvoiceId->setAddressRelatedByAddressInvoiceId($this);
+    }
+
+    /**
+     * @param  CartRelatedByAddressInvoiceId $cartRelatedByAddressInvoiceId The cartRelatedByAddressInvoiceId object to remove.
+     * @return ChildAddress The current object (for fluent API support)
+     */
+    public function removeCartRelatedByAddressInvoiceId($cartRelatedByAddressInvoiceId)
+    {
+        if ($this->getCartsRelatedByAddressInvoiceId()->contains($cartRelatedByAddressInvoiceId)) {
+            $this->collCartsRelatedByAddressInvoiceId->remove($this->collCartsRelatedByAddressInvoiceId->search($cartRelatedByAddressInvoiceId));
+            if (null === $this->cartsRelatedByAddressInvoiceIdScheduledForDeletion) {
+                $this->cartsRelatedByAddressInvoiceIdScheduledForDeletion = clone $this->collCartsRelatedByAddressInvoiceId;
+                $this->cartsRelatedByAddressInvoiceIdScheduledForDeletion->clear();
+            }
+            $this->cartsRelatedByAddressInvoiceIdScheduledForDeletion[]= $cartRelatedByAddressInvoiceId;
+            $cartRelatedByAddressInvoiceId->setAddressRelatedByAddressInvoiceId(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Address is new, it will return
+     * an empty collection; or if this Address has previously
+     * been saved, it will retrieve related CartsRelatedByAddressInvoiceId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Address.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCart[] List of ChildCart objects
+     */
+    public function getCartsRelatedByAddressInvoiceIdJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCartQuery::create(null, $criteria);
+        $query->joinWith('Customer', $joinBehavior);
+
+        return $this->getCartsRelatedByAddressInvoiceId($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Address is new, it will return
+     * an empty collection; or if this Address has previously
+     * been saved, it will retrieve related CartsRelatedByAddressInvoiceId from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Address.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCart[] List of ChildCart objects
+     */
+    public function getCartsRelatedByAddressInvoiceIdJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCartQuery::create(null, $criteria);
+        $query->joinWith('Currency', $joinBehavior);
+
+        return $this->getCartsRelatedByAddressInvoiceId($query, $con);
+    }
+
     /**
      * Clears the current object and sets all attributes to their default values
      */
@@ -2094,7 +2742,7 @@ abstract class Address implements ActiveRecordInterface
         $this->country_id = null;
         $this->phone = null;
         $this->cellphone = null;
-        $this->is_default = null;
+        $this->default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2117,8 +2765,26 @@ abstract class Address implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
+            if ($this->collCartsRelatedByAddressDeliveryId) {
+                foreach ($this->collCartsRelatedByAddressDeliveryId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCartsRelatedByAddressInvoiceId) {
+                foreach ($this->collCartsRelatedByAddressInvoiceId as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
+        if ($this->collCartsRelatedByAddressDeliveryId instanceof Collection) {
+            $this->collCartsRelatedByAddressDeliveryId->clearIterator();
+        }
+        $this->collCartsRelatedByAddressDeliveryId = null;
+        if ($this->collCartsRelatedByAddressInvoiceId instanceof Collection) {
+            $this->collCartsRelatedByAddressInvoiceId->clearIterator();
+        }
+        $this->collCartsRelatedByAddressInvoiceId = null;
         $this->aCustomer = null;
         $this->aCustomerTitle = null;
     }
