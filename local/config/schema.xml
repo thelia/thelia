@@ -339,7 +339,7 @@
     <column name="lang" size="10" type="VARCHAR" />
     <column name="sponsor" size="50" type="VARCHAR" />
     <column name="discount" type="FLOAT" />
-    <foreign-key foreignTable="customer_title" name="fk_address_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+    <foreign-key foreignTable="customer_title" name="fk_customer_customer_title_id" onDelete="RESTRICT" onUpdate="RESTRICT">
       <reference foreign="id" local="title_id" />
     </foreign-key>
     <unique name="ref_UNIQUE">
