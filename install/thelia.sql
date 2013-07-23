@@ -453,6 +453,7 @@ CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `ref` VARCHAR(50) NOT NULL,
+    `title_id` INTEGER,
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(50),
@@ -465,7 +466,13 @@ CREATE TABLE `customer`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `ref_UNIQUE` (`ref`)
+    UNIQUE INDEX `ref_UNIQUE` (`ref`),
+    INDEX `FI_address_customer_title_id` (`title_id`),
+    CONSTRAINT `fk_address_customer_title_id`
+        FOREIGN KEY (`title_id`)
+        REFERENCES `customer_title` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
