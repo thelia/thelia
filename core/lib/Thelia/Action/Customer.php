@@ -41,6 +41,8 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
+use Propel\Runtime\Exception\PropelException;
+
 
 class Customer implements EventSubscriberInterface
 {
@@ -98,7 +100,7 @@ class Customer implements EventSubscriberInterface
                 	// Connect the newly created user,and redirect to the success URL
                 	$this->processSuccessfulLogin($event, $customer, $customerCreation, true);
 
-                } catch (\PropelException $e) {
+                } catch (PropelException $e) {
                     Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
 
                     $message = "Failed to create your account, please try again.";
@@ -155,7 +157,7 @@ class Customer implements EventSubscriberInterface
                     // We don-t send the login event, as the customer si already logged.
                     $this->processSuccessfulLogin($event, $customer, $customerModification);
                  }
-                catch(\PropelException $e) {
+                catch(PropelException $e) {
 
                     Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
 
@@ -280,7 +282,7 @@ class Customer implements EventSubscriberInterface
     	if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
 
     	// Redirect to the success URL
-    	return Redirect::exec($form->getSuccessUrl());
+    	Redirect::exec($form->getSuccessUrl());
     }
 
     /**
