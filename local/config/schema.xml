@@ -3,7 +3,6 @@
   <table name="category" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" type="INTEGER" />
-    <column name="link" size="255" type="VARCHAR" />
     <column name="visible" required="true" type="TINYINT" />
     <column name="position" required="true" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />

@@ -23,7 +23,6 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  *
  * @method     ChildCategoryVersionQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCategoryVersionQuery orderByParent($order = Criteria::ASC) Order by the parent column
- * @method     ChildCategoryVersionQuery orderByLink($order = Criteria::ASC) Order by the link column
  * @method     ChildCategoryVersionQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildCategoryVersionQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildCategoryVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -34,7 +33,6 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  *
  * @method     ChildCategoryVersionQuery groupById() Group by the id column
  * @method     ChildCategoryVersionQuery groupByParent() Group by the parent column
- * @method     ChildCategoryVersionQuery groupByLink() Group by the link column
  * @method     ChildCategoryVersionQuery groupByVisible() Group by the visible column
  * @method     ChildCategoryVersionQuery groupByPosition() Group by the position column
  * @method     ChildCategoryVersionQuery groupByCreatedAt() Group by the created_at column
@@ -56,7 +54,6 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  *
  * @method     ChildCategoryVersion findOneById(int $id) Return the first ChildCategoryVersion filtered by the id column
  * @method     ChildCategoryVersion findOneByParent(int $parent) Return the first ChildCategoryVersion filtered by the parent column
- * @method     ChildCategoryVersion findOneByLink(string $link) Return the first ChildCategoryVersion filtered by the link column
  * @method     ChildCategoryVersion findOneByVisible(int $visible) Return the first ChildCategoryVersion filtered by the visible column
  * @method     ChildCategoryVersion findOneByPosition(int $position) Return the first ChildCategoryVersion filtered by the position column
  * @method     ChildCategoryVersion findOneByCreatedAt(string $created_at) Return the first ChildCategoryVersion filtered by the created_at column
@@ -67,7 +64,6 @@ use Thelia\Model\Map\CategoryVersionTableMap;
  *
  * @method     array findById(int $id) Return ChildCategoryVersion objects filtered by the id column
  * @method     array findByParent(int $parent) Return ChildCategoryVersion objects filtered by the parent column
- * @method     array findByLink(string $link) Return ChildCategoryVersion objects filtered by the link column
  * @method     array findByVisible(int $visible) Return ChildCategoryVersion objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildCategoryVersion objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildCategoryVersion objects filtered by the created_at column
@@ -163,7 +159,7 @@ abstract class CategoryVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PARENT, LINK, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM category_version WHERE ID = :p0 AND VERSION = :p1';
+        $sql = 'SELECT ID, PARENT, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM category_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -346,35 +342,6 @@ abstract class CategoryVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CategoryVersionTableMap::PARENT, $parent, $comparison);
-    }
-
-    /**
-     * Filter the query on the link column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLink('fooValue');   // WHERE link = 'fooValue'
-     * $query->filterByLink('%fooValue%'); // WHERE link LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $link The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCategoryVersionQuery The current query, for fluid interface
-     */
-    public function filterByLink($link = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($link)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $link)) {
-                $link = str_replace('*', '%', $link);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CategoryVersionTableMap::LINK, $link, $comparison);
     }
 
     /**

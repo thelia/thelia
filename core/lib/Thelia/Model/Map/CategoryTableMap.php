@@ -57,7 +57,7 @@ class CategoryTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 10;
+    const NUM_COLUMNS = 9;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class CategoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 10;
+    const NUM_HYDRATE_COLUMNS = 9;
 
     /**
      * the column name for the ID field
@@ -78,11 +78,6 @@ class CategoryTableMap extends TableMap
      * the column name for the PARENT field
      */
     const PARENT = 'category.PARENT';
-
-    /**
-     * the column name for the LINK field
-     */
-    const LINK = 'category.LINK';
 
     /**
      * the column name for the VISIBLE field
@@ -140,12 +135,12 @@ class CategoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Parent', 'Link', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'parent', 'link', 'visible', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(CategoryTableMap::ID, CategoryTableMap::PARENT, CategoryTableMap::LINK, CategoryTableMap::VISIBLE, CategoryTableMap::POSITION, CategoryTableMap::CREATED_AT, CategoryTableMap::UPDATED_AT, CategoryTableMap::VERSION, CategoryTableMap::VERSION_CREATED_AT, CategoryTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PARENT', 'LINK', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'parent', 'link', 'visible', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id', 'Parent', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'parent', 'visible', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        self::TYPE_COLNAME       => array(CategoryTableMap::ID, CategoryTableMap::PARENT, CategoryTableMap::VISIBLE, CategoryTableMap::POSITION, CategoryTableMap::CREATED_AT, CategoryTableMap::UPDATED_AT, CategoryTableMap::VERSION, CategoryTableMap::VERSION_CREATED_AT, CategoryTableMap::VERSION_CREATED_BY, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PARENT', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        self::TYPE_FIELDNAME     => array('id', 'parent', 'visible', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -155,12 +150,12 @@ class CategoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Parent' => 1, 'Link' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Version' => 7, 'VersionCreatedAt' => 8, 'VersionCreatedBy' => 9, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'version' => 7, 'versionCreatedAt' => 8, 'versionCreatedBy' => 9, ),
-        self::TYPE_COLNAME       => array(CategoryTableMap::ID => 0, CategoryTableMap::PARENT => 1, CategoryTableMap::LINK => 2, CategoryTableMap::VISIBLE => 3, CategoryTableMap::POSITION => 4, CategoryTableMap::CREATED_AT => 5, CategoryTableMap::UPDATED_AT => 6, CategoryTableMap::VERSION => 7, CategoryTableMap::VERSION_CREATED_AT => 8, CategoryTableMap::VERSION_CREATED_BY => 9, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PARENT' => 1, 'LINK' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, 'VERSION' => 7, 'VERSION_CREATED_AT' => 8, 'VERSION_CREATED_BY' => 9, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'parent' => 1, 'link' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, 'version' => 7, 'version_created_at' => 8, 'version_created_by' => 9, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Parent' => 1, 'Visible' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, 'Version' => 6, 'VersionCreatedAt' => 7, 'VersionCreatedBy' => 8, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, 'version' => 6, 'versionCreatedAt' => 7, 'versionCreatedBy' => 8, ),
+        self::TYPE_COLNAME       => array(CategoryTableMap::ID => 0, CategoryTableMap::PARENT => 1, CategoryTableMap::VISIBLE => 2, CategoryTableMap::POSITION => 3, CategoryTableMap::CREATED_AT => 4, CategoryTableMap::UPDATED_AT => 5, CategoryTableMap::VERSION => 6, CategoryTableMap::VERSION_CREATED_AT => 7, CategoryTableMap::VERSION_CREATED_BY => 8, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PARENT' => 1, 'VISIBLE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, 'VERSION' => 6, 'VERSION_CREATED_AT' => 7, 'VERSION_CREATED_BY' => 8, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'parent' => 1, 'visible' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, 'version' => 6, 'version_created_at' => 7, 'version_created_by' => 8, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
     );
 
     /**
@@ -181,7 +176,6 @@ class CategoryTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addColumn('PARENT', 'Parent', 'INTEGER', false, null, null);
-        $this->addColumn('LINK', 'Link', 'VARCHAR', false, 255, null);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
@@ -382,7 +376,6 @@ class CategoryTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(CategoryTableMap::ID);
             $criteria->addSelectColumn(CategoryTableMap::PARENT);
-            $criteria->addSelectColumn(CategoryTableMap::LINK);
             $criteria->addSelectColumn(CategoryTableMap::VISIBLE);
             $criteria->addSelectColumn(CategoryTableMap::POSITION);
             $criteria->addSelectColumn(CategoryTableMap::CREATED_AT);
@@ -393,7 +386,6 @@ class CategoryTableMap extends TableMap
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PARENT');
-            $criteria->addSelectColumn($alias . '.LINK');
             $criteria->addSelectColumn($alias . '.VISIBLE');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');

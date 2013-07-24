@@ -13,7 +13,6 @@ CREATE TABLE `category`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `parent` INTEGER,
-    `link` VARCHAR(255),
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,
@@ -1775,7 +1774,6 @@ CREATE TABLE `category_version`
 (
     `id` INTEGER NOT NULL,
     `parent` INTEGER,
-    `link` VARCHAR(255),
     `visible` TINYINT NOT NULL,
     `position` INTEGER NOT NULL,
     `created_at` DATETIME,

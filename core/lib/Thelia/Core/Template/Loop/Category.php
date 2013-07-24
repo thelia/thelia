@@ -74,7 +74,6 @@ class Category extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanTypeArgument('visible', 1),
-            Argument::createAnyTypeArgument('link'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -121,13 +120,6 @@ class Category extends BaseLoop
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
-        }
-
-
-        $link = $this->getLink();
-
-        if (!is_null($link)) {
-            $search->filterByLink($link);
         }
 
         $search->filterByVisible($this->getVisible() ? 1 : 0);
@@ -183,7 +175,6 @@ class Category extends BaseLoop
             $loopResultRow->set("PARENT", $category->getParent());
             $loopResultRow->set("ID", $category->getId());
             $loopResultRow->set("URL", $category->getUrl());
-            $loopResultRow->set("LINK", $category->getLink());
             $loopResultRow->set("PRODUCT_COUNT", $category->countChild());
 
             $loopResult->addRow($loopResultRow);
