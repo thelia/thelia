@@ -51,7 +51,7 @@ abstract class BaseLoop
     protected $securityContext;
 
 
-    private $args;
+    protected $args;
 
     /**
      * Create a new Loop
@@ -143,8 +143,6 @@ abstract class BaseLoop
 
 	            $argument->setValue($value);
 			}
-
-            $this->args->next();
         }
 
         if (!empty($faultActor)) {

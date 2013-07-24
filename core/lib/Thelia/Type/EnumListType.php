@@ -38,6 +38,12 @@ class EnumListType implements TypeInterface
             $this->values = $values;
     }
 
+    public function addValue($value)
+    {
+        if(!in_array($value, $this->values))
+            $this->values[] = $value;
+    }
+
     public function getType()
     {
         return 'Enum list type';

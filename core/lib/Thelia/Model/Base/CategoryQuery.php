@@ -24,7 +24,6 @@ use Thelia\Model\Map\CategoryTableMap;
  *
  * @method     ChildCategoryQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildCategoryQuery orderByParent($order = Criteria::ASC) Order by the parent column
- * @method     ChildCategoryQuery orderByLink($order = Criteria::ASC) Order by the link column
  * @method     ChildCategoryQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildCategoryQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildCategoryQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -35,7 +34,6 @@ use Thelia\Model\Map\CategoryTableMap;
  *
  * @method     ChildCategoryQuery groupById() Group by the id column
  * @method     ChildCategoryQuery groupByParent() Group by the parent column
- * @method     ChildCategoryQuery groupByLink() Group by the link column
  * @method     ChildCategoryQuery groupByVisible() Group by the visible column
  * @method     ChildCategoryQuery groupByPosition() Group by the position column
  * @method     ChildCategoryQuery groupByCreatedAt() Group by the created_at column
@@ -89,7 +87,6 @@ use Thelia\Model\Map\CategoryTableMap;
  *
  * @method     ChildCategory findOneById(int $id) Return the first ChildCategory filtered by the id column
  * @method     ChildCategory findOneByParent(int $parent) Return the first ChildCategory filtered by the parent column
- * @method     ChildCategory findOneByLink(string $link) Return the first ChildCategory filtered by the link column
  * @method     ChildCategory findOneByVisible(int $visible) Return the first ChildCategory filtered by the visible column
  * @method     ChildCategory findOneByPosition(int $position) Return the first ChildCategory filtered by the position column
  * @method     ChildCategory findOneByCreatedAt(string $created_at) Return the first ChildCategory filtered by the created_at column
@@ -100,7 +97,6 @@ use Thelia\Model\Map\CategoryTableMap;
  *
  * @method     array findById(int $id) Return ChildCategory objects filtered by the id column
  * @method     array findByParent(int $parent) Return ChildCategory objects filtered by the parent column
- * @method     array findByLink(string $link) Return ChildCategory objects filtered by the link column
  * @method     array findByVisible(int $visible) Return ChildCategory objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildCategory objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildCategory objects filtered by the created_at column
@@ -203,7 +199,7 @@ abstract class CategoryQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PARENT, LINK, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM category WHERE ID = :p0';
+        $sql = 'SELECT ID, PARENT, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM category WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -372,35 +368,6 @@ abstract class CategoryQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CategoryTableMap::PARENT, $parent, $comparison);
-    }
-
-    /**
-     * Filter the query on the link column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLink('fooValue');   // WHERE link = 'fooValue'
-     * $query->filterByLink('%fooValue%'); // WHERE link LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $link The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCategoryQuery The current query, for fluid interface
-     */
-    public function filterByLink($link = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($link)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $link)) {
-                $link = str_replace('*', '%', $link);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CategoryTableMap::LINK, $link, $comparison);
     }
 
     /**

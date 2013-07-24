@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,7 +33,11 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Base\FeatureProdQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\FeatureAvQuery;
+use Thelia\Model\FeatureQuery;
+use Thelia\Model\Map\FeatureProdTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -74,16 +79,29 @@ class Product extends BaseLoop
             Argument::createFloatTypeArgument('max_weight'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
-            Argument::createIntTypeArgument('depth'),
+            Argument::createIntTypeArgument('depth', 1),
             Argument::createBooleanTypeArgument('visible', 1),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
+                ),
+                'manual'
+            ),
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntListTypeArgument('exclude_category'),
+            new Argument(
+                'feature_available',
+                new TypeCollection(
+                    new Type\IntToCombinedIntsListType()
                 )
             ),
-            Argument::createBooleanTypeArgument('random', 0),
-            Argument::createIntListTypeArgument('exclude')
+            new Argument(
+                'feature_values',
+                new TypeCollection(
+                    new Type\IntToCombinedStringsListType()
+                )
+            )
         );
     }
 
@@ -231,68 +249,131 @@ class Product extends BaseLoop
             );
         }
 
-        $search->filterByVisible($this->getVisible());
+        $visible = $this->getVisible();
+
+        $search->filterByVisible($visible);
 
         $orders  = $this->getOrder();
 
-        if(null === $orders) {
-            $search->orderByPosition();
-        } else {
-            foreach($orders as $order) {
-                switch ($order) {
-                    case "alpha":
-                        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
-                        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
-                        break;
-                    case "alpha_reverse":
-                        $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
-                        break;
-                    case "reverse":
-                        $search->orderByPosition(Criteria::DESC);
-                        break;
-                    case "min_price":
-                        $search->orderBy('real_price', Criteria::ASC);
-                        break;
-                    case "max_price":
-                        $search->orderBy('real_price', Criteria::DESC);
-                        break;
-                    case "manual":
-                        if(null === $this->category || count($this->category) != 1)
-                            throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
-                        $search->addAscendingOrderByColumn(ProductTableMap::POSITION);
-                        break;
-                    case "manual_reverse":
-                        if(null === $this->category || count($this->category) != 1)
-                            throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
-                        $search->addDescendingOrderByColumn(ProductTableMap::POSITION);
-                        break;
-                    case "ref":
-                        $search->addAscendingOrderByColumn(ProductTableMap::REF);
-                        break;
-                    case "promo":
-                        $search->addDescendingOrderByColumn(ProductTableMap::PROMO);
-                        break;
-                    case "new":
-                        $search->addDescendingOrderByColumn(ProductTableMap::NEWNESS);
-                        break;
-                    default:
-                        $search->orderByPosition();
-                        break;
-                }
+
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
+                    break;
+                case "min_price":
+                    $search->orderBy('real_price', Criteria::ASC);
+                    break;
+                case "max_price":
+                    $search->orderBy('real_price', Criteria::DESC);
+                    break;
+                case "manual":
+                    if(null === $this->category || count($this->category) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    if(null === $this->category || count($this->category) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "ref":
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case "promo":
+                    $search->orderByPromo(Criteria::DESC);
+                    break;
+                case "new":
+                    $search->orderByNewness(Criteria::DESC);
+                    break;
+                case "given_id":
+                    if(null === $id)
+                        throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
+                    foreach($id as $singleId) {
+                        $givenIdMatched = 'given_id_matched_' . $singleId;
+                        $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
+                        $search->orderBy($givenIdMatched, Criteria::DESC);
+                    }
+                    break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
             }
-        }
-
-        $random  = $this->getRandom();
-
-        if ($random === true) {
-            $search->clearOrderByColumns();
-            $search->addAscendingOrderByColumn('RAND()');
         }
 
         $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $exclude_category = $this->getExclude_category();
+
+        if (!is_null($exclude_category)) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterById($exclude_category, Criteria::IN)->find(),
+                Criteria::NOT_IN
+            );
+        }
+
+        $feature_available = $this->getFeature_available();
+
+        if(null !== $feature_available) {
+            foreach($feature_available as $feature => $feature_choice) {
+                foreach($feature_choice['values'] as $feature_av) {
+                    $featureAlias = 'fa_' . $feature;
+                    if($feature_av != '*')
+                        $featureAlias .= '_' . $feature_av;
+                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
+                    if($feature_av != '*')
+                        $search->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
+                }
+
+                /* format for mysql */
+                $sqlWhereString = $feature_choice['expression'];
+                if($sqlWhereString == '*') {
+                    $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
+                } else {
+                    $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                }
+
+                $search->where("(" . $sqlWhereString . ")");
+            }
+        }
+
+        $feature_values = $this->getFeature_values();
+
+        if(null !== $feature_values) {
+            foreach($feature_values as $feature => $feature_choice) {
+                foreach($feature_choice['values'] as $feature_value) {
+                    $featureAlias = 'fv_' . $feature;
+                    if($feature_value != '*')
+                        $featureAlias .= '_' . $feature_value;
+                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                        ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
+                    if($feature_value != '*')
+                        $search->addJoinCondition($featureAlias, "`$featureAlias`.BY_DEFAULT = ?", $feature_value, null, \PDO::PARAM_STR);
+                }
+
+                /* format for mysql */
+                $sqlWhereString = $feature_choice['expression'];
+                if($sqlWhereString == '*') {
+                    $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
+                } else {
+                    $sqlWhereString = preg_replace('#([a-zA-Z0-9_\-]+)#', 'NOT ISNULL(`fv_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
+                    $sqlWhereString = str_replace('&', ' AND ', $sqlWhereString);
+                    $sqlWhereString = str_replace('|', ' OR ', $sqlWhereString);
+                }
+
+                $search->where("(" . $sqlWhereString . ")");
+            }
         }
 
         /**
@@ -305,6 +386,8 @@ class Product extends BaseLoop
             $this->request->getSession()->getLocale(),
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
+
+        $search->groupBy(ProductTableMap::ID);
 
         $products = $this->search($search, $pagination);
 
@@ -323,8 +406,6 @@ class Product extends BaseLoop
             $loopResultRow->set("WEIGHT", $product->getWeight());
             $loopResultRow->set("PROMO", $product->getPromo());
             $loopResultRow->set("NEW", $product->getNewness());
-
-            //$loopResultRow->set("URL", $product->getUrl());
 
             $loopResult->addRow($loopResultRow);
         }

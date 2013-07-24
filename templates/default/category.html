@@ -19,11 +19,37 @@
     <hr />
 {/loop*}
 <h2>PRODUCTS</h2>
-{loop name="product" type="product" order="promo,min_price"}
+{*loop name="product" type="product" order="promo,min_price" exclude_category="3"}
     <h3>PRODUCT : #REF / #TITLE</h3>
     price : #PRICE €<br />
     promo price : #PROMO_PRICE €<br />
     is promo : #PROMO<br />
     is new : #NEW<br />
     weight : #WEIGHT<br />
+{/loop*}
+
+{*loop name="product" type="product" order="ref" feature_available="1: (1 | 2) , 2: 4, 3: 433"}
+    <h3>PRODUCT : #REF / #TITLE</h3>
+    price : #PRICE €<br />
+    promo price : #PROMO_PRICE €<br />
+    is promo : #PROMO<br />
+    is new : #NEW<br />
+    weight : #WEIGHT<br />
+{/loop*}
+
+{*loop name="product" type="product" order="ref" feature_values="1: foo"}
+    <h3>PRODUCT : #REF / #TITLE</h3>
+    price : #PRICE €<br />
+    promo price : #PROMO_PRICE €<br />
+    is promo : #PROMO<br />
+    is new : #NEW<br />
+    weight : #WEIGHT<br />
+{/loop*}
+
+{loop name="product" type="product" order="ref"}
+    <h3>PRODUCT : #REF / #TITLE</h3>
+    <h4>Accessories</h4>
+    {loop name="acc" type="accessory" product="#ID" order="accessory,max_price"}
+        #REF -
+    {/loop}
 {/loop}

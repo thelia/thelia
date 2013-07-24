@@ -142,4 +142,9 @@ class TypeCollection implements \Iterator
 
         return null;
     }
+
+    public function getKey($key)
+    {
+        return isset($this->types[$key]) ? $this->types[$key] : null;
+    }
 }

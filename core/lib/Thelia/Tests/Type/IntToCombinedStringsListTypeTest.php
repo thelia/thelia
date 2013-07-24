@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -17,31 +17,48 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.     */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Type;
+
+namespace Thelia\Tests\Type;
+
+use Thelia\Type\IntToCombinedStringsListType;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-
-class BooleanType implements TypeInterface
+class IntToCombinedStringsListTypeTest extends \PHPUnit_Framework_TestCase
 {
-    public function getType()
+    public function testIntToCombinedStringsListType()
     {
-        return 'Boolean type';
+        $type = new IntToCombinedStringsListType();
+        $this->assertTrue($type->isValid('1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar)'));
+        $this->assertFalse($type->isValid('1,2,3'));
     }
 
-    public function isValid($value)
+    public function testFormatJsonType()
     {
-        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null;
-    }
-
-    public function getFormattedValue($value)
-    {
-        return $value === null ? null : filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $type = new IntToCombinedStringsListType();
+        $this->assertEquals(
+            $type->getFormattedValue('1: foo & bar | (fooo &baar), 4: *, 67: (foooo & baaar)'),
+            array(
+                1 => array(
+                    "values" => array('foo','bar','fooo','baar'),
+                    "expression" => 'foo&bar|(fooo&baar)',
+                ),
+                4 => array(
+                    "values" => array('*'),
+                    "expression" => '*',
+                ),
+                67 => array(
+                    "values" => array('foooo','baaar'),
+                    "expression" => '(foooo&baaar)',
+                ),
+            )
+        );
+        $this->assertNull($type->getFormattedValue('foo'));
     }
 }

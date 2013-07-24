@@ -46,12 +46,7 @@ use Thelia\Type;
  * - current : current id is used if you are on a category page
  * - not_empty : if value is 1, category and subcategories must have at least 1 product
  * - visible : default 1, if you want category not visible put 0
- * - order : all value available :
- *      * alpha : sorting by title alphabetical order
- *      * alpha_reverse : sorting by title alphabetical reverse order
- *      * reverse : sorting by position descending
- *      * by default results are sorting by position ascending
- * - random : if 1, random results. Default value is 0
+ * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual-reverse', 'random'
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
  *
  * example :
@@ -79,14 +74,13 @@ class Category extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanTypeArgument('visible', 1),
-            Argument::createAnyTypeArgument('link'),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType('alpha', 'alpha_reverse', 'reverse')
-                )
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual-reverse', 'random'))
+                ),
+                'manual'
             ),
-            Argument::createBooleanTypeArgument('random', 0),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -128,43 +122,30 @@ class Category extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-
-        $link = $this->getLink();
-
-        if (!is_null($link)) {
-            $search->filterByLink($link);
-        }
-
         $search->filterByVisible($this->getVisible() ? 1 : 0);
 
         $orders  = $this->getOrder();
 
-        if(null === $orders) {
-            $search->orderByPosition();
-        } else {
-            foreach($orders as $order) {
-                switch ($order) {
-                    case "alpha":
-                        $search->addAscendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                        break;
-                    case "alpha_reverse":
-                        $search->addDescendingOrderByColumn(\Thelia\Model\CategoryI18nPeer::TITLE);
-                        break;
-                    case "reverse":
-                        $search->orderByPosition(\Criteria::DESC);
-                        break;
-                    default:
-                        $search->orderByPosition();
-                        break;
-                }
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    break;
+                case "manual-reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
+                    break;
             }
-        }
-
-        $random = $this->getRandom();
-
-        if ($random === true) {
-            $search->clearOrderByColumns();
-            $search->addAscendingOrderByColumn('RAND()');
         }
 
         /**
@@ -194,8 +175,7 @@ class Category extends BaseLoop
             $loopResultRow->set("PARENT", $category->getParent());
             $loopResultRow->set("ID", $category->getId());
             $loopResultRow->set("URL", $category->getUrl());
-            $loopResultRow->set("LINK", $category->getLink());
-            $loopResultRow->set("NB_CHILD", $category->countChild());
+            $loopResultRow->set("PRODUCT_COUNT", $category->countChild());
 
             $loopResult->addRow($loopResultRow);
         }
