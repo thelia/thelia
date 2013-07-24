@@ -46,12 +46,7 @@ use Thelia\Type;
  * - current : current id is used if you are on a category page
  * - not_empty : if value is 1, category and subcategories must have at least 1 product
  * - visible : default 1, if you want category not visible put 0
- * - order : all value available :
- *      * alpha : sorting by title alphabetical order
- *      * alpha_reverse : sorting by title alphabetical reverse order
- *      * reverse : sorting by position descending
- *      * by default results are sorting by position ascending
- * - random : if 1, random results. Default value is 0
+ * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual-reverse', 'random'
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
  *
  * example :
@@ -87,7 +82,6 @@ class Category extends BaseLoop
                 ),
                 'manual'
             ),
-            Argument::createBooleanTypeArgument('random', 0),
             Argument::createIntListTypeArgument('exclude')
         );
     }
@@ -190,7 +184,7 @@ class Category extends BaseLoop
             $loopResultRow->set("ID", $category->getId());
             $loopResultRow->set("URL", $category->getUrl());
             $loopResultRow->set("LINK", $category->getLink());
-            $loopResultRow->set("NB_CHILD", $category->countChild());
+            $loopResultRow->set("PRODUCT_COUNT", $category->countChild());
 
             $loopResult->addRow($loopResultRow);
         }
