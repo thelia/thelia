@@ -51,6 +51,6 @@ class AdminLogin extends BaseForm {
 
     public function getName()
     {
-        return "adminLogin";
+        return "thelia_admin_login";
     }
 }

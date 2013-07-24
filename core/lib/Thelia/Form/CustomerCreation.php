@@ -160,6 +160,6 @@ class CustomerCreation extends BaseForm
 
     public function getName()
     {
-        return "thelia.customer.creation";
+        return "thelia_customer_creation";
     }
 }

@@ -51,6 +51,6 @@ class CustomerLogin extends BaseForm {
 
     public function getName()
     {
-        return "thelia.customer.login";
+        return "thelia_customer_login";
     }
 }
