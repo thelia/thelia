@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\SmartyPluginInterface;
 use Thelia\Log\Tlog;
+use Thelia\Core\Template\ParserContext;
 
 /**
  *
@@ -58,12 +59,14 @@ class Form implements SmartyPluginInterface
 {
 
     protected $request;
+    protected $parserContext;
+
     protected $formDefinition = array();
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, ParserContext $parserContext)
     {
         $this->request = $request;
-
+        $this->parserContext = $parserContext;
     }
 
     public function setFormDefinition($formDefinition)
@@ -88,21 +91,23 @@ class Form implements SmartyPluginInterface
 
             $instance = $this->createInstance($params['name']);
 
-            // Check if session contains our form
-            $errorForm = $this->request->getSession()->getErrorFormName();
+            // Check if parser context contains our form
+            $errorForm = $this->parserContext->getErrorForm();
 
-            if ($errorForm == $instance->getName()) {
+            if (null != $errorForm && $errorForm->getName() == $instance->getName()) {
 
-            	// Bind form with current request to get error messages and field values.
-                $instance->getForm()->bind($this->request);
+            	// Re-use the errored form
+            	$instance = $errorForm;
 
-                // Remove the form from the session
-                $this->request->getSession()->clearErrorFormName();
+            	$this->parserContext->clearErrorForm();
             }
 
             $instance->createView();
 
             $template->assign("form", $instance);
+
+            $template->assign("form_error", $instance->hasError() ? true : false);
+            $template->assign("form_error_message", $instance->getErrorMessage());
         }
         else {
             return $content;

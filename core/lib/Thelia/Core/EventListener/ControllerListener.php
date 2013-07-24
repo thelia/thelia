@@ -49,10 +49,6 @@ class ControllerListener implements EventSubscriberInterface
             $event = new ActionEventFactory($request, $action, $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
             $actionEvent = $event->createActionEvent();
             $dispatcher->dispatch("action.".$action, $actionEvent);
-
-            if ($actionEvent->hasFormError()) {
-                $request->getSession()->setErrorFormName($actionEvent->getFormError()->getName());
-            }
         }
     }
 

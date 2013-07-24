@@ -102,6 +102,8 @@
             <tag name="thelia.parser.register_plugin"/>
 
             <argument type="service" id="request"/>
+            <argument type="service" id="thelia.parser.context"/>
+
             <call method="setFormDefinition">
                 <argument>%thelia.parser.forms%</argument>
             </call>

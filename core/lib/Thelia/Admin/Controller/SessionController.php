@@ -49,11 +49,11 @@ class SessionController extends BaseAdminController {
 
     public function checkLoginAction()
     {
-		$form = new AdminLogin($this->getRequest());
+		$adminLoginForm = new AdminLogin($this->getRequest());
 
     	$request = $this->getRequest();
 
-    	$authenticator = new AdminUsernamePasswordFormAuthenticator($request, $form);
+    	$authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
 
     	try {
     		$user = $authenticator->getAuthentifiedUser();
@@ -65,7 +65,7 @@ class SessionController extends BaseAdminController {
     		AdminLog::append("Authentication successuful", $request, $user);
 
     		// Redirect to the success URL
-    		return Redirect::exec($form->getSuccessUrl());
+    		return Redirect::exec($adminLoginForm->getSuccessUrl());
      	}
          catch (ValidatorException $ex) {
 
@@ -87,12 +87,14 @@ class SessionController extends BaseAdminController {
      		$message = "Unable to process your request. Please try again.";
      	}
 
-     	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
-     	$request->getSession()->setErrorFormName($form->getName());
+     	// Store error information in the form
+     	$adminLoginForm->setError(true);
+     	$adminLoginForm->setErrorMessage($message);
 
-      	// Display the login form again, with an error message if required
-    	return $this->render("login.html", array(
-     		"message" => $message
-     	));
+     	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
+     	$this->getParserContext()->setErrorForm($adminLoginForm);
+
+      	// Display the login form again
+    	return $this->render("login.html");
     }
 }

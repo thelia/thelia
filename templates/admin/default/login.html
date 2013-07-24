@@ -16,7 +16,7 @@
 			{form name="thelia.admin.login" success_url="home" error_url="login"}
 			<form action="{url path='/admin/checklogin'}" method="post" class="well form-inline" {form_enctype form=$form}>
 
-				{if isset($message)}<div class="alert alert-error">{$message}</div>{/if}
+				{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
 
                 {form_hidden_fields form=$form}
 

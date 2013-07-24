@@ -67,9 +67,9 @@ class Customer implements EventSubscriberInterface
 
         $request = $event->getRequest();
 
-        $customerCreation = new CustomerCreation($request);
+        $customerCreationForm = new CustomerCreation($request);
 
-        $form = $customerCreation->getForm();
+        $form = $customerCreationForm->getForm();
 
         if ($request->isMethod("post")) {
 
@@ -98,7 +98,7 @@ class Customer implements EventSubscriberInterface
                     $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $event);
 
                 	// Connect the newly created user,and redirect to the success URL
-                	$this->processSuccessfulLogin($event, $customer, $customerCreation, true);
+                	$this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
 
                 } catch (PropelException $e) {
                     Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
@@ -114,9 +114,15 @@ class Customer implements EventSubscriberInterface
         	$message = "Wrong form method !";
         }
 
-        $this->parserContext->set('customer_creation_error_message', $message);
+        // The form has an error
+        $customerCreationForm->setError(true);
+        $customerCreationForm->setErrorMessage($message);
 
-    	$event->setFormError($customerCreation);
+        // Store the form in the parser context
+        $this->parserContext->setErrorForm($customerCreationForm);
+
+        // Stop event propagation
+        $event->stopPropagation();
     }
 
     public function modify(ActionEvent $event)
@@ -130,6 +136,7 @@ class Customer implements EventSubscriberInterface
         $form = $customerModification->getForm();
 
         if ($request->isMethod("post")) {
+
             $form->bind($request);
 
             if ($form->isValid()) {
@@ -172,9 +179,15 @@ class Customer implements EventSubscriberInterface
         	$message = "Wrong form method !";
         }
 
-        $this->parserContext->set('customer_change_error_message', $message);
+        // The form has an error
+        $customerModification->setError(true);
+        $customerModification->setErrorMessage($message);
 
-    	$event->setFormError($customerModification);
+        // Store the form in the parser context
+        $this->parserContext->setErrorForm($customerModification);
+
+        // Stop event propagation
+        $event->stopPropagation();
     }
 
 
@@ -202,14 +215,14 @@ class Customer implements EventSubscriberInterface
     {
     	$request = $event->getRequest();
 
-    	$form = new CustomerLogin($request);
+    	$customerLoginForm = new CustomerLogin($request);
 
-    	$authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $form);
+    	$authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
     	try {
     		$user = $authenticator->getAuthentifiedUser();
 
-    		$this->processSuccessfulLogin($event, $user, $form);
+    		$this->processSuccessfulLogin($event, $user, $customerLoginForm);
      	}
     	catch (ValidatorException $ex) {
     		$message = "Missing or invalid information. Please check your input.";
@@ -224,11 +237,12 @@ class Customer implements EventSubscriberInterface
     		$message = sprintf("Unable to process your request. Please try again (%s in %s).", $ex->getMessage(), $ex->getFile());
     	}
 
-    	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
-    	$request->getSession()->setErrorFormName($form->getName());
+    	// The for has an error
+    	$customerLoginForm->setError(true);
+    	$customerLoginForm->setErrorMessage($message);
 
-    	// Put the message in the ParserContext to make it available to the template
-    	$this->parserContext->set('customer_login_error_message', $message);
+    	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
+    	$this->parserContext->setErrorForm($customerLoginForm);
 
     	// A this point, the same view is displayed again.
     }

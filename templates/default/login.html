@@ -24,11 +24,11 @@
 	{/form_field}
 
 	{*
-	customer_login_error_message is defined in Customer action processor class,
-	and passed the parser through the ParserContext service.
+	The form error status and the form error messages are defined in Customer action,
+	and passed back to the form plugin through the ParserContext.
 	*}
 
-	{if isset($customer_login_error_message)}<div class="alert alert-error">{$customer_login_error_message}</div>{/if}
+	{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
 
     {form_hidden_fields form=$form}
 

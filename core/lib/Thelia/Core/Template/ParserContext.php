@@ -26,6 +26,7 @@ namespace Thelia\Core\Template;
 use Thelia\Model\ConfigQuery;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Tools\URL;
+use Thelia\Form\BaseForm;
 /**
  * The parser context is an application-wide context, which stores var-value pairs.
  * Theses pairs are injected in the parser and becomes available to the templates.
@@ -46,6 +47,28 @@ class ParserContext implements \IteratorAggregate
 		;
 	}
 
+	// -- Error form -----------------------------------------------------------
+
+	/**
+	 * @param BaseForm $form the errored form
+	 */
+	public function setErrorForm(BaseForm $form)
+	{
+		$this->set('error_form', $form);
+	}
+
+	public function getErrorForm()
+	{
+		return $this->get('error_form', null);
+	}
+
+	public function clearErrorForm()
+	{
+		return $this->remove('error_form');
+	}
+
+	// -- Internal table manipulation ------------------------------------------
+
 	public function set($name, $value)
 	{
 		$this->store[$name] = $value;
@@ -53,9 +76,16 @@ class ParserContext implements \IteratorAggregate
 		return $this;
 	}
 
-	public function get($name)
+	public function remove($name)
 	{
-		return $this->store[$name];
+		unset($this->store[$name]);
+
+		return $this;
+	}
+
+	public function get($name, $default = null)
+	{
+		return isset($this->store[$name]) ? $this->store[$name] : $default;
 	}
 
 	public function getIterator()

@@ -77,26 +77,6 @@ class Session extends BaseSession {
     	return $this->remove('admin_user');
     }
 
-    // -- Error form -----------------------------------------------------------
-
-    /**
-     * @param string $formName the form name
-     */
-    public function setErrorFormName($formName)
-    {
-    	$this->set('error_form', $formName);
-    }
-
-    public function getErrorFormName()
-    {
-    	return $this->get('error_form', null);
-    }
-
-    public function clearErrorFormName()
-    {
-    	return $this->remove('error_form');
-    }
-
     // -- Return page ----------------------------------------------------------
 
     public function setReturnToUrl($url)

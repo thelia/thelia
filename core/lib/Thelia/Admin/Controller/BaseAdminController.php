@@ -36,6 +36,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
+use Thelia\Core\Template\ParserContext;
 
 /**
  *
@@ -98,6 +99,16 @@ class BaseAdminController extends ContainerAware
 
         	Redirect::exec(URL::absoluteUrl($ex->getLoginTemplate()));
         }
+    }
+
+    /**
+     * Return the parser context,
+     *
+     * @return ParserContext
+     */
+    protected function getParserContext($context = false)
+    {
+    	return $this->container->get('thelia.parser.context');
     }
 
     /**

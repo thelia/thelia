@@ -46,6 +46,18 @@ abstract class BaseForm {
 
 	private $view = null;
 
+	/**
+	 * true if the form has an error, false otherwise.
+	 * @var boolean
+	 */
+	private $has_error = false;
+
+	/**
+	 * The form error message.
+	 * @var string
+	 */
+	private $error_message = '';
+
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
         $validator = Validation::createValidator();
@@ -108,6 +120,48 @@ abstract class BaseForm {
     	if ($this->view === null) throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
 
     	return $this->view;
+    }
+
+    // -- Error and errro message ----------------------------------------------
+
+    /**
+     * Set the error status of the form.
+     *
+     * @param boolean $has_error
+     */
+    public function setError($has_error = true)
+    {
+    	$this->has_error = $has_error;
+    }
+
+    /**
+     * Get the cuirrent error status of the form.
+     *
+     * @return boolean
+     */
+    public function hasError()
+    {
+    	return $this->has_error;
+    }
+
+    /**
+     * Set the error message related to global form error
+     *
+     * @param unknown $message
+     */
+    public function setErrorMessage($message)
+    {
+    	$this->error_message = $message;
+    }
+
+    /**
+     * Get the form error message.
+     *
+     * @return string
+     */
+    public function getErrorMessage()
+    {
+    	return $this->error_message;
     }
 
     /**

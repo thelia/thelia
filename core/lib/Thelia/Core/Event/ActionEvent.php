@@ -79,33 +79,4 @@ abstract class ActionEvent extends Event
     {
         return $this->request;
     }
-
-    /**
-     * Store a form taht contains error, to pass it to the current session.
-     *
-     * @param BaseForm $form
-     */
-    public function setFormError(BaseForm $form)
-    {
-        $this->form = $form;
-        $this->stopPropagation();
-    }
-
-    /**
-     * @return BaseForm the errored form, or null
-     */
-    public function getFormError()
-    {
-        return $this->form;
-    }
-
-    /**
-     * Check if theis event contains a form with errors
-     *
-     * @return boolean
-     */
-    public function hasFormError()
-    {
-        return $this->form !== null;
-    }
 }
