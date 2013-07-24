@@ -39,7 +39,6 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Tools\Redirect;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
-use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
 
@@ -51,14 +50,8 @@ class Customer implements EventSubscriberInterface
 	 */
 	protected $securityContext;
 
-	/**
-	 * @var Thelia\Core\Template\ParserContext
-	 */
-	protected $parserContext;
-
-	public function __construct(SecurityContext $securityContext, ParserContext $parserContext) {
+	public function __construct(SecurityContext $securityContext) {
 		$this->securityContext = $securityContext;
-		$this->parserContext = $parserContext;
 	}
 
     public function create(ActionEvent $event)
@@ -119,7 +112,7 @@ class Customer implements EventSubscriberInterface
         $customerCreationForm->setErrorMessage($message);
 
         // Store the form in the parser context
-        $this->parserContext->setErrorForm($customerCreationForm);
+        $event->setErrorForm($customerCreationForm);
 
         // Stop event propagation
         $event->stopPropagation();
@@ -183,11 +176,8 @@ class Customer implements EventSubscriberInterface
         $customerModification->setError(true);
         $customerModification->setErrorMessage($message);
 
-        // Store the form in the parser context
-        $this->parserContext->setErrorForm($customerModification);
-
-        // Stop event propagation
-        $event->stopPropagation();
+        // Dispatch the errored form
+        $event->setErrorForm($customerModification);
     }
 
 
@@ -241,8 +231,8 @@ class Customer implements EventSubscriberInterface
     	$customerLoginForm->setError(true);
     	$customerLoginForm->setErrorMessage($message);
 
-    	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
-    	$this->parserContext->setErrorForm($customerLoginForm);
+    	// Dispatch the errored form
+    	$event->setErrorForm($customerLoginForm);
 
     	// A this point, the same view is displayed again.
     }

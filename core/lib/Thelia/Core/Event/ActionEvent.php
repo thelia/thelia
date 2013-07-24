@@ -49,7 +49,7 @@ abstract class ActionEvent extends Event
      */
     protected $action;
 
-    protected $form = null;
+    protected $errorForm = null;
 
     /**
      *
@@ -78,5 +78,19 @@ abstract class ActionEvent extends Event
     public function getRequest()
     {
         return $this->request;
+    }
+
+    public function setErrorForm(BaseForm $form) {
+    	$this->errorForm = $form;
+
+    	if ($form != null) $this->stopPropagation();
+    }
+
+    public function getErrorForm() {
+    	return $this->errorForm;
+    }
+
+    public function hasErrorForm() {
+    	return $this->errorForm != null ? true : false;
     }
 }

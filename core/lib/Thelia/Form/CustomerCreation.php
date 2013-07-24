@@ -27,7 +27,6 @@ use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\CustomerQuery;
 
-
 class CustomerCreation extends BaseForm
 {
 
@@ -161,6 +160,6 @@ class CustomerCreation extends BaseForm
 
     public function getName()
     {
-        return "customerCreation";
+        return "thelia.customer.creation";
     }
 }

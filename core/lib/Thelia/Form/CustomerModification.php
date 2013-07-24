@@ -115,6 +115,6 @@ class CustomerModification extends BaseForm {
      */
     public function getName()
     {
-        return "customerModification";
+        return "thelia.customer.modification";
     }
 }

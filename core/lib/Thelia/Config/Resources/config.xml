@@ -34,8 +34,9 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="thelia.controller_listener" class="Thelia\Core\EventListener\ControllerListener">
+        <service id="thelia.controller_listener" class="Thelia\Core\EventListener\ControllerListener" scope="request">
             <tag name="kernel.event_subscriber"/>
+            <argument type="service" id="thelia.parser.context"/>
         </service>
 
 		<!--

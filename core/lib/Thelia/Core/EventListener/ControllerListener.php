@@ -26,6 +26,7 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Thelia\Core\Factory\ActionEventFactory;
+use Thelia\Core\Template\ParserContext;
 
 /**
  *
@@ -38,6 +39,14 @@ use Thelia\Core\Factory\ActionEventFactory;
  */
 class ControllerListener implements EventSubscriberInterface
 {
+	/**
+	 * @var ParserContext the parser context
+	 */
+	protected $parserContext;
+
+	public function __construct(ParserContext $parserContext) {
+		$this->parserContext = $parserContext;
+	}
 
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -49,6 +58,11 @@ class ControllerListener implements EventSubscriberInterface
             $event = new ActionEventFactory($request, $action, $event->getKernel()->getContainer()->getParameter("thelia.actionEvent"));
             $actionEvent = $event->createActionEvent();
             $dispatcher->dispatch("action.".$action, $actionEvent);
+
+            // Process form errors
+            if ($actionEvent->hasErrorForm()) {
+            	$this->parserContext->setErrorForm($actionEvent->getErrorForm());
+            }
         }
     }
 
