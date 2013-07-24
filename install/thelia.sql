@@ -379,7 +379,7 @@ CREATE TABLE `stock`
     `combination_id` INTEGER,
     `product_id` INTEGER NOT NULL,
     `increase` FLOAT,
-    `value` FLOAT NOT NULL,
+    `quantity` FLOAT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -453,7 +453,7 @@ CREATE TABLE `customer`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `ref` VARCHAR(50) NOT NULL,
-    `title_id` INTEGER,
+    `title_id` INTEGER NOT NULL,
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
     `email` VARCHAR(50),
@@ -467,7 +467,7 @@ CREATE TABLE `customer`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `ref_UNIQUE` (`ref`),
-    INDEX `FI_customer_customer_title_id` (`title_id`),
+    INDEX `idx_customer_customer_title_id` (`title_id`),
     CONSTRAINT `fk_customer_customer_title_id`
         FOREIGN KEY (`title_id`)
         REFERENCES `customer_title` (`id`)
@@ -498,7 +498,7 @@ CREATE TABLE `address`
     `country_id` INTEGER NOT NULL,
     `phone` VARCHAR(20),
     `cellphone` VARCHAR(20),
-    `is_default` TINYINT DEFAULT 0,
+    `default` TINYINT DEFAULT 0,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1286,6 +1286,72 @@ CREATE TABLE `content_folder`
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- cart
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `cart`;
+
+CREATE TABLE `cart`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `token` VARCHAR(255) NOT NULL,
+    `customer_id` INTEGER,
+    `address_delivery_id` INTEGER,
+    `address_invoice_id` INTEGER,
+    `currency_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `token_UNIQUE` (`token`),
+    INDEX `idx_cart_customer_id` (`customer_id`),
+    INDEX `idx_cart_address_delivery_id` (`address_delivery_id`),
+    INDEX `idx_cart_address_invoice_id` (`address_invoice_id`),
+    INDEX `idx_cart_currency_id` (`currency_id`),
+    CONSTRAINT `fk_cart_customer_id`
+        FOREIGN KEY (`customer_id`)
+        REFERENCES `customer` (`id`),
+    CONSTRAINT `fk_cart_address_delivery_id`
+        FOREIGN KEY (`address_delivery_id`)
+        REFERENCES `address` (`id`),
+    CONSTRAINT `fk_cart_address_invoice_id`
+        FOREIGN KEY (`address_invoice_id`)
+        REFERENCES `address` (`id`),
+    CONSTRAINT `fk_cart_currency_id`
+        FOREIGN KEY (`currency_id`)
+        REFERENCES `currency` (`id`)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- cart_item
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `cart_item`;
+
+CREATE TABLE `cart_item`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `cart_id` INTEGER NOT NULL,
+    `product_id` INTEGER NOT NULL,
+    `quantity` FLOAT DEFAULT 1,
+    `combination_id` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_cart_item_cart_id` (`cart_id`),
+    INDEX `idx_cart_item_product_id` (`product_id`),
+    INDEX `idx_cart_item_combination_id` (`combination_id`),
+    CONSTRAINT `fk_cart_item_cart_id`
+        FOREIGN KEY (`cart_id`)
+        REFERENCES `cart` (`id`),
+    CONSTRAINT `fk_cart_item_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`),
+    CONSTRAINT `fk_cart_item_combination_id`
+        FOREIGN KEY (`combination_id`)
+        REFERENCES `combination` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------

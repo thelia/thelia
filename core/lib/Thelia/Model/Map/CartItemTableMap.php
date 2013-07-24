@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Combination;
-use Thelia\Model\CombinationQuery;
+use Thelia\Model\CartItem;
+use Thelia\Model\CartItemQuery;
 
 
 /**
- * This class defines the structure of the 'combination' table.
+ * This class defines the structure of the 'cart_item' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\CombinationQuery;
  * (i.e. if it's a text column type).
  *
  */
-class CombinationTableMap extends TableMap
+class CartItemTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.CombinationTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.CartItemTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class CombinationTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'combination';
+    const TABLE_NAME = 'cart_item';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Combination';
+    const OM_CLASS = '\\Thelia\\Model\\CartItem';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Combination';
+    const CLASS_DEFAULT = 'Thelia.Model.CartItem';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -67,27 +67,42 @@ class CombinationTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'combination.ID';
+    const ID = 'cart_item.ID';
 
     /**
-     * the column name for the REF field
+     * the column name for the CART_ID field
      */
-    const REF = 'combination.REF';
+    const CART_ID = 'cart_item.CART_ID';
+
+    /**
+     * the column name for the PRODUCT_ID field
+     */
+    const PRODUCT_ID = 'cart_item.PRODUCT_ID';
+
+    /**
+     * the column name for the QUANTITY field
+     */
+    const QUANTITY = 'cart_item.QUANTITY';
+
+    /**
+     * the column name for the COMBINATION_ID field
+     */
+    const COMBINATION_ID = 'cart_item.COMBINATION_ID';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'combination.CREATED_AT';
+    const CREATED_AT = 'cart_item.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'combination.UPDATED_AT';
+    const UPDATED_AT = 'cart_item.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -101,12 +116,12 @@ class CombinationTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CombinationTableMap::ID, CombinationTableMap::REF, CombinationTableMap::CREATED_AT, CombinationTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'CartId', 'ProductId', 'Quantity', 'CombinationId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'cartId', 'productId', 'quantity', 'combinationId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CartItemTableMap::ID, CartItemTableMap::CART_ID, CartItemTableMap::PRODUCT_ID, CartItemTableMap::QUANTITY, CartItemTableMap::COMBINATION_ID, CartItemTableMap::CREATED_AT, CartItemTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CART_ID', 'PRODUCT_ID', 'QUANTITY', 'COMBINATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'cart_id', 'product_id', 'quantity', 'combination_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -116,12 +131,12 @@ class CombinationTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(CombinationTableMap::ID => 0, CombinationTableMap::REF => 1, CombinationTableMap::CREATED_AT => 2, CombinationTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CartId' => 1, 'ProductId' => 2, 'Quantity' => 3, 'CombinationId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'cartId' => 1, 'productId' => 2, 'quantity' => 3, 'combinationId' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(CartItemTableMap::ID => 0, CartItemTableMap::CART_ID => 1, CartItemTableMap::PRODUCT_ID => 2, CartItemTableMap::QUANTITY => 3, CartItemTableMap::COMBINATION_ID => 4, CartItemTableMap::CREATED_AT => 5, CartItemTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CART_ID' => 1, 'PRODUCT_ID' => 2, 'QUANTITY' => 3, 'COMBINATION_ID' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'cart_id' => 1, 'product_id' => 2, 'quantity' => 3, 'combination_id' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -134,14 +149,17 @@ class CombinationTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('combination');
-        $this->setPhpName('Combination');
-        $this->setClassName('\\Thelia\\Model\\Combination');
+        $this->setName('cart_item');
+        $this->setPhpName('CartItem');
+        $this->setClassName('\\Thelia\\Model\\CartItem');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 255, null);
+        $this->addForeignKey('CART_ID', 'CartId', 'INTEGER', 'cart', 'ID', true, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
+        $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', false, null, 1);
+        $this->addForeignKey('COMBINATION_ID', 'CombinationId', 'INTEGER', 'combination', 'ID', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -151,9 +169,9 @@ class CombinationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
-        $this->addRelation('Stock', '\\Thelia\\Model\\Stock', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'SET NULL', 'RESTRICT', 'Stocks');
-        $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), null, null, 'CartItems');
+        $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::MANY_TO_ONE, array('cart_id' => 'id', ), null, null);
+        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), null, null);
+        $this->addRelation('Combination', '\\Thelia\\Model\\Combination', RelationMap::MANY_TO_ONE, array('combination_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -168,16 +186,6 @@ class CombinationTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to combination     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AttributeCombinationTableMap::clearInstancePool();
-                StockTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -235,7 +243,7 @@ class CombinationTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CombinationTableMap::CLASS_DEFAULT : CombinationTableMap::OM_CLASS;
+        return $withPrefix ? CartItemTableMap::CLASS_DEFAULT : CartItemTableMap::OM_CLASS;
     }
 
     /**
@@ -249,21 +257,21 @@ class CombinationTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Combination object, last column rank)
+     * @return array (CartItem object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CombinationTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CombinationTableMap::getInstanceFromPool($key))) {
+        $key = CartItemTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = CartItemTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CombinationTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + CartItemTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CombinationTableMap::OM_CLASS;
+            $cls = CartItemTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CombinationTableMap::addInstanceToPool($obj, $key);
+            CartItemTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -286,8 +294,8 @@ class CombinationTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CombinationTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CombinationTableMap::getInstanceFromPool($key))) {
+            $key = CartItemTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = CartItemTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -296,7 +304,7 @@ class CombinationTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CombinationTableMap::addInstanceToPool($obj, $key);
+                CartItemTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -317,13 +325,19 @@ class CombinationTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CombinationTableMap::ID);
-            $criteria->addSelectColumn(CombinationTableMap::REF);
-            $criteria->addSelectColumn(CombinationTableMap::CREATED_AT);
-            $criteria->addSelectColumn(CombinationTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(CartItemTableMap::ID);
+            $criteria->addSelectColumn(CartItemTableMap::CART_ID);
+            $criteria->addSelectColumn(CartItemTableMap::PRODUCT_ID);
+            $criteria->addSelectColumn(CartItemTableMap::QUANTITY);
+            $criteria->addSelectColumn(CartItemTableMap::COMBINATION_ID);
+            $criteria->addSelectColumn(CartItemTableMap::CREATED_AT);
+            $criteria->addSelectColumn(CartItemTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.REF');
+            $criteria->addSelectColumn($alias . '.CART_ID');
+            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
+            $criteria->addSelectColumn($alias . '.QUANTITY');
+            $criteria->addSelectColumn($alias . '.COMBINATION_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -338,7 +352,7 @@ class CombinationTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CombinationTableMap::DATABASE_NAME)->getTable(CombinationTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(CartItemTableMap::DATABASE_NAME)->getTable(CartItemTableMap::TABLE_NAME);
     }
 
     /**
@@ -346,16 +360,16 @@ class CombinationTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CombinationTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(CombinationTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new CombinationTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CartItemTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CartItemTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CartItemTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Combination or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CartItem or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Combination object or primary key or array of primary keys
+     * @param mixed               $values Criteria or CartItem object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -366,25 +380,25 @@ class CombinationTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CartItemTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Combination) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\CartItem) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CombinationTableMap::DATABASE_NAME);
-            $criteria->add(CombinationTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(CartItemTableMap::DATABASE_NAME);
+            $criteria->add(CartItemTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = CombinationQuery::create()->mergeWith($criteria);
+        $query = CartItemQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { CombinationTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { CartItemTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { CombinationTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { CartItemTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -392,20 +406,20 @@ class CombinationTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the combination table.
+     * Deletes all rows from the cart_item table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CombinationQuery::create()->doDeleteAll($con);
+        return CartItemQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Combination or Criteria object.
+     * Performs an INSERT on the database, given a CartItem or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Combination object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or CartItem object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -414,22 +428,22 @@ class CombinationTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CartItemTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Combination object
+            $criteria = $criteria->buildCriteria(); // build Criteria from CartItem object
         }
 
-        if ($criteria->containsKey(CombinationTableMap::ID) && $criteria->keyContainsValue(CombinationTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CombinationTableMap::ID.')');
+        if ($criteria->containsKey(CartItemTableMap::ID) && $criteria->keyContainsValue(CartItemTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CartItemTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = CombinationQuery::create()->mergeWith($criteria);
+        $query = CartItemQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -445,7 +459,7 @@ class CombinationTableMap extends TableMap
         return $pk;
     }
 
-} // CombinationTableMap
+} // CartItemTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CombinationTableMap::buildTableMap();
+CartItemTableMap::buildTableMap();

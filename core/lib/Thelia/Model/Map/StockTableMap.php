@@ -90,9 +90,9 @@ class StockTableMap extends TableMap
     const INCREASE = 'stock.INCREASE';
 
     /**
-     * the column name for the VALUE field
+     * the column name for the QUANTITY field
      */
-    const VALUE = 'stock.VALUE';
+    const QUANTITY = 'stock.QUANTITY';
 
     /**
      * the column name for the CREATED_AT field
@@ -116,11 +116,11 @@ class StockTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CombinationId', 'ProductId', 'Increase', 'Value', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'combinationId', 'productId', 'increase', 'value', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(StockTableMap::ID, StockTableMap::COMBINATION_ID, StockTableMap::PRODUCT_ID, StockTableMap::INCREASE, StockTableMap::VALUE, StockTableMap::CREATED_AT, StockTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'COMBINATION_ID', 'PRODUCT_ID', 'INCREASE', 'VALUE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'combination_id', 'product_id', 'increase', 'value', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'CombinationId', 'ProductId', 'Increase', 'Quantity', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'combinationId', 'productId', 'increase', 'quantity', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(StockTableMap::ID, StockTableMap::COMBINATION_ID, StockTableMap::PRODUCT_ID, StockTableMap::INCREASE, StockTableMap::QUANTITY, StockTableMap::CREATED_AT, StockTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'COMBINATION_ID', 'PRODUCT_ID', 'INCREASE', 'QUANTITY', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'combination_id', 'product_id', 'increase', 'quantity', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -131,11 +131,11 @@ class StockTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CombinationId' => 1, 'ProductId' => 2, 'Increase' => 3, 'Value' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'combinationId' => 1, 'productId' => 2, 'increase' => 3, 'value' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(StockTableMap::ID => 0, StockTableMap::COMBINATION_ID => 1, StockTableMap::PRODUCT_ID => 2, StockTableMap::INCREASE => 3, StockTableMap::VALUE => 4, StockTableMap::CREATED_AT => 5, StockTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'COMBINATION_ID' => 1, 'PRODUCT_ID' => 2, 'INCREASE' => 3, 'VALUE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'combination_id' => 1, 'product_id' => 2, 'increase' => 3, 'value' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CombinationId' => 1, 'ProductId' => 2, 'Increase' => 3, 'Quantity' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'combinationId' => 1, 'productId' => 2, 'increase' => 3, 'quantity' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(StockTableMap::ID => 0, StockTableMap::COMBINATION_ID => 1, StockTableMap::PRODUCT_ID => 2, StockTableMap::INCREASE => 3, StockTableMap::QUANTITY => 4, StockTableMap::CREATED_AT => 5, StockTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'COMBINATION_ID' => 1, 'PRODUCT_ID' => 2, 'INCREASE' => 3, 'QUANTITY' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'combination_id' => 1, 'product_id' => 2, 'increase' => 3, 'quantity' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -159,7 +159,7 @@ class StockTableMap extends TableMap
         $this->addForeignKey('COMBINATION_ID', 'CombinationId', 'INTEGER', 'combination', 'ID', false, null, null);
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('INCREASE', 'Increase', 'FLOAT', false, null, null);
-        $this->addColumn('VALUE', 'Value', 'FLOAT', true, null, null);
+        $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -328,7 +328,7 @@ class StockTableMap extends TableMap
             $criteria->addSelectColumn(StockTableMap::COMBINATION_ID);
             $criteria->addSelectColumn(StockTableMap::PRODUCT_ID);
             $criteria->addSelectColumn(StockTableMap::INCREASE);
-            $criteria->addSelectColumn(StockTableMap::VALUE);
+            $criteria->addSelectColumn(StockTableMap::QUANTITY);
             $criteria->addSelectColumn(StockTableMap::CREATED_AT);
             $criteria->addSelectColumn(StockTableMap::UPDATED_AT);
         } else {
@@ -336,7 +336,7 @@ class StockTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.COMBINATION_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.INCREASE');
-            $criteria->addSelectColumn($alias . '.VALUE');
+            $criteria->addSelectColumn($alias . '.QUANTITY');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

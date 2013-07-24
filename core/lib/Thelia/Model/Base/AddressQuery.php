@@ -36,7 +36,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery orderByCountryId($order = Criteria::ASC) Order by the country_id column
  * @method     ChildAddressQuery orderByPhone($order = Criteria::ASC) Order by the phone column
  * @method     ChildAddressQuery orderByCellphone($order = Criteria::ASC) Order by the cellphone column
- * @method     ChildAddressQuery orderByIsDefault($order = Criteria::ASC) Order by the is_default column
+ * @method     ChildAddressQuery orderByDefault($order = Criteria::ASC) Order by the default column
  * @method     ChildAddressQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAddressQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -55,7 +55,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery groupByCountryId() Group by the country_id column
  * @method     ChildAddressQuery groupByPhone() Group by the phone column
  * @method     ChildAddressQuery groupByCellphone() Group by the cellphone column
- * @method     ChildAddressQuery groupByIsDefault() Group by the is_default column
+ * @method     ChildAddressQuery groupByDefault() Group by the default column
  * @method     ChildAddressQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAddressQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -70,6 +70,14 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddressQuery leftJoinCustomerTitle($relationAlias = null) Adds a LEFT JOIN clause to the query using the CustomerTitle relation
  * @method     ChildAddressQuery rightJoinCustomerTitle($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CustomerTitle relation
  * @method     ChildAddressQuery innerJoinCustomerTitle($relationAlias = null) Adds a INNER JOIN clause to the query using the CustomerTitle relation
+ *
+ * @method     ChildAddressQuery leftJoinCartRelatedByAddressDeliveryId($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartRelatedByAddressDeliveryId relation
+ * @method     ChildAddressQuery rightJoinCartRelatedByAddressDeliveryId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartRelatedByAddressDeliveryId relation
+ * @method     ChildAddressQuery innerJoinCartRelatedByAddressDeliveryId($relationAlias = null) Adds a INNER JOIN clause to the query using the CartRelatedByAddressDeliveryId relation
+ *
+ * @method     ChildAddressQuery leftJoinCartRelatedByAddressInvoiceId($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartRelatedByAddressInvoiceId relation
+ * @method     ChildAddressQuery rightJoinCartRelatedByAddressInvoiceId($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartRelatedByAddressInvoiceId relation
+ * @method     ChildAddressQuery innerJoinCartRelatedByAddressInvoiceId($relationAlias = null) Adds a INNER JOIN clause to the query using the CartRelatedByAddressInvoiceId relation
  *
  * @method     ChildAddress findOne(ConnectionInterface $con = null) Return the first ChildAddress matching the query
  * @method     ChildAddress findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAddress matching the query, or a new ChildAddress object populated from the query conditions when no match is found
@@ -89,7 +97,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     ChildAddress findOneByCountryId(int $country_id) Return the first ChildAddress filtered by the country_id column
  * @method     ChildAddress findOneByPhone(string $phone) Return the first ChildAddress filtered by the phone column
  * @method     ChildAddress findOneByCellphone(string $cellphone) Return the first ChildAddress filtered by the cellphone column
- * @method     ChildAddress findOneByIsDefault(int $is_default) Return the first ChildAddress filtered by the is_default column
+ * @method     ChildAddress findOneByDefault(int $default) Return the first ChildAddress filtered by the default column
  * @method     ChildAddress findOneByCreatedAt(string $created_at) Return the first ChildAddress filtered by the created_at column
  * @method     ChildAddress findOneByUpdatedAt(string $updated_at) Return the first ChildAddress filtered by the updated_at column
  *
@@ -108,7 +116,7 @@ use Thelia\Model\Map\AddressTableMap;
  * @method     array findByCountryId(int $country_id) Return ChildAddress objects filtered by the country_id column
  * @method     array findByPhone(string $phone) Return ChildAddress objects filtered by the phone column
  * @method     array findByCellphone(string $cellphone) Return ChildAddress objects filtered by the cellphone column
- * @method     array findByIsDefault(int $is_default) Return ChildAddress objects filtered by the is_default column
+ * @method     array findByDefault(int $default) Return ChildAddress objects filtered by the default column
  * @method     array findByCreatedAt(string $created_at) Return ChildAddress objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAddress objects filtered by the updated_at column
  *
@@ -199,7 +207,7 @@ abstract class AddressQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TITLE, CUSTOMER_ID, CUSTOMER_TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CELLPHONE, IS_DEFAULT, CREATED_AT, UPDATED_AT FROM address WHERE ID = :p0';
+        $sql = 'SELECT ID, TITLE, CUSTOMER_ID, CUSTOMER_TITLE_ID, COMPANY, FIRSTNAME, LASTNAME, ADDRESS1, ADDRESS2, ADDRESS3, ZIPCODE, CITY, COUNTRY_ID, PHONE, CELLPHONE, DEFAULT, CREATED_AT, UPDATED_AT FROM address WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -776,16 +784,16 @@ abstract class AddressQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the is_default column
+     * Filter the query on the default column
      *
      * Example usage:
      * <code>
-     * $query->filterByIsDefault(1234); // WHERE is_default = 1234
-     * $query->filterByIsDefault(array(12, 34)); // WHERE is_default IN (12, 34)
-     * $query->filterByIsDefault(array('min' => 12)); // WHERE is_default > 12
+     * $query->filterByDefault(1234); // WHERE default = 1234
+     * $query->filterByDefault(array(12, 34)); // WHERE default IN (12, 34)
+     * $query->filterByDefault(array('min' => 12)); // WHERE default > 12
      * </code>
      *
-     * @param     mixed $isDefault The value to use as filter.
+     * @param     mixed $default The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -793,16 +801,16 @@ abstract class AddressQuery extends ModelCriteria
      *
      * @return ChildAddressQuery The current query, for fluid interface
      */
-    public function filterByIsDefault($isDefault = null, $comparison = null)
+    public function filterByDefault($default = null, $comparison = null)
     {
-        if (is_array($isDefault)) {
+        if (is_array($default)) {
             $useMinMax = false;
-            if (isset($isDefault['min'])) {
-                $this->addUsingAlias(AddressTableMap::IS_DEFAULT, $isDefault['min'], Criteria::GREATER_EQUAL);
+            if (isset($default['min'])) {
+                $this->addUsingAlias(AddressTableMap::DEFAULT, $default['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($isDefault['max'])) {
-                $this->addUsingAlias(AddressTableMap::IS_DEFAULT, $isDefault['max'], Criteria::LESS_EQUAL);
+            if (isset($default['max'])) {
+                $this->addUsingAlias(AddressTableMap::DEFAULT, $default['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -813,7 +821,7 @@ abstract class AddressQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AddressTableMap::IS_DEFAULT, $isDefault, $comparison);
+        return $this->addUsingAlias(AddressTableMap::DEFAULT, $default, $comparison);
     }
 
     /**
@@ -1050,6 +1058,152 @@ abstract class AddressQuery extends ModelCriteria
         return $this
             ->joinCustomerTitle($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'CustomerTitle', '\Thelia\Model\CustomerTitleQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Cart object
+     *
+     * @param \Thelia\Model\Cart|ObjectCollection $cart  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function filterByCartRelatedByAddressDeliveryId($cart, $comparison = null)
+    {
+        if ($cart instanceof \Thelia\Model\Cart) {
+            return $this
+                ->addUsingAlias(AddressTableMap::ID, $cart->getAddressDeliveryId(), $comparison);
+        } elseif ($cart instanceof ObjectCollection) {
+            return $this
+                ->useCartRelatedByAddressDeliveryIdQuery()
+                ->filterByPrimaryKeys($cart->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCartRelatedByAddressDeliveryId() only accepts arguments of type \Thelia\Model\Cart or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CartRelatedByAddressDeliveryId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function joinCartRelatedByAddressDeliveryId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CartRelatedByAddressDeliveryId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CartRelatedByAddressDeliveryId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CartRelatedByAddressDeliveryId relation Cart object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
+     */
+    public function useCartRelatedByAddressDeliveryIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCartRelatedByAddressDeliveryId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CartRelatedByAddressDeliveryId', '\Thelia\Model\CartQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\Cart object
+     *
+     * @param \Thelia\Model\Cart|ObjectCollection $cart  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function filterByCartRelatedByAddressInvoiceId($cart, $comparison = null)
+    {
+        if ($cart instanceof \Thelia\Model\Cart) {
+            return $this
+                ->addUsingAlias(AddressTableMap::ID, $cart->getAddressInvoiceId(), $comparison);
+        } elseif ($cart instanceof ObjectCollection) {
+            return $this
+                ->useCartRelatedByAddressInvoiceIdQuery()
+                ->filterByPrimaryKeys($cart->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCartRelatedByAddressInvoiceId() only accepts arguments of type \Thelia\Model\Cart or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CartRelatedByAddressInvoiceId relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildAddressQuery The current query, for fluid interface
+     */
+    public function joinCartRelatedByAddressInvoiceId($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CartRelatedByAddressInvoiceId');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CartRelatedByAddressInvoiceId');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CartRelatedByAddressInvoiceId relation Cart object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CartQuery A secondary query class using the current class as primary query
+     */
+    public function useCartRelatedByAddressInvoiceIdQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinCartRelatedByAddressInvoiceId($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CartRelatedByAddressInvoiceId', '\Thelia\Model\CartQuery');
     }
 
     /**
