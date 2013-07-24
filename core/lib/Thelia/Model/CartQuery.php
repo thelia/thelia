@@ -3,7 +3,7 @@
 namespace Thelia\Model;
 
 use Thelia\Model\Base\CartQuery as BaseCartQuery;
-
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * Skeleton subclass for performing query and update operations on the 'cart' table.
@@ -17,5 +17,6 @@ use Thelia\Model\Base\CartQuery as BaseCartQuery;
  */
 class CartQuery extends BaseCartQuery
 {
+
 
 } // CartQuery
