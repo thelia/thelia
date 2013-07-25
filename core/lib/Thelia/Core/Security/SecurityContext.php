@@ -55,6 +55,8 @@ class SecurityContext {
 		}
 
 		$this->context = $context;
+
+		return $this;
 	}
 
 	public function getContext($exception_if_context_undefined = false) {
@@ -133,7 +135,7 @@ class SecurityContext {
 	        	// Get permissions from profile
 	        	// $userPermissions = $user->getPermissions();
 
-       			echo "TODO: Finalize permissions system !";
+       			// TODO: Finalize permissions system !;
 
        			$userPermissions = array('*'); // FIXME !
 

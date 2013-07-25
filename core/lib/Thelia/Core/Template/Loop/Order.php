@@ -21,66 +21,39 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\Smarty\Plugins;
+namespace Thelia\Core\Template\Loop;
 
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
-use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 
-class Security extends AbstractSmartyPlugin
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
+
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
+
+/**
+ *
+ * @package Thelia\Core\Template\Loop
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class Order extends BaseLoop
 {
-	private $securityContext;
-
-	public function __construct(SecurityContext $securityContext)
-	{
-		$this->securityContext = $securityContext;
-	}
+    public function getArgDefinitions()
+    {
+        return new ArgumentCollection();
+    }
 
     /**
-     * Process security check function
      *
-     * @param  array $params
-     * @param  unknown $smarty
-     * @return string no text is returned.
-     */
-    public function checkAuthFunction($params, &$smarty)
-    {
-    	// Context: 'front' or 'admin'
-   		$context = strtolower(trim($params['context']));
-
-   		$this->securityContext->setContext($context);
-
-   		$roles = $this->_explode($params['roles']);
-   		$permissions = $this->_explode($params['permissions']);
-
-   		if (! $this->securityContext->isGranted($roles, $permissions)) {
-   			$ex = new AuthenticationException(
-   					sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
-   							implode(',', $roles), implode(',', $permissions), $context
-   					)
-   			);
-
-   			if (! empty($params['login_tpl'])) {
-   				$ex->setLoginTemplate($params['login_tpl']);
-   			}
-
-   			throw $ex;
-   		}
-
-   		return '';
-     }
-
-    /**
-     * Define the various smarty plugins hendled by this class
      *
-     * @return an array of smarty plugin descriptors
+     * @return \Thelia\Core\Template\Element\LoopResult
      */
-    public function getPluginDescriptors()
+    public function exec(&$pagination)
     {
-        return array(
-            new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAuthFunction')
-        );
+    	// TODO : a coder !
+        return new LoopResult();
     }
 }

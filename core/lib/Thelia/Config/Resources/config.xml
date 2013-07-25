@@ -10,6 +10,8 @@
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
+        <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
+        <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
     </loops>
 
     <forms>
@@ -128,6 +130,12 @@
         <service id="smarty.plugin.security" class="Thelia\Core\Template\Smarty\Plugins\Security"  scope="request">
             <tag name="thelia.parser.register_plugin"/>
             <argument type="service" id="thelia.securityContext" />
+        </service>
+
+        <service id="smarty.plugin.dataAccess" class="Thelia\Core\Template\Smarty\Plugins\DataAccessFunctions"  scope="request">
+            <tag name="thelia.parser.register_plugin"/>
+            <argument type="service" id="thelia.securityContext" />
+            <argument type="service" id="thelia.parser.context"/>
         </service>
 
         <service id="http_kernel" class="Thelia\Core\TheliaHttpKernel">

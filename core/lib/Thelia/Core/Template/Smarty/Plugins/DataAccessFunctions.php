@@ -23,55 +23,80 @@
 
 namespace Thelia\Core\Template\Smarty\Plugins;
 
-use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Security\Exception\AuthenticationException;
-
-class Security extends AbstractSmartyPlugin
+use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
+/**
+ * Implementation of data access to main Thelia objects (users, cart, etc.)
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ *
+ */
+class DataAccessFunctions extends AbstractSmartyPlugin
 {
 	private $securityContext;
+	protected $parserContext;
 
-	public function __construct(SecurityContext $securityContext)
+	public function __construct(SecurityContext $securityContext, ParserContext $parserContext)
 	{
 		$this->securityContext = $securityContext;
 	}
 
     /**
-     * Process security check function
+     * Provides access to the current logged administrator attributes using the accessors.
      *
      * @param  array $params
      * @param  unknown $smarty
-     * @return string no text is returned.
+     * @return string the value of the requested attribute
      */
-    public function checkAuthFunction($params, &$smarty)
+    public function adminDataAccess($params, &$smarty)
     {
-    	// Context: 'front' or 'admin'
-   		$context = strtolower(trim($params['context']));
+     	return $this->userDataAccess("Admin User", SecurityContext::CONTEXT_BACK_OFFICE, $params);
+    }
 
-   		$this->securityContext->setContext($context);
-
-   		$roles = $this->_explode($params['roles']);
-   		$permissions = $this->_explode($params['permissions']);
-
-   		if (! $this->securityContext->isGranted($roles, $permissions)) {
-   			$ex = new AuthenticationException(
-   					sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
-   							implode(',', $roles), implode(',', $permissions), $context
-   					)
-   			);
-
-   			if (! empty($params['login_tpl'])) {
-   				$ex->setLoginTemplate($params['login_tpl']);
-   			}
-
-   			throw $ex;
-   		}
-
-   		return '';
+     /**
+      * Provides access to the current logged customer attributes throught the accessor
+      *
+      * @param  array $params
+      * @param  unknown $smarty
+      * @return string the value of the requested attribute
+      */
+     public function customerDataAccess($params, &$smarty)
+     {
+     	return $this->userDataAccess("Customer User", SecurityContext::CONTEXT_FRONT_OFFICE, $params);
      }
 
+
+    /**
+     * Provides access to user attributes using the accessors.
+     *
+     * @param  array $params
+     * @param  unknown $smarty
+     * @return string the value of the requested attribute
+     * @throws InvalidArgumentException if the object does not have the requested attribute.
+     */
+     protected function userDataAccess($objectLabel, $context, $params)
+     {
+     	$attribute = $params['attr'];
+
+     	if (! empty($attribute)) {
+     		$user = $this->securityContext->setContext($context)->getUser();
+
+     		if (null != $user) {
+     			$getter = sprintf("get%s", ucfirst(strtolower($attribute)));
+
+     			if (method_exists($user, $getter)) {
+     				return $user->$getter();
+     			}
+
+     			throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", $objectLabel, $attribute));
+
+     		}
+     	}
+
+     	return '';
+     }
     /**
      * Define the various smarty plugins hendled by this class
      *
@@ -80,7 +105,8 @@ class Security extends AbstractSmartyPlugin
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('function', 'check_auth', $this, 'checkAuthFunction')
+            new SmartyPluginDescriptor('function', 'admin', $this, 'adminDataAccess'),
+            new SmartyPluginDescriptor('function', 'customer', $this, 'customerDataAccess')
         );
     }
 }

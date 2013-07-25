@@ -24,7 +24,7 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Element\BaseLoop;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
@@ -34,7 +34,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Core\Security\SecurityContext;
 
-class TheliaLoop implements SmartyPluginInterface
+class TheliaLoop extends AbstractSmartyPlugin
 {
     protected static $pagination = null;
 
@@ -66,6 +66,23 @@ class TheliaLoop implements SmartyPluginInterface
         } else {
             return null;
         }
+    }
+
+    /**
+     * Process the count function: executes a loop and return the number of items found
+     */
+    public function theliaCount($params, $template) {
+
+        if (empty($params['type']))
+            throw new \InvalidArgumentException("Missing 'type' parameter in count arguments");
+
+        $loop = $this->createLoopInstance($params);
+
+        $dummy = null;
+
+    	$loopResults = $loop->exec($dummy);
+
+    	return $loopResults->valid() ? $loopResults->getCount() : 0;
     }
 
     /**
@@ -343,10 +360,11 @@ class TheliaLoop implements SmartyPluginInterface
     {
         return array(
 
-    		new SmartyPluginDescriptor('block', 'loop'     , $this, 'theliaLoop'),
-    		new SmartyPluginDescriptor('block', 'elseloop' , $this, 'theliaElseloop'),
-    		new SmartyPluginDescriptor('block', 'ifloop'   , $this, 'theliaIfLoop'),
-    		new SmartyPluginDescriptor('block', 'pageloop'   , $this, 'theliaPageLoop'),
+    		new SmartyPluginDescriptor('function', 'count'    , $this, 'theliaCount'),
+    		new SmartyPluginDescriptor('block'   , 'loop'     , $this, 'theliaLoop'),
+        	new SmartyPluginDescriptor('block'   , 'elseloop' , $this, 'theliaElseloop'),
+    		new SmartyPluginDescriptor('block'   , 'ifloop'   , $this, 'theliaIfLoop'),
+    		new SmartyPluginDescriptor('block'   , 'pageloop' , $this, 'theliaPageLoop'),
         );
      }
 }

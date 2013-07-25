@@ -25,15 +25,34 @@ namespace Thelia\Core\Template\Smarty;
 
 /**
  *
- * this interface must be implements when you want to add plugin to smarty using config process
+ * The class all Smarty Thelia plugin shoud extend
  *
- * Interface SmartyPluginInterface
+ * Class AbstractSmartyPlugin
  * @package Thelia\Core\Template\Smarty
  */
-interface SmartyPluginInterface
+abstract class AbstractSmartyPlugin
 {
+	/**
+	 * Explode a comma separated list in a array, trimming all array elements
+	 *
+	 * @param unknown $commaSeparatedValues
+	 * @return multitype:
+	 */
+	protected function _explode($commaSeparatedValues)
+	{
+		$array = explode(',', $commaSeparatedValues);
+
+		if (array_walk($array, function(&$item) {
+			$item = strtoupper(trim($item));
+		})) {
+			return $array;
+		}
+
+		return array();
+	}
+
     /**
      * @return an array of SmartyPluginDescriptor
      */
-    public function getPluginDescriptors();
+    public abstract function getPluginDescriptors();
 }

@@ -24,11 +24,11 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Tools\URL;
 use Thelia\Core\HttpFoundation\Request;
 
-class UrlGenerator implements SmartyPluginInterface
+class UrlGenerator extends AbstractSmartyPlugin
 {
     protected $request;
 

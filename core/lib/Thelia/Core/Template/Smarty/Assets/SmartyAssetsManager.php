@@ -50,10 +50,7 @@ class SmartyAssetsManager
         $this->assetic_manager = new AsseticHelper();
     }
 
-    public function processSmartyPluginCall($assetType, $params, $content, \Smarty_Internal_Template $template, &$repeat)
-    {
-        // Opening tag (first call only)
-        if ($repeat) {
+    public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template) {
             $file    = $params['file'];
             $filters = isset($params['filters']) ? $params['filters'] : '';
             $debug   = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
@@ -79,7 +76,17 @@ class SmartyAssetsManager
                     $debug
              );
 
+            return $url;
+    }
+
+    public function processSmartyPluginCall($assetType, $params, $content, \Smarty_Internal_Template $template, &$repeat)
+    {
+        // Opening tag (first call only)
+        if ($repeat) {
+			$url = $this->computeAssetUrl($assetType, $params, $template);
+
             $template->assign('asset_url', $url);
+
         } elseif (isset($content)) {
             return $content;
         }

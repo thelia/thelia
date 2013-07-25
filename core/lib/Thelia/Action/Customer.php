@@ -56,8 +56,6 @@ class Customer implements EventSubscriberInterface
 
     public function create(ActionEvent $event)
     {
-        $event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
-
         $request = $event->getRequest();
 
         $customerCreationForm = new CustomerCreation($request);
@@ -71,8 +69,11 @@ class Customer implements EventSubscriberInterface
             if ($form->isValid()) {
                 $data = $form->getData();
                 $customer = new CustomerModel();
+
                 try {
-                    $customer->createOrUpdate(
+        			$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
+
+                	$customer->createOrUpdate(
                         $data["title"],
                         $data["firstname"],
                         $data["lastname"],
@@ -120,8 +121,6 @@ class Customer implements EventSubscriberInterface
 
     public function modify(ActionEvent $event)
     {
-    	$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $event);
-
         $request = $event->getRequest();
 
         $customerModification = new CustomerModification($request);
@@ -137,7 +136,10 @@ class Customer implements EventSubscriberInterface
 
                 $customer = CustomerQuery::create()->findPk(1);
                 try {
-                    $data = $form->getData();
+    				$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $event);
+
+                	$data = $form->getData();
+
                     $customer->createOrUpdate(
                         $data["title"],
                         $data["firstname"],
