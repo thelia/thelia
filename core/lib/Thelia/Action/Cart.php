@@ -26,6 +26,10 @@ namespace Thelia\Action;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\CartQuery;
+use Thelia\Model\Cart as CartModel;
+use Thelia\Model\Customer;
 
 
 class Cart implements EventSubscriberInterface
@@ -94,6 +98,10 @@ class Cart implements EventSubscriberInterface
 
     public function getCart(Request $request)
     {
+        if (null !== $cartId = $request->getSession()->getCart()){
+            $cart = CartQuery::create()->findPk($cartId);
+        }
+
         if ($request->cookies->has("thelia_cart")) {
             //le cookie de panier existe, on le récupère
             $cookie = $request->cookies->get("thelia_cart");
@@ -117,19 +125,30 @@ class Cart implements EventSubscriberInterface
                 }
 
             } else {
-                $cart = $this->createCart();
+                $cart = $this->createCart($request->getSession());
             }
         } else {
             //le cookie de panier n'existe pas, il va falloir le créer et faire un enregistrement en base.
-            $cart = $this->createCart();
+            $cart = $this->createCart($request->getSession());
         }
 
         return $cart;
     }
 
-    public function createCart()
+    public function createCart(Session $session)
     {
+        $cart = new CartModel();
+        $cart->setToken($this->generateCookie());
 
+        if(null !== $customer = $session->getCustomerUser()) {
+            $cart->setCustomer($customer);
+        }
+
+        $cart->save();
+
+        $session->setCart($cart->getId());
+
+        return $cart;
     }
 
 

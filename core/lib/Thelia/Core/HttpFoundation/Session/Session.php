@@ -113,4 +113,16 @@ class Session extends BaseSession {
     	return $this->get('return_to_url', URL::getIndexPage());
     }
 
+    // -- Cart ------------------------------------------------------------------
+
+    public function getCart()
+    {
+        return $this->get("cart_id");
+    }
+
+    public function setCart($cart_id)
+    {
+        $this->set("cart_id", $cart_id);
+    }
+
 }
