@@ -115,11 +115,21 @@ class Session extends BaseSession {
 
     // -- Cart ------------------------------------------------------------------
 
+    /**
+     * retrieve cart id in session
+     *
+     * @return int cart id
+     */
     public function getCart()
     {
         return $this->get("cart_id");
     }
 
+    /**
+     * assign cart id in session
+     *
+     * @param $cart_id
+     */
     public function setCart($cart_id)
     {
         $this->set("cart_id", $cart_id);
