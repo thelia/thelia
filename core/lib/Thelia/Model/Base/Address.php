@@ -152,11 +152,11 @@ abstract class Address implements ActiveRecordInterface
     protected $cellphone;
 
     /**
-     * The value for the default field.
+     * The value for the is_default field.
      * Note: this column has a database default value of: 0
      * @var        int
      */
-    protected $default;
+    protected $is_default;
 
     /**
      * The value for the created_at field.
@@ -220,7 +220,7 @@ abstract class Address implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->default = 0;
+        $this->is_default = 0;
     }
 
     /**
@@ -645,14 +645,14 @@ abstract class Address implements ActiveRecordInterface
     }
 
     /**
-     * Get the [default] column value.
+     * Get the [is_default] column value.
      *
      * @return   int
      */
-    public function getDefault()
+    public function getIsDefault()
     {
 
-        return $this->default;
+        return $this->is_default;
     }
 
     /**
@@ -1019,25 +1019,25 @@ abstract class Address implements ActiveRecordInterface
     } // setCellphone()
 
     /**
-     * Set the value of [default] column.
+     * Set the value of [is_default] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\Address The current object (for fluent API support)
      */
-    public function setDefault($v)
+    public function setIsDefault($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->default !== $v) {
-            $this->default = $v;
-            $this->modifiedColumns[] = AddressTableMap::DEFAULT;
+        if ($this->is_default !== $v) {
+            $this->is_default = $v;
+            $this->modifiedColumns[] = AddressTableMap::IS_DEFAULT;
         }
 
 
         return $this;
-    } // setDefault()
+    } // setIsDefault()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -1091,7 +1091,7 @@ abstract class Address implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->default !== 0) {
+            if ($this->is_default !== 0) {
                 return false;
             }
 
@@ -1167,8 +1167,8 @@ abstract class Address implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : AddressTableMap::translateFieldName('Cellphone', TableMap::TYPE_PHPNAME, $indexType)];
             $this->cellphone = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : AddressTableMap::translateFieldName('Default', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->default = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : AddressTableMap::translateFieldName('IsDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->is_default = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : AddressTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -1521,8 +1521,8 @@ abstract class Address implements ActiveRecordInterface
         if ($this->isColumnModified(AddressTableMap::CELLPHONE)) {
             $modifiedColumns[':p' . $index++]  = 'CELLPHONE';
         }
-        if ($this->isColumnModified(AddressTableMap::DEFAULT)) {
-            $modifiedColumns[':p' . $index++]  = 'DEFAULT';
+        if ($this->isColumnModified(AddressTableMap::IS_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = 'IS_DEFAULT';
         }
         if ($this->isColumnModified(AddressTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1586,8 +1586,8 @@ abstract class Address implements ActiveRecordInterface
                     case 'CELLPHONE':
                         $stmt->bindValue($identifier, $this->cellphone, PDO::PARAM_STR);
                         break;
-                    case 'DEFAULT':
-                        $stmt->bindValue($identifier, $this->default, PDO::PARAM_INT);
+                    case 'IS_DEFAULT':
+                        $stmt->bindValue($identifier, $this->is_default, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1703,7 +1703,7 @@ abstract class Address implements ActiveRecordInterface
                 return $this->getCellphone();
                 break;
             case 15:
-                return $this->getDefault();
+                return $this->getIsDefault();
                 break;
             case 16:
                 return $this->getCreatedAt();
@@ -1755,7 +1755,7 @@ abstract class Address implements ActiveRecordInterface
             $keys[12] => $this->getCountryId(),
             $keys[13] => $this->getPhone(),
             $keys[14] => $this->getCellphone(),
-            $keys[15] => $this->getDefault(),
+            $keys[15] => $this->getIsDefault(),
             $keys[16] => $this->getCreatedAt(),
             $keys[17] => $this->getUpdatedAt(),
         );
@@ -1858,7 +1858,7 @@ abstract class Address implements ActiveRecordInterface
                 $this->setCellphone($value);
                 break;
             case 15:
-                $this->setDefault($value);
+                $this->setIsDefault($value);
                 break;
             case 16:
                 $this->setCreatedAt($value);
@@ -1905,7 +1905,7 @@ abstract class Address implements ActiveRecordInterface
         if (array_key_exists($keys[12], $arr)) $this->setCountryId($arr[$keys[12]]);
         if (array_key_exists($keys[13], $arr)) $this->setPhone($arr[$keys[13]]);
         if (array_key_exists($keys[14], $arr)) $this->setCellphone($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setDefault($arr[$keys[15]]);
+        if (array_key_exists($keys[15], $arr)) $this->setIsDefault($arr[$keys[15]]);
         if (array_key_exists($keys[16], $arr)) $this->setCreatedAt($arr[$keys[16]]);
         if (array_key_exists($keys[17], $arr)) $this->setUpdatedAt($arr[$keys[17]]);
     }
@@ -1934,7 +1934,7 @@ abstract class Address implements ActiveRecordInterface
         if ($this->isColumnModified(AddressTableMap::COUNTRY_ID)) $criteria->add(AddressTableMap::COUNTRY_ID, $this->country_id);
         if ($this->isColumnModified(AddressTableMap::PHONE)) $criteria->add(AddressTableMap::PHONE, $this->phone);
         if ($this->isColumnModified(AddressTableMap::CELLPHONE)) $criteria->add(AddressTableMap::CELLPHONE, $this->cellphone);
-        if ($this->isColumnModified(AddressTableMap::DEFAULT)) $criteria->add(AddressTableMap::DEFAULT, $this->default);
+        if ($this->isColumnModified(AddressTableMap::IS_DEFAULT)) $criteria->add(AddressTableMap::IS_DEFAULT, $this->is_default);
         if ($this->isColumnModified(AddressTableMap::CREATED_AT)) $criteria->add(AddressTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AddressTableMap::UPDATED_AT)) $criteria->add(AddressTableMap::UPDATED_AT, $this->updated_at);
 
@@ -2014,7 +2014,7 @@ abstract class Address implements ActiveRecordInterface
         $copyObj->setCountryId($this->getCountryId());
         $copyObj->setPhone($this->getPhone());
         $copyObj->setCellphone($this->getCellphone());
-        $copyObj->setDefault($this->getDefault());
+        $copyObj->setIsDefault($this->getIsDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -2742,7 +2742,7 @@ abstract class Address implements ActiveRecordInterface
         $this->country_id = null;
         $this->phone = null;
         $this->cellphone = null;
-        $this->default = null;
+        $this->is_default = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
