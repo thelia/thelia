@@ -171,7 +171,7 @@ class Cart implements EventSubscriberInterface
         return $newCart;
     }
 
-    public function generateCookie()
+    protected function generateCookie()
     {
         $id = uniqid('', true);
         setcookie("thelia_cart", $id, uniqid('', true));

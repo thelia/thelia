@@ -28,6 +28,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Model\Cart;
 use Thelia\Model\Customer;
 
 class CartTest extends \PHPUnit_Framework_TestCase
@@ -73,6 +74,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($cart->getCustomerId());
         $this->assertNull($cart->getAddressDeliveryId());
         $this->assertNull($cart->getAddressInvoiceId());
+        $this->assertEquals($this->uniqid, $cart->getToken());
 
     }
 
@@ -97,7 +99,46 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($customer->getId(), $cart->getCustomerId());
         $this->assertNull($cart->getAddressDeliveryId());
         $this->assertNull($cart->getAddressInvoiceId());
+        $this->assertEquals($this->uniqid, $cart->getToken());
 
+    }
+
+    public function testGetCartWithoutCustomerAndWithExistingCart()
+    {
+        $actionCart = $this->actionCart;
+
+        $request = $this->request;
+
+        //create a fake cart in database;
+        $cart = new Cart();
+        $cart->setToken($this->uniqid);
+        $cart->save();
+
+        $request->cookies->set("thelia_cart", $this->uniqid);
+
+        $getCart = $actionCart->getCart($request);
+        $this->assertInstanceOf("Thelia\Model\Cart", $getCart, '$cart must be an instance of cart model Thelia\Model\Cart');
+        $this->assertNull($getCart->getCustomerId());
+        $this->assertNull($getCart->getAddressDeliveryId());
+        $this->assertNull($getCart->getAddressInvoiceId());
+        $this->assertEquals($cart->getToken(), $getCart->getToken());
+    }
+
+    public function testGetCartWithExistingCartButNotGoodCookies()
+    {
+        $actionCart = $this->actionCart;
+
+        $request = $this->request;
+
+        $token = "WrongToken";
+        $request->cookies->set("thelia_cart", $token);
+
+        $cart = $actionCart->getCart($request);
+        $this->assertInstanceOf("Thelia\Model\Cart", $cart, '$cart must be an instance of cart model Thelia\Model\Cart');
+        $this->assertNull($cart->getCustomerId());
+        $this->assertNull($cart->getAddressDeliveryId());
+        $this->assertNull($cart->getAddressInvoiceId());
+        $this->assertNotEquals($token, $cart->getToken());
     }
 
 }
