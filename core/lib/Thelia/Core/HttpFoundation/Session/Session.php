@@ -25,13 +25,14 @@ namespace Thelia\Core\HttpFoundation\Session;
 
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Thelia\Core\Security\User\UserInterface;
-use Thelia\Form\BaseForm;
-use Thelia\Model\ConfigQuery;
+use Thelia\Exception\InvalidCartException;
+use Thelia\Model\CartQuery;
+use Thelia\Model\Cart;
 use Thelia\Tools\URL;
 
-class Session extends BaseSession {
-
-	// -- Language ------------------------------------------------------------
+class Session extends BaseSession
+{
+    // -- Language ------------------------------------------------------------
 
     public function getLocale()
     {
@@ -47,41 +48,61 @@ class Session extends BaseSession {
 
     public function setCustomerUser(UserInterface $user)
     {
-    	$this->set('customer_user', $user);
+        $this->set('customer_user', $user);
     }
 
     public function getCustomerUser()
     {
-    	return $this->get('customer_user');
+        return $this->get('customer_user');
     }
 
     public function clearCustomerUser()
     {
-    	return $this->remove('customer_user');
+        return $this->remove('customer_user');
     }
 
     // -- Admin user -----------------------------------------------------------
 
     public function setAdminUser(UserInterface $user)
     {
-    	$this->set('admin_user', $user);
+        $this->set('admin_user', $user);
     }
 
     public function getAdminUser()
     {
-    	return $this->get('admin_user');
+        return $this->get('admin_user');
     }
 
     public function clearAdminUser()
     {
-    	return $this->remove('admin_user');
+        return $this->remove('admin_user');
+    }
+
+    // -- Error form -----------------------------------------------------------
+
+    /**
+     * @param string $formName the form name
+     */
+    public function setErrorFormName($formName)
+    {
+        $this->set('error_form', $formName);
+    }
+
+    public function getErrorFormName()
+    {
+        return $this->get('error_form', null);
+    }
+
+    public function clearErrorFormName()
+    {
+        return $this->remove('error_form');
     }
 
     // -- Return page ----------------------------------------------------------
 
     public function setReturnToUrl($url)
     {
-    	$this->set('return_to_url', $url);
+        $this->set('return_to_url', $url);
     }
 
     /**
@@ -90,7 +111,56 @@ class Session extends BaseSession {
      */
     public function getReturnToUrl()
     {
-    	return $this->get('return_to_url', URL::getIndexPage());
+        return $this->get('return_to_url', URL::getIndexPage());
+    }
+
+    // -- Cart ------------------------------------------------------------------
+
+    /**
+     * return cart if exists and is valid (checking customer)
+     *
+     * @return \Thelia\Model\Cart|null
+     */
+    public function getCart()
+    {
+        $cart_id =  $this->get("cart_id");
+        $cart = null;
+        if ($cart_id) {
+            $cart = CartQuery::create()->findPk($cart_id);
+            try {
+                $this->verifyValidCart($cart);
+            } catch (InvalidCartException $e) {
+                $cart = null;
+            }
+        }
+
+        return $cart;
+    }
+
+    /**
+     *
+     *
+     * @param \Thelia\Model\Cart $cart
+     * @throws \Thelia\Exception\InvalidCartException
+     */
+    protected function verifyValidCart(Cart $cart)
+    {
+        $customer = $this->getCustomerUser();
+        if ($customer && $cart->getCustomerId() != $customer->getId()) {
+            throw new InvalidCartException("customer in session and customer_id in cart are not the same");
+        } else if($customer === null && $cart->getCustomerId() !== null) {
+            throw new InvalidCartException("Customer exists in cart and not in session");
+        }
+    }
+
+    /**
+     * assign cart id in session
+     *
+     * @param $cart_id
+     */
+    public function setCart($cart_id)
+    {
+        $this->set("cart_id", $cart_id);
     }
 
 }
