@@ -32,21 +32,21 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CustomerQuery;
+use Thelia\Model\AddressQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Customer loop
+ * Address loop
  *
  *
- * Class Customer
+ * Class Address
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Customer extends BaseLoop
+class Address extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -54,16 +54,17 @@ class Customer extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createBooleanTypeArgument('current', 1),
             Argument::createIntListTypeArgument('id'),
             new Argument(
-                'ref',
+                'customer',
                 new TypeCollection(
-                    new Type\AlphaNumStringListType()
-                )
+                    new Type\IntType(),
+                    new Type\EnumType(array('current'))
+                ),
+                'current'
             ),
-            Argument::createBooleanTypeArgument('reseller'),
-            Argument::createIntTypeArgument('sponsor')
+            Argument::createBooleanTypeArgument('default'),
+            Argument::createIntListTypeArgument('exclude')
         );
     }
 
@@ -74,18 +75,7 @@ class Customer extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CustomerQuery::create();
-
-		$current = $this->getCurrent();
-
-        if ($current === true) {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
-            if($currentCustomer === null) {
-                return new LoopResult();
-            } else {
-                $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
-            }
-        }
+        $search = AddressQuery::create();
 
 		$id = $this->getId();
 
@@ -93,44 +83,58 @@ class Customer extends BaseLoop
             $search->filterById($id, Criteria::IN);
         }
 
-        $ref = $this->getRef();
+        $customer = $this->getCustomer();
 
-        if (null !== $ref) {
-            $search->filterByRef($ref, Criteria::IN);
+        if ($customer === 'current') {
+            $currentCustomer = $this->request->getSession()->getCustomerUser();
+            if($currentCustomer === null) {
+                return new LoopResult();
+            } else {
+                $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
+            }
+        } else {
+            $search->filterByCustomerId($customer, Criteria::EQUAL);
         }
 
-        $reseller = $this->getReseller();
+        $default = $this->getDefault();
 
-        if ($reseller === true) {
-            $search->filterByReseller(1, Criteria::EQUAL);
-        } else if($reseller === false) {
-            $search->filterByReseller(0, Criteria::EQUAL);
+        if ($default === true) {
+            $search->filterByIsDefault(1, Criteria::EQUAL);
+        } elseif($default === false) {
+            $search->filterByIsDefault(1, Criteria::NOT_EQUAL);
         }
 
-        $sponsor = $this->getSponsor();
+        $exclude = $this->getExclude();
 
-        if ($sponsor !== null) {
-            $search->filterBySponsor($sponsor, Criteria::EQUAL);
+        if (!is_null($exclude)) {
+            $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $customers = $this->search($search, $pagination);
+        $addresses = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($customers as $customer) {
+        foreach ($addresses as $address) {
 
-            if ($this->not_empty && $customer->countAllProducts() == 0) continue;
+            if ($this->not_empty && $address->countAllProducts() == 0) continue;
 
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $customer->getId());
-            $loopResultRow->set("REF", $customer->getRef());
-            $loopResultRow->set("TITLE", $customer->getTitleId());
-            $loopResultRow->set("FIRSTNAME", $customer->getFirstname());
-            $loopResultRow->set("LASTNAME", $customer->getLastname());
-            $loopResultRow->set("EMAIL", $customer->getEmail());
-            $loopResultRow->set("RESELLER", $customer->getReseller());
-            $loopResultRow->set("SPONSOR", $customer->getSponsor());
-            $loopResultRow->set("DISCOUNT", $customer->getDiscount());
+            $loopResultRow->set("ID", $address->getId());
+            $loopResultRow->set("NAME", $address->getName());
+            $loopResultRow->set("CUSTOMER", $address->getCustomerId());
+            $loopResultRow->set("TITLE", $address->getTitleId());
+            $loopResultRow->set("COMPANY", $address->getCompany());
+            $loopResultRow->set("FIRSTNAME", $address->getFirstname());
+            $loopResultRow->set("LASTNAME", $address->getLastname());
+            $loopResultRow->set("ADDRESS1", $address->getAddress1());
+            $loopResultRow->set("ADDRESS2", $address->getAddress2());
+            $loopResultRow->set("ADDRESS3", $address->getAddress3());
+            $loopResultRow->set("ZIPCODE", $address->getZipcode());
+            $loopResultRow->set("CITY", $address->getCity());
+            $loopResultRow->set("COUNTRY", $address->getCountryId());
+            $loopResultRow->set("PHONE", $address->getPhone());
+            $loopResultRow->set("CELLPHONE", $address->getCellphone());
+            $loopResultRow->set("DEFAULT", $address->getIsDefault());
 
             $loopResult->addRow($loopResultRow);
         }

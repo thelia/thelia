@@ -32,21 +32,21 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CustomerQuery;
+use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Customer loop
+ * Title loop
  *
  *
- * Class Customer
+ * Class Title
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Customer extends BaseLoop
+class Title extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -54,16 +54,7 @@ class Customer extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createBooleanTypeArgument('current', 1),
-            Argument::createIntListTypeArgument('id'),
-            new Argument(
-                'ref',
-                new TypeCollection(
-                    new Type\AlphaNumStringListType()
-                )
-            ),
-            Argument::createBooleanTypeArgument('reseller'),
-            Argument::createIntTypeArgument('sponsor')
+            Argument::createIntListTypeArgument('id')
         );
     }
 
@@ -74,18 +65,7 @@ class Customer extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CustomerQuery::create();
-
-		$current = $this->getCurrent();
-
-        if ($current === true) {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
-            if($currentCustomer === null) {
-                return new LoopResult();
-            } else {
-                $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
-            }
-        }
+        $search = CustomerTitleQuery::create();
 
 		$id = $this->getId();
 
@@ -93,44 +73,32 @@ class Customer extends BaseLoop
             $search->filterById($id, Criteria::IN);
         }
 
-        $ref = $this->getRef();
+        /**
+         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
+         *
+         * @todo : verify here if we want results for row without translations.
+         */
 
-        if (null !== $ref) {
-            $search->filterByRef($ref, Criteria::IN);
-        }
+        $search->joinWithI18n(
+            $this->request->getSession()->getLocale(),
+            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
+        );
 
-        $reseller = $this->getReseller();
+        $search->orderByPosition();
 
-        if ($reseller === true) {
-            $search->filterByReseller(1, Criteria::EQUAL);
-        } else if($reseller === false) {
-            $search->filterByReseller(0, Criteria::EQUAL);
-        }
-
-        $sponsor = $this->getSponsor();
-
-        if ($sponsor !== null) {
-            $search->filterBySponsor($sponsor, Criteria::EQUAL);
-        }
-
-        $customers = $this->search($search, $pagination);
+        $titles = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($customers as $customer) {
+        foreach ($titles as $title) {
 
-            if ($this->not_empty && $customer->countAllProducts() == 0) continue;
+            if ($this->not_empty && $title->countAllProducts() == 0) continue;
 
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $customer->getId());
-            $loopResultRow->set("REF", $customer->getRef());
-            $loopResultRow->set("TITLE", $customer->getTitleId());
-            $loopResultRow->set("FIRSTNAME", $customer->getFirstname());
-            $loopResultRow->set("LASTNAME", $customer->getLastname());
-            $loopResultRow->set("EMAIL", $customer->getEmail());
-            $loopResultRow->set("RESELLER", $customer->getReseller());
-            $loopResultRow->set("SPONSOR", $customer->getSponsor());
-            $loopResultRow->set("DISCOUNT", $customer->getDiscount());
+            $loopResultRow->set("ID", $title->getId());
+            $loopResultRow->set("DEFAULT", $title->getByDefault());
+            $loopResultRow->set("SHORT", $title->getShort());
+            $loopResultRow->set("LONG", $title->getLong());
 
             $loopResult->addRow($loopResultRow);
         }

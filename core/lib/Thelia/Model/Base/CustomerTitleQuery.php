@@ -523,7 +523,7 @@ abstract class CustomerTitleQuery extends ModelCriteria
     {
         if ($address instanceof \Thelia\Model\Address) {
             return $this
-                ->addUsingAlias(CustomerTitleTableMap::ID, $address->getCustomerTitleId(), $comparison);
+                ->addUsingAlias(CustomerTitleTableMap::ID, $address->getTitleId(), $comparison);
         } elseif ($address instanceof ObjectCollection) {
             return $this
                 ->useAddressQuery()
@@ -542,7 +542,7 @@ abstract class CustomerTitleQuery extends ModelCriteria
      *
      * @return ChildCustomerTitleQuery The current query, for fluid interface
      */
-    public function joinAddress($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinAddress($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Address');
@@ -577,7 +577,7 @@ abstract class CustomerTitleQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\AddressQuery A secondary query class using the current class as primary query
      */
-    public function useAddressQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useAddressQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinAddress($relationAlias, $joinType)

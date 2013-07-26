@@ -1,5 +1,10 @@
+<h1>CUSTOMER</h1>
+
+<h2>Information</h2>
+
+{loop name="customer" type="customer"}
+
 <table border="1" cellspacing="0" cellpadding="5">
-    {loop name="customer" type="customer"}
         <tr>
             <td>ID</td>
             <td>#ID</td>
@@ -10,7 +15,11 @@
         </tr>
         <tr>
             <td>Title</td>
-            <td>#TITLE</td>
+            <td>
+                {loop name="title" type="title" id="#TITLE"}
+                    #LONG (#SHORT)
+                {/loop}
+            </td>
         </tr>
         <tr>
             <td>Firstname</td>
@@ -36,5 +45,63 @@
             <td>Discount</td>
             <td>#DISCOUNT %</td>
         </tr>
-    {/loop}
 </table>
+
+{/loop}
+
+<h2>Addresses</h2>
+
+{loop name="addresses" type="address"}
+
+<table border="1" cellspacing="0" cellpadding="5">
+    <tr>
+        <td>ID</td>
+        <td>#ID</td>
+    </tr>
+    <tr>
+        <td>Name</td>
+        <td>#NAME</td>
+    </tr>
+    <tr>
+        <td>Title</td>
+        <td>
+            {loop name="title" type="title"}
+            #LONG (#SHORT)
+            {/loop}
+        </td>
+    </tr>
+    <tr>
+        <td>Company</td>
+        <td>#COMPANY</td>
+    </tr>
+    <tr>
+        <td>Firstname</td>
+        <td>#FIRSTNAME</td>
+    </tr>
+    <tr>
+        <td>Lastname</td>
+        <td>#LASTNAME</td>
+    </tr>
+    <tr>
+        <td>Address</td>
+        <td>#ADDRESS1<br/>#ADDRESS2<br/>#ADDRESS3</td>
+    </tr>
+    <tr>
+        <td>Zipcode</td>
+        <td>#ZIPCODE</td>
+    </tr>
+    <tr>
+        <td>City</td>
+        <td>#CITY</td>
+    </tr>
+    <tr>
+        <td>Phone</td>
+        <td>#PHONE</td>
+    </tr>
+    <tr>
+        <td>Cellphone</td>
+        <td>#CELLPHONE</td>
+    </tr>
+</table>
+
+{/loop}

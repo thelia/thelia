@@ -483,9 +483,9 @@ DROP TABLE IF EXISTS `address`;
 CREATE TABLE `address`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `title` VARCHAR(255),
+    `name` VARCHAR(255),
     `customer_id` INTEGER NOT NULL,
-    `customer_title_id` INTEGER,
+    `title_id` INTEGER NOT NULL,
     `company` VARCHAR(255),
     `firstname` VARCHAR(255) NOT NULL,
     `lastname` VARCHAR(255) NOT NULL,
@@ -502,15 +502,21 @@ CREATE TABLE `address`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_address_customer_id` (`customer_id`),
-    INDEX `idx_address_customer_title_id` (`customer_title_id`),
+    INDEX `idx_address_customer_title_id` (`title_id`),
+    INDEX `idx_address_country_id` (`country_id`),
     CONSTRAINT `fk_address_customer_id`
         FOREIGN KEY (`customer_id`)
         REFERENCES `customer` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
     CONSTRAINT `fk_address_customer_title_id`
-        FOREIGN KEY (`customer_title_id`)
+        FOREIGN KEY (`title_id`)
         REFERENCES `customer_title` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_address_country_id`
+        FOREIGN KEY (`country_id`)
+        REFERENCES `country` (`id`)
         ON UPDATE RESTRICT
         ON DELETE RESTRICT
 ) ENGINE=InnoDB;
