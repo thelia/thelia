@@ -26,7 +26,7 @@ namespace Thelia\Core\HttpFoundation\Session;
 use Symfony\Component\HttpFoundation\Session\Session as BaseSession;
 use Thelia\Core\Security\User\UserInterface;
 use Thelia\Exception\InvalidCartException;
-use Thelia\Model\Base\CartQuery;
+use Thelia\Model\CartQuery;
 use Thelia\Model\Cart;
 use Thelia\Tools\URL;
 
@@ -117,9 +117,9 @@ class Session extends BaseSession
     // -- Cart ------------------------------------------------------------------
 
     /**
-     * retrieve cart id in session
+     * return cart if exists and is valid (checking customer)
      *
-     * @return int cart id
+     * @return \Thelia\Model\Cart|null
      */
     public function getCart()
     {
@@ -137,6 +137,12 @@ class Session extends BaseSession
         return $cart;
     }
 
+    /**
+     *
+     *
+     * @param \Thelia\Model\Cart $cart
+     * @throws \Thelia\Exception\InvalidCartException
+     */
     protected function verifyValidCart(Cart $cart)
     {
         $customer = $this->getCustomerUser();

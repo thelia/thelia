@@ -98,15 +98,16 @@ class Cart implements EventSubscriberInterface
 
     public function getCart(Request $request)
     {
-        if (null !== $cartId = $request->getSession()->getCart()){
-            $cart = CartQuery::create()->findPk($cartId);
+
+        if(null !== $cart = $request->getSession()->getCart()){
+            return $cart;
         }
 
         if ($request->cookies->has("thelia_cart")) {
             //le cookie de panier existe, on le récupère
-            $cookie = $request->cookies->get("thelia_cart");
+            $token = $request->cookies->get("thelia_cart");
 
-            $cart = CartQuery::create()->findOneByToken($cookie);
+            $cart = CartQuery::create()->findOneByToken($token);
 
             if ($cart) {
                 //le panier existe en base
@@ -115,12 +116,12 @@ class Cart implements EventSubscriberInterface
                 if ($customer) {
                     if($cart->getCustomerId() != $customer->getId()) {
                         //le customer du panier n'est pas le mm que celui connecté, il faut cloner le panier sans le customer_id
-                        $cart = $cart->duplicate($customer);
+                        $cart = $this->duplicateCart($cart, $request->getSession(), $customer);
                     }
                 } else {
                     if ($cart->getCustomerId() != null) {
                         //il faut dupliquer le panier sans le customer_id
-                        $cart = $cart->duplicate();
+                        $cart = $this->duplicateCart($cart, $request->getSession());
                     }
                 }
 
@@ -135,7 +136,11 @@ class Cart implements EventSubscriberInterface
         return $cart;
     }
 
-    public function createCart(Session $session)
+    /**
+     * @param Session $session
+     * @return CartModel
+     */
+    protected function createCart(Session $session)
     {
         $cart = new CartModel();
         $cart->setToken($this->generateCookie());
@@ -152,17 +157,25 @@ class Cart implements EventSubscriberInterface
     }
 
 
+    /**
+     * @param CartModel $cart
+     * @param Session $session
+     * @param Customer $customer
+     * @return CartModel
+     */
+    protected function duplicateCart(CartModel $cart, Session $session, Customer $customer = null)
+    {
+        $newCart = $cart->duplicate($this->generateCookie(), $customer);
+        $session->setCart($newCart->getId());
+
+        return $newCart;
+    }
+
     public function generateCookie()
     {
         $id = uniqid('', true);
-
-        setcookie("thelia_cart", $id, time());
+        setcookie("thelia_cart", $id, uniqid('', true));
 
         return $id;
-    }
-
-    public function addItem()
-    {
-
     }
 }
