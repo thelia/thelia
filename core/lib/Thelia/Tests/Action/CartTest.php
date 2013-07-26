@@ -105,13 +105,13 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $actionCart = $this->actionCart;
 
         $request = $this->request;
-
+        $uniqid = uniqid("test1", true);
         //create a fake cart in database;
         $cart = new Cart();
-        $cart->setToken($this->uniqid);
+        $cart->setToken($uniqid);
         $cart->save();
 
-        $request->cookies->set("thelia_cart", $this->uniqid);
+        $request->cookies->set("thelia_cart", $uniqid);
 
         $getCart = $actionCart->getCart($request);
         $this->assertInstanceOf("Thelia\Model\Cart", $getCart, '$cart must be an instance of cart model Thelia\Model\Cart');
@@ -136,6 +136,74 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($cart->getAddressDeliveryId());
         $this->assertNull($cart->getAddressInvoiceId());
         $this->assertNotEquals($token, $cart->getToken());
+    }
+
+    public function testGetCartWithExistingCartAndCustomer()
+    {
+        $actionCart = $this->actionCart;
+
+        $request = $this->request;
+
+
+        //create a fake customer just for test. If not persists test fails !
+        $customer = new Customer();
+        $customer->setFirstname("john");
+        $customer->setLastname("doe");
+        $customer->setTitleId(1);
+        $customer->save();
+
+        $uniqid = uniqid("test2", true);
+        //create a fake cart in database;
+        $cart = new Cart();
+        $cart->setToken($uniqid);
+        $cart->setCustomer($customer);
+        $cart->save();
+
+        $request->cookies->set("thelia_cart", $uniqid);
+
+        $request->getSession()->setCustomerUser($customer);
+
+        $getCart = $actionCart->getCart($request);
+        $this->assertInstanceOf("Thelia\Model\Cart", $getCart, '$cart must be an instance of cart model Thelia\Model\Cart');
+        $this->assertNotNull($getCart->getCustomerId());
+        $this->assertNull($getCart->getAddressDeliveryId());
+        $this->assertNull($getCart->getAddressInvoiceId());
+        $this->assertEquals($cart->getToken(), $getCart->getToken(), "token must be the same");
+        $this->assertEquals($customer->getId(), $getCart->getCustomerId());
+    }
+
+    public function testGetCartWithExistinsCartAndCustomerButNotSameCustomerId()
+    {
+        $actionCart = $this->actionCart;
+
+        $request = $this->request;
+
+
+        //create a fake customer just for test. If not persists test fails !
+        $customer = new Customer();
+        $customer->setFirstname("john");
+        $customer->setLastname("doe");
+        $customer->setTitleId(1);
+        $customer->save();
+
+        $uniqid = uniqid("test3", true);
+        //create a fake cart in database;
+        $cart = new Cart();
+        $cart->setToken($uniqid);
+
+        $cart->save();
+
+        $request->cookies->set("thelia_cart", $uniqid);
+
+        $request->getSession()->setCustomerUser($customer);
+
+        $getCart = $actionCart->getCart($request);
+        $this->assertInstanceOf("Thelia\Model\Cart", $getCart, '$cart must be an instance of cart model Thelia\Model\Cart');
+        $this->assertNotNull($getCart->getCustomerId());
+        $this->assertNull($getCart->getAddressDeliveryId());
+        $this->assertNull($getCart->getAddressInvoiceId());
+        $this->assertNotEquals($cart->getToken(), $getCart->getToken(), "token must be different");
+        $this->assertEquals($customer->getId(), $getCart->getCustomerId());
     }
 
 }
