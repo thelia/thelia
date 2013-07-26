@@ -61,6 +61,11 @@ class CartTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->uniqid));
     }
 
+    /**
+     * no cart present in session and cart_id no yet exists in cookies.
+     *
+     * In this case, a new cart instance must be create
+     */
     public function testGetCartWithoutCustomerAndWithoutExistingCart()
     {
         $actionCart = $this->actionCart;
@@ -75,6 +80,11 @@ class CartTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Customer is connected but his cart does not exists yet
+     *
+     * Cart must be created and associated to the current connected Customer
+     */
     public function testGetCartWithCustomerAndWithoutExistingCart()
     {
         $actionCart = $this->actionCart;
@@ -100,6 +110,11 @@ class CartTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    /**
+     * Cart exists and his id put in cookies.
+     *
+     * Must return the same cart instance
+     */
     public function testGetCartWithoutCustomerAndWithExistingCart()
     {
         $actionCart = $this->actionCart;
@@ -121,6 +136,11 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($cart->getToken(), $getCart->getToken());
     }
 
+    /**
+     * a cart id exists in cookies but this id does not exists yet in databases
+     *
+     * a new cart must be created (different token)
+     */
     public function testGetCartWithExistingCartButNotGoodCookies()
     {
         $actionCart = $this->actionCart;
@@ -138,6 +158,9 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($token, $cart->getToken());
     }
 
+    /**
+     *
+     */
     public function testGetCartWithExistingCartAndCustomer()
     {
         $actionCart = $this->actionCart;

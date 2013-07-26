@@ -174,7 +174,7 @@ class Cart implements EventSubscriberInterface
     protected function generateCookie()
     {
         $id = uniqid('', true);
-        setcookie("thelia_cart", $id, uniqid('', true));
+        setcookie("thelia_cart", $id, time()+(60*60*24*365));
 
         return $id;
     }
