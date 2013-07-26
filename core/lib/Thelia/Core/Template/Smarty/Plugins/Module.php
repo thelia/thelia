@@ -24,9 +24,9 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 
-class Module implements SmartyPluginInterface
+class Module extends AbstractSmartyPlugin
 {
     /**
      * Process theliaModule template inclusion function

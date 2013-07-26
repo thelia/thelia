@@ -11,12 +11,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/ezyang/htmlpurifier.git",
-                "reference": "107b3055a10eb824701463602f77fbc8129180a2"
+                "reference": "af7107e8304e0ac0ad6fc2dfbecc9062d90e0b17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/107b3055a10eb824701463602f77fbc8129180a2",
-                "reference": "107b3055a10eb824701463602f77fbc8129180a2",
+                "url": "https://api.github.com/repos/ezyang/htmlpurifier/zipball/af7107e8304e0ac0ad6fc2dfbecc9062d90e0b17",
+                "reference": "af7107e8304e0ac0ad6fc2dfbecc9062d90e0b17",
                 "shasum": ""
             },
             "require": {
@@ -47,7 +47,7 @@
             "keywords": [
                 "html"
             ],
-            "time": "2013-07-17 04:56:29"
+            "time": "2013-07-18 17:22:45"
         },
         {
             "name": "ircmaxell/password-compat",
@@ -304,12 +304,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/krichprollsch/phpCssEmbed.git",
-                "reference": "v1.0.1"
+                "reference": "v1.0.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/krichprollsch/phpCssEmbed/zipball/v1.0.1",
-                "reference": "v1.0.1",
+                "url": "https://api.github.com/repos/krichprollsch/phpCssEmbed/zipball/v1.0.2",
+                "reference": "v1.0.2",
                 "shasum": ""
             },
             "require": {
@@ -337,7 +337,7 @@
                 "css",
                 "url"
             ],
-            "time": "2013-04-29 19:58:29"
+            "time": "2013-07-22 20:01:48"
         },
         {
             "name": "simplepie/simplepie",

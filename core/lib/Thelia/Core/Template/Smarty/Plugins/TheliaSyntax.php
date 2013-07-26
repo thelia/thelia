@@ -23,7 +23,7 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 
 /**
  * Class TheliaSyntax
@@ -31,7 +31,7 @@ use Thelia\Core\Template\Smarty\SmartyPluginInterface;
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class TheliaSyntax implements SmartyPluginInterface
+class TheliaSyntax extends AbstractSmartyPlugin
 {
     public function dieseCancel($value, $diese)
     {

@@ -37,6 +37,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
+use Thelia\Core\Event\ActionEvent;
 
 /**
  *
@@ -134,9 +135,20 @@ class BaseAdminController extends ContainerAware
     }
 
     /**
+     * Dispatch a Thelia event to modules
+     *
+     * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param ActionEvent $event the event
+     */
+    protected function dispatch($eventName, ActionEvent $event = null) {
+
+    	$this->container->get("event_dispatcher")->dispatch($eventName, $event);
+    }
+
+    /**
      * Returns the session from the current request
      *
-     * @return Ambigous <NULL, \Symfony\Component\HttpFoundation\Session\SessionInterface>
+     * @return \Symfony\Component\HttpFoundation\Session\SessionInterface
      */
     protected function getSession() {
 
@@ -146,8 +158,7 @@ class BaseAdminController extends ContainerAware
     }
 
     /**
-     *
-     * @return a ParserInterface instance parser, as configured.
+     * @return a ParserInterface instance parser
      */
     protected function getParser()
     {
@@ -157,16 +168,6 @@ class BaseAdminController extends ContainerAware
         $parser->setTemplate(ConfigQuery::read('base_admin_template', 'admin/default'));
 
         return $parser;
-    }
-
-    protected function getFormFactory()
-    {
-        return BaseForm::getFormFactory($this->getRequest(), ConfigQuery::read("form.secret.admin", md5(__DIR__)));
-    }
-
-    protected function getFormBuilder()
-    {
-        return $this->getFormFactory()->createBuilder("form");
     }
 
     /**
