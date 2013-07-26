@@ -159,7 +159,9 @@ class CartTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * cart and customer already exists. Cart and customer are linked.
      *
+     * cart in session must be return
      */
     public function testGetCartWithExistingCartAndCustomer()
     {
@@ -195,6 +197,11 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($customer->getId(), $getCart->getCustomerId());
     }
 
+    /**
+     * Customer is connected but cart not associated to him
+     *
+     * A new cart must be created (duplicated) containing customer id
+     */
     public function testGetCartWithExistinsCartAndCustomerButNotSameCustomerId()
     {
         $actionCart = $this->actionCart;
