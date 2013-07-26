@@ -31,13 +31,13 @@ use Thelia\Model\Customer;
 class CartTest extends \PHPUnit_Framework_TestCase
 {
 
-    public $session;
+    protected $session;
 
-    public $request;
+    protected $request;
 
-    public $actionCart;
+    protected $actionCart;
 
-    public $uniqid;
+    protected $uniqid;
 
 
 
