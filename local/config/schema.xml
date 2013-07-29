@@ -239,19 +239,19 @@
     <column name="attribute_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="attribute_av_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="stock_id" primaryKey="true" required="true" type="INTEGER" />
-    <foreign-key foreignTable="attribute" name="fk_ attribute_combination_attribute_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="attribute" name="fk_attribute_combination_attribute_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
-    <foreign-key foreignTable="attribute_av" name="fk_ attribute_combination_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="attribute_av" name="fk_attribute_combination_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_av_id" />
     </foreign-key>
     <foreign-key foreignTable="stock" name="fk_attribute_combination_stock_id">
       <reference foreign="id" local="stock_id" />
     </foreign-key>
-    <index name="idx_ attribute_combination_attribute_id">
+    <index name="idx_attribute_combination_attribute_id">
       <index-column name="attribute_id" />
     </index>
-    <index name="idx_ attribute_combination_attribute_av_id">
+    <index name="idx_attribute_combination_attribute_av_id">
       <index-column name="attribute_av_id" />
     </index>
     <index name="idx_attribute_combination_stock_id">
