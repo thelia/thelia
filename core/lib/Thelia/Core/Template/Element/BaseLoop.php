@@ -45,8 +45,9 @@ abstract class BaseLoop
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
      */
     protected $dispatcher;
+
     /**
-     * @var Thelia\Core\Security\SecurityContext
+     * @var SecurityContext
      */
     protected $securityContext;
 
@@ -56,9 +57,9 @@ abstract class BaseLoop
     /**
      * Create a new Loop
      *
-     * @param \Symfony\Component\HttpFoundation\Request                   $request
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-     * @param Thelia\Core\Security\SecurityContext $securityContext
+     * @param Request                  $request
+     * @param EventDispatcherInterface $dispatcher
+     * @param SecurityContext          $securityContext
      */
     public function __construct(Request $request, EventDispatcherInterface $dispatcher, SecurityContext $securityContext)
     {
@@ -66,20 +67,20 @@ abstract class BaseLoop
         $this->dispatcher = $dispatcher;
         $this->securityContext = $securityContext;
 
-        $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs());
+        $this->args = $this->getArgDefinitions()->addArguments($this->getDefaultArgs(), false);
     }
 
     /**
      * Define common loop arguments
      *
-     * @return an array ofL \Thelia\Core\Template\Loop\Argument\Argument
+     * @return Argument[]
      */
     protected function getDefaultArgs()
     {
     	return array(
-    			Argument::createIntTypeArgument('offset', 0),
-    			Argument::createIntTypeArgument('page'),
-    			Argument::createIntTypeArgument('limit', 10),
+            Argument::createIntTypeArgument('offset', 0),
+            Argument::createIntTypeArgument('page'),
+            Argument::createIntTypeArgument('limit', 10),
     	);
     }
 
@@ -87,7 +88,9 @@ abstract class BaseLoop
      * Provides a getter to loop parameters
      *
      * @param string $name the methode name (only getArgname is supported)
-     * @param mixed $arguments this parameter is ignored
+     * @param $arguments this parameter is ignored
+     *
+     * @return null
      * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported.
      */
     public function __call($name, $arguments) {

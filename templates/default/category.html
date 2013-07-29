@@ -47,9 +47,11 @@
 {/loop*}
 
 {loop name="product" type="product" order="ref"}
-    <h3>PRODUCT : #REF / #TITLE</h3>
+    <h3>PRODUCT #ID : #REF / #TITLE</h3>
     <h4>Accessories</h4>
+        <ul>
     {loop name="acc" type="accessory" product="#ID" order="accessory,max_price"}
-        #REF -
+        <li>#REF</li>
     {/loop}
+        </ul>
 {/loop}

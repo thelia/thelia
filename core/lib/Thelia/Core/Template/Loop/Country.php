@@ -32,7 +32,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CustomerCountryQuery;
+use Thelia\Model\CountryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -54,7 +54,11 @@ class Country extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntTypeArgument('limit', 500), // overwrite orginal param to increase the limit
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('area'),
+            Argument::createBooleanTypeArgument('with_area'),
+            Argument::createIntListTypeArgument('exclude')
         );
     }
 
@@ -65,12 +69,26 @@ class Country extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CustomerCountryQuery::create();
+        $search = CountryQuery::create();
 
 		$id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
+        }
+
+        $area = $this->getArea();
+
+        if (null !== $area) {
+            $search->filterByAreaId($area, Criteria::IN);
+        }
+
+        $withArea = $this->getWith_area();
+
+        if (true === $withArea) {
+            $search->filterByAreaId(null, Criteria::ISNOTNULL);
+        } elseif (false == $withArea) {
+            $search->filterByAreaId(null, Criteria::ISNULL);
         }
 
         /**
@@ -84,21 +102,23 @@ class Country extends BaseLoop
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
-        $search->orderByPosition();
+        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CountryI18nTableMap::TITLE);
 
         $countrys = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
         foreach ($countrys as $country) {
-
-            if ($this->not_empty && $country->countAllProducts() == 0) continue;
-
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $country->getId());
-            $loopResultRow->set("DEFAULT", $country->getByDefault());
-            $loopResultRow->set("SHORT", $country->getShort());
-            $loopResultRow->set("LONG", $country->getLong());
+            $loopResultRow->set("AREA", $country->getAreaId());
+            $loopResultRow->set("TITLE", $country->getTitle());
+            $loopResultRow->set("CHAPO", $country->getChapo());
+            $loopResultRow->set("DESCRIPTION", $country->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $country->getPostscriptum());
+            $loopResultRow->set("ISOCODE", $country->getIsocode());
+            $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
+            $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());
 
             $loopResult->addRow($loopResultRow);
         }

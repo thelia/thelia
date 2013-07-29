@@ -118,9 +118,6 @@ class Customer extends BaseLoop
         $loopResult = new LoopResult();
 
         foreach ($customers as $customer) {
-
-            if ($this->not_empty && $customer->countAllProducts() == 0) continue;
-
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $customer->getId());
             $loopResultRow->set("REF", $customer->getRef());

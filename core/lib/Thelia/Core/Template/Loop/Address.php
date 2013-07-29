@@ -115,9 +115,6 @@ class Address extends BaseLoop
         $loopResult = new LoopResult();
 
         foreach ($addresses as $address) {
-
-            if ($this->not_empty && $address->countAllProducts() == 0) continue;
-
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $address->getId());
             $loopResultRow->set("NAME", $address->getName());
