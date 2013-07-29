@@ -16,6 +16,7 @@ $request = Request::createFromGlobals();
 
 if ( false === in_array($request->getClientIp(), $trustIp)) {
     //change request to send to a 404 error page
+    exit;
 }
 
 $thelia = new Thelia("dev", true);
