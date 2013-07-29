@@ -350,7 +350,6 @@ DROP TABLE IF EXISTS `stock`;
 CREATE TABLE `stock`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `combination_id` INTEGER,
     `product_id` INTEGER NOT NULL,
     `increase` FLOAT,
     `quantity` FLOAT NOT NULL,

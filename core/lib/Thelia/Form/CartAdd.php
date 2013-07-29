@@ -64,10 +64,10 @@ class CartAdd extends BaseForm
                     ))
                 )
             ))
-            ->add("combination", "hidden", array(
+            ->add("stock_id", "hidden", array(
                 "constraints" => array(
                     new Constraints\Callback(array(
-                        "methods" => array($this, "checkCombination")
+                        "methods" => array($this, "checkStockAvailability")
                     ))
                 )
 
@@ -94,18 +94,15 @@ class CartAdd extends BaseForm
         }
     }
 
-    protected function checkCombination($value, ExecutionContextInterface $context)
+    protected function checkStockAvailability($value, ExecutionContextInterface $context)
     {
         if ($value) {
             $data = $context->getRoot()->getData();
 
-            $stock = StockQuery::create()
-                ->filterByProductId($data["product"])
-                ->filterByCombinationId($value, Criteria::EQUAL)
-                ->findOne();
+            $stock = StockQuery::create()->findPk($value);
 
             if (is_null($stock)) {
-                throw new CombinationNotFoundException(sprintf("This combination id does not exists for this product : %d", $value));
+                throw new CombinationNotFoundException(sprintf("This stock_id does not exists for this product : %d", $value));
             }
         }
     }

@@ -70,12 +70,6 @@ abstract class Stock implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the combination_id field.
-     * @var        int
-     */
-    protected $combination_id;
-
-    /**
      * The value for the product_id field.
      * @var        int
      */
@@ -454,17 +448,6 @@ abstract class Stock implements ActiveRecordInterface
     }
 
     /**
-     * Get the [combination_id] column value.
-     *
-     * @return   int
-     */
-    public function getCombinationId()
-    {
-
-        return $this->combination_id;
-    }
-
-    /**
      * Get the [product_id] column value.
      *
      * @return   int
@@ -590,27 +573,6 @@ abstract class Stock implements ActiveRecordInterface
 
         return $this;
     } // setId()
-
-    /**
-     * Set the value of [combination_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Stock The current object (for fluent API support)
-     */
-    public function setCombinationId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->combination_id !== $v) {
-            $this->combination_id = $v;
-            $this->modifiedColumns[] = StockTableMap::COMBINATION_ID;
-        }
-
-
-        return $this;
-    } // setCombinationId()
 
     /**
      * Set the value of [product_id] column.
@@ -832,34 +794,31 @@ abstract class Stock implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : StockTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : StockTableMap::translateFieldName('CombinationId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->combination_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : StockTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : StockTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : StockTableMap::translateFieldName('Increase', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : StockTableMap::translateFieldName('Increase', TableMap::TYPE_PHPNAME, $indexType)];
             $this->increase = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : StockTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : StockTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->quantity = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : StockTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : StockTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : StockTableMap::translateFieldName('Newness', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : StockTableMap::translateFieldName('Newness', TableMap::TYPE_PHPNAME, $indexType)];
             $this->newness = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : StockTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : StockTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
             $this->weight = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : StockTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : StockTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : StockTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : StockTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -872,7 +831,7 @@ abstract class Stock implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 10; // 10 = StockTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = StockTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Stock object", 0, $e);
@@ -1168,9 +1127,6 @@ abstract class Stock implements ActiveRecordInterface
         if ($this->isColumnModified(StockTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(StockTableMap::COMBINATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'COMBINATION_ID';
-        }
         if ($this->isColumnModified(StockTableMap::PRODUCT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
@@ -1208,9 +1164,6 @@ abstract class Stock implements ActiveRecordInterface
                 switch ($columnName) {
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
-                    case 'COMBINATION_ID':
-                        $stmt->bindValue($identifier, $this->combination_id, PDO::PARAM_INT);
                         break;
                     case 'PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
@@ -1302,30 +1255,27 @@ abstract class Stock implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getCombinationId();
-                break;
-            case 2:
                 return $this->getProductId();
                 break;
-            case 3:
+            case 2:
                 return $this->getIncrease();
                 break;
-            case 4:
+            case 3:
                 return $this->getQuantity();
                 break;
-            case 5:
+            case 4:
                 return $this->getPromo();
                 break;
-            case 6:
+            case 5:
                 return $this->getNewness();
                 break;
-            case 7:
+            case 6:
                 return $this->getWeight();
                 break;
-            case 8:
+            case 7:
                 return $this->getCreatedAt();
                 break;
-            case 9:
+            case 8:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1358,15 +1308,14 @@ abstract class Stock implements ActiveRecordInterface
         $keys = StockTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getCombinationId(),
-            $keys[2] => $this->getProductId(),
-            $keys[3] => $this->getIncrease(),
-            $keys[4] => $this->getQuantity(),
-            $keys[5] => $this->getPromo(),
-            $keys[6] => $this->getNewness(),
-            $keys[7] => $this->getWeight(),
-            $keys[8] => $this->getCreatedAt(),
-            $keys[9] => $this->getUpdatedAt(),
+            $keys[1] => $this->getProductId(),
+            $keys[2] => $this->getIncrease(),
+            $keys[3] => $this->getQuantity(),
+            $keys[4] => $this->getPromo(),
+            $keys[5] => $this->getNewness(),
+            $keys[6] => $this->getWeight(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1425,30 +1374,27 @@ abstract class Stock implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setCombinationId($value);
-                break;
-            case 2:
                 $this->setProductId($value);
                 break;
-            case 3:
+            case 2:
                 $this->setIncrease($value);
                 break;
-            case 4:
+            case 3:
                 $this->setQuantity($value);
                 break;
-            case 5:
+            case 4:
                 $this->setPromo($value);
                 break;
-            case 6:
+            case 5:
                 $this->setNewness($value);
                 break;
-            case 7:
+            case 6:
                 $this->setWeight($value);
                 break;
-            case 8:
+            case 7:
                 $this->setCreatedAt($value);
                 break;
-            case 9:
+            case 8:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1476,15 +1422,14 @@ abstract class Stock implements ActiveRecordInterface
         $keys = StockTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setCombinationId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setProductId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setIncrease($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setQuantity($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setPromo($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setNewness($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setWeight($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
+        if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setIncrease($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setQuantity($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setPromo($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setNewness($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setWeight($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
     }
 
     /**
@@ -1497,7 +1442,6 @@ abstract class Stock implements ActiveRecordInterface
         $criteria = new Criteria(StockTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(StockTableMap::ID)) $criteria->add(StockTableMap::ID, $this->id);
-        if ($this->isColumnModified(StockTableMap::COMBINATION_ID)) $criteria->add(StockTableMap::COMBINATION_ID, $this->combination_id);
         if ($this->isColumnModified(StockTableMap::PRODUCT_ID)) $criteria->add(StockTableMap::PRODUCT_ID, $this->product_id);
         if ($this->isColumnModified(StockTableMap::INCREASE)) $criteria->add(StockTableMap::INCREASE, $this->increase);
         if ($this->isColumnModified(StockTableMap::QUANTITY)) $criteria->add(StockTableMap::QUANTITY, $this->quantity);
@@ -1569,7 +1513,6 @@ abstract class Stock implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setCombinationId($this->getCombinationId());
         $copyObj->setProductId($this->getProductId());
         $copyObj->setIncrease($this->getIncrease());
         $copyObj->setQuantity($this->getQuantity());
@@ -2493,7 +2436,6 @@ abstract class Stock implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->combination_id = null;
         $this->product_id = null;
         $this->increase = null;
         $this->quantity = null;

@@ -22,7 +22,6 @@ use Thelia\Model\Map\StockTableMap;
  *
  *
  * @method     ChildStockQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildStockQuery orderByCombinationId($order = Criteria::ASC) Order by the combination_id column
  * @method     ChildStockQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildStockQuery orderByIncrease($order = Criteria::ASC) Order by the increase column
  * @method     ChildStockQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
@@ -33,7 +32,6 @@ use Thelia\Model\Map\StockTableMap;
  * @method     ChildStockQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildStockQuery groupById() Group by the id column
- * @method     ChildStockQuery groupByCombinationId() Group by the combination_id column
  * @method     ChildStockQuery groupByProductId() Group by the product_id column
  * @method     ChildStockQuery groupByIncrease() Group by the increase column
  * @method     ChildStockQuery groupByQuantity() Group by the quantity column
@@ -67,7 +65,6 @@ use Thelia\Model\Map\StockTableMap;
  * @method     ChildStock findOneOrCreate(ConnectionInterface $con = null) Return the first ChildStock matching the query, or a new ChildStock object populated from the query conditions when no match is found
  *
  * @method     ChildStock findOneById(int $id) Return the first ChildStock filtered by the id column
- * @method     ChildStock findOneByCombinationId(int $combination_id) Return the first ChildStock filtered by the combination_id column
  * @method     ChildStock findOneByProductId(int $product_id) Return the first ChildStock filtered by the product_id column
  * @method     ChildStock findOneByIncrease(double $increase) Return the first ChildStock filtered by the increase column
  * @method     ChildStock findOneByQuantity(double $quantity) Return the first ChildStock filtered by the quantity column
@@ -78,7 +75,6 @@ use Thelia\Model\Map\StockTableMap;
  * @method     ChildStock findOneByUpdatedAt(string $updated_at) Return the first ChildStock filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildStock objects filtered by the id column
- * @method     array findByCombinationId(int $combination_id) Return ChildStock objects filtered by the combination_id column
  * @method     array findByProductId(int $product_id) Return ChildStock objects filtered by the product_id column
  * @method     array findByIncrease(double $increase) Return ChildStock objects filtered by the increase column
  * @method     array findByQuantity(double $quantity) Return ChildStock objects filtered by the quantity column
@@ -175,7 +171,7 @@ abstract class StockQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, COMBINATION_ID, PRODUCT_ID, INCREASE, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM stock WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, INCREASE, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM stock WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -303,47 +299,6 @@ abstract class StockQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(StockTableMap::ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query on the combination_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCombinationId(1234); // WHERE combination_id = 1234
-     * $query->filterByCombinationId(array(12, 34)); // WHERE combination_id IN (12, 34)
-     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
-     * </code>
-     *
-     * @param     mixed $combinationId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildStockQuery The current query, for fluid interface
-     */
-    public function filterByCombinationId($combinationId = null, $comparison = null)
-    {
-        if (is_array($combinationId)) {
-            $useMinMax = false;
-            if (isset($combinationId['min'])) {
-                $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($combinationId['max'])) {
-                $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId, $comparison);
     }
 
     /**
