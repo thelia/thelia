@@ -25,7 +25,7 @@ namespace Thelia\Form;
 use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Action\Exception\CombinationNotFoundException;
+use Thelia\Action\Exception\StockNotFoundException;
 use Thelia\Action\Exception\ProductNotFoundException;
 use Thelia\Model\Base\StockQuery;
 use Thelia\Model\ProductQuery;
@@ -77,7 +77,8 @@ class CartAdd extends BaseForm
                     new Constraints\NotBlank(),
                     new Constraints\Callback(array(
                         "methods" => array($this, "checkStock")
-                    ))
+                    )),
+                    new
                 )
             ))
             ->add("append", "hidden")
@@ -99,10 +100,13 @@ class CartAdd extends BaseForm
         if ($value) {
             $data = $context->getRoot()->getData();
 
-            $stock = StockQuery::create()->findPk($value);
+            $stock = StockQuery::create()
+                ->filterById($value)
+                ->filterByProductId($data["product"])
+                ->count();
 
-            if (is_null($stock)) {
-                throw new CombinationNotFoundException(sprintf("This stock_id does not exists for this product : %d", $value));
+            if ($stock == 0) {
+                throw new StockNotFoundException(sprintf("This stock_id does not exists for this product : %d", $value));
             }
         }
     }
@@ -111,12 +115,13 @@ class CartAdd extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        $product = ProductQuery::create()->findPk($data["product"]);
+        $stock = StockQuery::create()
+            ->filterById($data["stock_id"])
+            ->filterByProductId($data["product"])
+            ->findOne();
 
-        if ($product) {
-             if(false === $product->stockIsValid($value, $data["combination"])) {
-                $context->addViolation("quantity value is not valid");
-             }
+        if ($stock->getQuantity() < $value) {
+            $context->addViolation("quantity value is not valid");
         }
 
     }

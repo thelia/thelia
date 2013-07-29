@@ -24,7 +24,7 @@
 namespace Thelia\Action\Exception;
 
 
-class CombinationNotFoundException extends ActionException
+class StockNotFoundException extends ActionException
 {
 
 }

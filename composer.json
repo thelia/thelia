@@ -26,9 +26,9 @@
         "symfony-cmf/routing": "1.0.0",
 
         "symfony/form": "2.2.*",
-        "symfony/validator": "2.2.*",
+        "symfony/validator": "2.3.*",
 
-        "smarty/smarty": "v3.1.13",
+        "smarty/smarty": "v3.1.14",
         "kriswallsmith/assetic": "1.2.*@dev",
         "leafo/lessphp": "0.3.*@dev",
         "ptachoire/cssembed": "dev-master",
