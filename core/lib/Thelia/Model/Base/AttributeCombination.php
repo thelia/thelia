@@ -22,8 +22,8 @@ use Thelia\Model\AttributeAvQuery as ChildAttributeAvQuery;
 use Thelia\Model\AttributeCombination as ChildAttributeCombination;
 use Thelia\Model\AttributeCombinationQuery as ChildAttributeCombinationQuery;
 use Thelia\Model\AttributeQuery as ChildAttributeQuery;
-use Thelia\Model\Combination as ChildCombination;
-use Thelia\Model\CombinationQuery as ChildCombinationQuery;
+use Thelia\Model\Stock as ChildStock;
+use Thelia\Model\StockQuery as ChildStockQuery;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 
 abstract class AttributeCombination implements ActiveRecordInterface
@@ -61,28 +61,22 @@ abstract class AttributeCombination implements ActiveRecordInterface
     protected $virtualColumns = array();
 
     /**
-     * The value for the id field.
-     * @var        int
-     */
-    protected $id;
-
-    /**
      * The value for the attribute_id field.
      * @var        int
      */
     protected $attribute_id;
 
     /**
-     * The value for the combination_id field.
-     * @var        int
-     */
-    protected $combination_id;
-
-    /**
      * The value for the attribute_av_id field.
      * @var        int
      */
     protected $attribute_av_id;
+
+    /**
+     * The value for the stock_id field.
+     * @var        int
+     */
+    protected $stock_id;
 
     /**
      * The value for the created_at field.
@@ -107,9 +101,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
     protected $aAttributeAv;
 
     /**
-     * @var        Combination
+     * @var        Stock
      */
-    protected $aCombination;
+    protected $aStock;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -374,17 +368,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Get the [id] column value.
-     *
-     * @return   int
-     */
-    public function getId()
-    {
-
-        return $this->id;
-    }
-
-    /**
      * Get the [attribute_id] column value.
      *
      * @return   int
@@ -396,17 +379,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Get the [combination_id] column value.
-     *
-     * @return   int
-     */
-    public function getCombinationId()
-    {
-
-        return $this->combination_id;
-    }
-
-    /**
      * Get the [attribute_av_id] column value.
      *
      * @return   int
@@ -415,6 +387,17 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
 
         return $this->attribute_av_id;
+    }
+
+    /**
+     * Get the [stock_id] column value.
+     *
+     * @return   int
+     */
+    public function getStockId()
+    {
+
+        return $this->stock_id;
     }
 
     /**
@@ -458,27 +441,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Set the value of [id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
-     */
-    public function setId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->id !== $v) {
-            $this->id = $v;
-            $this->modifiedColumns[] = AttributeCombinationTableMap::ID;
-        }
-
-
-        return $this;
-    } // setId()
-
-    /**
      * Set the value of [attribute_id] column.
      *
      * @param      int $v new value
@@ -504,31 +466,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
     } // setAttributeId()
 
     /**
-     * Set the value of [combination_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
-     */
-    public function setCombinationId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->combination_id !== $v) {
-            $this->combination_id = $v;
-            $this->modifiedColumns[] = AttributeCombinationTableMap::COMBINATION_ID;
-        }
-
-        if ($this->aCombination !== null && $this->aCombination->getId() !== $v) {
-            $this->aCombination = null;
-        }
-
-
-        return $this;
-    } // setCombinationId()
-
-    /**
      * Set the value of [attribute_av_id] column.
      *
      * @param      int $v new value
@@ -552,6 +489,31 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         return $this;
     } // setAttributeAvId()
+
+    /**
+     * Set the value of [stock_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
+     */
+    public function setStockId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->stock_id !== $v) {
+            $this->stock_id = $v;
+            $this->modifiedColumns[] = AttributeCombinationTableMap::STOCK_ID;
+        }
+
+        if ($this->aStock !== null && $this->aStock->getId() !== $v) {
+            $this->aStock = null;
+        }
+
+
+        return $this;
+    } // setStockId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -632,25 +594,22 @@ abstract class AttributeCombination implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AttributeCombinationTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AttributeCombinationTableMap::translateFieldName('AttributeId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AttributeCombinationTableMap::translateFieldName('AttributeId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->attribute_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeCombinationTableMap::translateFieldName('CombinationId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->combination_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeCombinationTableMap::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AttributeCombinationTableMap::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->attribute_av_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AttributeCombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeCombinationTableMap::translateFieldName('StockId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->stock_id = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeCombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AttributeCombinationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AttributeCombinationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -663,7 +622,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = AttributeCombinationTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = AttributeCombinationTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\AttributeCombination object", 0, $e);
@@ -688,11 +647,11 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->aAttribute !== null && $this->attribute_id !== $this->aAttribute->getId()) {
             $this->aAttribute = null;
         }
-        if ($this->aCombination !== null && $this->combination_id !== $this->aCombination->getId()) {
-            $this->aCombination = null;
-        }
         if ($this->aAttributeAv !== null && $this->attribute_av_id !== $this->aAttributeAv->getId()) {
             $this->aAttributeAv = null;
+        }
+        if ($this->aStock !== null && $this->stock_id !== $this->aStock->getId()) {
+            $this->aStock = null;
         }
     } // ensureConsistency
 
@@ -735,7 +694,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
             $this->aAttribute = null;
             $this->aAttributeAv = null;
-            $this->aCombination = null;
+            $this->aStock = null;
         } // if (deep)
     }
 
@@ -877,11 +836,11 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->setAttributeAv($this->aAttributeAv);
             }
 
-            if ($this->aCombination !== null) {
-                if ($this->aCombination->isModified() || $this->aCombination->isNew()) {
-                    $affectedRows += $this->aCombination->save($con);
+            if ($this->aStock !== null) {
+                if ($this->aStock->isModified() || $this->aStock->isNew()) {
+                    $affectedRows += $this->aStock->save($con);
                 }
-                $this->setCombination($this->aCombination);
+                $this->setStock($this->aStock);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -915,23 +874,16 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = AttributeCombinationTableMap::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . AttributeCombinationTableMap::ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(AttributeCombinationTableMap::ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ID';
-        }
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_ID';
         }
-        if ($this->isColumnModified(AttributeCombinationTableMap::COMBINATION_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'COMBINATION_ID';
-        }
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_AV_ID)) {
             $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_AV_ID';
+        }
+        if ($this->isColumnModified(AttributeCombinationTableMap::STOCK_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'STOCK_ID';
         }
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -950,17 +902,14 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $stmt = $con->prepare($sql);
             foreach ($modifiedColumns as $identifier => $columnName) {
                 switch ($columnName) {
-                    case 'ID':
-                        $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
-                        break;
                     case 'ATTRIBUTE_ID':
                         $stmt->bindValue($identifier, $this->attribute_id, PDO::PARAM_INT);
                         break;
-                    case 'COMBINATION_ID':
-                        $stmt->bindValue($identifier, $this->combination_id, PDO::PARAM_INT);
-                        break;
                     case 'ATTRIBUTE_AV_ID':
                         $stmt->bindValue($identifier, $this->attribute_av_id, PDO::PARAM_INT);
+                        break;
+                    case 'STOCK_ID':
+                        $stmt->bindValue($identifier, $this->stock_id, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -975,13 +924,6 @@ abstract class AttributeCombination implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1031,21 +973,18 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                return $this->getId();
-                break;
-            case 1:
                 return $this->getAttributeId();
                 break;
-            case 2:
-                return $this->getCombinationId();
-                break;
-            case 3:
+            case 1:
                 return $this->getAttributeAvId();
                 break;
-            case 4:
+            case 2:
+                return $this->getStockId();
+                break;
+            case 3:
                 return $this->getCreatedAt();
                 break;
-            case 5:
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1077,12 +1016,11 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $alreadyDumpedObjects['AttributeCombination'][serialize($this->getPrimaryKey())] = true;
         $keys = AttributeCombinationTableMap::getFieldNames($keyType);
         $result = array(
-            $keys[0] => $this->getId(),
-            $keys[1] => $this->getAttributeId(),
-            $keys[2] => $this->getCombinationId(),
-            $keys[3] => $this->getAttributeAvId(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[0] => $this->getAttributeId(),
+            $keys[1] => $this->getAttributeAvId(),
+            $keys[2] => $this->getStockId(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1097,8 +1035,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
             if (null !== $this->aAttributeAv) {
                 $result['AttributeAv'] = $this->aAttributeAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aCombination) {
-                $result['Combination'] = $this->aCombination->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aStock) {
+                $result['Stock'] = $this->aStock->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1135,21 +1073,18 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         switch ($pos) {
             case 0:
-                $this->setId($value);
-                break;
-            case 1:
                 $this->setAttributeId($value);
                 break;
-            case 2:
-                $this->setCombinationId($value);
-                break;
-            case 3:
+            case 1:
                 $this->setAttributeAvId($value);
                 break;
-            case 4:
+            case 2:
+                $this->setStockId($value);
+                break;
+            case 3:
                 $this->setCreatedAt($value);
                 break;
-            case 5:
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1176,12 +1111,11 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         $keys = AttributeCombinationTableMap::getFieldNames($keyType);
 
-        if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setAttributeId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCombinationId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setAttributeAvId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[0], $arr)) $this->setAttributeId($arr[$keys[0]]);
+        if (array_key_exists($keys[1], $arr)) $this->setAttributeAvId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setStockId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1193,10 +1127,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         $criteria = new Criteria(AttributeCombinationTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(AttributeCombinationTableMap::ID)) $criteria->add(AttributeCombinationTableMap::ID, $this->id);
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_ID, $this->attribute_id);
-        if ($this->isColumnModified(AttributeCombinationTableMap::COMBINATION_ID)) $criteria->add(AttributeCombinationTableMap::COMBINATION_ID, $this->combination_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_AV_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
+        if ($this->isColumnModified(AttributeCombinationTableMap::STOCK_ID)) $criteria->add(AttributeCombinationTableMap::STOCK_ID, $this->stock_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) $criteria->add(AttributeCombinationTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AttributeCombinationTableMap::UPDATED_AT)) $criteria->add(AttributeCombinationTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1214,10 +1147,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
     public function buildPkeyCriteria()
     {
         $criteria = new Criteria(AttributeCombinationTableMap::DATABASE_NAME);
-        $criteria->add(AttributeCombinationTableMap::ID, $this->id);
         $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_ID, $this->attribute_id);
-        $criteria->add(AttributeCombinationTableMap::COMBINATION_ID, $this->combination_id);
         $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
+        $criteria->add(AttributeCombinationTableMap::STOCK_ID, $this->stock_id);
 
         return $criteria;
     }
@@ -1230,10 +1162,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
     public function getPrimaryKey()
     {
         $pks = array();
-        $pks[0] = $this->getId();
-        $pks[1] = $this->getAttributeId();
-        $pks[2] = $this->getCombinationId();
-        $pks[3] = $this->getAttributeAvId();
+        $pks[0] = $this->getAttributeId();
+        $pks[1] = $this->getAttributeAvId();
+        $pks[2] = $this->getStockId();
 
         return $pks;
     }
@@ -1246,10 +1177,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function setPrimaryKey($keys)
     {
-        $this->setId($keys[0]);
-        $this->setAttributeId($keys[1]);
-        $this->setCombinationId($keys[2]);
-        $this->setAttributeAvId($keys[3]);
+        $this->setAttributeId($keys[0]);
+        $this->setAttributeAvId($keys[1]);
+        $this->setStockId($keys[2]);
     }
 
     /**
@@ -1259,7 +1189,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getId()) && (null === $this->getAttributeId()) && (null === $this->getCombinationId()) && (null === $this->getAttributeAvId());
+        return (null === $this->getAttributeId()) && (null === $this->getAttributeAvId()) && (null === $this->getStockId());
     }
 
     /**
@@ -1276,13 +1206,12 @@ abstract class AttributeCombination implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setAttributeId($this->getAttributeId());
-        $copyObj->setCombinationId($this->getCombinationId());
         $copyObj->setAttributeAvId($this->getAttributeAvId());
+        $copyObj->setStockId($this->getStockId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1411,24 +1340,24 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildCombination object.
+     * Declares an association between this object and a ChildStock object.
      *
-     * @param                  ChildCombination $v
+     * @param                  ChildStock $v
      * @return                 \Thelia\Model\AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCombination(ChildCombination $v = null)
+    public function setStock(ChildStock $v = null)
     {
         if ($v === null) {
-            $this->setCombinationId(NULL);
+            $this->setStockId(NULL);
         } else {
-            $this->setCombinationId($v->getId());
+            $this->setStockId($v->getId());
         }
 
-        $this->aCombination = $v;
+        $this->aStock = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCombination object, it will not be re-added.
+        // If this object has already been added to the ChildStock object, it will not be re-added.
         if ($v !== null) {
             $v->addAttributeCombination($this);
         }
@@ -1439,26 +1368,26 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildCombination object
+     * Get the associated ChildStock object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCombination The associated ChildCombination object.
+     * @return                 ChildStock The associated ChildStock object.
      * @throws PropelException
      */
-    public function getCombination(ConnectionInterface $con = null)
+    public function getStock(ConnectionInterface $con = null)
     {
-        if ($this->aCombination === null && ($this->combination_id !== null)) {
-            $this->aCombination = ChildCombinationQuery::create()->findPk($this->combination_id, $con);
+        if ($this->aStock === null && ($this->stock_id !== null)) {
+            $this->aStock = ChildStockQuery::create()->findPk($this->stock_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCombination->addAttributeCombinations($this);
+                $this->aStock->addAttributeCombinations($this);
              */
         }
 
-        return $this->aCombination;
+        return $this->aStock;
     }
 
     /**
@@ -1466,10 +1395,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
      */
     public function clear()
     {
-        $this->id = null;
         $this->attribute_id = null;
-        $this->combination_id = null;
         $this->attribute_av_id = null;
+        $this->stock_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1495,7 +1423,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         $this->aAttribute = null;
         $this->aAttributeAv = null;
-        $this->aCombination = null;
+        $this->aStock = null;
     }
 
     /**

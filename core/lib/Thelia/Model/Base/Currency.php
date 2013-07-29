@@ -23,6 +23,8 @@ use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
+use Thelia\Model\ProductPrice as ChildProductPrice;
+use Thelia\Model\ProductPriceQuery as ChildProductPriceQuery;
 use Thelia\Model\Map\CurrencyTableMap;
 
 abstract class Currency implements ActiveRecordInterface
@@ -120,6 +122,12 @@ abstract class Currency implements ActiveRecordInterface
     protected $collCartsPartial;
 
     /**
+     * @var        ObjectCollection|ChildProductPrice[] Collection to store aggregation of ChildProductPrice objects.
+     */
+    protected $collProductPrices;
+    protected $collProductPricesPartial;
+
+    /**
      * Flag to prevent endless save loop, if this object is referenced
      * by another object which falls in this transaction.
      *
@@ -138,6 +146,12 @@ abstract class Currency implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $cartsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $productPricesScheduledForDeletion = null;
 
     /**
      * Initializes internal state of Thelia\Model\Base\Currency object.
@@ -806,6 +820,8 @@ abstract class Currency implements ActiveRecordInterface
 
             $this->collCarts = null;
 
+            $this->collProductPrices = null;
+
         } // if (deep)
     }
 
@@ -969,6 +985,23 @@ abstract class Currency implements ActiveRecordInterface
 
                 if ($this->collCarts !== null) {
             foreach ($this->collCarts as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productPricesScheduledForDeletion !== null) {
+                if (!$this->productPricesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductPriceQuery::create()
+                        ->filterByPrimaryKeys($this->productPricesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productPricesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collProductPrices !== null) {
+            foreach ($this->collProductPrices as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1197,6 +1230,9 @@ abstract class Currency implements ActiveRecordInterface
             if (null !== $this->collCarts) {
                 $result['Carts'] = $this->collCarts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collProductPrices) {
+                $result['ProductPrices'] = $this->collProductPrices->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
         }
 
         return $result;
@@ -1394,6 +1430,12 @@ abstract class Currency implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getProductPrices() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductPrice($relObj->copy($deepCopy));
+                }
+            }
+
         } // if ($deepCopy)
 
         if ($makeNew) {
@@ -1440,6 +1482,9 @@ abstract class Currency implements ActiveRecordInterface
         }
         if ('Cart' == $relationName) {
             return $this->initCarts();
+        }
+        if ('ProductPrice' == $relationName) {
+            return $this->initProductPrices();
         }
     }
 
@@ -2055,6 +2100,249 @@ abstract class Currency implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collProductPrices collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductPrices()
+     */
+    public function clearProductPrices()
+    {
+        $this->collProductPrices = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProductPrices collection loaded partially.
+     */
+    public function resetPartialProductPrices($v = true)
+    {
+        $this->collProductPricesPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductPrices collection.
+     *
+     * By default this just sets the collProductPrices collection to an empty array (like clearcollProductPrices());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductPrices($overrideExisting = true)
+    {
+        if (null !== $this->collProductPrices && !$overrideExisting) {
+            return;
+        }
+        $this->collProductPrices = new ObjectCollection();
+        $this->collProductPrices->setModel('\Thelia\Model\ProductPrice');
+    }
+
+    /**
+     * Gets an array of ChildProductPrice objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCurrency is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProductPrice[] List of ChildProductPrice objects
+     * @throws PropelException
+     */
+    public function getProductPrices($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductPricesPartial && !$this->isNew();
+        if (null === $this->collProductPrices || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductPrices) {
+                // return empty collection
+                $this->initProductPrices();
+            } else {
+                $collProductPrices = ChildProductPriceQuery::create(null, $criteria)
+                    ->filterByCurrency($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProductPricesPartial && count($collProductPrices)) {
+                        $this->initProductPrices(false);
+
+                        foreach ($collProductPrices as $obj) {
+                            if (false == $this->collProductPrices->contains($obj)) {
+                                $this->collProductPrices->append($obj);
+                            }
+                        }
+
+                        $this->collProductPricesPartial = true;
+                    }
+
+                    $collProductPrices->getInternalIterator()->rewind();
+
+                    return $collProductPrices;
+                }
+
+                if ($partial && $this->collProductPrices) {
+                    foreach ($this->collProductPrices as $obj) {
+                        if ($obj->isNew()) {
+                            $collProductPrices[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductPrices = $collProductPrices;
+                $this->collProductPricesPartial = false;
+            }
+        }
+
+        return $this->collProductPrices;
+    }
+
+    /**
+     * Sets a collection of ProductPrice objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $productPrices A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCurrency The current object (for fluent API support)
+     */
+    public function setProductPrices(Collection $productPrices, ConnectionInterface $con = null)
+    {
+        $productPricesToDelete = $this->getProductPrices(new Criteria(), $con)->diff($productPrices);
+
+
+        $this->productPricesScheduledForDeletion = $productPricesToDelete;
+
+        foreach ($productPricesToDelete as $productPriceRemoved) {
+            $productPriceRemoved->setCurrency(null);
+        }
+
+        $this->collProductPrices = null;
+        foreach ($productPrices as $productPrice) {
+            $this->addProductPrice($productPrice);
+        }
+
+        $this->collProductPrices = $productPrices;
+        $this->collProductPricesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProductPrice objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductPrice objects.
+     * @throws PropelException
+     */
+    public function countProductPrices(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductPricesPartial && !$this->isNew();
+        if (null === $this->collProductPrices || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductPrices) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProductPrices());
+            }
+
+            $query = ChildProductPriceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCurrency($this)
+                ->count($con);
+        }
+
+        return count($this->collProductPrices);
+    }
+
+    /**
+     * Method called to associate a ChildProductPrice object to this object
+     * through the ChildProductPrice foreign key attribute.
+     *
+     * @param    ChildProductPrice $l ChildProductPrice
+     * @return   \Thelia\Model\Currency The current object (for fluent API support)
+     */
+    public function addProductPrice(ChildProductPrice $l)
+    {
+        if ($this->collProductPrices === null) {
+            $this->initProductPrices();
+            $this->collProductPricesPartial = true;
+        }
+
+        if (!in_array($l, $this->collProductPrices->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductPrice($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProductPrice $productPrice The productPrice object to add.
+     */
+    protected function doAddProductPrice($productPrice)
+    {
+        $this->collProductPrices[]= $productPrice;
+        $productPrice->setCurrency($this);
+    }
+
+    /**
+     * @param  ProductPrice $productPrice The productPrice object to remove.
+     * @return ChildCurrency The current object (for fluent API support)
+     */
+    public function removeProductPrice($productPrice)
+    {
+        if ($this->getProductPrices()->contains($productPrice)) {
+            $this->collProductPrices->remove($this->collProductPrices->search($productPrice));
+            if (null === $this->productPricesScheduledForDeletion) {
+                $this->productPricesScheduledForDeletion = clone $this->collProductPrices;
+                $this->productPricesScheduledForDeletion->clear();
+            }
+            $this->productPricesScheduledForDeletion[]= clone $productPrice;
+            $productPrice->setCurrency(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Currency is new, it will return
+     * an empty collection; or if this Currency has previously
+     * been saved, it will retrieve related ProductPrices from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Currency.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildProductPrice[] List of ChildProductPrice objects
+     */
+    public function getProductPricesJoinStock($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildProductPriceQuery::create(null, $criteria);
+        $query->joinWith('Stock', $joinBehavior);
+
+        return $this->getProductPrices($query, $con);
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -2096,6 +2384,11 @@ abstract class Currency implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collProductPrices) {
+                foreach ($this->collProductPrices as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
         } // if ($deep)
 
         if ($this->collOrders instanceof Collection) {
@@ -2106,6 +2399,10 @@ abstract class Currency implements ActiveRecordInterface
             $this->collCarts->clearIterator();
         }
         $this->collCarts = null;
+        if ($this->collProductPrices instanceof Collection) {
+            $this->collProductPrices->clearIterator();
+        }
+        $this->collProductPrices = null;
     }
 
     /**
