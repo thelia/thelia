@@ -91,6 +91,12 @@ class Country extends BaseLoop
             $search->filterByAreaId(null, Criteria::ISNULL);
         }
 
+        $exclude = $this->getExclude();
+
+        if (!is_null($exclude)) {
+            $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
         /**
          * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
          *
