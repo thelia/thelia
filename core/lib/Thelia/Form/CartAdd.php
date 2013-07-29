@@ -27,7 +27,8 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Action\Exception\StockNotFoundException;
 use Thelia\Action\Exception\ProductNotFoundException;
-use Thelia\Model\Base\StockQuery;
+use Thelia\Model\StockQuery;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;
 
 class CartAdd extends BaseForm
@@ -78,7 +79,7 @@ class CartAdd extends BaseForm
                     new Constraints\Callback(array(
                         "methods" => array($this, "checkStock")
                     )),
-                    new
+                    new Constraints\GreaterThanOrEqual(0)
                 )
             ))
             ->add("append", "hidden")
@@ -90,7 +91,7 @@ class CartAdd extends BaseForm
     {
         $product = ProductQuery::create()->findPk($value);
 
-        if (is_null($product)) {
+        if (is_null($product) || $product->getVisible() == 0) {
             throw new ProductNotFoundException(sprintf("this product id does not exists : %d", $value));
         }
     }
@@ -120,10 +121,9 @@ class CartAdd extends BaseForm
             ->filterByProductId($data["product"])
             ->findOne();
 
-        if ($stock->getQuantity() < $value) {
+        if ($stock->getQuantity() < $value && ConfigQuery::read("verifyStock", 1) == 1) {
             $context->addViolation("quantity value is not valid");
         }
-
     }
 
     /**
