@@ -160,7 +160,7 @@
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
-  <table name="feature_prod" namespace="Thelia\Model">
+  <table name="feature_product" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="feature_id" required="true" type="INTEGER" />

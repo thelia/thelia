@@ -209,12 +209,12 @@ CREATE TABLE `feature_av`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- feature_prod
+-- feature_product
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `feature_prod`;
+DROP TABLE IF EXISTS `feature_product`;
 
-CREATE TABLE `feature_prod`
+CREATE TABLE `feature_product`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,

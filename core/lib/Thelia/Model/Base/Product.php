@@ -27,8 +27,8 @@ use Thelia\Model\ContentAssoc as ChildContentAssoc;
 use Thelia\Model\ContentAssocQuery as ChildContentAssocQuery;
 use Thelia\Model\Document as ChildDocument;
 use Thelia\Model\DocumentQuery as ChildDocumentQuery;
-use Thelia\Model\FeatureProd as ChildFeatureProd;
-use Thelia\Model\FeatureProdQuery as ChildFeatureProdQuery;
+use Thelia\Model\FeatureProduct as ChildFeatureProduct;
+use Thelia\Model\FeatureProductQuery as ChildFeatureProductQuery;
 use Thelia\Model\Image as ChildImage;
 use Thelia\Model\ImageQuery as ChildImageQuery;
 use Thelia\Model\Product as ChildProduct;
@@ -156,10 +156,10 @@ abstract class Product implements ActiveRecordInterface
     protected $collProductCategoriesPartial;
 
     /**
-     * @var        ObjectCollection|ChildFeatureProd[] Collection to store aggregation of ChildFeatureProd objects.
+     * @var        ObjectCollection|ChildFeatureProduct[] Collection to store aggregation of ChildFeatureProduct objects.
      */
-    protected $collFeatureProds;
-    protected $collFeatureProdsPartial;
+    protected $collFeatureProducts;
+    protected $collFeatureProductsPartial;
 
     /**
      * @var        ObjectCollection|ChildStock[] Collection to store aggregation of ChildStock objects.
@@ -294,7 +294,7 @@ abstract class Product implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $featureProdsScheduledForDeletion = null;
+    protected $featureProductsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1133,7 +1133,7 @@ abstract class Product implements ActiveRecordInterface
             $this->aTaxRule = null;
             $this->collProductCategories = null;
 
-            $this->collFeatureProds = null;
+            $this->collFeatureProducts = null;
 
             $this->collStocks = null;
 
@@ -1413,17 +1413,17 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
-            if ($this->featureProdsScheduledForDeletion !== null) {
-                if (!$this->featureProdsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\FeatureProdQuery::create()
-                        ->filterByPrimaryKeys($this->featureProdsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->featureProductsScheduledForDeletion !== null) {
+                if (!$this->featureProductsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\FeatureProductQuery::create()
+                        ->filterByPrimaryKeys($this->featureProductsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->featureProdsScheduledForDeletion = null;
+                    $this->featureProductsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collFeatureProds !== null) {
-            foreach ($this->collFeatureProds as $referrerFK) {
+                if ($this->collFeatureProducts !== null) {
+            foreach ($this->collFeatureProducts as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1842,8 +1842,8 @@ abstract class Product implements ActiveRecordInterface
             if (null !== $this->collProductCategories) {
                 $result['ProductCategories'] = $this->collProductCategories->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collFeatureProds) {
-                $result['FeatureProds'] = $this->collFeatureProds->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collFeatureProducts) {
+                $result['FeatureProducts'] = $this->collFeatureProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collStocks) {
                 $result['Stocks'] = $this->collStocks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2078,9 +2078,9 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getFeatureProds() as $relObj) {
+            foreach ($this->getFeatureProducts() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addFeatureProd($relObj->copy($deepCopy));
+                    $copyObj->addFeatureProduct($relObj->copy($deepCopy));
                 }
             }
 
@@ -2239,8 +2239,8 @@ abstract class Product implements ActiveRecordInterface
         if ('ProductCategory' == $relationName) {
             return $this->initProductCategories();
         }
-        if ('FeatureProd' == $relationName) {
-            return $this->initFeatureProds();
+        if ('FeatureProduct' == $relationName) {
+            return $this->initFeatureProducts();
         }
         if ('Stock' == $relationName) {
             return $this->initStocks();
@@ -2521,31 +2521,31 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collFeatureProds collection
+     * Clears out the collFeatureProducts collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addFeatureProds()
+     * @see        addFeatureProducts()
      */
-    public function clearFeatureProds()
+    public function clearFeatureProducts()
     {
-        $this->collFeatureProds = null; // important to set this to NULL since that means it is uninitialized
+        $this->collFeatureProducts = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collFeatureProds collection loaded partially.
+     * Reset is the collFeatureProducts collection loaded partially.
      */
-    public function resetPartialFeatureProds($v = true)
+    public function resetPartialFeatureProducts($v = true)
     {
-        $this->collFeatureProdsPartial = $v;
+        $this->collFeatureProductsPartial = $v;
     }
 
     /**
-     * Initializes the collFeatureProds collection.
+     * Initializes the collFeatureProducts collection.
      *
-     * By default this just sets the collFeatureProds collection to an empty array (like clearcollFeatureProds());
+     * By default this just sets the collFeatureProducts collection to an empty array (like clearcollFeatureProducts());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -2554,17 +2554,17 @@ abstract class Product implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initFeatureProds($overrideExisting = true)
+    public function initFeatureProducts($overrideExisting = true)
     {
-        if (null !== $this->collFeatureProds && !$overrideExisting) {
+        if (null !== $this->collFeatureProducts && !$overrideExisting) {
             return;
         }
-        $this->collFeatureProds = new ObjectCollection();
-        $this->collFeatureProds->setModel('\Thelia\Model\FeatureProd');
+        $this->collFeatureProducts = new ObjectCollection();
+        $this->collFeatureProducts->setModel('\Thelia\Model\FeatureProduct');
     }
 
     /**
-     * Gets an array of ChildFeatureProd objects which contain a foreign key that references this object.
+     * Gets an array of ChildFeatureProduct objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -2574,109 +2574,109 @@ abstract class Product implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildFeatureProd[] List of ChildFeatureProd objects
+     * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      * @throws PropelException
      */
-    public function getFeatureProds($criteria = null, ConnectionInterface $con = null)
+    public function getFeatureProducts($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collFeatureProdsPartial && !$this->isNew();
-        if (null === $this->collFeatureProds || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collFeatureProds) {
+        $partial = $this->collFeatureProductsPartial && !$this->isNew();
+        if (null === $this->collFeatureProducts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProducts) {
                 // return empty collection
-                $this->initFeatureProds();
+                $this->initFeatureProducts();
             } else {
-                $collFeatureProds = ChildFeatureProdQuery::create(null, $criteria)
+                $collFeatureProducts = ChildFeatureProductQuery::create(null, $criteria)
                     ->filterByProduct($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collFeatureProdsPartial && count($collFeatureProds)) {
-                        $this->initFeatureProds(false);
+                    if (false !== $this->collFeatureProductsPartial && count($collFeatureProducts)) {
+                        $this->initFeatureProducts(false);
 
-                        foreach ($collFeatureProds as $obj) {
-                            if (false == $this->collFeatureProds->contains($obj)) {
-                                $this->collFeatureProds->append($obj);
+                        foreach ($collFeatureProducts as $obj) {
+                            if (false == $this->collFeatureProducts->contains($obj)) {
+                                $this->collFeatureProducts->append($obj);
                             }
                         }
 
-                        $this->collFeatureProdsPartial = true;
+                        $this->collFeatureProductsPartial = true;
                     }
 
-                    $collFeatureProds->getInternalIterator()->rewind();
+                    $collFeatureProducts->getInternalIterator()->rewind();
 
-                    return $collFeatureProds;
+                    return $collFeatureProducts;
                 }
 
-                if ($partial && $this->collFeatureProds) {
-                    foreach ($this->collFeatureProds as $obj) {
+                if ($partial && $this->collFeatureProducts) {
+                    foreach ($this->collFeatureProducts as $obj) {
                         if ($obj->isNew()) {
-                            $collFeatureProds[] = $obj;
+                            $collFeatureProducts[] = $obj;
                         }
                     }
                 }
 
-                $this->collFeatureProds = $collFeatureProds;
-                $this->collFeatureProdsPartial = false;
+                $this->collFeatureProducts = $collFeatureProducts;
+                $this->collFeatureProductsPartial = false;
             }
         }
 
-        return $this->collFeatureProds;
+        return $this->collFeatureProducts;
     }
 
     /**
-     * Sets a collection of FeatureProd objects related by a one-to-many relationship
+     * Sets a collection of FeatureProduct objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $featureProds A Propel collection.
+     * @param      Collection $featureProducts A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildProduct The current object (for fluent API support)
      */
-    public function setFeatureProds(Collection $featureProds, ConnectionInterface $con = null)
+    public function setFeatureProducts(Collection $featureProducts, ConnectionInterface $con = null)
     {
-        $featureProdsToDelete = $this->getFeatureProds(new Criteria(), $con)->diff($featureProds);
+        $featureProductsToDelete = $this->getFeatureProducts(new Criteria(), $con)->diff($featureProducts);
 
 
-        $this->featureProdsScheduledForDeletion = $featureProdsToDelete;
+        $this->featureProductsScheduledForDeletion = $featureProductsToDelete;
 
-        foreach ($featureProdsToDelete as $featureProdRemoved) {
-            $featureProdRemoved->setProduct(null);
+        foreach ($featureProductsToDelete as $featureProductRemoved) {
+            $featureProductRemoved->setProduct(null);
         }
 
-        $this->collFeatureProds = null;
-        foreach ($featureProds as $featureProd) {
-            $this->addFeatureProd($featureProd);
+        $this->collFeatureProducts = null;
+        foreach ($featureProducts as $featureProduct) {
+            $this->addFeatureProduct($featureProduct);
         }
 
-        $this->collFeatureProds = $featureProds;
-        $this->collFeatureProdsPartial = false;
+        $this->collFeatureProducts = $featureProducts;
+        $this->collFeatureProductsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related FeatureProd objects.
+     * Returns the number of related FeatureProduct objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related FeatureProd objects.
+     * @return int             Count of related FeatureProduct objects.
      * @throws PropelException
      */
-    public function countFeatureProds(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countFeatureProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collFeatureProdsPartial && !$this->isNew();
-        if (null === $this->collFeatureProds || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collFeatureProds) {
+        $partial = $this->collFeatureProductsPartial && !$this->isNew();
+        if (null === $this->collFeatureProducts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProducts) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getFeatureProds());
+                return count($this->getFeatureProducts());
             }
 
-            $query = ChildFeatureProdQuery::create(null, $criteria);
+            $query = ChildFeatureProductQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -2686,53 +2686,53 @@ abstract class Product implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collFeatureProds);
+        return count($this->collFeatureProducts);
     }
 
     /**
-     * Method called to associate a ChildFeatureProd object to this object
-     * through the ChildFeatureProd foreign key attribute.
+     * Method called to associate a ChildFeatureProduct object to this object
+     * through the ChildFeatureProduct foreign key attribute.
      *
-     * @param    ChildFeatureProd $l ChildFeatureProd
+     * @param    ChildFeatureProduct $l ChildFeatureProduct
      * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
-    public function addFeatureProd(ChildFeatureProd $l)
+    public function addFeatureProduct(ChildFeatureProduct $l)
     {
-        if ($this->collFeatureProds === null) {
-            $this->initFeatureProds();
-            $this->collFeatureProdsPartial = true;
+        if ($this->collFeatureProducts === null) {
+            $this->initFeatureProducts();
+            $this->collFeatureProductsPartial = true;
         }
 
-        if (!in_array($l, $this->collFeatureProds->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddFeatureProd($l);
+        if (!in_array($l, $this->collFeatureProducts->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFeatureProduct($l);
         }
 
         return $this;
     }
 
     /**
-     * @param FeatureProd $featureProd The featureProd object to add.
+     * @param FeatureProduct $featureProduct The featureProduct object to add.
      */
-    protected function doAddFeatureProd($featureProd)
+    protected function doAddFeatureProduct($featureProduct)
     {
-        $this->collFeatureProds[]= $featureProd;
-        $featureProd->setProduct($this);
+        $this->collFeatureProducts[]= $featureProduct;
+        $featureProduct->setProduct($this);
     }
 
     /**
-     * @param  FeatureProd $featureProd The featureProd object to remove.
+     * @param  FeatureProduct $featureProduct The featureProduct object to remove.
      * @return ChildProduct The current object (for fluent API support)
      */
-    public function removeFeatureProd($featureProd)
+    public function removeFeatureProduct($featureProduct)
     {
-        if ($this->getFeatureProds()->contains($featureProd)) {
-            $this->collFeatureProds->remove($this->collFeatureProds->search($featureProd));
-            if (null === $this->featureProdsScheduledForDeletion) {
-                $this->featureProdsScheduledForDeletion = clone $this->collFeatureProds;
-                $this->featureProdsScheduledForDeletion->clear();
+        if ($this->getFeatureProducts()->contains($featureProduct)) {
+            $this->collFeatureProducts->remove($this->collFeatureProducts->search($featureProduct));
+            if (null === $this->featureProductsScheduledForDeletion) {
+                $this->featureProductsScheduledForDeletion = clone $this->collFeatureProducts;
+                $this->featureProductsScheduledForDeletion->clear();
             }
-            $this->featureProdsScheduledForDeletion[]= clone $featureProd;
-            $featureProd->setProduct(null);
+            $this->featureProductsScheduledForDeletion[]= clone $featureProduct;
+            $featureProduct->setProduct(null);
         }
 
         return $this;
@@ -2744,7 +2744,7 @@ abstract class Product implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Product is new, it will return
      * an empty collection; or if this Product has previously
-     * been saved, it will retrieve related FeatureProds from storage.
+     * been saved, it will retrieve related FeatureProducts from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -2753,14 +2753,14 @@ abstract class Product implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildFeatureProd[] List of ChildFeatureProd objects
+     * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      */
-    public function getFeatureProdsJoinFeature($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getFeatureProductsJoinFeature($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildFeatureProdQuery::create(null, $criteria);
+        $query = ChildFeatureProductQuery::create(null, $criteria);
         $query->joinWith('Feature', $joinBehavior);
 
-        return $this->getFeatureProds($query, $con);
+        return $this->getFeatureProducts($query, $con);
     }
 
 
@@ -2769,7 +2769,7 @@ abstract class Product implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this Product is new, it will return
      * an empty collection; or if this Product has previously
-     * been saved, it will retrieve related FeatureProds from storage.
+     * been saved, it will retrieve related FeatureProducts from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -2778,14 +2778,14 @@ abstract class Product implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildFeatureProd[] List of ChildFeatureProd objects
+     * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      */
-    public function getFeatureProdsJoinFeatureAv($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getFeatureProductsJoinFeatureAv($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildFeatureProdQuery::create(null, $criteria);
+        $query = ChildFeatureProductQuery::create(null, $criteria);
         $query->joinWith('FeatureAv', $joinBehavior);
 
-        return $this->getFeatureProds($query, $con);
+        return $this->getFeatureProducts($query, $con);
     }
 
     /**
@@ -5892,8 +5892,8 @@ abstract class Product implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collFeatureProds) {
-                foreach ($this->collFeatureProds as $o) {
+            if ($this->collFeatureProducts) {
+                foreach ($this->collFeatureProducts as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -5972,10 +5972,10 @@ abstract class Product implements ActiveRecordInterface
             $this->collProductCategories->clearIterator();
         }
         $this->collProductCategories = null;
-        if ($this->collFeatureProds instanceof Collection) {
-            $this->collFeatureProds->clearIterator();
+        if ($this->collFeatureProducts instanceof Collection) {
+            $this->collFeatureProducts->clearIterator();
         }
-        $this->collFeatureProds = null;
+        $this->collFeatureProducts = null;
         if ($this->collStocks instanceof Collection) {
             $this->collStocks->clearIterator();
         }

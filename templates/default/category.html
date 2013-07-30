@@ -51,7 +51,7 @@
 
     <h4>Accessories</h4>
         <ul>
-    {loop name="acc" type="accessory" product="#ID" order="accessory,max_price"}
+    {loop name="acc" type="accessory" product="#ID" order="accessory"}
         <li>#REF</li>
     {/loop}
         </ul>
@@ -72,7 +72,7 @@
     <li>
         #TITLE
         <ul>
-            {loop name="ftav" type="feature_available" order="manual"}
+            {loop name="ftav" type="feature_available" order="manual" feature="#ID"}
                 <li>#TITLE</li>
             {/loop}
         </ul>
