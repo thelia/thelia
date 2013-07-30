@@ -5035,20 +5035,6 @@ abstract class Category implements ActiveRecordInterface
         return (string) $this->exportTo(CategoryTableMap::DEFAULT_STRING_FORMAT);
     }
 
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     ChildCategory The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = CategoryTableMap::UPDATED_AT;
-
-        return $this;
-    }
-
     // i18n behavior
 
     /**
@@ -5528,6 +5514,20 @@ abstract class Category implements ActiveRecordInterface
 
         return $this->getCategoryVersions($criteria, $con);
     }
+    // timestampable behavior
+
+    /**
+     * Mark the current object so that the update date doesn't get updated during next save
+     *
+     * @return     ChildCategory The current object (for fluent API support)
+     */
+    public function keepUpdateDateUnchanged()
+    {
+        $this->modifiedColumns[] = CategoryTableMap::UPDATED_AT;
+
+        return $this;
+    }
+
     /**
      * Code to be run before persisting the object
      * @param  ConnectionInterface $con

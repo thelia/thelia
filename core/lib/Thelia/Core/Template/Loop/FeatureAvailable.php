@@ -33,24 +33,21 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\CategoryQuery;
-use Thelia\Model\Base\ProductCategoryQuery;
-use Thelia\Model\Base\FeatureQuery;
+use Thelia\Model\Base\FeatureAvQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Feature loop
+ * FeatureAvailable loop
  *
  *
- * Class Feature
+ * Class FeatureAvailable
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Feature extends BaseLoop
+class FeatureAvailable extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -59,9 +56,7 @@ class Feature extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('product'),
-            Argument::createIntListTypeArgument('category'),
-            Argument::createBooleanTypeArgument('visible', 1),
+            Argument::createIntListTypeArgument('feature'),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
@@ -80,7 +75,7 @@ class Feature extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = FeatureQuery::create();
+        $search = FeatureAvQuery::create();
 
         $id = $this->getId();
 
@@ -94,28 +89,10 @@ class Feature extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $visible = $this->getVisible();
+        $feature = $this->getFeature();
 
-        $search->filterByVisible($visible);
-
-        $product = $this->getProduct();
-        $category = $this->getCategory();
-
-        if(null !== $product) {
-            $productCategories = ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find()->getData();
-
-            if(null === $category) {
-                $category = $productCategories;
-            } else {
-                $category = array_merge($category, $productCategories);
-            }
-        }
-
-        if(null !== $category) {
-            $search->filterByCategory(
-                CategoryQuery::create()->filterById($category)->find(),
-                Criteria::IN
-            );
+        if(null !== $feature) {
+            $search->filterByFeatureId($feature, Criteria::IN);
         }
 
         $orders  = $this->getOrder();
@@ -123,10 +100,10 @@ class Feature extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);

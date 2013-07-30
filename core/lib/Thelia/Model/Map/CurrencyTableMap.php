@@ -177,6 +177,7 @@ class CurrencyTableMap extends TableMap
     {
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'SET NULL', 'RESTRICT', 'Orders');
         $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), null, null, 'Carts');
+        $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), null, null, 'ProductPrices');
     } // buildRelations()
 
     /**

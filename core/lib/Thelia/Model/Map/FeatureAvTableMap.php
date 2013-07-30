@@ -57,7 +57,7 @@ class FeatureAvTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class FeatureAvTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ID field
@@ -78,6 +78,11 @@ class FeatureAvTableMap extends TableMap
      * the column name for the FEATURE_ID field
      */
     const FEATURE_ID = 'feature_av.FEATURE_ID';
+
+    /**
+     * the column name for the POSITION field
+     */
+    const POSITION = 'feature_av.POSITION';
 
     /**
      * the column name for the CREATED_AT field
@@ -110,12 +115,12 @@ class FeatureAvTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'FeatureId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'featureId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(FeatureAvTableMap::ID, FeatureAvTableMap::FEATURE_ID, FeatureAvTableMap::CREATED_AT, FeatureAvTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'FEATURE_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'feature_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'FeatureId', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'featureId', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(FeatureAvTableMap::ID, FeatureAvTableMap::FEATURE_ID, FeatureAvTableMap::POSITION, FeatureAvTableMap::CREATED_AT, FeatureAvTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'FEATURE_ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'feature_id', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -125,12 +130,12 @@ class FeatureAvTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'FeatureId' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'featureId' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(FeatureAvTableMap::ID => 0, FeatureAvTableMap::FEATURE_ID => 1, FeatureAvTableMap::CREATED_AT => 2, FeatureAvTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FEATURE_ID' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'feature_id' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'FeatureId' => 1, 'Position' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'featureId' => 1, 'position' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(FeatureAvTableMap::ID => 0, FeatureAvTableMap::FEATURE_ID => 1, FeatureAvTableMap::POSITION => 2, FeatureAvTableMap::CREATED_AT => 3, FeatureAvTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'FEATURE_ID' => 1, 'POSITION' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'feature_id' => 1, 'position' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -151,6 +156,7 @@ class FeatureAvTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('FEATURE_ID', 'FeatureId', 'INTEGER', 'feature', 'ID', true, null, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -329,11 +335,13 @@ class FeatureAvTableMap extends TableMap
         if (null === $alias) {
             $criteria->addSelectColumn(FeatureAvTableMap::ID);
             $criteria->addSelectColumn(FeatureAvTableMap::FEATURE_ID);
+            $criteria->addSelectColumn(FeatureAvTableMap::POSITION);
             $criteria->addSelectColumn(FeatureAvTableMap::CREATED_AT);
             $criteria->addSelectColumn(FeatureAvTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.FEATURE_ID');
+            $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

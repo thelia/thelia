@@ -64,3 +64,18 @@
     </ul>
 
 {/loop}
+
+<h2>ALL FEATURES AND THEIR AVAILABILITY</h2>
+
+<ul>
+    {loop name="ft" type="feature" order="manual"}
+    <li>
+        #TITLE
+        <ul>
+            {loop name="ftav" type="feature_available" order="manual"}
+                <li>#TITLE</li>
+            {/loop}
+        </ul>
+    </li>
+    {/loop}
+</ul>

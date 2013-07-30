@@ -57,7 +57,7 @@ class ProductVersionTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 17;
+    const NUM_COLUMNS = 10;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class ProductVersionTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 17;
+    const NUM_HYDRATE_COLUMNS = 10;
 
     /**
      * the column name for the ID field
@@ -85,44 +85,9 @@ class ProductVersionTableMap extends TableMap
     const REF = 'product_version.REF';
 
     /**
-     * the column name for the PRICE field
-     */
-    const PRICE = 'product_version.PRICE';
-
-    /**
-     * the column name for the PRICE2 field
-     */
-    const PRICE2 = 'product_version.PRICE2';
-
-    /**
-     * the column name for the ECOTAX field
-     */
-    const ECOTAX = 'product_version.ECOTAX';
-
-    /**
-     * the column name for the NEWNESS field
-     */
-    const NEWNESS = 'product_version.NEWNESS';
-
-    /**
-     * the column name for the PROMO field
-     */
-    const PROMO = 'product_version.PROMO';
-
-    /**
-     * the column name for the QUANTITY field
-     */
-    const QUANTITY = 'product_version.QUANTITY';
-
-    /**
      * the column name for the VISIBLE field
      */
     const VISIBLE = 'product_version.VISIBLE';
-
-    /**
-     * the column name for the WEIGHT field
-     */
-    const WEIGHT = 'product_version.WEIGHT';
 
     /**
      * the column name for the POSITION field
@@ -166,12 +131,12 @@ class ProductVersionTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'TaxRuleId', 'Ref', 'Price', 'Price2', 'Ecotax', 'Newness', 'Promo', 'Quantity', 'Visible', 'Weight', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'taxRuleId', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'quantity', 'visible', 'weight', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
-        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID, ProductVersionTableMap::TAX_RULE_ID, ProductVersionTableMap::REF, ProductVersionTableMap::PRICE, ProductVersionTableMap::PRICE2, ProductVersionTableMap::ECOTAX, ProductVersionTableMap::NEWNESS, ProductVersionTableMap::PROMO, ProductVersionTableMap::QUANTITY, ProductVersionTableMap::VISIBLE, ProductVersionTableMap::WEIGHT, ProductVersionTableMap::POSITION, ProductVersionTableMap::CREATED_AT, ProductVersionTableMap::UPDATED_AT, ProductVersionTableMap::VERSION, ProductVersionTableMap::VERSION_CREATED_AT, ProductVersionTableMap::VERSION_CREATED_BY, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'TAX_RULE_ID', 'REF', 'PRICE', 'PRICE2', 'ECOTAX', 'NEWNESS', 'PROMO', 'QUANTITY', 'VISIBLE', 'WEIGHT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
-        self::TYPE_FIELDNAME     => array('id', 'tax_rule_id', 'ref', 'price', 'price2', 'ecotax', 'newness', 'promo', 'quantity', 'visible', 'weight', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+        self::TYPE_PHPNAME       => array('Id', 'TaxRuleId', 'Ref', 'Visible', 'Position', 'CreatedAt', 'UpdatedAt', 'Version', 'VersionCreatedAt', 'VersionCreatedBy', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'taxRuleId', 'ref', 'visible', 'position', 'createdAt', 'updatedAt', 'version', 'versionCreatedAt', 'versionCreatedBy', ),
+        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID, ProductVersionTableMap::TAX_RULE_ID, ProductVersionTableMap::REF, ProductVersionTableMap::VISIBLE, ProductVersionTableMap::POSITION, ProductVersionTableMap::CREATED_AT, ProductVersionTableMap::UPDATED_AT, ProductVersionTableMap::VERSION, ProductVersionTableMap::VERSION_CREATED_AT, ProductVersionTableMap::VERSION_CREATED_BY, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'TAX_RULE_ID', 'REF', 'VISIBLE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', 'VERSION', 'VERSION_CREATED_AT', 'VERSION_CREATED_BY', ),
+        self::TYPE_FIELDNAME     => array('id', 'tax_rule_id', 'ref', 'visible', 'position', 'created_at', 'updated_at', 'version', 'version_created_at', 'version_created_by', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -181,12 +146,12 @@ class ProductVersionTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Price' => 3, 'Price2' => 4, 'Ecotax' => 5, 'Newness' => 6, 'Promo' => 7, 'Quantity' => 8, 'Visible' => 9, 'Weight' => 10, 'Position' => 11, 'CreatedAt' => 12, 'UpdatedAt' => 13, 'Version' => 14, 'VersionCreatedAt' => 15, 'VersionCreatedBy' => 16, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'quantity' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'createdAt' => 12, 'updatedAt' => 13, 'version' => 14, 'versionCreatedAt' => 15, 'versionCreatedBy' => 16, ),
-        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID => 0, ProductVersionTableMap::TAX_RULE_ID => 1, ProductVersionTableMap::REF => 2, ProductVersionTableMap::PRICE => 3, ProductVersionTableMap::PRICE2 => 4, ProductVersionTableMap::ECOTAX => 5, ProductVersionTableMap::NEWNESS => 6, ProductVersionTableMap::PROMO => 7, ProductVersionTableMap::QUANTITY => 8, ProductVersionTableMap::VISIBLE => 9, ProductVersionTableMap::WEIGHT => 10, ProductVersionTableMap::POSITION => 11, ProductVersionTableMap::CREATED_AT => 12, ProductVersionTableMap::UPDATED_AT => 13, ProductVersionTableMap::VERSION => 14, ProductVersionTableMap::VERSION_CREATED_AT => 15, ProductVersionTableMap::VERSION_CREATED_BY => 16, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'PRICE' => 3, 'PRICE2' => 4, 'ECOTAX' => 5, 'NEWNESS' => 6, 'PROMO' => 7, 'QUANTITY' => 8, 'VISIBLE' => 9, 'WEIGHT' => 10, 'POSITION' => 11, 'CREATED_AT' => 12, 'UPDATED_AT' => 13, 'VERSION' => 14, 'VERSION_CREATED_AT' => 15, 'VERSION_CREATED_BY' => 16, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'price' => 3, 'price2' => 4, 'ecotax' => 5, 'newness' => 6, 'promo' => 7, 'quantity' => 8, 'visible' => 9, 'weight' => 10, 'position' => 11, 'created_at' => 12, 'updated_at' => 13, 'version' => 14, 'version_created_at' => 15, 'version_created_by' => 16, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'TaxRuleId' => 1, 'Ref' => 2, 'Visible' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, 'Version' => 7, 'VersionCreatedAt' => 8, 'VersionCreatedBy' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'taxRuleId' => 1, 'ref' => 2, 'visible' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, 'version' => 7, 'versionCreatedAt' => 8, 'versionCreatedBy' => 9, ),
+        self::TYPE_COLNAME       => array(ProductVersionTableMap::ID => 0, ProductVersionTableMap::TAX_RULE_ID => 1, ProductVersionTableMap::REF => 2, ProductVersionTableMap::VISIBLE => 3, ProductVersionTableMap::POSITION => 4, ProductVersionTableMap::CREATED_AT => 5, ProductVersionTableMap::UPDATED_AT => 6, ProductVersionTableMap::VERSION => 7, ProductVersionTableMap::VERSION_CREATED_AT => 8, ProductVersionTableMap::VERSION_CREATED_BY => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'TAX_RULE_ID' => 1, 'REF' => 2, 'VISIBLE' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, 'VERSION' => 7, 'VERSION_CREATED_AT' => 8, 'VERSION_CREATED_BY' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'tax_rule_id' => 1, 'ref' => 2, 'visible' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, 'version' => 7, 'version_created_at' => 8, 'version_created_by' => 9, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
     /**
@@ -208,14 +173,7 @@ class ProductVersionTableMap extends TableMap
         $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'product', 'ID', true, null, null);
         $this->addColumn('TAX_RULE_ID', 'TaxRuleId', 'INTEGER', false, null, null);
         $this->addColumn('REF', 'Ref', 'VARCHAR', true, 255, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('PRICE2', 'Price2', 'FLOAT', false, null, null);
-        $this->addColumn('ECOTAX', 'Ecotax', 'FLOAT', false, null, null);
-        $this->addColumn('NEWNESS', 'Newness', 'TINYINT', false, null, 0);
-        $this->addColumn('PROMO', 'Promo', 'TINYINT', false, null, 0);
-        $this->addColumn('QUANTITY', 'Quantity', 'INTEGER', false, null, 0);
         $this->addColumn('VISIBLE', 'Visible', 'TINYINT', true, null, 0);
-        $this->addColumn('WEIGHT', 'Weight', 'FLOAT', false, null, null);
         $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -299,11 +257,11 @@ class ProductVersionTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 14 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 14 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 7 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -422,14 +380,7 @@ class ProductVersionTableMap extends TableMap
             $criteria->addSelectColumn(ProductVersionTableMap::ID);
             $criteria->addSelectColumn(ProductVersionTableMap::TAX_RULE_ID);
             $criteria->addSelectColumn(ProductVersionTableMap::REF);
-            $criteria->addSelectColumn(ProductVersionTableMap::PRICE);
-            $criteria->addSelectColumn(ProductVersionTableMap::PRICE2);
-            $criteria->addSelectColumn(ProductVersionTableMap::ECOTAX);
-            $criteria->addSelectColumn(ProductVersionTableMap::NEWNESS);
-            $criteria->addSelectColumn(ProductVersionTableMap::PROMO);
-            $criteria->addSelectColumn(ProductVersionTableMap::QUANTITY);
             $criteria->addSelectColumn(ProductVersionTableMap::VISIBLE);
-            $criteria->addSelectColumn(ProductVersionTableMap::WEIGHT);
             $criteria->addSelectColumn(ProductVersionTableMap::POSITION);
             $criteria->addSelectColumn(ProductVersionTableMap::CREATED_AT);
             $criteria->addSelectColumn(ProductVersionTableMap::UPDATED_AT);
@@ -440,14 +391,7 @@ class ProductVersionTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.TAX_RULE_ID');
             $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.PRICE');
-            $criteria->addSelectColumn($alias . '.PRICE2');
-            $criteria->addSelectColumn($alias . '.ECOTAX');
-            $criteria->addSelectColumn($alias . '.NEWNESS');
-            $criteria->addSelectColumn($alias . '.PROMO');
-            $criteria->addSelectColumn($alias . '.QUANTITY');
             $criteria->addSelectColumn($alias . '.VISIBLE');
-            $criteria->addSelectColumn($alias . '.WEIGHT');
             $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');

@@ -12,6 +12,8 @@
         <loop class="Thelia\Core\Template\Loop\Country" name="country"/>
         <loop class="Thelia\Core\Template\Loop\Customer" name="customer"/>
         <loop class="Thelia\Core\Template\Loop\Feature" name="feature"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureAvailable" name="feature_available"/>
+        <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>

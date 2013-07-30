@@ -74,6 +74,12 @@ abstract class FeatureAv implements ActiveRecordInterface
     protected $feature_id;
 
     /**
+     * The value for the position field.
+     * @var        int
+     */
+    protected $position;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -413,6 +419,17 @@ abstract class FeatureAv implements ActiveRecordInterface
     }
 
     /**
+     * Get the [position] column value.
+     *
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -499,6 +516,27 @@ abstract class FeatureAv implements ActiveRecordInterface
     } // setFeatureId()
 
     /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\FeatureAv The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[] = FeatureAvTableMap::POSITION;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -583,13 +621,16 @@ abstract class FeatureAv implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : FeatureAvTableMap::translateFieldName('FeatureId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->feature_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureAvTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureAvTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureAvTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureAvTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FeatureAvTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -602,7 +643,7 @@ abstract class FeatureAv implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = FeatureAvTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = FeatureAvTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\FeatureAv object", 0, $e);
@@ -882,6 +923,9 @@ abstract class FeatureAv implements ActiveRecordInterface
         if ($this->isColumnModified(FeatureAvTableMap::FEATURE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'FEATURE_ID';
         }
+        if ($this->isColumnModified(FeatureAvTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
+        }
         if ($this->isColumnModified(FeatureAvTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -904,6 +948,9 @@ abstract class FeatureAv implements ActiveRecordInterface
                         break;
                     case 'FEATURE_ID':
                         $stmt->bindValue($identifier, $this->feature_id, PDO::PARAM_INT);
+                        break;
+                    case 'POSITION':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -980,9 +1027,12 @@ abstract class FeatureAv implements ActiveRecordInterface
                 return $this->getFeatureId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1016,8 +1066,9 @@ abstract class FeatureAv implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getFeatureId(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getPosition(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1076,9 +1127,12 @@ abstract class FeatureAv implements ActiveRecordInterface
                 $this->setFeatureId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1107,8 +1161,9 @@ abstract class FeatureAv implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setFeatureId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPosition($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1122,6 +1177,7 @@ abstract class FeatureAv implements ActiveRecordInterface
 
         if ($this->isColumnModified(FeatureAvTableMap::ID)) $criteria->add(FeatureAvTableMap::ID, $this->id);
         if ($this->isColumnModified(FeatureAvTableMap::FEATURE_ID)) $criteria->add(FeatureAvTableMap::FEATURE_ID, $this->feature_id);
+        if ($this->isColumnModified(FeatureAvTableMap::POSITION)) $criteria->add(FeatureAvTableMap::POSITION, $this->position);
         if ($this->isColumnModified(FeatureAvTableMap::CREATED_AT)) $criteria->add(FeatureAvTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(FeatureAvTableMap::UPDATED_AT)) $criteria->add(FeatureAvTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1188,6 +1244,7 @@ abstract class FeatureAv implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setFeatureId($this->getFeatureId());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1808,6 +1865,7 @@ abstract class FeatureAv implements ActiveRecordInterface
     {
         $this->id = null;
         $this->feature_id = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
