@@ -79,7 +79,9 @@ class CartAdd extends BaseForm
                     new Constraints\Callback(array(
                         "methods" => array($this, "checkStock")
                     )),
-                    new Constraints\GreaterThanOrEqual(0)
+                    new Constraints\GreaterThanOrEqual(array(
+                        "value" => 0
+                    ))
                 )
             ))
             ->add("append", "hidden")

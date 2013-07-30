@@ -66,19 +66,22 @@ abstract class BaseForm {
             $options["attr"]["thelia_name"] = $this->getName();
         }
 
-        $this->formBuilder = Forms::createFormFactoryBuilder()
-            ->addExtension(new HttpFoundationExtension())
-            ->addExtension(
+        $builder =  Forms::createFormFactoryBuilder()
+            ->addExtension(new HttpFoundationExtension());
+        if(!isset($options["csrf_protection"]) || $options["csrf_protection"] !== false) {
+            $builder->addExtension(
                 new CsrfExtension(
                     new SessionCsrfProvider(
                         $request->getSession(),
                         isset($options["secret"]) ? $options["secret"] : ConfigQuery::read("form.secret", md5(__DIR__))
                     )
                 )
-            )
+            );
+        }
+        $this->formBuilder = $builder
             ->addExtension(new ValidatorExtension($validator))
             ->getFormFactory()
-            ->createNamedBuilder($this->getName(), $type, $data, $options);
+            ->createNamedBuilder($this->getName(), $type, $data, $this->cleanOptions($options));
         ;
 
         $this->buildForm();
@@ -89,6 +92,13 @@ abstract class BaseForm {
         }
 
         $this->form = $this->formBuilder->getForm();
+    }
+
+    protected function cleanOptions($options)
+    {
+        unset($options["csrf_protection"]);
+
+        return $options;
     }
 
     /**
