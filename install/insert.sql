@@ -23,6 +23,13 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 (3, 'en_US', 'Miss', 'Miss'),
 (3, 'fr_FR', 'Mlle', 'Madamemoiselle');
 
+INSERT INTO `currency` (`id` ,`name` ,`code` ,`symbol` ,`rate` ,`by_default` ,`created_at` ,`updated_at`)
+VALUES
+(1 , 'euro', 'EUR', '€', '1', '1', NOW() , NOW()),
+(2, 'dollar', 'USD', '$', '1.26', '0', NOW(), NOW()),
+(3, 'livre', 'GBP', '£', '0.89', '0', NOW(), NOW());
+
+
 INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `created_at`, `updated_at`) VALUES
 (1, NULL, '4', 'AF', 'AFG', '2013-07-26 14:44:00', '2013-07-26 14:44:00'),
 (2, NULL, '710', 'ZA', 'ZAF', '2013-07-26 14:44:00', '2013-07-26 14:44:00'),
