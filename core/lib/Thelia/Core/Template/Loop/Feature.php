@@ -33,6 +33,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Base\CategoryQuery;
 use Thelia\Model\Base\ProductCategoryQuery;
 use Thelia\Model\Base\FeatureQuery;
 use Thelia\Model\ConfigQuery;
@@ -110,10 +111,9 @@ class Feature extends BaseLoop
             }
         }
 
-        /* TODO */
         if(null !== $category) {
             $search->filterByCategory(
-                ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find(),
+                CategoryQuery::create()->filterById($category)->find(),
                 Criteria::IN
             );
         }
