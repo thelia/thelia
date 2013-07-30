@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\ProductPrice;
-use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\FeatureProduct;
+use Thelia\Model\FeatureProductQuery;
 
 
 /**
- * This class defines the structure of the 'product_price' table.
+ * This class defines the structure of the 'feature_product' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\ProductPriceQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ProductPriceTableMap extends TableMap
+class FeatureProductTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ProductPriceTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.FeatureProductTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class ProductPriceTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'product_price';
+    const TABLE_NAME = 'feature_product';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\ProductPrice';
+    const OM_CLASS = '\\Thelia\\Model\\FeatureProduct';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.ProductPrice';
+    const CLASS_DEFAULT = 'Thelia.Model.FeatureProduct';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 8;
 
     /**
      * The number of lazy-loaded columns
@@ -67,42 +67,47 @@ class ProductPriceTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 8;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'product_price.ID';
+    const ID = 'feature_product.ID';
 
     /**
-     * the column name for the PRODUCT_SALE_ELEMENTS_ID field
+     * the column name for the PRODUCT_ID field
      */
-    const PRODUCT_SALE_ELEMENTS_ID = 'product_price.PRODUCT_SALE_ELEMENTS_ID';
+    const PRODUCT_ID = 'feature_product.PRODUCT_ID';
 
     /**
-     * the column name for the CURRENCY_ID field
+     * the column name for the FEATURE_ID field
      */
-    const CURRENCY_ID = 'product_price.CURRENCY_ID';
+    const FEATURE_ID = 'feature_product.FEATURE_ID';
 
     /**
-     * the column name for the PRICE field
+     * the column name for the FEATURE_AV_ID field
      */
-    const PRICE = 'product_price.PRICE';
+    const FEATURE_AV_ID = 'feature_product.FEATURE_AV_ID';
 
     /**
-     * the column name for the PROMO_PRICE field
+     * the column name for the BY_DEFAULT field
      */
-    const PROMO_PRICE = 'product_price.PROMO_PRICE';
+    const BY_DEFAULT = 'feature_product.BY_DEFAULT';
+
+    /**
+     * the column name for the POSITION field
+     */
+    const POSITION = 'feature_product.POSITION';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'product_price.CREATED_AT';
+    const CREATED_AT = 'feature_product.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'product_price.UPDATED_AT';
+    const UPDATED_AT = 'feature_product.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -116,12 +121,12 @@ class ProductPriceTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProductSaleElementsId', 'CurrencyId', 'Price', 'PromoPrice', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'productSaleElementsId', 'currencyId', 'price', 'promoPrice', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProductPriceTableMap::ID, ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductPriceTableMap::CURRENCY_ID, ProductPriceTableMap::PRICE, ProductPriceTableMap::PROMO_PRICE, ProductPriceTableMap::CREATED_AT, ProductPriceTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_SALE_ELEMENTS_ID', 'CURRENCY_ID', 'PRICE', 'PROMO_PRICE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'product_sale_elements_id', 'currency_id', 'price', 'promo_price', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'FeatureId', 'FeatureAvId', 'ByDefault', 'Position', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'featureId', 'featureAvId', 'byDefault', 'position', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(FeatureProductTableMap::ID, FeatureProductTableMap::PRODUCT_ID, FeatureProductTableMap::FEATURE_ID, FeatureProductTableMap::FEATURE_AV_ID, FeatureProductTableMap::BY_DEFAULT, FeatureProductTableMap::POSITION, FeatureProductTableMap::CREATED_AT, FeatureProductTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'FEATURE_ID', 'FEATURE_AV_ID', 'BY_DEFAULT', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'product_id', 'feature_id', 'feature_av_id', 'by_default', 'position', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -131,12 +136,12 @@ class ProductPriceTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductSaleElementsId' => 1, 'CurrencyId' => 2, 'Price' => 3, 'PromoPrice' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productSaleElementsId' => 1, 'currencyId' => 2, 'price' => 3, 'promoPrice' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ProductPriceTableMap::ID => 0, ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID => 1, ProductPriceTableMap::CURRENCY_ID => 2, ProductPriceTableMap::PRICE => 3, ProductPriceTableMap::PROMO_PRICE => 4, ProductPriceTableMap::CREATED_AT => 5, ProductPriceTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_SALE_ELEMENTS_ID' => 1, 'CURRENCY_ID' => 2, 'PRICE' => 3, 'PROMO_PRICE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'product_sale_elements_id' => 1, 'currency_id' => 2, 'price' => 3, 'promo_price' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'FeatureId' => 2, 'FeatureAvId' => 3, 'ByDefault' => 4, 'Position' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'featureId' => 2, 'featureAvId' => 3, 'byDefault' => 4, 'position' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
+        self::TYPE_COLNAME       => array(FeatureProductTableMap::ID => 0, FeatureProductTableMap::PRODUCT_ID => 1, FeatureProductTableMap::FEATURE_ID => 2, FeatureProductTableMap::FEATURE_AV_ID => 3, FeatureProductTableMap::BY_DEFAULT => 4, FeatureProductTableMap::POSITION => 5, FeatureProductTableMap::CREATED_AT => 6, FeatureProductTableMap::UPDATED_AT => 7, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'FEATURE_ID' => 2, 'FEATURE_AV_ID' => 3, 'BY_DEFAULT' => 4, 'POSITION' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'feature_id' => 2, 'feature_av_id' => 3, 'by_default' => 4, 'position' => 5, 'created_at' => 6, 'updated_at' => 7, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
     );
 
     /**
@@ -149,17 +154,18 @@ class ProductPriceTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('product_price');
-        $this->setPhpName('ProductPrice');
-        $this->setClassName('\\Thelia\\Model\\ProductPrice');
+        $this->setName('feature_product');
+        $this->setPhpName('FeatureProduct');
+        $this->setClassName('\\Thelia\\Model\\FeatureProduct');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', 'product_sale_elements', 'ID', true, null, null);
-        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', true, null, null);
-        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
-        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'FLOAT', false, null, null);
+        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
+        $this->addForeignKey('FEATURE_ID', 'FeatureId', 'INTEGER', 'feature', 'ID', true, null, null);
+        $this->addForeignKey('FEATURE_AV_ID', 'FeatureAvId', 'INTEGER', 'feature_av', 'ID', false, null, null);
+        $this->addColumn('BY_DEFAULT', 'ByDefault', 'VARCHAR', false, 255, null);
+        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -169,8 +175,9 @@ class ProductPriceTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_ONE, array('product_sale_elements_id' => 'id', ), null, null);
-        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), null, null);
+        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Feature', '\\Thelia\\Model\\Feature', RelationMap::MANY_TO_ONE, array('feature_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('FeatureAv', '\\Thelia\\Model\\FeatureAv', RelationMap::MANY_TO_ONE, array('feature_av_id' => 'id', ), 'CASCADE', 'RESTRICT');
     } // buildRelations()
 
     /**
@@ -242,7 +249,7 @@ class ProductPriceTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ProductPriceTableMap::CLASS_DEFAULT : ProductPriceTableMap::OM_CLASS;
+        return $withPrefix ? FeatureProductTableMap::CLASS_DEFAULT : FeatureProductTableMap::OM_CLASS;
     }
 
     /**
@@ -256,21 +263,21 @@ class ProductPriceTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (ProductPrice object, last column rank)
+     * @return array (FeatureProduct object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ProductPriceTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ProductPriceTableMap::getInstanceFromPool($key))) {
+        $key = FeatureProductTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = FeatureProductTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ProductPriceTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + FeatureProductTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProductPriceTableMap::OM_CLASS;
+            $cls = FeatureProductTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ProductPriceTableMap::addInstanceToPool($obj, $key);
+            FeatureProductTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -293,8 +300,8 @@ class ProductPriceTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ProductPriceTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ProductPriceTableMap::getInstanceFromPool($key))) {
+            $key = FeatureProductTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = FeatureProductTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -303,7 +310,7 @@ class ProductPriceTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProductPriceTableMap::addInstanceToPool($obj, $key);
+                FeatureProductTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -324,19 +331,21 @@ class ProductPriceTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProductPriceTableMap::ID);
-            $criteria->addSelectColumn(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID);
-            $criteria->addSelectColumn(ProductPriceTableMap::CURRENCY_ID);
-            $criteria->addSelectColumn(ProductPriceTableMap::PRICE);
-            $criteria->addSelectColumn(ProductPriceTableMap::PROMO_PRICE);
-            $criteria->addSelectColumn(ProductPriceTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ProductPriceTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(FeatureProductTableMap::ID);
+            $criteria->addSelectColumn(FeatureProductTableMap::PRODUCT_ID);
+            $criteria->addSelectColumn(FeatureProductTableMap::FEATURE_ID);
+            $criteria->addSelectColumn(FeatureProductTableMap::FEATURE_AV_ID);
+            $criteria->addSelectColumn(FeatureProductTableMap::BY_DEFAULT);
+            $criteria->addSelectColumn(FeatureProductTableMap::POSITION);
+            $criteria->addSelectColumn(FeatureProductTableMap::CREATED_AT);
+            $criteria->addSelectColumn(FeatureProductTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
-            $criteria->addSelectColumn($alias . '.CURRENCY_ID');
-            $criteria->addSelectColumn($alias . '.PRICE');
-            $criteria->addSelectColumn($alias . '.PROMO_PRICE');
+            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
+            $criteria->addSelectColumn($alias . '.FEATURE_ID');
+            $criteria->addSelectColumn($alias . '.FEATURE_AV_ID');
+            $criteria->addSelectColumn($alias . '.BY_DEFAULT');
+            $criteria->addSelectColumn($alias . '.POSITION');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -351,7 +360,7 @@ class ProductPriceTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ProductPriceTableMap::DATABASE_NAME)->getTable(ProductPriceTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(FeatureProductTableMap::DATABASE_NAME)->getTable(FeatureProductTableMap::TABLE_NAME);
     }
 
     /**
@@ -359,16 +368,16 @@ class ProductPriceTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductPriceTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ProductPriceTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ProductPriceTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(FeatureProductTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(FeatureProductTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new FeatureProductTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a ProductPrice or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a FeatureProduct or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ProductPrice object or primary key or array of primary keys
+     * @param mixed               $values Criteria or FeatureProduct object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -379,25 +388,25 @@ class ProductPriceTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductPriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\ProductPrice) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\FeatureProduct) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
-            $criteria->add(ProductPriceTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(FeatureProductTableMap::DATABASE_NAME);
+            $criteria->add(FeatureProductTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ProductPriceQuery::create()->mergeWith($criteria);
+        $query = FeatureProductQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ProductPriceTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { FeatureProductTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ProductPriceTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { FeatureProductTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -405,20 +414,20 @@ class ProductPriceTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the product_price table.
+     * Deletes all rows from the feature_product table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ProductPriceQuery::create()->doDeleteAll($con);
+        return FeatureProductQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ProductPrice or Criteria object.
+     * Performs an INSERT on the database, given a FeatureProduct or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ProductPrice object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or FeatureProduct object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -427,22 +436,22 @@ class ProductPriceTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductPriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ProductPrice object
+            $criteria = $criteria->buildCriteria(); // build Criteria from FeatureProduct object
         }
 
-        if ($criteria->containsKey(ProductPriceTableMap::ID) && $criteria->keyContainsValue(ProductPriceTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductPriceTableMap::ID.')');
+        if ($criteria->containsKey(FeatureProductTableMap::ID) && $criteria->keyContainsValue(FeatureProductTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.FeatureProductTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ProductPriceQuery::create()->mergeWith($criteria);
+        $query = FeatureProductQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -458,7 +467,7 @@ class ProductPriceTableMap extends TableMap
         return $pk;
     }
 
-} // ProductPriceTableMap
+} // FeatureProductTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ProductPriceTableMap::buildTableMap();
+FeatureProductTableMap::buildTableMap();

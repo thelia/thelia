@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Stock;
-use Thelia\Model\StockQuery;
+use Thelia\Model\ProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery;
 
 
 /**
- * This class defines the structure of the 'stock' table.
+ * This class defines the structure of the 'product_sale_elements' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\StockQuery;
  * (i.e. if it's a text column type).
  *
  */
-class StockTableMap extends TableMap
+class ProductSaleElementsTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.StockTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ProductSaleElementsTableMap';
 
     /**
      * The default database name for this class
@@ -42,17 +42,17 @@ class StockTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'stock';
+    const TABLE_NAME = 'product_sale_elements';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Stock';
+    const OM_CLASS = '\\Thelia\\Model\\ProductSaleElements';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Stock';
+    const CLASS_DEFAULT = 'Thelia.Model.ProductSaleElements';
 
     /**
      * The total number of columns
@@ -72,47 +72,47 @@ class StockTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'stock.ID';
+    const ID = 'product_sale_elements.ID';
 
     /**
      * the column name for the PRODUCT_ID field
      */
-    const PRODUCT_ID = 'stock.PRODUCT_ID';
+    const PRODUCT_ID = 'product_sale_elements.PRODUCT_ID';
 
     /**
      * the column name for the INCREASE field
      */
-    const INCREASE = 'stock.INCREASE';
+    const INCREASE = 'product_sale_elements.INCREASE';
 
     /**
      * the column name for the QUANTITY field
      */
-    const QUANTITY = 'stock.QUANTITY';
+    const QUANTITY = 'product_sale_elements.QUANTITY';
 
     /**
      * the column name for the PROMO field
      */
-    const PROMO = 'stock.PROMO';
+    const PROMO = 'product_sale_elements.PROMO';
 
     /**
      * the column name for the NEWNESS field
      */
-    const NEWNESS = 'stock.NEWNESS';
+    const NEWNESS = 'product_sale_elements.NEWNESS';
 
     /**
      * the column name for the WEIGHT field
      */
-    const WEIGHT = 'stock.WEIGHT';
+    const WEIGHT = 'product_sale_elements.WEIGHT';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'stock.CREATED_AT';
+    const CREATED_AT = 'product_sale_elements.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'stock.UPDATED_AT';
+    const UPDATED_AT = 'product_sale_elements.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -128,7 +128,7 @@ class StockTableMap extends TableMap
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'ProductId', 'Increase', 'Quantity', 'Promo', 'Newness', 'Weight', 'CreatedAt', 'UpdatedAt', ),
         self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'increase', 'quantity', 'promo', 'newness', 'weight', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(StockTableMap::ID, StockTableMap::PRODUCT_ID, StockTableMap::INCREASE, StockTableMap::QUANTITY, StockTableMap::PROMO, StockTableMap::NEWNESS, StockTableMap::WEIGHT, StockTableMap::CREATED_AT, StockTableMap::UPDATED_AT, ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsTableMap::ID, ProductSaleElementsTableMap::PRODUCT_ID, ProductSaleElementsTableMap::INCREASE, ProductSaleElementsTableMap::QUANTITY, ProductSaleElementsTableMap::PROMO, ProductSaleElementsTableMap::NEWNESS, ProductSaleElementsTableMap::WEIGHT, ProductSaleElementsTableMap::CREATED_AT, ProductSaleElementsTableMap::UPDATED_AT, ),
         self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'INCREASE', 'QUANTITY', 'PROMO', 'NEWNESS', 'WEIGHT', 'CREATED_AT', 'UPDATED_AT', ),
         self::TYPE_FIELDNAME     => array('id', 'product_id', 'increase', 'quantity', 'promo', 'newness', 'weight', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
@@ -143,7 +143,7 @@ class StockTableMap extends TableMap
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'Increase' => 2, 'Quantity' => 3, 'Promo' => 4, 'Newness' => 5, 'Weight' => 6, 'CreatedAt' => 7, 'UpdatedAt' => 8, ),
         self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'increase' => 2, 'quantity' => 3, 'promo' => 4, 'newness' => 5, 'weight' => 6, 'createdAt' => 7, 'updatedAt' => 8, ),
-        self::TYPE_COLNAME       => array(StockTableMap::ID => 0, StockTableMap::PRODUCT_ID => 1, StockTableMap::INCREASE => 2, StockTableMap::QUANTITY => 3, StockTableMap::PROMO => 4, StockTableMap::NEWNESS => 5, StockTableMap::WEIGHT => 6, StockTableMap::CREATED_AT => 7, StockTableMap::UPDATED_AT => 8, ),
+        self::TYPE_COLNAME       => array(ProductSaleElementsTableMap::ID => 0, ProductSaleElementsTableMap::PRODUCT_ID => 1, ProductSaleElementsTableMap::INCREASE => 2, ProductSaleElementsTableMap::QUANTITY => 3, ProductSaleElementsTableMap::PROMO => 4, ProductSaleElementsTableMap::NEWNESS => 5, ProductSaleElementsTableMap::WEIGHT => 6, ProductSaleElementsTableMap::CREATED_AT => 7, ProductSaleElementsTableMap::UPDATED_AT => 8, ),
         self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'INCREASE' => 2, 'QUANTITY' => 3, 'PROMO' => 4, 'NEWNESS' => 5, 'WEIGHT' => 6, 'CREATED_AT' => 7, 'UPDATED_AT' => 8, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'increase' => 2, 'quantity' => 3, 'promo' => 4, 'newness' => 5, 'weight' => 6, 'created_at' => 7, 'updated_at' => 8, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, )
@@ -159,9 +159,9 @@ class StockTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('stock');
-        $this->setPhpName('Stock');
-        $this->setClassName('\\Thelia\\Model\\Stock');
+        $this->setName('product_sale_elements');
+        $this->setPhpName('ProductSaleElements');
+        $this->setClassName('\\Thelia\\Model\\ProductSaleElements');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
@@ -182,9 +182,9 @@ class StockTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'stock_id', ), null, null, 'AttributeCombinations');
-        $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'stock_id', ), null, null, 'CartItems');
-        $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'stock_id', ), null, null, 'ProductPrices');
+        $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'AttributeCombinations');
+        $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'CartItems');
+        $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'ProductPrices');
     } // buildRelations()
 
     /**
@@ -256,7 +256,7 @@ class StockTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? StockTableMap::CLASS_DEFAULT : StockTableMap::OM_CLASS;
+        return $withPrefix ? ProductSaleElementsTableMap::CLASS_DEFAULT : ProductSaleElementsTableMap::OM_CLASS;
     }
 
     /**
@@ -270,21 +270,21 @@ class StockTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Stock object, last column rank)
+     * @return array (ProductSaleElements object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = StockTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = StockTableMap::getInstanceFromPool($key))) {
+        $key = ProductSaleElementsTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ProductSaleElementsTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + StockTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ProductSaleElementsTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = StockTableMap::OM_CLASS;
+            $cls = ProductSaleElementsTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            StockTableMap::addInstanceToPool($obj, $key);
+            ProductSaleElementsTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -307,8 +307,8 @@ class StockTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = StockTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = StockTableMap::getInstanceFromPool($key))) {
+            $key = ProductSaleElementsTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ProductSaleElementsTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -317,7 +317,7 @@ class StockTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                StockTableMap::addInstanceToPool($obj, $key);
+                ProductSaleElementsTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -338,15 +338,15 @@ class StockTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(StockTableMap::ID);
-            $criteria->addSelectColumn(StockTableMap::PRODUCT_ID);
-            $criteria->addSelectColumn(StockTableMap::INCREASE);
-            $criteria->addSelectColumn(StockTableMap::QUANTITY);
-            $criteria->addSelectColumn(StockTableMap::PROMO);
-            $criteria->addSelectColumn(StockTableMap::NEWNESS);
-            $criteria->addSelectColumn(StockTableMap::WEIGHT);
-            $criteria->addSelectColumn(StockTableMap::CREATED_AT);
-            $criteria->addSelectColumn(StockTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::ID);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::PRODUCT_ID);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::INCREASE);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::QUANTITY);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::PROMO);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::NEWNESS);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::WEIGHT);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ProductSaleElementsTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
@@ -369,7 +369,7 @@ class StockTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(StockTableMap::DATABASE_NAME)->getTable(StockTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ProductSaleElementsTableMap::DATABASE_NAME)->getTable(ProductSaleElementsTableMap::TABLE_NAME);
     }
 
     /**
@@ -377,16 +377,16 @@ class StockTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(StockTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(StockTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new StockTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductSaleElementsTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ProductSaleElementsTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProductSaleElementsTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Stock or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ProductSaleElements or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Stock object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ProductSaleElements object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -397,25 +397,25 @@ class StockTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Stock) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ProductSaleElements) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(StockTableMap::DATABASE_NAME);
-            $criteria->add(StockTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ProductSaleElementsTableMap::DATABASE_NAME);
+            $criteria->add(ProductSaleElementsTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = StockQuery::create()->mergeWith($criteria);
+        $query = ProductSaleElementsQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { StockTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ProductSaleElementsTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { StockTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ProductSaleElementsTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -423,20 +423,20 @@ class StockTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the stock table.
+     * Deletes all rows from the product_sale_elements table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return StockQuery::create()->doDeleteAll($con);
+        return ProductSaleElementsQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Stock or Criteria object.
+     * Performs an INSERT on the database, given a ProductSaleElements or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Stock object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ProductSaleElements object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -445,22 +445,22 @@ class StockTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Stock object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ProductSaleElements object
         }
 
-        if ($criteria->containsKey(StockTableMap::ID) && $criteria->keyContainsValue(StockTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.StockTableMap::ID.')');
+        if ($criteria->containsKey(ProductSaleElementsTableMap::ID) && $criteria->keyContainsValue(ProductSaleElementsTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductSaleElementsTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = StockQuery::create()->mergeWith($criteria);
+        $query = ProductSaleElementsQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -476,7 +476,7 @@ class StockTableMap extends TableMap
         return $pk;
     }
 
-} // StockTableMap
+} // ProductSaleElementsTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-StockTableMap::buildTableMap();
+ProductSaleElementsTableMap::buildTableMap();

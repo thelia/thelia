@@ -22,8 +22,8 @@ use Thelia\Model\CartItemQuery as ChildCartItemQuery;
 use Thelia\Model\CartQuery as ChildCartQuery;
 use Thelia\Model\Product as ChildProduct;
 use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
+use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\Map\CartItemTableMap;
 
 abstract class CartItem implements ActiveRecordInterface
@@ -86,10 +86,10 @@ abstract class CartItem implements ActiveRecordInterface
     protected $quantity;
 
     /**
-     * The value for the stock_id field.
+     * The value for the product_sale_elements_id field.
      * @var        int
      */
-    protected $stock_id;
+    protected $product_sale_elements_id;
 
     /**
      * The value for the created_at field.
@@ -114,9 +114,9 @@ abstract class CartItem implements ActiveRecordInterface
     protected $aProduct;
 
     /**
-     * @var        Stock
+     * @var        ProductSaleElements
      */
-    protected $aStock;
+    protected $aProductSaleElements;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -438,14 +438,14 @@ abstract class CartItem implements ActiveRecordInterface
     }
 
     /**
-     * Get the [stock_id] column value.
+     * Get the [product_sale_elements_id] column value.
      *
      * @return   int
      */
-    public function getStockId()
+    public function getProductSaleElementsId()
     {
 
-        return $this->stock_id;
+        return $this->product_sale_elements_id;
     }
 
     /**
@@ -581,29 +581,29 @@ abstract class CartItem implements ActiveRecordInterface
     } // setQuantity()
 
     /**
-     * Set the value of [stock_id] column.
+     * Set the value of [product_sale_elements_id] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
-    public function setStockId($v)
+    public function setProductSaleElementsId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->stock_id !== $v) {
-            $this->stock_id = $v;
-            $this->modifiedColumns[] = CartItemTableMap::STOCK_ID;
+        if ($this->product_sale_elements_id !== $v) {
+            $this->product_sale_elements_id = $v;
+            $this->modifiedColumns[] = CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID;
         }
 
-        if ($this->aStock !== null && $this->aStock->getId() !== $v) {
-            $this->aStock = null;
+        if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
+            $this->aProductSaleElements = null;
         }
 
 
         return $this;
-    } // setStockId()
+    } // setProductSaleElementsId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -700,8 +700,8 @@ abstract class CartItem implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CartItemTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->quantity = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CartItemTableMap::translateFieldName('StockId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->stock_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CartItemTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CartItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -750,8 +750,8 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
             $this->aProduct = null;
         }
-        if ($this->aStock !== null && $this->stock_id !== $this->aStock->getId()) {
-            $this->aStock = null;
+        if ($this->aProductSaleElements !== null && $this->product_sale_elements_id !== $this->aProductSaleElements->getId()) {
+            $this->aProductSaleElements = null;
         }
     } // ensureConsistency
 
@@ -794,7 +794,7 @@ abstract class CartItem implements ActiveRecordInterface
 
             $this->aCart = null;
             $this->aProduct = null;
-            $this->aStock = null;
+            $this->aProductSaleElements = null;
         } // if (deep)
     }
 
@@ -936,11 +936,11 @@ abstract class CartItem implements ActiveRecordInterface
                 $this->setProduct($this->aProduct);
             }
 
-            if ($this->aStock !== null) {
-                if ($this->aStock->isModified() || $this->aStock->isNew()) {
-                    $affectedRows += $this->aStock->save($con);
+            if ($this->aProductSaleElements !== null) {
+                if ($this->aProductSaleElements->isModified() || $this->aProductSaleElements->isNew()) {
+                    $affectedRows += $this->aProductSaleElements->save($con);
                 }
-                $this->setStock($this->aStock);
+                $this->setProductSaleElements($this->aProductSaleElements);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -992,8 +992,8 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->isColumnModified(CartItemTableMap::QUANTITY)) {
             $modifiedColumns[':p' . $index++]  = 'QUANTITY';
         }
-        if ($this->isColumnModified(CartItemTableMap::STOCK_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'STOCK_ID';
+        if ($this->isColumnModified(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
         }
         if ($this->isColumnModified(CartItemTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1024,8 +1024,8 @@ abstract class CartItem implements ActiveRecordInterface
                     case 'QUANTITY':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
                         break;
-                    case 'STOCK_ID':
-                        $stmt->bindValue($identifier, $this->stock_id, PDO::PARAM_INT);
+                    case 'PRODUCT_SALE_ELEMENTS_ID':
+                        $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1108,7 +1108,7 @@ abstract class CartItem implements ActiveRecordInterface
                 return $this->getQuantity();
                 break;
             case 4:
-                return $this->getStockId();
+                return $this->getProductSaleElementsId();
                 break;
             case 5:
                 return $this->getCreatedAt();
@@ -1149,7 +1149,7 @@ abstract class CartItem implements ActiveRecordInterface
             $keys[1] => $this->getCartId(),
             $keys[2] => $this->getProductId(),
             $keys[3] => $this->getQuantity(),
-            $keys[4] => $this->getStockId(),
+            $keys[4] => $this->getProductSaleElementsId(),
             $keys[5] => $this->getCreatedAt(),
             $keys[6] => $this->getUpdatedAt(),
         );
@@ -1166,8 +1166,8 @@ abstract class CartItem implements ActiveRecordInterface
             if (null !== $this->aProduct) {
                 $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aStock) {
-                $result['Stock'] = $this->aStock->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProductSaleElements) {
+                $result['ProductSaleElements'] = $this->aProductSaleElements->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1216,7 +1216,7 @@ abstract class CartItem implements ActiveRecordInterface
                 $this->setQuantity($value);
                 break;
             case 4:
-                $this->setStockId($value);
+                $this->setProductSaleElementsId($value);
                 break;
             case 5:
                 $this->setCreatedAt($value);
@@ -1252,7 +1252,7 @@ abstract class CartItem implements ActiveRecordInterface
         if (array_key_exists($keys[1], $arr)) $this->setCartId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setProductId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setQuantity($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setStockId($arr[$keys[4]]);
+        if (array_key_exists($keys[4], $arr)) $this->setProductSaleElementsId($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
     }
@@ -1270,7 +1270,7 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->isColumnModified(CartItemTableMap::CART_ID)) $criteria->add(CartItemTableMap::CART_ID, $this->cart_id);
         if ($this->isColumnModified(CartItemTableMap::PRODUCT_ID)) $criteria->add(CartItemTableMap::PRODUCT_ID, $this->product_id);
         if ($this->isColumnModified(CartItemTableMap::QUANTITY)) $criteria->add(CartItemTableMap::QUANTITY, $this->quantity);
-        if ($this->isColumnModified(CartItemTableMap::STOCK_ID)) $criteria->add(CartItemTableMap::STOCK_ID, $this->stock_id);
+        if ($this->isColumnModified(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
         if ($this->isColumnModified(CartItemTableMap::CREATED_AT)) $criteria->add(CartItemTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CartItemTableMap::UPDATED_AT)) $criteria->add(CartItemTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1339,7 +1339,7 @@ abstract class CartItem implements ActiveRecordInterface
         $copyObj->setCartId($this->getCartId());
         $copyObj->setProductId($this->getProductId());
         $copyObj->setQuantity($this->getQuantity());
-        $copyObj->setStockId($this->getStockId());
+        $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1473,24 +1473,24 @@ abstract class CartItem implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildStock object.
+     * Declares an association between this object and a ChildProductSaleElements object.
      *
-     * @param                  ChildStock $v
+     * @param                  ChildProductSaleElements $v
      * @return                 \Thelia\Model\CartItem The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setStock(ChildStock $v = null)
+    public function setProductSaleElements(ChildProductSaleElements $v = null)
     {
         if ($v === null) {
-            $this->setStockId(NULL);
+            $this->setProductSaleElementsId(NULL);
         } else {
-            $this->setStockId($v->getId());
+            $this->setProductSaleElementsId($v->getId());
         }
 
-        $this->aStock = $v;
+        $this->aProductSaleElements = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildStock object, it will not be re-added.
+        // If this object has already been added to the ChildProductSaleElements object, it will not be re-added.
         if ($v !== null) {
             $v->addCartItem($this);
         }
@@ -1501,26 +1501,26 @@ abstract class CartItem implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildStock object
+     * Get the associated ChildProductSaleElements object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildStock The associated ChildStock object.
+     * @return                 ChildProductSaleElements The associated ChildProductSaleElements object.
      * @throws PropelException
      */
-    public function getStock(ConnectionInterface $con = null)
+    public function getProductSaleElements(ConnectionInterface $con = null)
     {
-        if ($this->aStock === null && ($this->stock_id !== null)) {
-            $this->aStock = ChildStockQuery::create()->findPk($this->stock_id, $con);
+        if ($this->aProductSaleElements === null && ($this->product_sale_elements_id !== null)) {
+            $this->aProductSaleElements = ChildProductSaleElementsQuery::create()->findPk($this->product_sale_elements_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aStock->addCartItems($this);
+                $this->aProductSaleElements->addCartItems($this);
              */
         }
 
-        return $this->aStock;
+        return $this->aProductSaleElements;
     }
 
     /**
@@ -1532,7 +1532,7 @@ abstract class CartItem implements ActiveRecordInterface
         $this->cart_id = null;
         $this->product_id = null;
         $this->quantity = null;
-        $this->stock_id = null;
+        $this->product_sale_elements_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1559,7 +1559,7 @@ abstract class CartItem implements ActiveRecordInterface
 
         $this->aCart = null;
         $this->aProduct = null;
-        $this->aStock = null;
+        $this->aProductSaleElements = null;
     }
 
     /**

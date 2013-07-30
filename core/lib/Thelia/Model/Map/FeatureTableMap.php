@@ -167,7 +167,7 @@ class FeatureTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('FeatureAv', '\\Thelia\\Model\\FeatureAv', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureAvs');
-        $this->addRelation('FeatureProd', '\\Thelia\\Model\\FeatureProd', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureProds');
+        $this->addRelation('FeatureProduct', '\\Thelia\\Model\\FeatureProduct', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureProducts');
         $this->addRelation('FeatureCategory', '\\Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'feature_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategories');
         $this->addRelation('FeatureI18n', '\\Thelia\\Model\\FeatureI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FeatureI18ns');
         $this->addRelation('Category', '\\Thelia\\Model\\Category', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Categories');
@@ -194,7 +194,7 @@ class FeatureTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 FeatureAvTableMap::clearInstancePool();
-                FeatureProdTableMap::clearInstancePool();
+                FeatureProductTableMap::clearInstancePool();
                 FeatureCategoryTableMap::clearInstancePool();
                 FeatureI18nTableMap::clearInstancePool();
             }

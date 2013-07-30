@@ -42,9 +42,9 @@ use Thelia\Model\Map\FeatureTableMap;
  * @method     ChildFeatureQuery rightJoinFeatureAv($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAv relation
  * @method     ChildFeatureQuery innerJoinFeatureAv($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAv relation
  *
- * @method     ChildFeatureQuery leftJoinFeatureProd($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureProd relation
- * @method     ChildFeatureQuery rightJoinFeatureProd($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureProd relation
- * @method     ChildFeatureQuery innerJoinFeatureProd($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureProd relation
+ * @method     ChildFeatureQuery leftJoinFeatureProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureProduct relation
+ * @method     ChildFeatureQuery rightJoinFeatureProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureProduct relation
+ * @method     ChildFeatureQuery innerJoinFeatureProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureProduct relation
  *
  * @method     ChildFeatureQuery leftJoinFeatureCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureCategory relation
  * @method     ChildFeatureQuery rightJoinFeatureCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureCategory relation
@@ -528,40 +528,40 @@ abstract class FeatureQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\FeatureProd object
+     * Filter the query by a related \Thelia\Model\FeatureProduct object
      *
-     * @param \Thelia\Model\FeatureProd|ObjectCollection $featureProd  the related object to use as filter
+     * @param \Thelia\Model\FeatureProduct|ObjectCollection $featureProduct  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
-    public function filterByFeatureProd($featureProd, $comparison = null)
+    public function filterByFeatureProduct($featureProduct, $comparison = null)
     {
-        if ($featureProd instanceof \Thelia\Model\FeatureProd) {
+        if ($featureProduct instanceof \Thelia\Model\FeatureProduct) {
             return $this
-                ->addUsingAlias(FeatureTableMap::ID, $featureProd->getFeatureId(), $comparison);
-        } elseif ($featureProd instanceof ObjectCollection) {
+                ->addUsingAlias(FeatureTableMap::ID, $featureProduct->getFeatureId(), $comparison);
+        } elseif ($featureProduct instanceof ObjectCollection) {
             return $this
-                ->useFeatureProdQuery()
-                ->filterByPrimaryKeys($featureProd->getPrimaryKeys())
+                ->useFeatureProductQuery()
+                ->filterByPrimaryKeys($featureProduct->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByFeatureProd() only accepts arguments of type \Thelia\Model\FeatureProd or Collection');
+            throw new PropelException('filterByFeatureProduct() only accepts arguments of type \Thelia\Model\FeatureProduct or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the FeatureProd relation
+     * Adds a JOIN clause to the query using the FeatureProduct relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildFeatureQuery The current query, for fluid interface
      */
-    public function joinFeatureProd($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinFeatureProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('FeatureProd');
+        $relationMap = $tableMap->getRelation('FeatureProduct');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -576,14 +576,14 @@ abstract class FeatureQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'FeatureProd');
+            $this->addJoinObject($join, 'FeatureProduct');
         }
 
         return $this;
     }
 
     /**
-     * Use the FeatureProd relation FeatureProd object
+     * Use the FeatureProduct relation FeatureProduct object
      *
      * @see useQuery()
      *
@@ -591,13 +591,13 @@ abstract class FeatureQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\FeatureProdQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\FeatureProductQuery A secondary query class using the current class as primary query
      */
-    public function useFeatureProdQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useFeatureProductQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinFeatureProd($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'FeatureProd', '\Thelia\Model\FeatureProdQuery');
+            ->joinFeatureProduct($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FeatureProduct', '\Thelia\Model\FeatureProductQuery');
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\StockQuery as BaseStockQuery;
+use Thelia\Model\Base\CurrencyI18nQuery as BaseCurrencyI18nQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'stock' table.
+ * Skeleton subclass for performing query and update operations on the 'currency_i18n' table.
  *
  *
  *
@@ -15,6 +15,7 @@ use Thelia\Model\Base\StockQuery as BaseStockQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class StockQuery extends BaseStockQuery {
+class CurrencyI18nQuery extends BaseCurrencyI18nQuery
+{
 
-} // StockQuery
+} // CurrencyI18nQuery

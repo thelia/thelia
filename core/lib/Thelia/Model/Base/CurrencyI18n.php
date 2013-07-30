@@ -2,7 +2,6 @@
 
 namespace Thelia\Model\Base;
 
-use \DateTime;
 use \Exception;
 use \PDO;
 use Propel\Runtime\Propel;
@@ -15,21 +14,17 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Currency as ChildCurrency;
+use Thelia\Model\CurrencyI18nQuery as ChildCurrencyI18nQuery;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
-use Thelia\Model\ProductPrice as ChildProductPrice;
-use Thelia\Model\ProductPriceQuery as ChildProductPriceQuery;
-use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
-use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
-use Thelia\Model\Map\ProductPriceTableMap;
+use Thelia\Model\Map\CurrencyI18nTableMap;
 
-abstract class ProductPrice implements ActiveRecordInterface
+abstract class CurrencyI18n implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProductPriceTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\CurrencyI18nTableMap';
 
 
     /**
@@ -65,45 +60,17 @@ abstract class ProductPrice implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the product_sale_elements_id field.
-     * @var        int
-     */
-    protected $product_sale_elements_id;
-
-    /**
-     * The value for the currency_id field.
-     * @var        int
-     */
-    protected $currency_id;
-
-    /**
-     * The value for the price field.
-     * @var        double
-     */
-    protected $price;
-
-    /**
-     * The value for the promo_price field.
-     * @var        double
-     */
-    protected $promo_price;
-
-    /**
-     * The value for the created_at field.
+     * The value for the locale field.
+     * Note: this column has a database default value of: 'en_US'
      * @var        string
      */
-    protected $created_at;
+    protected $locale;
 
     /**
-     * The value for the updated_at field.
+     * The value for the name field.
      * @var        string
      */
-    protected $updated_at;
-
-    /**
-     * @var        ProductSaleElements
-     */
-    protected $aProductSaleElements;
+    protected $name;
 
     /**
      * @var        Currency
@@ -119,10 +86,23 @@ abstract class ProductPrice implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\ProductPrice object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->locale = 'en_US';
+    }
+
+    /**
+     * Initializes internal state of Thelia\Model\Base\CurrencyI18n object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -214,9 +194,9 @@ abstract class ProductPrice implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ProductPrice</code> instance.  If
-     * <code>obj</code> is an instance of <code>ProductPrice</code>, delegates to
-     * <code>equals(ProductPrice)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>CurrencyI18n</code> instance.  If
+     * <code>obj</code> is an instance of <code>CurrencyI18n</code>, delegates to
+     * <code>equals(CurrencyI18n)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -297,7 +277,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return ProductPrice The current object, for fluid interface
+     * @return CurrencyI18n The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -329,7 +309,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return ProductPrice The current object, for fluid interface
+     * @return CurrencyI18n The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -384,94 +364,32 @@ abstract class ProductPrice implements ActiveRecordInterface
     }
 
     /**
-     * Get the [product_sale_elements_id] column value.
+     * Get the [locale] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getProductSaleElementsId()
+    public function getLocale()
     {
 
-        return $this->product_sale_elements_id;
+        return $this->locale;
     }
 
     /**
-     * Get the [currency_id] column value.
+     * Get the [name] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getCurrencyId()
+    public function getName()
     {
 
-        return $this->currency_id;
-    }
-
-    /**
-     * Get the [price] column value.
-     *
-     * @return   double
-     */
-    public function getPrice()
-    {
-
-        return $this->price;
-    }
-
-    /**
-     * Get the [promo_price] column value.
-     *
-     * @return   double
-     */
-    public function getPromoPrice()
-    {
-
-        return $this->promo_price;
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [created_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getCreatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->created_at;
-        } else {
-            return $this->created_at !== null ? $this->created_at->format($format) : null;
-        }
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [updated_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getUpdatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->updated_at;
-        } else {
-            return $this->updated_at !== null ? $this->updated_at->format($format) : null;
-        }
+        return $this->name;
     }
 
     /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
+     * @return   \Thelia\Model\CurrencyI18n The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -481,53 +399,7 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::ID;
-        }
-
-
-        return $this;
-    } // setId()
-
-    /**
-     * Set the value of [product_sale_elements_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
-     */
-    public function setProductSaleElementsId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->product_sale_elements_id !== $v) {
-            $this->product_sale_elements_id = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID;
-        }
-
-        if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
-            $this->aProductSaleElements = null;
-        }
-
-
-        return $this;
-    } // setProductSaleElementsId()
-
-    /**
-     * Set the value of [currency_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
-     */
-    public function setCurrencyId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->currency_id !== $v) {
-            $this->currency_id = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::CURRENCY_ID;
+            $this->modifiedColumns[] = CurrencyI18nTableMap::ID;
         }
 
         if ($this->aCurrency !== null && $this->aCurrency->getId() !== $v) {
@@ -536,91 +408,49 @@ abstract class ProductPrice implements ActiveRecordInterface
 
 
         return $this;
-    } // setCurrencyId()
+    } // setId()
 
     /**
-     * Set the value of [price] column.
+     * Set the value of [locale] column.
      *
-     * @param      double $v new value
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\CurrencyI18n The current object (for fluent API support)
      */
-    public function setPrice($v)
+    public function setLocale($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
-        if ($this->price !== $v) {
-            $this->price = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::PRICE;
+        if ($this->locale !== $v) {
+            $this->locale = $v;
+            $this->modifiedColumns[] = CurrencyI18nTableMap::LOCALE;
         }
 
 
         return $this;
-    } // setPrice()
+    } // setLocale()
 
     /**
-     * Set the value of [promo_price] column.
+     * Set the value of [name] column.
      *
-     * @param      double $v new value
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\CurrencyI18n The current object (for fluent API support)
      */
-    public function setPromoPrice($v)
+    public function setName($v)
     {
         if ($v !== null) {
-            $v = (double) $v;
+            $v = (string) $v;
         }
 
-        if ($this->promo_price !== $v) {
-            $this->promo_price = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::PROMO_PRICE;
+        if ($this->name !== $v) {
+            $this->name = $v;
+            $this->modifiedColumns[] = CurrencyI18nTableMap::NAME;
         }
 
 
         return $this;
-    } // setPromoPrice()
-
-    /**
-     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
-     */
-    public function setCreatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->created_at !== null || $dt !== null) {
-            if ($dt !== $this->created_at) {
-                $this->created_at = $dt;
-                $this->modifiedColumns[] = ProductPriceTableMap::CREATED_AT;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setCreatedAt()
-
-    /**
-     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
-     */
-    public function setUpdatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->updated_at !== null || $dt !== null) {
-            if ($dt !== $this->updated_at) {
-                $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProductPriceTableMap::UPDATED_AT;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setUpdatedAt()
+    } // setName()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -632,6 +462,10 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->locale !== 'en_US') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -659,32 +493,14 @@ abstract class ProductPrice implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductPriceTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CurrencyI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductPriceTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CurrencyI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->locale = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductPriceTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->currency_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductPriceTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->price = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductPriceTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->promo_price = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductPriceTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductPriceTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CurrencyI18nTableMap::translateFieldName('Name', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->name = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -693,10 +509,10 @@ abstract class ProductPrice implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = ProductPriceTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 3; // 3 = CurrencyI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\ProductPrice object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\CurrencyI18n object", 0, $e);
         }
     }
 
@@ -715,10 +531,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aProductSaleElements !== null && $this->product_sale_elements_id !== $this->aProductSaleElements->getId()) {
-            $this->aProductSaleElements = null;
-        }
-        if ($this->aCurrency !== null && $this->currency_id !== $this->aCurrency->getId()) {
+        if ($this->aCurrency !== null && $this->id !== $this->aCurrency->getId()) {
             $this->aCurrency = null;
         }
     } // ensureConsistency
@@ -744,13 +557,13 @@ abstract class ProductPrice implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ProductPriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CurrencyI18nTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildProductPriceQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildCurrencyI18nQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -760,7 +573,6 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aProductSaleElements = null;
             $this->aCurrency = null;
         } // if (deep)
     }
@@ -771,8 +583,8 @@ abstract class ProductPrice implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ProductPrice::setDeleted()
-     * @see ProductPrice::isDeleted()
+     * @see CurrencyI18n::setDeleted()
+     * @see CurrencyI18n::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -781,12 +593,12 @@ abstract class ProductPrice implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductPriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CurrencyI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildProductPriceQuery::create()
+            $deleteQuery = ChildCurrencyI18nQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -823,7 +635,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProductPriceTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CurrencyI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -832,19 +644,8 @@ abstract class ProductPrice implements ActiveRecordInterface
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
-                // timestampable behavior
-                if (!$this->isColumnModified(ProductPriceTableMap::CREATED_AT)) {
-                    $this->setCreatedAt(time());
-                }
-                if (!$this->isColumnModified(ProductPriceTableMap::UPDATED_AT)) {
-                    $this->setUpdatedAt(time());
-                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
-                // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(ProductPriceTableMap::UPDATED_AT)) {
-                    $this->setUpdatedAt(time());
-                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -854,7 +655,7 @@ abstract class ProductPrice implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ProductPriceTableMap::addInstanceToPool($this);
+                CurrencyI18nTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -888,13 +689,6 @@ abstract class ProductPrice implements ActiveRecordInterface
             // were passed to this object by their corresponding set
             // method.  This object relates to these object(s) by a
             // foreign key reference.
-
-            if ($this->aProductSaleElements !== null) {
-                if ($this->aProductSaleElements->isModified() || $this->aProductSaleElements->isNew()) {
-                    $affectedRows += $this->aProductSaleElements->save($con);
-                }
-                $this->setProductSaleElements($this->aProductSaleElements);
-            }
 
             if ($this->aCurrency !== null) {
                 if ($this->aCurrency->isModified() || $this->aCurrency->isNew()) {
@@ -934,36 +728,20 @@ abstract class ProductPrice implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProductPriceTableMap::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProductPriceTableMap::ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ProductPriceTableMap::ID)) {
+        if ($this->isColumnModified(CurrencyI18nTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
+        if ($this->isColumnModified(CurrencyI18nTableMap::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = 'LOCALE';
         }
-        if ($this->isColumnModified(ProductPriceTableMap::CURRENCY_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
-        }
-        if ($this->isColumnModified(ProductPriceTableMap::PRICE)) {
-            $modifiedColumns[':p' . $index++]  = 'PRICE';
-        }
-        if ($this->isColumnModified(ProductPriceTableMap::PROMO_PRICE)) {
-            $modifiedColumns[':p' . $index++]  = 'PROMO_PRICE';
-        }
-        if ($this->isColumnModified(ProductPriceTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
-        }
-        if ($this->isColumnModified(ProductPriceTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+        if ($this->isColumnModified(CurrencyI18nTableMap::NAME)) {
+            $modifiedColumns[':p' . $index++]  = 'NAME';
         }
 
         $sql = sprintf(
-            'INSERT INTO product_price (%s) VALUES (%s)',
+            'INSERT INTO currency_i18n (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -975,23 +753,11 @@ abstract class ProductPrice implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'PRODUCT_SALE_ELEMENTS_ID':
-                        $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
+                    case 'LOCALE':
+                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
-                    case 'CURRENCY_ID':
-                        $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
-                        break;
-                    case 'PRICE':
-                        $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
-                        break;
-                    case 'PROMO_PRICE':
-                        $stmt->bindValue($identifier, $this->promo_price, PDO::PARAM_STR);
-                        break;
-                    case 'CREATED_AT':
-                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case 'UPDATED_AT':
-                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                    case 'NAME':
+                        $stmt->bindValue($identifier, $this->name, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -1000,13 +766,6 @@ abstract class ProductPrice implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -1039,7 +798,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProductPriceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CurrencyI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1059,22 +818,10 @@ abstract class ProductPrice implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getProductSaleElementsId();
+                return $this->getLocale();
                 break;
             case 2:
-                return $this->getCurrencyId();
-                break;
-            case 3:
-                return $this->getPrice();
-                break;
-            case 4:
-                return $this->getPromoPrice();
-                break;
-            case 5:
-                return $this->getCreatedAt();
-                break;
-            case 6:
-                return $this->getUpdatedAt();
+                return $this->getName();
                 break;
             default:
                 return null;
@@ -1099,19 +846,15 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ProductPrice'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CurrencyI18n'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ProductPrice'][$this->getPrimaryKey()] = true;
-        $keys = ProductPriceTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['CurrencyI18n'][serialize($this->getPrimaryKey())] = true;
+        $keys = CurrencyI18nTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getProductSaleElementsId(),
-            $keys[2] => $this->getCurrencyId(),
-            $keys[3] => $this->getPrice(),
-            $keys[4] => $this->getPromoPrice(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[1] => $this->getLocale(),
+            $keys[2] => $this->getName(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1120,9 +863,6 @@ abstract class ProductPrice implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aProductSaleElements) {
-                $result['ProductSaleElements'] = $this->aProductSaleElements->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
             if (null !== $this->aCurrency) {
                 $result['Currency'] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
@@ -1144,7 +884,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProductPriceTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CurrencyI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1164,22 +904,10 @@ abstract class ProductPrice implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setProductSaleElementsId($value);
+                $this->setLocale($value);
                 break;
             case 2:
-                $this->setCurrencyId($value);
-                break;
-            case 3:
-                $this->setPrice($value);
-                break;
-            case 4:
-                $this->setPromoPrice($value);
-                break;
-            case 5:
-                $this->setCreatedAt($value);
-                break;
-            case 6:
-                $this->setUpdatedAt($value);
+                $this->setName($value);
                 break;
         } // switch()
     }
@@ -1203,15 +931,11 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ProductPriceTableMap::getFieldNames($keyType);
+        $keys = CurrencyI18nTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setProductSaleElementsId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCurrencyId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPrice($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPromoPrice($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setName($arr[$keys[2]]);
     }
 
     /**
@@ -1221,15 +945,11 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CurrencyI18nTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ProductPriceTableMap::ID)) $criteria->add(ProductPriceTableMap::ID, $this->id);
-        if ($this->isColumnModified(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
-        if ($this->isColumnModified(ProductPriceTableMap::CURRENCY_ID)) $criteria->add(ProductPriceTableMap::CURRENCY_ID, $this->currency_id);
-        if ($this->isColumnModified(ProductPriceTableMap::PRICE)) $criteria->add(ProductPriceTableMap::PRICE, $this->price);
-        if ($this->isColumnModified(ProductPriceTableMap::PROMO_PRICE)) $criteria->add(ProductPriceTableMap::PROMO_PRICE, $this->promo_price);
-        if ($this->isColumnModified(ProductPriceTableMap::CREATED_AT)) $criteria->add(ProductPriceTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(ProductPriceTableMap::UPDATED_AT)) $criteria->add(ProductPriceTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CurrencyI18nTableMap::ID)) $criteria->add(CurrencyI18nTableMap::ID, $this->id);
+        if ($this->isColumnModified(CurrencyI18nTableMap::LOCALE)) $criteria->add(CurrencyI18nTableMap::LOCALE, $this->locale);
+        if ($this->isColumnModified(CurrencyI18nTableMap::NAME)) $criteria->add(CurrencyI18nTableMap::NAME, $this->name);
 
         return $criteria;
     }
@@ -1244,30 +964,37 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
-        $criteria->add(ProductPriceTableMap::ID, $this->id);
+        $criteria = new Criteria(CurrencyI18nTableMap::DATABASE_NAME);
+        $criteria->add(CurrencyI18nTableMap::ID, $this->id);
+        $criteria->add(CurrencyI18nTableMap::LOCALE, $this->locale);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return   int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getLocale();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setId($keys[0]);
+        $this->setLocale($keys[1]);
     }
 
     /**
@@ -1277,7 +1004,7 @@ abstract class ProductPrice implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getId()) && (null === $this->getLocale());
     }
 
     /**
@@ -1286,22 +1013,18 @@ abstract class ProductPrice implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\ProductPrice (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\CurrencyI18n (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
-        $copyObj->setCurrencyId($this->getCurrencyId());
-        $copyObj->setPrice($this->getPrice());
-        $copyObj->setPromoPrice($this->getPromoPrice());
-        $copyObj->setCreatedAt($this->getCreatedAt());
-        $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setId($this->getId());
+        $copyObj->setLocale($this->getLocale());
+        $copyObj->setName($this->getName());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1314,7 +1037,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\ProductPrice Clone of current object.
+     * @return                 \Thelia\Model\CurrencyI18n Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1328,69 +1051,18 @@ abstract class ProductPrice implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildProductSaleElements object.
-     *
-     * @param                  ChildProductSaleElements $v
-     * @return                 \Thelia\Model\ProductPrice The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProductSaleElements(ChildProductSaleElements $v = null)
-    {
-        if ($v === null) {
-            $this->setProductSaleElementsId(NULL);
-        } else {
-            $this->setProductSaleElementsId($v->getId());
-        }
-
-        $this->aProductSaleElements = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProductSaleElements object, it will not be re-added.
-        if ($v !== null) {
-            $v->addProductPrice($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildProductSaleElements object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProductSaleElements The associated ChildProductSaleElements object.
-     * @throws PropelException
-     */
-    public function getProductSaleElements(ConnectionInterface $con = null)
-    {
-        if ($this->aProductSaleElements === null && ($this->product_sale_elements_id !== null)) {
-            $this->aProductSaleElements = ChildProductSaleElementsQuery::create()->findPk($this->product_sale_elements_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aProductSaleElements->addProductPrices($this);
-             */
-        }
-
-        return $this->aProductSaleElements;
-    }
-
-    /**
      * Declares an association between this object and a ChildCurrency object.
      *
      * @param                  ChildCurrency $v
-     * @return                 \Thelia\Model\ProductPrice The current object (for fluent API support)
+     * @return                 \Thelia\Model\CurrencyI18n The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCurrency(ChildCurrency $v = null)
     {
         if ($v === null) {
-            $this->setCurrencyId(NULL);
+            $this->setId(NULL);
         } else {
-            $this->setCurrencyId($v->getId());
+            $this->setId($v->getId());
         }
 
         $this->aCurrency = $v;
@@ -1398,7 +1070,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildCurrency object, it will not be re-added.
         if ($v !== null) {
-            $v->addProductPrice($this);
+            $v->addCurrencyI18n($this);
         }
 
 
@@ -1415,14 +1087,14 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function getCurrency(ConnectionInterface $con = null)
     {
-        if ($this->aCurrency === null && ($this->currency_id !== null)) {
-            $this->aCurrency = ChildCurrencyQuery::create()->findPk($this->currency_id, $con);
+        if ($this->aCurrency === null && ($this->id !== null)) {
+            $this->aCurrency = ChildCurrencyQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCurrency->addProductPrices($this);
+                $this->aCurrency->addCurrencyI18ns($this);
              */
         }
 
@@ -1435,14 +1107,11 @@ abstract class ProductPrice implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->product_sale_elements_id = null;
-        $this->currency_id = null;
-        $this->price = null;
-        $this->promo_price = null;
-        $this->created_at = null;
-        $this->updated_at = null;
+        $this->locale = null;
+        $this->name = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1462,7 +1131,6 @@ abstract class ProductPrice implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aProductSaleElements = null;
         $this->aCurrency = null;
     }
 
@@ -1473,21 +1141,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ProductPriceTableMap::DEFAULT_STRING_FORMAT);
-    }
-
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     ChildProductPrice The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = ProductPriceTableMap::UPDATED_AT;
-
-        return $this;
+        return (string) $this->exportTo(CurrencyI18nTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**

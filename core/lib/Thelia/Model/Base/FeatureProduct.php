@@ -10,31 +10,28 @@ use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\ActiveQuery\ModelCriteria;
 use Propel\Runtime\ActiveRecord\ActiveRecordInterface;
 use Propel\Runtime\Collection\Collection;
-use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Address as ChildAddress;
-use Thelia\Model\AddressQuery as ChildAddressQuery;
-use Thelia\Model\Cart as ChildCart;
-use Thelia\Model\CartItem as ChildCartItem;
-use Thelia\Model\CartItemQuery as ChildCartItemQuery;
-use Thelia\Model\CartQuery as ChildCartQuery;
-use Thelia\Model\Currency as ChildCurrency;
-use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
-use Thelia\Model\Customer as ChildCustomer;
-use Thelia\Model\CustomerQuery as ChildCustomerQuery;
-use Thelia\Model\Map\CartTableMap;
+use Thelia\Model\Feature as ChildFeature;
+use Thelia\Model\FeatureAv as ChildFeatureAv;
+use Thelia\Model\FeatureAvQuery as ChildFeatureAvQuery;
+use Thelia\Model\FeatureProduct as ChildFeatureProduct;
+use Thelia\Model\FeatureProductQuery as ChildFeatureProductQuery;
+use Thelia\Model\FeatureQuery as ChildFeatureQuery;
+use Thelia\Model\Product as ChildProduct;
+use Thelia\Model\ProductQuery as ChildProductQuery;
+use Thelia\Model\Map\FeatureProductTableMap;
 
-abstract class Cart implements ActiveRecordInterface
+abstract class FeatureProduct implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\CartTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\FeatureProductTableMap';
 
 
     /**
@@ -70,34 +67,34 @@ abstract class Cart implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the token field.
+     * The value for the product_id field.
+     * @var        int
+     */
+    protected $product_id;
+
+    /**
+     * The value for the feature_id field.
+     * @var        int
+     */
+    protected $feature_id;
+
+    /**
+     * The value for the feature_av_id field.
+     * @var        int
+     */
+    protected $feature_av_id;
+
+    /**
+     * The value for the by_default field.
      * @var        string
      */
-    protected $token;
+    protected $by_default;
 
     /**
-     * The value for the customer_id field.
+     * The value for the position field.
      * @var        int
      */
-    protected $customer_id;
-
-    /**
-     * The value for the address_delivery_id field.
-     * @var        int
-     */
-    protected $address_delivery_id;
-
-    /**
-     * The value for the address_invoice_id field.
-     * @var        int
-     */
-    protected $address_invoice_id;
-
-    /**
-     * The value for the currency_id field.
-     * @var        int
-     */
-    protected $currency_id;
+    protected $position;
 
     /**
      * The value for the created_at field.
@@ -112,30 +109,19 @@ abstract class Cart implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        Customer
+     * @var        Product
      */
-    protected $aCustomer;
+    protected $aProduct;
 
     /**
-     * @var        Address
+     * @var        Feature
      */
-    protected $aAddressRelatedByAddressDeliveryId;
+    protected $aFeature;
 
     /**
-     * @var        Address
+     * @var        FeatureAv
      */
-    protected $aAddressRelatedByAddressInvoiceId;
-
-    /**
-     * @var        Currency
-     */
-    protected $aCurrency;
-
-    /**
-     * @var        ObjectCollection|ChildCartItem[] Collection to store aggregation of ChildCartItem objects.
-     */
-    protected $collCartItems;
-    protected $collCartItemsPartial;
+    protected $aFeatureAv;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -146,13 +132,7 @@ abstract class Cart implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $cartItemsScheduledForDeletion = null;
-
-    /**
-     * Initializes internal state of Thelia\Model\Base\Cart object.
+     * Initializes internal state of Thelia\Model\Base\FeatureProduct object.
      */
     public function __construct()
     {
@@ -247,9 +227,9 @@ abstract class Cart implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Cart</code> instance.  If
-     * <code>obj</code> is an instance of <code>Cart</code>, delegates to
-     * <code>equals(Cart)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>FeatureProduct</code> instance.  If
+     * <code>obj</code> is an instance of <code>FeatureProduct</code>, delegates to
+     * <code>equals(FeatureProduct)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -330,7 +310,7 @@ abstract class Cart implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return Cart The current object, for fluid interface
+     * @return FeatureProduct The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -362,7 +342,7 @@ abstract class Cart implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return Cart The current object, for fluid interface
+     * @return FeatureProduct The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -417,58 +397,58 @@ abstract class Cart implements ActiveRecordInterface
     }
 
     /**
-     * Get the [token] column value.
+     * Get the [product_id] column value.
+     *
+     * @return   int
+     */
+    public function getProductId()
+    {
+
+        return $this->product_id;
+    }
+
+    /**
+     * Get the [feature_id] column value.
+     *
+     * @return   int
+     */
+    public function getFeatureId()
+    {
+
+        return $this->feature_id;
+    }
+
+    /**
+     * Get the [feature_av_id] column value.
+     *
+     * @return   int
+     */
+    public function getFeatureAvId()
+    {
+
+        return $this->feature_av_id;
+    }
+
+    /**
+     * Get the [by_default] column value.
      *
      * @return   string
      */
-    public function getToken()
+    public function getByDefault()
     {
 
-        return $this->token;
+        return $this->by_default;
     }
 
     /**
-     * Get the [customer_id] column value.
+     * Get the [position] column value.
      *
      * @return   int
      */
-    public function getCustomerId()
+    public function getPosition()
     {
 
-        return $this->customer_id;
-    }
-
-    /**
-     * Get the [address_delivery_id] column value.
-     *
-     * @return   int
-     */
-    public function getAddressDeliveryId()
-    {
-
-        return $this->address_delivery_id;
-    }
-
-    /**
-     * Get the [address_invoice_id] column value.
-     *
-     * @return   int
-     */
-    public function getAddressInvoiceId()
-    {
-
-        return $this->address_invoice_id;
-    }
-
-    /**
-     * Get the [currency_id] column value.
-     *
-     * @return   int
-     */
-    public function getCurrencyId()
-    {
-
-        return $this->currency_id;
+        return $this->position;
     }
 
     /**
@@ -515,7 +495,7 @@ abstract class Cart implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -525,7 +505,7 @@ abstract class Cart implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CartTableMap::ID;
+            $this->modifiedColumns[] = FeatureProductTableMap::ID;
         }
 
 
@@ -533,132 +513,128 @@ abstract class Cart implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [token] column.
+     * Set the value of [product_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
+     */
+    public function setProductId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->product_id !== $v) {
+            $this->product_id = $v;
+            $this->modifiedColumns[] = FeatureProductTableMap::PRODUCT_ID;
+        }
+
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
+        }
+
+
+        return $this;
+    } // setProductId()
+
+    /**
+     * Set the value of [feature_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
+     */
+    public function setFeatureId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->feature_id !== $v) {
+            $this->feature_id = $v;
+            $this->modifiedColumns[] = FeatureProductTableMap::FEATURE_ID;
+        }
+
+        if ($this->aFeature !== null && $this->aFeature->getId() !== $v) {
+            $this->aFeature = null;
+        }
+
+
+        return $this;
+    } // setFeatureId()
+
+    /**
+     * Set the value of [feature_av_id] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
+     */
+    public function setFeatureAvId($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->feature_av_id !== $v) {
+            $this->feature_av_id = $v;
+            $this->modifiedColumns[] = FeatureProductTableMap::FEATURE_AV_ID;
+        }
+
+        if ($this->aFeatureAv !== null && $this->aFeatureAv->getId() !== $v) {
+            $this->aFeatureAv = null;
+        }
+
+
+        return $this;
+    } // setFeatureAvId()
+
+    /**
+     * Set the value of [by_default] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
-    public function setToken($v)
+    public function setByDefault($v)
     {
         if ($v !== null) {
             $v = (string) $v;
         }
 
-        if ($this->token !== $v) {
-            $this->token = $v;
-            $this->modifiedColumns[] = CartTableMap::TOKEN;
+        if ($this->by_default !== $v) {
+            $this->by_default = $v;
+            $this->modifiedColumns[] = FeatureProductTableMap::BY_DEFAULT;
         }
 
 
         return $this;
-    } // setToken()
+    } // setByDefault()
 
     /**
-     * Set the value of [customer_id] column.
+     * Set the value of [position] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
-    public function setCustomerId($v)
+    public function setPosition($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->customer_id !== $v) {
-            $this->customer_id = $v;
-            $this->modifiedColumns[] = CartTableMap::CUSTOMER_ID;
-        }
-
-        if ($this->aCustomer !== null && $this->aCustomer->getId() !== $v) {
-            $this->aCustomer = null;
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[] = FeatureProductTableMap::POSITION;
         }
 
 
         return $this;
-    } // setCustomerId()
-
-    /**
-     * Set the value of [address_delivery_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
-     */
-    public function setAddressDeliveryId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->address_delivery_id !== $v) {
-            $this->address_delivery_id = $v;
-            $this->modifiedColumns[] = CartTableMap::ADDRESS_DELIVERY_ID;
-        }
-
-        if ($this->aAddressRelatedByAddressDeliveryId !== null && $this->aAddressRelatedByAddressDeliveryId->getId() !== $v) {
-            $this->aAddressRelatedByAddressDeliveryId = null;
-        }
-
-
-        return $this;
-    } // setAddressDeliveryId()
-
-    /**
-     * Set the value of [address_invoice_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
-     */
-    public function setAddressInvoiceId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->address_invoice_id !== $v) {
-            $this->address_invoice_id = $v;
-            $this->modifiedColumns[] = CartTableMap::ADDRESS_INVOICE_ID;
-        }
-
-        if ($this->aAddressRelatedByAddressInvoiceId !== null && $this->aAddressRelatedByAddressInvoiceId->getId() !== $v) {
-            $this->aAddressRelatedByAddressInvoiceId = null;
-        }
-
-
-        return $this;
-    } // setAddressInvoiceId()
-
-    /**
-     * Set the value of [currency_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
-     */
-    public function setCurrencyId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->currency_id !== $v) {
-            $this->currency_id = $v;
-            $this->modifiedColumns[] = CartTableMap::CURRENCY_ID;
-        }
-
-        if ($this->aCurrency !== null && $this->aCurrency->getId() !== $v) {
-            $this->aCurrency = null;
-        }
-
-
-        return $this;
-    } // setCurrencyId()
+    } // setPosition()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -666,7 +642,7 @@ abstract class Cart implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CartTableMap::CREATED_AT;
+                $this->modifiedColumns[] = FeatureProductTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -679,7 +655,7 @@ abstract class Cart implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -687,7 +663,7 @@ abstract class Cart implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CartTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = FeatureProductTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -732,31 +708,31 @@ abstract class Cart implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CartTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : FeatureProductTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CartTableMap::translateFieldName('Token', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->token = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : FeatureProductTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CartTableMap::translateFieldName('CustomerId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->customer_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureProductTableMap::translateFieldName('FeatureId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->feature_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CartTableMap::translateFieldName('AddressDeliveryId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->address_delivery_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureProductTableMap::translateFieldName('FeatureAvId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->feature_av_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CartTableMap::translateFieldName('AddressInvoiceId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->address_invoice_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FeatureProductTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->by_default = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CartTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->currency_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FeatureProductTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CartTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FeatureProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CartTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : FeatureProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -769,10 +745,10 @@ abstract class Cart implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = CartTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = FeatureProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\Cart object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\FeatureProduct object", 0, $e);
         }
     }
 
@@ -791,17 +767,14 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aCustomer !== null && $this->customer_id !== $this->aCustomer->getId()) {
-            $this->aCustomer = null;
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
         }
-        if ($this->aAddressRelatedByAddressDeliveryId !== null && $this->address_delivery_id !== $this->aAddressRelatedByAddressDeliveryId->getId()) {
-            $this->aAddressRelatedByAddressDeliveryId = null;
+        if ($this->aFeature !== null && $this->feature_id !== $this->aFeature->getId()) {
+            $this->aFeature = null;
         }
-        if ($this->aAddressRelatedByAddressInvoiceId !== null && $this->address_invoice_id !== $this->aAddressRelatedByAddressInvoiceId->getId()) {
-            $this->aAddressRelatedByAddressInvoiceId = null;
-        }
-        if ($this->aCurrency !== null && $this->currency_id !== $this->aCurrency->getId()) {
-            $this->aCurrency = null;
+        if ($this->aFeatureAv !== null && $this->feature_av_id !== $this->aFeatureAv->getId()) {
+            $this->aFeatureAv = null;
         }
     } // ensureConsistency
 
@@ -826,13 +799,13 @@ abstract class Cart implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CartTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildCartQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildFeatureProductQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -842,12 +815,9 @@ abstract class Cart implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aCustomer = null;
-            $this->aAddressRelatedByAddressDeliveryId = null;
-            $this->aAddressRelatedByAddressInvoiceId = null;
-            $this->aCurrency = null;
-            $this->collCartItems = null;
-
+            $this->aProduct = null;
+            $this->aFeature = null;
+            $this->aFeatureAv = null;
         } // if (deep)
     }
 
@@ -857,8 +827,8 @@ abstract class Cart implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Cart::setDeleted()
-     * @see Cart::isDeleted()
+     * @see FeatureProduct::setDeleted()
+     * @see FeatureProduct::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -867,12 +837,12 @@ abstract class Cart implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CartTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildCartQuery::create()
+            $deleteQuery = ChildFeatureProductQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -909,7 +879,7 @@ abstract class Cart implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CartTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -919,16 +889,16 @@ abstract class Cart implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(CartTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(FeatureProductTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(CartTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(CartTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -940,7 +910,7 @@ abstract class Cart implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CartTableMap::addInstanceToPool($this);
+                FeatureProductTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -975,32 +945,25 @@ abstract class Cart implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aCustomer !== null) {
-                if ($this->aCustomer->isModified() || $this->aCustomer->isNew()) {
-                    $affectedRows += $this->aCustomer->save($con);
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
                 }
-                $this->setCustomer($this->aCustomer);
+                $this->setProduct($this->aProduct);
             }
 
-            if ($this->aAddressRelatedByAddressDeliveryId !== null) {
-                if ($this->aAddressRelatedByAddressDeliveryId->isModified() || $this->aAddressRelatedByAddressDeliveryId->isNew()) {
-                    $affectedRows += $this->aAddressRelatedByAddressDeliveryId->save($con);
+            if ($this->aFeature !== null) {
+                if ($this->aFeature->isModified() || $this->aFeature->isNew()) {
+                    $affectedRows += $this->aFeature->save($con);
                 }
-                $this->setAddressRelatedByAddressDeliveryId($this->aAddressRelatedByAddressDeliveryId);
+                $this->setFeature($this->aFeature);
             }
 
-            if ($this->aAddressRelatedByAddressInvoiceId !== null) {
-                if ($this->aAddressRelatedByAddressInvoiceId->isModified() || $this->aAddressRelatedByAddressInvoiceId->isNew()) {
-                    $affectedRows += $this->aAddressRelatedByAddressInvoiceId->save($con);
+            if ($this->aFeatureAv !== null) {
+                if ($this->aFeatureAv->isModified() || $this->aFeatureAv->isNew()) {
+                    $affectedRows += $this->aFeatureAv->save($con);
                 }
-                $this->setAddressRelatedByAddressInvoiceId($this->aAddressRelatedByAddressInvoiceId);
-            }
-
-            if ($this->aCurrency !== null) {
-                if ($this->aCurrency->isModified() || $this->aCurrency->isNew()) {
-                    $affectedRows += $this->aCurrency->save($con);
-                }
-                $this->setCurrency($this->aCurrency);
+                $this->setFeatureAv($this->aFeatureAv);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1012,23 +975,6 @@ abstract class Cart implements ActiveRecordInterface
                 }
                 $affectedRows += 1;
                 $this->resetModified();
-            }
-
-            if ($this->cartItemsScheduledForDeletion !== null) {
-                if (!$this->cartItemsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\CartItemQuery::create()
-                        ->filterByPrimaryKeys($this->cartItemsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->cartItemsScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collCartItems !== null) {
-            foreach ($this->collCartItems as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
             }
 
             $this->alreadyInSave = false;
@@ -1051,39 +997,39 @@ abstract class Cart implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CartTableMap::ID;
+        $this->modifiedColumns[] = FeatureProductTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CartTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . FeatureProductTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CartTableMap::ID)) {
+        if ($this->isColumnModified(FeatureProductTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(CartTableMap::TOKEN)) {
-            $modifiedColumns[':p' . $index++]  = 'TOKEN';
+        if ($this->isColumnModified(FeatureProductTableMap::PRODUCT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
-        if ($this->isColumnModified(CartTableMap::CUSTOMER_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CUSTOMER_ID';
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'FEATURE_ID';
         }
-        if ($this->isColumnModified(CartTableMap::ADDRESS_DELIVERY_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ADDRESS_DELIVERY_ID';
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_AV_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'FEATURE_AV_ID';
         }
-        if ($this->isColumnModified(CartTableMap::ADDRESS_INVOICE_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'ADDRESS_INVOICE_ID';
+        if ($this->isColumnModified(FeatureProductTableMap::BY_DEFAULT)) {
+            $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
         }
-        if ($this->isColumnModified(CartTableMap::CURRENCY_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
+        if ($this->isColumnModified(FeatureProductTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
-        if ($this->isColumnModified(CartTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(FeatureProductTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(CartTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO cart (%s) VALUES (%s)',
+            'INSERT INTO feature_product (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1095,20 +1041,20 @@ abstract class Cart implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'TOKEN':
-                        $stmt->bindValue($identifier, $this->token, PDO::PARAM_STR);
+                    case 'PRODUCT_ID':
+                        $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
-                    case 'CUSTOMER_ID':
-                        $stmt->bindValue($identifier, $this->customer_id, PDO::PARAM_INT);
+                    case 'FEATURE_ID':
+                        $stmt->bindValue($identifier, $this->feature_id, PDO::PARAM_INT);
                         break;
-                    case 'ADDRESS_DELIVERY_ID':
-                        $stmt->bindValue($identifier, $this->address_delivery_id, PDO::PARAM_INT);
+                    case 'FEATURE_AV_ID':
+                        $stmt->bindValue($identifier, $this->feature_av_id, PDO::PARAM_INT);
                         break;
-                    case 'ADDRESS_INVOICE_ID':
-                        $stmt->bindValue($identifier, $this->address_invoice_id, PDO::PARAM_INT);
+                    case 'BY_DEFAULT':
+                        $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_STR);
                         break;
-                    case 'CURRENCY_ID':
-                        $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
+                    case 'POSITION':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1162,7 +1108,7 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CartTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = FeatureProductTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1182,19 +1128,19 @@ abstract class Cart implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getToken();
+                return $this->getProductId();
                 break;
             case 2:
-                return $this->getCustomerId();
+                return $this->getFeatureId();
                 break;
             case 3:
-                return $this->getAddressDeliveryId();
+                return $this->getFeatureAvId();
                 break;
             case 4:
-                return $this->getAddressInvoiceId();
+                return $this->getByDefault();
                 break;
             case 5:
-                return $this->getCurrencyId();
+                return $this->getPosition();
                 break;
             case 6:
                 return $this->getCreatedAt();
@@ -1225,18 +1171,18 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Cart'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['FeatureProduct'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Cart'][$this->getPrimaryKey()] = true;
-        $keys = CartTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['FeatureProduct'][$this->getPrimaryKey()] = true;
+        $keys = FeatureProductTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getToken(),
-            $keys[2] => $this->getCustomerId(),
-            $keys[3] => $this->getAddressDeliveryId(),
-            $keys[4] => $this->getAddressInvoiceId(),
-            $keys[5] => $this->getCurrencyId(),
+            $keys[1] => $this->getProductId(),
+            $keys[2] => $this->getFeatureId(),
+            $keys[3] => $this->getFeatureAvId(),
+            $keys[4] => $this->getByDefault(),
+            $keys[5] => $this->getPosition(),
             $keys[6] => $this->getCreatedAt(),
             $keys[7] => $this->getUpdatedAt(),
         );
@@ -1247,20 +1193,14 @@ abstract class Cart implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aCustomer) {
-                $result['Customer'] = $this->aCustomer->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aAddressRelatedByAddressDeliveryId) {
-                $result['AddressRelatedByAddressDeliveryId'] = $this->aAddressRelatedByAddressDeliveryId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aFeature) {
+                $result['Feature'] = $this->aFeature->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aAddressRelatedByAddressInvoiceId) {
-                $result['AddressRelatedByAddressInvoiceId'] = $this->aAddressRelatedByAddressInvoiceId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aCurrency) {
-                $result['Currency'] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->collCartItems) {
-                $result['CartItems'] = $this->collCartItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->aFeatureAv) {
+                $result['FeatureAv'] = $this->aFeatureAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1280,7 +1220,7 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CartTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = FeatureProductTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1300,19 +1240,19 @@ abstract class Cart implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setToken($value);
+                $this->setProductId($value);
                 break;
             case 2:
-                $this->setCustomerId($value);
+                $this->setFeatureId($value);
                 break;
             case 3:
-                $this->setAddressDeliveryId($value);
+                $this->setFeatureAvId($value);
                 break;
             case 4:
-                $this->setAddressInvoiceId($value);
+                $this->setByDefault($value);
                 break;
             case 5:
-                $this->setCurrencyId($value);
+                $this->setPosition($value);
                 break;
             case 6:
                 $this->setCreatedAt($value);
@@ -1342,14 +1282,14 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = CartTableMap::getFieldNames($keyType);
+        $keys = FeatureProductTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setToken($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCustomerId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setAddressDeliveryId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setAddressInvoiceId($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCurrencyId($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setFeatureId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setFeatureAvId($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setByDefault($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setPosition($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
         if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
@@ -1361,16 +1301,16 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CartTableMap::DATABASE_NAME);
+        $criteria = new Criteria(FeatureProductTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CartTableMap::ID)) $criteria->add(CartTableMap::ID, $this->id);
-        if ($this->isColumnModified(CartTableMap::TOKEN)) $criteria->add(CartTableMap::TOKEN, $this->token);
-        if ($this->isColumnModified(CartTableMap::CUSTOMER_ID)) $criteria->add(CartTableMap::CUSTOMER_ID, $this->customer_id);
-        if ($this->isColumnModified(CartTableMap::ADDRESS_DELIVERY_ID)) $criteria->add(CartTableMap::ADDRESS_DELIVERY_ID, $this->address_delivery_id);
-        if ($this->isColumnModified(CartTableMap::ADDRESS_INVOICE_ID)) $criteria->add(CartTableMap::ADDRESS_INVOICE_ID, $this->address_invoice_id);
-        if ($this->isColumnModified(CartTableMap::CURRENCY_ID)) $criteria->add(CartTableMap::CURRENCY_ID, $this->currency_id);
-        if ($this->isColumnModified(CartTableMap::CREATED_AT)) $criteria->add(CartTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(CartTableMap::UPDATED_AT)) $criteria->add(CartTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(FeatureProductTableMap::ID)) $criteria->add(FeatureProductTableMap::ID, $this->id);
+        if ($this->isColumnModified(FeatureProductTableMap::PRODUCT_ID)) $criteria->add(FeatureProductTableMap::PRODUCT_ID, $this->product_id);
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_ID)) $criteria->add(FeatureProductTableMap::FEATURE_ID, $this->feature_id);
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_AV_ID)) $criteria->add(FeatureProductTableMap::FEATURE_AV_ID, $this->feature_av_id);
+        if ($this->isColumnModified(FeatureProductTableMap::BY_DEFAULT)) $criteria->add(FeatureProductTableMap::BY_DEFAULT, $this->by_default);
+        if ($this->isColumnModified(FeatureProductTableMap::POSITION)) $criteria->add(FeatureProductTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(FeatureProductTableMap::CREATED_AT)) $criteria->add(FeatureProductTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) $criteria->add(FeatureProductTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1385,8 +1325,8 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(CartTableMap::DATABASE_NAME);
-        $criteria->add(CartTableMap::ID, $this->id);
+        $criteria = new Criteria(FeatureProductTableMap::DATABASE_NAME);
+        $criteria->add(FeatureProductTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1427,34 +1367,20 @@ abstract class Cart implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Cart (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\FeatureProduct (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setToken($this->getToken());
-        $copyObj->setCustomerId($this->getCustomerId());
-        $copyObj->setAddressDeliveryId($this->getAddressDeliveryId());
-        $copyObj->setAddressInvoiceId($this->getAddressInvoiceId());
-        $copyObj->setCurrencyId($this->getCurrencyId());
+        $copyObj->setProductId($this->getProductId());
+        $copyObj->setFeatureId($this->getFeatureId());
+        $copyObj->setFeatureAvId($this->getFeatureAvId());
+        $copyObj->setByDefault($this->getByDefault());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
-
-        if ($deepCopy) {
-            // important: temporarily setNew(false) because this affects the behavior of
-            // the getter/setter methods for fkey referrer objects.
-            $copyObj->setNew(false);
-
-            foreach ($this->getCartItems() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addCartItem($relObj->copy($deepCopy));
-                }
-            }
-
-        } // if ($deepCopy)
-
         if ($makeNew) {
             $copyObj->setNew(true);
             $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
@@ -1470,7 +1396,7 @@ abstract class Cart implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Cart Clone of current object.
+     * @return                 \Thelia\Model\FeatureProduct Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1484,26 +1410,26 @@ abstract class Cart implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildCustomer object.
+     * Declares an association between this object and a ChildProduct object.
      *
-     * @param                  ChildCustomer $v
-     * @return                 \Thelia\Model\Cart The current object (for fluent API support)
+     * @param                  ChildProduct $v
+     * @return                 \Thelia\Model\FeatureProduct The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setCustomer(ChildCustomer $v = null)
+    public function setProduct(ChildProduct $v = null)
     {
         if ($v === null) {
-            $this->setCustomerId(NULL);
+            $this->setProductId(NULL);
         } else {
-            $this->setCustomerId($v->getId());
+            $this->setProductId($v->getId());
         }
 
-        $this->aCustomer = $v;
+        $this->aProduct = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCustomer object, it will not be re-added.
+        // If this object has already been added to the ChildProduct object, it will not be re-added.
         if ($v !== null) {
-            $v->addCart($this);
+            $v->addFeatureProduct($this);
         }
 
 
@@ -1512,49 +1438,49 @@ abstract class Cart implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildCustomer object
+     * Get the associated ChildProduct object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCustomer The associated ChildCustomer object.
+     * @return                 ChildProduct The associated ChildProduct object.
      * @throws PropelException
      */
-    public function getCustomer(ConnectionInterface $con = null)
+    public function getProduct(ConnectionInterface $con = null)
     {
-        if ($this->aCustomer === null && ($this->customer_id !== null)) {
-            $this->aCustomer = ChildCustomerQuery::create()->findPk($this->customer_id, $con);
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ChildProductQuery::create()->findPk($this->product_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCustomer->addCarts($this);
+                $this->aProduct->addFeatureProducts($this);
              */
         }
 
-        return $this->aCustomer;
+        return $this->aProduct;
     }
 
     /**
-     * Declares an association between this object and a ChildAddress object.
+     * Declares an association between this object and a ChildFeature object.
      *
-     * @param                  ChildAddress $v
-     * @return                 \Thelia\Model\Cart The current object (for fluent API support)
+     * @param                  ChildFeature $v
+     * @return                 \Thelia\Model\FeatureProduct The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setAddressRelatedByAddressDeliveryId(ChildAddress $v = null)
+    public function setFeature(ChildFeature $v = null)
     {
         if ($v === null) {
-            $this->setAddressDeliveryId(NULL);
+            $this->setFeatureId(NULL);
         } else {
-            $this->setAddressDeliveryId($v->getId());
+            $this->setFeatureId($v->getId());
         }
 
-        $this->aAddressRelatedByAddressDeliveryId = $v;
+        $this->aFeature = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildAddress object, it will not be re-added.
+        // If this object has already been added to the ChildFeature object, it will not be re-added.
         if ($v !== null) {
-            $v->addCartRelatedByAddressDeliveryId($this);
+            $v->addFeatureProduct($this);
         }
 
 
@@ -1563,49 +1489,49 @@ abstract class Cart implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildAddress object
+     * Get the associated ChildFeature object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildAddress The associated ChildAddress object.
+     * @return                 ChildFeature The associated ChildFeature object.
      * @throws PropelException
      */
-    public function getAddressRelatedByAddressDeliveryId(ConnectionInterface $con = null)
+    public function getFeature(ConnectionInterface $con = null)
     {
-        if ($this->aAddressRelatedByAddressDeliveryId === null && ($this->address_delivery_id !== null)) {
-            $this->aAddressRelatedByAddressDeliveryId = ChildAddressQuery::create()->findPk($this->address_delivery_id, $con);
+        if ($this->aFeature === null && ($this->feature_id !== null)) {
+            $this->aFeature = ChildFeatureQuery::create()->findPk($this->feature_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aAddressRelatedByAddressDeliveryId->addCartsRelatedByAddressDeliveryId($this);
+                $this->aFeature->addFeatureProducts($this);
              */
         }
 
-        return $this->aAddressRelatedByAddressDeliveryId;
+        return $this->aFeature;
     }
 
     /**
-     * Declares an association between this object and a ChildAddress object.
+     * Declares an association between this object and a ChildFeatureAv object.
      *
-     * @param                  ChildAddress $v
-     * @return                 \Thelia\Model\Cart The current object (for fluent API support)
+     * @param                  ChildFeatureAv $v
+     * @return                 \Thelia\Model\FeatureProduct The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setAddressRelatedByAddressInvoiceId(ChildAddress $v = null)
+    public function setFeatureAv(ChildFeatureAv $v = null)
     {
         if ($v === null) {
-            $this->setAddressInvoiceId(NULL);
+            $this->setFeatureAvId(NULL);
         } else {
-            $this->setAddressInvoiceId($v->getId());
+            $this->setFeatureAvId($v->getId());
         }
 
-        $this->aAddressRelatedByAddressInvoiceId = $v;
+        $this->aFeatureAv = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildAddress object, it will not be re-added.
+        // If this object has already been added to the ChildFeatureAv object, it will not be re-added.
         if ($v !== null) {
-            $v->addCartRelatedByAddressInvoiceId($this);
+            $v->addFeatureProduct($this);
         }
 
 
@@ -1614,361 +1540,26 @@ abstract class Cart implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildAddress object
+     * Get the associated ChildFeatureAv object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildAddress The associated ChildAddress object.
+     * @return                 ChildFeatureAv The associated ChildFeatureAv object.
      * @throws PropelException
      */
-    public function getAddressRelatedByAddressInvoiceId(ConnectionInterface $con = null)
+    public function getFeatureAv(ConnectionInterface $con = null)
     {
-        if ($this->aAddressRelatedByAddressInvoiceId === null && ($this->address_invoice_id !== null)) {
-            $this->aAddressRelatedByAddressInvoiceId = ChildAddressQuery::create()->findPk($this->address_invoice_id, $con);
+        if ($this->aFeatureAv === null && ($this->feature_av_id !== null)) {
+            $this->aFeatureAv = ChildFeatureAvQuery::create()->findPk($this->feature_av_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aAddressRelatedByAddressInvoiceId->addCartsRelatedByAddressInvoiceId($this);
+                $this->aFeatureAv->addFeatureProducts($this);
              */
         }
 
-        return $this->aAddressRelatedByAddressInvoiceId;
-    }
-
-    /**
-     * Declares an association between this object and a ChildCurrency object.
-     *
-     * @param                  ChildCurrency $v
-     * @return                 \Thelia\Model\Cart The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setCurrency(ChildCurrency $v = null)
-    {
-        if ($v === null) {
-            $this->setCurrencyId(NULL);
-        } else {
-            $this->setCurrencyId($v->getId());
-        }
-
-        $this->aCurrency = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildCurrency object, it will not be re-added.
-        if ($v !== null) {
-            $v->addCart($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildCurrency object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildCurrency The associated ChildCurrency object.
-     * @throws PropelException
-     */
-    public function getCurrency(ConnectionInterface $con = null)
-    {
-        if ($this->aCurrency === null && ($this->currency_id !== null)) {
-            $this->aCurrency = ChildCurrencyQuery::create()->findPk($this->currency_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aCurrency->addCarts($this);
-             */
-        }
-
-        return $this->aCurrency;
-    }
-
-
-    /**
-     * Initializes a collection based on the name of a relation.
-     * Avoids crafting an 'init[$relationName]s' method name
-     * that wouldn't work when StandardEnglishPluralizer is used.
-     *
-     * @param      string $relationName The name of the relation to initialize
-     * @return void
-     */
-    public function initRelation($relationName)
-    {
-        if ('CartItem' == $relationName) {
-            return $this->initCartItems();
-        }
-    }
-
-    /**
-     * Clears out the collCartItems collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addCartItems()
-     */
-    public function clearCartItems()
-    {
-        $this->collCartItems = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collCartItems collection loaded partially.
-     */
-    public function resetPartialCartItems($v = true)
-    {
-        $this->collCartItemsPartial = $v;
-    }
-
-    /**
-     * Initializes the collCartItems collection.
-     *
-     * By default this just sets the collCartItems collection to an empty array (like clearcollCartItems());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initCartItems($overrideExisting = true)
-    {
-        if (null !== $this->collCartItems && !$overrideExisting) {
-            return;
-        }
-        $this->collCartItems = new ObjectCollection();
-        $this->collCartItems->setModel('\Thelia\Model\CartItem');
-    }
-
-    /**
-     * Gets an array of ChildCartItem objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCart is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildCartItem[] List of ChildCartItem objects
-     * @throws PropelException
-     */
-    public function getCartItems($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCartItemsPartial && !$this->isNew();
-        if (null === $this->collCartItems || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collCartItems) {
-                // return empty collection
-                $this->initCartItems();
-            } else {
-                $collCartItems = ChildCartItemQuery::create(null, $criteria)
-                    ->filterByCart($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collCartItemsPartial && count($collCartItems)) {
-                        $this->initCartItems(false);
-
-                        foreach ($collCartItems as $obj) {
-                            if (false == $this->collCartItems->contains($obj)) {
-                                $this->collCartItems->append($obj);
-                            }
-                        }
-
-                        $this->collCartItemsPartial = true;
-                    }
-
-                    $collCartItems->getInternalIterator()->rewind();
-
-                    return $collCartItems;
-                }
-
-                if ($partial && $this->collCartItems) {
-                    foreach ($this->collCartItems as $obj) {
-                        if ($obj->isNew()) {
-                            $collCartItems[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collCartItems = $collCartItems;
-                $this->collCartItemsPartial = false;
-            }
-        }
-
-        return $this->collCartItems;
-    }
-
-    /**
-     * Sets a collection of CartItem objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $cartItems A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCart The current object (for fluent API support)
-     */
-    public function setCartItems(Collection $cartItems, ConnectionInterface $con = null)
-    {
-        $cartItemsToDelete = $this->getCartItems(new Criteria(), $con)->diff($cartItems);
-
-
-        $this->cartItemsScheduledForDeletion = $cartItemsToDelete;
-
-        foreach ($cartItemsToDelete as $cartItemRemoved) {
-            $cartItemRemoved->setCart(null);
-        }
-
-        $this->collCartItems = null;
-        foreach ($cartItems as $cartItem) {
-            $this->addCartItem($cartItem);
-        }
-
-        $this->collCartItems = $cartItems;
-        $this->collCartItemsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related CartItem objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related CartItem objects.
-     * @throws PropelException
-     */
-    public function countCartItems(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collCartItemsPartial && !$this->isNew();
-        if (null === $this->collCartItems || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collCartItems) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getCartItems());
-            }
-
-            $query = ChildCartItemQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCart($this)
-                ->count($con);
-        }
-
-        return count($this->collCartItems);
-    }
-
-    /**
-     * Method called to associate a ChildCartItem object to this object
-     * through the ChildCartItem foreign key attribute.
-     *
-     * @param    ChildCartItem $l ChildCartItem
-     * @return   \Thelia\Model\Cart The current object (for fluent API support)
-     */
-    public function addCartItem(ChildCartItem $l)
-    {
-        if ($this->collCartItems === null) {
-            $this->initCartItems();
-            $this->collCartItemsPartial = true;
-        }
-
-        if (!in_array($l, $this->collCartItems->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddCartItem($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param CartItem $cartItem The cartItem object to add.
-     */
-    protected function doAddCartItem($cartItem)
-    {
-        $this->collCartItems[]= $cartItem;
-        $cartItem->setCart($this);
-    }
-
-    /**
-     * @param  CartItem $cartItem The cartItem object to remove.
-     * @return ChildCart The current object (for fluent API support)
-     */
-    public function removeCartItem($cartItem)
-    {
-        if ($this->getCartItems()->contains($cartItem)) {
-            $this->collCartItems->remove($this->collCartItems->search($cartItem));
-            if (null === $this->cartItemsScheduledForDeletion) {
-                $this->cartItemsScheduledForDeletion = clone $this->collCartItems;
-                $this->cartItemsScheduledForDeletion->clear();
-            }
-            $this->cartItemsScheduledForDeletion[]= clone $cartItem;
-            $cartItem->setCart(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Cart is new, it will return
-     * an empty collection; or if this Cart has previously
-     * been saved, it will retrieve related CartItems from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Cart.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildCartItem[] List of ChildCartItem objects
-     */
-    public function getCartItemsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildCartItemQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getCartItems($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Cart is new, it will return
-     * an empty collection; or if this Cart has previously
-     * been saved, it will retrieve related CartItems from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Cart.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildCartItem[] List of ChildCartItem objects
-     */
-    public function getCartItemsJoinProductSaleElements($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildCartItemQuery::create(null, $criteria);
-        $query->joinWith('ProductSaleElements', $joinBehavior);
-
-        return $this->getCartItems($query, $con);
+        return $this->aFeatureAv;
     }
 
     /**
@@ -1977,11 +1568,11 @@ abstract class Cart implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->token = null;
-        $this->customer_id = null;
-        $this->address_delivery_id = null;
-        $this->address_invoice_id = null;
-        $this->currency_id = null;
+        $this->product_id = null;
+        $this->feature_id = null;
+        $this->feature_av_id = null;
+        $this->by_default = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -2003,21 +1594,11 @@ abstract class Cart implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collCartItems) {
-                foreach ($this->collCartItems as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
         } // if ($deep)
 
-        if ($this->collCartItems instanceof Collection) {
-            $this->collCartItems->clearIterator();
-        }
-        $this->collCartItems = null;
-        $this->aCustomer = null;
-        $this->aAddressRelatedByAddressDeliveryId = null;
-        $this->aAddressRelatedByAddressInvoiceId = null;
-        $this->aCurrency = null;
+        $this->aProduct = null;
+        $this->aFeature = null;
+        $this->aFeatureAv = null;
     }
 
     /**
@@ -2027,7 +1608,7 @@ abstract class Cart implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CartTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(FeatureProductTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -2035,11 +1616,11 @@ abstract class Cart implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildCart The current object (for fluent API support)
+     * @return     ChildFeatureProduct The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CartTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = FeatureProductTableMap::UPDATED_AT;
 
         return $this;
     }

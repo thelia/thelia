@@ -12,108 +12,108 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
-use Thelia\Model\Map\StockTableMap;
+use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 
 /**
- * Base class that represents a query for the 'stock' table.
+ * Base class that represents a query for the 'product_sale_elements' table.
  *
  *
  *
- * @method     ChildStockQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildStockQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
- * @method     ChildStockQuery orderByIncrease($order = Criteria::ASC) Order by the increase column
- * @method     ChildStockQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
- * @method     ChildStockQuery orderByPromo($order = Criteria::ASC) Order by the promo column
- * @method     ChildStockQuery orderByNewness($order = Criteria::ASC) Order by the newness column
- * @method     ChildStockQuery orderByWeight($order = Criteria::ASC) Order by the weight column
- * @method     ChildStockQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildStockQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildProductSaleElementsQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildProductSaleElementsQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
+ * @method     ChildProductSaleElementsQuery orderByIncrease($order = Criteria::ASC) Order by the increase column
+ * @method     ChildProductSaleElementsQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
+ * @method     ChildProductSaleElementsQuery orderByPromo($order = Criteria::ASC) Order by the promo column
+ * @method     ChildProductSaleElementsQuery orderByNewness($order = Criteria::ASC) Order by the newness column
+ * @method     ChildProductSaleElementsQuery orderByWeight($order = Criteria::ASC) Order by the weight column
+ * @method     ChildProductSaleElementsQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildProductSaleElementsQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildStockQuery groupById() Group by the id column
- * @method     ChildStockQuery groupByProductId() Group by the product_id column
- * @method     ChildStockQuery groupByIncrease() Group by the increase column
- * @method     ChildStockQuery groupByQuantity() Group by the quantity column
- * @method     ChildStockQuery groupByPromo() Group by the promo column
- * @method     ChildStockQuery groupByNewness() Group by the newness column
- * @method     ChildStockQuery groupByWeight() Group by the weight column
- * @method     ChildStockQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildStockQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildProductSaleElementsQuery groupById() Group by the id column
+ * @method     ChildProductSaleElementsQuery groupByProductId() Group by the product_id column
+ * @method     ChildProductSaleElementsQuery groupByIncrease() Group by the increase column
+ * @method     ChildProductSaleElementsQuery groupByQuantity() Group by the quantity column
+ * @method     ChildProductSaleElementsQuery groupByPromo() Group by the promo column
+ * @method     ChildProductSaleElementsQuery groupByNewness() Group by the newness column
+ * @method     ChildProductSaleElementsQuery groupByWeight() Group by the weight column
+ * @method     ChildProductSaleElementsQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildProductSaleElementsQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildStockQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildStockQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildStockQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildProductSaleElementsQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildProductSaleElementsQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildProductSaleElementsQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildStockQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method     ChildStockQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method     ChildStockQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method     ChildProductSaleElementsQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
+ * @method     ChildProductSaleElementsQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
+ * @method     ChildProductSaleElementsQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
  *
- * @method     ChildStockQuery leftJoinAttributeCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeCombination relation
- * @method     ChildStockQuery rightJoinAttributeCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCombination relation
- * @method     ChildStockQuery innerJoinAttributeCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCombination relation
+ * @method     ChildProductSaleElementsQuery leftJoinAttributeCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeCombination relation
+ * @method     ChildProductSaleElementsQuery rightJoinAttributeCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCombination relation
+ * @method     ChildProductSaleElementsQuery innerJoinAttributeCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCombination relation
  *
- * @method     ChildStockQuery leftJoinCartItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartItem relation
- * @method     ChildStockQuery rightJoinCartItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartItem relation
- * @method     ChildStockQuery innerJoinCartItem($relationAlias = null) Adds a INNER JOIN clause to the query using the CartItem relation
+ * @method     ChildProductSaleElementsQuery leftJoinCartItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartItem relation
+ * @method     ChildProductSaleElementsQuery rightJoinCartItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartItem relation
+ * @method     ChildProductSaleElementsQuery innerJoinCartItem($relationAlias = null) Adds a INNER JOIN clause to the query using the CartItem relation
  *
- * @method     ChildStockQuery leftJoinProductPrice($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductPrice relation
- * @method     ChildStockQuery rightJoinProductPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductPrice relation
- * @method     ChildStockQuery innerJoinProductPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductPrice relation
+ * @method     ChildProductSaleElementsQuery leftJoinProductPrice($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductPrice relation
+ * @method     ChildProductSaleElementsQuery rightJoinProductPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductPrice relation
+ * @method     ChildProductSaleElementsQuery innerJoinProductPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductPrice relation
  *
- * @method     ChildStock findOne(ConnectionInterface $con = null) Return the first ChildStock matching the query
- * @method     ChildStock findOneOrCreate(ConnectionInterface $con = null) Return the first ChildStock matching the query, or a new ChildStock object populated from the query conditions when no match is found
+ * @method     ChildProductSaleElements findOne(ConnectionInterface $con = null) Return the first ChildProductSaleElements matching the query
+ * @method     ChildProductSaleElements findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProductSaleElements matching the query, or a new ChildProductSaleElements object populated from the query conditions when no match is found
  *
- * @method     ChildStock findOneById(int $id) Return the first ChildStock filtered by the id column
- * @method     ChildStock findOneByProductId(int $product_id) Return the first ChildStock filtered by the product_id column
- * @method     ChildStock findOneByIncrease(double $increase) Return the first ChildStock filtered by the increase column
- * @method     ChildStock findOneByQuantity(double $quantity) Return the first ChildStock filtered by the quantity column
- * @method     ChildStock findOneByPromo(int $promo) Return the first ChildStock filtered by the promo column
- * @method     ChildStock findOneByNewness(int $newness) Return the first ChildStock filtered by the newness column
- * @method     ChildStock findOneByWeight(double $weight) Return the first ChildStock filtered by the weight column
- * @method     ChildStock findOneByCreatedAt(string $created_at) Return the first ChildStock filtered by the created_at column
- * @method     ChildStock findOneByUpdatedAt(string $updated_at) Return the first ChildStock filtered by the updated_at column
+ * @method     ChildProductSaleElements findOneById(int $id) Return the first ChildProductSaleElements filtered by the id column
+ * @method     ChildProductSaleElements findOneByProductId(int $product_id) Return the first ChildProductSaleElements filtered by the product_id column
+ * @method     ChildProductSaleElements findOneByIncrease(double $increase) Return the first ChildProductSaleElements filtered by the increase column
+ * @method     ChildProductSaleElements findOneByQuantity(double $quantity) Return the first ChildProductSaleElements filtered by the quantity column
+ * @method     ChildProductSaleElements findOneByPromo(int $promo) Return the first ChildProductSaleElements filtered by the promo column
+ * @method     ChildProductSaleElements findOneByNewness(int $newness) Return the first ChildProductSaleElements filtered by the newness column
+ * @method     ChildProductSaleElements findOneByWeight(double $weight) Return the first ChildProductSaleElements filtered by the weight column
+ * @method     ChildProductSaleElements findOneByCreatedAt(string $created_at) Return the first ChildProductSaleElements filtered by the created_at column
+ * @method     ChildProductSaleElements findOneByUpdatedAt(string $updated_at) Return the first ChildProductSaleElements filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildStock objects filtered by the id column
- * @method     array findByProductId(int $product_id) Return ChildStock objects filtered by the product_id column
- * @method     array findByIncrease(double $increase) Return ChildStock objects filtered by the increase column
- * @method     array findByQuantity(double $quantity) Return ChildStock objects filtered by the quantity column
- * @method     array findByPromo(int $promo) Return ChildStock objects filtered by the promo column
- * @method     array findByNewness(int $newness) Return ChildStock objects filtered by the newness column
- * @method     array findByWeight(double $weight) Return ChildStock objects filtered by the weight column
- * @method     array findByCreatedAt(string $created_at) Return ChildStock objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildStock objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildProductSaleElements objects filtered by the id column
+ * @method     array findByProductId(int $product_id) Return ChildProductSaleElements objects filtered by the product_id column
+ * @method     array findByIncrease(double $increase) Return ChildProductSaleElements objects filtered by the increase column
+ * @method     array findByQuantity(double $quantity) Return ChildProductSaleElements objects filtered by the quantity column
+ * @method     array findByPromo(int $promo) Return ChildProductSaleElements objects filtered by the promo column
+ * @method     array findByNewness(int $newness) Return ChildProductSaleElements objects filtered by the newness column
+ * @method     array findByWeight(double $weight) Return ChildProductSaleElements objects filtered by the weight column
+ * @method     array findByCreatedAt(string $created_at) Return ChildProductSaleElements objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildProductSaleElements objects filtered by the updated_at column
  *
  */
-abstract class StockQuery extends ModelCriteria
+abstract class ProductSaleElementsQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\StockQuery object.
+     * Initializes internal state of \Thelia\Model\Base\ProductSaleElementsQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\Stock', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProductSaleElements', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildStockQuery object.
+     * Returns a new ChildProductSaleElementsQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildStockQuery
+     * @return ChildProductSaleElementsQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\StockQuery) {
+        if ($criteria instanceof \Thelia\Model\ProductSaleElementsQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\StockQuery();
+        $query = new \Thelia\Model\ProductSaleElementsQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -136,19 +136,19 @@ abstract class StockQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildStock|array|mixed the result, formatted by the current formatter
+     * @return ChildProductSaleElements|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = StockTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = ProductSaleElementsTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -167,11 +167,11 @@ abstract class StockQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildStock A model object, or null if the key is not found
+     * @return   ChildProductSaleElements A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, INCREASE, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM stock WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, INCREASE, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -182,9 +182,9 @@ abstract class StockQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildStock();
+            $obj = new ChildProductSaleElements();
             $obj->hydrate($row);
-            StockTableMap::addInstanceToPool($obj, (string) $key);
+            ProductSaleElementsTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -197,7 +197,7 @@ abstract class StockQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildStock|array|mixed the result, formatted by the current formatter
+     * @return ChildProductSaleElements|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -239,12 +239,12 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(StockTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -252,12 +252,12 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(StockTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -276,18 +276,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(StockTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(StockTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -298,7 +298,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -319,18 +319,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByProductId($productId = null, $comparison = null)
     {
         if (is_array($productId)) {
             $useMinMax = false;
             if (isset($productId['min'])) {
-                $this->addUsingAlias(StockTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($productId['max'])) {
-                $this->addUsingAlias(StockTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -341,7 +341,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::PRODUCT_ID, $productId, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::PRODUCT_ID, $productId, $comparison);
     }
 
     /**
@@ -360,18 +360,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByIncrease($increase = null, $comparison = null)
     {
         if (is_array($increase)) {
             $useMinMax = false;
             if (isset($increase['min'])) {
-                $this->addUsingAlias(StockTableMap::INCREASE, $increase['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::INCREASE, $increase['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($increase['max'])) {
-                $this->addUsingAlias(StockTableMap::INCREASE, $increase['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::INCREASE, $increase['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -382,7 +382,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::INCREASE, $increase, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::INCREASE, $increase, $comparison);
     }
 
     /**
@@ -401,18 +401,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByQuantity($quantity = null, $comparison = null)
     {
         if (is_array($quantity)) {
             $useMinMax = false;
             if (isset($quantity['min'])) {
-                $this->addUsingAlias(StockTableMap::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($quantity['max'])) {
-                $this->addUsingAlias(StockTableMap::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -423,7 +423,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::QUANTITY, $quantity, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::QUANTITY, $quantity, $comparison);
     }
 
     /**
@@ -442,18 +442,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByPromo($promo = null, $comparison = null)
     {
         if (is_array($promo)) {
             $useMinMax = false;
             if (isset($promo['min'])) {
-                $this->addUsingAlias(StockTableMap::PROMO, $promo['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::PROMO, $promo['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($promo['max'])) {
-                $this->addUsingAlias(StockTableMap::PROMO, $promo['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::PROMO, $promo['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -464,7 +464,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::PROMO, $promo, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::PROMO, $promo, $comparison);
     }
 
     /**
@@ -483,18 +483,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByNewness($newness = null, $comparison = null)
     {
         if (is_array($newness)) {
             $useMinMax = false;
             if (isset($newness['min'])) {
-                $this->addUsingAlias(StockTableMap::NEWNESS, $newness['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::NEWNESS, $newness['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($newness['max'])) {
-                $this->addUsingAlias(StockTableMap::NEWNESS, $newness['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::NEWNESS, $newness['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -505,7 +505,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::NEWNESS, $newness, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::NEWNESS, $newness, $comparison);
     }
 
     /**
@@ -524,18 +524,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByWeight($weight = null, $comparison = null)
     {
         if (is_array($weight)) {
             $useMinMax = false;
             if (isset($weight['min'])) {
-                $this->addUsingAlias(StockTableMap::WEIGHT, $weight['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::WEIGHT, $weight['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($weight['max'])) {
-                $this->addUsingAlias(StockTableMap::WEIGHT, $weight['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::WEIGHT, $weight['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -546,7 +546,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::WEIGHT, $weight, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::WEIGHT, $weight, $comparison);
     }
 
     /**
@@ -567,18 +567,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(StockTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(StockTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -589,7 +589,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -610,18 +610,18 @@ abstract class StockQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(StockTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(StockTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductSaleElementsTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -632,7 +632,7 @@ abstract class StockQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(StockTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -641,20 +641,20 @@ abstract class StockQuery extends ModelCriteria
      * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByProduct($product, $comparison = null)
     {
         if ($product instanceof \Thelia\Model\Product) {
             return $this
-                ->addUsingAlias(StockTableMap::PRODUCT_ID, $product->getId(), $comparison);
+                ->addUsingAlias(ProductSaleElementsTableMap::PRODUCT_ID, $product->getId(), $comparison);
         } elseif ($product instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(StockTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ProductSaleElementsTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByProduct() only accepts arguments of type \Thelia\Model\Product or Collection');
         }
@@ -666,7 +666,7 @@ abstract class StockQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -716,13 +716,13 @@ abstract class StockQuery extends ModelCriteria
      * @param \Thelia\Model\AttributeCombination|ObjectCollection $attributeCombination  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByAttributeCombination($attributeCombination, $comparison = null)
     {
         if ($attributeCombination instanceof \Thelia\Model\AttributeCombination) {
             return $this
-                ->addUsingAlias(StockTableMap::ID, $attributeCombination->getStockId(), $comparison);
+                ->addUsingAlias(ProductSaleElementsTableMap::ID, $attributeCombination->getProductSaleElementsId(), $comparison);
         } elseif ($attributeCombination instanceof ObjectCollection) {
             return $this
                 ->useAttributeCombinationQuery()
@@ -739,7 +739,7 @@ abstract class StockQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function joinAttributeCombination($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -789,13 +789,13 @@ abstract class StockQuery extends ModelCriteria
      * @param \Thelia\Model\CartItem|ObjectCollection $cartItem  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByCartItem($cartItem, $comparison = null)
     {
         if ($cartItem instanceof \Thelia\Model\CartItem) {
             return $this
-                ->addUsingAlias(StockTableMap::ID, $cartItem->getStockId(), $comparison);
+                ->addUsingAlias(ProductSaleElementsTableMap::ID, $cartItem->getProductSaleElementsId(), $comparison);
         } elseif ($cartItem instanceof ObjectCollection) {
             return $this
                 ->useCartItemQuery()
@@ -812,7 +812,7 @@ abstract class StockQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function joinCartItem($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -862,13 +862,13 @@ abstract class StockQuery extends ModelCriteria
      * @param \Thelia\Model\ProductPrice|ObjectCollection $productPrice  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function filterByProductPrice($productPrice, $comparison = null)
     {
         if ($productPrice instanceof \Thelia\Model\ProductPrice) {
             return $this
-                ->addUsingAlias(StockTableMap::ID, $productPrice->getStockId(), $comparison);
+                ->addUsingAlias(ProductSaleElementsTableMap::ID, $productPrice->getProductSaleElementsId(), $comparison);
         } elseif ($productPrice instanceof ObjectCollection) {
             return $this
                 ->useProductPriceQuery()
@@ -885,7 +885,7 @@ abstract class StockQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function joinProductPrice($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -932,21 +932,21 @@ abstract class StockQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildStock $stock Object to remove from the list of results
+     * @param   ChildProductSaleElements $productSaleElements Object to remove from the list of results
      *
-     * @return ChildStockQuery The current query, for fluid interface
+     * @return ChildProductSaleElementsQuery The current query, for fluid interface
      */
-    public function prune($stock = null)
+    public function prune($productSaleElements = null)
     {
-        if ($stock) {
-            $this->addUsingAlias(StockTableMap::ID, $stock->getId(), Criteria::NOT_EQUAL);
+        if ($productSaleElements) {
+            $this->addUsingAlias(ProductSaleElementsTableMap::ID, $productSaleElements->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the stock table.
+     * Deletes all rows from the product_sale_elements table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -954,7 +954,7 @@ abstract class StockQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -965,8 +965,8 @@ abstract class StockQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            StockTableMap::clearInstancePool();
-            StockTableMap::clearRelatedInstancePool();
+            ProductSaleElementsTableMap::clearInstancePool();
+            ProductSaleElementsTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -978,9 +978,9 @@ abstract class StockQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildStock or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildProductSaleElements or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildStock object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildProductSaleElements object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -991,13 +991,13 @@ abstract class StockQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(StockTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(StockTableMap::DATABASE_NAME);
+        $criteria->setDbName(ProductSaleElementsTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -1007,10 +1007,10 @@ abstract class StockQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        StockTableMap::removeInstanceFromPool($criteria);
+        ProductSaleElementsTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            StockTableMap::clearRelatedInstancePool();
+            ProductSaleElementsTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -1027,11 +1027,11 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(StockTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -1039,51 +1039,51 @@ abstract class StockQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(StockTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProductSaleElementsTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(StockTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(ProductSaleElementsTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(StockTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(ProductSaleElementsTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(StockTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(ProductSaleElementsTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildStockQuery The current query, for fluid interface
+     * @return     ChildProductSaleElementsQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(StockTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(ProductSaleElementsTableMap::CREATED_AT);
     }
 
-} // StockQuery
+} // ProductSaleElementsQuery

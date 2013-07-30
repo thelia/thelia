@@ -23,13 +23,13 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  *
  * @method     ChildAttributeCombinationQuery orderByAttributeId($order = Criteria::ASC) Order by the attribute_id column
  * @method     ChildAttributeCombinationQuery orderByAttributeAvId($order = Criteria::ASC) Order by the attribute_av_id column
- * @method     ChildAttributeCombinationQuery orderByStockId($order = Criteria::ASC) Order by the stock_id column
+ * @method     ChildAttributeCombinationQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
  * @method     ChildAttributeCombinationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAttributeCombinationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildAttributeCombinationQuery groupByAttributeId() Group by the attribute_id column
  * @method     ChildAttributeCombinationQuery groupByAttributeAvId() Group by the attribute_av_id column
- * @method     ChildAttributeCombinationQuery groupByStockId() Group by the stock_id column
+ * @method     ChildAttributeCombinationQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
  * @method     ChildAttributeCombinationQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAttributeCombinationQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -45,22 +45,22 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  * @method     ChildAttributeCombinationQuery rightJoinAttributeAv($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeAv relation
  * @method     ChildAttributeCombinationQuery innerJoinAttributeAv($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeAv relation
  *
- * @method     ChildAttributeCombinationQuery leftJoinStock($relationAlias = null) Adds a LEFT JOIN clause to the query using the Stock relation
- * @method     ChildAttributeCombinationQuery rightJoinStock($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Stock relation
- * @method     ChildAttributeCombinationQuery innerJoinStock($relationAlias = null) Adds a INNER JOIN clause to the query using the Stock relation
+ * @method     ChildAttributeCombinationQuery leftJoinProductSaleElements($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildAttributeCombinationQuery rightJoinProductSaleElements($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildAttributeCombinationQuery innerJoinProductSaleElements($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductSaleElements relation
  *
  * @method     ChildAttributeCombination findOne(ConnectionInterface $con = null) Return the first ChildAttributeCombination matching the query
  * @method     ChildAttributeCombination findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAttributeCombination matching the query, or a new ChildAttributeCombination object populated from the query conditions when no match is found
  *
  * @method     ChildAttributeCombination findOneByAttributeId(int $attribute_id) Return the first ChildAttributeCombination filtered by the attribute_id column
  * @method     ChildAttributeCombination findOneByAttributeAvId(int $attribute_av_id) Return the first ChildAttributeCombination filtered by the attribute_av_id column
- * @method     ChildAttributeCombination findOneByStockId(int $stock_id) Return the first ChildAttributeCombination filtered by the stock_id column
+ * @method     ChildAttributeCombination findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildAttributeCombination filtered by the product_sale_elements_id column
  * @method     ChildAttributeCombination findOneByCreatedAt(string $created_at) Return the first ChildAttributeCombination filtered by the created_at column
  * @method     ChildAttributeCombination findOneByUpdatedAt(string $updated_at) Return the first ChildAttributeCombination filtered by the updated_at column
  *
  * @method     array findByAttributeId(int $attribute_id) Return ChildAttributeCombination objects filtered by the attribute_id column
  * @method     array findByAttributeAvId(int $attribute_av_id) Return ChildAttributeCombination objects filtered by the attribute_av_id column
- * @method     array findByStockId(int $stock_id) Return ChildAttributeCombination objects filtered by the stock_id column
+ * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildAttributeCombination objects filtered by the product_sale_elements_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildAttributeCombination objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAttributeCombination objects filtered by the updated_at column
  *
@@ -113,7 +113,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * $obj = $c->findPk(array(12, 34, 56), $con);
      * </code>
      *
-     * @param array[$attribute_id, $attribute_av_id, $stock_id] $key Primary key to use for the query
+     * @param array[$attribute_id, $attribute_av_id, $product_sale_elements_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildAttributeCombination|array|mixed the result, formatted by the current formatter
@@ -151,7 +151,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ATTRIBUTE_ID, ATTRIBUTE_AV_ID, STOCK_ID, CREATED_AT, UPDATED_AT FROM attribute_combination WHERE ATTRIBUTE_ID = :p0 AND ATTRIBUTE_AV_ID = :p1 AND STOCK_ID = :p2';
+        $sql = 'SELECT ATTRIBUTE_ID, ATTRIBUTE_AV_ID, PRODUCT_SALE_ELEMENTS_ID, CREATED_AT, UPDATED_AT FROM attribute_combination WHERE ATTRIBUTE_ID = :p0 AND ATTRIBUTE_AV_ID = :p1 AND PRODUCT_SALE_ELEMENTS_ID = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -227,7 +227,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     {
         $this->addUsingAlias(AttributeCombinationTableMap::ATTRIBUTE_ID, $key[0], Criteria::EQUAL);
         $this->addUsingAlias(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $key[2], Criteria::EQUAL);
+        $this->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $key[2], Criteria::EQUAL);
 
         return $this;
     }
@@ -248,7 +248,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
             $cton0 = $this->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_ID, $key[0], Criteria::EQUAL);
             $cton1 = $this->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(AttributeCombinationTableMap::STOCK_ID, $key[2], Criteria::EQUAL);
+            $cton2 = $this->getNewCriterion(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $key[2], Criteria::EQUAL);
             $cton0->addAnd($cton2);
             $this->addOr($cton0);
         }
@@ -343,18 +343,18 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the stock_id column
+     * Filter the query on the product_sale_elements_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByStockId(1234); // WHERE stock_id = 1234
-     * $query->filterByStockId(array(12, 34)); // WHERE stock_id IN (12, 34)
-     * $query->filterByStockId(array('min' => 12)); // WHERE stock_id > 12
+     * $query->filterByProductSaleElementsId(1234); // WHERE product_sale_elements_id = 1234
+     * $query->filterByProductSaleElementsId(array(12, 34)); // WHERE product_sale_elements_id IN (12, 34)
+     * $query->filterByProductSaleElementsId(array('min' => 12)); // WHERE product_sale_elements_id > 12
      * </code>
      *
-     * @see       filterByStock()
+     * @see       filterByProductSaleElements()
      *
-     * @param     mixed $stockId The value to use as filter.
+     * @param     mixed $productSaleElementsId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -362,16 +362,16 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
-    public function filterByStockId($stockId = null, $comparison = null)
+    public function filterByProductSaleElementsId($productSaleElementsId = null, $comparison = null)
     {
-        if (is_array($stockId)) {
+        if (is_array($productSaleElementsId)) {
             $useMinMax = false;
-            if (isset($stockId['min'])) {
-                $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stockId['min'], Criteria::GREATER_EQUAL);
+            if (isset($productSaleElementsId['min'])) {
+                $this->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($stockId['max'])) {
-                $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stockId['max'], Criteria::LESS_EQUAL);
+            if (isset($productSaleElementsId['max'])) {
+                $this->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -382,7 +382,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stockId, $comparison);
+        return $this->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId, $comparison);
     }
 
     /**
@@ -622,42 +622,42 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Stock object
+     * Filter the query by a related \Thelia\Model\ProductSaleElements object
      *
-     * @param \Thelia\Model\Stock|ObjectCollection $stock The related object(s) to use as filter
+     * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
-    public function filterByStock($stock, $comparison = null)
+    public function filterByProductSaleElements($productSaleElements, $comparison = null)
     {
-        if ($stock instanceof \Thelia\Model\Stock) {
+        if ($productSaleElements instanceof \Thelia\Model\ProductSaleElements) {
             return $this
-                ->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stock->getId(), $comparison);
-        } elseif ($stock instanceof ObjectCollection) {
+                ->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElements->getId(), $comparison);
+        } elseif ($productSaleElements instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stock->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElements->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByStock() only accepts arguments of type \Thelia\Model\Stock or Collection');
+            throw new PropelException('filterByProductSaleElements() only accepts arguments of type \Thelia\Model\ProductSaleElements or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Stock relation
+     * Adds a JOIN clause to the query using the ProductSaleElements relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
-    public function joinStock($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProductSaleElements($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Stock');
+        $relationMap = $tableMap->getRelation('ProductSaleElements');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -672,14 +672,14 @@ abstract class AttributeCombinationQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Stock');
+            $this->addJoinObject($join, 'ProductSaleElements');
         }
 
         return $this;
     }
 
     /**
-     * Use the Stock relation Stock object
+     * Use the ProductSaleElements relation ProductSaleElements object
      *
      * @see useQuery()
      *
@@ -687,13 +687,13 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\StockQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
      */
-    public function useStockQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProductSaleElementsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinStock($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Stock', '\Thelia\Model\StockQuery');
+            ->joinProductSaleElements($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductSaleElements', '\Thelia\Model\ProductSaleElementsQuery');
     }
 
     /**
@@ -708,7 +708,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
         if ($attributeCombination) {
             $this->addCond('pruneCond0', $this->getAliasedColName(AttributeCombinationTableMap::ATTRIBUTE_ID), $attributeCombination->getAttributeId(), Criteria::NOT_EQUAL);
             $this->addCond('pruneCond1', $this->getAliasedColName(AttributeCombinationTableMap::ATTRIBUTE_AV_ID), $attributeCombination->getAttributeAvId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(AttributeCombinationTableMap::STOCK_ID), $attributeCombination->getStockId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond2', $this->getAliasedColName(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID), $attributeCombination->getProductSaleElementsId(), Criteria::NOT_EQUAL);
             $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
         }
 

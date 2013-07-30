@@ -23,8 +23,15 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Core\Event\ActionEvent;
 
-class DefaultActionEvent extends ActionEvent
-{
+use Symfony\Component\EventDispatcher\Event;
+
+/**
+ * Base class used for internal event like creating new Customer, adding item to cart, etc
+ *
+ * Class InternalEvent
+ * @package Thelia\Core\Event
+ */
+abstract class InternalEvent extends Event {
+
 }

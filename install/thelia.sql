@@ -64,8 +64,8 @@ CREATE TABLE `product_category`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`product_id`,`category_id`),
-    INDEX `fk_product_has_category_category1_idx` (`category_id`),
-    INDEX `fk_product_has_category_product1_idx` (`product_id`),
+    INDEX `idx_product_has_category_category1` (`category_id`),
+    INDEX `idx_product_has_category_product1` (`product_id`),
     CONSTRAINT `fk_product_has_category_product1`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
@@ -196,6 +196,7 @@ CREATE TABLE `feature_av`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `feature_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -208,12 +209,12 @@ CREATE TABLE `feature_av`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- feature_prod
+-- feature_product
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `feature_prod`;
+DROP TABLE IF EXISTS `feature_product`;
 
-CREATE TABLE `feature_prod`
+CREATE TABLE `feature_product`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
@@ -319,13 +320,13 @@ CREATE TABLE `attribute_combination`
 (
     `attribute_id` INTEGER NOT NULL,
     `attribute_av_id` INTEGER NOT NULL,
-    `stock_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
-    PRIMARY KEY (`attribute_id`,`attribute_av_id`,`stock_id`),
+    PRIMARY KEY (`attribute_id`,`attribute_av_id`,`product_sale_elements_id`),
     INDEX `idx_attribute_combination_attribute_id` (`attribute_id`),
     INDEX `idx_attribute_combination_attribute_av_id` (`attribute_av_id`),
-    INDEX `idx_attribute_combination_stock_id` (`stock_id`),
+    INDEX `idx_attribute_combination_product_sale_elements_id` (`product_sale_elements_id`),
     CONSTRAINT `fk_attribute_combination_attribute_id`
         FOREIGN KEY (`attribute_id`)
         REFERENCES `attribute` (`id`)
@@ -336,18 +337,18 @@ CREATE TABLE `attribute_combination`
         REFERENCES `attribute_av` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE,
-    CONSTRAINT `fk_attribute_combination_stock_id`
-        FOREIGN KEY (`stock_id`)
-        REFERENCES `stock` (`id`)
+    CONSTRAINT `fk_attribute_combination_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- stock
+-- product_sale_elements
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `stock`;
+DROP TABLE IF EXISTS `product_sale_elements`;
 
-CREATE TABLE `stock`
+CREATE TABLE `product_sale_elements`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
@@ -359,8 +360,8 @@ CREATE TABLE `stock`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_stock_product_id` (`product_id`),
-    CONSTRAINT `fk_stock_product_id`
+    INDEX `idx_product_sale_element_product_id` (`product_id`),
+    CONSTRAINT `fk_product_sale_element_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
@@ -759,7 +760,6 @@ DROP TABLE IF EXISTS `currency`;
 CREATE TABLE `currency`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(45),
     `code` VARCHAR(45),
     `symbol` VARCHAR(45),
     `rate` FLOAT,
@@ -1072,8 +1072,8 @@ CREATE TABLE `group_module`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `id_idx` (`group_id`),
-    INDEX `id_idx1` (`module_id`),
+    INDEX `idx_group_module_group_id` (`group_id`),
+    INDEX `idx_group_module_module_id` (`module_id`),
     CONSTRAINT `fk_group_module_group_id`
         FOREIGN KEY (`group_id`)
         REFERENCES `group` (`id`)
@@ -1250,8 +1250,8 @@ CREATE TABLE `content_folder`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`content_id`,`folder_id`),
-    INDEX `fk__idx` (`content_id`),
-    INDEX `fk_content_folder_folder_id_idx` (`folder_id`),
+    INDEX `idx_content_folder_content_id` (`content_id`),
+    INDEX `idx_content_folder_folder_id` (`folder_id`),
     CONSTRAINT `fk_content_folder_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
@@ -1312,22 +1312,22 @@ CREATE TABLE `cart_item`
     `cart_id` INTEGER NOT NULL,
     `product_id` INTEGER NOT NULL,
     `quantity` FLOAT DEFAULT 1,
-    `stock_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_cart_item_cart_id` (`cart_id`),
     INDEX `idx_cart_item_product_id` (`product_id`),
-    INDEX `idx_cart_item_stock_id` (`stock_id`),
+    INDEX `idx_cart_item_product_sale_elements_id` (`product_sale_elements_id`),
     CONSTRAINT `fk_cart_item_cart_id`
         FOREIGN KEY (`cart_id`)
         REFERENCES `cart` (`id`),
     CONSTRAINT `fk_cart_item_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`),
-    CONSTRAINT `fk_cart_item_stock_id`
-        FOREIGN KEY (`stock_id`)
-        REFERENCES `stock` (`id`)
+    CONSTRAINT `fk_cart_item_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1339,18 +1339,18 @@ DROP TABLE IF EXISTS `product_price`;
 CREATE TABLE `product_price`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `stock_id` INTEGER NOT NULL,
+    `product_sale_elements_id` INTEGER NOT NULL,
     `currency_id` INTEGER NOT NULL,
     `price` FLOAT NOT NULL,
     `promo_price` FLOAT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_product_price_stock_id` (`stock_id`),
+    INDEX `idx_product_price_product_sale_elements_id` (`product_sale_elements_id`),
     INDEX `idx_product_price_currency_id` (`currency_id`),
-    CONSTRAINT `fk_product_price_stock_id`
-        FOREIGN KEY (`stock_id`)
-        REFERENCES `stock` (`id`),
+    CONSTRAINT `fk_product_price_product_sale_elements_id`
+        FOREIGN KEY (`product_sale_elements_id`)
+        REFERENCES `product_sale_elements` (`id`),
     CONSTRAINT `fk_product_price_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
@@ -1660,6 +1660,24 @@ CREATE TABLE `document_i18n`
     CONSTRAINT `document_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `document` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- currency_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `currency_i18n`;
+
+CREATE TABLE `currency_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `name` VARCHAR(45),
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `currency_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `currency` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

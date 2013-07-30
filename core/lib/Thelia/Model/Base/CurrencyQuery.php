@@ -13,6 +13,7 @@ use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\Currency as ChildCurrency;
+use Thelia\Model\CurrencyI18nQuery as ChildCurrencyI18nQuery;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\Map\CurrencyTableMap;
 
@@ -22,7 +23,6 @@ use Thelia\Model\Map\CurrencyTableMap;
  *
  *
  * @method     ChildCurrencyQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildCurrencyQuery orderByName($order = Criteria::ASC) Order by the name column
  * @method     ChildCurrencyQuery orderByCode($order = Criteria::ASC) Order by the code column
  * @method     ChildCurrencyQuery orderBySymbol($order = Criteria::ASC) Order by the symbol column
  * @method     ChildCurrencyQuery orderByRate($order = Criteria::ASC) Order by the rate column
@@ -31,7 +31,6 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildCurrencyQuery groupById() Group by the id column
- * @method     ChildCurrencyQuery groupByName() Group by the name column
  * @method     ChildCurrencyQuery groupByCode() Group by the code column
  * @method     ChildCurrencyQuery groupBySymbol() Group by the symbol column
  * @method     ChildCurrencyQuery groupByRate() Group by the rate column
@@ -55,11 +54,14 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery rightJoinProductPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductPrice relation
  * @method     ChildCurrencyQuery innerJoinProductPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductPrice relation
  *
+ * @method     ChildCurrencyQuery leftJoinCurrencyI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CurrencyI18n relation
+ * @method     ChildCurrencyQuery rightJoinCurrencyI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CurrencyI18n relation
+ * @method     ChildCurrencyQuery innerJoinCurrencyI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the CurrencyI18n relation
+ *
  * @method     ChildCurrency findOne(ConnectionInterface $con = null) Return the first ChildCurrency matching the query
  * @method     ChildCurrency findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCurrency matching the query, or a new ChildCurrency object populated from the query conditions when no match is found
  *
  * @method     ChildCurrency findOneById(int $id) Return the first ChildCurrency filtered by the id column
- * @method     ChildCurrency findOneByName(string $name) Return the first ChildCurrency filtered by the name column
  * @method     ChildCurrency findOneByCode(string $code) Return the first ChildCurrency filtered by the code column
  * @method     ChildCurrency findOneBySymbol(string $symbol) Return the first ChildCurrency filtered by the symbol column
  * @method     ChildCurrency findOneByRate(double $rate) Return the first ChildCurrency filtered by the rate column
@@ -68,7 +70,6 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrency findOneByUpdatedAt(string $updated_at) Return the first ChildCurrency filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildCurrency objects filtered by the id column
- * @method     array findByName(string $name) Return ChildCurrency objects filtered by the name column
  * @method     array findByCode(string $code) Return ChildCurrency objects filtered by the code column
  * @method     array findBySymbol(string $symbol) Return ChildCurrency objects filtered by the symbol column
  * @method     array findByRate(double $rate) Return ChildCurrency objects filtered by the rate column
@@ -163,7 +164,7 @@ abstract class CurrencyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, NAME, CODE, SYMBOL, RATE, BY_DEFAULT, CREATED_AT, UPDATED_AT FROM currency WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, SYMBOL, RATE, BY_DEFAULT, CREATED_AT, UPDATED_AT FROM currency WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -291,35 +292,6 @@ abstract class CurrencyQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CurrencyTableMap::ID, $id, $comparison);
-    }
-
-    /**
-     * Filter the query on the name column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByName('fooValue');   // WHERE name = 'fooValue'
-     * $query->filterByName('%fooValue%'); // WHERE name LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $name The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCurrencyQuery The current query, for fluid interface
-     */
-    public function filterByName($name = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($name)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $name)) {
-                $name = str_replace('*', '%', $name);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(CurrencyTableMap::NAME, $name, $comparison);
     }
 
     /**
@@ -768,6 +740,79 @@ abstract class CurrencyQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query by a related \Thelia\Model\CurrencyI18n object
+     *
+     * @param \Thelia\Model\CurrencyI18n|ObjectCollection $currencyI18n  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function filterByCurrencyI18n($currencyI18n, $comparison = null)
+    {
+        if ($currencyI18n instanceof \Thelia\Model\CurrencyI18n) {
+            return $this
+                ->addUsingAlias(CurrencyTableMap::ID, $currencyI18n->getId(), $comparison);
+        } elseif ($currencyI18n instanceof ObjectCollection) {
+            return $this
+                ->useCurrencyI18nQuery()
+                ->filterByPrimaryKeys($currencyI18n->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCurrencyI18n() only accepts arguments of type \Thelia\Model\CurrencyI18n or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CurrencyI18n relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function joinCurrencyI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CurrencyI18n');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CurrencyI18n');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CurrencyI18n relation CurrencyI18n object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CurrencyI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useCurrencyI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    {
+        return $this
+            ->joinCurrencyI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CurrencyI18n', '\Thelia\Model\CurrencyI18nQuery');
+    }
+
+    /**
      * Exclude object from result
      *
      * @param   ChildCurrency $currency Object to remove from the list of results
@@ -922,6 +967,63 @@ abstract class CurrencyQuery extends ModelCriteria
     public function firstCreatedFirst()
     {
         return $this->addAscendingOrderByColumn(CurrencyTableMap::CREATED_AT);
+    }
+
+    // i18n behavior
+
+    /**
+     * Adds a JOIN clause to the query using the i18n relation
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        $relationName = $relationAlias ? $relationAlias : 'CurrencyI18n';
+
+        return $this
+            ->joinCurrencyI18n($relationAlias, $joinType)
+            ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
+    }
+
+    /**
+     * Adds a JOIN clause to the query and hydrates the related I18n object.
+     * Shortcut for $c->joinI18n($locale)->with()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
+    {
+        $this
+            ->joinI18n($locale, null, $joinType)
+            ->with('CurrencyI18n');
+        $this->with['CurrencyI18n']->setIsWithOneToMany(false);
+
+        return $this;
+    }
+
+    /**
+     * Use the I18n relation query object
+     *
+     * @see       useQuery()
+     *
+     * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
+     *
+     * @return    ChildCurrencyI18nQuery A secondary query class using the current class as primary query
+     */
+    public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    {
+        return $this
+            ->joinI18n($locale, $relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CurrencyI18n', '\Thelia\Model\CurrencyI18nQuery');
     }
 
 } // CurrencyQuery
