@@ -4,7 +4,7 @@ namespace Thelia\Model;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\Base\Cart as BaseCart;
-use Thelia\Model\Base\StockQuery;
+use Thelia\Model\Base\ProductSaleElementsQuery;
 
 class Cart extends BaseCart
 {
@@ -36,8 +36,8 @@ class Cart extends BaseCart
         foreach ($cartItems as $cartItem){
 
             $product = $cartItem->getProduct();
-            $stock = $cartItem->getStock();
-            if ($product && $stock && $product->getVisible() == 1 && $stock->getQuantity() > $cartItem->getQuantity()) {
+            $productSaleElements = $cartItem->getProductSaleElements();
+            if ($product && $productSaleElements && $product->getVisible() == 1 && $productSaleElements->getQuantity() > $cartItem->getQuantity()) {
 
                 $item = new CartItem();
                 $item->setCart($cart);

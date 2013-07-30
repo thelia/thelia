@@ -27,7 +27,7 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Action\Exception\StockNotFoundException;
 use Thelia\Action\Exception\ProductNotFoundException;
-use Thelia\Model\StockQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;
 
@@ -65,7 +65,7 @@ class CartAdd extends BaseForm
                     ))
                 )
             ))
-            ->add("stock_id", "hidden", array(
+            ->add("product_sale_elements_id", "hidden", array(
                 "constraints" => array(
                     new Constraints\Callback(array(
                         "methods" => array($this, "checkStockAvailability")
@@ -103,13 +103,13 @@ class CartAdd extends BaseForm
         if ($value) {
             $data = $context->getRoot()->getData();
 
-            $stock = StockQuery::create()
+            $productSaleElements = ProductSaleElementsQuery::create()
                 ->filterById($value)
                 ->filterByProductId($data["product"])
                 ->count();
 
-            if ($stock == 0) {
-                throw new StockNotFoundException(sprintf("This stock_id does not exists for this product : %d", $value));
+            if ($productSaleElements == 0) {
+                throw new StockNotFoundException(sprintf("This product_sale_elements_id does not exists for this product : %d", $value));
             }
         }
     }
@@ -118,12 +118,12 @@ class CartAdd extends BaseForm
     {
         $data = $context->getRoot()->getData();
 
-        $stock = StockQuery::create()
-            ->filterById($data["stock_id"])
+        $productSaleElements = ProductSaleElementsQuery::create()
+            ->filterById($data["product_sale_elements_id"])
             ->filterByProductId($data["product"])
             ->findOne();
 
-        if ($stock->getQuantity() < $value && ConfigQuery::read("verifyStock", 1) == 1) {
+        if ($productSaleElements->getQuantity() < $value && ConfigQuery::read("verifyStock", 1) == 1) {
             $context->addViolation("quantity value is not valid");
         }
     }
