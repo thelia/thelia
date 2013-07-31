@@ -20,14 +20,40 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Tests\Command;
 
+namespace Thelia\Core\Template\Loop;
 
-abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase {
-    public function getKernel()
+use Thelia\Core\Template\Element\BaseLoop;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
+
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Core\Template\Loop\Argument\Argument;
+
+use Thelia\Type\TypeCollection;
+use Thelia\Type;
+
+/**
+ *
+ * @package Thelia\Core\Template\Loop
+ *
+ * @author Franck Allimant <franck@cqfdev.fr>
+ */
+class Order extends BaseLoop
+{
+    public function getArgDefinitions()
     {
-        $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");
+        return new ArgumentCollection();
+    }
 
-        return $kernel;
+    /**
+     *
+     *
+     * @return \Thelia\Core\Template\Element\LoopResult
+     */
+    public function exec(&$pagination)
+    {
+    	// TODO : a coder !
+        return new LoopResult();
     }
 }

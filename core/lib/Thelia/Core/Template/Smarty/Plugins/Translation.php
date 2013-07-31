@@ -24,10 +24,10 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Symfony\Component\Translation\TranslatorInterface;
 
-class Translation implements SmartyPluginInterface
+class Translation extends AbstractSmartyPlugin
 {
 	protected $translator;
 
@@ -44,7 +44,15 @@ class Translation implements SmartyPluginInterface
      */
     public function translate($params, &$smarty)
     {
-    	return $this->translator->trans($params['l'], isset($params['p']) ? $params['p'] : array());
+    	// All parameters other than 'l' are supposed to be variables. Build an array of var => value pairs
+    	// and pass it to the translator
+    	$vars = array();
+
+    	foreach($params as $name => $value) {
+    		$vars["%$name"] = $value;
+    	}
+
+    	return $this->translator->trans($params['l'], $vars);
     }
 
     /**

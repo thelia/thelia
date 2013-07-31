@@ -31,6 +31,7 @@ use Thelia\Core\Security\Exception\AuthenticationException;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
+use Thelia\Core\Event\TheliaEvents;
 
 class SessionController extends BaseAdminController {
 
@@ -41,6 +42,8 @@ class SessionController extends BaseAdminController {
 
 	public function checkLogoutAction()
 	{
+    	$this->dispatch(TheliaEvents::ADMIN_LOGOUT);
+
 		$this->getSecurityContext()->clear();
 
 		// Go back to login page.
@@ -63,6 +66,8 @@ class SessionController extends BaseAdminController {
 
     		// Log authentication success
     		AdminLog::append("Authentication successuful", $request, $user);
+
+    		$this->dispatch(TheliaEvents::ADMIN_LOGIN);
 
     		// Redirect to the success URL
     		return Redirect::exec($adminLoginForm->getSuccessUrl());

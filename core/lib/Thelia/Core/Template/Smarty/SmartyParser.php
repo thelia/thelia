@@ -10,7 +10,7 @@ use \Smarty;
 use Symfony\Component\HttpFoundation\Response;
 use Thelia\Core\Template\ParserInterface;
 
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Exception\ResourceNotFoundException;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Model\ConfigQuery;
@@ -177,7 +177,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->status = $status;
     }
 
-    public function addPlugins(SmartyPluginInterface $plugin)
+    public function addPlugins(AbstractSmartyPlugin $plugin)
     {
         $this->plugins[] = $plugin;
     }

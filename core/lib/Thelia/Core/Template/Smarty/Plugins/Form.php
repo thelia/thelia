@@ -27,7 +27,7 @@ use Thelia\Form\BaseForm;
 use Thelia\Core\Template\Element\Exception\ElementNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Log\Tlog;
 use Thelia\Core\Template\ParserContext;
 
@@ -55,7 +55,7 @@ use Thelia\Core\Template\ParserContext;
  * Class Form
  * @package Thelia\Core\Template\Smarty\Plugins
  */
-class Form implements SmartyPluginInterface
+class Form extends AbstractSmartyPlugin
 {
 
     protected $request;

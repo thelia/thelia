@@ -24,12 +24,12 @@
 namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
-use Thelia\Core\Template\Smarty\SmartyPluginInterface;
+use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 
-class Assetic implements SmartyPluginInterface
+class Assetic extends AbstractSmartyPlugin
 {
-    public $asset_manager;
+    public $assetManager;
 
     public function __construct()
     {
@@ -37,22 +37,27 @@ class Assetic implements SmartyPluginInterface
 
         $asset_dir_from_web_root = 'assets/admin/default'; // FIXME
 
-        $this->asset_manager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root);
+        $this->assetManager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root);
     }
 
-    public function theliaBlockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    public function blockJavascripts($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        return $this->asset_manager->processSmartyPluginCall('js', $params, $content, $template, $repeat);
+        return $this->assetManager->processSmartyPluginCall('js', $params, $content, $template, $repeat);
     }
 
-    public function theliaBlockImages($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    public function blockImages($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        return $this->asset_manager->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
+        return $this->assetManager->processSmartyPluginCall(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $content, $template, $repeat);
     }
 
-    public function theliaBlockStylesheets($params, $content, \Smarty_Internal_Template $template, &$repeat)
+    public function blockStylesheets($params, $content, \Smarty_Internal_Template $template, &$repeat)
     {
-        return $this->asset_manager->processSmartyPluginCall('css', $params, $content, $template, $repeat);
+        return $this->assetManager->processSmartyPluginCall('css', $params, $content, $template, $repeat);
+    }
+
+    public function functionImage($params, \Smarty_Internal_Template $template)
+    {
+    	return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template);
     }
 
     /**
@@ -63,9 +68,10 @@ class Assetic implements SmartyPluginInterface
     public function getPluginDescriptors()
     {
         return array(
-            new SmartyPluginDescriptor('block', 'stylesheets', $this, 'theliaBlockStylesheets'),
-            new SmartyPluginDescriptor('block', 'javascripts', $this, 'theliaBlockJavascripts'),
-            new SmartyPluginDescriptor('block', 'images'     , $this, 'theliaBlockImages')
+            new SmartyPluginDescriptor('block'   , 'stylesheets', $this, 'blockStylesheets'),
+            new SmartyPluginDescriptor('block'   , 'javascripts', $this, 'blockJavascripts'),
+            new SmartyPluginDescriptor('block'   , 'images'     , $this, 'blockImages'),
+            new SmartyPluginDescriptor('function', 'image'      , $this, 'functionImage')
         );
     }
 }

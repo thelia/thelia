@@ -116,7 +116,7 @@ class Customer extends BaseCustomer implements UserInterface
 
     protected function generateRef()
     {
-        return date("YmdHisu");
+        return uniqid(substr($this->getLastname(), 0, (strlen($this->getLastname()) >= 3) ? 3 : strlen($this->getLastname())), true);
     }
 
     public function setPassword($password)

@@ -8,3 +8,4 @@ Variables Config à initialiser:
 - default_locale : la locale par défaut (ex. en_US), à utiliser pour les fichiers de traduction
 - asset_dir_from_web_root : le chemin relatif à /web du repertoires des assets (ex. assets)
 - active_template: chemin du template front relatif au repertoire template (ex. default)
+- thelia_version: la version de Thelia (ex. 2.0.0 alpha)

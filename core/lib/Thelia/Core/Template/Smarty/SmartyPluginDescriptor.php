@@ -42,7 +42,7 @@ class SmartyPluginDescriptor
     protected $name;
 
     /**
-     * @var SmartyPluginInterface plugin implmentation class
+     * @var AbstractSmartyPlugin plugin implmentation class
      */
     protected $class;
 
