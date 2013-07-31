@@ -1,4 +1,5 @@
 {
+    "name" : "thelia/thelia",
     "description" : "Thelia is an ecommerce CMS.",
     "licence" : "GPL-3.0+",
     "homepage" : "http://thelia.net",
