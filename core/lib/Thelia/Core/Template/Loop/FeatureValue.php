@@ -33,24 +33,21 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\FeatureValueQuery;
-use Thelia\Model\Base\ProductCategoryQuery;
-use Thelia\Model\Base\FeatureQuery;
+use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Feature loop
+ * FeatureValue loop
  *
  *
- * Class Feature
+ * Class FeatureValue
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Feature extends BaseLoop
+class FeatureValue extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -58,11 +55,11 @@ class Feature extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('product'),
-            Argument::createIntListTypeArgument('category'),
-            Argument::createBooleanTypeArgument('visible', 1),
-            Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('feature', null, true),
+            Argument::createIntTypeArgument('product', null, true),
+            Argument::createIntListTypeArgument('feature_available'),
+            Argument::createBooleanTypeArgument('exclude_feature_available', 0),
+            Argument::createBooleanTypeArgument('exclude_default_values', 0),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -80,54 +77,31 @@ class Feature extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = FeatureQuery::create();
+        $search = FeatureProductQuery::create();
 
-        $id = $this->getId();
+        $feature = $this->getFeature();
 
-        if (null !== $id) {
-            $search->filterById($id, Criteria::IN);
-        }
-
-        $exclude = $this->getExclude();
-
-        if (null !== $exclude) {
-            $search->filterById($exclude, Criteria::NOT_IN);
-        }
-
-        $visible = $this->getVisible();
-
-        $search->filterByVisible($visible);
+        $search->filterByFeatureId($feature, Criteria::EQUAL);
 
         $product = $this->getProduct();
-        $category = $this->getCategory();
 
-        if(null !== $product) {
-            $productCategories = ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find()->getData();
+        $search->filterByProductId($product, Criteria::EQUAL);
 
-            if(null === $category) {
-                $category = $productCategories;
-            } else {
-                $category = array_merge($category, $productCategories);
-            }
+        $featureAvailable = $this->geFeature_available();
+
+        if (null !== $featureAvailable) {
+            $search->filterByFeatureAvId($featureAvailable, Criteria::IN);
         }
 
-        if(null !== $category) {
-            $search->filterByCategory(
-                CategoryQuery::create()->filterById($category)->find(),
-                Criteria::IN
-            );
+        $excludeFeatureAvailable = $this->getExclude_feature_available();
+        if($excludeFeatureAvailable == true) {
+            $search->filterByFeatureAvId(null, Criteria::NULL);
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
+        $excludeDefaultValues = $this->getExclude_default_values();
+        if($excludeDefaultValues == true) {
+            $search->filterByByDefault(null, Criteria::NULL);
+        }
 
         $orders  = $this->getOrder();
 
@@ -148,17 +122,28 @@ class Feature extends BaseLoop
             }
         }
 
-        $features = $this->search($search, $pagination);
+        /**
+         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
+         *
+         * @todo : verify here if we want results for row without translations.
+         */
+
+        /*$search->joinWithI18n(
+            $this->request->getSession()->getLocale(),
+            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
+        );*/
+
+        $featureValues = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($features as $feature) {
+        foreach ($featureValues as $featureValue) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $feature->getId());
-            $loopResultRow->set("TITLE",$feature->getTitle());
-            $loopResultRow->set("CHAPO", $feature->getChapo());
-            $loopResultRow->set("DESCRIPTION", $feature->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $feature->getPostscriptum());
+            $loopResultRow->set("ID", $featureValue->getId());
+            /*$loopResultRow->set("TITLE",$featureValue->getTitle());
+            $loopResultRow->set("CHAPO", $featureValue->getChapo());
+            $loopResultRow->set("DESCRIPTION", $featureValue->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $featureValue->getPostscriptum());*/
 
             $loopResult->addRow($loopResultRow);
         }

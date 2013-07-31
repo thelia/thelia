@@ -39,7 +39,7 @@ use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
- *
+ *todo : to be finished
  * FeatureAvailable loop
  *
  *
@@ -125,17 +125,17 @@ class FeatureAvailable extends BaseLoop
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
-        $features = $this->search($search, $pagination);
+        $featuresAv = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($features as $feature) {
+        foreach ($featuresAv as $featureAv) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $feature->getId());
-            $loopResultRow->set("TITLE",$feature->getTitle());
-            $loopResultRow->set("CHAPO", $feature->getChapo());
-            $loopResultRow->set("DESCRIPTION", $feature->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $feature->getPostscriptum());
+            $loopResultRow->set("ID", $featureAv->getId());
+            $loopResultRow->set("TITLE",$featureAv->getTitle());
+            $loopResultRow->set("CHAPO", $featureAv->getChapo());
+            $loopResultRow->set("DESCRIPTION", $featureAv->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $featureAv->getPostscriptum());
 
             $loopResult->addRow($loopResultRow);
         }

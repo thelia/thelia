@@ -33,11 +33,11 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\FeatureProdQuery;
+use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureQuery;
-use Thelia\Model\Map\FeatureProdTableMap;
+use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -328,7 +328,7 @@ class Product extends BaseLoop
                     $featureAlias = 'fa_' . $feature;
                     if($feature_av != '*')
                         $featureAlias .= '_' . $feature_av;
-                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
                     if($feature_av != '*')
                         $search->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
@@ -356,7 +356,7 @@ class Product extends BaseLoop
                     $featureAlias = 'fv_' . $feature;
                     if($feature_value != '*')
                         $featureAlias .= '_' . $feature_value;
-                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
                     if($feature_value != '*')
                         $search->addJoinCondition($featureAlias, "`$featureAlias`.BY_DEFAULT = ?", $feature_value, null, \PDO::PARAM_STR);
