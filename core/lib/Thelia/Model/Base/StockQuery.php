@@ -22,18 +22,22 @@ use Thelia\Model\Map\StockTableMap;
  *
  *
  * @method     ChildStockQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildStockQuery orderByCombinationId($order = Criteria::ASC) Order by the combination_id column
  * @method     ChildStockQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildStockQuery orderByIncrease($order = Criteria::ASC) Order by the increase column
  * @method     ChildStockQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
+ * @method     ChildStockQuery orderByPromo($order = Criteria::ASC) Order by the promo column
+ * @method     ChildStockQuery orderByNewness($order = Criteria::ASC) Order by the newness column
+ * @method     ChildStockQuery orderByWeight($order = Criteria::ASC) Order by the weight column
  * @method     ChildStockQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildStockQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildStockQuery groupById() Group by the id column
- * @method     ChildStockQuery groupByCombinationId() Group by the combination_id column
  * @method     ChildStockQuery groupByProductId() Group by the product_id column
  * @method     ChildStockQuery groupByIncrease() Group by the increase column
  * @method     ChildStockQuery groupByQuantity() Group by the quantity column
+ * @method     ChildStockQuery groupByPromo() Group by the promo column
+ * @method     ChildStockQuery groupByNewness() Group by the newness column
+ * @method     ChildStockQuery groupByWeight() Group by the weight column
  * @method     ChildStockQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildStockQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -41,30 +45,42 @@ use Thelia\Model\Map\StockTableMap;
  * @method     ChildStockQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildStockQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildStockQuery leftJoinCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the Combination relation
- * @method     ChildStockQuery rightJoinCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Combination relation
- * @method     ChildStockQuery innerJoinCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the Combination relation
- *
  * @method     ChildStockQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
  * @method     ChildStockQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
  * @method     ChildStockQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ *
+ * @method     ChildStockQuery leftJoinAttributeCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the AttributeCombination relation
+ * @method     ChildStockQuery rightJoinAttributeCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeCombination relation
+ * @method     ChildStockQuery innerJoinAttributeCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeCombination relation
+ *
+ * @method     ChildStockQuery leftJoinCartItem($relationAlias = null) Adds a LEFT JOIN clause to the query using the CartItem relation
+ * @method     ChildStockQuery rightJoinCartItem($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CartItem relation
+ * @method     ChildStockQuery innerJoinCartItem($relationAlias = null) Adds a INNER JOIN clause to the query using the CartItem relation
+ *
+ * @method     ChildStockQuery leftJoinProductPrice($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductPrice relation
+ * @method     ChildStockQuery rightJoinProductPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductPrice relation
+ * @method     ChildStockQuery innerJoinProductPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductPrice relation
  *
  * @method     ChildStock findOne(ConnectionInterface $con = null) Return the first ChildStock matching the query
  * @method     ChildStock findOneOrCreate(ConnectionInterface $con = null) Return the first ChildStock matching the query, or a new ChildStock object populated from the query conditions when no match is found
  *
  * @method     ChildStock findOneById(int $id) Return the first ChildStock filtered by the id column
- * @method     ChildStock findOneByCombinationId(int $combination_id) Return the first ChildStock filtered by the combination_id column
  * @method     ChildStock findOneByProductId(int $product_id) Return the first ChildStock filtered by the product_id column
  * @method     ChildStock findOneByIncrease(double $increase) Return the first ChildStock filtered by the increase column
  * @method     ChildStock findOneByQuantity(double $quantity) Return the first ChildStock filtered by the quantity column
+ * @method     ChildStock findOneByPromo(int $promo) Return the first ChildStock filtered by the promo column
+ * @method     ChildStock findOneByNewness(int $newness) Return the first ChildStock filtered by the newness column
+ * @method     ChildStock findOneByWeight(double $weight) Return the first ChildStock filtered by the weight column
  * @method     ChildStock findOneByCreatedAt(string $created_at) Return the first ChildStock filtered by the created_at column
  * @method     ChildStock findOneByUpdatedAt(string $updated_at) Return the first ChildStock filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildStock objects filtered by the id column
- * @method     array findByCombinationId(int $combination_id) Return ChildStock objects filtered by the combination_id column
  * @method     array findByProductId(int $product_id) Return ChildStock objects filtered by the product_id column
  * @method     array findByIncrease(double $increase) Return ChildStock objects filtered by the increase column
  * @method     array findByQuantity(double $quantity) Return ChildStock objects filtered by the quantity column
+ * @method     array findByPromo(int $promo) Return ChildStock objects filtered by the promo column
+ * @method     array findByNewness(int $newness) Return ChildStock objects filtered by the newness column
+ * @method     array findByWeight(double $weight) Return ChildStock objects filtered by the weight column
  * @method     array findByCreatedAt(string $created_at) Return ChildStock objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildStock objects filtered by the updated_at column
  *
@@ -155,7 +171,7 @@ abstract class StockQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, COMBINATION_ID, PRODUCT_ID, INCREASE, QUANTITY, CREATED_AT, UPDATED_AT FROM stock WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, INCREASE, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM stock WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -286,49 +302,6 @@ abstract class StockQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the combination_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCombinationId(1234); // WHERE combination_id = 1234
-     * $query->filterByCombinationId(array(12, 34)); // WHERE combination_id IN (12, 34)
-     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
-     * </code>
-     *
-     * @see       filterByCombination()
-     *
-     * @param     mixed $combinationId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildStockQuery The current query, for fluid interface
-     */
-    public function filterByCombinationId($combinationId = null, $comparison = null)
-    {
-        if (is_array($combinationId)) {
-            $useMinMax = false;
-            if (isset($combinationId['min'])) {
-                $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($combinationId['max'])) {
-                $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(StockTableMap::COMBINATION_ID, $combinationId, $comparison);
-    }
-
-    /**
      * Filter the query on the product_id column
      *
      * Example usage:
@@ -454,6 +427,129 @@ abstract class StockQuery extends ModelCriteria
     }
 
     /**
+     * Filter the query on the promo column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPromo(1234); // WHERE promo = 1234
+     * $query->filterByPromo(array(12, 34)); // WHERE promo IN (12, 34)
+     * $query->filterByPromo(array('min' => 12)); // WHERE promo > 12
+     * </code>
+     *
+     * @param     mixed $promo The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function filterByPromo($promo = null, $comparison = null)
+    {
+        if (is_array($promo)) {
+            $useMinMax = false;
+            if (isset($promo['min'])) {
+                $this->addUsingAlias(StockTableMap::PROMO, $promo['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($promo['max'])) {
+                $this->addUsingAlias(StockTableMap::PROMO, $promo['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(StockTableMap::PROMO, $promo, $comparison);
+    }
+
+    /**
+     * Filter the query on the newness column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByNewness(1234); // WHERE newness = 1234
+     * $query->filterByNewness(array(12, 34)); // WHERE newness IN (12, 34)
+     * $query->filterByNewness(array('min' => 12)); // WHERE newness > 12
+     * </code>
+     *
+     * @param     mixed $newness The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function filterByNewness($newness = null, $comparison = null)
+    {
+        if (is_array($newness)) {
+            $useMinMax = false;
+            if (isset($newness['min'])) {
+                $this->addUsingAlias(StockTableMap::NEWNESS, $newness['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($newness['max'])) {
+                $this->addUsingAlias(StockTableMap::NEWNESS, $newness['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(StockTableMap::NEWNESS, $newness, $comparison);
+    }
+
+    /**
+     * Filter the query on the weight column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByWeight(1234); // WHERE weight = 1234
+     * $query->filterByWeight(array(12, 34)); // WHERE weight IN (12, 34)
+     * $query->filterByWeight(array('min' => 12)); // WHERE weight > 12
+     * </code>
+     *
+     * @param     mixed $weight The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function filterByWeight($weight = null, $comparison = null)
+    {
+        if (is_array($weight)) {
+            $useMinMax = false;
+            if (isset($weight['min'])) {
+                $this->addUsingAlias(StockTableMap::WEIGHT, $weight['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($weight['max'])) {
+                $this->addUsingAlias(StockTableMap::WEIGHT, $weight['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(StockTableMap::WEIGHT, $weight, $comparison);
+    }
+
+    /**
      * Filter the query on the created_at column
      *
      * Example usage:
@@ -540,81 +636,6 @@ abstract class StockQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Combination object
-     *
-     * @param \Thelia\Model\Combination|ObjectCollection $combination The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildStockQuery The current query, for fluid interface
-     */
-    public function filterByCombination($combination, $comparison = null)
-    {
-        if ($combination instanceof \Thelia\Model\Combination) {
-            return $this
-                ->addUsingAlias(StockTableMap::COMBINATION_ID, $combination->getId(), $comparison);
-        } elseif ($combination instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(StockTableMap::COMBINATION_ID, $combination->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByCombination() only accepts arguments of type \Thelia\Model\Combination or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Combination relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildStockQuery The current query, for fluid interface
-     */
-    public function joinCombination($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Combination');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Combination');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Combination relation Combination object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\CombinationQuery A secondary query class using the current class as primary query
-     */
-    public function useCombinationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinCombination($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Combination', '\Thelia\Model\CombinationQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\Product object
      *
      * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
@@ -687,6 +708,225 @@ abstract class StockQuery extends ModelCriteria
         return $this
             ->joinProduct($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Product', '\Thelia\Model\ProductQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\AttributeCombination object
+     *
+     * @param \Thelia\Model\AttributeCombination|ObjectCollection $attributeCombination  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function filterByAttributeCombination($attributeCombination, $comparison = null)
+    {
+        if ($attributeCombination instanceof \Thelia\Model\AttributeCombination) {
+            return $this
+                ->addUsingAlias(StockTableMap::ID, $attributeCombination->getStockId(), $comparison);
+        } elseif ($attributeCombination instanceof ObjectCollection) {
+            return $this
+                ->useAttributeCombinationQuery()
+                ->filterByPrimaryKeys($attributeCombination->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByAttributeCombination() only accepts arguments of type \Thelia\Model\AttributeCombination or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the AttributeCombination relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function joinAttributeCombination($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('AttributeCombination');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'AttributeCombination');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the AttributeCombination relation AttributeCombination object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\AttributeCombinationQuery A secondary query class using the current class as primary query
+     */
+    public function useAttributeCombinationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinAttributeCombination($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'AttributeCombination', '\Thelia\Model\AttributeCombinationQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\CartItem object
+     *
+     * @param \Thelia\Model\CartItem|ObjectCollection $cartItem  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function filterByCartItem($cartItem, $comparison = null)
+    {
+        if ($cartItem instanceof \Thelia\Model\CartItem) {
+            return $this
+                ->addUsingAlias(StockTableMap::ID, $cartItem->getStockId(), $comparison);
+        } elseif ($cartItem instanceof ObjectCollection) {
+            return $this
+                ->useCartItemQuery()
+                ->filterByPrimaryKeys($cartItem->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCartItem() only accepts arguments of type \Thelia\Model\CartItem or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CartItem relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function joinCartItem($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CartItem');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CartItem');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CartItem relation CartItem object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CartItemQuery A secondary query class using the current class as primary query
+     */
+    public function useCartItemQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCartItem($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CartItem', '\Thelia\Model\CartItemQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\ProductPrice object
+     *
+     * @param \Thelia\Model\ProductPrice|ObjectCollection $productPrice  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function filterByProductPrice($productPrice, $comparison = null)
+    {
+        if ($productPrice instanceof \Thelia\Model\ProductPrice) {
+            return $this
+                ->addUsingAlias(StockTableMap::ID, $productPrice->getStockId(), $comparison);
+        } elseif ($productPrice instanceof ObjectCollection) {
+            return $this
+                ->useProductPriceQuery()
+                ->filterByPrimaryKeys($productPrice->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByProductPrice() only accepts arguments of type \Thelia\Model\ProductPrice or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ProductPrice relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildStockQuery The current query, for fluid interface
+     */
+    public function joinProductPrice($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ProductPrice');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ProductPrice');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ProductPrice relation ProductPrice object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ProductPriceQuery A secondary query class using the current class as primary query
+     */
+    public function useProductPriceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinProductPrice($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductPrice', '\Thelia\Model\ProductPriceQuery');
     }
 
     /**

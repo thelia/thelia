@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,21 +33,21 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\AddressQuery;
+use Thelia\Model\Base\FeatureAvQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
+ *todo : to be finished
+ * FeatureAvailable loop
  *
- * Address loop
  *
- *
- * Class Address
+ * Class FeatureAvailable
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Address extends BaseLoop
+class FeatureAvailable extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -55,16 +56,15 @@ class Address extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
+            Argument::createIntListTypeArgument('feature'),
+            Argument::createIntListTypeArgument('exclude'),
             new Argument(
-                'customer',
+                'order',
                 new TypeCollection(
-                    new Type\IntType(),
-                    new Type\EnumType(array('current'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
-                'current'
-            ),
-            Argument::createBooleanTypeArgument('default'),
-            Argument::createIntListTypeArgument('exclude')
+                'manual'
+            )
         );
     }
 
@@ -75,63 +75,67 @@ class Address extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = AddressQuery::create();
+        $search = FeatureAvQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
-        $customer = $this->getCustomer();
-
-        if ($customer === 'current') {
-            $currentCustomer = $this->request->getSession()->getCustomerUser();
-            if($currentCustomer === null) {
-                return new LoopResult();
-            } else {
-                $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
-            }
-        } else {
-            $search->filterByCustomerId($customer, Criteria::EQUAL);
-        }
-
-        $default = $this->getDefault();
-
-        if ($default === true) {
-            $search->filterByIsDefault(1, Criteria::EQUAL);
-        } elseif($default === false) {
-            $search->filterByIsDefault(1, Criteria::NOT_EQUAL);
-        }
-
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $addresses = $this->search($search, $pagination);
+        $feature = $this->getFeature();
+
+        if(null !== $feature) {
+            $search->filterByFeatureId($feature, Criteria::IN);
+        }
+
+        $orders  = $this->getOrder();
+
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+            }
+        }
+
+        /**
+         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
+         *
+         * @todo : verify here if we want results for row without translations.
+         */
+
+        $search->joinWithI18n(
+            $this->request->getSession()->getLocale(),
+            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
+        );
+
+        $featuresAv = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($addresses as $address) {
+        foreach ($featuresAv as $featureAv) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $address->getId());
-            $loopResultRow->set("NAME", $address->getName());
-            $loopResultRow->set("CUSTOMER", $address->getCustomerId());
-            $loopResultRow->set("TITLE", $address->getTitleId());
-            $loopResultRow->set("COMPANY", $address->getCompany());
-            $loopResultRow->set("FIRSTNAME", $address->getFirstname());
-            $loopResultRow->set("LASTNAME", $address->getLastname());
-            $loopResultRow->set("ADDRESS1", $address->getAddress1());
-            $loopResultRow->set("ADDRESS2", $address->getAddress2());
-            $loopResultRow->set("ADDRESS3", $address->getAddress3());
-            $loopResultRow->set("ZIPCODE", $address->getZipcode());
-            $loopResultRow->set("CITY", $address->getCity());
-            $loopResultRow->set("COUNTRY", $address->getCountryId());
-            $loopResultRow->set("PHONE", $address->getPhone());
-            $loopResultRow->set("CELLPHONE", $address->getCellphone());
-            $loopResultRow->set("DEFAULT", $address->getIsDefault());
+            $loopResultRow->set("ID", $featureAv->getId());
+            $loopResultRow->set("TITLE",$featureAv->getTitle());
+            $loopResultRow->set("CHAPO", $featureAv->getChapo());
+            $loopResultRow->set("DESCRIPTION", $featureAv->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $featureAv->getPostscriptum());
 
             $loopResult->addRow($loopResultRow);
         }

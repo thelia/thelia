@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,21 +33,24 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CountryQuery;
+use Thelia\Model\Base\CategoryQuery;
+use Thelia\Model\Base\ProductCategoryQuery;
+use Thelia\Model\Base\FeatureQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Country loop
+ * Feature loop
  *
  *
- * Class Country
+ * Class Feature
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Country extends BaseLoop
+class Feature extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -54,11 +58,18 @@ class Country extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('limit', 500), // overwrite orginal param to increase the limit
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('area'),
-            Argument::createBooleanTypeArgument('with_area'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('product'),
+            Argument::createIntListTypeArgument('category'),
+            Argument::createBooleanTypeArgument('visible', 1),
+            Argument::createIntListTypeArgument('exclude'),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                ),
+                'manual'
+            )
         );
     }
 
@@ -69,32 +80,61 @@ class Country extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CountryQuery::create();
+        $search = FeatureQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
-        $area = $this->getArea();
-
-        if (null !== $area) {
-            $search->filterByAreaId($area, Criteria::IN);
-        }
-
-        $withArea = $this->getWith_area();
-
-        if (true === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNOTNULL);
-        } elseif (false == $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNULL);
-        }
-
         $exclude = $this->getExclude();
 
-        if (!is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
+        }
+
+        $visible = $this->getVisible();
+
+        $search->filterByVisible($visible);
+
+        $product = $this->getProduct();
+        $category = $this->getCategory();
+
+        if(null !== $product) {
+            $productCategories = ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find()->getData();
+
+            if(null === $category) {
+                $category = $productCategories;
+            } else {
+                $category = array_merge($category, $productCategories);
+            }
+        }
+
+        if(null !== $category) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterById($category)->find(),
+                Criteria::IN
+            );
+        }
+
+        $orders  = $this->getOrder();
+
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+            }
         }
 
         /**
@@ -108,23 +148,17 @@ class Country extends BaseLoop
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
-        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CountryI18nTableMap::TITLE);
-
-        $countries = $this->search($search, $pagination);
+        $features = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($countries as $country) {
+        foreach ($features as $feature) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $country->getId());
-            $loopResultRow->set("AREA", $country->getAreaId());
-            $loopResultRow->set("TITLE", $country->getTitle());
-            $loopResultRow->set("CHAPO", $country->getChapo());
-            $loopResultRow->set("DESCRIPTION", $country->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $country->getPostscriptum());
-            $loopResultRow->set("ISOCODE", $country->getIsocode());
-            $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
-            $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());
+            $loopResultRow->set("ID", $feature->getId());
+            $loopResultRow->set("TITLE",$feature->getTitle());
+            $loopResultRow->set("CHAPO", $feature->getChapo());
+            $loopResultRow->set("DESCRIPTION", $feature->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $feature->getPostscriptum());
 
             $loopResult->addRow($loopResultRow);
         }

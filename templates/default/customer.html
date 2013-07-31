@@ -17,7 +17,7 @@
             <td>Title</td>
             <td>
                 {loop name="title" type="title" id="#TITLE"}
-                    #LONG (#SHORT)
+                #LONG (#SHORT)
                 {/loop}
             </td>
         </tr>
@@ -65,9 +65,14 @@
     <tr>
         <td>Title</td>
         <td>
-            {loop name="title" type="title"}
-            #LONG (#SHORT)
-            {/loop}
+            <ul>
+                {assign var=current_title value=#TITLE}
+                {loop name="title" type="title"}
+                <li {if $current_title==#ID}style="background-color: yellow"{/if}>
+                #LONG (#SHORT)
+                </li>
+                {/loop}
+            </ul>
         </td>
     </tr>
     <tr>
@@ -93,6 +98,19 @@
     <tr>
         <td>City</td>
         <td>#CITY</td>
+    </tr>
+    <tr>
+        <td>Country</td>
+        <td>
+            <select>
+                {assign var=current_country value=#COUNTRY}
+                {loop name="country" type="country"}
+                <option {if $current_country==#ID}selected="selected"{/if}>
+                    #TITLE (#ID - #ISOCODE - #ISOALPHA2 - #ISOALPHA3)
+                </option>
+                {/loop}
+            </select>
+        </td>
     </tr>
     <tr>
         <td>Phone</td>

@@ -51,6 +51,10 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery rightJoinCart($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Cart relation
  * @method     ChildCurrencyQuery innerJoinCart($relationAlias = null) Adds a INNER JOIN clause to the query using the Cart relation
  *
+ * @method     ChildCurrencyQuery leftJoinProductPrice($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductPrice relation
+ * @method     ChildCurrencyQuery rightJoinProductPrice($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductPrice relation
+ * @method     ChildCurrencyQuery innerJoinProductPrice($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductPrice relation
+ *
  * @method     ChildCurrency findOne(ConnectionInterface $con = null) Return the first ChildCurrency matching the query
  * @method     ChildCurrency findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCurrency matching the query, or a new ChildCurrency object populated from the query conditions when no match is found
  *
@@ -688,6 +692,79 @@ abstract class CurrencyQuery extends ModelCriteria
         return $this
             ->joinCart($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Cart', '\Thelia\Model\CartQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\ProductPrice object
+     *
+     * @param \Thelia\Model\ProductPrice|ObjectCollection $productPrice  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function filterByProductPrice($productPrice, $comparison = null)
+    {
+        if ($productPrice instanceof \Thelia\Model\ProductPrice) {
+            return $this
+                ->addUsingAlias(CurrencyTableMap::ID, $productPrice->getCurrencyId(), $comparison);
+        } elseif ($productPrice instanceof ObjectCollection) {
+            return $this
+                ->useProductPriceQuery()
+                ->filterByPrimaryKeys($productPrice->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByProductPrice() only accepts arguments of type \Thelia\Model\ProductPrice or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the ProductPrice relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function joinProductPrice($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('ProductPrice');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'ProductPrice');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the ProductPrice relation ProductPrice object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\ProductPriceQuery A secondary query class using the current class as primary query
+     */
+    public function useProductPriceQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinProductPrice($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductPrice', '\Thelia\Model\ProductPriceQuery');
     }
 
     /**

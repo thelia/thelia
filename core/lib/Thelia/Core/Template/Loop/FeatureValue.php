@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,21 +33,21 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CountryQuery;
+use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Country loop
+ * FeatureValue loop
  *
  *
- * Class Country
+ * Class FeatureValue
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Country extends BaseLoop
+class FeatureValue extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -54,11 +55,18 @@ class Country extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('limit', 500), // overwrite orginal param to increase the limit
-            Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('area'),
-            Argument::createBooleanTypeArgument('with_area'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntTypeArgument('feature', null, true),
+            Argument::createIntTypeArgument('product', null, true),
+            Argument::createIntListTypeArgument('feature_available'),
+            Argument::createBooleanTypeArgument('exclude_feature_available', 0),
+            Argument::createBooleanTypeArgument('exclude_default_values', 0),
+            new Argument(
+                'order',
+                new TypeCollection(
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                ),
+                'manual'
+            )
         );
     }
 
@@ -69,32 +77,49 @@ class Country extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CountryQuery::create();
+        $search = FeatureProductQuery::create();
 
-		$id = $this->getId();
+        $feature = $this->getFeature();
 
-        if (null !== $id) {
-            $search->filterById($id, Criteria::IN);
+        $search->filterByFeatureId($feature, Criteria::EQUAL);
+
+        $product = $this->getProduct();
+
+        $search->filterByProductId($product, Criteria::EQUAL);
+
+        $featureAvailable = $this->geFeature_available();
+
+        if (null !== $featureAvailable) {
+            $search->filterByFeatureAvId($featureAvailable, Criteria::IN);
         }
 
-        $area = $this->getArea();
-
-        if (null !== $area) {
-            $search->filterByAreaId($area, Criteria::IN);
+        $excludeFeatureAvailable = $this->getExclude_feature_available();
+        if($excludeFeatureAvailable == true) {
+            $search->filterByFeatureAvId(null, Criteria::NULL);
         }
 
-        $withArea = $this->getWith_area();
-
-        if (true === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNOTNULL);
-        } elseif (false == $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNULL);
+        $excludeDefaultValues = $this->getExclude_default_values();
+        if($excludeDefaultValues == true) {
+            $search->filterByByDefault(null, Criteria::NULL);
         }
 
-        $exclude = $this->getExclude();
+        $orders  = $this->getOrder();
 
-        if (!is_null($exclude)) {
-            $search->filterById($exclude, Criteria::NOT_IN);
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+            }
         }
 
         /**
@@ -103,28 +128,22 @@ class Country extends BaseLoop
          * @todo : verify here if we want results for row without translations.
          */
 
-        $search->joinWithI18n(
+        /*$search->joinWithI18n(
             $this->request->getSession()->getLocale(),
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
+        );*/
 
-        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CountryI18nTableMap::TITLE);
-
-        $countries = $this->search($search, $pagination);
+        $featureValues = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($countries as $country) {
+        foreach ($featureValues as $featureValue) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $country->getId());
-            $loopResultRow->set("AREA", $country->getAreaId());
-            $loopResultRow->set("TITLE", $country->getTitle());
-            $loopResultRow->set("CHAPO", $country->getChapo());
-            $loopResultRow->set("DESCRIPTION", $country->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $country->getPostscriptum());
-            $loopResultRow->set("ISOCODE", $country->getIsocode());
-            $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
-            $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());
+            $loopResultRow->set("ID", $featureValue->getId());
+            /*$loopResultRow->set("TITLE",$featureValue->getTitle());
+            $loopResultRow->set("CHAPO", $featureValue->getChapo());
+            $loopResultRow->set("DESCRIPTION", $featureValue->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $featureValue->getPostscriptum());*/
 
             $loopResult->addRow($loopResultRow);
         }

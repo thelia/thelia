@@ -21,17 +21,15 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  *
  *
  *
- * @method     ChildAttributeCombinationQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildAttributeCombinationQuery orderByAttributeId($order = Criteria::ASC) Order by the attribute_id column
- * @method     ChildAttributeCombinationQuery orderByCombinationId($order = Criteria::ASC) Order by the combination_id column
  * @method     ChildAttributeCombinationQuery orderByAttributeAvId($order = Criteria::ASC) Order by the attribute_av_id column
+ * @method     ChildAttributeCombinationQuery orderByStockId($order = Criteria::ASC) Order by the stock_id column
  * @method     ChildAttributeCombinationQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildAttributeCombinationQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildAttributeCombinationQuery groupById() Group by the id column
  * @method     ChildAttributeCombinationQuery groupByAttributeId() Group by the attribute_id column
- * @method     ChildAttributeCombinationQuery groupByCombinationId() Group by the combination_id column
  * @method     ChildAttributeCombinationQuery groupByAttributeAvId() Group by the attribute_av_id column
+ * @method     ChildAttributeCombinationQuery groupByStockId() Group by the stock_id column
  * @method     ChildAttributeCombinationQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildAttributeCombinationQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -47,24 +45,22 @@ use Thelia\Model\Map\AttributeCombinationTableMap;
  * @method     ChildAttributeCombinationQuery rightJoinAttributeAv($relationAlias = null) Adds a RIGHT JOIN clause to the query using the AttributeAv relation
  * @method     ChildAttributeCombinationQuery innerJoinAttributeAv($relationAlias = null) Adds a INNER JOIN clause to the query using the AttributeAv relation
  *
- * @method     ChildAttributeCombinationQuery leftJoinCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the Combination relation
- * @method     ChildAttributeCombinationQuery rightJoinCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Combination relation
- * @method     ChildAttributeCombinationQuery innerJoinCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the Combination relation
+ * @method     ChildAttributeCombinationQuery leftJoinStock($relationAlias = null) Adds a LEFT JOIN clause to the query using the Stock relation
+ * @method     ChildAttributeCombinationQuery rightJoinStock($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Stock relation
+ * @method     ChildAttributeCombinationQuery innerJoinStock($relationAlias = null) Adds a INNER JOIN clause to the query using the Stock relation
  *
  * @method     ChildAttributeCombination findOne(ConnectionInterface $con = null) Return the first ChildAttributeCombination matching the query
  * @method     ChildAttributeCombination findOneOrCreate(ConnectionInterface $con = null) Return the first ChildAttributeCombination matching the query, or a new ChildAttributeCombination object populated from the query conditions when no match is found
  *
- * @method     ChildAttributeCombination findOneById(int $id) Return the first ChildAttributeCombination filtered by the id column
  * @method     ChildAttributeCombination findOneByAttributeId(int $attribute_id) Return the first ChildAttributeCombination filtered by the attribute_id column
- * @method     ChildAttributeCombination findOneByCombinationId(int $combination_id) Return the first ChildAttributeCombination filtered by the combination_id column
  * @method     ChildAttributeCombination findOneByAttributeAvId(int $attribute_av_id) Return the first ChildAttributeCombination filtered by the attribute_av_id column
+ * @method     ChildAttributeCombination findOneByStockId(int $stock_id) Return the first ChildAttributeCombination filtered by the stock_id column
  * @method     ChildAttributeCombination findOneByCreatedAt(string $created_at) Return the first ChildAttributeCombination filtered by the created_at column
  * @method     ChildAttributeCombination findOneByUpdatedAt(string $updated_at) Return the first ChildAttributeCombination filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildAttributeCombination objects filtered by the id column
  * @method     array findByAttributeId(int $attribute_id) Return ChildAttributeCombination objects filtered by the attribute_id column
- * @method     array findByCombinationId(int $combination_id) Return ChildAttributeCombination objects filtered by the combination_id column
  * @method     array findByAttributeAvId(int $attribute_av_id) Return ChildAttributeCombination objects filtered by the attribute_av_id column
+ * @method     array findByStockId(int $stock_id) Return ChildAttributeCombination objects filtered by the stock_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildAttributeCombination objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildAttributeCombination objects filtered by the updated_at column
  *
@@ -114,10 +110,10 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      * Go fast if the query is untouched.
      *
      * <code>
-     * $obj = $c->findPk(array(12, 34, 56, 78), $con);
+     * $obj = $c->findPk(array(12, 34, 56), $con);
      * </code>
      *
-     * @param array[$id, $attribute_id, $combination_id, $attribute_av_id] $key Primary key to use for the query
+     * @param array[$attribute_id, $attribute_av_id, $stock_id] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
      * @return ChildAttributeCombination|array|mixed the result, formatted by the current formatter
@@ -127,7 +123,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = AttributeCombinationTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2], (string) $key[3]))))) && !$this->formatter) {
+        if ((null !== ($obj = AttributeCombinationTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1], (string) $key[2]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
@@ -155,13 +151,12 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, ATTRIBUTE_ID, COMBINATION_ID, ATTRIBUTE_AV_ID, CREATED_AT, UPDATED_AT FROM attribute_combination WHERE ID = :p0 AND ATTRIBUTE_ID = :p1 AND COMBINATION_ID = :p2 AND ATTRIBUTE_AV_ID = :p3';
+        $sql = 'SELECT ATTRIBUTE_ID, ATTRIBUTE_AV_ID, STOCK_ID, CREATED_AT, UPDATED_AT FROM attribute_combination WHERE ATTRIBUTE_ID = :p0 AND ATTRIBUTE_AV_ID = :p1 AND STOCK_ID = :p2';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
             $stmt->bindValue(':p1', $key[1], PDO::PARAM_INT);
             $stmt->bindValue(':p2', $key[2], PDO::PARAM_INT);
-            $stmt->bindValue(':p3', $key[3], PDO::PARAM_INT);
             $stmt->execute();
         } catch (Exception $e) {
             Propel::log($e->getMessage(), Propel::LOG_ERR);
@@ -171,7 +166,7 @@ abstract class AttributeCombinationQuery extends ModelCriteria
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
             $obj = new ChildAttributeCombination();
             $obj->hydrate($row);
-            AttributeCombinationTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2], (string) $key[3])));
+            AttributeCombinationTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1], (string) $key[2])));
         }
         $stmt->closeCursor();
 
@@ -230,10 +225,9 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(AttributeCombinationTableMap::ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(AttributeCombinationTableMap::ATTRIBUTE_ID, $key[1], Criteria::EQUAL);
-        $this->addUsingAlias(AttributeCombinationTableMap::COMBINATION_ID, $key[2], Criteria::EQUAL);
-        $this->addUsingAlias(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $key[3], Criteria::EQUAL);
+        $this->addUsingAlias(AttributeCombinationTableMap::ATTRIBUTE_ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $key[2], Criteria::EQUAL);
 
         return $this;
     }
@@ -251,58 +245,15 @@ abstract class AttributeCombinationQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(AttributeCombinationTableMap::ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_ID, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
-            $cton2 = $this->getNewCriterion(AttributeCombinationTableMap::COMBINATION_ID, $key[2], Criteria::EQUAL);
+            $cton2 = $this->getNewCriterion(AttributeCombinationTableMap::STOCK_ID, $key[2], Criteria::EQUAL);
             $cton0->addAnd($cton2);
-            $cton3 = $this->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $key[3], Criteria::EQUAL);
-            $cton0->addAnd($cton3);
             $this->addOr($cton0);
         }
 
         return $this;
-    }
-
-    /**
-     * Filter the query on the id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterById(1234); // WHERE id = 1234
-     * $query->filterById(array(12, 34)); // WHERE id IN (12, 34)
-     * $query->filterById(array('min' => 12)); // WHERE id > 12
-     * </code>
-     *
-     * @param     mixed $id The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
-     */
-    public function filterById($id = null, $comparison = null)
-    {
-        if (is_array($id)) {
-            $useMinMax = false;
-            if (isset($id['min'])) {
-                $this->addUsingAlias(AttributeCombinationTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($id['max'])) {
-                $this->addUsingAlias(AttributeCombinationTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AttributeCombinationTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -349,49 +300,6 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the combination_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByCombinationId(1234); // WHERE combination_id = 1234
-     * $query->filterByCombinationId(array(12, 34)); // WHERE combination_id IN (12, 34)
-     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
-     * </code>
-     *
-     * @see       filterByCombination()
-     *
-     * @param     mixed $combinationId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildAttributeCombinationQuery The current query, for fluid interface
-     */
-    public function filterByCombinationId($combinationId = null, $comparison = null)
-    {
-        if (is_array($combinationId)) {
-            $useMinMax = false;
-            if (isset($combinationId['min'])) {
-                $this->addUsingAlias(AttributeCombinationTableMap::COMBINATION_ID, $combinationId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($combinationId['max'])) {
-                $this->addUsingAlias(AttributeCombinationTableMap::COMBINATION_ID, $combinationId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(AttributeCombinationTableMap::COMBINATION_ID, $combinationId, $comparison);
-    }
-
-    /**
      * Filter the query on the attribute_av_id column
      *
      * Example usage:
@@ -432,6 +340,49 @@ abstract class AttributeCombinationQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $attributeAvId, $comparison);
+    }
+
+    /**
+     * Filter the query on the stock_id column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByStockId(1234); // WHERE stock_id = 1234
+     * $query->filterByStockId(array(12, 34)); // WHERE stock_id IN (12, 34)
+     * $query->filterByStockId(array('min' => 12)); // WHERE stock_id > 12
+     * </code>
+     *
+     * @see       filterByStock()
+     *
+     * @param     mixed $stockId The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildAttributeCombinationQuery The current query, for fluid interface
+     */
+    public function filterByStockId($stockId = null, $comparison = null)
+    {
+        if (is_array($stockId)) {
+            $useMinMax = false;
+            if (isset($stockId['min'])) {
+                $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stockId['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($stockId['max'])) {
+                $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stockId['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stockId, $comparison);
     }
 
     /**
@@ -671,42 +622,42 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Combination object
+     * Filter the query by a related \Thelia\Model\Stock object
      *
-     * @param \Thelia\Model\Combination|ObjectCollection $combination The related object(s) to use as filter
+     * @param \Thelia\Model\Stock|ObjectCollection $stock The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
-    public function filterByCombination($combination, $comparison = null)
+    public function filterByStock($stock, $comparison = null)
     {
-        if ($combination instanceof \Thelia\Model\Combination) {
+        if ($stock instanceof \Thelia\Model\Stock) {
             return $this
-                ->addUsingAlias(AttributeCombinationTableMap::COMBINATION_ID, $combination->getId(), $comparison);
-        } elseif ($combination instanceof ObjectCollection) {
+                ->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stock->getId(), $comparison);
+        } elseif ($stock instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(AttributeCombinationTableMap::COMBINATION_ID, $combination->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(AttributeCombinationTableMap::STOCK_ID, $stock->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByCombination() only accepts arguments of type \Thelia\Model\Combination or Collection');
+            throw new PropelException('filterByStock() only accepts arguments of type \Thelia\Model\Stock or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Combination relation
+     * Adds a JOIN clause to the query using the Stock relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildAttributeCombinationQuery The current query, for fluid interface
      */
-    public function joinCombination($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinStock($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Combination');
+        $relationMap = $tableMap->getRelation('Stock');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -721,14 +672,14 @@ abstract class AttributeCombinationQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Combination');
+            $this->addJoinObject($join, 'Stock');
         }
 
         return $this;
     }
 
     /**
-     * Use the Combination relation Combination object
+     * Use the Stock relation Stock object
      *
      * @see useQuery()
      *
@@ -736,13 +687,13 @@ abstract class AttributeCombinationQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CombinationQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\StockQuery A secondary query class using the current class as primary query
      */
-    public function useCombinationQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useStockQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinCombination($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Combination', '\Thelia\Model\CombinationQuery');
+            ->joinStock($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'Stock', '\Thelia\Model\StockQuery');
     }
 
     /**
@@ -755,11 +706,10 @@ abstract class AttributeCombinationQuery extends ModelCriteria
     public function prune($attributeCombination = null)
     {
         if ($attributeCombination) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(AttributeCombinationTableMap::ID), $attributeCombination->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(AttributeCombinationTableMap::ATTRIBUTE_ID), $attributeCombination->getAttributeId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond2', $this->getAliasedColName(AttributeCombinationTableMap::COMBINATION_ID), $attributeCombination->getCombinationId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond3', $this->getAliasedColName(AttributeCombinationTableMap::ATTRIBUTE_AV_ID), $attributeCombination->getAttributeAvId(), Criteria::NOT_EQUAL);
-            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2', 'pruneCond3'), Criteria::LOGICAL_OR);
+            $this->addCond('pruneCond0', $this->getAliasedColName(AttributeCombinationTableMap::ATTRIBUTE_ID), $attributeCombination->getAttributeId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(AttributeCombinationTableMap::ATTRIBUTE_AV_ID), $attributeCombination->getAttributeAvId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond2', $this->getAliasedColName(AttributeCombinationTableMap::STOCK_ID), $attributeCombination->getStockId(), Criteria::NOT_EQUAL);
+            $this->combine(array('pruneCond0', 'pruneCond1', 'pruneCond2'), Criteria::LOGICAL_OR);
         }
 
         return $this;

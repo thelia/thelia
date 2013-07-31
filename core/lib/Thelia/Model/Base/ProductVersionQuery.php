@@ -24,14 +24,7 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     ChildProductVersionQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProductVersionQuery orderByTaxRuleId($order = Criteria::ASC) Order by the tax_rule_id column
  * @method     ChildProductVersionQuery orderByRef($order = Criteria::ASC) Order by the ref column
- * @method     ChildProductVersionQuery orderByPrice($order = Criteria::ASC) Order by the price column
- * @method     ChildProductVersionQuery orderByPrice2($order = Criteria::ASC) Order by the price2 column
- * @method     ChildProductVersionQuery orderByEcotax($order = Criteria::ASC) Order by the ecotax column
- * @method     ChildProductVersionQuery orderByNewness($order = Criteria::ASC) Order by the newness column
- * @method     ChildProductVersionQuery orderByPromo($order = Criteria::ASC) Order by the promo column
- * @method     ChildProductVersionQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method     ChildProductVersionQuery orderByVisible($order = Criteria::ASC) Order by the visible column
- * @method     ChildProductVersionQuery orderByWeight($order = Criteria::ASC) Order by the weight column
  * @method     ChildProductVersionQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildProductVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildProductVersionQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
@@ -42,14 +35,7 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     ChildProductVersionQuery groupById() Group by the id column
  * @method     ChildProductVersionQuery groupByTaxRuleId() Group by the tax_rule_id column
  * @method     ChildProductVersionQuery groupByRef() Group by the ref column
- * @method     ChildProductVersionQuery groupByPrice() Group by the price column
- * @method     ChildProductVersionQuery groupByPrice2() Group by the price2 column
- * @method     ChildProductVersionQuery groupByEcotax() Group by the ecotax column
- * @method     ChildProductVersionQuery groupByNewness() Group by the newness column
- * @method     ChildProductVersionQuery groupByPromo() Group by the promo column
- * @method     ChildProductVersionQuery groupByQuantity() Group by the quantity column
  * @method     ChildProductVersionQuery groupByVisible() Group by the visible column
- * @method     ChildProductVersionQuery groupByWeight() Group by the weight column
  * @method     ChildProductVersionQuery groupByPosition() Group by the position column
  * @method     ChildProductVersionQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildProductVersionQuery groupByUpdatedAt() Group by the updated_at column
@@ -71,14 +57,7 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     ChildProductVersion findOneById(int $id) Return the first ChildProductVersion filtered by the id column
  * @method     ChildProductVersion findOneByTaxRuleId(int $tax_rule_id) Return the first ChildProductVersion filtered by the tax_rule_id column
  * @method     ChildProductVersion findOneByRef(string $ref) Return the first ChildProductVersion filtered by the ref column
- * @method     ChildProductVersion findOneByPrice(double $price) Return the first ChildProductVersion filtered by the price column
- * @method     ChildProductVersion findOneByPrice2(double $price2) Return the first ChildProductVersion filtered by the price2 column
- * @method     ChildProductVersion findOneByEcotax(double $ecotax) Return the first ChildProductVersion filtered by the ecotax column
- * @method     ChildProductVersion findOneByNewness(int $newness) Return the first ChildProductVersion filtered by the newness column
- * @method     ChildProductVersion findOneByPromo(int $promo) Return the first ChildProductVersion filtered by the promo column
- * @method     ChildProductVersion findOneByQuantity(int $quantity) Return the first ChildProductVersion filtered by the quantity column
  * @method     ChildProductVersion findOneByVisible(int $visible) Return the first ChildProductVersion filtered by the visible column
- * @method     ChildProductVersion findOneByWeight(double $weight) Return the first ChildProductVersion filtered by the weight column
  * @method     ChildProductVersion findOneByPosition(int $position) Return the first ChildProductVersion filtered by the position column
  * @method     ChildProductVersion findOneByCreatedAt(string $created_at) Return the first ChildProductVersion filtered by the created_at column
  * @method     ChildProductVersion findOneByUpdatedAt(string $updated_at) Return the first ChildProductVersion filtered by the updated_at column
@@ -89,14 +68,7 @@ use Thelia\Model\Map\ProductVersionTableMap;
  * @method     array findById(int $id) Return ChildProductVersion objects filtered by the id column
  * @method     array findByTaxRuleId(int $tax_rule_id) Return ChildProductVersion objects filtered by the tax_rule_id column
  * @method     array findByRef(string $ref) Return ChildProductVersion objects filtered by the ref column
- * @method     array findByPrice(double $price) Return ChildProductVersion objects filtered by the price column
- * @method     array findByPrice2(double $price2) Return ChildProductVersion objects filtered by the price2 column
- * @method     array findByEcotax(double $ecotax) Return ChildProductVersion objects filtered by the ecotax column
- * @method     array findByNewness(int $newness) Return ChildProductVersion objects filtered by the newness column
- * @method     array findByPromo(int $promo) Return ChildProductVersion objects filtered by the promo column
- * @method     array findByQuantity(int $quantity) Return ChildProductVersion objects filtered by the quantity column
  * @method     array findByVisible(int $visible) Return ChildProductVersion objects filtered by the visible column
- * @method     array findByWeight(double $weight) Return ChildProductVersion objects filtered by the weight column
  * @method     array findByPosition(int $position) Return ChildProductVersion objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildProductVersion objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildProductVersion objects filtered by the updated_at column
@@ -191,7 +163,7 @@ abstract class ProductVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TAX_RULE_ID, REF, PRICE, PRICE2, ECOTAX, NEWNESS, PROMO, QUANTITY, VISIBLE, WEIGHT, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM product_version WHERE ID = :p0 AND VERSION = :p1';
+        $sql = 'SELECT ID, TAX_RULE_ID, REF, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM product_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -406,252 +378,6 @@ abstract class ProductVersionQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the price column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPrice(1234); // WHERE price = 1234
-     * $query->filterByPrice(array(12, 34)); // WHERE price IN (12, 34)
-     * $query->filterByPrice(array('min' => 12)); // WHERE price > 12
-     * </code>
-     *
-     * @param     mixed $price The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByPrice($price = null, $comparison = null)
-    {
-        if (is_array($price)) {
-            $useMinMax = false;
-            if (isset($price['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::PRICE, $price['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($price['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::PRICE, $price['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::PRICE, $price, $comparison);
-    }
-
-    /**
-     * Filter the query on the price2 column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPrice2(1234); // WHERE price2 = 1234
-     * $query->filterByPrice2(array(12, 34)); // WHERE price2 IN (12, 34)
-     * $query->filterByPrice2(array('min' => 12)); // WHERE price2 > 12
-     * </code>
-     *
-     * @param     mixed $price2 The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByPrice2($price2 = null, $comparison = null)
-    {
-        if (is_array($price2)) {
-            $useMinMax = false;
-            if (isset($price2['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::PRICE2, $price2['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($price2['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::PRICE2, $price2['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::PRICE2, $price2, $comparison);
-    }
-
-    /**
-     * Filter the query on the ecotax column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByEcotax(1234); // WHERE ecotax = 1234
-     * $query->filterByEcotax(array(12, 34)); // WHERE ecotax IN (12, 34)
-     * $query->filterByEcotax(array('min' => 12)); // WHERE ecotax > 12
-     * </code>
-     *
-     * @param     mixed $ecotax The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByEcotax($ecotax = null, $comparison = null)
-    {
-        if (is_array($ecotax)) {
-            $useMinMax = false;
-            if (isset($ecotax['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::ECOTAX, $ecotax['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($ecotax['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::ECOTAX, $ecotax['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::ECOTAX, $ecotax, $comparison);
-    }
-
-    /**
-     * Filter the query on the newness column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByNewness(1234); // WHERE newness = 1234
-     * $query->filterByNewness(array(12, 34)); // WHERE newness IN (12, 34)
-     * $query->filterByNewness(array('min' => 12)); // WHERE newness > 12
-     * </code>
-     *
-     * @param     mixed $newness The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByNewness($newness = null, $comparison = null)
-    {
-        if (is_array($newness)) {
-            $useMinMax = false;
-            if (isset($newness['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::NEWNESS, $newness['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($newness['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::NEWNESS, $newness['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::NEWNESS, $newness, $comparison);
-    }
-
-    /**
-     * Filter the query on the promo column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByPromo(1234); // WHERE promo = 1234
-     * $query->filterByPromo(array(12, 34)); // WHERE promo IN (12, 34)
-     * $query->filterByPromo(array('min' => 12)); // WHERE promo > 12
-     * </code>
-     *
-     * @param     mixed $promo The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByPromo($promo = null, $comparison = null)
-    {
-        if (is_array($promo)) {
-            $useMinMax = false;
-            if (isset($promo['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::PROMO, $promo['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($promo['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::PROMO, $promo['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::PROMO, $promo, $comparison);
-    }
-
-    /**
-     * Filter the query on the quantity column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByQuantity(1234); // WHERE quantity = 1234
-     * $query->filterByQuantity(array(12, 34)); // WHERE quantity IN (12, 34)
-     * $query->filterByQuantity(array('min' => 12)); // WHERE quantity > 12
-     * </code>
-     *
-     * @param     mixed $quantity The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByQuantity($quantity = null, $comparison = null)
-    {
-        if (is_array($quantity)) {
-            $useMinMax = false;
-            if (isset($quantity['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::QUANTITY, $quantity['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($quantity['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::QUANTITY, $quantity['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::QUANTITY, $quantity, $comparison);
-    }
-
-    /**
      * Filter the query on the visible column
      *
      * Example usage:
@@ -690,47 +416,6 @@ abstract class ProductVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductVersionTableMap::VISIBLE, $visible, $comparison);
-    }
-
-    /**
-     * Filter the query on the weight column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByWeight(1234); // WHERE weight = 1234
-     * $query->filterByWeight(array(12, 34)); // WHERE weight IN (12, 34)
-     * $query->filterByWeight(array('min' => 12)); // WHERE weight > 12
-     * </code>
-     *
-     * @param     mixed $weight The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductVersionQuery The current query, for fluid interface
-     */
-    public function filterByWeight($weight = null, $comparison = null)
-    {
-        if (is_array($weight)) {
-            $useMinMax = false;
-            if (isset($weight['min'])) {
-                $this->addUsingAlias(ProductVersionTableMap::WEIGHT, $weight['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($weight['max'])) {
-                $this->addUsingAlias(ProductVersionTableMap::WEIGHT, $weight['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductVersionTableMap::WEIGHT, $weight, $comparison);
     }
 
     /**

@@ -90,9 +90,9 @@ class CartItemTableMap extends TableMap
     const QUANTITY = 'cart_item.QUANTITY';
 
     /**
-     * the column name for the COMBINATION_ID field
+     * the column name for the STOCK_ID field
      */
-    const COMBINATION_ID = 'cart_item.COMBINATION_ID';
+    const STOCK_ID = 'cart_item.STOCK_ID';
 
     /**
      * the column name for the CREATED_AT field
@@ -116,11 +116,11 @@ class CartItemTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CartId', 'ProductId', 'Quantity', 'CombinationId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'cartId', 'productId', 'quantity', 'combinationId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CartItemTableMap::ID, CartItemTableMap::CART_ID, CartItemTableMap::PRODUCT_ID, CartItemTableMap::QUANTITY, CartItemTableMap::COMBINATION_ID, CartItemTableMap::CREATED_AT, CartItemTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CART_ID', 'PRODUCT_ID', 'QUANTITY', 'COMBINATION_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'cart_id', 'product_id', 'quantity', 'combination_id', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'CartId', 'ProductId', 'Quantity', 'StockId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'cartId', 'productId', 'quantity', 'stockId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CartItemTableMap::ID, CartItemTableMap::CART_ID, CartItemTableMap::PRODUCT_ID, CartItemTableMap::QUANTITY, CartItemTableMap::STOCK_ID, CartItemTableMap::CREATED_AT, CartItemTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CART_ID', 'PRODUCT_ID', 'QUANTITY', 'STOCK_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'cart_id', 'product_id', 'quantity', 'stock_id', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -131,11 +131,11 @@ class CartItemTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CartId' => 1, 'ProductId' => 2, 'Quantity' => 3, 'CombinationId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'cartId' => 1, 'productId' => 2, 'quantity' => 3, 'combinationId' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(CartItemTableMap::ID => 0, CartItemTableMap::CART_ID => 1, CartItemTableMap::PRODUCT_ID => 2, CartItemTableMap::QUANTITY => 3, CartItemTableMap::COMBINATION_ID => 4, CartItemTableMap::CREATED_AT => 5, CartItemTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CART_ID' => 1, 'PRODUCT_ID' => 2, 'QUANTITY' => 3, 'COMBINATION_ID' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'cart_id' => 1, 'product_id' => 2, 'quantity' => 3, 'combination_id' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CartId' => 1, 'ProductId' => 2, 'Quantity' => 3, 'StockId' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'cartId' => 1, 'productId' => 2, 'quantity' => 3, 'stockId' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(CartItemTableMap::ID => 0, CartItemTableMap::CART_ID => 1, CartItemTableMap::PRODUCT_ID => 2, CartItemTableMap::QUANTITY => 3, CartItemTableMap::STOCK_ID => 4, CartItemTableMap::CREATED_AT => 5, CartItemTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CART_ID' => 1, 'PRODUCT_ID' => 2, 'QUANTITY' => 3, 'STOCK_ID' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'cart_id' => 1, 'product_id' => 2, 'quantity' => 3, 'stock_id' => 4, 'created_at' => 5, 'updated_at' => 6, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
@@ -159,7 +159,7 @@ class CartItemTableMap extends TableMap
         $this->addForeignKey('CART_ID', 'CartId', 'INTEGER', 'cart', 'ID', true, null, null);
         $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
         $this->addColumn('QUANTITY', 'Quantity', 'FLOAT', false, null, 1);
-        $this->addForeignKey('COMBINATION_ID', 'CombinationId', 'INTEGER', 'combination', 'ID', false, null, null);
+        $this->addForeignKey('STOCK_ID', 'StockId', 'INTEGER', 'stock', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -171,7 +171,7 @@ class CartItemTableMap extends TableMap
     {
         $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::MANY_TO_ONE, array('cart_id' => 'id', ), null, null);
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), null, null);
-        $this->addRelation('Combination', '\\Thelia\\Model\\Combination', RelationMap::MANY_TO_ONE, array('combination_id' => 'id', ), null, null);
+        $this->addRelation('Stock', '\\Thelia\\Model\\Stock', RelationMap::MANY_TO_ONE, array('stock_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -329,7 +329,7 @@ class CartItemTableMap extends TableMap
             $criteria->addSelectColumn(CartItemTableMap::CART_ID);
             $criteria->addSelectColumn(CartItemTableMap::PRODUCT_ID);
             $criteria->addSelectColumn(CartItemTableMap::QUANTITY);
-            $criteria->addSelectColumn(CartItemTableMap::COMBINATION_ID);
+            $criteria->addSelectColumn(CartItemTableMap::STOCK_ID);
             $criteria->addSelectColumn(CartItemTableMap::CREATED_AT);
             $criteria->addSelectColumn(CartItemTableMap::UPDATED_AT);
         } else {
@@ -337,7 +337,7 @@ class CartItemTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.CART_ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
             $criteria->addSelectColumn($alias . '.QUANTITY');
-            $criteria->addSelectColumn($alias . '.COMBINATION_ID');
+            $criteria->addSelectColumn($alias . '.STOCK_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }

@@ -91,9 +91,6 @@ class Title extends BaseLoop
         $loopResult = new LoopResult();
 
         foreach ($titles as $title) {
-
-            if ($this->not_empty && $title->countAllProducts() == 0) continue;
-
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $title->getId());
             $loopResultRow->set("DEFAULT", $title->getByDefault());
