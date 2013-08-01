@@ -50,10 +50,23 @@ use Thelia\Core\Event\ActionEvent;
 
 class BaseAdminController extends ContainerAware
 {
-	const TEMPLATE_404 = "404.html";
+	const TEMPLATE_404 = "404";
 
-	protected function undefinedAction()
+	public function processTemplateAction($template)
 	{
+		try {
+			if (! empty($template)) {
+				// If we have a view in the URL, render this view
+				return $this->render($template);
+			}
+			else if (null != $view = $this->getRequest()->get('view')) {
+				return $this->render($view);
+			}
+		}
+		catch (\Exception $ex) {
+			// Nothing special
+		}
+
 		return new Response($this->renderRaw(self::TEMPLATE_404), 404);
 	}
 
@@ -81,6 +94,9 @@ class BaseAdminController extends ContainerAware
      */
     protected function renderRaw($templateName, $args = array())
     {
+    	// Add the template standard extension
+    	$templateName .= '.html';
+
     	$session = $this->getSession();
 
         $args = array_merge($args, array(
@@ -158,7 +174,7 @@ class BaseAdminController extends ContainerAware
     }
 
     /**
-     * @return a ParserInterface instance parser
+     * @return a ParserInterfac instance parser
      */
     protected function getParser()
     {

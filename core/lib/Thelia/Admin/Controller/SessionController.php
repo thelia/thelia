@@ -37,7 +37,7 @@ class SessionController extends BaseAdminController {
 
 	public function showLoginAction()
 	{
-		return $this->render("login.html");
+		return $this->render("login");
 	}
 
 	public function checkLogoutAction()
@@ -100,6 +100,6 @@ class SessionController extends BaseAdminController {
      	$this->getParserContext()->setErrorForm($adminLoginForm);
 
       	// Display the login form again
-    	return $this->render("login.html");
+    	return $this->render("login");
     }
 }

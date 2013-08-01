@@ -27,6 +27,12 @@ class AdminController extends BaseAdminController {
 
     public function indexAction()
     {
-    	return $this->render("home.html");
+    	return $this->render("home");
+    }
+
+    public function processAction()
+    {
+    	echo "not yet coded !";
+    	exit();
     }
 }

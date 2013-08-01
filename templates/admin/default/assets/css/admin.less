@@ -1,10 +1,27 @@
 // -- Tools --------------------------------------------------------------------
 
-.border-radius(@radius: 5px) {
-	-webkit-border-radius: @radius;
-	-moz-border-radius: @radius;
-	border-radius: @radius;
+.rounded(@radius: 2px) {
+  -webkit-border-radius: @radius;
+  -moz-border-radius: @radius;
+  border-radius: @radius;
 }
+
+.border-radius(@topright: 0, @bottomright: 0, @bottomleft: 0, @topleft: 0) {
+  -webkit-border-top-right-radius: @topright;
+  -webkit-border-bottom-right-radius: @bottomright;
+  -webkit-border-bottom-left-radius: @bottomleft;
+  -webkit-border-top-left-radius: @topleft;
+  -moz-border-radius-topright: @topright;
+  -moz-border-radius-bottomright: @bottomright;
+  -moz-border-radius-bottomleft: @bottomleft;
+  -moz-border-radius-topleft: @topleft;
+  border-top-right-radius: @topright;
+  border-bottom-right-radius: @bottomright;
+  border-bottom-left-radius: @bottomleft;
+  border-top-left-radius: @topleft;
+  .background-clip(padding-box);
+}
+
 
 .box-shadow(@shadow: 0 1px 2px rgba(0,0,0,.05)) {
 	-webkit-box-shadow: @shadow;
@@ -130,6 +147,10 @@ hr {
 		float: right;
 		margin: 0px;
 
+		.control-group {
+			margin-bottom: 0px;
+		}
+
 		input.search-query {
 			background: url("img/search.png") no-repeat;
 			width: 212px;
@@ -137,7 +158,7 @@ hr {
 			outline: none;
 			border: none;
 			padding: 5px 20px 5px 20px;
-			border-radius: 0px;
+			.rounded(0px);
 			font-size: 12px;
 			color: #eee;
 
@@ -160,7 +181,7 @@ hr {
 			border: none;
 			top: 17px;
 			box-shadow: none;
-			border-radius: 0px;
+			.rounded(0px);
 			z-index: 1337;
 		}
 	}
@@ -196,6 +217,7 @@ hr {
 // -- Brandbar ----------------------------------------------------------------
 
 .loginpage {
+
 	.brandbar {
 		width: 100%;
 	}
@@ -231,7 +253,7 @@ hr {
 	}
 
 	.breadcrumb {
-		border-radius: 0px;
+		.rounded(0px);
 		padding: 25px 0px 25px 30px;
 		background: url("img/logo-light.png") left center no-repeat;
 		float: left;
@@ -279,6 +301,38 @@ hr {
 	}
 }
 
+// -- Navigation bar ----------------------------------------------------------
+
+.navbar {
+	margin-bottom: 0px;
+}
+
+.navbar-inner {
+	border-top: none;
+	.border-radius(0, 4px, 4px, 0);
+
+	.container{
+		width: 1170px;
+	}
+}
+
+// -- Breadcrumb --------------------------------------------------------------
+
+.breadcrumb {
+	margin-top: 0;
+	background-color: transparent;
+	padding: 0 15px;
+
+
+	> li > .divider {
+		color: inherit;
+	}
+
+	> .active {
+		color: inherit;
+	}
+}
+
 // -- Feed list on home page --------------------------------------------------
 
 .feed-list {
@@ -314,8 +368,13 @@ hr {
 	margin: 0 auto 20px;
 	background-color: #fff;
 	border: 1px solid #e5e5e5;
-	.border-radius;
+	.rounded(5px);
 	.box-shadow;
+}
+
+textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="datetime"]:focus, input[type="datetime-local"]:focus, input[type="date"]:focus, input[type="month"]:focus, input[type="time"]:focus, input[type="week"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="url"]:focus, input[type="search"]:focus, input[type="tel"]:focus, input[type="color"]:focus, .uneditable-input:focus {
+	border: 1px solid #E9730F;
+	box-shadow: 0px 0px 8px #FFA65A;
 }
 
 // -- Allow inline forms validation states ------------------------------------
@@ -474,4 +533,51 @@ hr {
   color: #3a87ad;
   background-color: #d9edf7;
   border-color: #3a87ad;
+}
+
+// -- Catalog Tables ----------------------------------------------------------
+
+.table-striped {
+
+	background: white;
+
+	caption {
+		text-align: left;
+		color: #5A6876;
+		text-transform: uppercase;
+		font-weight: bold;
+		background-color: #fff;
+		padding: 0.5em 0.5em 0.5em 1em;
+		border-bottom: 2px solid #A5CED8;
+
+		line-height: 30px;
+
+		.btn-add-item {
+			display: block;
+			float: right;
+		}
+	}
+
+	td, th {
+		text-align: center;
+	}
+
+	td.object-title, th.object-title {
+		text-align: left;
+	}
+
+	td.message {
+		// Center the alert box (20px bottom margin) in the table cell
+		padding: 20px 20px 0 20px;
+
+		// No border, nor background in alert blocks
+		.alert {
+			border: none;
+			background-color: transparent;
+
+			&-info {
+				background-color: transparent;
+			}
+		}
+	}
 }

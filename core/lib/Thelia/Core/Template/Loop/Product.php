@@ -271,12 +271,12 @@ class Product extends BaseLoop
                     $search->orderBy('real_price', Criteria::DESC);
                     break;
                 case "manual":
-                    if(null === $this->category || count($this->category) != 1)
+                    if(null === $category || count($category) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    if(null === $this->category || count($this->category) != 1)
+                    if(null === $category || count($category) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::DESC);
                     break;
@@ -406,6 +406,7 @@ class Product extends BaseLoop
             $loopResultRow->set("WEIGHT", $product->getWeight());
             $loopResultRow->set("PROMO", $product->getPromo());
             $loopResultRow->set("NEW", $product->getNewness());
+            $loopResultRow->set("POSITION", $product->getPosition());
 
             $loopResult->addRow($loopResultRow);
         }

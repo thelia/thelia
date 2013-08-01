@@ -12,6 +12,7 @@
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
+        <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
     </loops>
 
     <forms>

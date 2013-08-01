@@ -78,13 +78,13 @@ class DataAccessFunctions extends AbstractSmartyPlugin
      */
      protected function userDataAccess($objectLabel, $context, $params)
      {
-     	$attribute = $params['attr'];
+     	$attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
 
      	if (! empty($attribute)) {
      		$user = $this->securityContext->setContext($context)->getUser();
 
      		if (null != $user) {
-     			$getter = sprintf("get%s", ucfirst(strtolower($attribute)));
+     			$getter = sprintf("get%s", ucfirst($attribute));
 
      			if (method_exists($user, $getter)) {
      				return $user->$getter();

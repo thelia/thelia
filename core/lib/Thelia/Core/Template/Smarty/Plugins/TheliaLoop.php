@@ -71,9 +71,11 @@ class TheliaLoop extends AbstractSmartyPlugin
     /**
      * Process the count function: executes a loop and return the number of items found
      */
-    public function theliaCount($params, $template) {
+    public function theliaCount($params, $template)
+    {
+    	$type = $this->getParam($params, 'type');
 
-        if (empty($params['type']))
+    	if (null == $type)
             throw new \InvalidArgumentException("Missing 'type' parameter in count arguments");
 
         $loop = $this->createLoopInstance($params);
@@ -97,13 +99,15 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public function theliaLoop($params, $content, $template, &$repeat)
     {
-        if (empty($params['name']))
+    	$name = $this->getParam($params, 'name');
+
+        if (null == $name)
             throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
 
-        if (empty($params['type']))
-            throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
+        $type = $this->getParam($params, 'type');
 
-        $name = $params['name'];
+        if (null == $type)
+            throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
 
         if ($content === null) {
             // Check if a loop with the same name exists in the current scope, and abort if it's the case.
@@ -223,10 +227,10 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public function theliaPageLoop($params, $content, $template, &$repeat)
     {
-        if (empty($params['rel']))
-            throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
+    	$loopName = $this->getParam($params, 'rel');
 
-        $loopName = $params['rel'];
+        if (null == $loopName)
+            throw new \InvalidArgumentException("Missing 'rel' parameter in page loop");
 
         // Find loop results in the current template vars
         /* $loopResults = $template->getTemplateVars($loopName);
@@ -274,11 +278,10 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     protected function checkEmptyLoop($params, $template)
     {
+    	$loopName = $this->getParam($params, 'rel');
 
-    	if (empty($params['rel']))
-    		throw new \InvalidArgumentException("Missing 'rel' parameter in ifloop/elseloop arguments");
-
-        $loopName = $params['rel'];
+    	if (null == $loopName)
+    		 throw new \InvalidArgumentException("Missing 'rel' parameter in ifloop/elseloop arguments");
 
         if (! isset($this->loopstack[$loopName])) {
             throw new \InvalidArgumentException("Loop $loopName is not defined.");

@@ -30,6 +30,8 @@ class LoopResultRow
     public function set($key, $value)
     {
         $this->substitution[$key] = $value === null ? '' : $value;
+
+        return $this;
     }
 
     public function get($key)

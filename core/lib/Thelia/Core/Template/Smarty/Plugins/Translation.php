@@ -49,10 +49,10 @@ class Translation extends AbstractSmartyPlugin
     	$vars = array();
 
     	foreach($params as $name => $value) {
-    		$vars["%$name"] = $value;
+    		if ($name != 'l') $vars["%$name"] = $value;
     	}
 
-    	return $this->translator->trans($params['l'], $vars);
+    	return $this->translator->trans($this->getParam($params, 'l'), $vars);
     }
 
     /**

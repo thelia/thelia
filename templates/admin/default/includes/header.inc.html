@@ -19,6 +19,16 @@
 		<link rel="stylesheet" href="{$asset_url}">
 	{/stylesheets}
 
+	{* Include here page specifc CSS file, if any *}
+
+	{if ! empty($thelia_page_css_file)}
+		{stylesheets file='../assets/css/$thelia_page_css_file'  filters='less,cssembed'}
+			<link rel="stylesheet" href="{$asset_url}" target="screen">
+		{/stylesheets}
+	{/if}
+
+	{* Modules css are included here *}
+
 	{module_include location='head_css'}
 </head>
 <body>
@@ -59,12 +69,6 @@
 <div class="navbar">
 	<div class="navbar-inner">
     	<div class="container">
-      		<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-        		<span class="icon-bar"></span>
-        		<span class="icon-bar"></span>
-        		<span class="icon-bar"></span>
-      		</a>
-
       		<div class="nav-collapse">
 
         		<ul class="nav">
