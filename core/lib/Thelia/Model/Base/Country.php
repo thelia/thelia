@@ -17,6 +17,8 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Address as ChildAddress;
+use Thelia\Model\AddressQuery as ChildAddressQuery;
 use Thelia\Model\Area as ChildArea;
 use Thelia\Model\AreaQuery as ChildAreaQuery;
 use Thelia\Model\Country as ChildCountry;
@@ -115,6 +117,12 @@ abstract class Country implements ActiveRecordInterface
     protected $collTaxRuleCountriesPartial;
 
     /**
+     * @var        ObjectCollection|ChildAddress[] Collection to store aggregation of ChildAddress objects.
+     */
+    protected $collAddresses;
+    protected $collAddressesPartial;
+
+    /**
      * @var        ObjectCollection|ChildCountryI18n[] Collection to store aggregation of ChildCountryI18n objects.
      */
     protected $collCountryI18ns;
@@ -147,6 +155,12 @@ abstract class Country implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $taxRuleCountriesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $addressesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -792,6 +806,8 @@ abstract class Country implements ActiveRecordInterface
             $this->aArea = null;
             $this->collTaxRuleCountries = null;
 
+            $this->collAddresses = null;
+
             $this->collCountryI18ns = null;
 
         } // if (deep)
@@ -950,6 +966,23 @@ abstract class Country implements ActiveRecordInterface
 
                 if ($this->collTaxRuleCountries !== null) {
             foreach ($this->collTaxRuleCountries as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->addressesScheduledForDeletion !== null) {
+                if (!$this->addressesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\AddressQuery::create()
+                        ->filterByPrimaryKeys($this->addressesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->addressesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collAddresses !== null) {
+            foreach ($this->collAddresses as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1174,6 +1207,9 @@ abstract class Country implements ActiveRecordInterface
             if (null !== $this->collTaxRuleCountries) {
                 $result['TaxRuleCountries'] = $this->collTaxRuleCountries->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
+            if (null !== $this->collAddresses) {
+                $result['Addresses'] = $this->collAddresses->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
             if (null !== $this->collCountryI18ns) {
                 $result['CountryI18ns'] = $this->collCountryI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1363,6 +1399,12 @@ abstract class Country implements ActiveRecordInterface
                 }
             }
 
+            foreach ($this->getAddresses() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addAddress($relObj->copy($deepCopy));
+                }
+            }
+
             foreach ($this->getCountryI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCountryI18n($relObj->copy($deepCopy));
@@ -1462,6 +1504,9 @@ abstract class Country implements ActiveRecordInterface
     {
         if ('TaxRuleCountry' == $relationName) {
             return $this->initTaxRuleCountries();
+        }
+        if ('Address' == $relationName) {
+            return $this->initAddresses();
         }
         if ('CountryI18n' == $relationName) {
             return $this->initCountryI18ns();
@@ -1737,6 +1782,274 @@ abstract class Country implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collAddresses collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addAddresses()
+     */
+    public function clearAddresses()
+    {
+        $this->collAddresses = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collAddresses collection loaded partially.
+     */
+    public function resetPartialAddresses($v = true)
+    {
+        $this->collAddressesPartial = $v;
+    }
+
+    /**
+     * Initializes the collAddresses collection.
+     *
+     * By default this just sets the collAddresses collection to an empty array (like clearcollAddresses());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initAddresses($overrideExisting = true)
+    {
+        if (null !== $this->collAddresses && !$overrideExisting) {
+            return;
+        }
+        $this->collAddresses = new ObjectCollection();
+        $this->collAddresses->setModel('\Thelia\Model\Address');
+    }
+
+    /**
+     * Gets an array of ChildAddress objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCountry is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildAddress[] List of ChildAddress objects
+     * @throws PropelException
+     */
+    public function getAddresses($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAddressesPartial && !$this->isNew();
+        if (null === $this->collAddresses || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collAddresses) {
+                // return empty collection
+                $this->initAddresses();
+            } else {
+                $collAddresses = ChildAddressQuery::create(null, $criteria)
+                    ->filterByCountry($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collAddressesPartial && count($collAddresses)) {
+                        $this->initAddresses(false);
+
+                        foreach ($collAddresses as $obj) {
+                            if (false == $this->collAddresses->contains($obj)) {
+                                $this->collAddresses->append($obj);
+                            }
+                        }
+
+                        $this->collAddressesPartial = true;
+                    }
+
+                    $collAddresses->getInternalIterator()->rewind();
+
+                    return $collAddresses;
+                }
+
+                if ($partial && $this->collAddresses) {
+                    foreach ($this->collAddresses as $obj) {
+                        if ($obj->isNew()) {
+                            $collAddresses[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collAddresses = $collAddresses;
+                $this->collAddressesPartial = false;
+            }
+        }
+
+        return $this->collAddresses;
+    }
+
+    /**
+     * Sets a collection of Address objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $addresses A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCountry The current object (for fluent API support)
+     */
+    public function setAddresses(Collection $addresses, ConnectionInterface $con = null)
+    {
+        $addressesToDelete = $this->getAddresses(new Criteria(), $con)->diff($addresses);
+
+
+        $this->addressesScheduledForDeletion = $addressesToDelete;
+
+        foreach ($addressesToDelete as $addressRemoved) {
+            $addressRemoved->setCountry(null);
+        }
+
+        $this->collAddresses = null;
+        foreach ($addresses as $address) {
+            $this->addAddress($address);
+        }
+
+        $this->collAddresses = $addresses;
+        $this->collAddressesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related Address objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related Address objects.
+     * @throws PropelException
+     */
+    public function countAddresses(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collAddressesPartial && !$this->isNew();
+        if (null === $this->collAddresses || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collAddresses) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getAddresses());
+            }
+
+            $query = ChildAddressQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCountry($this)
+                ->count($con);
+        }
+
+        return count($this->collAddresses);
+    }
+
+    /**
+     * Method called to associate a ChildAddress object to this object
+     * through the ChildAddress foreign key attribute.
+     *
+     * @param    ChildAddress $l ChildAddress
+     * @return   \Thelia\Model\Country The current object (for fluent API support)
+     */
+    public function addAddress(ChildAddress $l)
+    {
+        if ($this->collAddresses === null) {
+            $this->initAddresses();
+            $this->collAddressesPartial = true;
+        }
+
+        if (!in_array($l, $this->collAddresses->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddAddress($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param Address $address The address object to add.
+     */
+    protected function doAddAddress($address)
+    {
+        $this->collAddresses[]= $address;
+        $address->setCountry($this);
+    }
+
+    /**
+     * @param  Address $address The address object to remove.
+     * @return ChildCountry The current object (for fluent API support)
+     */
+    public function removeAddress($address)
+    {
+        if ($this->getAddresses()->contains($address)) {
+            $this->collAddresses->remove($this->collAddresses->search($address));
+            if (null === $this->addressesScheduledForDeletion) {
+                $this->addressesScheduledForDeletion = clone $this->collAddresses;
+                $this->addressesScheduledForDeletion->clear();
+            }
+            $this->addressesScheduledForDeletion[]= clone $address;
+            $address->setCountry(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Country is new, it will return
+     * an empty collection; or if this Country has previously
+     * been saved, it will retrieve related Addresses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Country.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAddress[] List of ChildAddress objects
+     */
+    public function getAddressesJoinCustomer($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAddressQuery::create(null, $criteria);
+        $query->joinWith('Customer', $joinBehavior);
+
+        return $this->getAddresses($query, $con);
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Country is new, it will return
+     * an empty collection; or if this Country has previously
+     * been saved, it will retrieve related Addresses from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Country.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildAddress[] List of ChildAddress objects
+     */
+    public function getAddressesJoinCustomerTitle($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildAddressQuery::create(null, $criteria);
+        $query->joinWith('CustomerTitle', $joinBehavior);
+
+        return $this->getAddresses($query, $con);
+    }
+
+    /**
      * Clears out the collCountryI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -1997,6 +2310,11 @@ abstract class Country implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
+            if ($this->collAddresses) {
+                foreach ($this->collAddresses as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
             if ($this->collCountryI18ns) {
                 foreach ($this->collCountryI18ns as $o) {
                     $o->clearAllReferences($deep);
@@ -2012,6 +2330,10 @@ abstract class Country implements ActiveRecordInterface
             $this->collTaxRuleCountries->clearIterator();
         }
         $this->collTaxRuleCountries = null;
+        if ($this->collAddresses instanceof Collection) {
+            $this->collAddresses->clearIterator();
+        }
+        $this->collAddresses = null;
         if ($this->collCountryI18ns instanceof Collection) {
             $this->collCountryI18ns->clearIterator();
         }

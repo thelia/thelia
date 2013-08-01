@@ -47,9 +47,35 @@
 {/loop*}
 
 {loop name="product" type="product" order="ref"}
-    <h3>PRODUCT : #REF / #TITLE</h3>
+    <h3>PRODUCT #ID : #REF / #TITLE</h3>
+
     <h4>Accessories</h4>
-    {loop name="acc" type="accessory" product="#ID" order="accessory,max_price"}
-        #REF -
+        <ul>
+    {loop name="acc" type="accessory" product="#ID" order="accessory"}
+        <li>#REF</li>
     {/loop}
+        </ul>
+
+    <h4>Features</h4>
+    <ul>
+        {loop name="ft" type="feature" order="manual" product="#ID"}
+        <li>#TITLE</li>
+        {/loop}
+    </ul>
+
 {/loop}
+
+<h2>ALL FEATURES AND THEIR AVAILABILITY</h2>
+
+<ul>
+    {loop name="ft" type="feature" order="manual"}
+    <li>
+        #TITLE
+        <ul>
+            {loop name="ftav" type="feature_available" order="manual" feature="#ID"}
+                <li>#TITLE</li>
+            {/loop}
+        </ul>
+    </li>
+    {/loop}
+</ul>

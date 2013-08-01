@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\FeatureProdQuery as BaseFeatureProdQuery;
+use Thelia\Model\Base\ProductPriceQuery as BaseProductPriceQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'feature_prod' table.
+ * Skeleton subclass for performing query and update operations on the 'product_price' table.
  *
  *
  *
@@ -15,6 +15,7 @@ use Thelia\Model\Base\FeatureProdQuery as BaseFeatureProdQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class FeatureProdQuery extends BaseFeatureProdQuery {
+class ProductPriceQuery extends BaseProductPriceQuery
+{
 
-} // FeatureProdQuery
+} // ProductPriceQuery

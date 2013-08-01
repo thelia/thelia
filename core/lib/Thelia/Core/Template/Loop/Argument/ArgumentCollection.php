@@ -34,7 +34,7 @@ class ArgumentCollection implements \Iterator
 
     public function __construct()
     {
-        $this->addArguments(func_get_args());
+        $this->addArguments(func_get_args(), true);
     }
 
     public function hasKey($key) {
@@ -51,14 +51,15 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param array $argumentList
+     * @param array    $argumentList
+     * @param          $force
      *
      * @return ArgumentCollection
      */
-    public function addArguments(array $argumentList)
+    public function addArguments(array $argumentList, $force = true)
     {
         foreach($argumentList as $argument) {
-            $this->addArgument($argument);
+            $this->addArgument($argument, $force);
         }
 
         return $this;
@@ -66,11 +67,16 @@ class ArgumentCollection implements \Iterator
 
     /**
      * @param Argument $argument
+     * @param          $force
      *
      * @return ArgumentCollection
      */
-    public function addArgument(Argument $argument)
+    public function addArgument(Argument $argument, $force = true)
     {
+        if(isset($this->arguments[$argument->name]) && ! $force) {
+            return $this;
+        }
+
         $this->arguments[$argument->name] = $argument;
 
         return $this;

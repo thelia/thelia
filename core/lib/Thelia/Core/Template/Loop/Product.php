@@ -33,11 +33,11 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\FeatureProdQuery;
+use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\FeatureAvQuery;
 use Thelia\Model\FeatureQuery;
-use Thelia\Model\Map\FeatureProdTableMap;
+use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -70,13 +70,13 @@ class Product extends BaseLoop
                 )
             ),
             Argument::createIntListTypeArgument('category'),
-            Argument::createBooleanTypeArgument('new'),
-            Argument::createBooleanTypeArgument('promo'),
-            Argument::createFloatTypeArgument('min_price'),
-            Argument::createFloatTypeArgument('max_price'),
-            Argument::createIntTypeArgument('min_stock'),
-            Argument::createFloatTypeArgument('min_weight'),
-            Argument::createFloatTypeArgument('max_weight'),
+            //Argument::createBooleanTypeArgument('new'),
+            //Argument::createBooleanTypeArgument('promo'),
+            //Argument::createFloatTypeArgument('min_price'),
+            //Argument::createFloatTypeArgument('max_price'),
+            //Argument::createIntTypeArgument('min_stock'),
+            //Argument::createFloatTypeArgument('min_weight'),
+            //Argument::createFloatTypeArgument('max_weight'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
@@ -84,7 +84,7 @@ class Product extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', /*'min_price', 'max_price',*/ 'manual', 'manual_reverse', 'ref', /*'promo', 'new',*/ 'random', 'given_id'))
                 ),
                 'manual'
             ),
@@ -114,7 +114,7 @@ class Product extends BaseLoop
     {
         $search = ProductQuery::create();
 
-        $search->withColumn('CASE WHEN ' . ProductTableMap::PROMO . '=1 THEN ' . ProductTableMap::PRICE2 . ' ELSE ' . ProductTableMap::PRICE . ' END', 'real_price');
+        //$search->withColumn('CASE WHEN ' . ProductTableMap::PROMO . '=1 THEN ' . ProductTableMap::PRICE2 . ' ELSE ' . ProductTableMap::PRICE . ' END', 'real_price');
 
         $id = $this->getId();
 
@@ -147,7 +147,7 @@ class Product extends BaseLoop
             );
         }
 
-        $new = $this->getNew();
+        /*$new = $this->getNew();
 
         if ($new === true) {
             $search->filterByNewness(1, Criteria::EQUAL);
@@ -169,15 +169,15 @@ class Product extends BaseLoop
             $search->filterByQuantity($min_stock, Criteria::GREATER_EQUAL);
         }
 
-        $min_price = $this->getMin_price();
+        $min_price = $this->getMin_price();*/
 
-        if(null !== $min_price) {
+        //if(null !== $min_price) {
             /**
              * Following should work but does not :
              *
              *  $search->filterBy('real_price', $max_price, Criteria::GREATER_EQUAL);
              */
-            $search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
+            /*$search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
                     ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
                     ->condition('min_price2', ProductTableMap::PRICE2 . Criteria::GREATER_EQUAL . '?', $min_price)
                     ->condition('min_price', ProductTableMap::PRICE . Criteria::GREATER_EQUAL . '?', $min_price)
@@ -186,24 +186,24 @@ class Product extends BaseLoop
                     ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
         }
 
-        $max_price = $this->getMax_price();
+        $max_price = $this->getMax_price();*/
 
-        if(null !== $max_price) {
+        //if(null !== $max_price) {
             /**
              * Following should work but does not :
              *
              *  $search->filterBy('real_price', $max_price, Criteria::LESS_EQUAL);
              */
-            $search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
+            /*$search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
                     ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
                     ->condition('max_price2', ProductTableMap::PRICE2 . Criteria::LESS_EQUAL . '?', $max_price)
                     ->condition('max_price', ProductTableMap::PRICE . Criteria::LESS_EQUAL . '?', $max_price)
                     ->combine(array('in_promo', 'max_price2'), Criteria::LOGICAL_AND, 'in_promo_max_price')
                     ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
                     ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
-        }
+        }*/
 
-        $min_weight = $this->getMin_weight();
+        /*$min_weight = $this->getMin_weight();
 
         if(null !== $min_weight) {
             $search->filterByWeight($min_weight, Criteria::GREATER_EQUAL);
@@ -213,7 +213,7 @@ class Product extends BaseLoop
 
         if(null !== $max_weight) {
             $search->filterByWeight($max_weight, Criteria::LESS_EQUAL);
-        }
+        }*/
 
         $current = $this->getCurrent();
 
@@ -264,12 +264,12 @@ class Product extends BaseLoop
                 case "alpha_reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
                     break;
-                case "min_price":
+                /*case "min_price":
                     $search->orderBy('real_price', Criteria::ASC);
                     break;
                 case "max_price":
                     $search->orderBy('real_price', Criteria::DESC);
-                    break;
+                    break;*/
                 case "manual":
                     if(null === $category || count($category) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
@@ -283,12 +283,12 @@ class Product extends BaseLoop
                 case "ref":
                     $search->orderByRef(Criteria::ASC);
                     break;
-                case "promo":
+                /*case "promo":
                     $search->orderByPromo(Criteria::DESC);
                     break;
                 case "new":
                     $search->orderByNewness(Criteria::DESC);
-                    break;
+                    break;*/
                 case "given_id":
                     if(null === $id)
                         throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
@@ -328,7 +328,7 @@ class Product extends BaseLoop
                     $featureAlias = 'fa_' . $feature;
                     if($feature_av != '*')
                         $featureAlias .= '_' . $feature_av;
-                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
                     if($feature_av != '*')
                         $search->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_AV_ID = ?", $feature_av, null, \PDO::PARAM_INT);
@@ -356,7 +356,7 @@ class Product extends BaseLoop
                     $featureAlias = 'fv_' . $feature;
                     if($feature_value != '*')
                         $featureAlias .= '_' . $feature_value;
-                    $search->joinFeatureProd($featureAlias, Criteria::LEFT_JOIN)
+                    $search->joinFeatureProduct($featureAlias, Criteria::LEFT_JOIN)
                         ->addJoinCondition($featureAlias, "`$featureAlias`.FEATURE_ID = ?", $feature, null, \PDO::PARAM_INT);
                     if($feature_value != '*')
                         $search->addJoinCondition($featureAlias, "`$featureAlias`.BY_DEFAULT = ?", $feature_value, null, \PDO::PARAM_STR);
@@ -395,18 +395,20 @@ class Product extends BaseLoop
 
         foreach ($products as $product) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $product->getId());
-            $loopResultRow->set("REF",$product->getRef());
-            $loopResultRow->set("TITLE",$product->getTitle());
-            $loopResultRow->set("CHAPO", $product->getChapo());
-            $loopResultRow->set("DESCRIPTION", $product->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $product->getPostscriptum());
-            $loopResultRow->set("PRICE", $product->getPrice());
-            $loopResultRow->set("PROMO_PRICE", $product->getPrice2());
-            $loopResultRow->set("WEIGHT", $product->getWeight());
-            $loopResultRow->set("PROMO", $product->getPromo());
-            $loopResultRow->set("NEW", $product->getNewness());
-            $loopResultRow->set("POSITION", $product->getPosition());
+
+            $loopResultRow->set("ID", $product->getId())
+	            ->set("REF",$product->getRef())
+	            ->set("TITLE",$product->getTitle())
+	            ->set("CHAPO", $product->getChapo())
+	            ->set("DESCRIPTION", $product->getDescription())
+	            ->set("POSTSCRIPTUM", $product->getPostscriptum())
+	            ->set("PRICE", $product->getPrice())
+	            ->set("PROMO_PRICE", $product->getPrice2())
+	            ->set("WEIGHT", $product->getWeight())
+	            ->set("PROMO", $product->getPromo())
+	            ->set("NEW", $product->getNewness())
+	            ->set("POSITION", $product->getPosition())
+			;
 
             $loopResult->addRow($loopResultRow);
         }

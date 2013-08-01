@@ -19,19 +19,19 @@ use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Feature as ChildFeature;
 use Thelia\Model\FeatureAv as ChildFeatureAv;
 use Thelia\Model\FeatureAvQuery as ChildFeatureAvQuery;
-use Thelia\Model\FeatureProd as ChildFeatureProd;
-use Thelia\Model\FeatureProdQuery as ChildFeatureProdQuery;
+use Thelia\Model\FeatureProduct as ChildFeatureProduct;
+use Thelia\Model\FeatureProductQuery as ChildFeatureProductQuery;
 use Thelia\Model\FeatureQuery as ChildFeatureQuery;
 use Thelia\Model\Product as ChildProduct;
 use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\Map\FeatureProdTableMap;
+use Thelia\Model\Map\FeatureProductTableMap;
 
-abstract class FeatureProd implements ActiveRecordInterface
+abstract class FeatureProduct implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\FeatureProdTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\FeatureProductTableMap';
 
 
     /**
@@ -132,7 +132,7 @@ abstract class FeatureProd implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\FeatureProd object.
+     * Initializes internal state of Thelia\Model\Base\FeatureProduct object.
      */
     public function __construct()
     {
@@ -227,9 +227,9 @@ abstract class FeatureProd implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>FeatureProd</code> instance.  If
-     * <code>obj</code> is an instance of <code>FeatureProd</code>, delegates to
-     * <code>equals(FeatureProd)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>FeatureProduct</code> instance.  If
+     * <code>obj</code> is an instance of <code>FeatureProduct</code>, delegates to
+     * <code>equals(FeatureProduct)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -310,7 +310,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return FeatureProd The current object, for fluid interface
+     * @return FeatureProduct The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -342,7 +342,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return FeatureProd The current object, for fluid interface
+     * @return FeatureProduct The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -495,7 +495,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -505,7 +505,7 @@ abstract class FeatureProd implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = FeatureProdTableMap::ID;
+            $this->modifiedColumns[] = FeatureProductTableMap::ID;
         }
 
 
@@ -516,7 +516,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Set the value of [product_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setProductId($v)
     {
@@ -526,7 +526,7 @@ abstract class FeatureProd implements ActiveRecordInterface
 
         if ($this->product_id !== $v) {
             $this->product_id = $v;
-            $this->modifiedColumns[] = FeatureProdTableMap::PRODUCT_ID;
+            $this->modifiedColumns[] = FeatureProductTableMap::PRODUCT_ID;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
@@ -541,7 +541,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Set the value of [feature_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setFeatureId($v)
     {
@@ -551,7 +551,7 @@ abstract class FeatureProd implements ActiveRecordInterface
 
         if ($this->feature_id !== $v) {
             $this->feature_id = $v;
-            $this->modifiedColumns[] = FeatureProdTableMap::FEATURE_ID;
+            $this->modifiedColumns[] = FeatureProductTableMap::FEATURE_ID;
         }
 
         if ($this->aFeature !== null && $this->aFeature->getId() !== $v) {
@@ -566,7 +566,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Set the value of [feature_av_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setFeatureAvId($v)
     {
@@ -576,7 +576,7 @@ abstract class FeatureProd implements ActiveRecordInterface
 
         if ($this->feature_av_id !== $v) {
             $this->feature_av_id = $v;
-            $this->modifiedColumns[] = FeatureProdTableMap::FEATURE_AV_ID;
+            $this->modifiedColumns[] = FeatureProductTableMap::FEATURE_AV_ID;
         }
 
         if ($this->aFeatureAv !== null && $this->aFeatureAv->getId() !== $v) {
@@ -591,7 +591,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Set the value of [by_default] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setByDefault($v)
     {
@@ -601,7 +601,7 @@ abstract class FeatureProd implements ActiveRecordInterface
 
         if ($this->by_default !== $v) {
             $this->by_default = $v;
-            $this->modifiedColumns[] = FeatureProdTableMap::BY_DEFAULT;
+            $this->modifiedColumns[] = FeatureProductTableMap::BY_DEFAULT;
         }
 
 
@@ -612,7 +612,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Set the value of [position] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -622,7 +622,7 @@ abstract class FeatureProd implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = FeatureProdTableMap::POSITION;
+            $this->modifiedColumns[] = FeatureProductTableMap::POSITION;
         }
 
 
@@ -634,7 +634,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -642,7 +642,7 @@ abstract class FeatureProd implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = FeatureProdTableMap::CREATED_AT;
+                $this->modifiedColumns[] = FeatureProductTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -655,7 +655,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return   \Thelia\Model\FeatureProduct The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -663,7 +663,7 @@ abstract class FeatureProd implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = FeatureProdTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = FeatureProductTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -708,31 +708,31 @@ abstract class FeatureProd implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : FeatureProdTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : FeatureProductTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : FeatureProdTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : FeatureProductTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureProdTableMap::translateFieldName('FeatureId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureProductTableMap::translateFieldName('FeatureId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->feature_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureProdTableMap::translateFieldName('FeatureAvId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureProductTableMap::translateFieldName('FeatureAvId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->feature_av_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FeatureProdTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FeatureProductTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->by_default = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FeatureProdTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FeatureProductTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FeatureProdTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FeatureProductTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : FeatureProdTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : FeatureProductTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -745,10 +745,10 @@ abstract class FeatureProd implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = FeatureProdTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = FeatureProductTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\FeatureProd object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\FeatureProduct object", 0, $e);
         }
     }
 
@@ -799,13 +799,13 @@ abstract class FeatureProd implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(FeatureProdTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildFeatureProdQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildFeatureProductQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -827,8 +827,8 @@ abstract class FeatureProd implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see FeatureProd::setDeleted()
-     * @see FeatureProd::isDeleted()
+     * @see FeatureProduct::setDeleted()
+     * @see FeatureProduct::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -837,12 +837,12 @@ abstract class FeatureProd implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProdTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildFeatureProdQuery::create()
+            $deleteQuery = ChildFeatureProductQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -879,7 +879,7 @@ abstract class FeatureProd implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProdTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -889,16 +889,16 @@ abstract class FeatureProd implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(FeatureProdTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(FeatureProductTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(FeatureProdTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(FeatureProdTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -910,7 +910,7 @@ abstract class FeatureProd implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                FeatureProdTableMap::addInstanceToPool($this);
+                FeatureProductTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -997,39 +997,39 @@ abstract class FeatureProd implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = FeatureProdTableMap::ID;
+        $this->modifiedColumns[] = FeatureProductTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . FeatureProdTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . FeatureProductTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(FeatureProdTableMap::ID)) {
+        if ($this->isColumnModified(FeatureProductTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(FeatureProdTableMap::PRODUCT_ID)) {
+        if ($this->isColumnModified(FeatureProductTableMap::PRODUCT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
-        if ($this->isColumnModified(FeatureProdTableMap::FEATURE_ID)) {
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'FEATURE_ID';
         }
-        if ($this->isColumnModified(FeatureProdTableMap::FEATURE_AV_ID)) {
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_AV_ID)) {
             $modifiedColumns[':p' . $index++]  = 'FEATURE_AV_ID';
         }
-        if ($this->isColumnModified(FeatureProdTableMap::BY_DEFAULT)) {
+        if ($this->isColumnModified(FeatureProductTableMap::BY_DEFAULT)) {
             $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
         }
-        if ($this->isColumnModified(FeatureProdTableMap::POSITION)) {
+        if ($this->isColumnModified(FeatureProductTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
-        if ($this->isColumnModified(FeatureProdTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(FeatureProductTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(FeatureProdTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO feature_prod (%s) VALUES (%s)',
+            'INSERT INTO feature_product (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1108,7 +1108,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = FeatureProdTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = FeatureProductTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1171,11 +1171,11 @@ abstract class FeatureProd implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['FeatureProd'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['FeatureProduct'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['FeatureProd'][$this->getPrimaryKey()] = true;
-        $keys = FeatureProdTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['FeatureProduct'][$this->getPrimaryKey()] = true;
+        $keys = FeatureProductTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getProductId(),
@@ -1220,7 +1220,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = FeatureProdTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = FeatureProductTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1282,7 +1282,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = FeatureProdTableMap::getFieldNames($keyType);
+        $keys = FeatureProductTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
@@ -1301,16 +1301,16 @@ abstract class FeatureProd implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(FeatureProdTableMap::DATABASE_NAME);
+        $criteria = new Criteria(FeatureProductTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(FeatureProdTableMap::ID)) $criteria->add(FeatureProdTableMap::ID, $this->id);
-        if ($this->isColumnModified(FeatureProdTableMap::PRODUCT_ID)) $criteria->add(FeatureProdTableMap::PRODUCT_ID, $this->product_id);
-        if ($this->isColumnModified(FeatureProdTableMap::FEATURE_ID)) $criteria->add(FeatureProdTableMap::FEATURE_ID, $this->feature_id);
-        if ($this->isColumnModified(FeatureProdTableMap::FEATURE_AV_ID)) $criteria->add(FeatureProdTableMap::FEATURE_AV_ID, $this->feature_av_id);
-        if ($this->isColumnModified(FeatureProdTableMap::BY_DEFAULT)) $criteria->add(FeatureProdTableMap::BY_DEFAULT, $this->by_default);
-        if ($this->isColumnModified(FeatureProdTableMap::POSITION)) $criteria->add(FeatureProdTableMap::POSITION, $this->position);
-        if ($this->isColumnModified(FeatureProdTableMap::CREATED_AT)) $criteria->add(FeatureProdTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(FeatureProdTableMap::UPDATED_AT)) $criteria->add(FeatureProdTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(FeatureProductTableMap::ID)) $criteria->add(FeatureProductTableMap::ID, $this->id);
+        if ($this->isColumnModified(FeatureProductTableMap::PRODUCT_ID)) $criteria->add(FeatureProductTableMap::PRODUCT_ID, $this->product_id);
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_ID)) $criteria->add(FeatureProductTableMap::FEATURE_ID, $this->feature_id);
+        if ($this->isColumnModified(FeatureProductTableMap::FEATURE_AV_ID)) $criteria->add(FeatureProductTableMap::FEATURE_AV_ID, $this->feature_av_id);
+        if ($this->isColumnModified(FeatureProductTableMap::BY_DEFAULT)) $criteria->add(FeatureProductTableMap::BY_DEFAULT, $this->by_default);
+        if ($this->isColumnModified(FeatureProductTableMap::POSITION)) $criteria->add(FeatureProductTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(FeatureProductTableMap::CREATED_AT)) $criteria->add(FeatureProductTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(FeatureProductTableMap::UPDATED_AT)) $criteria->add(FeatureProductTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1325,8 +1325,8 @@ abstract class FeatureProd implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(FeatureProdTableMap::DATABASE_NAME);
-        $criteria->add(FeatureProdTableMap::ID, $this->id);
+        $criteria = new Criteria(FeatureProductTableMap::DATABASE_NAME);
+        $criteria->add(FeatureProductTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1367,7 +1367,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\FeatureProd (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\FeatureProduct (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1396,7 +1396,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\FeatureProd Clone of current object.
+     * @return                 \Thelia\Model\FeatureProduct Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1413,7 +1413,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Declares an association between this object and a ChildProduct object.
      *
      * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return                 \Thelia\Model\FeatureProduct The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(ChildProduct $v = null)
@@ -1429,7 +1429,7 @@ abstract class FeatureProd implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildProduct object, it will not be re-added.
         if ($v !== null) {
-            $v->addFeatureProd($this);
+            $v->addFeatureProduct($this);
         }
 
 
@@ -1453,7 +1453,7 @@ abstract class FeatureProd implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProduct->addFeatureProds($this);
+                $this->aProduct->addFeatureProducts($this);
              */
         }
 
@@ -1464,7 +1464,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Declares an association between this object and a ChildFeature object.
      *
      * @param                  ChildFeature $v
-     * @return                 \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return                 \Thelia\Model\FeatureProduct The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFeature(ChildFeature $v = null)
@@ -1480,7 +1480,7 @@ abstract class FeatureProd implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildFeature object, it will not be re-added.
         if ($v !== null) {
-            $v->addFeatureProd($this);
+            $v->addFeatureProduct($this);
         }
 
 
@@ -1504,7 +1504,7 @@ abstract class FeatureProd implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aFeature->addFeatureProds($this);
+                $this->aFeature->addFeatureProducts($this);
              */
         }
 
@@ -1515,7 +1515,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      * Declares an association between this object and a ChildFeatureAv object.
      *
      * @param                  ChildFeatureAv $v
-     * @return                 \Thelia\Model\FeatureProd The current object (for fluent API support)
+     * @return                 \Thelia\Model\FeatureProduct The current object (for fluent API support)
      * @throws PropelException
      */
     public function setFeatureAv(ChildFeatureAv $v = null)
@@ -1531,7 +1531,7 @@ abstract class FeatureProd implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildFeatureAv object, it will not be re-added.
         if ($v !== null) {
-            $v->addFeatureProd($this);
+            $v->addFeatureProduct($this);
         }
 
 
@@ -1555,7 +1555,7 @@ abstract class FeatureProd implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aFeatureAv->addFeatureProds($this);
+                $this->aFeatureAv->addFeatureProducts($this);
              */
         }
 
@@ -1608,7 +1608,7 @@ abstract class FeatureProd implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(FeatureProdTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(FeatureProductTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1616,11 +1616,11 @@ abstract class FeatureProd implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildFeatureProd The current object (for fluent API support)
+     * @return     ChildFeatureProduct The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = FeatureProdTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = FeatureProductTableMap::UPDATED_AT;
 
         return $this;
     }

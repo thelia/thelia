@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Combination;
-use Thelia\Model\CombinationQuery;
+use Thelia\Model\ProductPrice;
+use Thelia\Model\ProductPriceQuery;
 
 
 /**
- * This class defines the structure of the 'combination' table.
+ * This class defines the structure of the 'product_price' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\CombinationQuery;
  * (i.e. if it's a text column type).
  *
  */
-class CombinationTableMap extends TableMap
+class ProductPriceTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.CombinationTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ProductPriceTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class CombinationTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'combination';
+    const TABLE_NAME = 'product_price';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Combination';
+    const OM_CLASS = '\\Thelia\\Model\\ProductPrice';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Combination';
+    const CLASS_DEFAULT = 'Thelia.Model.ProductPrice';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -67,27 +67,42 @@ class CombinationTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'combination.ID';
+    const ID = 'product_price.ID';
 
     /**
-     * the column name for the REF field
+     * the column name for the PRODUCT_SALE_ELEMENTS_ID field
      */
-    const REF = 'combination.REF';
+    const PRODUCT_SALE_ELEMENTS_ID = 'product_price.PRODUCT_SALE_ELEMENTS_ID';
+
+    /**
+     * the column name for the CURRENCY_ID field
+     */
+    const CURRENCY_ID = 'product_price.CURRENCY_ID';
+
+    /**
+     * the column name for the PRICE field
+     */
+    const PRICE = 'product_price.PRICE';
+
+    /**
+     * the column name for the PROMO_PRICE field
+     */
+    const PROMO_PRICE = 'product_price.PROMO_PRICE';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'combination.CREATED_AT';
+    const CREATED_AT = 'product_price.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'combination.UPDATED_AT';
+    const UPDATED_AT = 'product_price.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -101,12 +116,12 @@ class CombinationTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CombinationTableMap::ID, CombinationTableMap::REF, CombinationTableMap::CREATED_AT, CombinationTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'ProductSaleElementsId', 'CurrencyId', 'Price', 'PromoPrice', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'productSaleElementsId', 'currencyId', 'price', 'promoPrice', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(ProductPriceTableMap::ID, ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, ProductPriceTableMap::CURRENCY_ID, ProductPriceTableMap::PRICE, ProductPriceTableMap::PROMO_PRICE, ProductPriceTableMap::CREATED_AT, ProductPriceTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_SALE_ELEMENTS_ID', 'CURRENCY_ID', 'PRICE', 'PROMO_PRICE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'product_sale_elements_id', 'currency_id', 'price', 'promo_price', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -116,12 +131,12 @@ class CombinationTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(CombinationTableMap::ID => 0, CombinationTableMap::REF => 1, CombinationTableMap::CREATED_AT => 2, CombinationTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductSaleElementsId' => 1, 'CurrencyId' => 2, 'Price' => 3, 'PromoPrice' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productSaleElementsId' => 1, 'currencyId' => 2, 'price' => 3, 'promoPrice' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(ProductPriceTableMap::ID => 0, ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID => 1, ProductPriceTableMap::CURRENCY_ID => 2, ProductPriceTableMap::PRICE => 3, ProductPriceTableMap::PROMO_PRICE => 4, ProductPriceTableMap::CREATED_AT => 5, ProductPriceTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_SALE_ELEMENTS_ID' => 1, 'CURRENCY_ID' => 2, 'PRICE' => 3, 'PROMO_PRICE' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'product_sale_elements_id' => 1, 'currency_id' => 2, 'price' => 3, 'promo_price' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -134,14 +149,17 @@ class CombinationTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('combination');
-        $this->setPhpName('Combination');
-        $this->setClassName('\\Thelia\\Model\\Combination');
+        $this->setName('product_price');
+        $this->setPhpName('ProductPrice');
+        $this->setClassName('\\Thelia\\Model\\ProductPrice');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 255, null);
+        $this->addForeignKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', 'product_sale_elements', 'ID', true, null, null);
+        $this->addForeignKey('CURRENCY_ID', 'CurrencyId', 'INTEGER', 'currency', 'ID', true, null, null);
+        $this->addColumn('PRICE', 'Price', 'FLOAT', true, null, null);
+        $this->addColumn('PROMO_PRICE', 'PromoPrice', 'FLOAT', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -151,9 +169,8 @@ class CombinationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
-        $this->addRelation('Stock', '\\Thelia\\Model\\Stock', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'SET NULL', 'RESTRICT', 'Stocks');
-        $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), null, null, 'CartItems');
+        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_ONE, array('product_sale_elements_id' => 'id', ), null, null);
+        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('currency_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -168,16 +185,6 @@ class CombinationTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
-    /**
-     * Method to invalidate the instance pool of all tables related to combination     * by a foreign key with ON DELETE CASCADE
-     */
-    public static function clearRelatedInstancePool()
-    {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AttributeCombinationTableMap::clearInstancePool();
-                StockTableMap::clearInstancePool();
-            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -235,7 +242,7 @@ class CombinationTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CombinationTableMap::CLASS_DEFAULT : CombinationTableMap::OM_CLASS;
+        return $withPrefix ? ProductPriceTableMap::CLASS_DEFAULT : ProductPriceTableMap::OM_CLASS;
     }
 
     /**
@@ -249,21 +256,21 @@ class CombinationTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Combination object, last column rank)
+     * @return array (ProductPrice object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CombinationTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CombinationTableMap::getInstanceFromPool($key))) {
+        $key = ProductPriceTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ProductPriceTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CombinationTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ProductPriceTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CombinationTableMap::OM_CLASS;
+            $cls = ProductPriceTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CombinationTableMap::addInstanceToPool($obj, $key);
+            ProductPriceTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -286,8 +293,8 @@ class CombinationTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CombinationTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CombinationTableMap::getInstanceFromPool($key))) {
+            $key = ProductPriceTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ProductPriceTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -296,7 +303,7 @@ class CombinationTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CombinationTableMap::addInstanceToPool($obj, $key);
+                ProductPriceTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -317,13 +324,19 @@ class CombinationTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CombinationTableMap::ID);
-            $criteria->addSelectColumn(CombinationTableMap::REF);
-            $criteria->addSelectColumn(CombinationTableMap::CREATED_AT);
-            $criteria->addSelectColumn(CombinationTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ProductPriceTableMap::ID);
+            $criteria->addSelectColumn(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID);
+            $criteria->addSelectColumn(ProductPriceTableMap::CURRENCY_ID);
+            $criteria->addSelectColumn(ProductPriceTableMap::PRICE);
+            $criteria->addSelectColumn(ProductPriceTableMap::PROMO_PRICE);
+            $criteria->addSelectColumn(ProductPriceTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ProductPriceTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.REF');
+            $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
+            $criteria->addSelectColumn($alias . '.CURRENCY_ID');
+            $criteria->addSelectColumn($alias . '.PRICE');
+            $criteria->addSelectColumn($alias . '.PROMO_PRICE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -338,7 +351,7 @@ class CombinationTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CombinationTableMap::DATABASE_NAME)->getTable(CombinationTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ProductPriceTableMap::DATABASE_NAME)->getTable(ProductPriceTableMap::TABLE_NAME);
     }
 
     /**
@@ -346,16 +359,16 @@ class CombinationTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CombinationTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(CombinationTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new CombinationTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductPriceTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ProductPriceTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProductPriceTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Combination or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ProductPrice or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Combination object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ProductPrice object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -366,25 +379,25 @@ class CombinationTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductPriceTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Combination) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ProductPrice) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CombinationTableMap::DATABASE_NAME);
-            $criteria->add(CombinationTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
+            $criteria->add(ProductPriceTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = CombinationQuery::create()->mergeWith($criteria);
+        $query = ProductPriceQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { CombinationTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ProductPriceTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { CombinationTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ProductPriceTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -392,20 +405,20 @@ class CombinationTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the combination table.
+     * Deletes all rows from the product_price table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CombinationQuery::create()->doDeleteAll($con);
+        return ProductPriceQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Combination or Criteria object.
+     * Performs an INSERT on the database, given a ProductPrice or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Combination object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ProductPrice object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -414,22 +427,22 @@ class CombinationTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductPriceTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Combination object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ProductPrice object
         }
 
-        if ($criteria->containsKey(CombinationTableMap::ID) && $criteria->keyContainsValue(CombinationTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CombinationTableMap::ID.')');
+        if ($criteria->containsKey(ProductPriceTableMap::ID) && $criteria->keyContainsValue(ProductPriceTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductPriceTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = CombinationQuery::create()->mergeWith($criteria);
+        $query = ProductPriceQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -445,7 +458,7 @@ class CombinationTableMap extends TableMap
         return $pk;
     }
 
-} // CombinationTableMap
+} // ProductPriceTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CombinationTableMap::buildTableMap();
+ProductPriceTableMap::buildTableMap();

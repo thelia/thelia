@@ -12,100 +12,100 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\FeatureProd as ChildFeatureProd;
-use Thelia\Model\FeatureProdQuery as ChildFeatureProdQuery;
-use Thelia\Model\Map\FeatureProdTableMap;
+use Thelia\Model\FeatureProduct as ChildFeatureProduct;
+use Thelia\Model\FeatureProductQuery as ChildFeatureProductQuery;
+use Thelia\Model\Map\FeatureProductTableMap;
 
 /**
- * Base class that represents a query for the 'feature_prod' table.
+ * Base class that represents a query for the 'feature_product' table.
  *
  *
  *
- * @method     ChildFeatureProdQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildFeatureProdQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
- * @method     ChildFeatureProdQuery orderByFeatureId($order = Criteria::ASC) Order by the feature_id column
- * @method     ChildFeatureProdQuery orderByFeatureAvId($order = Criteria::ASC) Order by the feature_av_id column
- * @method     ChildFeatureProdQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
- * @method     ChildFeatureProdQuery orderByPosition($order = Criteria::ASC) Order by the position column
- * @method     ChildFeatureProdQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildFeatureProdQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildFeatureProductQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildFeatureProductQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
+ * @method     ChildFeatureProductQuery orderByFeatureId($order = Criteria::ASC) Order by the feature_id column
+ * @method     ChildFeatureProductQuery orderByFeatureAvId($order = Criteria::ASC) Order by the feature_av_id column
+ * @method     ChildFeatureProductQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
+ * @method     ChildFeatureProductQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildFeatureProductQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildFeatureProductQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildFeatureProdQuery groupById() Group by the id column
- * @method     ChildFeatureProdQuery groupByProductId() Group by the product_id column
- * @method     ChildFeatureProdQuery groupByFeatureId() Group by the feature_id column
- * @method     ChildFeatureProdQuery groupByFeatureAvId() Group by the feature_av_id column
- * @method     ChildFeatureProdQuery groupByByDefault() Group by the by_default column
- * @method     ChildFeatureProdQuery groupByPosition() Group by the position column
- * @method     ChildFeatureProdQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildFeatureProdQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildFeatureProductQuery groupById() Group by the id column
+ * @method     ChildFeatureProductQuery groupByProductId() Group by the product_id column
+ * @method     ChildFeatureProductQuery groupByFeatureId() Group by the feature_id column
+ * @method     ChildFeatureProductQuery groupByFeatureAvId() Group by the feature_av_id column
+ * @method     ChildFeatureProductQuery groupByByDefault() Group by the by_default column
+ * @method     ChildFeatureProductQuery groupByPosition() Group by the position column
+ * @method     ChildFeatureProductQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildFeatureProductQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildFeatureProdQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildFeatureProdQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildFeatureProdQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildFeatureProductQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildFeatureProductQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildFeatureProductQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildFeatureProdQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method     ChildFeatureProdQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method     ChildFeatureProdQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method     ChildFeatureProductQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
+ * @method     ChildFeatureProductQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
+ * @method     ChildFeatureProductQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
  *
- * @method     ChildFeatureProdQuery leftJoinFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the Feature relation
- * @method     ChildFeatureProdQuery rightJoinFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Feature relation
- * @method     ChildFeatureProdQuery innerJoinFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the Feature relation
+ * @method     ChildFeatureProductQuery leftJoinFeature($relationAlias = null) Adds a LEFT JOIN clause to the query using the Feature relation
+ * @method     ChildFeatureProductQuery rightJoinFeature($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Feature relation
+ * @method     ChildFeatureProductQuery innerJoinFeature($relationAlias = null) Adds a INNER JOIN clause to the query using the Feature relation
  *
- * @method     ChildFeatureProdQuery leftJoinFeatureAv($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureAv relation
- * @method     ChildFeatureProdQuery rightJoinFeatureAv($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAv relation
- * @method     ChildFeatureProdQuery innerJoinFeatureAv($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAv relation
+ * @method     ChildFeatureProductQuery leftJoinFeatureAv($relationAlias = null) Adds a LEFT JOIN clause to the query using the FeatureAv relation
+ * @method     ChildFeatureProductQuery rightJoinFeatureAv($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureAv relation
+ * @method     ChildFeatureProductQuery innerJoinFeatureAv($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureAv relation
  *
- * @method     ChildFeatureProd findOne(ConnectionInterface $con = null) Return the first ChildFeatureProd matching the query
- * @method     ChildFeatureProd findOneOrCreate(ConnectionInterface $con = null) Return the first ChildFeatureProd matching the query, or a new ChildFeatureProd object populated from the query conditions when no match is found
+ * @method     ChildFeatureProduct findOne(ConnectionInterface $con = null) Return the first ChildFeatureProduct matching the query
+ * @method     ChildFeatureProduct findOneOrCreate(ConnectionInterface $con = null) Return the first ChildFeatureProduct matching the query, or a new ChildFeatureProduct object populated from the query conditions when no match is found
  *
- * @method     ChildFeatureProd findOneById(int $id) Return the first ChildFeatureProd filtered by the id column
- * @method     ChildFeatureProd findOneByProductId(int $product_id) Return the first ChildFeatureProd filtered by the product_id column
- * @method     ChildFeatureProd findOneByFeatureId(int $feature_id) Return the first ChildFeatureProd filtered by the feature_id column
- * @method     ChildFeatureProd findOneByFeatureAvId(int $feature_av_id) Return the first ChildFeatureProd filtered by the feature_av_id column
- * @method     ChildFeatureProd findOneByByDefault(string $by_default) Return the first ChildFeatureProd filtered by the by_default column
- * @method     ChildFeatureProd findOneByPosition(int $position) Return the first ChildFeatureProd filtered by the position column
- * @method     ChildFeatureProd findOneByCreatedAt(string $created_at) Return the first ChildFeatureProd filtered by the created_at column
- * @method     ChildFeatureProd findOneByUpdatedAt(string $updated_at) Return the first ChildFeatureProd filtered by the updated_at column
+ * @method     ChildFeatureProduct findOneById(int $id) Return the first ChildFeatureProduct filtered by the id column
+ * @method     ChildFeatureProduct findOneByProductId(int $product_id) Return the first ChildFeatureProduct filtered by the product_id column
+ * @method     ChildFeatureProduct findOneByFeatureId(int $feature_id) Return the first ChildFeatureProduct filtered by the feature_id column
+ * @method     ChildFeatureProduct findOneByFeatureAvId(int $feature_av_id) Return the first ChildFeatureProduct filtered by the feature_av_id column
+ * @method     ChildFeatureProduct findOneByByDefault(string $by_default) Return the first ChildFeatureProduct filtered by the by_default column
+ * @method     ChildFeatureProduct findOneByPosition(int $position) Return the first ChildFeatureProduct filtered by the position column
+ * @method     ChildFeatureProduct findOneByCreatedAt(string $created_at) Return the first ChildFeatureProduct filtered by the created_at column
+ * @method     ChildFeatureProduct findOneByUpdatedAt(string $updated_at) Return the first ChildFeatureProduct filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildFeatureProd objects filtered by the id column
- * @method     array findByProductId(int $product_id) Return ChildFeatureProd objects filtered by the product_id column
- * @method     array findByFeatureId(int $feature_id) Return ChildFeatureProd objects filtered by the feature_id column
- * @method     array findByFeatureAvId(int $feature_av_id) Return ChildFeatureProd objects filtered by the feature_av_id column
- * @method     array findByByDefault(string $by_default) Return ChildFeatureProd objects filtered by the by_default column
- * @method     array findByPosition(int $position) Return ChildFeatureProd objects filtered by the position column
- * @method     array findByCreatedAt(string $created_at) Return ChildFeatureProd objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildFeatureProd objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildFeatureProduct objects filtered by the id column
+ * @method     array findByProductId(int $product_id) Return ChildFeatureProduct objects filtered by the product_id column
+ * @method     array findByFeatureId(int $feature_id) Return ChildFeatureProduct objects filtered by the feature_id column
+ * @method     array findByFeatureAvId(int $feature_av_id) Return ChildFeatureProduct objects filtered by the feature_av_id column
+ * @method     array findByByDefault(string $by_default) Return ChildFeatureProduct objects filtered by the by_default column
+ * @method     array findByPosition(int $position) Return ChildFeatureProduct objects filtered by the position column
+ * @method     array findByCreatedAt(string $created_at) Return ChildFeatureProduct objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildFeatureProduct objects filtered by the updated_at column
  *
  */
-abstract class FeatureProdQuery extends ModelCriteria
+abstract class FeatureProductQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\FeatureProdQuery object.
+     * Initializes internal state of \Thelia\Model\Base\FeatureProductQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\FeatureProd', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\FeatureProduct', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildFeatureProdQuery object.
+     * Returns a new ChildFeatureProductQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildFeatureProdQuery
+     * @return ChildFeatureProductQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\FeatureProdQuery) {
+        if ($criteria instanceof \Thelia\Model\FeatureProductQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\FeatureProdQuery();
+        $query = new \Thelia\Model\FeatureProductQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -128,19 +128,19 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildFeatureProd|array|mixed the result, formatted by the current formatter
+     * @return ChildFeatureProduct|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = FeatureProdTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = FeatureProductTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(FeatureProdTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(FeatureProductTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -159,11 +159,11 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildFeatureProd A model object, or null if the key is not found
+     * @return   ChildFeatureProduct A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, FEATURE_ID, FEATURE_AV_ID, BY_DEFAULT, POSITION, CREATED_AT, UPDATED_AT FROM feature_prod WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, FEATURE_ID, FEATURE_AV_ID, BY_DEFAULT, POSITION, CREATED_AT, UPDATED_AT FROM feature_product WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -174,9 +174,9 @@ abstract class FeatureProdQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildFeatureProd();
+            $obj = new ChildFeatureProduct();
             $obj->hydrate($row);
-            FeatureProdTableMap::addInstanceToPool($obj, (string) $key);
+            FeatureProductTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -189,7 +189,7 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildFeatureProd|array|mixed the result, formatted by the current formatter
+     * @return ChildFeatureProduct|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -231,12 +231,12 @@ abstract class FeatureProdQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(FeatureProdTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(FeatureProductTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -244,12 +244,12 @@ abstract class FeatureProdQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(FeatureProdTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(FeatureProductTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -268,18 +268,18 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(FeatureProdTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(FeatureProdTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -290,7 +290,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -311,18 +311,18 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByProductId($productId = null, $comparison = null)
     {
         if (is_array($productId)) {
             $useMinMax = false;
             if (isset($productId['min'])) {
-                $this->addUsingAlias(FeatureProdTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($productId['max'])) {
-                $this->addUsingAlias(FeatureProdTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -333,7 +333,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::PRODUCT_ID, $productId, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::PRODUCT_ID, $productId, $comparison);
     }
 
     /**
@@ -354,18 +354,18 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByFeatureId($featureId = null, $comparison = null)
     {
         if (is_array($featureId)) {
             $useMinMax = false;
             if (isset($featureId['min'])) {
-                $this->addUsingAlias(FeatureProdTableMap::FEATURE_ID, $featureId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::FEATURE_ID, $featureId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($featureId['max'])) {
-                $this->addUsingAlias(FeatureProdTableMap::FEATURE_ID, $featureId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::FEATURE_ID, $featureId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -376,7 +376,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::FEATURE_ID, $featureId, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::FEATURE_ID, $featureId, $comparison);
     }
 
     /**
@@ -397,18 +397,18 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByFeatureAvId($featureAvId = null, $comparison = null)
     {
         if (is_array($featureAvId)) {
             $useMinMax = false;
             if (isset($featureAvId['min'])) {
-                $this->addUsingAlias(FeatureProdTableMap::FEATURE_AV_ID, $featureAvId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::FEATURE_AV_ID, $featureAvId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($featureAvId['max'])) {
-                $this->addUsingAlias(FeatureProdTableMap::FEATURE_AV_ID, $featureAvId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::FEATURE_AV_ID, $featureAvId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -419,7 +419,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::FEATURE_AV_ID, $featureAvId, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::FEATURE_AV_ID, $featureAvId, $comparison);
     }
 
     /**
@@ -435,7 +435,7 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByByDefault($byDefault = null, $comparison = null)
     {
@@ -448,7 +448,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::BY_DEFAULT, $byDefault, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::BY_DEFAULT, $byDefault, $comparison);
     }
 
     /**
@@ -467,18 +467,18 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByPosition($position = null, $comparison = null)
     {
         if (is_array($position)) {
             $useMinMax = false;
             if (isset($position['min'])) {
-                $this->addUsingAlias(FeatureProdTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($position['max'])) {
-                $this->addUsingAlias(FeatureProdTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -489,7 +489,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::POSITION, $position, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::POSITION, $position, $comparison);
     }
 
     /**
@@ -510,18 +510,18 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(FeatureProdTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(FeatureProdTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -532,7 +532,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -553,18 +553,18 @@ abstract class FeatureProdQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(FeatureProdTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(FeatureProdTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(FeatureProductTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -575,7 +575,7 @@ abstract class FeatureProdQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(FeatureProdTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(FeatureProductTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -584,20 +584,20 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByProduct($product, $comparison = null)
     {
         if ($product instanceof \Thelia\Model\Product) {
             return $this
-                ->addUsingAlias(FeatureProdTableMap::PRODUCT_ID, $product->getId(), $comparison);
+                ->addUsingAlias(FeatureProductTableMap::PRODUCT_ID, $product->getId(), $comparison);
         } elseif ($product instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(FeatureProdTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(FeatureProductTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByProduct() only accepts arguments of type \Thelia\Model\Product or Collection');
         }
@@ -609,7 +609,7 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -659,20 +659,20 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param \Thelia\Model\Feature|ObjectCollection $feature The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByFeature($feature, $comparison = null)
     {
         if ($feature instanceof \Thelia\Model\Feature) {
             return $this
-                ->addUsingAlias(FeatureProdTableMap::FEATURE_ID, $feature->getId(), $comparison);
+                ->addUsingAlias(FeatureProductTableMap::FEATURE_ID, $feature->getId(), $comparison);
         } elseif ($feature instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(FeatureProdTableMap::FEATURE_ID, $feature->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(FeatureProductTableMap::FEATURE_ID, $feature->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByFeature() only accepts arguments of type \Thelia\Model\Feature or Collection');
         }
@@ -684,7 +684,7 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function joinFeature($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -734,20 +734,20 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param \Thelia\Model\FeatureAv|ObjectCollection $featureAv The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function filterByFeatureAv($featureAv, $comparison = null)
     {
         if ($featureAv instanceof \Thelia\Model\FeatureAv) {
             return $this
-                ->addUsingAlias(FeatureProdTableMap::FEATURE_AV_ID, $featureAv->getId(), $comparison);
+                ->addUsingAlias(FeatureProductTableMap::FEATURE_AV_ID, $featureAv->getId(), $comparison);
         } elseif ($featureAv instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(FeatureProdTableMap::FEATURE_AV_ID, $featureAv->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(FeatureProductTableMap::FEATURE_AV_ID, $featureAv->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByFeatureAv() only accepts arguments of type \Thelia\Model\FeatureAv or Collection');
         }
@@ -759,7 +759,7 @@ abstract class FeatureProdQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
     public function joinFeatureAv($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
@@ -806,21 +806,21 @@ abstract class FeatureProdQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildFeatureProd $featureProd Object to remove from the list of results
+     * @param   ChildFeatureProduct $featureProduct Object to remove from the list of results
      *
-     * @return ChildFeatureProdQuery The current query, for fluid interface
+     * @return ChildFeatureProductQuery The current query, for fluid interface
      */
-    public function prune($featureProd = null)
+    public function prune($featureProduct = null)
     {
-        if ($featureProd) {
-            $this->addUsingAlias(FeatureProdTableMap::ID, $featureProd->getId(), Criteria::NOT_EQUAL);
+        if ($featureProduct) {
+            $this->addUsingAlias(FeatureProductTableMap::ID, $featureProduct->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the feature_prod table.
+     * Deletes all rows from the feature_product table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -828,7 +828,7 @@ abstract class FeatureProdQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProdTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -839,8 +839,8 @@ abstract class FeatureProdQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            FeatureProdTableMap::clearInstancePool();
-            FeatureProdTableMap::clearRelatedInstancePool();
+            FeatureProductTableMap::clearInstancePool();
+            FeatureProductTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -852,9 +852,9 @@ abstract class FeatureProdQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildFeatureProd or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildFeatureProduct or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildFeatureProd object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildFeatureProduct object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -865,13 +865,13 @@ abstract class FeatureProdQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProdTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(FeatureProductTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(FeatureProdTableMap::DATABASE_NAME);
+        $criteria->setDbName(FeatureProductTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -881,10 +881,10 @@ abstract class FeatureProdQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        FeatureProdTableMap::removeInstanceFromPool($criteria);
+        FeatureProductTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            FeatureProdTableMap::clearRelatedInstancePool();
+            FeatureProductTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -901,11 +901,11 @@ abstract class FeatureProdQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildFeatureProdQuery The current query, for fluid interface
+     * @return     ChildFeatureProductQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(FeatureProdTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(FeatureProductTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -913,51 +913,51 @@ abstract class FeatureProdQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildFeatureProdQuery The current query, for fluid interface
+     * @return     ChildFeatureProductQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(FeatureProdTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(FeatureProductTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildFeatureProdQuery The current query, for fluid interface
+     * @return     ChildFeatureProductQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(FeatureProdTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(FeatureProductTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildFeatureProdQuery The current query, for fluid interface
+     * @return     ChildFeatureProductQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(FeatureProdTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(FeatureProductTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildFeatureProdQuery The current query, for fluid interface
+     * @return     ChildFeatureProductQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(FeatureProdTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(FeatureProductTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildFeatureProdQuery The current query, for fluid interface
+     * @return     ChildFeatureProductQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(FeatureProdTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(FeatureProductTableMap::CREATED_AT);
     }
 
-} // FeatureProdQuery
+} // FeatureProductQuery

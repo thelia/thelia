@@ -21,18 +21,20 @@ use Thelia\Model\AttributeCombination as ChildAttributeCombination;
 use Thelia\Model\AttributeCombinationQuery as ChildAttributeCombinationQuery;
 use Thelia\Model\CartItem as ChildCartItem;
 use Thelia\Model\CartItemQuery as ChildCartItemQuery;
-use Thelia\Model\Combination as ChildCombination;
-use Thelia\Model\CombinationQuery as ChildCombinationQuery;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
-use Thelia\Model\Map\CombinationTableMap;
+use Thelia\Model\Product as ChildProduct;
+use Thelia\Model\ProductPrice as ChildProductPrice;
+use Thelia\Model\ProductPriceQuery as ChildProductPriceQuery;
+use Thelia\Model\ProductQuery as ChildProductQuery;
+use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 
-abstract class Combination implements ActiveRecordInterface
+abstract class ProductSaleElements implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\CombinationTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProductSaleElementsTableMap';
 
 
     /**
@@ -68,10 +70,36 @@ abstract class Combination implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the ref field.
-     * @var        string
+     * The value for the product_id field.
+     * @var        int
      */
-    protected $ref;
+    protected $product_id;
+
+    /**
+     * The value for the quantity field.
+     * @var        double
+     */
+    protected $quantity;
+
+    /**
+     * The value for the promo field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $promo;
+
+    /**
+     * The value for the newness field.
+     * Note: this column has a database default value of: 0
+     * @var        int
+     */
+    protected $newness;
+
+    /**
+     * The value for the weight field.
+     * @var        double
+     */
+    protected $weight;
 
     /**
      * The value for the created_at field.
@@ -86,22 +114,27 @@ abstract class Combination implements ActiveRecordInterface
     protected $updated_at;
 
     /**
+     * @var        Product
+     */
+    protected $aProduct;
+
+    /**
      * @var        ObjectCollection|ChildAttributeCombination[] Collection to store aggregation of ChildAttributeCombination objects.
      */
     protected $collAttributeCombinations;
     protected $collAttributeCombinationsPartial;
 
     /**
-     * @var        ObjectCollection|ChildStock[] Collection to store aggregation of ChildStock objects.
-     */
-    protected $collStocks;
-    protected $collStocksPartial;
-
-    /**
      * @var        ObjectCollection|ChildCartItem[] Collection to store aggregation of ChildCartItem objects.
      */
     protected $collCartItems;
     protected $collCartItemsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildProductPrice[] Collection to store aggregation of ChildProductPrice objects.
+     */
+    protected $collProductPrices;
+    protected $collProductPricesPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -121,19 +154,33 @@ abstract class Combination implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $stocksScheduledForDeletion = null;
+    protected $cartItemsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $cartItemsScheduledForDeletion = null;
+    protected $productPricesScheduledForDeletion = null;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\Combination object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->promo = 0;
+        $this->newness = 0;
+    }
+
+    /**
+     * Initializes internal state of Thelia\Model\Base\ProductSaleElements object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -225,9 +272,9 @@ abstract class Combination implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Combination</code> instance.  If
-     * <code>obj</code> is an instance of <code>Combination</code>, delegates to
-     * <code>equals(Combination)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ProductSaleElements</code> instance.  If
+     * <code>obj</code> is an instance of <code>ProductSaleElements</code>, delegates to
+     * <code>equals(ProductSaleElements)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -308,7 +355,7 @@ abstract class Combination implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return Combination The current object, for fluid interface
+     * @return ProductSaleElements The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -340,7 +387,7 @@ abstract class Combination implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return Combination The current object, for fluid interface
+     * @return ProductSaleElements The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -395,14 +442,58 @@ abstract class Combination implements ActiveRecordInterface
     }
 
     /**
-     * Get the [ref] column value.
+     * Get the [product_id] column value.
      *
-     * @return   string
+     * @return   int
      */
-    public function getRef()
+    public function getProductId()
     {
 
-        return $this->ref;
+        return $this->product_id;
+    }
+
+    /**
+     * Get the [quantity] column value.
+     *
+     * @return   double
+     */
+    public function getQuantity()
+    {
+
+        return $this->quantity;
+    }
+
+    /**
+     * Get the [promo] column value.
+     *
+     * @return   int
+     */
+    public function getPromo()
+    {
+
+        return $this->promo;
+    }
+
+    /**
+     * Get the [newness] column value.
+     *
+     * @return   int
+     */
+    public function getNewness()
+    {
+
+        return $this->newness;
+    }
+
+    /**
+     * Get the [weight] column value.
+     *
+     * @return   double
+     */
+    public function getWeight()
+    {
+
+        return $this->weight;
     }
 
     /**
@@ -449,7 +540,7 @@ abstract class Combination implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Combination The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -459,7 +550,7 @@ abstract class Combination implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = CombinationTableMap::ID;
+            $this->modifiedColumns[] = ProductSaleElementsTableMap::ID;
         }
 
 
@@ -467,32 +558,120 @@ abstract class Combination implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [ref] column.
+     * Set the value of [product_id] column.
      *
-     * @param      string $v new value
-     * @return   \Thelia\Model\Combination The current object (for fluent API support)
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
      */
-    public function setRef($v)
+    public function setProductId($v)
     {
         if ($v !== null) {
-            $v = (string) $v;
+            $v = (int) $v;
         }
 
-        if ($this->ref !== $v) {
-            $this->ref = $v;
-            $this->modifiedColumns[] = CombinationTableMap::REF;
+        if ($this->product_id !== $v) {
+            $this->product_id = $v;
+            $this->modifiedColumns[] = ProductSaleElementsTableMap::PRODUCT_ID;
+        }
+
+        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
+            $this->aProduct = null;
         }
 
 
         return $this;
-    } // setRef()
+    } // setProductId()
+
+    /**
+     * Set the value of [quantity] column.
+     *
+     * @param      double $v new value
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function setQuantity($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->quantity !== $v) {
+            $this->quantity = $v;
+            $this->modifiedColumns[] = ProductSaleElementsTableMap::QUANTITY;
+        }
+
+
+        return $this;
+    } // setQuantity()
+
+    /**
+     * Set the value of [promo] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function setPromo($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->promo !== $v) {
+            $this->promo = $v;
+            $this->modifiedColumns[] = ProductSaleElementsTableMap::PROMO;
+        }
+
+
+        return $this;
+    } // setPromo()
+
+    /**
+     * Set the value of [newness] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function setNewness($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->newness !== $v) {
+            $this->newness = $v;
+            $this->modifiedColumns[] = ProductSaleElementsTableMap::NEWNESS;
+        }
+
+
+        return $this;
+    } // setNewness()
+
+    /**
+     * Set the value of [weight] column.
+     *
+     * @param      double $v new value
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function setWeight($v)
+    {
+        if ($v !== null) {
+            $v = (double) $v;
+        }
+
+        if ($this->weight !== $v) {
+            $this->weight = $v;
+            $this->modifiedColumns[] = ProductSaleElementsTableMap::WEIGHT;
+        }
+
+
+        return $this;
+    } // setWeight()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Combination The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -500,7 +679,7 @@ abstract class Combination implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = CombinationTableMap::CREATED_AT;
+                $this->modifiedColumns[] = ProductSaleElementsTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -513,7 +692,7 @@ abstract class Combination implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Combination The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -521,7 +700,7 @@ abstract class Combination implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = CombinationTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = ProductSaleElementsTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -539,6 +718,14 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->promo !== 0) {
+                return false;
+            }
+
+            if ($this->newness !== 0) {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -566,19 +753,31 @@ abstract class Combination implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CombinationTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductSaleElementsTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CombinationTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->ref = (null !== $col) ? (string) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductSaleElementsTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductSaleElementsTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->quantity = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductSaleElementsTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->promo = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductSaleElementsTableMap::translateFieldName('Newness', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->newness = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductSaleElementsTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->weight = (null !== $col) ? (double) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductSaleElementsTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CombinationTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductSaleElementsTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -591,10 +790,10 @@ abstract class Combination implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = CombinationTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = ProductSaleElementsTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\Combination object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\ProductSaleElements object", 0, $e);
         }
     }
 
@@ -613,6 +812,9 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
+        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
+            $this->aProduct = null;
+        }
     } // ensureConsistency
 
     /**
@@ -636,13 +838,13 @@ abstract class Combination implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildCombinationQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildProductSaleElementsQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -652,11 +854,12 @@ abstract class Combination implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
+            $this->aProduct = null;
             $this->collAttributeCombinations = null;
 
-            $this->collStocks = null;
-
             $this->collCartItems = null;
+
+            $this->collProductPrices = null;
 
         } // if (deep)
     }
@@ -667,8 +870,8 @@ abstract class Combination implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Combination::setDeleted()
-     * @see Combination::isDeleted()
+     * @see ProductSaleElements::setDeleted()
+     * @see ProductSaleElements::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -677,12 +880,12 @@ abstract class Combination implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildCombinationQuery::create()
+            $deleteQuery = ChildProductSaleElementsQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -719,7 +922,7 @@ abstract class Combination implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductSaleElementsTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -729,16 +932,16 @@ abstract class Combination implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(CombinationTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(ProductSaleElementsTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(CombinationTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(ProductSaleElementsTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(CombinationTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(ProductSaleElementsTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -750,7 +953,7 @@ abstract class Combination implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                CombinationTableMap::addInstanceToPool($this);
+                ProductSaleElementsTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -780,6 +983,18 @@ abstract class Combination implements ActiveRecordInterface
         if (!$this->alreadyInSave) {
             $this->alreadyInSave = true;
 
+            // We call the save method on the following object(s) if they
+            // were passed to this object by their corresponding set
+            // method.  This object relates to these object(s) by a
+            // foreign key reference.
+
+            if ($this->aProduct !== null) {
+                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
+                    $affectedRows += $this->aProduct->save($con);
+                }
+                $this->setProduct($this->aProduct);
+            }
+
             if ($this->isNew() || $this->isModified()) {
                 // persist changes
                 if ($this->isNew()) {
@@ -808,36 +1023,34 @@ abstract class Combination implements ActiveRecordInterface
                 }
             }
 
-            if ($this->stocksScheduledForDeletion !== null) {
-                if (!$this->stocksScheduledForDeletion->isEmpty()) {
-                    foreach ($this->stocksScheduledForDeletion as $stock) {
-                        // need to save related object because we set the relation to null
-                        $stock->save($con);
-                    }
-                    $this->stocksScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collStocks !== null) {
-            foreach ($this->collStocks as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->cartItemsScheduledForDeletion !== null) {
                 if (!$this->cartItemsScheduledForDeletion->isEmpty()) {
-                    foreach ($this->cartItemsScheduledForDeletion as $cartItem) {
-                        // need to save related object because we set the relation to null
-                        $cartItem->save($con);
-                    }
+                    \Thelia\Model\CartItemQuery::create()
+                        ->filterByPrimaryKeys($this->cartItemsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
                     $this->cartItemsScheduledForDeletion = null;
                 }
             }
 
                 if ($this->collCartItems !== null) {
             foreach ($this->collCartItems as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productPricesScheduledForDeletion !== null) {
+                if (!$this->productPricesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductPriceQuery::create()
+                        ->filterByPrimaryKeys($this->productPricesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productPricesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collProductPrices !== null) {
+            foreach ($this->collProductPrices as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -864,27 +1077,39 @@ abstract class Combination implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = CombinationTableMap::ID;
+        $this->modifiedColumns[] = ProductSaleElementsTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CombinationTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProductSaleElementsTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(CombinationTableMap::ID)) {
+        if ($this->isColumnModified(ProductSaleElementsTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(CombinationTableMap::REF)) {
-            $modifiedColumns[':p' . $index++]  = 'REF';
+        if ($this->isColumnModified(ProductSaleElementsTableMap::PRODUCT_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
-        if ($this->isColumnModified(CombinationTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(ProductSaleElementsTableMap::QUANTITY)) {
+            $modifiedColumns[':p' . $index++]  = 'QUANTITY';
+        }
+        if ($this->isColumnModified(ProductSaleElementsTableMap::PROMO)) {
+            $modifiedColumns[':p' . $index++]  = 'PROMO';
+        }
+        if ($this->isColumnModified(ProductSaleElementsTableMap::NEWNESS)) {
+            $modifiedColumns[':p' . $index++]  = 'NEWNESS';
+        }
+        if ($this->isColumnModified(ProductSaleElementsTableMap::WEIGHT)) {
+            $modifiedColumns[':p' . $index++]  = 'WEIGHT';
+        }
+        if ($this->isColumnModified(ProductSaleElementsTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(CombinationTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(ProductSaleElementsTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO combination (%s) VALUES (%s)',
+            'INSERT INTO product_sale_elements (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -896,8 +1121,20 @@ abstract class Combination implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'REF':
-                        $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
+                    case 'PRODUCT_ID':
+                        $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
+                        break;
+                    case 'QUANTITY':
+                        $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
+                        break;
+                    case 'PROMO':
+                        $stmt->bindValue($identifier, $this->promo, PDO::PARAM_INT);
+                        break;
+                    case 'NEWNESS':
+                        $stmt->bindValue($identifier, $this->newness, PDO::PARAM_INT);
+                        break;
+                    case 'WEIGHT':
+                        $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -951,7 +1188,7 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CombinationTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProductSaleElementsTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -971,12 +1208,24 @@ abstract class Combination implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getRef();
+                return $this->getProductId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getQuantity();
                 break;
             case 3:
+                return $this->getPromo();
+                break;
+            case 4:
+                return $this->getNewness();
+                break;
+            case 5:
+                return $this->getWeight();
+                break;
+            case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1002,16 +1251,20 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Combination'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['ProductSaleElements'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Combination'][$this->getPrimaryKey()] = true;
-        $keys = CombinationTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ProductSaleElements'][$this->getPrimaryKey()] = true;
+        $keys = ProductSaleElementsTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getRef(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[1] => $this->getProductId(),
+            $keys[2] => $this->getQuantity(),
+            $keys[3] => $this->getPromo(),
+            $keys[4] => $this->getNewness(),
+            $keys[5] => $this->getWeight(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1020,14 +1273,17 @@ abstract class Combination implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
+            if (null !== $this->aProduct) {
+                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
             if (null !== $this->collAttributeCombinations) {
                 $result['AttributeCombinations'] = $this->collAttributeCombinations->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collStocks) {
-                $result['Stocks'] = $this->collStocks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collCartItems) {
                 $result['CartItems'] = $this->collCartItems->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collProductPrices) {
+                $result['ProductPrices'] = $this->collProductPrices->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1047,7 +1303,7 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = CombinationTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProductSaleElementsTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1067,12 +1323,24 @@ abstract class Combination implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setRef($value);
+                $this->setProductId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setQuantity($value);
                 break;
             case 3:
+                $this->setPromo($value);
+                break;
+            case 4:
+                $this->setNewness($value);
+                break;
+            case 5:
+                $this->setWeight($value);
+                break;
+            case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1097,12 +1365,16 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = CombinationTableMap::getFieldNames($keyType);
+        $keys = ProductSaleElementsTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setRef($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
+        if (array_key_exists($keys[2], $arr)) $this->setQuantity($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPromo($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setNewness($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setWeight($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1112,12 +1384,16 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(CombinationTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ProductSaleElementsTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(CombinationTableMap::ID)) $criteria->add(CombinationTableMap::ID, $this->id);
-        if ($this->isColumnModified(CombinationTableMap::REF)) $criteria->add(CombinationTableMap::REF, $this->ref);
-        if ($this->isColumnModified(CombinationTableMap::CREATED_AT)) $criteria->add(CombinationTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(CombinationTableMap::UPDATED_AT)) $criteria->add(CombinationTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::ID)) $criteria->add(ProductSaleElementsTableMap::ID, $this->id);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::PRODUCT_ID)) $criteria->add(ProductSaleElementsTableMap::PRODUCT_ID, $this->product_id);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::QUANTITY)) $criteria->add(ProductSaleElementsTableMap::QUANTITY, $this->quantity);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::PROMO)) $criteria->add(ProductSaleElementsTableMap::PROMO, $this->promo);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::NEWNESS)) $criteria->add(ProductSaleElementsTableMap::NEWNESS, $this->newness);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::WEIGHT)) $criteria->add(ProductSaleElementsTableMap::WEIGHT, $this->weight);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::CREATED_AT)) $criteria->add(ProductSaleElementsTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ProductSaleElementsTableMap::UPDATED_AT)) $criteria->add(ProductSaleElementsTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1132,8 +1408,8 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(CombinationTableMap::DATABASE_NAME);
-        $criteria->add(CombinationTableMap::ID, $this->id);
+        $criteria = new Criteria(ProductSaleElementsTableMap::DATABASE_NAME);
+        $criteria->add(ProductSaleElementsTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1174,14 +1450,18 @@ abstract class Combination implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Combination (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\ProductSaleElements (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setRef($this->getRef());
+        $copyObj->setProductId($this->getProductId());
+        $copyObj->setQuantity($this->getQuantity());
+        $copyObj->setPromo($this->getPromo());
+        $copyObj->setNewness($this->getNewness());
+        $copyObj->setWeight($this->getWeight());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1196,15 +1476,15 @@ abstract class Combination implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getStocks() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addStock($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getCartItems() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addCartItem($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getProductPrices() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductPrice($relObj->copy($deepCopy));
                 }
             }
 
@@ -1225,7 +1505,7 @@ abstract class Combination implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Combination Clone of current object.
+     * @return                 \Thelia\Model\ProductSaleElements Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1236,6 +1516,57 @@ abstract class Combination implements ActiveRecordInterface
         $this->copyInto($copyObj, $deepCopy);
 
         return $copyObj;
+    }
+
+    /**
+     * Declares an association between this object and a ChildProduct object.
+     *
+     * @param                  ChildProduct $v
+     * @return                 \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setProduct(ChildProduct $v = null)
+    {
+        if ($v === null) {
+            $this->setProductId(NULL);
+        } else {
+            $this->setProductId($v->getId());
+        }
+
+        $this->aProduct = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildProduct object, it will not be re-added.
+        if ($v !== null) {
+            $v->addProductSaleElements($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildProduct object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildProduct The associated ChildProduct object.
+     * @throws PropelException
+     */
+    public function getProduct(ConnectionInterface $con = null)
+    {
+        if ($this->aProduct === null && ($this->product_id !== null)) {
+            $this->aProduct = ChildProductQuery::create()->findPk($this->product_id, $con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aProduct->addProductSaleElementss($this);
+             */
+        }
+
+        return $this->aProduct;
     }
 
 
@@ -1252,11 +1583,11 @@ abstract class Combination implements ActiveRecordInterface
         if ('AttributeCombination' == $relationName) {
             return $this->initAttributeCombinations();
         }
-        if ('Stock' == $relationName) {
-            return $this->initStocks();
-        }
         if ('CartItem' == $relationName) {
             return $this->initCartItems();
+        }
+        if ('ProductPrice' == $relationName) {
+            return $this->initProductPrices();
         }
     }
 
@@ -1309,7 +1640,7 @@ abstract class Combination implements ActiveRecordInterface
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCombination is new, it will return
+     * If this ChildProductSaleElements is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
@@ -1326,7 +1657,7 @@ abstract class Combination implements ActiveRecordInterface
                 $this->initAttributeCombinations();
             } else {
                 $collAttributeCombinations = ChildAttributeCombinationQuery::create(null, $criteria)
-                    ->filterByCombination($this)
+                    ->filterByProductSaleElements($this)
                     ->find($con);
 
                 if (null !== $criteria) {
@@ -1371,7 +1702,7 @@ abstract class Combination implements ActiveRecordInterface
      *
      * @param      Collection $attributeCombinations A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCombination The current object (for fluent API support)
+     * @return   ChildProductSaleElements The current object (for fluent API support)
      */
     public function setAttributeCombinations(Collection $attributeCombinations, ConnectionInterface $con = null)
     {
@@ -1384,7 +1715,7 @@ abstract class Combination implements ActiveRecordInterface
         $this->attributeCombinationsScheduledForDeletion = clone $attributeCombinationsToDelete;
 
         foreach ($attributeCombinationsToDelete as $attributeCombinationRemoved) {
-            $attributeCombinationRemoved->setCombination(null);
+            $attributeCombinationRemoved->setProductSaleElements(null);
         }
 
         $this->collAttributeCombinations = null;
@@ -1425,7 +1756,7 @@ abstract class Combination implements ActiveRecordInterface
             }
 
             return $query
-                ->filterByCombination($this)
+                ->filterByProductSaleElements($this)
                 ->count($con);
         }
 
@@ -1437,7 +1768,7 @@ abstract class Combination implements ActiveRecordInterface
      * through the ChildAttributeCombination foreign key attribute.
      *
      * @param    ChildAttributeCombination $l ChildAttributeCombination
-     * @return   \Thelia\Model\Combination The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
      */
     public function addAttributeCombination(ChildAttributeCombination $l)
     {
@@ -1459,12 +1790,12 @@ abstract class Combination implements ActiveRecordInterface
     protected function doAddAttributeCombination($attributeCombination)
     {
         $this->collAttributeCombinations[]= $attributeCombination;
-        $attributeCombination->setCombination($this);
+        $attributeCombination->setProductSaleElements($this);
     }
 
     /**
      * @param  AttributeCombination $attributeCombination The attributeCombination object to remove.
-     * @return ChildCombination The current object (for fluent API support)
+     * @return ChildProductSaleElements The current object (for fluent API support)
      */
     public function removeAttributeCombination($attributeCombination)
     {
@@ -1475,7 +1806,7 @@ abstract class Combination implements ActiveRecordInterface
                 $this->attributeCombinationsScheduledForDeletion->clear();
             }
             $this->attributeCombinationsScheduledForDeletion[]= clone $attributeCombination;
-            $attributeCombination->setCombination(null);
+            $attributeCombination->setProductSaleElements(null);
         }
 
         return $this;
@@ -1485,13 +1816,13 @@ abstract class Combination implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Combination is new, it will return
-     * an empty collection; or if this Combination has previously
+     * Otherwise if this ProductSaleElements is new, it will return
+     * an empty collection; or if this ProductSaleElements has previously
      * been saved, it will retrieve related AttributeCombinations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Combination.
+     * actually need in ProductSaleElements.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -1510,13 +1841,13 @@ abstract class Combination implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Combination is new, it will return
-     * an empty collection; or if this Combination has previously
+     * Otherwise if this ProductSaleElements is new, it will return
+     * an empty collection; or if this ProductSaleElements has previously
      * been saved, it will retrieve related AttributeCombinations from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Combination.
+     * actually need in ProductSaleElements.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -1529,249 +1860,6 @@ abstract class Combination implements ActiveRecordInterface
         $query->joinWith('AttributeAv', $joinBehavior);
 
         return $this->getAttributeCombinations($query, $con);
-    }
-
-    /**
-     * Clears out the collStocks collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addStocks()
-     */
-    public function clearStocks()
-    {
-        $this->collStocks = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collStocks collection loaded partially.
-     */
-    public function resetPartialStocks($v = true)
-    {
-        $this->collStocksPartial = $v;
-    }
-
-    /**
-     * Initializes the collStocks collection.
-     *
-     * By default this just sets the collStocks collection to an empty array (like clearcollStocks());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initStocks($overrideExisting = true)
-    {
-        if (null !== $this->collStocks && !$overrideExisting) {
-            return;
-        }
-        $this->collStocks = new ObjectCollection();
-        $this->collStocks->setModel('\Thelia\Model\Stock');
-    }
-
-    /**
-     * Gets an array of ChildStock objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCombination is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildStock[] List of ChildStock objects
-     * @throws PropelException
-     */
-    public function getStocks($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collStocksPartial && !$this->isNew();
-        if (null === $this->collStocks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collStocks) {
-                // return empty collection
-                $this->initStocks();
-            } else {
-                $collStocks = ChildStockQuery::create(null, $criteria)
-                    ->filterByCombination($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collStocksPartial && count($collStocks)) {
-                        $this->initStocks(false);
-
-                        foreach ($collStocks as $obj) {
-                            if (false == $this->collStocks->contains($obj)) {
-                                $this->collStocks->append($obj);
-                            }
-                        }
-
-                        $this->collStocksPartial = true;
-                    }
-
-                    $collStocks->getInternalIterator()->rewind();
-
-                    return $collStocks;
-                }
-
-                if ($partial && $this->collStocks) {
-                    foreach ($this->collStocks as $obj) {
-                        if ($obj->isNew()) {
-                            $collStocks[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collStocks = $collStocks;
-                $this->collStocksPartial = false;
-            }
-        }
-
-        return $this->collStocks;
-    }
-
-    /**
-     * Sets a collection of Stock objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $stocks A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCombination The current object (for fluent API support)
-     */
-    public function setStocks(Collection $stocks, ConnectionInterface $con = null)
-    {
-        $stocksToDelete = $this->getStocks(new Criteria(), $con)->diff($stocks);
-
-
-        $this->stocksScheduledForDeletion = $stocksToDelete;
-
-        foreach ($stocksToDelete as $stockRemoved) {
-            $stockRemoved->setCombination(null);
-        }
-
-        $this->collStocks = null;
-        foreach ($stocks as $stock) {
-            $this->addStock($stock);
-        }
-
-        $this->collStocks = $stocks;
-        $this->collStocksPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Stock objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Stock objects.
-     * @throws PropelException
-     */
-    public function countStocks(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collStocksPartial && !$this->isNew();
-        if (null === $this->collStocks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collStocks) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getStocks());
-            }
-
-            $query = ChildStockQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCombination($this)
-                ->count($con);
-        }
-
-        return count($this->collStocks);
-    }
-
-    /**
-     * Method called to associate a ChildStock object to this object
-     * through the ChildStock foreign key attribute.
-     *
-     * @param    ChildStock $l ChildStock
-     * @return   \Thelia\Model\Combination The current object (for fluent API support)
-     */
-    public function addStock(ChildStock $l)
-    {
-        if ($this->collStocks === null) {
-            $this->initStocks();
-            $this->collStocksPartial = true;
-        }
-
-        if (!in_array($l, $this->collStocks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddStock($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Stock $stock The stock object to add.
-     */
-    protected function doAddStock($stock)
-    {
-        $this->collStocks[]= $stock;
-        $stock->setCombination($this);
-    }
-
-    /**
-     * @param  Stock $stock The stock object to remove.
-     * @return ChildCombination The current object (for fluent API support)
-     */
-    public function removeStock($stock)
-    {
-        if ($this->getStocks()->contains($stock)) {
-            $this->collStocks->remove($this->collStocks->search($stock));
-            if (null === $this->stocksScheduledForDeletion) {
-                $this->stocksScheduledForDeletion = clone $this->collStocks;
-                $this->stocksScheduledForDeletion->clear();
-            }
-            $this->stocksScheduledForDeletion[]= $stock;
-            $stock->setCombination(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Combination is new, it will return
-     * an empty collection; or if this Combination has previously
-     * been saved, it will retrieve related Stocks from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Combination.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildStock[] List of ChildStock objects
-     */
-    public function getStocksJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildStockQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getStocks($query, $con);
     }
 
     /**
@@ -1823,7 +1911,7 @@ abstract class Combination implements ActiveRecordInterface
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCombination is new, it will return
+     * If this ChildProductSaleElements is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
@@ -1840,7 +1928,7 @@ abstract class Combination implements ActiveRecordInterface
                 $this->initCartItems();
             } else {
                 $collCartItems = ChildCartItemQuery::create(null, $criteria)
-                    ->filterByCombination($this)
+                    ->filterByProductSaleElements($this)
                     ->find($con);
 
                 if (null !== $criteria) {
@@ -1885,7 +1973,7 @@ abstract class Combination implements ActiveRecordInterface
      *
      * @param      Collection $cartItems A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCombination The current object (for fluent API support)
+     * @return   ChildProductSaleElements The current object (for fluent API support)
      */
     public function setCartItems(Collection $cartItems, ConnectionInterface $con = null)
     {
@@ -1895,7 +1983,7 @@ abstract class Combination implements ActiveRecordInterface
         $this->cartItemsScheduledForDeletion = $cartItemsToDelete;
 
         foreach ($cartItemsToDelete as $cartItemRemoved) {
-            $cartItemRemoved->setCombination(null);
+            $cartItemRemoved->setProductSaleElements(null);
         }
 
         $this->collCartItems = null;
@@ -1936,7 +2024,7 @@ abstract class Combination implements ActiveRecordInterface
             }
 
             return $query
-                ->filterByCombination($this)
+                ->filterByProductSaleElements($this)
                 ->count($con);
         }
 
@@ -1948,7 +2036,7 @@ abstract class Combination implements ActiveRecordInterface
      * through the ChildCartItem foreign key attribute.
      *
      * @param    ChildCartItem $l ChildCartItem
-     * @return   \Thelia\Model\Combination The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
      */
     public function addCartItem(ChildCartItem $l)
     {
@@ -1970,12 +2058,12 @@ abstract class Combination implements ActiveRecordInterface
     protected function doAddCartItem($cartItem)
     {
         $this->collCartItems[]= $cartItem;
-        $cartItem->setCombination($this);
+        $cartItem->setProductSaleElements($this);
     }
 
     /**
      * @param  CartItem $cartItem The cartItem object to remove.
-     * @return ChildCombination The current object (for fluent API support)
+     * @return ChildProductSaleElements The current object (for fluent API support)
      */
     public function removeCartItem($cartItem)
     {
@@ -1985,8 +2073,8 @@ abstract class Combination implements ActiveRecordInterface
                 $this->cartItemsScheduledForDeletion = clone $this->collCartItems;
                 $this->cartItemsScheduledForDeletion->clear();
             }
-            $this->cartItemsScheduledForDeletion[]= $cartItem;
-            $cartItem->setCombination(null);
+            $this->cartItemsScheduledForDeletion[]= clone $cartItem;
+            $cartItem->setProductSaleElements(null);
         }
 
         return $this;
@@ -1996,13 +2084,13 @@ abstract class Combination implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Combination is new, it will return
-     * an empty collection; or if this Combination has previously
+     * Otherwise if this ProductSaleElements is new, it will return
+     * an empty collection; or if this ProductSaleElements has previously
      * been saved, it will retrieve related CartItems from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Combination.
+     * actually need in ProductSaleElements.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -2021,13 +2109,13 @@ abstract class Combination implements ActiveRecordInterface
     /**
      * If this collection has already been initialized with
      * an identical criteria, it returns the collection.
-     * Otherwise if this Combination is new, it will return
-     * an empty collection; or if this Combination has previously
+     * Otherwise if this ProductSaleElements is new, it will return
+     * an empty collection; or if this ProductSaleElements has previously
      * been saved, it will retrieve related CartItems from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
-     * actually need in Combination.
+     * actually need in ProductSaleElements.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
@@ -2043,16 +2131,264 @@ abstract class Combination implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collProductPrices collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductPrices()
+     */
+    public function clearProductPrices()
+    {
+        $this->collProductPrices = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProductPrices collection loaded partially.
+     */
+    public function resetPartialProductPrices($v = true)
+    {
+        $this->collProductPricesPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductPrices collection.
+     *
+     * By default this just sets the collProductPrices collection to an empty array (like clearcollProductPrices());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductPrices($overrideExisting = true)
+    {
+        if (null !== $this->collProductPrices && !$overrideExisting) {
+            return;
+        }
+        $this->collProductPrices = new ObjectCollection();
+        $this->collProductPrices->setModel('\Thelia\Model\ProductPrice');
+    }
+
+    /**
+     * Gets an array of ChildProductPrice objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildProductSaleElements is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProductPrice[] List of ChildProductPrice objects
+     * @throws PropelException
+     */
+    public function getProductPrices($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductPricesPartial && !$this->isNew();
+        if (null === $this->collProductPrices || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductPrices) {
+                // return empty collection
+                $this->initProductPrices();
+            } else {
+                $collProductPrices = ChildProductPriceQuery::create(null, $criteria)
+                    ->filterByProductSaleElements($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProductPricesPartial && count($collProductPrices)) {
+                        $this->initProductPrices(false);
+
+                        foreach ($collProductPrices as $obj) {
+                            if (false == $this->collProductPrices->contains($obj)) {
+                                $this->collProductPrices->append($obj);
+                            }
+                        }
+
+                        $this->collProductPricesPartial = true;
+                    }
+
+                    $collProductPrices->getInternalIterator()->rewind();
+
+                    return $collProductPrices;
+                }
+
+                if ($partial && $this->collProductPrices) {
+                    foreach ($this->collProductPrices as $obj) {
+                        if ($obj->isNew()) {
+                            $collProductPrices[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductPrices = $collProductPrices;
+                $this->collProductPricesPartial = false;
+            }
+        }
+
+        return $this->collProductPrices;
+    }
+
+    /**
+     * Sets a collection of ProductPrice objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $productPrices A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function setProductPrices(Collection $productPrices, ConnectionInterface $con = null)
+    {
+        $productPricesToDelete = $this->getProductPrices(new Criteria(), $con)->diff($productPrices);
+
+
+        $this->productPricesScheduledForDeletion = $productPricesToDelete;
+
+        foreach ($productPricesToDelete as $productPriceRemoved) {
+            $productPriceRemoved->setProductSaleElements(null);
+        }
+
+        $this->collProductPrices = null;
+        foreach ($productPrices as $productPrice) {
+            $this->addProductPrice($productPrice);
+        }
+
+        $this->collProductPrices = $productPrices;
+        $this->collProductPricesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProductPrice objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductPrice objects.
+     * @throws PropelException
+     */
+    public function countProductPrices(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductPricesPartial && !$this->isNew();
+        if (null === $this->collProductPrices || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductPrices) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProductPrices());
+            }
+
+            $query = ChildProductPriceQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByProductSaleElements($this)
+                ->count($con);
+        }
+
+        return count($this->collProductPrices);
+    }
+
+    /**
+     * Method called to associate a ChildProductPrice object to this object
+     * through the ChildProductPrice foreign key attribute.
+     *
+     * @param    ChildProductPrice $l ChildProductPrice
+     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
+     */
+    public function addProductPrice(ChildProductPrice $l)
+    {
+        if ($this->collProductPrices === null) {
+            $this->initProductPrices();
+            $this->collProductPricesPartial = true;
+        }
+
+        if (!in_array($l, $this->collProductPrices->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductPrice($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProductPrice $productPrice The productPrice object to add.
+     */
+    protected function doAddProductPrice($productPrice)
+    {
+        $this->collProductPrices[]= $productPrice;
+        $productPrice->setProductSaleElements($this);
+    }
+
+    /**
+     * @param  ProductPrice $productPrice The productPrice object to remove.
+     * @return ChildProductSaleElements The current object (for fluent API support)
+     */
+    public function removeProductPrice($productPrice)
+    {
+        if ($this->getProductPrices()->contains($productPrice)) {
+            $this->collProductPrices->remove($this->collProductPrices->search($productPrice));
+            if (null === $this->productPricesScheduledForDeletion) {
+                $this->productPricesScheduledForDeletion = clone $this->collProductPrices;
+                $this->productPricesScheduledForDeletion->clear();
+            }
+            $this->productPricesScheduledForDeletion[]= clone $productPrice;
+            $productPrice->setProductSaleElements(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this ProductSaleElements is new, it will return
+     * an empty collection; or if this ProductSaleElements has previously
+     * been saved, it will retrieve related ProductPrices from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in ProductSaleElements.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildProductPrice[] List of ChildProductPrice objects
+     */
+    public function getProductPricesJoinCurrency($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildProductPriceQuery::create(null, $criteria);
+        $query->joinWith('Currency', $joinBehavior);
+
+        return $this->getProductPrices($query, $con);
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
     {
         $this->id = null;
-        $this->ref = null;
+        $this->product_id = null;
+        $this->quantity = null;
+        $this->promo = null;
+        $this->newness = null;
+        $this->weight = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -2075,13 +2411,13 @@ abstract class Combination implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collStocks) {
-                foreach ($this->collStocks as $o) {
+            if ($this->collCartItems) {
+                foreach ($this->collCartItems as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collCartItems) {
-                foreach ($this->collCartItems as $o) {
+            if ($this->collProductPrices) {
+                foreach ($this->collProductPrices as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -2091,14 +2427,15 @@ abstract class Combination implements ActiveRecordInterface
             $this->collAttributeCombinations->clearIterator();
         }
         $this->collAttributeCombinations = null;
-        if ($this->collStocks instanceof Collection) {
-            $this->collStocks->clearIterator();
-        }
-        $this->collStocks = null;
         if ($this->collCartItems instanceof Collection) {
             $this->collCartItems->clearIterator();
         }
         $this->collCartItems = null;
+        if ($this->collProductPrices instanceof Collection) {
+            $this->collProductPrices->clearIterator();
+        }
+        $this->collProductPrices = null;
+        $this->aProduct = null;
     }
 
     /**
@@ -2108,7 +2445,7 @@ abstract class Combination implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(CombinationTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ProductSaleElementsTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -2116,11 +2453,11 @@ abstract class Combination implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildCombination The current object (for fluent API support)
+     * @return     ChildProductSaleElements The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = CombinationTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = ProductSaleElementsTableMap::UPDATED_AT;
 
         return $this;
     }

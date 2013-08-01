@@ -25,7 +25,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItemQuery orderByCartId($order = Criteria::ASC) Order by the cart_id column
  * @method     ChildCartItemQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
  * @method     ChildCartItemQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
- * @method     ChildCartItemQuery orderByCombinationId($order = Criteria::ASC) Order by the combination_id column
+ * @method     ChildCartItemQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
  * @method     ChildCartItemQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCartItemQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -33,7 +33,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItemQuery groupByCartId() Group by the cart_id column
  * @method     ChildCartItemQuery groupByProductId() Group by the product_id column
  * @method     ChildCartItemQuery groupByQuantity() Group by the quantity column
- * @method     ChildCartItemQuery groupByCombinationId() Group by the combination_id column
+ * @method     ChildCartItemQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
  * @method     ChildCartItemQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCartItemQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -49,9 +49,9 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItemQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
  * @method     ChildCartItemQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
  *
- * @method     ChildCartItemQuery leftJoinCombination($relationAlias = null) Adds a LEFT JOIN clause to the query using the Combination relation
- * @method     ChildCartItemQuery rightJoinCombination($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Combination relation
- * @method     ChildCartItemQuery innerJoinCombination($relationAlias = null) Adds a INNER JOIN clause to the query using the Combination relation
+ * @method     ChildCartItemQuery leftJoinProductSaleElements($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildCartItemQuery rightJoinProductSaleElements($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildCartItemQuery innerJoinProductSaleElements($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductSaleElements relation
  *
  * @method     ChildCartItem findOne(ConnectionInterface $con = null) Return the first ChildCartItem matching the query
  * @method     ChildCartItem findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCartItem matching the query, or a new ChildCartItem object populated from the query conditions when no match is found
@@ -60,7 +60,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItem findOneByCartId(int $cart_id) Return the first ChildCartItem filtered by the cart_id column
  * @method     ChildCartItem findOneByProductId(int $product_id) Return the first ChildCartItem filtered by the product_id column
  * @method     ChildCartItem findOneByQuantity(double $quantity) Return the first ChildCartItem filtered by the quantity column
- * @method     ChildCartItem findOneByCombinationId(int $combination_id) Return the first ChildCartItem filtered by the combination_id column
+ * @method     ChildCartItem findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildCartItem filtered by the product_sale_elements_id column
  * @method     ChildCartItem findOneByCreatedAt(string $created_at) Return the first ChildCartItem filtered by the created_at column
  * @method     ChildCartItem findOneByUpdatedAt(string $updated_at) Return the first ChildCartItem filtered by the updated_at column
  *
@@ -68,7 +68,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     array findByCartId(int $cart_id) Return ChildCartItem objects filtered by the cart_id column
  * @method     array findByProductId(int $product_id) Return ChildCartItem objects filtered by the product_id column
  * @method     array findByQuantity(double $quantity) Return ChildCartItem objects filtered by the quantity column
- * @method     array findByCombinationId(int $combination_id) Return ChildCartItem objects filtered by the combination_id column
+ * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildCartItem objects filtered by the product_sale_elements_id column
  * @method     array findByCreatedAt(string $created_at) Return ChildCartItem objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCartItem objects filtered by the updated_at column
  *
@@ -159,7 +159,7 @@ abstract class CartItemQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CART_ID, PRODUCT_ID, QUANTITY, COMBINATION_ID, CREATED_AT, UPDATED_AT FROM cart_item WHERE ID = :p0';
+        $sql = 'SELECT ID, CART_ID, PRODUCT_ID, QUANTITY, PRODUCT_SALE_ELEMENTS_ID, CREATED_AT, UPDATED_AT FROM cart_item WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -417,18 +417,18 @@ abstract class CartItemQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the combination_id column
+     * Filter the query on the product_sale_elements_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByCombinationId(1234); // WHERE combination_id = 1234
-     * $query->filterByCombinationId(array(12, 34)); // WHERE combination_id IN (12, 34)
-     * $query->filterByCombinationId(array('min' => 12)); // WHERE combination_id > 12
+     * $query->filterByProductSaleElementsId(1234); // WHERE product_sale_elements_id = 1234
+     * $query->filterByProductSaleElementsId(array(12, 34)); // WHERE product_sale_elements_id IN (12, 34)
+     * $query->filterByProductSaleElementsId(array('min' => 12)); // WHERE product_sale_elements_id > 12
      * </code>
      *
-     * @see       filterByCombination()
+     * @see       filterByProductSaleElements()
      *
-     * @param     mixed $combinationId The value to use as filter.
+     * @param     mixed $productSaleElementsId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -436,16 +436,16 @@ abstract class CartItemQuery extends ModelCriteria
      *
      * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function filterByCombinationId($combinationId = null, $comparison = null)
+    public function filterByProductSaleElementsId($productSaleElementsId = null, $comparison = null)
     {
-        if (is_array($combinationId)) {
+        if (is_array($productSaleElementsId)) {
             $useMinMax = false;
-            if (isset($combinationId['min'])) {
-                $this->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combinationId['min'], Criteria::GREATER_EQUAL);
+            if (isset($productSaleElementsId['min'])) {
+                $this->addUsingAlias(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($combinationId['max'])) {
-                $this->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combinationId['max'], Criteria::LESS_EQUAL);
+            if (isset($productSaleElementsId['max'])) {
+                $this->addUsingAlias(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -456,7 +456,7 @@ abstract class CartItemQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combinationId, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId, $comparison);
     }
 
     /**
@@ -696,42 +696,42 @@ abstract class CartItemQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Combination object
+     * Filter the query by a related \Thelia\Model\ProductSaleElements object
      *
-     * @param \Thelia\Model\Combination|ObjectCollection $combination The related object(s) to use as filter
+     * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function filterByCombination($combination, $comparison = null)
+    public function filterByProductSaleElements($productSaleElements, $comparison = null)
     {
-        if ($combination instanceof \Thelia\Model\Combination) {
+        if ($productSaleElements instanceof \Thelia\Model\ProductSaleElements) {
             return $this
-                ->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combination->getId(), $comparison);
-        } elseif ($combination instanceof ObjectCollection) {
+                ->addUsingAlias(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElements->getId(), $comparison);
+        } elseif ($productSaleElements instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(CartItemTableMap::COMBINATION_ID, $combination->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElements->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByCombination() only accepts arguments of type \Thelia\Model\Combination or Collection');
+            throw new PropelException('filterByProductSaleElements() only accepts arguments of type \Thelia\Model\ProductSaleElements or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Combination relation
+     * Adds a JOIN clause to the query using the ProductSaleElements relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function joinCombination($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinProductSaleElements($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Combination');
+        $relationMap = $tableMap->getRelation('ProductSaleElements');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -746,14 +746,14 @@ abstract class CartItemQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Combination');
+            $this->addJoinObject($join, 'ProductSaleElements');
         }
 
         return $this;
     }
 
     /**
-     * Use the Combination relation Combination object
+     * Use the ProductSaleElements relation ProductSaleElements object
      *
      * @see useQuery()
      *
@@ -761,13 +761,13 @@ abstract class CartItemQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\CombinationQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
      */
-    public function useCombinationQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useProductSaleElementsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinCombination($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Combination', '\Thelia\Model\CombinationQuery');
+            ->joinProductSaleElements($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductSaleElements', '\Thelia\Model\ProductSaleElementsQuery');
     }
 
     /**

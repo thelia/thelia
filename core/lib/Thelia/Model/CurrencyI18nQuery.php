@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\CombinationQuery as BaseCombinationQuery;
+use Thelia\Model\Base\CurrencyI18nQuery as BaseCurrencyI18nQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'combination' table.
+ * Skeleton subclass for performing query and update operations on the 'currency_i18n' table.
  *
  *
  *
@@ -15,6 +15,7 @@ use Thelia\Model\Base\CombinationQuery as BaseCombinationQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class CombinationQuery extends BaseCombinationQuery {
+class CurrencyI18nQuery extends BaseCurrencyI18nQuery
+{
 
-} // CombinationQuery
+} // CurrencyI18nQuery

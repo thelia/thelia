@@ -22,8 +22,8 @@ use Thelia\Model\FeatureAv as ChildFeatureAv;
 use Thelia\Model\FeatureAvI18n as ChildFeatureAvI18n;
 use Thelia\Model\FeatureAvI18nQuery as ChildFeatureAvI18nQuery;
 use Thelia\Model\FeatureAvQuery as ChildFeatureAvQuery;
-use Thelia\Model\FeatureProd as ChildFeatureProd;
-use Thelia\Model\FeatureProdQuery as ChildFeatureProdQuery;
+use Thelia\Model\FeatureProduct as ChildFeatureProduct;
+use Thelia\Model\FeatureProductQuery as ChildFeatureProductQuery;
 use Thelia\Model\FeatureQuery as ChildFeatureQuery;
 use Thelia\Model\Map\FeatureAvTableMap;
 
@@ -74,6 +74,12 @@ abstract class FeatureAv implements ActiveRecordInterface
     protected $feature_id;
 
     /**
+     * The value for the position field.
+     * @var        int
+     */
+    protected $position;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -91,10 +97,10 @@ abstract class FeatureAv implements ActiveRecordInterface
     protected $aFeature;
 
     /**
-     * @var        ObjectCollection|ChildFeatureProd[] Collection to store aggregation of ChildFeatureProd objects.
+     * @var        ObjectCollection|ChildFeatureProduct[] Collection to store aggregation of ChildFeatureProduct objects.
      */
-    protected $collFeatureProds;
-    protected $collFeatureProdsPartial;
+    protected $collFeatureProducts;
+    protected $collFeatureProductsPartial;
 
     /**
      * @var        ObjectCollection|ChildFeatureAvI18n[] Collection to store aggregation of ChildFeatureAvI18n objects.
@@ -128,7 +134,7 @@ abstract class FeatureAv implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $featureProdsScheduledForDeletion = null;
+    protected $featureProductsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -413,6 +419,17 @@ abstract class FeatureAv implements ActiveRecordInterface
     }
 
     /**
+     * Get the [position] column value.
+     *
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -499,6 +516,27 @@ abstract class FeatureAv implements ActiveRecordInterface
     } // setFeatureId()
 
     /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\FeatureAv The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[] = FeatureAvTableMap::POSITION;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -583,13 +621,16 @@ abstract class FeatureAv implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : FeatureAvTableMap::translateFieldName('FeatureId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->feature_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureAvTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FeatureAvTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureAvTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FeatureAvTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FeatureAvTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -602,7 +643,7 @@ abstract class FeatureAv implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 4; // 4 = FeatureAvTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 5; // 5 = FeatureAvTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\FeatureAv object", 0, $e);
@@ -667,7 +708,7 @@ abstract class FeatureAv implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aFeature = null;
-            $this->collFeatureProds = null;
+            $this->collFeatureProducts = null;
 
             $this->collFeatureAvI18ns = null;
 
@@ -816,17 +857,17 @@ abstract class FeatureAv implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->featureProdsScheduledForDeletion !== null) {
-                if (!$this->featureProdsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\FeatureProdQuery::create()
-                        ->filterByPrimaryKeys($this->featureProdsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->featureProductsScheduledForDeletion !== null) {
+                if (!$this->featureProductsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\FeatureProductQuery::create()
+                        ->filterByPrimaryKeys($this->featureProductsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->featureProdsScheduledForDeletion = null;
+                    $this->featureProductsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collFeatureProds !== null) {
-            foreach ($this->collFeatureProds as $referrerFK) {
+                if ($this->collFeatureProducts !== null) {
+            foreach ($this->collFeatureProducts as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -882,6 +923,9 @@ abstract class FeatureAv implements ActiveRecordInterface
         if ($this->isColumnModified(FeatureAvTableMap::FEATURE_ID)) {
             $modifiedColumns[':p' . $index++]  = 'FEATURE_ID';
         }
+        if ($this->isColumnModified(FeatureAvTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
+        }
         if ($this->isColumnModified(FeatureAvTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -904,6 +948,9 @@ abstract class FeatureAv implements ActiveRecordInterface
                         break;
                     case 'FEATURE_ID':
                         $stmt->bindValue($identifier, $this->feature_id, PDO::PARAM_INT);
+                        break;
+                    case 'POSITION':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -980,9 +1027,12 @@ abstract class FeatureAv implements ActiveRecordInterface
                 return $this->getFeatureId();
                 break;
             case 2:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 3:
+                return $this->getCreatedAt();
+                break;
+            case 4:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1016,8 +1066,9 @@ abstract class FeatureAv implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getFeatureId(),
-            $keys[2] => $this->getCreatedAt(),
-            $keys[3] => $this->getUpdatedAt(),
+            $keys[2] => $this->getPosition(),
+            $keys[3] => $this->getCreatedAt(),
+            $keys[4] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1029,8 +1080,8 @@ abstract class FeatureAv implements ActiveRecordInterface
             if (null !== $this->aFeature) {
                 $result['Feature'] = $this->aFeature->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collFeatureProds) {
-                $result['FeatureProds'] = $this->collFeatureProds->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collFeatureProducts) {
+                $result['FeatureProducts'] = $this->collFeatureProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collFeatureAvI18ns) {
                 $result['FeatureAvI18ns'] = $this->collFeatureAvI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1076,9 +1127,12 @@ abstract class FeatureAv implements ActiveRecordInterface
                 $this->setFeatureId($value);
                 break;
             case 2:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 3:
+                $this->setCreatedAt($value);
+                break;
+            case 4:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1107,8 +1161,9 @@ abstract class FeatureAv implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setFeatureId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setCreatedAt($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setUpdatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[2], $arr)) $this->setPosition($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
 
     /**
@@ -1122,6 +1177,7 @@ abstract class FeatureAv implements ActiveRecordInterface
 
         if ($this->isColumnModified(FeatureAvTableMap::ID)) $criteria->add(FeatureAvTableMap::ID, $this->id);
         if ($this->isColumnModified(FeatureAvTableMap::FEATURE_ID)) $criteria->add(FeatureAvTableMap::FEATURE_ID, $this->feature_id);
+        if ($this->isColumnModified(FeatureAvTableMap::POSITION)) $criteria->add(FeatureAvTableMap::POSITION, $this->position);
         if ($this->isColumnModified(FeatureAvTableMap::CREATED_AT)) $criteria->add(FeatureAvTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(FeatureAvTableMap::UPDATED_AT)) $criteria->add(FeatureAvTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1188,6 +1244,7 @@ abstract class FeatureAv implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setFeatureId($this->getFeatureId());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
 
@@ -1196,9 +1253,9 @@ abstract class FeatureAv implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getFeatureProds() as $relObj) {
+            foreach ($this->getFeatureProducts() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addFeatureProd($relObj->copy($deepCopy));
+                    $copyObj->addFeatureProduct($relObj->copy($deepCopy));
                 }
             }
 
@@ -1300,8 +1357,8 @@ abstract class FeatureAv implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('FeatureProd' == $relationName) {
-            return $this->initFeatureProds();
+        if ('FeatureProduct' == $relationName) {
+            return $this->initFeatureProducts();
         }
         if ('FeatureAvI18n' == $relationName) {
             return $this->initFeatureAvI18ns();
@@ -1309,31 +1366,31 @@ abstract class FeatureAv implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collFeatureProds collection
+     * Clears out the collFeatureProducts collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addFeatureProds()
+     * @see        addFeatureProducts()
      */
-    public function clearFeatureProds()
+    public function clearFeatureProducts()
     {
-        $this->collFeatureProds = null; // important to set this to NULL since that means it is uninitialized
+        $this->collFeatureProducts = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collFeatureProds collection loaded partially.
+     * Reset is the collFeatureProducts collection loaded partially.
      */
-    public function resetPartialFeatureProds($v = true)
+    public function resetPartialFeatureProducts($v = true)
     {
-        $this->collFeatureProdsPartial = $v;
+        $this->collFeatureProductsPartial = $v;
     }
 
     /**
-     * Initializes the collFeatureProds collection.
+     * Initializes the collFeatureProducts collection.
      *
-     * By default this just sets the collFeatureProds collection to an empty array (like clearcollFeatureProds());
+     * By default this just sets the collFeatureProducts collection to an empty array (like clearcollFeatureProducts());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1342,17 +1399,17 @@ abstract class FeatureAv implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initFeatureProds($overrideExisting = true)
+    public function initFeatureProducts($overrideExisting = true)
     {
-        if (null !== $this->collFeatureProds && !$overrideExisting) {
+        if (null !== $this->collFeatureProducts && !$overrideExisting) {
             return;
         }
-        $this->collFeatureProds = new ObjectCollection();
-        $this->collFeatureProds->setModel('\Thelia\Model\FeatureProd');
+        $this->collFeatureProducts = new ObjectCollection();
+        $this->collFeatureProducts->setModel('\Thelia\Model\FeatureProduct');
     }
 
     /**
-     * Gets an array of ChildFeatureProd objects which contain a foreign key that references this object.
+     * Gets an array of ChildFeatureProduct objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -1362,109 +1419,109 @@ abstract class FeatureAv implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildFeatureProd[] List of ChildFeatureProd objects
+     * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      * @throws PropelException
      */
-    public function getFeatureProds($criteria = null, ConnectionInterface $con = null)
+    public function getFeatureProducts($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collFeatureProdsPartial && !$this->isNew();
-        if (null === $this->collFeatureProds || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collFeatureProds) {
+        $partial = $this->collFeatureProductsPartial && !$this->isNew();
+        if (null === $this->collFeatureProducts || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProducts) {
                 // return empty collection
-                $this->initFeatureProds();
+                $this->initFeatureProducts();
             } else {
-                $collFeatureProds = ChildFeatureProdQuery::create(null, $criteria)
+                $collFeatureProducts = ChildFeatureProductQuery::create(null, $criteria)
                     ->filterByFeatureAv($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collFeatureProdsPartial && count($collFeatureProds)) {
-                        $this->initFeatureProds(false);
+                    if (false !== $this->collFeatureProductsPartial && count($collFeatureProducts)) {
+                        $this->initFeatureProducts(false);
 
-                        foreach ($collFeatureProds as $obj) {
-                            if (false == $this->collFeatureProds->contains($obj)) {
-                                $this->collFeatureProds->append($obj);
+                        foreach ($collFeatureProducts as $obj) {
+                            if (false == $this->collFeatureProducts->contains($obj)) {
+                                $this->collFeatureProducts->append($obj);
                             }
                         }
 
-                        $this->collFeatureProdsPartial = true;
+                        $this->collFeatureProductsPartial = true;
                     }
 
-                    $collFeatureProds->getInternalIterator()->rewind();
+                    $collFeatureProducts->getInternalIterator()->rewind();
 
-                    return $collFeatureProds;
+                    return $collFeatureProducts;
                 }
 
-                if ($partial && $this->collFeatureProds) {
-                    foreach ($this->collFeatureProds as $obj) {
+                if ($partial && $this->collFeatureProducts) {
+                    foreach ($this->collFeatureProducts as $obj) {
                         if ($obj->isNew()) {
-                            $collFeatureProds[] = $obj;
+                            $collFeatureProducts[] = $obj;
                         }
                     }
                 }
 
-                $this->collFeatureProds = $collFeatureProds;
-                $this->collFeatureProdsPartial = false;
+                $this->collFeatureProducts = $collFeatureProducts;
+                $this->collFeatureProductsPartial = false;
             }
         }
 
-        return $this->collFeatureProds;
+        return $this->collFeatureProducts;
     }
 
     /**
-     * Sets a collection of FeatureProd objects related by a one-to-many relationship
+     * Sets a collection of FeatureProduct objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $featureProds A Propel collection.
+     * @param      Collection $featureProducts A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildFeatureAv The current object (for fluent API support)
      */
-    public function setFeatureProds(Collection $featureProds, ConnectionInterface $con = null)
+    public function setFeatureProducts(Collection $featureProducts, ConnectionInterface $con = null)
     {
-        $featureProdsToDelete = $this->getFeatureProds(new Criteria(), $con)->diff($featureProds);
+        $featureProductsToDelete = $this->getFeatureProducts(new Criteria(), $con)->diff($featureProducts);
 
 
-        $this->featureProdsScheduledForDeletion = $featureProdsToDelete;
+        $this->featureProductsScheduledForDeletion = $featureProductsToDelete;
 
-        foreach ($featureProdsToDelete as $featureProdRemoved) {
-            $featureProdRemoved->setFeatureAv(null);
+        foreach ($featureProductsToDelete as $featureProductRemoved) {
+            $featureProductRemoved->setFeatureAv(null);
         }
 
-        $this->collFeatureProds = null;
-        foreach ($featureProds as $featureProd) {
-            $this->addFeatureProd($featureProd);
+        $this->collFeatureProducts = null;
+        foreach ($featureProducts as $featureProduct) {
+            $this->addFeatureProduct($featureProduct);
         }
 
-        $this->collFeatureProds = $featureProds;
-        $this->collFeatureProdsPartial = false;
+        $this->collFeatureProducts = $featureProducts;
+        $this->collFeatureProductsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related FeatureProd objects.
+     * Returns the number of related FeatureProduct objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related FeatureProd objects.
+     * @return int             Count of related FeatureProduct objects.
      * @throws PropelException
      */
-    public function countFeatureProds(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countFeatureProducts(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collFeatureProdsPartial && !$this->isNew();
-        if (null === $this->collFeatureProds || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collFeatureProds) {
+        $partial = $this->collFeatureProductsPartial && !$this->isNew();
+        if (null === $this->collFeatureProducts || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFeatureProducts) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getFeatureProds());
+                return count($this->getFeatureProducts());
             }
 
-            $query = ChildFeatureProdQuery::create(null, $criteria);
+            $query = ChildFeatureProductQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -1474,53 +1531,53 @@ abstract class FeatureAv implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collFeatureProds);
+        return count($this->collFeatureProducts);
     }
 
     /**
-     * Method called to associate a ChildFeatureProd object to this object
-     * through the ChildFeatureProd foreign key attribute.
+     * Method called to associate a ChildFeatureProduct object to this object
+     * through the ChildFeatureProduct foreign key attribute.
      *
-     * @param    ChildFeatureProd $l ChildFeatureProd
+     * @param    ChildFeatureProduct $l ChildFeatureProduct
      * @return   \Thelia\Model\FeatureAv The current object (for fluent API support)
      */
-    public function addFeatureProd(ChildFeatureProd $l)
+    public function addFeatureProduct(ChildFeatureProduct $l)
     {
-        if ($this->collFeatureProds === null) {
-            $this->initFeatureProds();
-            $this->collFeatureProdsPartial = true;
+        if ($this->collFeatureProducts === null) {
+            $this->initFeatureProducts();
+            $this->collFeatureProductsPartial = true;
         }
 
-        if (!in_array($l, $this->collFeatureProds->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddFeatureProd($l);
+        if (!in_array($l, $this->collFeatureProducts->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFeatureProduct($l);
         }
 
         return $this;
     }
 
     /**
-     * @param FeatureProd $featureProd The featureProd object to add.
+     * @param FeatureProduct $featureProduct The featureProduct object to add.
      */
-    protected function doAddFeatureProd($featureProd)
+    protected function doAddFeatureProduct($featureProduct)
     {
-        $this->collFeatureProds[]= $featureProd;
-        $featureProd->setFeatureAv($this);
+        $this->collFeatureProducts[]= $featureProduct;
+        $featureProduct->setFeatureAv($this);
     }
 
     /**
-     * @param  FeatureProd $featureProd The featureProd object to remove.
+     * @param  FeatureProduct $featureProduct The featureProduct object to remove.
      * @return ChildFeatureAv The current object (for fluent API support)
      */
-    public function removeFeatureProd($featureProd)
+    public function removeFeatureProduct($featureProduct)
     {
-        if ($this->getFeatureProds()->contains($featureProd)) {
-            $this->collFeatureProds->remove($this->collFeatureProds->search($featureProd));
-            if (null === $this->featureProdsScheduledForDeletion) {
-                $this->featureProdsScheduledForDeletion = clone $this->collFeatureProds;
-                $this->featureProdsScheduledForDeletion->clear();
+        if ($this->getFeatureProducts()->contains($featureProduct)) {
+            $this->collFeatureProducts->remove($this->collFeatureProducts->search($featureProduct));
+            if (null === $this->featureProductsScheduledForDeletion) {
+                $this->featureProductsScheduledForDeletion = clone $this->collFeatureProducts;
+                $this->featureProductsScheduledForDeletion->clear();
             }
-            $this->featureProdsScheduledForDeletion[]= $featureProd;
-            $featureProd->setFeatureAv(null);
+            $this->featureProductsScheduledForDeletion[]= $featureProduct;
+            $featureProduct->setFeatureAv(null);
         }
 
         return $this;
@@ -1532,7 +1589,7 @@ abstract class FeatureAv implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this FeatureAv is new, it will return
      * an empty collection; or if this FeatureAv has previously
-     * been saved, it will retrieve related FeatureProds from storage.
+     * been saved, it will retrieve related FeatureProducts from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1541,14 +1598,14 @@ abstract class FeatureAv implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildFeatureProd[] List of ChildFeatureProd objects
+     * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      */
-    public function getFeatureProdsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getFeatureProductsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildFeatureProdQuery::create(null, $criteria);
+        $query = ChildFeatureProductQuery::create(null, $criteria);
         $query->joinWith('Product', $joinBehavior);
 
-        return $this->getFeatureProds($query, $con);
+        return $this->getFeatureProducts($query, $con);
     }
 
 
@@ -1557,7 +1614,7 @@ abstract class FeatureAv implements ActiveRecordInterface
      * an identical criteria, it returns the collection.
      * Otherwise if this FeatureAv is new, it will return
      * an empty collection; or if this FeatureAv has previously
-     * been saved, it will retrieve related FeatureProds from storage.
+     * been saved, it will retrieve related FeatureProducts from storage.
      *
      * This method is protected by default in order to keep the public
      * api reasonable.  You can provide public methods for those you
@@ -1566,14 +1623,14 @@ abstract class FeatureAv implements ActiveRecordInterface
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildFeatureProd[] List of ChildFeatureProd objects
+     * @return Collection|ChildFeatureProduct[] List of ChildFeatureProduct objects
      */
-    public function getFeatureProdsJoinFeature($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getFeatureProductsJoinFeature($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
-        $query = ChildFeatureProdQuery::create(null, $criteria);
+        $query = ChildFeatureProductQuery::create(null, $criteria);
         $query->joinWith('Feature', $joinBehavior);
 
-        return $this->getFeatureProds($query, $con);
+        return $this->getFeatureProducts($query, $con);
     }
 
     /**
@@ -1808,6 +1865,7 @@ abstract class FeatureAv implements ActiveRecordInterface
     {
         $this->id = null;
         $this->feature_id = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1829,8 +1887,8 @@ abstract class FeatureAv implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collFeatureProds) {
-                foreach ($this->collFeatureProds as $o) {
+            if ($this->collFeatureProducts) {
+                foreach ($this->collFeatureProducts as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1845,10 +1903,10 @@ abstract class FeatureAv implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collFeatureProds instanceof Collection) {
-            $this->collFeatureProds->clearIterator();
+        if ($this->collFeatureProducts instanceof Collection) {
+            $this->collFeatureProducts->clearIterator();
         }
-        $this->collFeatureProds = null;
+        $this->collFeatureProducts = null;
         if ($this->collFeatureAvI18ns instanceof Collection) {
             $this->collFeatureAvI18ns->clearIterator();
         }

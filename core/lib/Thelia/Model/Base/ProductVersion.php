@@ -74,56 +74,11 @@ abstract class ProductVersion implements ActiveRecordInterface
     protected $ref;
 
     /**
-     * The value for the price field.
-     * @var        double
-     */
-    protected $price;
-
-    /**
-     * The value for the price2 field.
-     * @var        double
-     */
-    protected $price2;
-
-    /**
-     * The value for the ecotax field.
-     * @var        double
-     */
-    protected $ecotax;
-
-    /**
-     * The value for the newness field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $newness;
-
-    /**
-     * The value for the promo field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $promo;
-
-    /**
-     * The value for the quantity field.
-     * Note: this column has a database default value of: 0
-     * @var        int
-     */
-    protected $quantity;
-
-    /**
      * The value for the visible field.
      * Note: this column has a database default value of: 0
      * @var        int
      */
     protected $visible;
-
-    /**
-     * The value for the weight field.
-     * @var        double
-     */
-    protected $weight;
 
     /**
      * The value for the position field.
@@ -183,9 +138,6 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->newness = 0;
-        $this->promo = 0;
-        $this->quantity = 0;
         $this->visible = 0;
         $this->version = 0;
     }
@@ -480,72 +432,6 @@ abstract class ProductVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [price] column value.
-     *
-     * @return   double
-     */
-    public function getPrice()
-    {
-
-        return $this->price;
-    }
-
-    /**
-     * Get the [price2] column value.
-     *
-     * @return   double
-     */
-    public function getPrice2()
-    {
-
-        return $this->price2;
-    }
-
-    /**
-     * Get the [ecotax] column value.
-     *
-     * @return   double
-     */
-    public function getEcotax()
-    {
-
-        return $this->ecotax;
-    }
-
-    /**
-     * Get the [newness] column value.
-     *
-     * @return   int
-     */
-    public function getNewness()
-    {
-
-        return $this->newness;
-    }
-
-    /**
-     * Get the [promo] column value.
-     *
-     * @return   int
-     */
-    public function getPromo()
-    {
-
-        return $this->promo;
-    }
-
-    /**
-     * Get the [quantity] column value.
-     *
-     * @return   int
-     */
-    public function getQuantity()
-    {
-
-        return $this->quantity;
-    }
-
-    /**
      * Get the [visible] column value.
      *
      * @return   int
@@ -554,17 +440,6 @@ abstract class ProductVersion implements ActiveRecordInterface
     {
 
         return $this->visible;
-    }
-
-    /**
-     * Get the [weight] column value.
-     *
-     * @return   double
-     */
-    public function getWeight()
-    {
-
-        return $this->weight;
     }
 
     /**
@@ -728,132 +603,6 @@ abstract class ProductVersion implements ActiveRecordInterface
     } // setRef()
 
     /**
-     * Set the value of [price] column.
-     *
-     * @param      double $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setPrice($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->price !== $v) {
-            $this->price = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::PRICE;
-        }
-
-
-        return $this;
-    } // setPrice()
-
-    /**
-     * Set the value of [price2] column.
-     *
-     * @param      double $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setPrice2($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->price2 !== $v) {
-            $this->price2 = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::PRICE2;
-        }
-
-
-        return $this;
-    } // setPrice2()
-
-    /**
-     * Set the value of [ecotax] column.
-     *
-     * @param      double $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setEcotax($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->ecotax !== $v) {
-            $this->ecotax = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::ECOTAX;
-        }
-
-
-        return $this;
-    } // setEcotax()
-
-    /**
-     * Set the value of [newness] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setNewness($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->newness !== $v) {
-            $this->newness = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::NEWNESS;
-        }
-
-
-        return $this;
-    } // setNewness()
-
-    /**
-     * Set the value of [promo] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setPromo($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->promo !== $v) {
-            $this->promo = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::PROMO;
-        }
-
-
-        return $this;
-    } // setPromo()
-
-    /**
-     * Set the value of [quantity] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setQuantity($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->quantity !== $v) {
-            $this->quantity = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::QUANTITY;
-        }
-
-
-        return $this;
-    } // setQuantity()
-
-    /**
      * Set the value of [visible] column.
      *
      * @param      int $v new value
@@ -873,27 +622,6 @@ abstract class ProductVersion implements ActiveRecordInterface
 
         return $this;
     } // setVisible()
-
-    /**
-     * Set the value of [weight] column.
-     *
-     * @param      double $v new value
-     * @return   \Thelia\Model\ProductVersion The current object (for fluent API support)
-     */
-    public function setWeight($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->weight !== $v) {
-            $this->weight = $v;
-            $this->modifiedColumns[] = ProductVersionTableMap::WEIGHT;
-        }
-
-
-        return $this;
-    } // setWeight()
 
     /**
      * Set the value of [position] column.
@@ -1031,18 +759,6 @@ abstract class ProductVersion implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->newness !== 0) {
-                return false;
-            }
-
-            if ($this->promo !== 0) {
-                return false;
-            }
-
-            if ($this->quantity !== 0) {
-                return false;
-            }
-
             if ($this->visible !== 0) {
                 return false;
             }
@@ -1087,55 +803,34 @@ abstract class ProductVersion implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductVersionTableMap::translateFieldName('Ref', TableMap::TYPE_PHPNAME, $indexType)];
             $this->ref = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductVersionTableMap::translateFieldName('Price', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->price = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductVersionTableMap::translateFieldName('Price2', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->price2 = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductVersionTableMap::translateFieldName('Ecotax', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->ecotax = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductVersionTableMap::translateFieldName('Newness', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->newness = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductVersionTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->promo = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductVersionTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->quantity = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductVersionTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductVersionTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
             $this->visible = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 10 + $startcol : ProductVersionTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->weight = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 11 + $startcol : ProductVersionTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductVersionTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 12 + $startcol : ProductVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 13 + $startcol : ProductVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 14 + $startcol : ProductVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 15 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 16 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : ProductVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -1145,7 +840,7 @@ abstract class ProductVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 17; // 17 = ProductVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 10; // 10 = ProductVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductVersion object", 0, $e);
@@ -1375,29 +1070,8 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->isColumnModified(ProductVersionTableMap::REF)) {
             $modifiedColumns[':p' . $index++]  = 'REF';
         }
-        if ($this->isColumnModified(ProductVersionTableMap::PRICE)) {
-            $modifiedColumns[':p' . $index++]  = 'PRICE';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::PRICE2)) {
-            $modifiedColumns[':p' . $index++]  = 'PRICE2';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::ECOTAX)) {
-            $modifiedColumns[':p' . $index++]  = 'ECOTAX';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::NEWNESS)) {
-            $modifiedColumns[':p' . $index++]  = 'NEWNESS';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::PROMO)) {
-            $modifiedColumns[':p' . $index++]  = 'PROMO';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::QUANTITY)) {
-            $modifiedColumns[':p' . $index++]  = 'QUANTITY';
-        }
         if ($this->isColumnModified(ProductVersionTableMap::VISIBLE)) {
             $modifiedColumns[':p' . $index++]  = 'VISIBLE';
-        }
-        if ($this->isColumnModified(ProductVersionTableMap::WEIGHT)) {
-            $modifiedColumns[':p' . $index++]  = 'WEIGHT';
         }
         if ($this->isColumnModified(ProductVersionTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = 'POSITION';
@@ -1437,29 +1111,8 @@ abstract class ProductVersion implements ActiveRecordInterface
                     case 'REF':
                         $stmt->bindValue($identifier, $this->ref, PDO::PARAM_STR);
                         break;
-                    case 'PRICE':
-                        $stmt->bindValue($identifier, $this->price, PDO::PARAM_STR);
-                        break;
-                    case 'PRICE2':
-                        $stmt->bindValue($identifier, $this->price2, PDO::PARAM_STR);
-                        break;
-                    case 'ECOTAX':
-                        $stmt->bindValue($identifier, $this->ecotax, PDO::PARAM_STR);
-                        break;
-                    case 'NEWNESS':
-                        $stmt->bindValue($identifier, $this->newness, PDO::PARAM_INT);
-                        break;
-                    case 'PROMO':
-                        $stmt->bindValue($identifier, $this->promo, PDO::PARAM_INT);
-                        break;
-                    case 'QUANTITY':
-                        $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_INT);
-                        break;
                     case 'VISIBLE':
                         $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
-                        break;
-                    case 'WEIGHT':
-                        $stmt->bindValue($identifier, $this->weight, PDO::PARAM_STR);
                         break;
                     case 'POSITION':
                         $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
@@ -1544,45 +1197,24 @@ abstract class ProductVersion implements ActiveRecordInterface
                 return $this->getRef();
                 break;
             case 3:
-                return $this->getPrice();
-                break;
-            case 4:
-                return $this->getPrice2();
-                break;
-            case 5:
-                return $this->getEcotax();
-                break;
-            case 6:
-                return $this->getNewness();
-                break;
-            case 7:
-                return $this->getPromo();
-                break;
-            case 8:
-                return $this->getQuantity();
-                break;
-            case 9:
                 return $this->getVisible();
                 break;
-            case 10:
-                return $this->getWeight();
-                break;
-            case 11:
+            case 4:
                 return $this->getPosition();
                 break;
-            case 12:
+            case 5:
                 return $this->getCreatedAt();
                 break;
-            case 13:
+            case 6:
                 return $this->getUpdatedAt();
                 break;
-            case 14:
+            case 7:
                 return $this->getVersion();
                 break;
-            case 15:
+            case 8:
                 return $this->getVersionCreatedAt();
                 break;
-            case 16:
+            case 9:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -1617,20 +1249,13 @@ abstract class ProductVersion implements ActiveRecordInterface
             $keys[0] => $this->getId(),
             $keys[1] => $this->getTaxRuleId(),
             $keys[2] => $this->getRef(),
-            $keys[3] => $this->getPrice(),
-            $keys[4] => $this->getPrice2(),
-            $keys[5] => $this->getEcotax(),
-            $keys[6] => $this->getNewness(),
-            $keys[7] => $this->getPromo(),
-            $keys[8] => $this->getQuantity(),
-            $keys[9] => $this->getVisible(),
-            $keys[10] => $this->getWeight(),
-            $keys[11] => $this->getPosition(),
-            $keys[12] => $this->getCreatedAt(),
-            $keys[13] => $this->getUpdatedAt(),
-            $keys[14] => $this->getVersion(),
-            $keys[15] => $this->getVersionCreatedAt(),
-            $keys[16] => $this->getVersionCreatedBy(),
+            $keys[3] => $this->getVisible(),
+            $keys[4] => $this->getPosition(),
+            $keys[5] => $this->getCreatedAt(),
+            $keys[6] => $this->getUpdatedAt(),
+            $keys[7] => $this->getVersion(),
+            $keys[8] => $this->getVersionCreatedAt(),
+            $keys[9] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1686,45 +1311,24 @@ abstract class ProductVersion implements ActiveRecordInterface
                 $this->setRef($value);
                 break;
             case 3:
-                $this->setPrice($value);
-                break;
-            case 4:
-                $this->setPrice2($value);
-                break;
-            case 5:
-                $this->setEcotax($value);
-                break;
-            case 6:
-                $this->setNewness($value);
-                break;
-            case 7:
-                $this->setPromo($value);
-                break;
-            case 8:
-                $this->setQuantity($value);
-                break;
-            case 9:
                 $this->setVisible($value);
                 break;
-            case 10:
-                $this->setWeight($value);
-                break;
-            case 11:
+            case 4:
                 $this->setPosition($value);
                 break;
-            case 12:
+            case 5:
                 $this->setCreatedAt($value);
                 break;
-            case 13:
+            case 6:
                 $this->setUpdatedAt($value);
                 break;
-            case 14:
+            case 7:
                 $this->setVersion($value);
                 break;
-            case 15:
+            case 8:
                 $this->setVersionCreatedAt($value);
                 break;
-            case 16:
+            case 9:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -1754,20 +1358,13 @@ abstract class ProductVersion implements ActiveRecordInterface
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setTaxRuleId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setRef($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPrice($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPrice2($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setEcotax($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setNewness($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setPromo($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setQuantity($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setVisible($arr[$keys[9]]);
-        if (array_key_exists($keys[10], $arr)) $this->setWeight($arr[$keys[10]]);
-        if (array_key_exists($keys[11], $arr)) $this->setPosition($arr[$keys[11]]);
-        if (array_key_exists($keys[12], $arr)) $this->setCreatedAt($arr[$keys[12]]);
-        if (array_key_exists($keys[13], $arr)) $this->setUpdatedAt($arr[$keys[13]]);
-        if (array_key_exists($keys[14], $arr)) $this->setVersion($arr[$keys[14]]);
-        if (array_key_exists($keys[15], $arr)) $this->setVersionCreatedAt($arr[$keys[15]]);
-        if (array_key_exists($keys[16], $arr)) $this->setVersionCreatedBy($arr[$keys[16]]);
+        if (array_key_exists($keys[3], $arr)) $this->setVisible($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersion($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[9], $arr)) $this->setVersionCreatedBy($arr[$keys[9]]);
     }
 
     /**
@@ -1782,14 +1379,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         if ($this->isColumnModified(ProductVersionTableMap::ID)) $criteria->add(ProductVersionTableMap::ID, $this->id);
         if ($this->isColumnModified(ProductVersionTableMap::TAX_RULE_ID)) $criteria->add(ProductVersionTableMap::TAX_RULE_ID, $this->tax_rule_id);
         if ($this->isColumnModified(ProductVersionTableMap::REF)) $criteria->add(ProductVersionTableMap::REF, $this->ref);
-        if ($this->isColumnModified(ProductVersionTableMap::PRICE)) $criteria->add(ProductVersionTableMap::PRICE, $this->price);
-        if ($this->isColumnModified(ProductVersionTableMap::PRICE2)) $criteria->add(ProductVersionTableMap::PRICE2, $this->price2);
-        if ($this->isColumnModified(ProductVersionTableMap::ECOTAX)) $criteria->add(ProductVersionTableMap::ECOTAX, $this->ecotax);
-        if ($this->isColumnModified(ProductVersionTableMap::NEWNESS)) $criteria->add(ProductVersionTableMap::NEWNESS, $this->newness);
-        if ($this->isColumnModified(ProductVersionTableMap::PROMO)) $criteria->add(ProductVersionTableMap::PROMO, $this->promo);
-        if ($this->isColumnModified(ProductVersionTableMap::QUANTITY)) $criteria->add(ProductVersionTableMap::QUANTITY, $this->quantity);
         if ($this->isColumnModified(ProductVersionTableMap::VISIBLE)) $criteria->add(ProductVersionTableMap::VISIBLE, $this->visible);
-        if ($this->isColumnModified(ProductVersionTableMap::WEIGHT)) $criteria->add(ProductVersionTableMap::WEIGHT, $this->weight);
         if ($this->isColumnModified(ProductVersionTableMap::POSITION)) $criteria->add(ProductVersionTableMap::POSITION, $this->position);
         if ($this->isColumnModified(ProductVersionTableMap::CREATED_AT)) $criteria->add(ProductVersionTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(ProductVersionTableMap::UPDATED_AT)) $criteria->add(ProductVersionTableMap::UPDATED_AT, $this->updated_at);
@@ -1869,14 +1459,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         $copyObj->setId($this->getId());
         $copyObj->setTaxRuleId($this->getTaxRuleId());
         $copyObj->setRef($this->getRef());
-        $copyObj->setPrice($this->getPrice());
-        $copyObj->setPrice2($this->getPrice2());
-        $copyObj->setEcotax($this->getEcotax());
-        $copyObj->setNewness($this->getNewness());
-        $copyObj->setPromo($this->getPromo());
-        $copyObj->setQuantity($this->getQuantity());
         $copyObj->setVisible($this->getVisible());
-        $copyObj->setWeight($this->getWeight());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -1969,14 +1552,7 @@ abstract class ProductVersion implements ActiveRecordInterface
         $this->id = null;
         $this->tax_rule_id = null;
         $this->ref = null;
-        $this->price = null;
-        $this->price2 = null;
-        $this->ecotax = null;
-        $this->newness = null;
-        $this->promo = null;
-        $this->quantity = null;
         $this->visible = null;
-        $this->weight = null;
         $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;

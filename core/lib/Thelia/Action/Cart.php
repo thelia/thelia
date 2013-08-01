@@ -23,9 +23,15 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Form\CartAdd;
+use Thelia\Model\CartQuery;
+use Thelia\Model\Cart as CartModel;
+use Thelia\Model\Customer;
 
 
 class Cart implements EventSubscriberInterface
@@ -38,8 +44,32 @@ class Cart implements EventSubscriberInterface
      */
     public function addArticle(ActionEvent $event)
     {
+        $request = $event->getRequest();
 
+        if ($request->isMethod("post")) {
+            $cartAdd = new CartAdd($request);
+        } else {
+            $cartAdd = new CartAdd(
+                $request,
+                "form",
+                array(),
+                array(
+                    'csrf_protection'   => false,
+                )
+            );
+        }
+
+        $form = $cartAdd->getForm();
+
+        $form->bind($request);
+
+        if($form->isValid()) {
+
+        } else {
+            var_dump($form->createView());
+        }
     }
+
 
     /**
      *
@@ -90,5 +120,88 @@ class Cart implements EventSubscriberInterface
             "action.deleteArticle" => array("deleteArticle", 128),
             "action.modifyArticle" => array("modifyArticle", 128),
         );
+    }
+
+    public function getCart(Request $request)
+    {
+
+        if(null !== $cart = $request->getSession()->getCart()){
+            return $cart;
+        }
+
+        if ($request->cookies->has("thelia_cart")) {
+            //le cookie de panier existe, on le récupère
+            $token = $request->cookies->get("thelia_cart");
+
+            $cart = CartQuery::create()->findOneByToken($token);
+
+            if ($cart) {
+                //le panier existe en base
+                $customer = $request->getSession()->getCustomerUser();
+
+                if ($customer) {
+                    if($cart->getCustomerId() != $customer->getId()) {
+                        //le customer du panier n'est pas le mm que celui connecté, il faut cloner le panier sans le customer_id
+                        $cart = $this->duplicateCart($cart, $request->getSession(), $customer);
+                    }
+                } else {
+                    if ($cart->getCustomerId() != null) {
+                        //il faut dupliquer le panier sans le customer_id
+                        $cart = $this->duplicateCart($cart, $request->getSession());
+                    }
+                }
+
+            } else {
+                $cart = $this->createCart($request->getSession());
+            }
+        } else {
+            //le cookie de panier n'existe pas, il va falloir le créer et faire un enregistrement en base.
+            $cart = $this->createCart($request->getSession());
+        }
+
+        return $cart;
+    }
+
+    /**
+     * @param Session $session
+     * @return CartModel
+     */
+    protected function createCart(Session $session)
+    {
+        $cart = new CartModel();
+        $cart->setToken($this->generateCookie());
+
+        if(null !== $customer = $session->getCustomerUser()) {
+            $cart->setCustomer($customer);
+        }
+
+        $cart->save();
+
+        $session->setCart($cart->getId());
+
+        return $cart;
+    }
+
+
+    /**
+     * @param CartModel $cart
+     * @param Session $session
+     * @param Customer $customer
+     * @return CartModel
+     */
+    protected function duplicateCart(CartModel $cart, Session $session, Customer $customer = null)
+    {
+        $newCart = $cart->duplicate($this->generateCookie(), $customer);
+        $session->setCart($newCart->getId());
+
+        return $newCart;
+    }
+
+    protected function generateCookie()
+    {
+        $id = uniqid('', true);
+        setcookie("thelia_cart", $id, time()+(60*60*24*365));
+
+        return $id;
     }
 }

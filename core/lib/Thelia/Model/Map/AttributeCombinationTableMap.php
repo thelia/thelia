@@ -57,7 +57,7 @@ class AttributeCombinationTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 5;
 
     /**
      * The number of lazy-loaded columns
@@ -67,12 +67,7 @@ class AttributeCombinationTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
-
-    /**
-     * the column name for the ID field
-     */
-    const ID = 'attribute_combination.ID';
+    const NUM_HYDRATE_COLUMNS = 5;
 
     /**
      * the column name for the ATTRIBUTE_ID field
@@ -80,14 +75,14 @@ class AttributeCombinationTableMap extends TableMap
     const ATTRIBUTE_ID = 'attribute_combination.ATTRIBUTE_ID';
 
     /**
-     * the column name for the COMBINATION_ID field
-     */
-    const COMBINATION_ID = 'attribute_combination.COMBINATION_ID';
-
-    /**
      * the column name for the ATTRIBUTE_AV_ID field
      */
     const ATTRIBUTE_AV_ID = 'attribute_combination.ATTRIBUTE_AV_ID';
+
+    /**
+     * the column name for the PRODUCT_SALE_ELEMENTS_ID field
+     */
+    const PRODUCT_SALE_ELEMENTS_ID = 'attribute_combination.PRODUCT_SALE_ELEMENTS_ID';
 
     /**
      * the column name for the CREATED_AT field
@@ -111,12 +106,12 @@ class AttributeCombinationTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'AttributeId', 'CombinationId', 'AttributeAvId', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'attributeId', 'combinationId', 'attributeAvId', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ID, AttributeCombinationTableMap::ATTRIBUTE_ID, AttributeCombinationTableMap::COMBINATION_ID, AttributeCombinationTableMap::ATTRIBUTE_AV_ID, AttributeCombinationTableMap::CREATED_AT, AttributeCombinationTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'ATTRIBUTE_ID', 'COMBINATION_ID', 'ATTRIBUTE_AV_ID', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'attribute_id', 'combination_id', 'attribute_av_id', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('AttributeId', 'AttributeAvId', 'ProductSaleElementsId', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('attributeId', 'attributeAvId', 'productSaleElementsId', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ATTRIBUTE_ID, AttributeCombinationTableMap::ATTRIBUTE_AV_ID, AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, AttributeCombinationTableMap::CREATED_AT, AttributeCombinationTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ATTRIBUTE_ID', 'ATTRIBUTE_AV_ID', 'PRODUCT_SALE_ELEMENTS_ID', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('attribute_id', 'attribute_av_id', 'product_sale_elements_id', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -126,12 +121,12 @@ class AttributeCombinationTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'AttributeId' => 1, 'CombinationId' => 2, 'AttributeAvId' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'attributeId' => 1, 'combinationId' => 2, 'attributeAvId' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ID => 0, AttributeCombinationTableMap::ATTRIBUTE_ID => 1, AttributeCombinationTableMap::COMBINATION_ID => 2, AttributeCombinationTableMap::ATTRIBUTE_AV_ID => 3, AttributeCombinationTableMap::CREATED_AT => 4, AttributeCombinationTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'ATTRIBUTE_ID' => 1, 'COMBINATION_ID' => 2, 'ATTRIBUTE_AV_ID' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'attribute_id' => 1, 'combination_id' => 2, 'attribute_av_id' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('AttributeId' => 0, 'AttributeAvId' => 1, 'ProductSaleElementsId' => 2, 'CreatedAt' => 3, 'UpdatedAt' => 4, ),
+        self::TYPE_STUDLYPHPNAME => array('attributeId' => 0, 'attributeAvId' => 1, 'productSaleElementsId' => 2, 'createdAt' => 3, 'updatedAt' => 4, ),
+        self::TYPE_COLNAME       => array(AttributeCombinationTableMap::ATTRIBUTE_ID => 0, AttributeCombinationTableMap::ATTRIBUTE_AV_ID => 1, AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID => 2, AttributeCombinationTableMap::CREATED_AT => 3, AttributeCombinationTableMap::UPDATED_AT => 4, ),
+        self::TYPE_RAW_COLNAME   => array('ATTRIBUTE_ID' => 0, 'ATTRIBUTE_AV_ID' => 1, 'PRODUCT_SALE_ELEMENTS_ID' => 2, 'CREATED_AT' => 3, 'UPDATED_AT' => 4, ),
+        self::TYPE_FIELDNAME     => array('attribute_id' => 0, 'attribute_av_id' => 1, 'product_sale_elements_id' => 2, 'created_at' => 3, 'updated_at' => 4, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, )
     );
 
     /**
@@ -148,12 +143,11 @@ class AttributeCombinationTableMap extends TableMap
         $this->setPhpName('AttributeCombination');
         $this->setClassName('\\Thelia\\Model\\AttributeCombination');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignPrimaryKey('ATTRIBUTE_ID', 'AttributeId', 'INTEGER' , 'attribute', 'ID', true, null, null);
-        $this->addForeignPrimaryKey('COMBINATION_ID', 'CombinationId', 'INTEGER' , 'combination', 'ID', true, null, null);
         $this->addForeignPrimaryKey('ATTRIBUTE_AV_ID', 'AttributeAvId', 'INTEGER' , 'attribute_av', 'ID', true, null, null);
+        $this->addForeignPrimaryKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER' , 'product_sale_elements', 'ID', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -165,7 +159,7 @@ class AttributeCombinationTableMap extends TableMap
     {
         $this->addRelation('Attribute', '\\Thelia\\Model\\Attribute', RelationMap::MANY_TO_ONE, array('attribute_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('AttributeAv', '\\Thelia\\Model\\AttributeAv', RelationMap::MANY_TO_ONE, array('attribute_av_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Combination', '\\Thelia\\Model\\Combination', RelationMap::MANY_TO_ONE, array('combination_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::MANY_TO_ONE, array('product_sale_elements_id' => 'id', ), null, null);
     } // buildRelations()
 
     /**
@@ -196,7 +190,7 @@ class AttributeCombinationTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled()) {
             if (null === $key) {
-                $key = serialize(array((string) $obj->getId(), (string) $obj->getAttributeId(), (string) $obj->getCombinationId(), (string) $obj->getAttributeAvId()));
+                $key = serialize(array((string) $obj->getAttributeId(), (string) $obj->getAttributeAvId(), (string) $obj->getProductSaleElementsId()));
             } // if key === null
             self::$instances[$key] = $obj;
         }
@@ -216,11 +210,11 @@ class AttributeCombinationTableMap extends TableMap
     {
         if (Propel::isInstancePoolingEnabled() && null !== $value) {
             if (is_object($value) && $value instanceof \Thelia\Model\AttributeCombination) {
-                $key = serialize(array((string) $value->getId(), (string) $value->getAttributeId(), (string) $value->getCombinationId(), (string) $value->getAttributeAvId()));
+                $key = serialize(array((string) $value->getAttributeId(), (string) $value->getAttributeAvId(), (string) $value->getProductSaleElementsId()));
 
-            } elseif (is_array($value) && count($value) === 4) {
+            } elseif (is_array($value) && count($value) === 3) {
                 // assume we've been passed a primary key";
-                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2], (string) $value[3]));
+                $key = serialize(array((string) $value[0], (string) $value[1], (string) $value[2]));
             } elseif ($value instanceof Criteria) {
                 self::$instances = [];
 
@@ -248,11 +242,11 @@ class AttributeCombinationTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('AttributeId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('CombinationId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('AttributeId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('AttributeId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('CombinationId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 3 + $offset : static::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('AttributeId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 2 + $offset : static::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -368,17 +362,15 @@ class AttributeCombinationTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(AttributeCombinationTableMap::ID);
             $criteria->addSelectColumn(AttributeCombinationTableMap::ATTRIBUTE_ID);
-            $criteria->addSelectColumn(AttributeCombinationTableMap::COMBINATION_ID);
             $criteria->addSelectColumn(AttributeCombinationTableMap::ATTRIBUTE_AV_ID);
+            $criteria->addSelectColumn(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID);
             $criteria->addSelectColumn(AttributeCombinationTableMap::CREATED_AT);
             $criteria->addSelectColumn(AttributeCombinationTableMap::UPDATED_AT);
         } else {
-            $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_ID');
-            $criteria->addSelectColumn($alias . '.COMBINATION_ID');
             $criteria->addSelectColumn($alias . '.ATTRIBUTE_AV_ID');
+            $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
@@ -439,10 +431,9 @@ class AttributeCombinationTableMap extends TableMap
                 $values = array($values);
             }
             foreach ($values as $value) {
-                $criterion = $criteria->getNewCriterion(AttributeCombinationTableMap::ID, $value[0]);
-                $criterion->addAnd($criteria->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_ID, $value[1]));
-                $criterion->addAnd($criteria->getNewCriterion(AttributeCombinationTableMap::COMBINATION_ID, $value[2]));
-                $criterion->addAnd($criteria->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $value[3]));
+                $criterion = $criteria->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $value[1]));
+                $criterion->addAnd($criteria->getNewCriterion(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $value[2]));
                 $criteria->addOr($criterion);
             }
         }
@@ -488,10 +479,6 @@ class AttributeCombinationTableMap extends TableMap
             $criteria = clone $criteria; // rename for clarity
         } else {
             $criteria = $criteria->buildCriteria(); // build Criteria from AttributeCombination object
-        }
-
-        if ($criteria->containsKey(AttributeCombinationTableMap::ID) && $criteria->keyContainsValue(AttributeCombinationTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AttributeCombinationTableMap::ID.')');
         }
 
 
