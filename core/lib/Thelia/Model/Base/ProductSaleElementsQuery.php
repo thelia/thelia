@@ -23,7 +23,6 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     ChildProductSaleElementsQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildProductSaleElementsQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
- * @method     ChildProductSaleElementsQuery orderByIncrease($order = Criteria::ASC) Order by the increase column
  * @method     ChildProductSaleElementsQuery orderByQuantity($order = Criteria::ASC) Order by the quantity column
  * @method     ChildProductSaleElementsQuery orderByPromo($order = Criteria::ASC) Order by the promo column
  * @method     ChildProductSaleElementsQuery orderByNewness($order = Criteria::ASC) Order by the newness column
@@ -33,7 +32,6 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     ChildProductSaleElementsQuery groupById() Group by the id column
  * @method     ChildProductSaleElementsQuery groupByProductId() Group by the product_id column
- * @method     ChildProductSaleElementsQuery groupByIncrease() Group by the increase column
  * @method     ChildProductSaleElementsQuery groupByQuantity() Group by the quantity column
  * @method     ChildProductSaleElementsQuery groupByPromo() Group by the promo column
  * @method     ChildProductSaleElementsQuery groupByNewness() Group by the newness column
@@ -66,7 +64,6 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     ChildProductSaleElements findOneById(int $id) Return the first ChildProductSaleElements filtered by the id column
  * @method     ChildProductSaleElements findOneByProductId(int $product_id) Return the first ChildProductSaleElements filtered by the product_id column
- * @method     ChildProductSaleElements findOneByIncrease(double $increase) Return the first ChildProductSaleElements filtered by the increase column
  * @method     ChildProductSaleElements findOneByQuantity(double $quantity) Return the first ChildProductSaleElements filtered by the quantity column
  * @method     ChildProductSaleElements findOneByPromo(int $promo) Return the first ChildProductSaleElements filtered by the promo column
  * @method     ChildProductSaleElements findOneByNewness(int $newness) Return the first ChildProductSaleElements filtered by the newness column
@@ -76,7 +73,6 @@ use Thelia\Model\Map\ProductSaleElementsTableMap;
  *
  * @method     array findById(int $id) Return ChildProductSaleElements objects filtered by the id column
  * @method     array findByProductId(int $product_id) Return ChildProductSaleElements objects filtered by the product_id column
- * @method     array findByIncrease(double $increase) Return ChildProductSaleElements objects filtered by the increase column
  * @method     array findByQuantity(double $quantity) Return ChildProductSaleElements objects filtered by the quantity column
  * @method     array findByPromo(int $promo) Return ChildProductSaleElements objects filtered by the promo column
  * @method     array findByNewness(int $newness) Return ChildProductSaleElements objects filtered by the newness column
@@ -171,7 +167,7 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, INCREASE, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, QUANTITY, PROMO, NEWNESS, WEIGHT, CREATED_AT, UPDATED_AT FROM product_sale_elements WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -342,47 +338,6 @@ abstract class ProductSaleElementsQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(ProductSaleElementsTableMap::PRODUCT_ID, $productId, $comparison);
-    }
-
-    /**
-     * Filter the query on the increase column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByIncrease(1234); // WHERE increase = 1234
-     * $query->filterByIncrease(array(12, 34)); // WHERE increase IN (12, 34)
-     * $query->filterByIncrease(array('min' => 12)); // WHERE increase > 12
-     * </code>
-     *
-     * @param     mixed $increase The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildProductSaleElementsQuery The current query, for fluid interface
-     */
-    public function filterByIncrease($increase = null, $comparison = null)
-    {
-        if (is_array($increase)) {
-            $useMinMax = false;
-            if (isset($increase['min'])) {
-                $this->addUsingAlias(ProductSaleElementsTableMap::INCREASE, $increase['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($increase['max'])) {
-                $this->addUsingAlias(ProductSaleElementsTableMap::INCREASE, $increase['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ProductSaleElementsTableMap::INCREASE, $increase, $comparison);
     }
 
     /**

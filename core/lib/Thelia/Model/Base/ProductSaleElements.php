@@ -76,12 +76,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     protected $product_id;
 
     /**
-     * The value for the increase field.
-     * @var        double
-     */
-    protected $increase;
-
-    /**
      * The value for the quantity field.
      * @var        double
      */
@@ -459,17 +453,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     }
 
     /**
-     * Get the [increase] column value.
-     *
-     * @return   double
-     */
-    public function getIncrease()
-    {
-
-        return $this->increase;
-    }
-
-    /**
      * Get the [quantity] column value.
      *
      * @return   double
@@ -598,27 +581,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         return $this;
     } // setProductId()
-
-    /**
-     * Set the value of [increase] column.
-     *
-     * @param      double $v new value
-     * @return   \Thelia\Model\ProductSaleElements The current object (for fluent API support)
-     */
-    public function setIncrease($v)
-    {
-        if ($v !== null) {
-            $v = (double) $v;
-        }
-
-        if ($this->increase !== $v) {
-            $this->increase = $v;
-            $this->modifiedColumns[] = ProductSaleElementsTableMap::INCREASE;
-        }
-
-
-        return $this;
-    } // setIncrease()
 
     /**
      * Set the value of [quantity] column.
@@ -797,28 +759,25 @@ abstract class ProductSaleElements implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductSaleElementsTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductSaleElementsTableMap::translateFieldName('Increase', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->increase = (null !== $col) ? (double) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductSaleElementsTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductSaleElementsTableMap::translateFieldName('Quantity', TableMap::TYPE_PHPNAME, $indexType)];
             $this->quantity = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductSaleElementsTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductSaleElementsTableMap::translateFieldName('Promo', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductSaleElementsTableMap::translateFieldName('Newness', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductSaleElementsTableMap::translateFieldName('Newness', TableMap::TYPE_PHPNAME, $indexType)];
             $this->newness = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductSaleElementsTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductSaleElementsTableMap::translateFieldName('Weight', TableMap::TYPE_PHPNAME, $indexType)];
             $this->weight = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductSaleElementsTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ProductSaleElementsTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : ProductSaleElementsTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : ProductSaleElementsTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -831,7 +790,7 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 9; // 9 = ProductSaleElementsTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = ProductSaleElementsTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\ProductSaleElements object", 0, $e);
@@ -1130,9 +1089,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         if ($this->isColumnModified(ProductSaleElementsTableMap::PRODUCT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
-        if ($this->isColumnModified(ProductSaleElementsTableMap::INCREASE)) {
-            $modifiedColumns[':p' . $index++]  = 'INCREASE';
-        }
         if ($this->isColumnModified(ProductSaleElementsTableMap::QUANTITY)) {
             $modifiedColumns[':p' . $index++]  = 'QUANTITY';
         }
@@ -1167,9 +1123,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                         break;
                     case 'PRODUCT_ID':
                         $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
-                        break;
-                    case 'INCREASE':
-                        $stmt->bindValue($identifier, $this->increase, PDO::PARAM_STR);
                         break;
                     case 'QUANTITY':
                         $stmt->bindValue($identifier, $this->quantity, PDO::PARAM_STR);
@@ -1258,24 +1211,21 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 return $this->getProductId();
                 break;
             case 2:
-                return $this->getIncrease();
-                break;
-            case 3:
                 return $this->getQuantity();
                 break;
-            case 4:
+            case 3:
                 return $this->getPromo();
                 break;
-            case 5:
+            case 4:
                 return $this->getNewness();
                 break;
-            case 6:
+            case 5:
                 return $this->getWeight();
                 break;
-            case 7:
+            case 6:
                 return $this->getCreatedAt();
                 break;
-            case 8:
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1309,13 +1259,12 @@ abstract class ProductSaleElements implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getProductId(),
-            $keys[2] => $this->getIncrease(),
-            $keys[3] => $this->getQuantity(),
-            $keys[4] => $this->getPromo(),
-            $keys[5] => $this->getNewness(),
-            $keys[6] => $this->getWeight(),
-            $keys[7] => $this->getCreatedAt(),
-            $keys[8] => $this->getUpdatedAt(),
+            $keys[2] => $this->getQuantity(),
+            $keys[3] => $this->getPromo(),
+            $keys[4] => $this->getNewness(),
+            $keys[5] => $this->getWeight(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1377,24 +1326,21 @@ abstract class ProductSaleElements implements ActiveRecordInterface
                 $this->setProductId($value);
                 break;
             case 2:
-                $this->setIncrease($value);
-                break;
-            case 3:
                 $this->setQuantity($value);
                 break;
-            case 4:
+            case 3:
                 $this->setPromo($value);
                 break;
-            case 5:
+            case 4:
                 $this->setNewness($value);
                 break;
-            case 6:
+            case 5:
                 $this->setWeight($value);
                 break;
-            case 7:
+            case 6:
                 $this->setCreatedAt($value);
                 break;
-            case 8:
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1423,13 +1369,12 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setIncrease($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setQuantity($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPromo($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setNewness($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setWeight($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
+        if (array_key_exists($keys[2], $arr)) $this->setQuantity($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPromo($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setNewness($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setWeight($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1443,7 +1388,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
 
         if ($this->isColumnModified(ProductSaleElementsTableMap::ID)) $criteria->add(ProductSaleElementsTableMap::ID, $this->id);
         if ($this->isColumnModified(ProductSaleElementsTableMap::PRODUCT_ID)) $criteria->add(ProductSaleElementsTableMap::PRODUCT_ID, $this->product_id);
-        if ($this->isColumnModified(ProductSaleElementsTableMap::INCREASE)) $criteria->add(ProductSaleElementsTableMap::INCREASE, $this->increase);
         if ($this->isColumnModified(ProductSaleElementsTableMap::QUANTITY)) $criteria->add(ProductSaleElementsTableMap::QUANTITY, $this->quantity);
         if ($this->isColumnModified(ProductSaleElementsTableMap::PROMO)) $criteria->add(ProductSaleElementsTableMap::PROMO, $this->promo);
         if ($this->isColumnModified(ProductSaleElementsTableMap::NEWNESS)) $criteria->add(ProductSaleElementsTableMap::NEWNESS, $this->newness);
@@ -1514,7 +1458,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setProductId($this->getProductId());
-        $copyObj->setIncrease($this->getIncrease());
         $copyObj->setQuantity($this->getQuantity());
         $copyObj->setPromo($this->getPromo());
         $copyObj->setNewness($this->getNewness());
@@ -2437,7 +2380,6 @@ abstract class ProductSaleElements implements ActiveRecordInterface
     {
         $this->id = null;
         $this->product_id = null;
-        $this->increase = null;
         $this->quantity = null;
         $this->promo = null;
         $this->newness = null;

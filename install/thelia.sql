@@ -352,7 +352,6 @@ CREATE TABLE `product_sale_elements`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
-    `increase` FLOAT,
     `quantity` FLOAT NOT NULL,
     `promo` TINYINT DEFAULT 0,
     `newness` TINYINT DEFAULT 0,
