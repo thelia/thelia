@@ -263,7 +263,6 @@
   <table name="product_sale_elements" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
-    <column name="increase" type="FLOAT" />
     <column name="quantity" required="true" type="FLOAT" />
     <column defaultValue="0" name="promo" type="TINYINT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
