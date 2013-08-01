@@ -37,12 +37,12 @@ use Thelia\Model\ProductCategoryQuery as ChildProductCategoryQuery;
 use Thelia\Model\ProductI18n as ChildProductI18n;
 use Thelia\Model\ProductI18nQuery as ChildProductI18nQuery;
 use Thelia\Model\ProductQuery as ChildProductQuery;
+use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\ProductVersion as ChildProductVersion;
 use Thelia\Model\ProductVersionQuery as ChildProductVersionQuery;
 use Thelia\Model\Rewriting as ChildRewriting;
 use Thelia\Model\RewritingQuery as ChildRewritingQuery;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
 use Thelia\Model\TaxRule as ChildTaxRule;
 use Thelia\Model\TaxRuleQuery as ChildTaxRuleQuery;
 use Thelia\Model\Map\ProductTableMap;
@@ -162,10 +162,10 @@ abstract class Product implements ActiveRecordInterface
     protected $collFeatureProductsPartial;
 
     /**
-     * @var        ObjectCollection|ChildStock[] Collection to store aggregation of ChildStock objects.
+     * @var        ObjectCollection|ChildProductSaleElements[] Collection to store aggregation of ChildProductSaleElements objects.
      */
-    protected $collStocks;
-    protected $collStocksPartial;
+    protected $collProductSaleElementss;
+    protected $collProductSaleElementssPartial;
 
     /**
      * @var        ObjectCollection|ChildContentAssoc[] Collection to store aggregation of ChildContentAssoc objects.
@@ -300,7 +300,7 @@ abstract class Product implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $stocksScheduledForDeletion = null;
+    protected $productSaleElementssScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1135,7 +1135,7 @@ abstract class Product implements ActiveRecordInterface
 
             $this->collFeatureProducts = null;
 
-            $this->collStocks = null;
+            $this->collProductSaleElementss = null;
 
             $this->collContentAssocs = null;
 
@@ -1430,17 +1430,17 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
-            if ($this->stocksScheduledForDeletion !== null) {
-                if (!$this->stocksScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\StockQuery::create()
-                        ->filterByPrimaryKeys($this->stocksScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->productSaleElementssScheduledForDeletion !== null) {
+                if (!$this->productSaleElementssScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductSaleElementsQuery::create()
+                        ->filterByPrimaryKeys($this->productSaleElementssScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->stocksScheduledForDeletion = null;
+                    $this->productSaleElementssScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collStocks !== null) {
-            foreach ($this->collStocks as $referrerFK) {
+                if ($this->collProductSaleElementss !== null) {
+            foreach ($this->collProductSaleElementss as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1845,8 +1845,8 @@ abstract class Product implements ActiveRecordInterface
             if (null !== $this->collFeatureProducts) {
                 $result['FeatureProducts'] = $this->collFeatureProducts->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collStocks) {
-                $result['Stocks'] = $this->collStocks->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProductSaleElementss) {
+                $result['ProductSaleElementss'] = $this->collProductSaleElementss->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collContentAssocs) {
                 $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2084,9 +2084,9 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getStocks() as $relObj) {
+            foreach ($this->getProductSaleElementss() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addStock($relObj->copy($deepCopy));
+                    $copyObj->addProductSaleElements($relObj->copy($deepCopy));
                 }
             }
 
@@ -2242,8 +2242,8 @@ abstract class Product implements ActiveRecordInterface
         if ('FeatureProduct' == $relationName) {
             return $this->initFeatureProducts();
         }
-        if ('Stock' == $relationName) {
-            return $this->initStocks();
+        if ('ProductSaleElements' == $relationName) {
+            return $this->initProductSaleElementss();
         }
         if ('ContentAssoc' == $relationName) {
             return $this->initContentAssocs();
@@ -2789,31 +2789,31 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collStocks collection
+     * Clears out the collProductSaleElementss collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addStocks()
+     * @see        addProductSaleElementss()
      */
-    public function clearStocks()
+    public function clearProductSaleElementss()
     {
-        $this->collStocks = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProductSaleElementss = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collStocks collection loaded partially.
+     * Reset is the collProductSaleElementss collection loaded partially.
      */
-    public function resetPartialStocks($v = true)
+    public function resetPartialProductSaleElementss($v = true)
     {
-        $this->collStocksPartial = $v;
+        $this->collProductSaleElementssPartial = $v;
     }
 
     /**
-     * Initializes the collStocks collection.
+     * Initializes the collProductSaleElementss collection.
      *
-     * By default this just sets the collStocks collection to an empty array (like clearcollStocks());
+     * By default this just sets the collProductSaleElementss collection to an empty array (like clearcollProductSaleElementss());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -2822,17 +2822,17 @@ abstract class Product implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initStocks($overrideExisting = true)
+    public function initProductSaleElementss($overrideExisting = true)
     {
-        if (null !== $this->collStocks && !$overrideExisting) {
+        if (null !== $this->collProductSaleElementss && !$overrideExisting) {
             return;
         }
-        $this->collStocks = new ObjectCollection();
-        $this->collStocks->setModel('\Thelia\Model\Stock');
+        $this->collProductSaleElementss = new ObjectCollection();
+        $this->collProductSaleElementss->setModel('\Thelia\Model\ProductSaleElements');
     }
 
     /**
-     * Gets an array of ChildStock objects which contain a foreign key that references this object.
+     * Gets an array of ChildProductSaleElements objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -2842,109 +2842,109 @@ abstract class Product implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildStock[] List of ChildStock objects
+     * @return Collection|ChildProductSaleElements[] List of ChildProductSaleElements objects
      * @throws PropelException
      */
-    public function getStocks($criteria = null, ConnectionInterface $con = null)
+    public function getProductSaleElementss($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collStocksPartial && !$this->isNew();
-        if (null === $this->collStocks || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collStocks) {
+        $partial = $this->collProductSaleElementssPartial && !$this->isNew();
+        if (null === $this->collProductSaleElementss || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductSaleElementss) {
                 // return empty collection
-                $this->initStocks();
+                $this->initProductSaleElementss();
             } else {
-                $collStocks = ChildStockQuery::create(null, $criteria)
+                $collProductSaleElementss = ChildProductSaleElementsQuery::create(null, $criteria)
                     ->filterByProduct($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collStocksPartial && count($collStocks)) {
-                        $this->initStocks(false);
+                    if (false !== $this->collProductSaleElementssPartial && count($collProductSaleElementss)) {
+                        $this->initProductSaleElementss(false);
 
-                        foreach ($collStocks as $obj) {
-                            if (false == $this->collStocks->contains($obj)) {
-                                $this->collStocks->append($obj);
+                        foreach ($collProductSaleElementss as $obj) {
+                            if (false == $this->collProductSaleElementss->contains($obj)) {
+                                $this->collProductSaleElementss->append($obj);
                             }
                         }
 
-                        $this->collStocksPartial = true;
+                        $this->collProductSaleElementssPartial = true;
                     }
 
-                    $collStocks->getInternalIterator()->rewind();
+                    $collProductSaleElementss->getInternalIterator()->rewind();
 
-                    return $collStocks;
+                    return $collProductSaleElementss;
                 }
 
-                if ($partial && $this->collStocks) {
-                    foreach ($this->collStocks as $obj) {
+                if ($partial && $this->collProductSaleElementss) {
+                    foreach ($this->collProductSaleElementss as $obj) {
                         if ($obj->isNew()) {
-                            $collStocks[] = $obj;
+                            $collProductSaleElementss[] = $obj;
                         }
                     }
                 }
 
-                $this->collStocks = $collStocks;
-                $this->collStocksPartial = false;
+                $this->collProductSaleElementss = $collProductSaleElementss;
+                $this->collProductSaleElementssPartial = false;
             }
         }
 
-        return $this->collStocks;
+        return $this->collProductSaleElementss;
     }
 
     /**
-     * Sets a collection of Stock objects related by a one-to-many relationship
+     * Sets a collection of ProductSaleElements objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $stocks A Propel collection.
+     * @param      Collection $productSaleElementss A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildProduct The current object (for fluent API support)
      */
-    public function setStocks(Collection $stocks, ConnectionInterface $con = null)
+    public function setProductSaleElementss(Collection $productSaleElementss, ConnectionInterface $con = null)
     {
-        $stocksToDelete = $this->getStocks(new Criteria(), $con)->diff($stocks);
+        $productSaleElementssToDelete = $this->getProductSaleElementss(new Criteria(), $con)->diff($productSaleElementss);
 
 
-        $this->stocksScheduledForDeletion = $stocksToDelete;
+        $this->productSaleElementssScheduledForDeletion = $productSaleElementssToDelete;
 
-        foreach ($stocksToDelete as $stockRemoved) {
-            $stockRemoved->setProduct(null);
+        foreach ($productSaleElementssToDelete as $productSaleElementsRemoved) {
+            $productSaleElementsRemoved->setProduct(null);
         }
 
-        $this->collStocks = null;
-        foreach ($stocks as $stock) {
-            $this->addStock($stock);
+        $this->collProductSaleElementss = null;
+        foreach ($productSaleElementss as $productSaleElements) {
+            $this->addProductSaleElements($productSaleElements);
         }
 
-        $this->collStocks = $stocks;
-        $this->collStocksPartial = false;
+        $this->collProductSaleElementss = $productSaleElementss;
+        $this->collProductSaleElementssPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related Stock objects.
+     * Returns the number of related ProductSaleElements objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related Stock objects.
+     * @return int             Count of related ProductSaleElements objects.
      * @throws PropelException
      */
-    public function countStocks(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countProductSaleElementss(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collStocksPartial && !$this->isNew();
-        if (null === $this->collStocks || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collStocks) {
+        $partial = $this->collProductSaleElementssPartial && !$this->isNew();
+        if (null === $this->collProductSaleElementss || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductSaleElementss) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getStocks());
+                return count($this->getProductSaleElementss());
             }
 
-            $query = ChildStockQuery::create(null, $criteria);
+            $query = ChildProductSaleElementsQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -2954,53 +2954,53 @@ abstract class Product implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collStocks);
+        return count($this->collProductSaleElementss);
     }
 
     /**
-     * Method called to associate a ChildStock object to this object
-     * through the ChildStock foreign key attribute.
+     * Method called to associate a ChildProductSaleElements object to this object
+     * through the ChildProductSaleElements foreign key attribute.
      *
-     * @param    ChildStock $l ChildStock
+     * @param    ChildProductSaleElements $l ChildProductSaleElements
      * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
-    public function addStock(ChildStock $l)
+    public function addProductSaleElements(ChildProductSaleElements $l)
     {
-        if ($this->collStocks === null) {
-            $this->initStocks();
-            $this->collStocksPartial = true;
+        if ($this->collProductSaleElementss === null) {
+            $this->initProductSaleElementss();
+            $this->collProductSaleElementssPartial = true;
         }
 
-        if (!in_array($l, $this->collStocks->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddStock($l);
+        if (!in_array($l, $this->collProductSaleElementss->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductSaleElements($l);
         }
 
         return $this;
     }
 
     /**
-     * @param Stock $stock The stock object to add.
+     * @param ProductSaleElements $productSaleElements The productSaleElements object to add.
      */
-    protected function doAddStock($stock)
+    protected function doAddProductSaleElements($productSaleElements)
     {
-        $this->collStocks[]= $stock;
-        $stock->setProduct($this);
+        $this->collProductSaleElementss[]= $productSaleElements;
+        $productSaleElements->setProduct($this);
     }
 
     /**
-     * @param  Stock $stock The stock object to remove.
+     * @param  ProductSaleElements $productSaleElements The productSaleElements object to remove.
      * @return ChildProduct The current object (for fluent API support)
      */
-    public function removeStock($stock)
+    public function removeProductSaleElements($productSaleElements)
     {
-        if ($this->getStocks()->contains($stock)) {
-            $this->collStocks->remove($this->collStocks->search($stock));
-            if (null === $this->stocksScheduledForDeletion) {
-                $this->stocksScheduledForDeletion = clone $this->collStocks;
-                $this->stocksScheduledForDeletion->clear();
+        if ($this->getProductSaleElementss()->contains($productSaleElements)) {
+            $this->collProductSaleElementss->remove($this->collProductSaleElementss->search($productSaleElements));
+            if (null === $this->productSaleElementssScheduledForDeletion) {
+                $this->productSaleElementssScheduledForDeletion = clone $this->collProductSaleElementss;
+                $this->productSaleElementssScheduledForDeletion->clear();
             }
-            $this->stocksScheduledForDeletion[]= clone $stock;
-            $stock->setProduct(null);
+            $this->productSaleElementssScheduledForDeletion[]= clone $productSaleElements;
+            $productSaleElements->setProduct(null);
         }
 
         return $this;
@@ -4849,10 +4849,10 @@ abstract class Product implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCartItem[] List of ChildCartItem objects
      */
-    public function getCartItemsJoinStock($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCartItemsJoinProductSaleElements($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCartItemQuery::create(null, $criteria);
-        $query->joinWith('Stock', $joinBehavior);
+        $query->joinWith('ProductSaleElements', $joinBehavior);
 
         return $this->getCartItems($query, $con);
     }
@@ -5897,8 +5897,8 @@ abstract class Product implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collStocks) {
-                foreach ($this->collStocks as $o) {
+            if ($this->collProductSaleElementss) {
+                foreach ($this->collProductSaleElementss as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -5976,10 +5976,10 @@ abstract class Product implements ActiveRecordInterface
             $this->collFeatureProducts->clearIterator();
         }
         $this->collFeatureProducts = null;
-        if ($this->collStocks instanceof Collection) {
-            $this->collStocks->clearIterator();
+        if ($this->collProductSaleElementss instanceof Collection) {
+            $this->collProductSaleElementss->clearIterator();
         }
-        $this->collStocks = null;
+        $this->collProductSaleElementss = null;
         if ($this->collContentAssocs instanceof Collection) {
             $this->collContentAssocs->clearIterator();
         }

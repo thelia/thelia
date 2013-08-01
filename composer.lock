@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "8ccfaf90277960280975fa78b6c7d3a1",
+    "hash": "b20fbb4995fbf676a7028034f21cfbe0",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -395,11 +395,11 @@
         },
         {
             "name": "smarty/smarty",
-            "version": "v3.1.13",
+            "version": "v3.1.14",
             "source": {
                 "type": "svn",
                 "url": "http://smarty-php.googlecode.com/svn",
-                "reference": "/tags/v3.1.13/@4699"
+                "reference": "/tags/v3.1.14/@4752"
             },
             "require": {
                 "php": ">=5.2"
@@ -408,7 +408,8 @@
             "autoload": {
                 "classmap": [
                     "distribution/libs/Smarty.class.php",
-                    "distribution/libs/SmartyBC.class.php"
+                    "distribution/libs/SmartyBC.class.php",
+                    "distribution/libs/sysplugins/smarty_security.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -434,7 +435,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2013-01-26 12:03:52"
+            "time": "2013-07-02 16:38:47"
         },
         {
             "name": "symfony-cmf/routing",
@@ -1455,17 +1456,17 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v2.2.4",
+            "version": "v2.3.2",
             "target-dir": "Symfony/Component/Validator",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Validator.git",
-                "reference": "v2.2.4"
+                "reference": "v2.3.2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Validator/zipball/v2.2.4",
-                "reference": "v2.2.4",
+                "url": "https://api.github.com/repos/symfony/Validator/zipball/v2.3.2",
+                "reference": "v2.3.2",
                 "shasum": ""
             },
             "require": {
@@ -1473,22 +1474,22 @@
                 "symfony/translation": "~2.0"
             },
             "require-dev": {
-                "symfony/config": ">=2.2,<2.3-dev",
+                "symfony/config": "~2.2",
                 "symfony/http-foundation": "~2.1",
-                "symfony/locale": "~2.0",
+                "symfony/intl": "~2.3",
                 "symfony/yaml": "~2.0"
             },
             "suggest": {
-                "doctrine/common": "~2.2",
-                "symfony/config": "2.2.*",
-                "symfony/http-foundation": "2.2.*",
-                "symfony/locale": "2.2.*",
-                "symfony/yaml": "2.2.*"
+                "doctrine/common": "",
+                "symfony/config": "",
+                "symfony/http-foundation": "",
+                "symfony/intl": "",
+                "symfony/yaml": ""
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2-dev"
+                    "dev-master": "2.3-dev"
                 }
             },
             "autoload": {
@@ -1512,7 +1513,7 @@
             ],
             "description": "Symfony Validator Component",
             "homepage": "http://symfony.com",
-            "time": "2013-07-02 07:41:45"
+            "time": "2013-07-08 13:36:15"
         },
         {
             "name": "symfony/yaml",

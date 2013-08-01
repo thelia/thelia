@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Combination;
-use Thelia\Model\CombinationQuery;
+use Thelia\Model\CurrencyI18n;
+use Thelia\Model\CurrencyI18nQuery;
 
 
 /**
- * This class defines the structure of the 'combination' table.
+ * This class defines the structure of the 'currency_i18n' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\CombinationQuery;
  * (i.e. if it's a text column type).
  *
  */
-class CombinationTableMap extends TableMap
+class CurrencyI18nTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.CombinationTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.CurrencyI18nTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class CombinationTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'combination';
+    const TABLE_NAME = 'currency_i18n';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Combination';
+    const OM_CLASS = '\\Thelia\\Model\\CurrencyI18n';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Combination';
+    const CLASS_DEFAULT = 'Thelia.Model.CurrencyI18n';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 4;
+    const NUM_COLUMNS = 3;
 
     /**
      * The number of lazy-loaded columns
@@ -67,27 +67,22 @@ class CombinationTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 4;
+    const NUM_HYDRATE_COLUMNS = 3;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'combination.ID';
+    const ID = 'currency_i18n.ID';
 
     /**
-     * the column name for the REF field
+     * the column name for the LOCALE field
      */
-    const REF = 'combination.REF';
+    const LOCALE = 'currency_i18n.LOCALE';
 
     /**
-     * the column name for the CREATED_AT field
+     * the column name for the NAME field
      */
-    const CREATED_AT = 'combination.CREATED_AT';
-
-    /**
-     * the column name for the UPDATED_AT field
-     */
-    const UPDATED_AT = 'combination.UPDATED_AT';
+    const NAME = 'currency_i18n.NAME';
 
     /**
      * The default string format for model objects of the related table
@@ -101,12 +96,12 @@ class CombinationTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Ref', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'ref', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CombinationTableMap::ID, CombinationTableMap::REF, CombinationTableMap::CREATED_AT, CombinationTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'REF', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'ref', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', 'Name', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', 'name', ),
+        self::TYPE_COLNAME       => array(CurrencyI18nTableMap::ID, CurrencyI18nTableMap::LOCALE, CurrencyI18nTableMap::NAME, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', 'NAME', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', 'name', ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -116,12 +111,12 @@ class CombinationTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Ref' => 1, 'CreatedAt' => 2, 'UpdatedAt' => 3, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'ref' => 1, 'createdAt' => 2, 'updatedAt' => 3, ),
-        self::TYPE_COLNAME       => array(CombinationTableMap::ID => 0, CombinationTableMap::REF => 1, CombinationTableMap::CREATED_AT => 2, CombinationTableMap::UPDATED_AT => 3, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'REF' => 1, 'CREATED_AT' => 2, 'UPDATED_AT' => 3, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'ref' => 1, 'created_at' => 2, 'updated_at' => 3, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, 'Name' => 2, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, 'name' => 2, ),
+        self::TYPE_COLNAME       => array(CurrencyI18nTableMap::ID => 0, CurrencyI18nTableMap::LOCALE => 1, CurrencyI18nTableMap::NAME => 2, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, 'NAME' => 2, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, 'name' => 2, ),
+        self::TYPE_NUM           => array(0, 1, 2, )
     );
 
     /**
@@ -134,16 +129,15 @@ class CombinationTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('combination');
-        $this->setPhpName('Combination');
-        $this->setClassName('\\Thelia\\Model\\Combination');
+        $this->setName('currency_i18n');
+        $this->setPhpName('CurrencyI18n');
+        $this->setClassName('\\Thelia\\Model\\CurrencyI18n');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('REF', 'Ref', 'VARCHAR', false, 255, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'currency', 'ID', true, null, null);
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_US');
+        $this->addColumn('NAME', 'Name', 'VARCHAR', false, 45, null);
     } // initialize()
 
     /**
@@ -151,33 +145,61 @@ class CombinationTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'CASCADE', 'RESTRICT', 'AttributeCombinations');
-        $this->addRelation('Stock', '\\Thelia\\Model\\Stock', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), 'SET NULL', 'RESTRICT', 'Stocks');
-        $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'combination_id', ), null, null, 'CartItems');
+        $this->addRelation('Currency', '\\Thelia\\Model\\Currency', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**
+     * Adds an object to the instance pool.
      *
-     * Gets the list of behaviors registered for this table
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
      *
-     * @return array Associative array (name => parameters) of behaviors
+     * @param \Thelia\Model\CurrencyI18n $obj A \Thelia\Model\CurrencyI18n object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public function getBehaviors()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-        );
-    } // getBehaviors()
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getLocale()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
     /**
-     * Method to invalidate the instance pool of all tables related to combination     * by a foreign key with ON DELETE CASCADE
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\CurrencyI18n object or a primary key value.
      */
-    public static function clearRelatedInstancePool()
+    public static function removeInstanceFromPool($value)
     {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                AttributeCombinationTableMap::clearInstancePool();
-                StockTableMap::clearInstancePool();
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\CurrencyI18n) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getLocale()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\CurrencyI18n object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
             }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -193,11 +215,11 @@ class CombinationTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -215,11 +237,7 @@ class CombinationTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -235,7 +253,7 @@ class CombinationTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CombinationTableMap::CLASS_DEFAULT : CombinationTableMap::OM_CLASS;
+        return $withPrefix ? CurrencyI18nTableMap::CLASS_DEFAULT : CurrencyI18nTableMap::OM_CLASS;
     }
 
     /**
@@ -249,21 +267,21 @@ class CombinationTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Combination object, last column rank)
+     * @return array (CurrencyI18n object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CombinationTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CombinationTableMap::getInstanceFromPool($key))) {
+        $key = CurrencyI18nTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = CurrencyI18nTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CombinationTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + CurrencyI18nTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CombinationTableMap::OM_CLASS;
+            $cls = CurrencyI18nTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CombinationTableMap::addInstanceToPool($obj, $key);
+            CurrencyI18nTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -286,8 +304,8 @@ class CombinationTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CombinationTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CombinationTableMap::getInstanceFromPool($key))) {
+            $key = CurrencyI18nTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = CurrencyI18nTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -296,7 +314,7 @@ class CombinationTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CombinationTableMap::addInstanceToPool($obj, $key);
+                CurrencyI18nTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -317,15 +335,13 @@ class CombinationTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CombinationTableMap::ID);
-            $criteria->addSelectColumn(CombinationTableMap::REF);
-            $criteria->addSelectColumn(CombinationTableMap::CREATED_AT);
-            $criteria->addSelectColumn(CombinationTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(CurrencyI18nTableMap::ID);
+            $criteria->addSelectColumn(CurrencyI18nTableMap::LOCALE);
+            $criteria->addSelectColumn(CurrencyI18nTableMap::NAME);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.REF');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.LOCALE');
+            $criteria->addSelectColumn($alias . '.NAME');
         }
     }
 
@@ -338,7 +354,7 @@ class CombinationTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CombinationTableMap::DATABASE_NAME)->getTable(CombinationTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(CurrencyI18nTableMap::DATABASE_NAME)->getTable(CurrencyI18nTableMap::TABLE_NAME);
     }
 
     /**
@@ -346,16 +362,16 @@ class CombinationTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CombinationTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(CombinationTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new CombinationTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CurrencyI18nTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CurrencyI18nTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CurrencyI18nTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Combination or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CurrencyI18n or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Combination object or primary key or array of primary keys
+     * @param mixed               $values Criteria or CurrencyI18n object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -366,25 +382,35 @@ class CombinationTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CurrencyI18nTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Combination) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\CurrencyI18n) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CombinationTableMap::DATABASE_NAME);
-            $criteria->add(CombinationTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(CurrencyI18nTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(CurrencyI18nTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(CurrencyI18nTableMap::LOCALE, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = CombinationQuery::create()->mergeWith($criteria);
+        $query = CurrencyI18nQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { CombinationTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { CurrencyI18nTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { CombinationTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { CurrencyI18nTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -392,20 +418,20 @@ class CombinationTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the combination table.
+     * Deletes all rows from the currency_i18n table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CombinationQuery::create()->doDeleteAll($con);
+        return CurrencyI18nQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Combination or Criteria object.
+     * Performs an INSERT on the database, given a CurrencyI18n or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Combination object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or CurrencyI18n object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -414,22 +440,18 @@ class CombinationTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CombinationTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CurrencyI18nTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Combination object
-        }
-
-        if ($criteria->containsKey(CombinationTableMap::ID) && $criteria->keyContainsValue(CombinationTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CombinationTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from CurrencyI18n object
         }
 
 
         // Set the correct dbName
-        $query = CombinationQuery::create()->mergeWith($criteria);
+        $query = CurrencyI18nQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -445,7 +467,7 @@ class CombinationTableMap extends TableMap
         return $pk;
     }
 
-} // CombinationTableMap
+} // CurrencyI18nTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CombinationTableMap::buildTableMap();
+CurrencyI18nTableMap::buildTableMap();

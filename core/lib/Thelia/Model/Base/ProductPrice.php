@@ -20,8 +20,8 @@ use Thelia\Model\Currency as ChildCurrency;
 use Thelia\Model\CurrencyQuery as ChildCurrencyQuery;
 use Thelia\Model\ProductPrice as ChildProductPrice;
 use Thelia\Model\ProductPriceQuery as ChildProductPriceQuery;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
+use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\Map\ProductPriceTableMap;
 
 abstract class ProductPrice implements ActiveRecordInterface
@@ -65,10 +65,10 @@ abstract class ProductPrice implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the stock_id field.
+     * The value for the product_sale_elements_id field.
      * @var        int
      */
-    protected $stock_id;
+    protected $product_sale_elements_id;
 
     /**
      * The value for the currency_id field.
@@ -101,9 +101,9 @@ abstract class ProductPrice implements ActiveRecordInterface
     protected $updated_at;
 
     /**
-     * @var        Stock
+     * @var        ProductSaleElements
      */
-    protected $aStock;
+    protected $aProductSaleElements;
 
     /**
      * @var        Currency
@@ -384,14 +384,14 @@ abstract class ProductPrice implements ActiveRecordInterface
     }
 
     /**
-     * Get the [stock_id] column value.
+     * Get the [product_sale_elements_id] column value.
      *
      * @return   int
      */
-    public function getStockId()
+    public function getProductSaleElementsId()
     {
 
-        return $this->stock_id;
+        return $this->product_sale_elements_id;
     }
 
     /**
@@ -489,29 +489,29 @@ abstract class ProductPrice implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [stock_id] column.
+     * Set the value of [product_sale_elements_id] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\ProductPrice The current object (for fluent API support)
      */
-    public function setStockId($v)
+    public function setProductSaleElementsId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->stock_id !== $v) {
-            $this->stock_id = $v;
-            $this->modifiedColumns[] = ProductPriceTableMap::STOCK_ID;
+        if ($this->product_sale_elements_id !== $v) {
+            $this->product_sale_elements_id = $v;
+            $this->modifiedColumns[] = ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID;
         }
 
-        if ($this->aStock !== null && $this->aStock->getId() !== $v) {
-            $this->aStock = null;
+        if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
+            $this->aProductSaleElements = null;
         }
 
 
         return $this;
-    } // setStockId()
+    } // setProductSaleElementsId()
 
     /**
      * Set the value of [currency_id] column.
@@ -662,8 +662,8 @@ abstract class ProductPrice implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductPriceTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductPriceTableMap::translateFieldName('StockId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->stock_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductPriceTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductPriceTableMap::translateFieldName('CurrencyId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->currency_id = (null !== $col) ? (int) $col : null;
@@ -715,8 +715,8 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aStock !== null && $this->stock_id !== $this->aStock->getId()) {
-            $this->aStock = null;
+        if ($this->aProductSaleElements !== null && $this->product_sale_elements_id !== $this->aProductSaleElements->getId()) {
+            $this->aProductSaleElements = null;
         }
         if ($this->aCurrency !== null && $this->currency_id !== $this->aCurrency->getId()) {
             $this->aCurrency = null;
@@ -760,7 +760,7 @@ abstract class ProductPrice implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aStock = null;
+            $this->aProductSaleElements = null;
             $this->aCurrency = null;
         } // if (deep)
     }
@@ -889,11 +889,11 @@ abstract class ProductPrice implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aStock !== null) {
-                if ($this->aStock->isModified() || $this->aStock->isNew()) {
-                    $affectedRows += $this->aStock->save($con);
+            if ($this->aProductSaleElements !== null) {
+                if ($this->aProductSaleElements->isModified() || $this->aProductSaleElements->isNew()) {
+                    $affectedRows += $this->aProductSaleElements->save($con);
                 }
-                $this->setStock($this->aStock);
+                $this->setProductSaleElements($this->aProductSaleElements);
             }
 
             if ($this->aCurrency !== null) {
@@ -943,8 +943,8 @@ abstract class ProductPrice implements ActiveRecordInterface
         if ($this->isColumnModified(ProductPriceTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(ProductPriceTableMap::STOCK_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'STOCK_ID';
+        if ($this->isColumnModified(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
         }
         if ($this->isColumnModified(ProductPriceTableMap::CURRENCY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CURRENCY_ID';
@@ -975,8 +975,8 @@ abstract class ProductPrice implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'STOCK_ID':
-                        $stmt->bindValue($identifier, $this->stock_id, PDO::PARAM_INT);
+                    case 'PRODUCT_SALE_ELEMENTS_ID':
+                        $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
                         break;
                     case 'CURRENCY_ID':
                         $stmt->bindValue($identifier, $this->currency_id, PDO::PARAM_INT);
@@ -1059,7 +1059,7 @@ abstract class ProductPrice implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getStockId();
+                return $this->getProductSaleElementsId();
                 break;
             case 2:
                 return $this->getCurrencyId();
@@ -1106,7 +1106,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         $keys = ProductPriceTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getStockId(),
+            $keys[1] => $this->getProductSaleElementsId(),
             $keys[2] => $this->getCurrencyId(),
             $keys[3] => $this->getPrice(),
             $keys[4] => $this->getPromoPrice(),
@@ -1120,8 +1120,8 @@ abstract class ProductPrice implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aStock) {
-                $result['Stock'] = $this->aStock->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProductSaleElements) {
+                $result['ProductSaleElements'] = $this->aProductSaleElements->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aCurrency) {
                 $result['Currency'] = $this->aCurrency->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1164,7 +1164,7 @@ abstract class ProductPrice implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setStockId($value);
+                $this->setProductSaleElementsId($value);
                 break;
             case 2:
                 $this->setCurrencyId($value);
@@ -1206,7 +1206,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         $keys = ProductPriceTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setStockId($arr[$keys[1]]);
+        if (array_key_exists($keys[1], $arr)) $this->setProductSaleElementsId($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setCurrencyId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setPrice($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setPromoPrice($arr[$keys[4]]);
@@ -1224,7 +1224,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         $criteria = new Criteria(ProductPriceTableMap::DATABASE_NAME);
 
         if ($this->isColumnModified(ProductPriceTableMap::ID)) $criteria->add(ProductPriceTableMap::ID, $this->id);
-        if ($this->isColumnModified(ProductPriceTableMap::STOCK_ID)) $criteria->add(ProductPriceTableMap::STOCK_ID, $this->stock_id);
+        if ($this->isColumnModified(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
         if ($this->isColumnModified(ProductPriceTableMap::CURRENCY_ID)) $criteria->add(ProductPriceTableMap::CURRENCY_ID, $this->currency_id);
         if ($this->isColumnModified(ProductPriceTableMap::PRICE)) $criteria->add(ProductPriceTableMap::PRICE, $this->price);
         if ($this->isColumnModified(ProductPriceTableMap::PROMO_PRICE)) $criteria->add(ProductPriceTableMap::PROMO_PRICE, $this->promo_price);
@@ -1293,7 +1293,7 @@ abstract class ProductPrice implements ActiveRecordInterface
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setStockId($this->getStockId());
+        $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
         $copyObj->setCurrencyId($this->getCurrencyId());
         $copyObj->setPrice($this->getPrice());
         $copyObj->setPromoPrice($this->getPromoPrice());
@@ -1328,24 +1328,24 @@ abstract class ProductPrice implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildStock object.
+     * Declares an association between this object and a ChildProductSaleElements object.
      *
-     * @param                  ChildStock $v
+     * @param                  ChildProductSaleElements $v
      * @return                 \Thelia\Model\ProductPrice The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setStock(ChildStock $v = null)
+    public function setProductSaleElements(ChildProductSaleElements $v = null)
     {
         if ($v === null) {
-            $this->setStockId(NULL);
+            $this->setProductSaleElementsId(NULL);
         } else {
-            $this->setStockId($v->getId());
+            $this->setProductSaleElementsId($v->getId());
         }
 
-        $this->aStock = $v;
+        $this->aProductSaleElements = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildStock object, it will not be re-added.
+        // If this object has already been added to the ChildProductSaleElements object, it will not be re-added.
         if ($v !== null) {
             $v->addProductPrice($this);
         }
@@ -1356,26 +1356,26 @@ abstract class ProductPrice implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildStock object
+     * Get the associated ChildProductSaleElements object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildStock The associated ChildStock object.
+     * @return                 ChildProductSaleElements The associated ChildProductSaleElements object.
      * @throws PropelException
      */
-    public function getStock(ConnectionInterface $con = null)
+    public function getProductSaleElements(ConnectionInterface $con = null)
     {
-        if ($this->aStock === null && ($this->stock_id !== null)) {
-            $this->aStock = ChildStockQuery::create()->findPk($this->stock_id, $con);
+        if ($this->aProductSaleElements === null && ($this->product_sale_elements_id !== null)) {
+            $this->aProductSaleElements = ChildProductSaleElementsQuery::create()->findPk($this->product_sale_elements_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aStock->addProductPrices($this);
+                $this->aProductSaleElements->addProductPrices($this);
              */
         }
 
-        return $this->aStock;
+        return $this->aProductSaleElements;
     }
 
     /**
@@ -1435,7 +1435,7 @@ abstract class ProductPrice implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->stock_id = null;
+        $this->product_sale_elements_id = null;
         $this->currency_id = null;
         $this->price = null;
         $this->promo_price = null;
@@ -1462,7 +1462,7 @@ abstract class ProductPrice implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aStock = null;
+        $this->aProductSaleElements = null;
         $this->aCurrency = null;
     }
 

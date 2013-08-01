@@ -1628,10 +1628,10 @@ abstract class AttributeAv implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildAttributeCombination[] List of ChildAttributeCombination objects
      */
-    public function getAttributeCombinationsJoinStock($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getAttributeCombinationsJoinProductSaleElements($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildAttributeCombinationQuery::create(null, $criteria);
-        $query->joinWith('Stock', $joinBehavior);
+        $query->joinWith('ProductSaleElements', $joinBehavior);
 
         return $this->getAttributeCombinations($query, $con);
     }

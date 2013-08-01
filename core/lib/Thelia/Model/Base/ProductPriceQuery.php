@@ -22,7 +22,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  *
  *
  * @method     ChildProductPriceQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildProductPriceQuery orderByStockId($order = Criteria::ASC) Order by the stock_id column
+ * @method     ChildProductPriceQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
  * @method     ChildProductPriceQuery orderByCurrencyId($order = Criteria::ASC) Order by the currency_id column
  * @method     ChildProductPriceQuery orderByPrice($order = Criteria::ASC) Order by the price column
  * @method     ChildProductPriceQuery orderByPromoPrice($order = Criteria::ASC) Order by the promo_price column
@@ -30,7 +30,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPriceQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
  * @method     ChildProductPriceQuery groupById() Group by the id column
- * @method     ChildProductPriceQuery groupByStockId() Group by the stock_id column
+ * @method     ChildProductPriceQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
  * @method     ChildProductPriceQuery groupByCurrencyId() Group by the currency_id column
  * @method     ChildProductPriceQuery groupByPrice() Group by the price column
  * @method     ChildProductPriceQuery groupByPromoPrice() Group by the promo_price column
@@ -41,9 +41,9 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPriceQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildProductPriceQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildProductPriceQuery leftJoinStock($relationAlias = null) Adds a LEFT JOIN clause to the query using the Stock relation
- * @method     ChildProductPriceQuery rightJoinStock($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Stock relation
- * @method     ChildProductPriceQuery innerJoinStock($relationAlias = null) Adds a INNER JOIN clause to the query using the Stock relation
+ * @method     ChildProductPriceQuery leftJoinProductSaleElements($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildProductPriceQuery rightJoinProductSaleElements($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildProductPriceQuery innerJoinProductSaleElements($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductSaleElements relation
  *
  * @method     ChildProductPriceQuery leftJoinCurrency($relationAlias = null) Adds a LEFT JOIN clause to the query using the Currency relation
  * @method     ChildProductPriceQuery rightJoinCurrency($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Currency relation
@@ -53,7 +53,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPrice findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProductPrice matching the query, or a new ChildProductPrice object populated from the query conditions when no match is found
  *
  * @method     ChildProductPrice findOneById(int $id) Return the first ChildProductPrice filtered by the id column
- * @method     ChildProductPrice findOneByStockId(int $stock_id) Return the first ChildProductPrice filtered by the stock_id column
+ * @method     ChildProductPrice findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildProductPrice filtered by the product_sale_elements_id column
  * @method     ChildProductPrice findOneByCurrencyId(int $currency_id) Return the first ChildProductPrice filtered by the currency_id column
  * @method     ChildProductPrice findOneByPrice(double $price) Return the first ChildProductPrice filtered by the price column
  * @method     ChildProductPrice findOneByPromoPrice(double $promo_price) Return the first ChildProductPrice filtered by the promo_price column
@@ -61,7 +61,7 @@ use Thelia\Model\Map\ProductPriceTableMap;
  * @method     ChildProductPrice findOneByUpdatedAt(string $updated_at) Return the first ChildProductPrice filtered by the updated_at column
  *
  * @method     array findById(int $id) Return ChildProductPrice objects filtered by the id column
- * @method     array findByStockId(int $stock_id) Return ChildProductPrice objects filtered by the stock_id column
+ * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildProductPrice objects filtered by the product_sale_elements_id column
  * @method     array findByCurrencyId(int $currency_id) Return ChildProductPrice objects filtered by the currency_id column
  * @method     array findByPrice(double $price) Return ChildProductPrice objects filtered by the price column
  * @method     array findByPromoPrice(double $promo_price) Return ChildProductPrice objects filtered by the promo_price column
@@ -155,7 +155,7 @@ abstract class ProductPriceQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, STOCK_ID, CURRENCY_ID, PRICE, PROMO_PRICE, CREATED_AT, UPDATED_AT FROM product_price WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_SALE_ELEMENTS_ID, CURRENCY_ID, PRICE, PROMO_PRICE, CREATED_AT, UPDATED_AT FROM product_price WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -286,18 +286,18 @@ abstract class ProductPriceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the stock_id column
+     * Filter the query on the product_sale_elements_id column
      *
      * Example usage:
      * <code>
-     * $query->filterByStockId(1234); // WHERE stock_id = 1234
-     * $query->filterByStockId(array(12, 34)); // WHERE stock_id IN (12, 34)
-     * $query->filterByStockId(array('min' => 12)); // WHERE stock_id > 12
+     * $query->filterByProductSaleElementsId(1234); // WHERE product_sale_elements_id = 1234
+     * $query->filterByProductSaleElementsId(array(12, 34)); // WHERE product_sale_elements_id IN (12, 34)
+     * $query->filterByProductSaleElementsId(array('min' => 12)); // WHERE product_sale_elements_id > 12
      * </code>
      *
-     * @see       filterByStock()
+     * @see       filterByProductSaleElements()
      *
-     * @param     mixed $stockId The value to use as filter.
+     * @param     mixed $productSaleElementsId The value to use as filter.
      *              Use scalar values for equality.
      *              Use array values for in_array() equivalent.
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
@@ -305,16 +305,16 @@ abstract class ProductPriceQuery extends ModelCriteria
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
-    public function filterByStockId($stockId = null, $comparison = null)
+    public function filterByProductSaleElementsId($productSaleElementsId = null, $comparison = null)
     {
-        if (is_array($stockId)) {
+        if (is_array($productSaleElementsId)) {
             $useMinMax = false;
-            if (isset($stockId['min'])) {
-                $this->addUsingAlias(ProductPriceTableMap::STOCK_ID, $stockId['min'], Criteria::GREATER_EQUAL);
+            if (isset($productSaleElementsId['min'])) {
+                $this->addUsingAlias(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($stockId['max'])) {
-                $this->addUsingAlias(ProductPriceTableMap::STOCK_ID, $stockId['max'], Criteria::LESS_EQUAL);
+            if (isset($productSaleElementsId['max'])) {
+                $this->addUsingAlias(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -325,7 +325,7 @@ abstract class ProductPriceQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProductPriceTableMap::STOCK_ID, $stockId, $comparison);
+        return $this->addUsingAlias(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElementsId, $comparison);
     }
 
     /**
@@ -540,42 +540,42 @@ abstract class ProductPriceQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Stock object
+     * Filter the query by a related \Thelia\Model\ProductSaleElements object
      *
-     * @param \Thelia\Model\Stock|ObjectCollection $stock The related object(s) to use as filter
+     * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
-    public function filterByStock($stock, $comparison = null)
+    public function filterByProductSaleElements($productSaleElements, $comparison = null)
     {
-        if ($stock instanceof \Thelia\Model\Stock) {
+        if ($productSaleElements instanceof \Thelia\Model\ProductSaleElements) {
             return $this
-                ->addUsingAlias(ProductPriceTableMap::STOCK_ID, $stock->getId(), $comparison);
-        } elseif ($stock instanceof ObjectCollection) {
+                ->addUsingAlias(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElements->getId(), $comparison);
+        } elseif ($productSaleElements instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ProductPriceTableMap::STOCK_ID, $stock->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ProductPriceTableMap::PRODUCT_SALE_ELEMENTS_ID, $productSaleElements->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByStock() only accepts arguments of type \Thelia\Model\Stock or Collection');
+            throw new PropelException('filterByProductSaleElements() only accepts arguments of type \Thelia\Model\ProductSaleElements or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Stock relation
+     * Adds a JOIN clause to the query using the ProductSaleElements relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductPriceQuery The current query, for fluid interface
      */
-    public function joinStock($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProductSaleElements($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Stock');
+        $relationMap = $tableMap->getRelation('ProductSaleElements');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -590,14 +590,14 @@ abstract class ProductPriceQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Stock');
+            $this->addJoinObject($join, 'ProductSaleElements');
         }
 
         return $this;
     }
 
     /**
-     * Use the Stock relation Stock object
+     * Use the ProductSaleElements relation ProductSaleElements object
      *
      * @see useQuery()
      *
@@ -605,13 +605,13 @@ abstract class ProductPriceQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\StockQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
      */
-    public function useStockQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProductSaleElementsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinStock($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Stock', '\Thelia\Model\StockQuery');
+            ->joinProductSaleElements($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductSaleElements', '\Thelia\Model\ProductSaleElementsQuery');
     }
 
     /**

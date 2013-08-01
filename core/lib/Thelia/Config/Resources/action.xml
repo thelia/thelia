@@ -6,9 +6,7 @@
 
     <parameters>
         <parameter key="thelia.actionEvent" type="collection">
-            <parameter key="addArticle">Thelia\Core\Event\CartEvent</parameter>
-            <parameter key="modifyArticle">Thelia\Core\Event\CartEvent</parameter>
-            <parameter key="deleteArticle">Thelia\Core\Event\CartEvent</parameter>
+
         </parameter>
     </parameters>
 
