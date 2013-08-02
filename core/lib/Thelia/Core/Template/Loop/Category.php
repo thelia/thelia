@@ -161,11 +161,13 @@ class Category extends BaseLoop
 
         $categories = $this->search($search, $pagination);
 
+        $notEmpty  = $this->getNot_empty();
+
         $loopResult = new LoopResult();
 
         foreach ($categories as $category) {
 
-            if ($this->not_empty && $category->countAllProducts() == 0) continue;
+            if ($notEmpty && $category->countAllProducts() == 0) continue;
 
             $loopResultRow = new LoopResultRow();
 
