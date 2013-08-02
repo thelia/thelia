@@ -50,9 +50,13 @@ class CartTest extends \PHPUnit_Framework_TestCase
 
         $this->uniqid = uniqid('', true);
 
+        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
         $this->actionCart = $this->getMock(
             "\Thelia\Action\Cart",
-            array("generateCookie")
+            array("generateCookie"),
+            array($dispatcher)
+
         );
 
         $this->actionCart

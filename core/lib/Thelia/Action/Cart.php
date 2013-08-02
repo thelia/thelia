@@ -205,7 +205,7 @@ class Cart implements EventSubscriberInterface
         $session->setCart($newCart->getId());
 
         $cartEvent = new CartEvent($newCart);
-        $this->dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $newCart);
+        $this->dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
 
         return $cartEvent->cart;
     }
