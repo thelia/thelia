@@ -21,31 +21,66 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Tests\Core\Template\Loop;
+namespace Thelia\Tests\Core\Template\Element;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
-use Thelia\Core\Template\Loop\Title;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Core\HttpFoundation\Request;
+use Thelia\Core\Security\SecurityContext;
+use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\HttpFoundation\Session\Session;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class TitleTest extends BaseLoopTestor
+abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
 {
-    public function getTestedClassName()
-    {
-        return 'Thelia\Core\Template\Loop\Title';
+    protected $request;
+    protected $dispatcher;
+    protected $securityContext;
+
+    protected $instance;
+
+    abstract public function getTestedClassName();
+    abstract public function getTestedInstance();
+    abstract public function getMandatoryArguments();
+
+    protected function getMethod($name) {
+        $class = new \ReflectionClass($this->getTestedClassName());
+        $method = $class->getMethod($name);
+        $method->setAccessible(true);
+        return $method;
     }
 
-    public function getTestedInstance()
+    public function setUp()
     {
-        return new Title($this->request, $this->dispatcher, $this->securityContext);
+        $this->request = new Request();
+        $this->request->setSession(new Session(new MockArraySessionStorage()));
+
+        $this->dispatcher = new EventDispatcher();
+
+        $this->securityContext = new SecurityContext($this->request);
+
+        $this->instance = $this->getTestedInstance();
+        $this->instance->initializeArgs($this->getMandatoryArguments());
     }
 
-    public function getMandatoryArguments()
+    public function testGetArgDefinitions()
     {
-        return array();
+        $method = $this->getMethod('getArgDefinitions');
+
+        $methodReturn = $method->invoke($this->instance);
+
+        $this->assertInstanceOf('Thelia\Core\Template\Loop\Argument\ArgumentCollection', $methodReturn);
+    }
+
+    public function testExec()
+    {
+        $method = $this->getMethod('exec');
+
+        $methodReturn = $method->invokeArgs($this->instance, array(null));
+
+        $this->assertInstanceOf('\Thelia\Core\Template\Element\LoopResult', $methodReturn);
     }
 }

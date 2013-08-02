@@ -25,23 +25,23 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
-use Thelia\Core\Template\Loop\Title;
+use Thelia\Core\Template\Loop\Product;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class TitleTest extends BaseLoopTestor
+class ProductTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {
-        return 'Thelia\Core\Template\Loop\Title';
+        return 'Thelia\Core\Template\Loop\Product';
     }
 
     public function getTestedInstance()
     {
-        return new Title($this->request, $this->dispatcher, $this->securityContext);
+        return new Product($this->request, $this->dispatcher, $this->securityContext);
     }
 
     public function getMandatoryArguments()
