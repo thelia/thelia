@@ -8,14 +8,6 @@ use Thelia\Model\Base\ProductSaleElementsQuery;
 
 class Cart extends BaseCart
 {
-
-    protected $dispatcher;
-
-    public function setDispatcher(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
-
     public function duplicate($token, Customer $customer = null)
     {
         $cartItems = $this->getCartItems();
@@ -49,10 +41,5 @@ class Cart extends BaseCart
         }
 
         return $cart;
-    }
-
-    protected function dispatchEvent($name)
-    {
-
     }
 }

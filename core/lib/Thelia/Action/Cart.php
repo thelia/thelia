@@ -24,9 +24,12 @@
 namespace Thelia\Action;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\CartEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Form\CartAdd;
 use Thelia\Model\CartQuery;
@@ -36,6 +39,13 @@ use Thelia\Model\Customer;
 
 class Cart implements EventSubscriberInterface
 {
+    protected $dispatcher;
+
+    public function __construct(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
      *
      * add an article to cart
@@ -44,6 +54,7 @@ class Cart implements EventSubscriberInterface
      */
     public function addArticle(ActionEvent $event)
     {
+        var_dump($this);
         $request = $event->getRequest();
 
         if ($request->isMethod("post")) {
@@ -66,7 +77,6 @@ class Cart implements EventSubscriberInterface
         if($form->isValid()) {
 
         } else {
-            var_dump($form->createView());
         }
     }
 
@@ -194,7 +204,10 @@ class Cart implements EventSubscriberInterface
         $newCart = $cart->duplicate($this->generateCookie(), $customer);
         $session->setCart($newCart->getId());
 
-        return $newCart;
+        $cartEvent = new CartEvent($newCart);
+        $this->dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $newCart);
+
+        return $cartEvent->cart;
     }
 
     protected function generateCookie()

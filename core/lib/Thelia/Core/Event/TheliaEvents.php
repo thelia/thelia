@@ -88,4 +88,9 @@ final class TheliaEvents
      * Sent before customer insertion, to allow modules to create a custom customer reference.
      */
     const CREATECUSTOMER_CUSTOMREF = "customer.creation.customref";
+
+    /**
+     * sent when a new existing cat id duplicated. This append when current customer is different from current cart
+     */
+    const CART_DUPLICATE = "cart.duplicate";
 }
