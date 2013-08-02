@@ -38,27 +38,9 @@ use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
- *
- * Folder loop, all params available :
- *
- * - id : can be an id (eq : 3) or a "string list" (eg: 3, 4, 5)
- * - parent : categories having this parent id
- * - current : current id is used if you are on a folder page
- * - not_empty : if value is 1, folder and subcategories must have at least 1 product
- * - visible : default 1, if you want folder not visible put 0
- * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual-reverse', 'random'
- * - exclude : all folder id you want to exclude (as for id, an integer or a "string list" can be used)
- *
- * example :
- *
- * <THELIA_cat type="folder" parent="3" limit="4">
- *      #TITLE : #ID
- * </THELIA_cat>
- *
- *
  * Class Folder
+ *
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
 class Folder extends BaseLoop
