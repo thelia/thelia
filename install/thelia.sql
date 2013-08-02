@@ -1349,10 +1349,12 @@ CREATE TABLE `product_price`
     INDEX `idx_product_price_currency_id` (`currency_id`),
     CONSTRAINT `fk_product_price_product_sale_elements_id`
         FOREIGN KEY (`product_sale_elements_id`)
-        REFERENCES `product_sale_elements` (`id`),
+        REFERENCES `product_sale_elements` (`id`)
+        ON DELETE CASCADE,
     CONSTRAINT `fk_product_price_currency_id`
         FOREIGN KEY (`currency_id`)
         REFERENCES `currency` (`id`)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
