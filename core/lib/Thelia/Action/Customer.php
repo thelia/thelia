@@ -25,6 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerCreation;
@@ -88,8 +89,8 @@ class Customer implements EventSubscriberInterface
                         $data["password"],
                         $request->getSession()->getLang()
                     );
-
-                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $event);
+                    $customerEvent = new CustomerEvent($customer);
+                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
 
                 	// Connect the newly created user,and redirect to the success URL
                 	$this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
@@ -136,7 +137,8 @@ class Customer implements EventSubscriberInterface
 
                 $customer = CustomerQuery::create()->findPk(1);
                 try {
-    				$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $event);
+                    $customerEvent = new CustomerEvent($customer);
+    				$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
 
                 	$data = $form->getData();
 
@@ -153,7 +155,8 @@ class Customer implements EventSubscriberInterface
                         $data["country"]
                     );
 
-                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $event);
+                    $customerEvent->customer = $customer;
+                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
 
                     // Update the logged-in user, and redirect to the success URL (exits)
                     // We don-t send the login event, as the customer si already logged.
