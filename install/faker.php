@@ -110,7 +110,7 @@ try {
 
     }
 
-    //folders
+    //folders and contents
     for($i=0; $i<4; $i++) {
         $folder = new Thelia\Model\Folder();
         $folder->setParent(0);
@@ -141,6 +141,27 @@ try {
 
                 $content->save();
             }
+        }
+    }
+
+    //features and features_av
+    for($i=0; $i<4; $i++) {
+        $feature = new Thelia\Model\Feature();
+        $feature->setVisible(rand(1, 10)>7 ? 0 : 1);
+        $feature->setPosition($i);
+        $feature->setTitle($faker->text(20));
+        $feature->setDescription($faker->text(50));
+
+        $feature->save();
+
+        for($j=0; $j<rand(1, 5); $j++) {
+            $featureAv = new Thelia\Model\FeatureAv();
+            $featureAv->setFeature($feature);
+            $featureAv->setPosition($j);
+            $featureAv->setTitle($faker->text(20));
+            $featureAv->setDescription($faker->text(255));
+
+            $featureAv->save();
         }
     }
 
