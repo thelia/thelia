@@ -109,6 +109,7 @@ class Product extends BaseLoop
      * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
+     * @throws \InvalidArgumentException
      */
     public function exec(&$pagination)
     {
@@ -402,11 +403,11 @@ class Product extends BaseLoop
 	            ->set("CHAPO", $product->getChapo())
 	            ->set("DESCRIPTION", $product->getDescription())
 	            ->set("POSTSCRIPTUM", $product->getPostscriptum())
-	            ->set("PRICE", $product->getPrice())
-	            ->set("PROMO_PRICE", $product->getPrice2())
-	            ->set("WEIGHT", $product->getWeight())
-	            ->set("PROMO", $product->getPromo())
-	            ->set("NEW", $product->getNewness())
+	            //->set("PRICE", $product->getPrice())
+	            //->set("PROMO_PRICE", $product->getPrice2())
+	            //->set("WEIGHT", $product->getWeight())
+	            //->set("PROMO", $product->getPromo())
+	            //->set("NEW", $product->getNewness())
 	            ->set("POSITION", $product->getPosition())
 			;
 

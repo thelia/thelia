@@ -178,7 +178,7 @@ class ProductSaleElementsTableMap extends TableMap
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
         $this->addRelation('AttributeCombination', '\\Thelia\\Model\\AttributeCombination', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'AttributeCombinations');
         $this->addRelation('CartItem', '\\Thelia\\Model\\CartItem', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'CartItems');
-        $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), null, null, 'ProductPrices');
+        $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'product_sale_elements_id', ), 'CASCADE', null, 'ProductPrices');
     } // buildRelations()
 
     /**
@@ -193,6 +193,15 @@ class ProductSaleElementsTableMap extends TableMap
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
         );
     } // getBehaviors()
+    /**
+     * Method to invalidate the instance pool of all tables related to product_sale_elements     * by a foreign key with ON DELETE CASCADE
+     */
+    public static function clearRelatedInstancePool()
+    {
+        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
+        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
+                ProductPriceTableMap::clearInstancePool();
+            }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
