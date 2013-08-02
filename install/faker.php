@@ -7,6 +7,9 @@ $faker = Faker\Factory::create();
 
 $con = \Propel\Runtime\Propel::getConnection(Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
 $con->beginTransaction();
+
+$currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne();
+
 try {
 
     $category = Thelia\Model\CategoryQuery::create()
@@ -52,12 +55,24 @@ try {
         $product->addCategory($sweet);
         $product->setTitle($faker->bs);
         $product->setDescription($faker->text(250));
-        $product->setQuantity($faker->randomNumber(1,50));
-        $product->setPrice($faker->randomFloat(2, 20, 2500));
+/*        $product->setQuantity($faker->randomNumber(1,50));
+        $product->setPrice($faker->randomFloat(2, 20, 2500));*/
         $product->setVisible(1);
         $product->setPosition($i);
         $product->setRef($faker->text(255));
         $product->save();
+
+        $stock = new \Thelia\Model\ProductSaleElements();
+        $stock->setProduct($product);
+        $stock->setQuantity($faker->randomNumber(1,50));
+        $stock->setPromo($faker->randomNumber(0,1));
+        $stock->save();
+
+        $productPrice = new \Thelia\Model\ProductPrice();
+        $productPrice->setProductSaleElements($stock);
+        $productPrice->setCurrency($currency);
+        $productPrice->setPrice($faker->randomFloat(2, 20, 2500));
+        $productPrice->save();
 
     }
 
@@ -66,12 +81,24 @@ try {
         $product->addCategory($jeans);
         $product->setTitle($faker->bs);
         $product->setDescription($faker->text(250));
-        $product->setQuantity($faker->randomNumber(1,50));
-        $product->setPrice($faker->randomFloat(2, 20, 2500));
+/*        $product->setQuantity($faker->randomNumber(1,50));
+        $product->setPrice($faker->randomFloat(2, 20, 2500));*/
         $product->setVisible(1);
         $product->setPosition($i);
         $product->setRef($faker->text(255));
         $product->save();
+
+        $stock = new \Thelia\Model\ProductSaleElements();
+        $stock->setProduct($product);
+        $stock->setQuantity($faker->randomNumber(1,50));
+        $stock->setPromo($faker->randomNumber(0,1));
+        $stock->save();
+
+        $productPrice = new \Thelia\Model\ProductPrice();
+        $productPrice->setProductSaleElements($stock);
+        $productPrice->setCurrency($currency);
+        $productPrice->setPrice($faker->randomFloat(2, 20, 2500));
+        $productPrice->save();
 
     }
 

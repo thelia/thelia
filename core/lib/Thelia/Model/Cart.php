@@ -2,10 +2,19 @@
 
 namespace Thelia\Model;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\Base\Cart as BaseCart;
+use Thelia\Model\Base\ProductSaleElementsQuery;
 
 class Cart extends BaseCart
 {
+
+    protected $dispatcher;
+
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
     public function duplicate($token, Customer $customer = null)
     {
@@ -15,22 +24,35 @@ class Cart extends BaseCart
         $cart->setAddressDeliveryId($this->getAddressDeliveryId());
         $cart->setAddressInvoiceId($this->getAddressInvoiceId());
         $cart->setToken($token);
+        // TODO : set current Currency
+        $cart->setCurrencyId($this->getCurrencyId());
 
         if ($customer){
             $cart->setCustomer($customer);
         }
-        // TODO : set current Currency
-        //$cart->setCurrency()
+
         $cart->save();
 
         foreach ($cartItems as $cartItem){
-            $item = new CartItem();
-            $item->setCart($cart);
-            $item->setProductId($cartItem->getProductId());
-            $item->setQuantity($cartItem->getQuantity());
-            $item->save();
+
+            $product = $cartItem->getProduct();
+            $productSaleElements = $cartItem->getProductSaleElements();
+            if ($product && $productSaleElements && $product->getVisible() == 1 && $productSaleElements->getQuantity() > $cartItem->getQuantity()) {
+
+                $item = new CartItem();
+                $item->setCart($cart);
+                $item->setProductId($cartItem->getProductId());
+                $item->setQuantity($cartItem->getQuantity());
+                $item->save();
+            }
+
         }
 
         return $cart;
+    }
+
+    protected function dispatchEvent($name)
+    {
+
     }
 }

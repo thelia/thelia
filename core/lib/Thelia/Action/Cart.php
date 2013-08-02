@@ -23,10 +23,12 @@
 
 namespace Thelia\Action;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\HttpFoundation\Session\Session;
+use Thelia\Form\CartAdd;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Customer;
@@ -42,8 +44,32 @@ class Cart implements EventSubscriberInterface
      */
     public function addArticle(ActionEvent $event)
     {
+        $request = $event->getRequest();
 
+        if ($request->isMethod("post")) {
+            $cartAdd = new CartAdd($request);
+        } else {
+            $cartAdd = new CartAdd(
+                $request,
+                "form",
+                array(),
+                array(
+                    'csrf_protection'   => false,
+                )
+            );
+        }
+
+        $form = $cartAdd->getForm();
+
+        $form->bind($request);
+
+        if($form->isValid()) {
+
+        } else {
+            var_dump($form->createView());
+        }
     }
+
 
     /**
      *

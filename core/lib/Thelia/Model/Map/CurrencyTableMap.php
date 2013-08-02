@@ -57,7 +57,7 @@ class CurrencyTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 8;
+    const NUM_COLUMNS = 7;
 
     /**
      * The number of lazy-loaded columns
@@ -67,17 +67,12 @@ class CurrencyTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 8;
+    const NUM_HYDRATE_COLUMNS = 7;
 
     /**
      * the column name for the ID field
      */
     const ID = 'currency.ID';
-
-    /**
-     * the column name for the NAME field
-     */
-    const NAME = 'currency.NAME';
 
     /**
      * the column name for the CODE field
@@ -114,6 +109,15 @@ class CurrencyTableMap extends TableMap
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
 
+    // i18n behavior
+
+    /**
+     * The default locale to use for translations.
+     *
+     * @var string
+     */
+    const DEFAULT_LOCALE = 'en_US';
+
     /**
      * holds an array of fieldnames
      *
@@ -121,12 +125,12 @@ class CurrencyTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Name', 'Code', 'Symbol', 'Rate', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'name', 'code', 'symbol', 'rate', 'byDefault', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CurrencyTableMap::ID, CurrencyTableMap::NAME, CurrencyTableMap::CODE, CurrencyTableMap::SYMBOL, CurrencyTableMap::RATE, CurrencyTableMap::BY_DEFAULT, CurrencyTableMap::CREATED_AT, CurrencyTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'NAME', 'CODE', 'SYMBOL', 'RATE', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'name', 'code', 'symbol', 'rate', 'by_default', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'Symbol', 'Rate', 'ByDefault', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'symbol', 'rate', 'byDefault', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CurrencyTableMap::ID, CurrencyTableMap::CODE, CurrencyTableMap::SYMBOL, CurrencyTableMap::RATE, CurrencyTableMap::BY_DEFAULT, CurrencyTableMap::CREATED_AT, CurrencyTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'SYMBOL', 'RATE', 'BY_DEFAULT', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'symbol', 'rate', 'by_default', 'created_at', 'updated_at', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -136,12 +140,12 @@ class CurrencyTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Name' => 1, 'Code' => 2, 'Symbol' => 3, 'Rate' => 4, 'ByDefault' => 5, 'CreatedAt' => 6, 'UpdatedAt' => 7, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'name' => 1, 'code' => 2, 'symbol' => 3, 'rate' => 4, 'byDefault' => 5, 'createdAt' => 6, 'updatedAt' => 7, ),
-        self::TYPE_COLNAME       => array(CurrencyTableMap::ID => 0, CurrencyTableMap::NAME => 1, CurrencyTableMap::CODE => 2, CurrencyTableMap::SYMBOL => 3, CurrencyTableMap::RATE => 4, CurrencyTableMap::BY_DEFAULT => 5, CurrencyTableMap::CREATED_AT => 6, CurrencyTableMap::UPDATED_AT => 7, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'NAME' => 1, 'CODE' => 2, 'SYMBOL' => 3, 'RATE' => 4, 'BY_DEFAULT' => 5, 'CREATED_AT' => 6, 'UPDATED_AT' => 7, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'name' => 1, 'code' => 2, 'symbol' => 3, 'rate' => 4, 'by_default' => 5, 'created_at' => 6, 'updated_at' => 7, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Symbol' => 2, 'Rate' => 3, 'ByDefault' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'symbol' => 2, 'rate' => 3, 'byDefault' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
+        self::TYPE_COLNAME       => array(CurrencyTableMap::ID => 0, CurrencyTableMap::CODE => 1, CurrencyTableMap::SYMBOL => 2, CurrencyTableMap::RATE => 3, CurrencyTableMap::BY_DEFAULT => 4, CurrencyTableMap::CREATED_AT => 5, CurrencyTableMap::UPDATED_AT => 6, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'SYMBOL' => 2, 'RATE' => 3, 'BY_DEFAULT' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'symbol' => 2, 'rate' => 3, 'by_default' => 4, 'created_at' => 5, 'updated_at' => 6, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
     );
 
     /**
@@ -161,7 +165,6 @@ class CurrencyTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('NAME', 'Name', 'VARCHAR', false, 45, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', false, 45, null);
         $this->addColumn('SYMBOL', 'Symbol', 'VARCHAR', false, 45, null);
         $this->addColumn('RATE', 'Rate', 'FLOAT', false, null, null);
@@ -178,6 +181,7 @@ class CurrencyTableMap extends TableMap
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), 'SET NULL', 'RESTRICT', 'Orders');
         $this->addRelation('Cart', '\\Thelia\\Model\\Cart', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), null, null, 'Carts');
         $this->addRelation('ProductPrice', '\\Thelia\\Model\\ProductPrice', RelationMap::ONE_TO_MANY, array('id' => 'currency_id', ), null, null, 'ProductPrices');
+        $this->addRelation('CurrencyI18n', '\\Thelia\\Model\\CurrencyI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CurrencyI18ns');
     } // buildRelations()
 
     /**
@@ -190,6 +194,7 @@ class CurrencyTableMap extends TableMap
     {
         return array(
             'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
+            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => 'name', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
         );
     } // getBehaviors()
     /**
@@ -200,6 +205,7 @@ class CurrencyTableMap extends TableMap
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
                 OrderTableMap::clearInstancePool();
+                CurrencyI18nTableMap::clearInstancePool();
             }
 
     /**
@@ -341,7 +347,6 @@ class CurrencyTableMap extends TableMap
     {
         if (null === $alias) {
             $criteria->addSelectColumn(CurrencyTableMap::ID);
-            $criteria->addSelectColumn(CurrencyTableMap::NAME);
             $criteria->addSelectColumn(CurrencyTableMap::CODE);
             $criteria->addSelectColumn(CurrencyTableMap::SYMBOL);
             $criteria->addSelectColumn(CurrencyTableMap::RATE);
@@ -350,7 +355,6 @@ class CurrencyTableMap extends TableMap
             $criteria->addSelectColumn(CurrencyTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.NAME');
             $criteria->addSelectColumn($alias . '.CODE');
             $criteria->addSelectColumn($alias . '.SYMBOL');
             $criteria->addSelectColumn($alias . '.RATE');

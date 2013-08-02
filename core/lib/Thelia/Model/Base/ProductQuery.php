@@ -60,9 +60,9 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery rightJoinFeatureProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FeatureProduct relation
  * @method     ChildProductQuery innerJoinFeatureProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the FeatureProduct relation
  *
- * @method     ChildProductQuery leftJoinStock($relationAlias = null) Adds a LEFT JOIN clause to the query using the Stock relation
- * @method     ChildProductQuery rightJoinStock($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Stock relation
- * @method     ChildProductQuery innerJoinStock($relationAlias = null) Adds a INNER JOIN clause to the query using the Stock relation
+ * @method     ChildProductQuery leftJoinProductSaleElements($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildProductQuery rightJoinProductSaleElements($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductSaleElements relation
+ * @method     ChildProductQuery innerJoinProductSaleElements($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductSaleElements relation
  *
  * @method     ChildProductQuery leftJoinContentAssoc($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentAssoc relation
  * @method     ChildProductQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
@@ -924,40 +924,40 @@ abstract class ProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Stock object
+     * Filter the query by a related \Thelia\Model\ProductSaleElements object
      *
-     * @param \Thelia\Model\Stock|ObjectCollection $stock  the related object to use as filter
+     * @param \Thelia\Model\ProductSaleElements|ObjectCollection $productSaleElements  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
-    public function filterByStock($stock, $comparison = null)
+    public function filterByProductSaleElements($productSaleElements, $comparison = null)
     {
-        if ($stock instanceof \Thelia\Model\Stock) {
+        if ($productSaleElements instanceof \Thelia\Model\ProductSaleElements) {
             return $this
-                ->addUsingAlias(ProductTableMap::ID, $stock->getProductId(), $comparison);
-        } elseif ($stock instanceof ObjectCollection) {
+                ->addUsingAlias(ProductTableMap::ID, $productSaleElements->getProductId(), $comparison);
+        } elseif ($productSaleElements instanceof ObjectCollection) {
             return $this
-                ->useStockQuery()
-                ->filterByPrimaryKeys($stock->getPrimaryKeys())
+                ->useProductSaleElementsQuery()
+                ->filterByPrimaryKeys($productSaleElements->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByStock() only accepts arguments of type \Thelia\Model\Stock or Collection');
+            throw new PropelException('filterByProductSaleElements() only accepts arguments of type \Thelia\Model\ProductSaleElements or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the Stock relation
+     * Adds a JOIN clause to the query using the ProductSaleElements relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
-    public function joinStock($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProductSaleElements($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Stock');
+        $relationMap = $tableMap->getRelation('ProductSaleElements');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -972,14 +972,14 @@ abstract class ProductQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'Stock');
+            $this->addJoinObject($join, 'ProductSaleElements');
         }
 
         return $this;
     }
 
     /**
-     * Use the Stock relation Stock object
+     * Use the ProductSaleElements relation ProductSaleElements object
      *
      * @see useQuery()
      *
@@ -987,13 +987,13 @@ abstract class ProductQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\StockQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductSaleElementsQuery A secondary query class using the current class as primary query
      */
-    public function useStockQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProductSaleElementsQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinStock($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Stock', '\Thelia\Model\StockQuery');
+            ->joinProductSaleElements($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductSaleElements', '\Thelia\Model\ProductSaleElementsQuery');
     }
 
     /**

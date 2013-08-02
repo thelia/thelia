@@ -55,10 +55,10 @@
     <foreign-key foreignTable="category" name="fk_product_has_category_category1" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="category_id" />
     </foreign-key>
-    <index name="fk_product_has_category_category1_idx">
+    <index name="idx_product_has_category_category1">
       <index-column name="category_id" />
     </index>
-    <index name="fk_product_has_category_product1_idx">
+    <index name="idx_product_has_category_product1">
       <index-column name="product_id" />
     </index>
     <behavior name="timestampable" />
@@ -239,15 +239,15 @@
   <table name="attribute_combination" namespace="Thelia\Model">
     <column name="attribute_id" primaryKey="true" required="true" type="INTEGER" />
     <column name="attribute_av_id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="stock_id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" primaryKey="true" required="true" type="INTEGER" />
     <foreign-key foreignTable="attribute" name="fk_attribute_combination_attribute_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_id" />
     </foreign-key>
     <foreign-key foreignTable="attribute_av" name="fk_attribute_combination_attribute_av_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="attribute_av_id" />
     </foreign-key>
-    <foreign-key foreignTable="stock" name="fk_attribute_combination_stock_id">
-      <reference foreign="id" local="stock_id" />
+    <foreign-key foreignTable="product_sale_elements" name="fk_attribute_combination_product_sale_elements_id">
+      <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
     <index name="idx_attribute_combination_attribute_id">
       <index-column name="attribute_id" />
@@ -255,23 +255,22 @@
     <index name="idx_attribute_combination_attribute_av_id">
       <index-column name="attribute_av_id" />
     </index>
-    <index name="idx_attribute_combination_stock_id">
-      <index-column name="stock_id" />
+    <index name="idx_attribute_combination_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="stock" namespace="Thelia\Model">
+  <table name="product_sale_elements" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
-    <column name="increase" type="FLOAT" />
     <column name="quantity" required="true" type="FLOAT" />
     <column defaultValue="0" name="promo" type="TINYINT" />
     <column defaultValue="0" name="newness" type="TINYINT" />
     <column name="weight" type="FLOAT" />
-    <foreign-key foreignTable="product" name="fk_stock_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="product" name="fk_product_sale_element_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
-    <index name="idx_stock_product_id">
+    <index name="idx_product_sale_element_product_id">
       <index-column name="product_id" />
     </index>
     <behavior name="timestampable" />
@@ -591,6 +590,9 @@
     <column name="rate" type="FLOAT" />
     <column name="by_default" type="TINYINT" />
     <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="name" />
+    </behavior>
   </table>
   <table name="order_address" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
@@ -795,10 +797,10 @@
     <foreign-key foreignTable="module" name="fk_group_module_module_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="module_id" />
     </foreign-key>
-    <index name="id_idx">
+    <index name="idx_group_module_group_id">
       <index-column name="group_id" />
     </index>
-    <index name="id_idx1">
+    <index name="idx_group_module_module_id">
       <index-column name="module_id" />
     </index>
     <behavior name="timestampable" />
@@ -912,10 +914,10 @@
     <foreign-key foreignTable="folder" name="fk_content_folder_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="folder_id" />
     </foreign-key>
-    <index name="fk__idx">
+    <index name="idx_content_folder_content_id">
       <index-column name="content_id" />
     </index>
-    <index name="fk_content_folder_folder_id_idx">
+    <index name="idx_content_folder_folder_id">
       <index-column name="folder_id" />
     </index>
     <behavior name="timestampable" />
@@ -961,15 +963,15 @@
     <column name="cart_id" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column defaultValue="1" name="quantity" type="FLOAT" />
-    <column name="stock_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
     <foreign-key foreignTable="product" name="fk_cart_item_product_id">
       <reference foreign="id" local="product_id" />
     </foreign-key>
-    <foreign-key foreignTable="stock" name="fk_cart_item_stock_id">
-      <reference foreign="id" local="stock_id" />
+    <foreign-key foreignTable="product_sale_elements" name="fk_cart_item_product_sale_elements_id">
+      <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
     <index name="idx_cart_item_cart_id">
       <index-column name="cart_id" />
@@ -977,25 +979,25 @@
     <index name="idx_cart_item_product_id">
       <index-column name="product_id" />
     </index>
-    <index name="idx_cart_item_stock_id">
-      <index-column name="stock_id" />
+    <index name="idx_cart_item_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
     </index>
     <behavior name="timestampable" />
   </table>
   <table name="product_price" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="stock_id" required="true" type="INTEGER" />
+    <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column name="currency_id" required="true" type="INTEGER" />
     <column name="price" required="true" type="FLOAT" />
     <column name="promo_price" type="FLOAT" />
-    <foreign-key foreignTable="stock" name="fk_product_price_stock_id">
-      <reference foreign="id" local="stock_id" />
+    <foreign-key foreignTable="product_sale_elements" name="fk_product_price_product_sale_elements_id">
+      <reference foreign="id" local="product_sale_elements_id" />
     </foreign-key>
     <foreign-key foreignTable="currency" name="fk_product_price_currency_id">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
-    <index name="idx_product_price_stock_id">
-      <index-column name="stock_id" />
+    <index name="idx_product_price_product_sale_elements_id">
+      <index-column name="product_sale_elements_id" />
     </index>
     <index name="idx_product_price_currency_id">
       <index-column name="currency_id" />

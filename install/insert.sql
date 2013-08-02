@@ -5,7 +5,8 @@ INSERT INTO `lang`(`id`,`title`,`code`,`locale`,`url`,`by_default`,`created_at`,
 (4, 'Italiano', 'it', 'it_IT', '','0', NOW(), NOW());
 
 INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updated_at`) VALUES
-('session_config.default', '1', 1, 1, NOW(), NOW());
+('session_config.default', '1', 1, 1, NOW(), NOW()),
+('verifyStock', '1', 1, 0, NOW(), NOW());
 
 INSERT INTO `module` (`code`, `type`, `activate`, `position`, `created_at`, `updated_at`) VALUES ('test', '1', '1', '1', NOW(), NOW());
 
@@ -21,6 +22,19 @@ INSERT INTO `customer_title_i18n` (`id`, `locale`, `short`, `long`) VALUES
 (2, 'fr_FR', 'Mme', 'Madame'),
 (3, 'en_US', 'Miss', 'Miss'),
 (3, 'fr_FR', 'Mlle', 'Madamemoiselle');
+
+INSERT INTO `currency` (`id` ,`code` ,`symbol` ,`rate` ,`by_default` ,`created_at` ,`updated_at`)
+VALUES
+(1, 'EUR', '€', '1', '1', NOW() , NOW()),
+(2, 'USD', '$', '1.26', '0', NOW(), NOW()),
+(3, 'GBP', '£', '0.89', '0', NOW(), NOW());
+
+INSERT INTO `currency_i18n` (`id` ,`locale` ,`name`)
+VALUES
+(1, 'en_US', 'euro'),
+(2, 'en_US', 'dollar'),
+(3, 'en_US', 'pound');
+
 
 INSERT INTO `country` (`id`, `area_id`, `isocode`, `isoalpha2`, `isoalpha3`, `created_at`, `updated_at`) VALUES
 (1, NULL, '4', 'AF', 'AFG', NOW(), NOW()),

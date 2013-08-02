@@ -22,8 +22,8 @@ use Thelia\Model\AttributeAvQuery as ChildAttributeAvQuery;
 use Thelia\Model\AttributeCombination as ChildAttributeCombination;
 use Thelia\Model\AttributeCombinationQuery as ChildAttributeCombinationQuery;
 use Thelia\Model\AttributeQuery as ChildAttributeQuery;
-use Thelia\Model\Stock as ChildStock;
-use Thelia\Model\StockQuery as ChildStockQuery;
+use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
+use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\Map\AttributeCombinationTableMap;
 
 abstract class AttributeCombination implements ActiveRecordInterface
@@ -73,10 +73,10 @@ abstract class AttributeCombination implements ActiveRecordInterface
     protected $attribute_av_id;
 
     /**
-     * The value for the stock_id field.
+     * The value for the product_sale_elements_id field.
      * @var        int
      */
-    protected $stock_id;
+    protected $product_sale_elements_id;
 
     /**
      * The value for the created_at field.
@@ -101,9 +101,9 @@ abstract class AttributeCombination implements ActiveRecordInterface
     protected $aAttributeAv;
 
     /**
-     * @var        Stock
+     * @var        ProductSaleElements
      */
-    protected $aStock;
+    protected $aProductSaleElements;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -390,14 +390,14 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Get the [stock_id] column value.
+     * Get the [product_sale_elements_id] column value.
      *
      * @return   int
      */
-    public function getStockId()
+    public function getProductSaleElementsId()
     {
 
-        return $this->stock_id;
+        return $this->product_sale_elements_id;
     }
 
     /**
@@ -491,29 +491,29 @@ abstract class AttributeCombination implements ActiveRecordInterface
     } // setAttributeAvId()
 
     /**
-     * Set the value of [stock_id] column.
+     * Set the value of [product_sale_elements_id] column.
      *
      * @param      int $v new value
      * @return   \Thelia\Model\AttributeCombination The current object (for fluent API support)
      */
-    public function setStockId($v)
+    public function setProductSaleElementsId($v)
     {
         if ($v !== null) {
             $v = (int) $v;
         }
 
-        if ($this->stock_id !== $v) {
-            $this->stock_id = $v;
-            $this->modifiedColumns[] = AttributeCombinationTableMap::STOCK_ID;
+        if ($this->product_sale_elements_id !== $v) {
+            $this->product_sale_elements_id = $v;
+            $this->modifiedColumns[] = AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID;
         }
 
-        if ($this->aStock !== null && $this->aStock->getId() !== $v) {
-            $this->aStock = null;
+        if ($this->aProductSaleElements !== null && $this->aProductSaleElements->getId() !== $v) {
+            $this->aProductSaleElements = null;
         }
 
 
         return $this;
-    } // setStockId()
+    } // setProductSaleElementsId()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -600,8 +600,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AttributeCombinationTableMap::translateFieldName('AttributeAvId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->attribute_av_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeCombinationTableMap::translateFieldName('StockId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->stock_id = (null !== $col) ? (int) $col : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AttributeCombinationTableMap::translateFieldName('ProductSaleElementsId', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->product_sale_elements_id = (null !== $col) ? (int) $col : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AttributeCombinationTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -650,8 +650,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->aAttributeAv !== null && $this->attribute_av_id !== $this->aAttributeAv->getId()) {
             $this->aAttributeAv = null;
         }
-        if ($this->aStock !== null && $this->stock_id !== $this->aStock->getId()) {
-            $this->aStock = null;
+        if ($this->aProductSaleElements !== null && $this->product_sale_elements_id !== $this->aProductSaleElements->getId()) {
+            $this->aProductSaleElements = null;
         }
     } // ensureConsistency
 
@@ -694,7 +694,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
             $this->aAttribute = null;
             $this->aAttributeAv = null;
-            $this->aStock = null;
+            $this->aProductSaleElements = null;
         } // if (deep)
     }
 
@@ -836,11 +836,11 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->setAttributeAv($this->aAttributeAv);
             }
 
-            if ($this->aStock !== null) {
-                if ($this->aStock->isModified() || $this->aStock->isNew()) {
-                    $affectedRows += $this->aStock->save($con);
+            if ($this->aProductSaleElements !== null) {
+                if ($this->aProductSaleElements->isModified() || $this->aProductSaleElements->isNew()) {
+                    $affectedRows += $this->aProductSaleElements->save($con);
                 }
-                $this->setStock($this->aStock);
+                $this->setProductSaleElements($this->aProductSaleElements);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -882,8 +882,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_AV_ID)) {
             $modifiedColumns[':p' . $index++]  = 'ATTRIBUTE_AV_ID';
         }
-        if ($this->isColumnModified(AttributeCombinationTableMap::STOCK_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'STOCK_ID';
+        if ($this->isColumnModified(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID)) {
+            $modifiedColumns[':p' . $index++]  = 'PRODUCT_SALE_ELEMENTS_ID';
         }
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -908,8 +908,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
                     case 'ATTRIBUTE_AV_ID':
                         $stmt->bindValue($identifier, $this->attribute_av_id, PDO::PARAM_INT);
                         break;
-                    case 'STOCK_ID':
-                        $stmt->bindValue($identifier, $this->stock_id, PDO::PARAM_INT);
+                    case 'PRODUCT_SALE_ELEMENTS_ID':
+                        $stmt->bindValue($identifier, $this->product_sale_elements_id, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -979,7 +979,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 return $this->getAttributeAvId();
                 break;
             case 2:
-                return $this->getStockId();
+                return $this->getProductSaleElementsId();
                 break;
             case 3:
                 return $this->getCreatedAt();
@@ -1018,7 +1018,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getAttributeId(),
             $keys[1] => $this->getAttributeAvId(),
-            $keys[2] => $this->getStockId(),
+            $keys[2] => $this->getProductSaleElementsId(),
             $keys[3] => $this->getCreatedAt(),
             $keys[4] => $this->getUpdatedAt(),
         );
@@ -1035,8 +1035,8 @@ abstract class AttributeCombination implements ActiveRecordInterface
             if (null !== $this->aAttributeAv) {
                 $result['AttributeAv'] = $this->aAttributeAv->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->aStock) {
-                $result['Stock'] = $this->aStock->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aProductSaleElements) {
+                $result['ProductSaleElements'] = $this->aProductSaleElements->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1079,7 +1079,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
                 $this->setAttributeAvId($value);
                 break;
             case 2:
-                $this->setStockId($value);
+                $this->setProductSaleElementsId($value);
                 break;
             case 3:
                 $this->setCreatedAt($value);
@@ -1113,7 +1113,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setAttributeId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setAttributeAvId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setStockId($arr[$keys[2]]);
+        if (array_key_exists($keys[2], $arr)) $this->setProductSaleElementsId($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setCreatedAt($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setUpdatedAt($arr[$keys[4]]);
     }
@@ -1129,7 +1129,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_ID, $this->attribute_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::ATTRIBUTE_AV_ID)) $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
-        if ($this->isColumnModified(AttributeCombinationTableMap::STOCK_ID)) $criteria->add(AttributeCombinationTableMap::STOCK_ID, $this->stock_id);
+        if ($this->isColumnModified(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
         if ($this->isColumnModified(AttributeCombinationTableMap::CREATED_AT)) $criteria->add(AttributeCombinationTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(AttributeCombinationTableMap::UPDATED_AT)) $criteria->add(AttributeCombinationTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1149,7 +1149,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $criteria = new Criteria(AttributeCombinationTableMap::DATABASE_NAME);
         $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_ID, $this->attribute_id);
         $criteria->add(AttributeCombinationTableMap::ATTRIBUTE_AV_ID, $this->attribute_av_id);
-        $criteria->add(AttributeCombinationTableMap::STOCK_ID, $this->stock_id);
+        $criteria->add(AttributeCombinationTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
 
         return $criteria;
     }
@@ -1164,7 +1164,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
         $pks = array();
         $pks[0] = $this->getAttributeId();
         $pks[1] = $this->getAttributeAvId();
-        $pks[2] = $this->getStockId();
+        $pks[2] = $this->getProductSaleElementsId();
 
         return $pks;
     }
@@ -1179,7 +1179,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         $this->setAttributeId($keys[0]);
         $this->setAttributeAvId($keys[1]);
-        $this->setStockId($keys[2]);
+        $this->setProductSaleElementsId($keys[2]);
     }
 
     /**
@@ -1189,7 +1189,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return (null === $this->getAttributeId()) && (null === $this->getAttributeAvId()) && (null === $this->getStockId());
+        return (null === $this->getAttributeId()) && (null === $this->getAttributeAvId()) && (null === $this->getProductSaleElementsId());
     }
 
     /**
@@ -1207,7 +1207,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         $copyObj->setAttributeId($this->getAttributeId());
         $copyObj->setAttributeAvId($this->getAttributeAvId());
-        $copyObj->setStockId($this->getStockId());
+        $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1340,24 +1340,24 @@ abstract class AttributeCombination implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildStock object.
+     * Declares an association between this object and a ChildProductSaleElements object.
      *
-     * @param                  ChildStock $v
+     * @param                  ChildProductSaleElements $v
      * @return                 \Thelia\Model\AttributeCombination The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setStock(ChildStock $v = null)
+    public function setProductSaleElements(ChildProductSaleElements $v = null)
     {
         if ($v === null) {
-            $this->setStockId(NULL);
+            $this->setProductSaleElementsId(NULL);
         } else {
-            $this->setStockId($v->getId());
+            $this->setProductSaleElementsId($v->getId());
         }
 
-        $this->aStock = $v;
+        $this->aProductSaleElements = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildStock object, it will not be re-added.
+        // If this object has already been added to the ChildProductSaleElements object, it will not be re-added.
         if ($v !== null) {
             $v->addAttributeCombination($this);
         }
@@ -1368,26 +1368,26 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildStock object
+     * Get the associated ChildProductSaleElements object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildStock The associated ChildStock object.
+     * @return                 ChildProductSaleElements The associated ChildProductSaleElements object.
      * @throws PropelException
      */
-    public function getStock(ConnectionInterface $con = null)
+    public function getProductSaleElements(ConnectionInterface $con = null)
     {
-        if ($this->aStock === null && ($this->stock_id !== null)) {
-            $this->aStock = ChildStockQuery::create()->findPk($this->stock_id, $con);
+        if ($this->aProductSaleElements === null && ($this->product_sale_elements_id !== null)) {
+            $this->aProductSaleElements = ChildProductSaleElementsQuery::create()->findPk($this->product_sale_elements_id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aStock->addAttributeCombinations($this);
+                $this->aProductSaleElements->addAttributeCombinations($this);
              */
         }
 
-        return $this->aStock;
+        return $this->aProductSaleElements;
     }
 
     /**
@@ -1397,7 +1397,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
     {
         $this->attribute_id = null;
         $this->attribute_av_id = null;
-        $this->stock_id = null;
+        $this->product_sale_elements_id = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;
@@ -1423,7 +1423,7 @@ abstract class AttributeCombination implements ActiveRecordInterface
 
         $this->aAttribute = null;
         $this->aAttributeAv = null;
-        $this->aStock = null;
+        $this->aProductSaleElements = null;
     }
 
     /**

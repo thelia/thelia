@@ -1963,10 +1963,10 @@ abstract class Cart implements ActiveRecordInterface
      * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
      * @return Collection|ChildCartItem[] List of ChildCartItem objects
      */
-    public function getCartItemsJoinStock($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    public function getCartItemsJoinProductSaleElements($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
     {
         $query = ChildCartItemQuery::create(null, $criteria);
-        $query->joinWith('Stock', $joinBehavior);
+        $query->joinWith('ProductSaleElements', $joinBehavior);
 
         return $this->getCartItems($query, $con);
     }
