@@ -1,0 +1,20 @@
+{loop name="folder0" type="folder" parent="0"}
+    <h2>FOLDER : #TITLE</h2>
+    {loop name="folder1" type="folder" parent="#ID"}
+        <hr />
+        <h3>SUBFOLDER : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+        {*loop name="content" type="content" folder="#ID"}
+            <h3>CONTENT : #REF / #TITLE</h3>
+            #PRICE €
+        {/loop*}
+        <hr />
+        <hr />
+    {/loop}
+
+	{*loop name="content" type="content" folder="#ID"}
+        <h3>CONTENT : #REF / #TITLE</h3>
+        #PRICE €
+    {/loop*}
+    <hr />
+    <hr />
+{/loop}
