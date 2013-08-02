@@ -87,7 +87,7 @@ class FeatureValue extends BaseLoop
 
         $search->filterByProductId($product, Criteria::EQUAL);
 
-        $featureAvailable = $this->geFeature_available();
+        $featureAvailable = $this->getFeature_available();
 
         if (null !== $featureAvailable) {
             $search->filterByFeatureAvId($featureAvailable, Criteria::IN);

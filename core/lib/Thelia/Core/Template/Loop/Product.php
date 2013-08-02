@@ -86,7 +86,7 @@ class Product extends BaseLoop
                 new TypeCollection(
                     new Type\EnumListType(array('alpha', 'alpha_reverse', /*'min_price', 'max_price',*/ 'manual', 'manual_reverse', 'ref', /*'promo', 'new',*/ 'random', 'given_id'))
                 ),
-                'manual'
+                'alpha'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_category'),

@@ -62,14 +62,14 @@ try {
         $product->setRef($faker->text(255));
         $product->save();
 
-        $stock = new \Thelia\Model\Stock();
+        $stock = new \Thelia\Model\ProductSaleElements();
         $stock->setProduct($product);
         $stock->setQuantity($faker->randomNumber(1,50));
         $stock->setPromo($faker->randomNumber(0,1));
         $stock->save();
 
         $productPrice = new \Thelia\Model\ProductPrice();
-        $productPrice->setStock($stock);
+        $productPrice->setProductSaleElements($stock);
         $productPrice->setCurrency($currency);
         $productPrice->setPrice($faker->randomFloat(2, 20, 2500));
         $productPrice->save();
@@ -88,14 +88,14 @@ try {
         $product->setRef($faker->text(255));
         $product->save();
 
-        $stock = new \Thelia\Model\Stock();
+        $stock = new \Thelia\Model\ProductSaleElements();
         $stock->setProduct($product);
         $stock->setQuantity($faker->randomNumber(1,50));
         $stock->setPromo($faker->randomNumber(0,1));
         $stock->save();
 
         $productPrice = new \Thelia\Model\ProductPrice();
-        $productPrice->setStock($stock);
+        $productPrice->setProductSaleElements($stock);
         $productPrice->setCurrency($currency);
         $productPrice->setPrice($faker->randomFloat(2, 20, 2500));
         $productPrice->save();
