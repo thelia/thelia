@@ -141,13 +141,13 @@ class Folder extends BaseLoop
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
-        $categories = $this->search($search, $pagination);
+        $folders = $this->search($search, $pagination);
 
         $notEmpty  = $this->getNot_empty();
 
         $loopResult = new LoopResult();
 
-        foreach ($categories as $folder) {
+        foreach ($folders as $folder) {
 
             if ($notEmpty && $folder->countAllProducts() == 0) continue;
 
@@ -160,8 +160,7 @@ class Folder extends BaseLoop
 	            ->set("DESCRIPTION", $folder->getDescription())
 	            ->set("POSTSCRIPTUM", $folder->getPostscriptum())
 	            ->set("PARENT", $folder->getParent())
-	            ->set("URL", $folder->getUrl())
-	            ->set("PRODUCT_COUNT", $folder->countChild())
+	            ->set("CONTENT_COUNT", $folder->countChild())
 	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
 	            ->set("POSITION", $folder->getPosition())
 

@@ -109,6 +109,7 @@ class Product extends BaseLoop
      * @param $pagination
      *
      * @return \Thelia\Core\Template\Element\LoopResult
+     * @throws \InvalidArgumentException
      */
     public function exec(&$pagination)
     {

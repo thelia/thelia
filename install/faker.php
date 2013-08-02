@@ -121,15 +121,26 @@ try {
 
         $folder->save();
 
-        for($i=0; $i<rand(0, 4); $i++) {
+        for($j=0; $j<rand(0, 4); $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(rand(1, 10)>7 ? 0 : 1);
-            $subfolder->setPosition($i);
+            $subfolder->setPosition($j);
             $subfolder->setTitle($faker->text(20));
             $subfolder->setDescription($faker->text(255));
 
             $subfolder->save();
+
+            for($k=0; $k<rand(1, 5); $k++) {
+                $content = new Thelia\Model\Content();
+                $content->addFolder($subfolder);
+                $content->setVisible(rand(1, 10)>7 ? 0 : 1);
+                $content->setPosition($k);
+                $content->setTitle($faker->text(20));
+                $content->setDescription($faker->text(255));
+
+                $content->save();
+            }
         }
     }
 
