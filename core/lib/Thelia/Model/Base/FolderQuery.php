@@ -24,7 +24,6 @@ use Thelia\Model\Map\FolderTableMap;
  *
  * @method     ChildFolderQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildFolderQuery orderByParent($order = Criteria::ASC) Order by the parent column
- * @method     ChildFolderQuery orderByLink($order = Criteria::ASC) Order by the link column
  * @method     ChildFolderQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildFolderQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildFolderQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -35,7 +34,6 @@ use Thelia\Model\Map\FolderTableMap;
  *
  * @method     ChildFolderQuery groupById() Group by the id column
  * @method     ChildFolderQuery groupByParent() Group by the parent column
- * @method     ChildFolderQuery groupByLink() Group by the link column
  * @method     ChildFolderQuery groupByVisible() Group by the visible column
  * @method     ChildFolderQuery groupByPosition() Group by the position column
  * @method     ChildFolderQuery groupByCreatedAt() Group by the created_at column
@@ -77,7 +75,6 @@ use Thelia\Model\Map\FolderTableMap;
  *
  * @method     ChildFolder findOneById(int $id) Return the first ChildFolder filtered by the id column
  * @method     ChildFolder findOneByParent(int $parent) Return the first ChildFolder filtered by the parent column
- * @method     ChildFolder findOneByLink(string $link) Return the first ChildFolder filtered by the link column
  * @method     ChildFolder findOneByVisible(int $visible) Return the first ChildFolder filtered by the visible column
  * @method     ChildFolder findOneByPosition(int $position) Return the first ChildFolder filtered by the position column
  * @method     ChildFolder findOneByCreatedAt(string $created_at) Return the first ChildFolder filtered by the created_at column
@@ -88,7 +85,6 @@ use Thelia\Model\Map\FolderTableMap;
  *
  * @method     array findById(int $id) Return ChildFolder objects filtered by the id column
  * @method     array findByParent(int $parent) Return ChildFolder objects filtered by the parent column
- * @method     array findByLink(string $link) Return ChildFolder objects filtered by the link column
  * @method     array findByVisible(int $visible) Return ChildFolder objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildFolder objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildFolder objects filtered by the created_at column
@@ -191,7 +187,7 @@ abstract class FolderQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PARENT, LINK, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM folder WHERE ID = :p0';
+        $sql = 'SELECT ID, PARENT, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM folder WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -360,35 +356,6 @@ abstract class FolderQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FolderTableMap::PARENT, $parent, $comparison);
-    }
-
-    /**
-     * Filter the query on the link column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLink('fooValue');   // WHERE link = 'fooValue'
-     * $query->filterByLink('%fooValue%'); // WHERE link LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $link The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildFolderQuery The current query, for fluid interface
-     */
-    public function filterByLink($link = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($link)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $link)) {
-                $link = str_replace('*', '%', $link);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(FolderTableMap::LINK, $link, $comparison);
     }
 
     /**

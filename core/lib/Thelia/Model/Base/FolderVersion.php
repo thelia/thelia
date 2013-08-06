@@ -68,12 +68,6 @@ abstract class FolderVersion implements ActiveRecordInterface
     protected $parent;
 
     /**
-     * The value for the link field.
-     * @var        string
-     */
-    protected $link;
-
-    /**
      * The value for the visible field.
      * @var        int
      */
@@ -419,17 +413,6 @@ abstract class FolderVersion implements ActiveRecordInterface
     }
 
     /**
-     * Get the [link] column value.
-     *
-     * @return   string
-     */
-    public function getLink()
-    {
-
-        return $this->link;
-    }
-
-    /**
      * Get the [visible] column value.
      *
      * @return   int
@@ -578,27 +561,6 @@ abstract class FolderVersion implements ActiveRecordInterface
 
         return $this;
     } // setParent()
-
-    /**
-     * Set the value of [link] column.
-     *
-     * @param      string $v new value
-     * @return   \Thelia\Model\FolderVersion The current object (for fluent API support)
-     */
-    public function setLink($v)
-    {
-        if ($v !== null) {
-            $v = (string) $v;
-        }
-
-        if ($this->link !== $v) {
-            $this->link = $v;
-            $this->modifiedColumns[] = FolderVersionTableMap::LINK;
-        }
-
-
-        return $this;
-    } // setLink()
 
     /**
      * Set the value of [visible] column.
@@ -794,37 +756,34 @@ abstract class FolderVersion implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : FolderVersionTableMap::translateFieldName('Parent', TableMap::TYPE_PHPNAME, $indexType)];
             $this->parent = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FolderVersionTableMap::translateFieldName('Link', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->link = (null !== $col) ? (string) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FolderVersionTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : FolderVersionTableMap::translateFieldName('Visible', TableMap::TYPE_PHPNAME, $indexType)];
             $this->visible = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FolderVersionTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : FolderVersionTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FolderVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : FolderVersionTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FolderVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : FolderVersionTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : FolderVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : FolderVersionTableMap::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : FolderVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : FolderVersionTableMap::translateFieldName('VersionCreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->version_created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 9 + $startcol : FolderVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : FolderVersionTableMap::translateFieldName('VersionCreatedBy', TableMap::TYPE_PHPNAME, $indexType)];
             $this->version_created_by = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
@@ -834,7 +793,7 @@ abstract class FolderVersion implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 10; // 10 = FolderVersionTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = FolderVersionTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\FolderVersion object", 0, $e);
@@ -1061,9 +1020,6 @@ abstract class FolderVersion implements ActiveRecordInterface
         if ($this->isColumnModified(FolderVersionTableMap::PARENT)) {
             $modifiedColumns[':p' . $index++]  = 'PARENT';
         }
-        if ($this->isColumnModified(FolderVersionTableMap::LINK)) {
-            $modifiedColumns[':p' . $index++]  = 'LINK';
-        }
         if ($this->isColumnModified(FolderVersionTableMap::VISIBLE)) {
             $modifiedColumns[':p' . $index++]  = 'VISIBLE';
         }
@@ -1101,9 +1057,6 @@ abstract class FolderVersion implements ActiveRecordInterface
                         break;
                     case 'PARENT':
                         $stmt->bindValue($identifier, $this->parent, PDO::PARAM_INT);
-                        break;
-                    case 'LINK':
-                        $stmt->bindValue($identifier, $this->link, PDO::PARAM_STR);
                         break;
                     case 'VISIBLE':
                         $stmt->bindValue($identifier, $this->visible, PDO::PARAM_INT);
@@ -1188,27 +1141,24 @@ abstract class FolderVersion implements ActiveRecordInterface
                 return $this->getParent();
                 break;
             case 2:
-                return $this->getLink();
-                break;
-            case 3:
                 return $this->getVisible();
                 break;
-            case 4:
+            case 3:
                 return $this->getPosition();
                 break;
-            case 5:
+            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 6:
+            case 5:
                 return $this->getUpdatedAt();
                 break;
-            case 7:
+            case 6:
                 return $this->getVersion();
                 break;
-            case 8:
+            case 7:
                 return $this->getVersionCreatedAt();
                 break;
-            case 9:
+            case 8:
                 return $this->getVersionCreatedBy();
                 break;
             default:
@@ -1242,14 +1192,13 @@ abstract class FolderVersion implements ActiveRecordInterface
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getParent(),
-            $keys[2] => $this->getLink(),
-            $keys[3] => $this->getVisible(),
-            $keys[4] => $this->getPosition(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
-            $keys[7] => $this->getVersion(),
-            $keys[8] => $this->getVersionCreatedAt(),
-            $keys[9] => $this->getVersionCreatedBy(),
+            $keys[2] => $this->getVisible(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
+            $keys[6] => $this->getVersion(),
+            $keys[7] => $this->getVersionCreatedAt(),
+            $keys[8] => $this->getVersionCreatedBy(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1302,27 +1251,24 @@ abstract class FolderVersion implements ActiveRecordInterface
                 $this->setParent($value);
                 break;
             case 2:
-                $this->setLink($value);
-                break;
-            case 3:
                 $this->setVisible($value);
                 break;
-            case 4:
+            case 3:
                 $this->setPosition($value);
                 break;
-            case 5:
+            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 6:
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
-            case 7:
+            case 6:
                 $this->setVersion($value);
                 break;
-            case 8:
+            case 7:
                 $this->setVersionCreatedAt($value);
                 break;
-            case 9:
+            case 8:
                 $this->setVersionCreatedBy($value);
                 break;
         } // switch()
@@ -1351,14 +1297,13 @@ abstract class FolderVersion implements ActiveRecordInterface
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setParent($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setLink($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setVisible($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setVersion($arr[$keys[7]]);
-        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedAt($arr[$keys[8]]);
-        if (array_key_exists($keys[9], $arr)) $this->setVersionCreatedBy($arr[$keys[9]]);
+        if (array_key_exists($keys[2], $arr)) $this->setVisible($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setVersion($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setVersionCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setVersionCreatedBy($arr[$keys[8]]);
     }
 
     /**
@@ -1372,7 +1317,6 @@ abstract class FolderVersion implements ActiveRecordInterface
 
         if ($this->isColumnModified(FolderVersionTableMap::ID)) $criteria->add(FolderVersionTableMap::ID, $this->id);
         if ($this->isColumnModified(FolderVersionTableMap::PARENT)) $criteria->add(FolderVersionTableMap::PARENT, $this->parent);
-        if ($this->isColumnModified(FolderVersionTableMap::LINK)) $criteria->add(FolderVersionTableMap::LINK, $this->link);
         if ($this->isColumnModified(FolderVersionTableMap::VISIBLE)) $criteria->add(FolderVersionTableMap::VISIBLE, $this->visible);
         if ($this->isColumnModified(FolderVersionTableMap::POSITION)) $criteria->add(FolderVersionTableMap::POSITION, $this->position);
         if ($this->isColumnModified(FolderVersionTableMap::CREATED_AT)) $criteria->add(FolderVersionTableMap::CREATED_AT, $this->created_at);
@@ -1452,7 +1396,6 @@ abstract class FolderVersion implements ActiveRecordInterface
     {
         $copyObj->setId($this->getId());
         $copyObj->setParent($this->getParent());
-        $copyObj->setLink($this->getLink());
         $copyObj->setVisible($this->getVisible());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -1545,7 +1488,6 @@ abstract class FolderVersion implements ActiveRecordInterface
     {
         $this->id = null;
         $this->parent = null;
-        $this->link = null;
         $this->visible = null;
         $this->position = null;
         $this->created_at = null;
