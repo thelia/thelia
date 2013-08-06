@@ -30,7 +30,11 @@ class Cart extends BaseCart
 
             $product = $cartItem->getProduct();
             $productSaleElements = $cartItem->getProductSaleElements();
-            if ($product && $productSaleElements && $product->getVisible() == 1 && $productSaleElements->getQuantity() > $cartItem->getQuantity()) {
+            if ($product &&
+                $productSaleElements &&
+                $product->getVisible() == 1 &&
+                ($productSaleElements->getQuantity() > $cartItem->getQuantity() || ! ConfigQuery::read("verifyStock", 1)))
+            {
 
                 $item = new CartItem();
                 $item->setCart($cart);
