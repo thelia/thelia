@@ -23,6 +23,7 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -38,6 +39,7 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Tools\Redirect;
 
 /**
  *
@@ -71,37 +73,45 @@ class Cart implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $form = $this->getAddCartForm($request);
+        $cartAdd = $this->getAddCartForm($request);
+
+        $form = $cartAdd->getForm();
 
         $form->bind($request);
 
         if($form->isValid()) {
-            $cart = $this->getCart($request);
+            try {
+                $cart = $this->getCart($request);
 
-            $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
+                $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
 
-            $productPrice = ProductPriceQuery::create()
-                ->filterByProductSaleElementsId($productSaleElementsId)
-                ->findOne()
-            ;
+                $productPrice = ProductPriceQuery::create()
+                    ->filterByProductSaleElementsId($productSaleElementsId)
+                    ->findOne()
+                ;
 
-            $cartItem = new CartItem();
-            $cartItem->setDisptacher($event->getDispatcher());
-            $cartItem
-                ->setCart($cart)
-                ->setProductId($form->get("product")->getData())
-                ->setProductSaleElementsId($productSaleElementsId)
-                ->setQuantity($form->get("quantity")->getData())
-                ->setPrice($productPrice->getPrice())
-                ->setPromoPrice($productPrice->getPromoPrice())
-                ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
-                ->save();
-            ;
+                $cartItem = new CartItem();
+                $cartItem->setDisptacher($event->getDispatcher());
+                $cartItem
+                    ->setCart($cart)
+                    ->setProductId($form->get("product")->getData())
+                    ->setProductSaleElementsId($productSaleElementsId)
+                    ->setQuantity($form->get("quantity")->getData())
+                    ->setPrice($productPrice->getPrice())
+                    ->setPromoPrice($productPrice->getPromoPrice())
+                    ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
+                    ->save();
+                ;
 
+                Redirect::exec($cartAdd->getSuccessUrl());
+            } catch (PropelException $e) {
+                \Thelia\Log\Tlog::getInstance()->error(sptinf("error on adding item to cart with message : %s", $e->getMessage()));
+                $message = "Impossible to add this article to your cart, please try again";
+            }
 
         } else {
 
-
+            $message = "Missing or invalid data";
         }
     }
 
@@ -120,7 +130,7 @@ class Cart implements EventSubscriberInterface
             );
         }
 
-        return $cartAdd->getForm();
+        return $cartAdd;
     }
 
 
