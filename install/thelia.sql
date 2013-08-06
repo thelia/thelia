@@ -1271,7 +1271,7 @@ DROP TABLE IF EXISTS `cart`;
 CREATE TABLE `cart`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `token` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(255),
     `customer_id` INTEGER,
     `address_delivery_id` INTEGER,
     `address_invoice_id` INTEGER,
