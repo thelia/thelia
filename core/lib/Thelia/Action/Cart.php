@@ -113,6 +113,11 @@ class Cart implements EventSubscriberInterface
 
             $message = "Missing or invalid data";
         }
+
+        $cartAdd->setError(true);
+        $cartAdd->setErrorMessage($message);
+
+        $event->setErrorForm($cartAdd);
     }
 
     private function getAddCartForm(Request $request)
