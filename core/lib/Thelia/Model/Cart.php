@@ -24,7 +24,7 @@ class Cart extends BaseCart
         }
 
         $cart->save();
-
+        $currentDateTime = new \DateTime();
         foreach ($cartItems as $cartItem){
 
             $product = $cartItem->getProduct();
@@ -36,6 +36,12 @@ class Cart extends BaseCart
                 $item->setProductId($cartItem->getProductId());
                 $item->setQuantity($cartItem->getQuantity());
                 $item->setProductSaleElements($productSaleElements);
+                if ($currentDateTime <= $cartItem->getPriceEndOfLife()) {
+                    $item->setPrice($cartItem->getPrice());
+                    $item->setPromoPrice($cartItem->getPromoPrice());
+                    // TODO : new price EOF or duplicate current priceEOF from $cartItem ?
+                    $item->setPriceEndOfLife($cartItem->getPriceEndOfLife());
+                }
                 $item->save();
             }
 
