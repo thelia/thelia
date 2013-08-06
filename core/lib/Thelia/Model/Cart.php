@@ -4,7 +4,8 @@ namespace Thelia\Model;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\Base\Cart as BaseCart;
-use Thelia\Model\Base\ProductSaleElementsQuery;
+use Thelia\Model\ProductSaleElementsQuery;
+use Thelia\Model\ProductPriceQuery;
 
 class Cart extends BaseCart
 {
@@ -41,6 +42,12 @@ class Cart extends BaseCart
                     $item->setPromoPrice($cartItem->getPromoPrice());
                     // TODO : new price EOF or duplicate current priceEOF from $cartItem ?
                     $item->setPriceEndOfLife($cartItem->getPriceEndOfLife());
+                } else {
+                    $productPrices = ProductPriceQuery::create()->filterByProductSaleElements($productSaleElements)->findOne();
+
+                    $item->setPrice($productPrices->getPrice());
+                    $item->setPromoPrice($productPrices->getPromoPrice());
+                    $item->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30));
                 }
                 $item->save();
             }
