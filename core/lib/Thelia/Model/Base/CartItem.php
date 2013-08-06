@@ -104,10 +104,10 @@ abstract class CartItem implements ActiveRecordInterface
     protected $promo_price;
 
     /**
-     * The value for the price_end of life field.
+     * The value for the price_end_of_life field.
      * @var        string
      */
-    protected $price_end of life;
+    protected $price_end_of_life;
 
     /**
      * The value for the created_at field.
@@ -489,7 +489,7 @@ abstract class CartItem implements ActiveRecordInterface
     }
 
     /**
-     * Get the [optionally formatted] temporal [price_end of life] column value.
+     * Get the [optionally formatted] temporal [price_end_of_life] column value.
      *
      *
      * @param      string $format The date/time format string (either date()-style or strftime()-style).
@@ -499,12 +499,12 @@ abstract class CartItem implements ActiveRecordInterface
      *
      * @throws PropelException - if unable to parse/validate the date/time value.
      */
-    public function getPriceEnd of life($format = NULL)
+    public function getPriceEndOfLife($format = NULL)
     {
         if ($format === null) {
-            return $this->price_end of life;
+            return $this->price_end_of_life;
         } else {
-            return $this->price_end of life !== null ? $this->price_end of life->format($format) : null;
+            return $this->price_end_of_life !== null ? $this->price_end_of_life->format($format) : null;
         }
     }
 
@@ -708,25 +708,25 @@ abstract class CartItem implements ActiveRecordInterface
     } // setPromoPrice()
 
     /**
-     * Sets the value of [price_end of life] column to a normalized version of the date/time value specified.
+     * Sets the value of [price_end_of_life] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
      * @return   \Thelia\Model\CartItem The current object (for fluent API support)
      */
-    public function setPriceEnd of life($v)
+    public function setPriceEndOfLife($v)
     {
         $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->price_end of life !== null || $dt !== null) {
-            if ($dt !== $this->price_end of life) {
-                $this->price_end of life = $dt;
-                $this->modifiedColumns[] = CartItemTableMap::PRICE_END OF LIFE;
+        if ($this->price_end_of_life !== null || $dt !== null) {
+            if ($dt !== $this->price_end_of_life) {
+                $this->price_end_of_life = $dt;
+                $this->modifiedColumns[] = CartItemTableMap::PRICE_END_OF_LIFE;
             }
         } // if either are not null
 
 
         return $this;
-    } // setPriceEnd of life()
+    } // setPriceEndOfLife()
 
     /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
@@ -832,11 +832,11 @@ abstract class CartItem implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CartItemTableMap::translateFieldName('PromoPrice', TableMap::TYPE_PHPNAME, $indexType)];
             $this->promo_price = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CartItemTableMap::translateFieldName('PriceEnd of life', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CartItemTableMap::translateFieldName('PriceEndOfLife', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
-            $this->price_end of life = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+            $this->price_end_of_life = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
             $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : CartItemTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
@@ -1136,8 +1136,8 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->isColumnModified(CartItemTableMap::PROMO_PRICE)) {
             $modifiedColumns[':p' . $index++]  = 'PROMO_PRICE';
         }
-        if ($this->isColumnModified(CartItemTableMap::PRICE_END OF LIFE)) {
-            $modifiedColumns[':p' . $index++]  = 'PRICE_END OF LIFE';
+        if ($this->isColumnModified(CartItemTableMap::PRICE_END_OF_LIFE)) {
+            $modifiedColumns[':p' . $index++]  = 'PRICE_END_OF_LIFE';
         }
         if ($this->isColumnModified(CartItemTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
@@ -1177,8 +1177,8 @@ abstract class CartItem implements ActiveRecordInterface
                     case 'PROMO_PRICE':
                         $stmt->bindValue($identifier, $this->promo_price, PDO::PARAM_STR);
                         break;
-                    case 'PRICE_END OF LIFE':
-                        $stmt->bindValue($identifier, $this->price_end of life ? $this->price_end of life->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                    case 'PRICE_END_OF_LIFE':
+                        $stmt->bindValue($identifier, $this->price_end_of_life ? $this->price_end_of_life->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1270,7 +1270,7 @@ abstract class CartItem implements ActiveRecordInterface
                 return $this->getPromoPrice();
                 break;
             case 7:
-                return $this->getPriceEnd of life();
+                return $this->getPriceEndOfLife();
                 break;
             case 8:
                 return $this->getCreatedAt();
@@ -1314,7 +1314,7 @@ abstract class CartItem implements ActiveRecordInterface
             $keys[4] => $this->getProductSaleElementsId(),
             $keys[5] => $this->getPrice(),
             $keys[6] => $this->getPromoPrice(),
-            $keys[7] => $this->getPriceEnd of life(),
+            $keys[7] => $this->getPriceEndOfLife(),
             $keys[8] => $this->getCreatedAt(),
             $keys[9] => $this->getUpdatedAt(),
         );
@@ -1390,7 +1390,7 @@ abstract class CartItem implements ActiveRecordInterface
                 $this->setPromoPrice($value);
                 break;
             case 7:
-                $this->setPriceEnd of life($value);
+                $this->setPriceEndOfLife($value);
                 break;
             case 8:
                 $this->setCreatedAt($value);
@@ -1429,7 +1429,7 @@ abstract class CartItem implements ActiveRecordInterface
         if (array_key_exists($keys[4], $arr)) $this->setProductSaleElementsId($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setPrice($arr[$keys[5]]);
         if (array_key_exists($keys[6], $arr)) $this->setPromoPrice($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setPriceEnd of life($arr[$keys[7]]);
+        if (array_key_exists($keys[7], $arr)) $this->setPriceEndOfLife($arr[$keys[7]]);
         if (array_key_exists($keys[8], $arr)) $this->setCreatedAt($arr[$keys[8]]);
         if (array_key_exists($keys[9], $arr)) $this->setUpdatedAt($arr[$keys[9]]);
     }
@@ -1450,7 +1450,7 @@ abstract class CartItem implements ActiveRecordInterface
         if ($this->isColumnModified(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID)) $criteria->add(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, $this->product_sale_elements_id);
         if ($this->isColumnModified(CartItemTableMap::PRICE)) $criteria->add(CartItemTableMap::PRICE, $this->price);
         if ($this->isColumnModified(CartItemTableMap::PROMO_PRICE)) $criteria->add(CartItemTableMap::PROMO_PRICE, $this->promo_price);
-        if ($this->isColumnModified(CartItemTableMap::PRICE_END OF LIFE)) $criteria->add(CartItemTableMap::PRICE_END OF LIFE, $this->price_end of life);
+        if ($this->isColumnModified(CartItemTableMap::PRICE_END_OF_LIFE)) $criteria->add(CartItemTableMap::PRICE_END_OF_LIFE, $this->price_end_of_life);
         if ($this->isColumnModified(CartItemTableMap::CREATED_AT)) $criteria->add(CartItemTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CartItemTableMap::UPDATED_AT)) $criteria->add(CartItemTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1522,7 +1522,7 @@ abstract class CartItem implements ActiveRecordInterface
         $copyObj->setProductSaleElementsId($this->getProductSaleElementsId());
         $copyObj->setPrice($this->getPrice());
         $copyObj->setPromoPrice($this->getPromoPrice());
-        $copyObj->setPriceEnd of life($this->getPriceEnd of life());
+        $copyObj->setPriceEndOfLife($this->getPriceEndOfLife());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1718,7 +1718,7 @@ abstract class CartItem implements ActiveRecordInterface
         $this->product_sale_elements_id = null;
         $this->price = null;
         $this->promo_price = null;
-        $this->price_end of life = null;
+        $this->price_end_of_life = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

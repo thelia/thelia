@@ -28,7 +28,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItemQuery orderByProductSaleElementsId($order = Criteria::ASC) Order by the product_sale_elements_id column
  * @method     ChildCartItemQuery orderByPrice($order = Criteria::ASC) Order by the price column
  * @method     ChildCartItemQuery orderByPromoPrice($order = Criteria::ASC) Order by the promo_price column
- * @method     ChildCartItemQuery orderByPriceEnd of life($order = Criteria::ASC) Order by the price_end of life column
+ * @method     ChildCartItemQuery orderByPriceEndOfLife($order = Criteria::ASC) Order by the price_end_of_life column
  * @method     ChildCartItemQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCartItemQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -39,7 +39,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItemQuery groupByProductSaleElementsId() Group by the product_sale_elements_id column
  * @method     ChildCartItemQuery groupByPrice() Group by the price column
  * @method     ChildCartItemQuery groupByPromoPrice() Group by the promo_price column
- * @method     ChildCartItemQuery groupByPriceEnd of life() Group by the price_end of life column
+ * @method     ChildCartItemQuery groupByPriceEndOfLife() Group by the price_end_of_life column
  * @method     ChildCartItemQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCartItemQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -69,7 +69,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     ChildCartItem findOneByProductSaleElementsId(int $product_sale_elements_id) Return the first ChildCartItem filtered by the product_sale_elements_id column
  * @method     ChildCartItem findOneByPrice(double $price) Return the first ChildCartItem filtered by the price column
  * @method     ChildCartItem findOneByPromoPrice(double $promo_price) Return the first ChildCartItem filtered by the promo_price column
- * @method     ChildCartItem findOneByPriceEnd of life(string $price_end of life) Return the first ChildCartItem filtered by the price_end of life column
+ * @method     ChildCartItem findOneByPriceEndOfLife(string $price_end_of_life) Return the first ChildCartItem filtered by the price_end_of_life column
  * @method     ChildCartItem findOneByCreatedAt(string $created_at) Return the first ChildCartItem filtered by the created_at column
  * @method     ChildCartItem findOneByUpdatedAt(string $updated_at) Return the first ChildCartItem filtered by the updated_at column
  *
@@ -80,7 +80,7 @@ use Thelia\Model\Map\CartItemTableMap;
  * @method     array findByProductSaleElementsId(int $product_sale_elements_id) Return ChildCartItem objects filtered by the product_sale_elements_id column
  * @method     array findByPrice(double $price) Return ChildCartItem objects filtered by the price column
  * @method     array findByPromoPrice(double $promo_price) Return ChildCartItem objects filtered by the promo_price column
- * @method     array findByPriceEnd of life(string $price_end of life) Return ChildCartItem objects filtered by the price_end of life column
+ * @method     array findByPriceEndOfLife(string $price_end_of_life) Return ChildCartItem objects filtered by the price_end_of_life column
  * @method     array findByCreatedAt(string $created_at) Return ChildCartItem objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCartItem objects filtered by the updated_at column
  *
@@ -171,7 +171,7 @@ abstract class CartItemQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CART_ID, PRODUCT_ID, QUANTITY, PRODUCT_SALE_ELEMENTS_ID, PRICE, PROMO_PRICE, PRICE_END OF LIFE, CREATED_AT, UPDATED_AT FROM cart_item WHERE ID = :p0';
+        $sql = 'SELECT ID, CART_ID, PRODUCT_ID, QUANTITY, PRODUCT_SALE_ELEMENTS_ID, PRICE, PROMO_PRICE, PRICE_END_OF_LIFE, CREATED_AT, UPDATED_AT FROM cart_item WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -554,16 +554,16 @@ abstract class CartItemQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query on the price_end of life column
+     * Filter the query on the price_end_of_life column
      *
      * Example usage:
      * <code>
-     * $query->filterByPriceEnd of life('2011-03-14'); // WHERE price_end of life = '2011-03-14'
-     * $query->filterByPriceEnd of life('now'); // WHERE price_end of life = '2011-03-14'
-     * $query->filterByPriceEnd of life(array('max' => 'yesterday')); // WHERE price_end of life > '2011-03-13'
+     * $query->filterByPriceEndOfLife('2011-03-14'); // WHERE price_end_of_life = '2011-03-14'
+     * $query->filterByPriceEndOfLife('now'); // WHERE price_end_of_life = '2011-03-14'
+     * $query->filterByPriceEndOfLife(array('max' => 'yesterday')); // WHERE price_end_of_life > '2011-03-13'
      * </code>
      *
-     * @param     mixed $priceEnd of life The value to use as filter.
+     * @param     mixed $priceEndOfLife The value to use as filter.
      *              Values can be integers (unix timestamps), DateTime objects, or strings.
      *              Empty strings are treated as NULL.
      *              Use scalar values for equality.
@@ -573,16 +573,16 @@ abstract class CartItemQuery extends ModelCriteria
      *
      * @return ChildCartItemQuery The current query, for fluid interface
      */
-    public function filterByPriceEnd of life($priceEnd of life = null, $comparison = null)
+    public function filterByPriceEndOfLife($priceEndOfLife = null, $comparison = null)
     {
-        if (is_array($priceEnd of life)) {
+        if (is_array($priceEndOfLife)) {
             $useMinMax = false;
-            if (isset($priceEnd of life['min'])) {
-                $this->addUsingAlias(CartItemTableMap::PRICE_END OF LIFE, $priceEnd of life['min'], Criteria::GREATER_EQUAL);
+            if (isset($priceEndOfLife['min'])) {
+                $this->addUsingAlias(CartItemTableMap::PRICE_END_OF_LIFE, $priceEndOfLife['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
-            if (isset($priceEnd of life['max'])) {
-                $this->addUsingAlias(CartItemTableMap::PRICE_END OF LIFE, $priceEnd of life['max'], Criteria::LESS_EQUAL);
+            if (isset($priceEndOfLife['max'])) {
+                $this->addUsingAlias(CartItemTableMap::PRICE_END_OF_LIFE, $priceEndOfLife['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -593,7 +593,7 @@ abstract class CartItemQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(CartItemTableMap::PRICE_END OF LIFE, $priceEnd of life, $comparison);
+        return $this->addUsingAlias(CartItemTableMap::PRICE_END_OF_LIFE, $priceEndOfLife, $comparison);
     }
 
     /**

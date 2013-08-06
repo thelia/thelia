@@ -1313,7 +1313,7 @@ CREATE TABLE `cart_item`
     `product_sale_elements_id` INTEGER NOT NULL,
     `price` FLOAT,
     `promo_price` FLOAT,
-    `price_end of life` DATETIME,
+    `price_end_of_life` DATETIME,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),

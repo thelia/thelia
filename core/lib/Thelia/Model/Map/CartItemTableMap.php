@@ -105,9 +105,9 @@ class CartItemTableMap extends TableMap
     const PROMO_PRICE = 'cart_item.PROMO_PRICE';
 
     /**
-     * the column name for the PRICE_END OF LIFE field
+     * the column name for the PRICE_END_OF_LIFE field
      */
-    const PRICE_END OF LIFE = 'cart_item.PRICE_END OF LIFE';
+    const PRICE_END_OF_LIFE = 'cart_item.PRICE_END_OF_LIFE';
 
     /**
      * the column name for the CREATED_AT field
@@ -131,11 +131,11 @@ class CartItemTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CartId', 'ProductId', 'Quantity', 'ProductSaleElementsId', 'Price', 'PromoPrice', 'PriceEnd of life', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'cartId', 'productId', 'quantity', 'productSaleElementsId', 'price', 'promoPrice', 'priceEnd of life', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(CartItemTableMap::ID, CartItemTableMap::CART_ID, CartItemTableMap::PRODUCT_ID, CartItemTableMap::QUANTITY, CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, CartItemTableMap::PRICE, CartItemTableMap::PROMO_PRICE, CartItemTableMap::PRICE_END OF LIFE, CartItemTableMap::CREATED_AT, CartItemTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CART_ID', 'PRODUCT_ID', 'QUANTITY', 'PRODUCT_SALE_ELEMENTS_ID', 'PRICE', 'PROMO_PRICE', 'PRICE_END OF LIFE', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'cart_id', 'product_id', 'quantity', 'product_sale_elements_id', 'price', 'promo_price', 'price_end of life', 'created_at', 'updated_at', ),
+        self::TYPE_PHPNAME       => array('Id', 'CartId', 'ProductId', 'Quantity', 'ProductSaleElementsId', 'Price', 'PromoPrice', 'PriceEndOfLife', 'CreatedAt', 'UpdatedAt', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'cartId', 'productId', 'quantity', 'productSaleElementsId', 'price', 'promoPrice', 'priceEndOfLife', 'createdAt', 'updatedAt', ),
+        self::TYPE_COLNAME       => array(CartItemTableMap::ID, CartItemTableMap::CART_ID, CartItemTableMap::PRODUCT_ID, CartItemTableMap::QUANTITY, CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID, CartItemTableMap::PRICE, CartItemTableMap::PROMO_PRICE, CartItemTableMap::PRICE_END_OF_LIFE, CartItemTableMap::CREATED_AT, CartItemTableMap::UPDATED_AT, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CART_ID', 'PRODUCT_ID', 'QUANTITY', 'PRODUCT_SALE_ELEMENTS_ID', 'PRICE', 'PROMO_PRICE', 'PRICE_END_OF_LIFE', 'CREATED_AT', 'UPDATED_AT', ),
+        self::TYPE_FIELDNAME     => array('id', 'cart_id', 'product_id', 'quantity', 'product_sale_elements_id', 'price', 'promo_price', 'price_end_of_life', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
@@ -146,11 +146,11 @@ class CartItemTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CartId' => 1, 'ProductId' => 2, 'Quantity' => 3, 'ProductSaleElementsId' => 4, 'Price' => 5, 'PromoPrice' => 6, 'PriceEnd of life' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'cartId' => 1, 'productId' => 2, 'quantity' => 3, 'productSaleElementsId' => 4, 'price' => 5, 'promoPrice' => 6, 'priceEnd of life' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
-        self::TYPE_COLNAME       => array(CartItemTableMap::ID => 0, CartItemTableMap::CART_ID => 1, CartItemTableMap::PRODUCT_ID => 2, CartItemTableMap::QUANTITY => 3, CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID => 4, CartItemTableMap::PRICE => 5, CartItemTableMap::PROMO_PRICE => 6, CartItemTableMap::PRICE_END OF LIFE => 7, CartItemTableMap::CREATED_AT => 8, CartItemTableMap::UPDATED_AT => 9, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CART_ID' => 1, 'PRODUCT_ID' => 2, 'QUANTITY' => 3, 'PRODUCT_SALE_ELEMENTS_ID' => 4, 'PRICE' => 5, 'PROMO_PRICE' => 6, 'PRICE_END OF LIFE' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'cart_id' => 1, 'product_id' => 2, 'quantity' => 3, 'product_sale_elements_id' => 4, 'price' => 5, 'promo_price' => 6, 'price_end of life' => 7, 'created_at' => 8, 'updated_at' => 9, ),
+        self::TYPE_PHPNAME       => array('Id' => 0, 'CartId' => 1, 'ProductId' => 2, 'Quantity' => 3, 'ProductSaleElementsId' => 4, 'Price' => 5, 'PromoPrice' => 6, 'PriceEndOfLife' => 7, 'CreatedAt' => 8, 'UpdatedAt' => 9, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'cartId' => 1, 'productId' => 2, 'quantity' => 3, 'productSaleElementsId' => 4, 'price' => 5, 'promoPrice' => 6, 'priceEndOfLife' => 7, 'createdAt' => 8, 'updatedAt' => 9, ),
+        self::TYPE_COLNAME       => array(CartItemTableMap::ID => 0, CartItemTableMap::CART_ID => 1, CartItemTableMap::PRODUCT_ID => 2, CartItemTableMap::QUANTITY => 3, CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID => 4, CartItemTableMap::PRICE => 5, CartItemTableMap::PROMO_PRICE => 6, CartItemTableMap::PRICE_END_OF_LIFE => 7, CartItemTableMap::CREATED_AT => 8, CartItemTableMap::UPDATED_AT => 9, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CART_ID' => 1, 'PRODUCT_ID' => 2, 'QUANTITY' => 3, 'PRODUCT_SALE_ELEMENTS_ID' => 4, 'PRICE' => 5, 'PROMO_PRICE' => 6, 'PRICE_END_OF_LIFE' => 7, 'CREATED_AT' => 8, 'UPDATED_AT' => 9, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'cart_id' => 1, 'product_id' => 2, 'quantity' => 3, 'product_sale_elements_id' => 4, 'price' => 5, 'promo_price' => 6, 'price_end_of_life' => 7, 'created_at' => 8, 'updated_at' => 9, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, )
     );
 
@@ -177,7 +177,7 @@ class CartItemTableMap extends TableMap
         $this->addForeignKey('PRODUCT_SALE_ELEMENTS_ID', 'ProductSaleElementsId', 'INTEGER', 'product_sale_elements', 'ID', true, null, null);
         $this->addColumn('PRICE', 'Price', 'FLOAT', false, null, null);
         $this->addColumn('PROMO_PRICE', 'PromoPrice', 'FLOAT', false, null, null);
-        $this->addColumn('PRICE_END OF LIFE', 'PriceEnd of life', 'TIMESTAMP', false, null, null);
+        $this->addColumn('PRICE_END_OF_LIFE', 'PriceEndOfLife', 'TIMESTAMP', false, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
     } // initialize()
@@ -350,7 +350,7 @@ class CartItemTableMap extends TableMap
             $criteria->addSelectColumn(CartItemTableMap::PRODUCT_SALE_ELEMENTS_ID);
             $criteria->addSelectColumn(CartItemTableMap::PRICE);
             $criteria->addSelectColumn(CartItemTableMap::PROMO_PRICE);
-            $criteria->addSelectColumn(CartItemTableMap::PRICE_END OF LIFE);
+            $criteria->addSelectColumn(CartItemTableMap::PRICE_END_OF_LIFE);
             $criteria->addSelectColumn(CartItemTableMap::CREATED_AT);
             $criteria->addSelectColumn(CartItemTableMap::UPDATED_AT);
         } else {
@@ -361,7 +361,7 @@ class CartItemTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.PRODUCT_SALE_ELEMENTS_ID');
             $criteria->addSelectColumn($alias . '.PRICE');
             $criteria->addSelectColumn($alias . '.PROMO_PRICE');
-            $criteria->addSelectColumn($alias . '.PRICE_END OF LIFE');
+            $criteria->addSelectColumn($alias . '.PRICE_END_OF_LIFE');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
         }
