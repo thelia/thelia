@@ -965,7 +965,7 @@
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
     <column name="price" type="FLOAT" />
     <column name="promo_price" type="FLOAT" />
-    <column name="price_end of life" type="TIMESTAMP" />
+    <column name="price_end_of_life" type="TIMESTAMP" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>
