@@ -2,10 +2,12 @@
 
 namespace Thelia\Model;
 
+use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Thelia\Model\Base\Cart as BaseCart;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\CartItemQuery;
 
 class Cart extends BaseCart
 {
@@ -59,5 +61,14 @@ class Cart extends BaseCart
         }
 
         return $cart;
+    }
+
+    public function getLastCartItemAdded()
+    {
+        $items = CartItemQuery::create()
+            ->filterByCartId($this->getId())
+            ->orderByCreatedAt(Criteria::DESC)
+            ->findOne()
+        ;
     }
 }
