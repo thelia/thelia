@@ -36,11 +36,23 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\Customer;
 
-
+/**
+ *
+ * Class Cart where all actions are manage like adding, modifying or delete items.
+ *
+ * Class Cart
+ * @package Thelia\Action
+ */
 class Cart implements EventSubscriberInterface
 {
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
     protected $dispatcher;
 
+    /**
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
     public function __construct(EventDispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
@@ -132,6 +144,13 @@ class Cart implements EventSubscriberInterface
         );
     }
 
+    /**
+     *
+     * search if cart already exists in session. If not try to create a new one or duplicate an old one.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Thelia\Model\Cart
+     */
     public function getCart(Request $request)
     {
 
@@ -173,8 +192,8 @@ class Cart implements EventSubscriberInterface
     }
 
     /**
-     * @param Session $session
-     * @return CartModel
+     * @param \Thelia\Core\HttpFoundation\Session\Session $session
+     * @return \Thelia\Model\Cart
      */
     protected function createCart(Session $session)
     {
@@ -194,10 +213,12 @@ class Cart implements EventSubscriberInterface
 
 
     /**
-     * @param CartModel $cart
-     * @param Session $session
-     * @param Customer $customer
-     * @return CartModel
+     * try to duplicate existing Cart. Customer is here to determine if this cart belong to him.
+     *
+     * @param \Thelia\Model\Cart $cart
+     * @param \Thelia\Core\HttpFoundation\Session\Session $session
+     * @param \Thelia\Model\Customer $customer
+     * @return \Thelia\Model\Cart
      */
     protected function duplicateCart(CartModel $cart, Session $session, Customer $customer = null)
     {
