@@ -392,7 +392,6 @@
   <table name="folder" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" required="true" type="INTEGER" />
-    <column name="link" size="255" type="VARCHAR" />
     <column name="visible" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -964,6 +963,9 @@
     <column name="product_id" required="true" type="INTEGER" />
     <column defaultValue="1" name="quantity" type="FLOAT" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column name="price" type="FLOAT" />
+    <column name="promo_price" type="FLOAT" />
+    <column name="price_end of life" type="TIMESTAMP" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>

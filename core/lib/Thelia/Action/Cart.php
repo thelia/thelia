@@ -34,6 +34,7 @@ use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Form\CartAdd;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 
 /**
@@ -233,9 +234,12 @@ class Cart implements EventSubscriberInterface
 
     protected function generateCookie()
     {
-        $id = uniqid('', true);
-        setcookie("thelia_cart", $id, time()+(60*60*24*365));
+        if (ConfigQuery::read("cart.session_only", 0) == 0) {
+            $id = uniqid('', true);
+            setcookie("thelia_cart", $id, time()+ConfigQuery::read("cookie.lifetime", 60*60*24*365));
 
-        return $id;
+            return $id;
+        }
+
     }
 }

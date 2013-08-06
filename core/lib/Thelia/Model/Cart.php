@@ -35,6 +35,7 @@ class Cart extends BaseCart
                 $item->setCart($cart);
                 $item->setProductId($cartItem->getProductId());
                 $item->setQuantity($cartItem->getQuantity());
+                $item->setProductSaleElements($productSaleElements);
                 $item->save();
             }
 
