@@ -86,6 +86,7 @@ class Cart implements EventSubscriberInterface
             ;
 
             $cartItem = new CartItem();
+            $cartItem->setDisptacher($event->getDispatcher());
             $cartItem
                 ->setCart($cart)
                 ->setProductId($form->get("product")->getData())
