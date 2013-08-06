@@ -32,6 +32,8 @@ use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Form\CartAdd;
+use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\CartItem;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
@@ -67,9 +69,43 @@ class Cart implements EventSubscriberInterface
      */
     public function addArticle(ActionEvent $event)
     {
-        var_dump($this);
         $request = $event->getRequest();
 
+        $form = $this->getAddCartForm($request);
+
+        $form->bind($request);
+
+        if($form->isValid()) {
+            $cart = $this->getCart($request);
+
+            $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
+
+            $productPrice = ProductPriceQuery::create()
+                ->filterByProductSaleElementsId($productSaleElementsId)
+                ->findOne()
+            ;
+
+            $cartItem = new CartItem();
+            $cartItem
+                ->setCart($cart)
+                ->setProductId($form->get("product")->getData())
+                ->setProductSaleElementsId($productSaleElementsId)
+                ->setQuantity($form->get("quantity")->getData())
+                ->setPrice($productPrice->getPrice())
+                ->setPromoPrice($productPrice->getPromoPrice())
+                ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
+                ->save();
+            ;
+
+
+        } else {
+
+
+        }
+    }
+
+    private function getAddCartForm(Request $request)
+    {
         if ($request->isMethod("post")) {
             $cartAdd = new CartAdd($request);
         } else {
@@ -83,14 +119,7 @@ class Cart implements EventSubscriberInterface
             );
         }
 
-        $form = $cartAdd->getForm();
-
-        $form->bind($request);
-
-        if($form->isValid()) {
-
-        } else {
-        }
+        return $cartAdd->getForm();
     }
 
 
