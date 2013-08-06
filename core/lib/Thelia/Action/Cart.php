@@ -103,7 +103,7 @@ class Cart implements EventSubscriberInterface
                     ->save();
                 ;
 
-                Redirect::exec($cartAdd->getSuccessUrl());
+                Redirect::exec($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
             } catch (PropelException $e) {
                 \Thelia\Log\Tlog::getInstance()->error(sptinf("error on adding item to cart with message : %s", $e->getMessage()));
                 $message = "Impossible to add this article to your cart, please try again";
