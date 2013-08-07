@@ -240,4 +240,9 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($customer->getId(), $getCart->getCustomerId());
     }
 
+    public function testAddArticle()
+    {
+
+    }
+
 }

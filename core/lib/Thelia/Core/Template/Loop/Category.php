@@ -165,7 +165,7 @@ class Category extends BaseLoop
 
         foreach ($categories as $category) {
 
-            if ($this->not_empty && $category->countAllProducts() == 0) continue;
+            if ($this->getNot_empty() && $category->countAllProducts() == 0) continue;
 
             $loopResultRow = new LoopResultRow();
 
