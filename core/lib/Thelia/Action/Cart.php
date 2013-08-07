@@ -39,7 +39,6 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
-use Thelia\Tools\Redirect;
 
 /**
  *
@@ -48,7 +47,7 @@ use Thelia\Tools\Redirect;
  * Class Cart
  * @package Thelia\Action
  */
-class Cart implements EventSubscriberInterface
+class Cart extends BaseAction implements EventSubscriberInterface
 {
     /**
      * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
@@ -103,7 +102,7 @@ class Cart implements EventSubscriberInterface
                     ->save();
                 ;
 
-                Redirect::exec($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
+                $this->redirect($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
             } catch (PropelException $e) {
                 \Thelia\Log\Tlog::getInstance()->error(sptinf("error on adding item to cart with message : %s", $e->getMessage()));
                 $message = "Impossible to add this article to your cart, please try again";
