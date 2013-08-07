@@ -61,7 +61,7 @@ class CartItem extends BaseCartItem
             }
         }
 
-        $this->setQuantity($currentQuantity);
+        $this->setQuantity($newQuantity);
 
         return $this;
     }
