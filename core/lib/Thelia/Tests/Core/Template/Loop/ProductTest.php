@@ -32,7 +32,7 @@ use Thelia\Core\Template\Loop\Product;
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class ProductTest extends BaseLoopTestor
+/*class ProductTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {
@@ -48,4 +48,4 @@ class ProductTest extends BaseLoopTestor
     {
         return array();
     }
-}
+}*/
