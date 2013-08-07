@@ -33,8 +33,10 @@ use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Form\CartAdd;
+use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
@@ -80,26 +82,29 @@ class Cart extends BaseAction implements EventSubscriberInterface
         if($form->isValid()) {
             try {
                 $cart = $this->getCart($request);
+                $newness = $form->get("newness")->getData();
+                $append = $form->get("append")->getData();
+                $quantity = $form->get("quantity")->getData();
 
                 $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
+                $productId = $form->get("product")->getData();
 
-                $productPrice = ProductPriceQuery::create()
-                    ->filterByProductSaleElementsId($productSaleElementsId)
-                    ->findOne()
-                ;
+                $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
-                $cartItem = new CartItem();
-                $cartItem->setDisptacher($event->getDispatcher());
-                $cartItem
-                    ->setCart($cart)
-                    ->setProductId($form->get("product")->getData())
-                    ->setProductSaleElementsId($productSaleElementsId)
-                    ->setQuantity($form->get("quantity")->getData())
-                    ->setPrice($productPrice->getPrice())
-                    ->setPromoPrice($productPrice->getPromoPrice())
-                    ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
-                    ->save();
-                ;
+                if($cartItem === null || $newness)
+                {
+                    $productPrice = ProductPriceQuery::create()
+                        ->filterByProductSaleElementsId($productSaleElementsId)
+                        ->findOne()
+                    ;
+
+                    $this->addItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
+                }
+
+                if($append && $cartItem !== null) {
+                    $this->updateQuantity($cartItem, $quantity);
+                }
+
 
                 $this->redirect($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
             } catch (PropelException $e) {
@@ -116,6 +121,37 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $cartAdd->setErrorMessage($message);
 
         $event->setErrorForm($cartAdd);
+    }
+
+    protected function updateQuantity(CartItem $cartItem, $quantity)
+    {
+        $cartItem->setDisptacher($this->dispatcher);
+        $cartItem->addQuantity($quantity)
+            ->save();
+    }
+
+    protected function addItem(\Thelia\Model\Cart $cart, $productId, $productSaleElementsId, $quantity, ProductPrice $productPrice)
+    {
+        $cartItem = new CartItem();
+        $cartItem->setDisptacher($this->dispatcher);
+        $cartItem
+            ->setCart($cart)
+            ->setProductId($productId)
+            ->setProductSaleElementsId($productSaleElementsId)
+            ->setQuantity($quantity)
+            ->setPrice($productPrice->getPrice())
+            ->setPromoPrice($productPrice->getPromoPrice())
+            ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
+            ->save();
+    }
+
+    protected function findItem($cartId, $productId, $productSaleElementsId)
+    {
+        return CartItemQuery::create()
+            ->filterByCartId($cartId)
+            ->filterByProductId($productId)
+            ->filterByProductSaleElementsId($productSaleElementsId)
+            ->findOne();
     }
 
     private function getAddCartForm(Request $request)
