@@ -387,6 +387,7 @@
     <column name="locale" size="45" type="VARCHAR" />
     <column name="url" size="255" type="VARCHAR" />
     <column name="by_default" type="TINYINT" />
+    <column name="position" type="INTEGER" />
     <behavior name="timestampable" />
   </table>
   <table name="folder" namespace="Thelia\Model">
