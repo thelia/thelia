@@ -29,6 +29,7 @@
         <form name="thelia.customer.modification" class="Thelia\Form\CustomerModification"/>
         <form name="thelia.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
+        <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
     </forms>
 
 
@@ -84,7 +85,7 @@
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser.context"/>
-            <argument >true</argument> <!-- debug mode -->
+            <argument >false</argument>
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
         </service>

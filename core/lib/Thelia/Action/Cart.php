@@ -73,7 +73,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         $request = $event->getRequest();
 
         $cartAdd = $this->getAddCartForm($request);
-
         $form = $cartAdd->getForm();
 
         $form->bind($request);

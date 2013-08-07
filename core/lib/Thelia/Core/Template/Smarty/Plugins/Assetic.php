@@ -26,6 +26,7 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
 use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
+use Thelia\Model\ConfigQuery;
 
 class Assetic extends AbstractSmartyPlugin
 {
@@ -35,7 +36,7 @@ class Assetic extends AbstractSmartyPlugin
     {
         $web_root  = THELIA_WEB_DIR;
 
-        $asset_dir_from_web_root = 'assets/admin/default'; // FIXME
+        $asset_dir_from_web_root = ConfigQuery::read('asset_dir_from_web_root', 'assets');
 
         $this->assetManager = new SmartyAssetsManager($web_root, $asset_dir_from_web_root);
     }
