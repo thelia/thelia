@@ -73,7 +73,7 @@ class Category extends BaseLoop
             Argument::createIntTypeArgument('parent'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
-            Argument::createBooleanTypeArgument('visible', 1),
+            Argument::createBooleanOrBothTypeArgument('visible', 1),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -122,7 +122,8 @@ class Category extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $search->filterByVisible($this->getVisible() ? 1 : 0);
+        if ($this->getVisible() != '*')
+        	$search->filterByVisible($this->getVisible() ? 1 : 0);
 
         $orders  = $this->getOrder();
 
