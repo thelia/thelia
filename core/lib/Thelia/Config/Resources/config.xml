@@ -82,7 +82,7 @@
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser.context"/>
-            <argument >false</argument>
+            <argument >true</argument> <!-- debug mode -->
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
         </service>

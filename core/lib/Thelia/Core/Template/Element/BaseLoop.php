@@ -97,7 +97,8 @@ abstract class BaseLoop
 
     	if (substr($name, 0, 3) == 'get') {
 
-    		$argName = strtolower(substr($name, 3));
+    		// camelCase to underscore: getNotEmpty -> not_empty
+    		$argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', "$1_$2", substr($name, 3)));
 
     		return $this->getArg($argName)->getValue();
     	}
