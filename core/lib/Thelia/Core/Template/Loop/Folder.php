@@ -32,36 +32,18 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CategoryQuery;
+use Thelia\Model\FolderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
+ * Class Folder
  *
- * Category loop, all params available :
- *
- * - id : can be an id (eq : 3) or a "string list" (eg: 3, 4, 5)
- * - parent : categories having this parent id
- * - current : current id is used if you are on a category page
- * - not_empty : if value is 1, category and subcategories must have at least 1 product
- * - visible : default 1, if you want category not visible put 0
- * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual-reverse', 'random'
- * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
- *
- * example :
- *
- * <THELIA_cat type="category" parent="3" limit="4">
- *      #TITLE : #ID
- * </THELIA_cat>
- *
- *
- * Class Category
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseLoop
+class Folder extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -92,7 +74,7 @@ class Category extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CategoryQuery::create();
+        $search = FolderQuery::create();
 
 		$id = $this->getId();
 
@@ -110,9 +92,9 @@ class Category extends BaseLoop
 		$current = $this->getCurrent();
 
         if ($current === true) {
-            $search->filterById($this->request->get("category_id"));
+            $search->filterById($this->request->get("folder_id"));
         } elseif ($current === false) {
-            $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
+            $search->filterById($this->request->get("folder_id"), Criteria::NOT_IN);
         }
 
 
@@ -129,10 +111,10 @@ class Category extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
                     break;
                 case "manual-reverse":
                     $search->orderByPosition(Criteria::DESC);
@@ -159,36 +141,34 @@ class Category extends BaseLoop
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
-        $categories = $this->search($search, $pagination);
+        $folders = $this->search($search, $pagination);
 
         $notEmpty  = $this->getNot_empty();
 
         $loopResult = new LoopResult();
 
-        foreach ($categories as $category) {
+        foreach ($folders as $folder) {
 
-            if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
-
+            if ($notEmpty && $folder->countAllProducts() == 0) continue;
 
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
-            	->set("ID", $category->getId())
-            	->set("TITLE",$category->getTitle())
-	            ->set("CHAPO", $category->getChapo())
-	            ->set("DESCRIPTION", $category->getDescription())
-	            ->set("POSTSCRIPTUM", $category->getPostscriptum())
-	            ->set("PARENT", $category->getParent())
-	            ->set("URL", $category->getUrl())
-	            ->set("PRODUCT_COUNT", $category->countChild())
-	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
-	            ->set("POSITION", $category->getPosition())
+            	->set("ID", $folder->getId())
+            	->set("TITLE",$folder->getTitle())
+	            ->set("CHAPO", $folder->getChapo())
+	            ->set("DESCRIPTION", $folder->getDescription())
+	            ->set("POSTSCRIPTUM", $folder->getPostscriptum())
+	            ->set("PARENT", $folder->getParent())
+	            ->set("CONTENT_COUNT", $folder->countChild())
+	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
+	            ->set("POSITION", $folder->getPosition())
 
-	            ->set("CREATE_DATE", $category->getCreatedAt())
-	            ->set("UPDATE_DATE", $category->getUpdatedAt())
-	            ->set("VERSION", $category->getVersion())
-	            ->set("VERSION_DATE", $category->getVersionCreatedAt())
-	            ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
+	            ->set("CREATE_DATE", $folder->getCreatedAt())
+	            ->set("UPDATE_DATE", $folder->getUpdatedAt())
+	            ->set("VERSION", $folder->getVersion())
+	            ->set("VERSION_DATE", $folder->getVersionCreatedAt())
+	            ->set("VERSION_AUTHOR", $folder->getVersionCreatedBy())
 			;
 
             $loopResult->addRow($loopResultRow);

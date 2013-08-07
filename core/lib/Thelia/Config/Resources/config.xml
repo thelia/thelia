@@ -9,11 +9,13 @@
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
+        <loop class="Thelia\Core\Template\Loop\Content" name="content"/>
         <loop class="Thelia\Core\Template\Loop\Country" name="country"/>
         <loop class="Thelia\Core\Template\Loop\Customer" name="customer"/>
         <loop class="Thelia\Core\Template\Loop\Feature" name="feature"/>
         <loop class="Thelia\Core\Template\Loop\FeatureAvailable" name="feature_available"/>
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
+        <loop class="Thelia\Core\Template\Loop\Folder" name="folder"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
@@ -82,7 +84,7 @@
             <argument type="service" id="request" />
             <argument type="service" id="event_dispatcher"/>
             <argument type="service" id="thelia.parser.context"/>
-            <argument >false</argument>
+            <argument >true</argument> <!-- debug mode -->
             <argument >%kernel.environment%</argument>
             <argument >%kernel.debug%</argument>
         </service>

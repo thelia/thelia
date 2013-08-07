@@ -1,0 +1,170 @@
+{check_auth context="admin" roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
+
+{$page_title={intl l='Catalog'}}
+
+{include file='includes/header.inc.html'}
+
+<div class="catalog">
+	<div id="wrapper" class="container">
+
+		<ul class="breadcrumb">
+			{include file="includes/category_breadcrumb.html"}
+		</ul>
+
+	    {module_include location='catalog_top'}
+
+		<div class="row-fluid">
+			<div class="span12">
+			    <div class="general-block-decorator">
+	               	<table class="table table-striped">
+	                    <caption>
+	                    	{* display parent category name, and get current cat ID *}
+		                    {loop name="category_title" type="category" id="{$current_category_id}"}
+								{intl l="Categories in %cat" cat=$TITLE}
+								{$cat_id = $ID}
+							{/loop}
+							{elseloop rel="category_title"}
+								{intl l="Top level categories"}
+							{/elseloop}
+
+							{module_include location='category_list_caption'}
+
+	                        <a class="btn btn-primary btn-add-item" title="{intl l='Add a new category'}" href="{url path="admin/catalog/category/create/{$cat_id|default:0}"}">
+	                            <i class="icon-plus-sign icon-white"></i>
+	                        </a>
+	                    </caption>
+
+						{ifloop rel="category_list"}
+		                    <thead>
+		                        <tr>
+		                            <th class="object-title">{intl l="Category title"}</th>
+
+		                            {module_include location='category_list_header'}
+
+		                            <th>{intl l="Online"}</th>
+		                            <th>{intl l="Position"}</th>
+		                            <th>{intl l="Actions"}</th>
+		                        </tr>
+		                    </thead>
+
+		                    <tbody>
+		                    {loop name="category_list" type="category" parent="{$current_category_id}" order="manual"}
+		                    <tr>
+		                    	<td class="object-title"><a href="{url path="admin/catalog/category/browse/$ID"}" title="{intl l='Browse this category'}">{$TITLE}</a></td>
+
+	 							{module_include location='category_list_row'}
+
+		                    	<td>
+		                    		<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    	</td>
+
+		                    	<td>
+		                        	<a href="{url path='admin/catalog/category/positionUp/{$ID}'}"><i class="icon-arrow-up"></i></a>
+		                            <span class="object_classement_editable" data-action="changeCategoryPosition" data-name="category_id" data-id="{$ID}">{$POSITION}</span>
+		                          	<a href="{url path='admin/catalog/category/positionDown/{$ID}'}"><i class="icon-arrow-down"></i></a>
+		                    	</td>
+
+		                        <td>
+	                                <a class="btn btn-mini" title="{intl l='Browse this category'}" href="{url path="admin/catalog/category/browse/{$ID}"}"><i class="icon-folder-open"></i></a>
+	                                <a class="btn btn-mini" title="{intl l='Edit this category'}" href="{url path="admin/catalog/category/edit/{$ID}"}"><i class="icon-edit"></i></a>
+	                                <a class="btn btn-mini category-delete" title="{intl l='Delete this category and all its contents'}" href="{url path='admin/catalog/category/delete/{$ID}'}"><i class="icon-trash"></i></a>
+		                         </td>
+		                    </tr>
+		                    {/loop}
+							</tbody>
+						{/ifloop}
+
+						{elseloop rel="category_list"}
+						<thead>
+							<tr>
+								<td class="message"><div class="alert alert-info">{intl l="This category has no sub-categories. To create a new one, click the + button above."}</div></td>
+							</tr>
+						</thead>
+						{/elseloop}
+					</table>
+				</div>
+			</div>
+		</div>
+
+		<div class="row-fluid">
+			<div class="span12">
+			     <div class="general-block-decorator">
+	               	<table class="table table-striped">
+	                    <caption>
+	                    	{* display parent category name *}
+		                    {loop name="category_title" type="category" id="{$current_category_id}"}
+								{intl l="Products in %cat" cat=$TITLE}
+							{/loop}
+							{elseloop rel="category_title"}
+								{intl l="Top level Products"}
+							{/elseloop}
+
+							{module_include location='product_list_caption'}
+
+	                        <a class="btn btn-primary btn-add-item" title="{intl l='Add a new product'}" href="#productAddModal" data-toggle="modal">
+	                            <i class="icon-plus-sign icon-white"></i>
+	                        </a>
+	                    </caption>
+
+						{ifloop rel="product_list"}
+		                    <thead>
+		                        <tr>
+		                            <th>{intl l="Image"}</th>
+
+		                            <th class="object-title">{intl l="Product title"}</th>
+
+		                            {module_include location='product_list_header'}
+
+		                            <th>{intl l="Online"}</th>
+		                            <th>{intl l="Position"}</th>
+		                            <th>{intl l="Actions"}</th>
+		                        </tr>
+		                    </thead>
+
+		                    <tbody>
+		                    {loop name="product_list" type="product" category="{$current_category_id}" order="manual"}
+		                    <tr>
+		                    	<td><a href="{url path="admin/catalog/product/edit/$ID"}" title="{intl l='Edit this product'}">Image !</a></td>
+
+		                    	<td class="object-title"><a href="{url path="admin/catalog/product/edit/$ID"}" title="{intl l='Edit this product'}">{$TITLE}</a></td>
+
+	 							{module_include location='product_list_row'}
+
+		                    	<td>
+		                    		<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    	</td>
+
+		                    	<td>
+		                        	<a href="{url path='admin/catalog/product/positionUp/{$ID}'}"><i class="icon-arrow-up"></i></a>
+		                            <span class="object_classement_editable" data-action="changeProductPosition" data-name="product_id" data-id="{$ID}">{$POSITION}</span>
+		                          	<a href="{url path='admin/catalog/product/positionDown/{$ID}'}"><i class="icon-arrow-down"></i></a>
+		                    	</td>
+
+		                        <td>
+	                                <a class="btn btn-mini" title="{intl l='Edit this category'}" href="{url path="admin/catalog/product/edit/{$ID}"}"><i class="icon-edit"></i></a>
+	                                <a class="btn btn-mini product-delete" title="{intl l='Delete this product'}" href="{url path='admin/catalog/product/delete/{$ID}'}"><i class="icon-trash"></i></a>
+		                         </td>
+		                    </tr>
+		                    {/loop}
+							</tbody>
+						{/ifloop}
+
+						{elseloop rel="product_list"}
+						<thead>
+							<tr>
+								<td class="message"><div class="alert alert-info">{intl l="This category doesn't have any products. To add a new product, click the + button above."}</div></td>
+							</tr>
+						</thead>
+						{/elseloop}
+					</table>
+				</div>
+			</div>
+		</div>
+
+		{module_include location='catalog_bottom'}
+	</div>
+</div>
+
+{include file='includes/js.inc.html'}
+
+{include file='includes/footer.inc.html'}

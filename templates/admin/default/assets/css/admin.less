@@ -217,6 +217,16 @@ hr {
 			height: @top-bar-height;
 		}
 	}
+
+	.view-shop {
+		line-height: @top-bar-height;
+		margin-right: 20px;
+		float: right;
+		a {
+			color: #fff;
+			text-decoration: none;
+		}
+	}
 }
 
 // -- Brandbar ----------------------------------------------------------------
@@ -540,11 +550,95 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
   border-color: #3a87ad;
 }
 
+// -- General decoration of back-office boxes ---------------------------------
+
+.general-block-decorator {
+    background: none repeat scroll 0 0 white;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 4px 4px 4px 4px;
+    box-shadow: 0 -4px 0 rgba(0, 0, 0, 0.05) inset, 0 2px 3px rgba(0, 0, 0, 0.1);
+    padding: 1em;
+    margin-bottom: 20px;
+
+    .title {
+        color: #5A6876;
+        text-transform: uppercase;
+        font-weight: bold;
+        padding-bottom: 0.5em;
+
+        line-height: 30px;
+    }
+
+    .actions {
+        text-align: right;
+    }
+}
+
+// -- Admin forms tweaking ----------------------------------------------------
+
+label {
+    font-weight: bold;
+
+    &.checkbox {
+        font-weight: normal;
+    }
+}
+
+// Information in field label
+.label-help-block, .help-block {
+    color: lighten(#595959, 20);
+    display: block;
+    font-size: 80%;
+    font-style: italic;
+    line-height: 130%;
+    font-weight: normal;
+}
+
+.form-horizontal input + .help-block,
+.form-horizontal select + .help-block,
+.form-horizontal textarea + .help-block,
+.form-horizontal .uneditable-input + .help-block,
+.form-horizontal .input-prepend + .help-block,
+.form-horizontal .input-append + .help-block
+.help-block, .form-horizontal .help-block {
+    margin-top: 0px;
+}
+
+// Fix for append-fields shorter than others
+// see http://stackoverflow.com/questions/13306670/bootstrap-prepended-and-appended-input-how-to-max-input-field-width
+.input-append.input-block-level,
+.input-prepend.input-block-level {
+  display: table;
+}
+
+.input-append.input-block-level .add-on,
+.input-prepend.input-block-level .add-on {
+  display: table-cell;
+  width: 1%; /* remove this if you want default bootstrap button width */
+}
+
+.input-append.input-block-level > input,
+.input-prepend.input-block-level > input {
+  box-sizing: border-box; /* use bootstrap mixin or include vendor variants */
+  display: table; /* table-cell is not working well in Chrome for small widths */
+  min-height: inherit;
+  width: 100%;
+}
+
+.input-append.input-block-level > input {
+  border-right: 0;
+}
+
+.input-prepend.input-block-level > input {
+  border-left: 0;
+}
+
 // -- Catalog Tables ----------------------------------------------------------
 
 .table-striped {
 
 	background: white;
+	margin-bottom: 1em;
 
 	caption {
 		text-align: left;
@@ -552,7 +646,7 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 		text-transform: uppercase;
 		font-weight: bold;
 		background-color: #fff;
-		padding: 0.5em 0.5em 0.5em 1em;
+		padding-bottom: 0.5em;
 		border-bottom: 2px solid #A5CED8;
 
 		line-height: 30px;
@@ -574,15 +668,5 @@ textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[ty
 	td.message {
 		// Center the alert box (20px bottom margin) in the table cell
 		padding: 20px 20px 0 20px;
-
-		// No border, nor background in alert blocks
-		.alert {
-			border: none;
-			background-color: transparent;
-
-			&-info {
-				background-color: transparent;
-			}
-		}
 	}
 }
