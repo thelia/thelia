@@ -168,14 +168,25 @@ class Category extends BaseLoop
             if ($this->not_empty && $category->countAllProducts() == 0) continue;
 
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("TITLE",$category->getTitle());
-            $loopResultRow->set("CHAPO", $category->getChapo());
-            $loopResultRow->set("DESCRIPTION", $category->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $category->getPostscriptum());
-            $loopResultRow->set("PARENT", $category->getParent());
-            $loopResultRow->set("ID", $category->getId());
-            $loopResultRow->set("URL", $category->getUrl());
-            $loopResultRow->set("PRODUCT_COUNT", $category->countChild());
+
+            $loopResultRow
+            	->set("ID", $category->getId())
+            	->set("TITLE",$category->getTitle())
+	            ->set("CHAPO", $category->getChapo())
+	            ->set("DESCRIPTION", $category->getDescription())
+	            ->set("POSTSCRIPTUM", $category->getPostscriptum())
+	            ->set("PARENT", $category->getParent())
+	            ->set("URL", $category->getUrl())
+	            ->set("PRODUCT_COUNT", $category->countChild())
+	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
+	            ->set("POSITION", $category->getPosition())
+
+	            ->set("CREATE_DATE", $category->getCreatedAt())
+	            ->set("UPDATE_DATE", $category->getUpdatedAt())
+	            ->set("VERSION", $category->getVersion())
+	            ->set("VERSION_DATE", $category->getVersionCreatedAt())
+	            ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
+			;
 
             $loopResult->addRow($loopResultRow);
         }

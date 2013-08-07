@@ -117,6 +117,9 @@ abstract class BaseLoop
         $faultActor = array();
         $faultDetails = array();
 
+        $loopType = isset($nameValuePairs['type']) ? $nameValuePairs['type'] : "undefined";
+        $loopName = isset($nameValuePairs['name']) ? $nameValuePairs['name'] : "undefined";
+
         while (($argument = $this->args->current()) !== false) {
             $this->args->next();
 
@@ -125,17 +128,17 @@ abstract class BaseLoop
             /* check if mandatory */
             if($value === null && $argument->mandatory) {
                 $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('"%s" parameter is missing', $argument->name);
+                $faultDetails[] = sprintf('"%s" parameter is missing in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
             }
 			else  if($value === '' && !$argument->empty) {
            		/* check if empty */
                 $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('"%s" parameter cannot be empty', $argument->name);
+                $faultDetails[] = sprintf('"%s" parameter cannot be empty in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
             }
             else if($value !== null && !$argument->type->isValid($value)) {
             	/* check type */
                 $faultActor[] = $argument->name;
-                $faultDetails[] = sprintf('Invalid value for "%s" argument', $argument->name);
+                $faultDetails[] = sprintf('Invalid value for "%s" argument in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
             }
 			else {
 	            /* set default */

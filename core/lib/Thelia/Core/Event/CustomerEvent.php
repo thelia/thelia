@@ -21,18 +21,18 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Admin\Controller;
+namespace Thelia\Core\Event;
 
-class AdminController extends BaseAdminController {
 
-    public function indexAction()
+use Thelia\Model\Customer;
+
+class CustomerEvent extends InternalEvent {
+
+    public $customer;
+
+    public function __construct(Customer $customer)
     {
-    	return $this->render("home");
+        $this->customer = $customer;
     }
 
-    public function processAction()
-    {
-    	echo "not yet coded !";
-    	exit();
-    }
 }

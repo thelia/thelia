@@ -24,8 +24,22 @@
         <default key="_controller">Thelia\Admin\Controller\SessionController::checkLoginAction</default>
     </route>
 
-    <route id="admin.undefined" path="/admin/{everything}">
-        <default key="_controller">Thelia\Admin\Controller\AdminController::undefinedAction</default>
-        <requirement key="everything">.*</requirement>
+
+	<!-- Route to the catalog controller (process category browsing) -->
+
+    <route id="admin.catalog" path="/admin/catalog">
+        <default key="_controller">Thelia\Admin\Controller\CategoryController::indexAction</default>
+    </route>
+
+    <route id="admin.category" path="/admin/catalog/category/{action}">
+        <default key="_controller">Thelia\Admin\Controller\CategoryController::processAction</default>
+        <requirement key="action">.*</requirement>
+    </route>
+
+	<!-- The default route, to display a template -->
+
+    <route id="admin.processTemplate" path="/admin/{template}">
+        <default key="_controller">Thelia\Admin\Controller\AdminController::processTemplateAction</default>
+        <requirement key="template">.*</requirement>
     </route>
 </routes>

@@ -1,3 +1,5 @@
+		{module_include location='before_footer'}
+
 		<hr />
 		<footer class="modal-footer">
 			<div class="container">
@@ -7,19 +9,12 @@
 				- <a href="http://contrib.thelia.net/" target="_blank">{intl l='Contributions Thelia'}</a>
 		              <span class="pull-right">{intl l='interface par <a target="_blank" href="http://www.steaw-webdesign.com/">Steaw-Webdesign</a>'}</span>
 				</p>
+
+				{module_include location='in_footer'}
+
 			</div>
 		</footer>
 
-  		{* Include required JS files *}
-
-		{javascripts file='../assets/js/jquery.min.js'}
-			<link rel="stylesheet" href="{$asset_url}" target="screen">
-		{/javascripts}
-
-		{javascripts file='../assets/bootstrap/js/bootstrap.min.js'}
-			<link rel="stylesheet" href="{$asset_url}" target="screen">
-		{/javascripts}
-
- 		{* TODO allow modules to include JS here *}
+		{module_include location='after_footer'}
 	</body>
 </html>

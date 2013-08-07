@@ -49,7 +49,7 @@ class URL
 
     		$root = $path_only ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
 
-    		$base = $root . $path;
+    		$base = $root . '/' . ltrim($path, '/');
     	}
     	else
     		$base = $path;
@@ -67,11 +67,26 @@ class URL
     	return $base . $queryString;
     }
 
+    /**
+     * Returns the Absolute URL to a administration view
+     *
+     * @param string    $viewName      the view name (e.g. login for login.html)
+     * @param mixed     $parameters    An array of parameters
+     *
+     * @return string The generated URL
+     */
+    public static function adminViewUrl($viewName, array $parameters = array()) {
+
+    	$path = sprintf("%s/admin/%s", self::getIndexPage(), $viewName); // FIXME ! view= should not be necessaray, check routing parameters
+
+    	return self::absoluteUrl($path, $parameters);
+    }
+
 	/**
 	 * Returns the Absolute URL to a view
      *
-     * @param string         $viewName      the view name (e.g. login for login.html)
-     * @param mixed          $parameters    An array of parameters
+     * @param string    $viewName      the view name (e.g. login for login.html)
+     * @param mixed     $parameters    An array of parameters
      *
      * @return string The generated URL
      */

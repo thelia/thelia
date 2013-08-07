@@ -48,22 +48,25 @@ class Security extends AbstractSmartyPlugin
     public function checkAuthFunction($params, &$smarty)
     {
     	// Context: 'front' or 'admin'
-   		$context = strtolower(trim($params['context']));
+   		$context = $this->getNormalizedParam($params, 'context');
 
    		$this->securityContext->setContext($context);
 
-   		$roles = $this->_explode($params['roles']);
-   		$permissions = $this->_explode($params['permissions']);
+   		$roles = $this->_explode($this->getParam($params, 'roles'));
+   		$permissions = $this->_explode($this->getParam($params, 'permissions'));
 
    		if (! $this->securityContext->isGranted($roles, $permissions)) {
+
    			$ex = new AuthenticationException(
    					sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
    							implode(',', $roles), implode(',', $permissions), $context
    					)
    			);
 
-   			if (! empty($params['login_tpl'])) {
-   				$ex->setLoginTemplate($params['login_tpl']);
+   			$loginTpl = $this->getParam($params, 'login_tpl');
+
+   			if (null != $loginTpl) {
+   				$ex->setLoginTemplate($loginTpl);
    			}
 
    			throw $ex;
@@ -73,7 +76,7 @@ class Security extends AbstractSmartyPlugin
      }
 
     /**
-     * Define the various smarty plugins hendled by this class
+     * Define the various smarty plugins handled by this class
      *
      * @return an array of smarty plugin descriptors
      */

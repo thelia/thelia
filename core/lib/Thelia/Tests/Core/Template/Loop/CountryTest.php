@@ -21,18 +21,31 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Admin\Controller;
+namespace Thelia\Tests\Core\Template\Loop;
 
-class AdminController extends BaseAdminController {
+use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
-    public function indexAction()
+use Thelia\Core\Template\Loop\Country;
+
+/**
+ *
+ * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ */
+class CountryTest extends BaseLoopTestor
+{
+    public function getTestedClassName()
     {
-    	return $this->render("home");
+        return 'Thelia\Core\Template\Loop\Country';
     }
 
-    public function processAction()
+    public function getTestedInstance()
     {
-    	echo "not yet coded !";
-    	exit();
+        return new Country($this->request, $this->dispatcher, $this->securityContext);
+    }
+
+    public function getMandatoryArguments()
+    {
+        return array();
     }
 }

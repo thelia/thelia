@@ -85,11 +85,13 @@ class Form extends AbstractSmartyPlugin
     {
         if ($repeat) {
 
-            if (empty($params['name'])) {
+        	$name = $this->getParam($params, 'name');
+
+            if (null == $name) {
                 throw new \InvalidArgumentException("Missing 'name' parameter in form arguments");
             }
 
-            $instance = $this->createInstance($params['name']);
+            $instance = $this->createInstance($name);
 
             // Check if parser context contains our form
             $errorForm = $this->parserContext->getErrorForm();
@@ -212,10 +214,11 @@ class Form extends AbstractSmartyPlugin
     protected function getFormFieldView($params) {
 		$instance = $this->getInstanceFromParams($params);
 
-		if (! isset($params['field']))
+		$fieldName = $this->getParam($params, 'field');
+
+		if (null == $fieldName)
 			throw new \InvalidArgumentException("'field' parameter is missing");
 
-		$fieldName = $params['field'];
 
         if (empty($instance->getView()[$fieldName]))
         	throw new \InvalidArgumentException(sprintf("Field name '%s' not found in form %s", $fieldName, $instance->getName()));
@@ -225,11 +228,11 @@ class Form extends AbstractSmartyPlugin
 
     protected function getInstanceFromParams($params) {
 
-    	if (empty($params['form'])) {
+    	$instance = $this->getParam($params, 'form');
+
+    	if (null == $instance) {
     		throw new \InvalidArgumentException("Missing 'form' parameter in form arguments");
     	}
-
-    	$instance = $params["form"];
 
     	if (! $instance instanceof \Thelia\Form\BaseForm) {
     		throw new \InvalidArgumentException(sprintf("form parameter in form_field block must be an instance of

@@ -16,6 +16,7 @@
         <loop class="Thelia\Core\Template\Loop\FeatureValue" name="feature_value"/>
         <loop class="Thelia\Core\Template\Loop\Order" name="order"/>
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
+        <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>

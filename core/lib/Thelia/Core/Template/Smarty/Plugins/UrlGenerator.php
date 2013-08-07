@@ -47,7 +47,7 @@ class UrlGenerator extends AbstractSmartyPlugin
     public function generateUrlFunction($params, &$smarty)
     {
     	// the path to process
-   		$path = trim($params['path']);
+   		$path = $this->getParam($params, 'path');
 
    		return URL::absoluteUrl($path, $this->getArgsFromParam($params));
      }
@@ -59,19 +59,36 @@ class UrlGenerator extends AbstractSmartyPlugin
       * @param  unknown $smarty
       * @return string no text is returned.
       */
-     public function generateViewUrlFunction($params, &$smarty)
+     public function generateFrontViewUrlFunction($params, &$smarty)
+     {
+     	return $this->generateViewUrlFunction($params, false);
+     }
+
+     /**
+      * Process administration view url generator function
+      *
+      * @param  array $params
+      * @param  unknown $smarty
+      * @return string no text is returned.
+      */
+     public function generateAdminViewUrlFunction($params, &$smarty)
+     {
+     	return $this->generateViewUrlFunction($params, true);
+     }
+
+     protected function generateViewUrlFunction($params, $forAdmin)
      {
      	// the view name (without .html)
-     	$view = trim($params['view']);
+     	$view = $this->getParam($params,'view');
 
       	// the related action (optionale)
-     	$action = trim($params['action']);
+     	$action = $this->getParam($params, 'action');
 
      	$args = $this->getArgsFromParam($params);
 
      	if (! empty($action)) $args['action'] = $action;
 
-     	return URL::viewUrl($view, $args);
+     	return $forAdmin ? URL::adminViewUrl($view, $args) : URL::viewUrl($view, $args);
      }
 
      /**
@@ -83,14 +100,13 @@ class UrlGenerator extends AbstractSmartyPlugin
       */
      private function getArgsFromParam($params) {
 
-     	if (isset($params['args']))
-     		return explode($params['args'], ',');
+     	$args = $this->getParam($params, array('arguments', 'args'));
 
-     	return array();
+   		return $args !== null ? explode($args, ',') : array();
      }
 
     /**
-     * Define the various smarty plugins hendled by this class
+     * Define the various smarty plugins handled by this class
      *
      * @return an array of smarty plugin descriptors
      */
@@ -98,7 +114,8 @@ class UrlGenerator extends AbstractSmartyPlugin
     {
         return array(
             new SmartyPluginDescriptor('function', 'url', $this, 'generateUrlFunction'),
-            new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateViewUrlFunction')
+            new SmartyPluginDescriptor('function', 'viewurl', $this, 'generateFrontViewUrlFunction'),
+            new SmartyPluginDescriptor('function', 'admin_viewurl', $this, 'generateAdminViewUrlFunction')
         );
     }
 }

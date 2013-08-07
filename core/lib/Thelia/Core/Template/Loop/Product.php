@@ -86,7 +86,7 @@ class Product extends BaseLoop
                 new TypeCollection(
                     new Type\EnumListType(array('alpha', 'alpha_reverse', /*'min_price', 'max_price',*/ 'manual', 'manual_reverse', 'ref', /*'promo', 'new',*/ 'random', 'given_id'))
                 ),
-                'manual'
+                'alpha'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_category'),
@@ -271,12 +271,12 @@ class Product extends BaseLoop
                     $search->orderBy('real_price', Criteria::DESC);
                     break;*/
                 case "manual":
-                    if(null === $this->category || count($this->category) != 1)
+                    if(null === $category || count($category) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    if(null === $this->category || count($this->category) != 1)
+                    if(null === $category || count($category) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
                     $search->orderByPosition(Criteria::DESC);
                     break;
@@ -395,17 +395,20 @@ class Product extends BaseLoop
 
         foreach ($products as $product) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $product->getId());
-            $loopResultRow->set("REF",$product->getRef());
-            $loopResultRow->set("TITLE",$product->getTitle());
-            $loopResultRow->set("CHAPO", $product->getChapo());
-            $loopResultRow->set("DESCRIPTION", $product->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $product->getPostscriptum());
-            //$loopResultRow->set("PRICE", $product->getPrice());
-            //$loopResultRow->set("PROMO_PRICE", $product->getPrice2());
-            //$loopResultRow->set("WEIGHT", $product->getWeight());
-            //$loopResultRow->set("PROMO", $product->getPromo());
-            //$loopResultRow->set("NEW", $product->getNewness());
+
+            $loopResultRow->set("ID", $product->getId())
+	            ->set("REF",$product->getRef())
+	            ->set("TITLE",$product->getTitle())
+	            ->set("CHAPO", $product->getChapo())
+	            ->set("DESCRIPTION", $product->getDescription())
+	            ->set("POSTSCRIPTUM", $product->getPostscriptum())
+	            ->set("PRICE", $product->getPrice())
+	            ->set("PROMO_PRICE", $product->getPrice2())
+	            ->set("WEIGHT", $product->getWeight())
+	            ->set("PROMO", $product->getPromo())
+	            ->set("NEW", $product->getNewness())
+	            ->set("POSITION", $product->getPosition())
+			;
 
             $loopResult->addRow($loopResultRow);
         }
