@@ -23,10 +23,12 @@
 namespace Thelia\Tests\Action;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
+use Thelia\Model\ProductQuery;
 
 class CartTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,7 +56,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
 
         $this->actionCart = $this->getMock(
             "\Thelia\Action\Cart",
-            array("generateCookie"),
+            array("generateCookie", "redirect"),
             array($dispatcher)
 
         );
@@ -63,6 +65,10 @@ class CartTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method("generateCookie")
             ->will($this->returnValue($this->uniqid));
+
+        $this->actionCart
+            ->expects($this->any())
+            ->method("redirect");
     }
 
     /**
@@ -206,7 +212,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
      *
      * A new cart must be created (duplicated) containing customer id
      */
-    public function testGetCartWithExistinsCartAndCustomerButNotSameCustomerId()
+    public function testGetCartWithExistingCartAndCustomerButNotSameCustomerId()
     {
         $actionCart = $this->actionCart;
 
@@ -240,9 +246,20 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($customer->getId(), $getCart->getCustomerId());
     }
 
-    public function testAddArticle()
+
+    /**
+     * AddArticle action without data in the request, the form must not be valid
+     */
+    public function testAddArticleWithError()
     {
+        $actionEvent = new DefaultActionEvent($this->request, "AddArticle");
+
+        $this->actionCart->addArticle($actionEvent);
+
+        $this->assertTrue($actionEvent->hasErrorForm(), "no data in the request, so the action must failed and a form error must be present");
 
     }
+
+
 
 }
