@@ -154,13 +154,24 @@ class BaseAdminController extends ContainerAware
 
     	$actionEvent = $eventFactory->createActionEvent();
 
-    	$this->getDispatcher()->dispatch("action.$action", $actionEvent);
+    	$this->dispatch("action.$action", $actionEvent);
 
     	if ($actionEvent->hasErrorForm()) {
     		$this->getParserContext()->setErrorForm($actionEvent->getErrorForm());
     	}
 
     	return $actionEvent;
+    }
+
+    /**
+     * Dispatch a Thelia event to modules
+     *
+     * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param ActionEvent $event the event
+     */
+    protected function dispatch($eventName, ActionEvent $event = null) {
+
+    	$this->getDispatcher()->dispatch($eventName, $event);
     }
 
     /**

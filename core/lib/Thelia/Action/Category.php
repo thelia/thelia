@@ -33,71 +33,51 @@ use Thelia\Tools\Redirect;
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\AdminLog;
 use Thelia\Form\CategoryDeletionForm;
+use Thelia\Action\Exception\FormValidationException;
 
-class Category implements EventSubscriberInterface
+class Category extends BaseAction implements EventSubscriberInterface
 {
     public function create(ActionEvent $event)
     {
-        $request = $event->getRequest();
+    	$request = $event->getRequest();
 
-        $categoryCreationForm = new CategoryCreationForm($request);
+    	try {
+    		$categoryCreationForm = new CategoryCreationForm($request);
 
-        $form = $categoryCreationForm->getForm();
+    		$form = $this->validateForm($categoryCreationForm, "POST");
 
-        if ($request->isMethod("post")) {
+    		$data = $form->getData();
 
-            $form->bind($request);
+            $category = new CategoryModel();
 
-            if ($form->isValid()) {
+   			$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECATEGORY, $event);
 
-                $data = $form->getData();
+           	$category->create(
+                $data["title"],
+                $data["parent"],
+                $data["locale"]
+            );
 
-                $category = new CategoryModel();
+           	AdminLog::append(sprintf("Category %s (ID %s) created", $category->getTitle(), $category->getId()), $request, $request->getSession()->getAdminUser());
 
-                try {
-        			$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECATEGORY, $event);
+            $categoryEvent = new CategoryEvent($category);
 
-                	$category->create(
-                        $data["title"],
-                        $data["parent"],
-                        $data["locale"]
-                    );
+            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECATEGORY, $categoryEvent);
 
-                	AdminLog::append(sprintf("Category %s (ID %s) created", $category->getTitle(), $category->getId()), $request, $request->getSession()->getAdminUser());
+            // Substitute _ID_ in the URL with the ID of the created category
+            $successUrl = str_replace('_ID_', $category->getId(), $categoryCreationForm->getSuccessUrl());
 
-                    $categoryEvent = new CategoryEvent($category);
+	    	// Redirect to the success URL
+	    	Redirect::exec($successUrl);
 
-                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECATEGORY, $categoryEvent);
+        } catch (PropelException $e) {
+            Tlog::getInstance()->error(sprintf('error during creating category with message "%s"', $e->getMessage()));
 
-                    // Substitute _ID_ in the URL with the ID of the created category
-                    $successUrl = str_replace('_ID_', $category->getId(), $categoryCreationForm->getSuccessUrl());
-
-			    	// Redirect to the success URL
-			    	Redirect::exec($successUrl);
-
-                } catch (Exception $e) {
-                    Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
-
-                    $message = "Failed to create this category, please try again.";
-                }
-            }
-            else {
-            	$message = "Missing or invalid data";
-            }
-        }
-        else {
-        	$message = "Wrong form method !";
+            $message = "Failed to create this category, please try again.";
         }
 
-        // The form has an error
-        $categoryCreationForm->setError(true);
-        $categoryCreationForm->setErrorMessage($message);
-
-        // Store the form in the parser context
-        $event->setErrorForm($categoryCreationForm);
-
-        // Stop event propagation
-        $event->stopPropagation();
+        // The form has errors, propagate it.
+        $this->propagateFormError($categoryCreationForm, $message, $event);
     }
 
     public function modify(ActionEvent $event)
@@ -176,63 +156,45 @@ class Category implements EventSubscriberInterface
     {
     	$request = $event->getRequest();
 
-    	$categoryDeletionForm = new CategoryDeletionForm($request);
+    	try {
+    		$categoryDeletionForm = new CategoryDeletionForm($request);
 
-    	$form = $categoryDeletionForm->getForm();
+    		$form = $this->validateForm($categoryDeletionForm, "POST");
 
-    	if ($request->isMethod("post")) {
+    		$data = $form->getData();
 
-    		$form->bind($request);
+	    	$category = CategoryQuery::create()->findPk($data['id']);
 
-    		if ($form->isValid()) {
+	    	$categoryEvent = new CategoryEvent($category);
 
-    			$data = $form->getData();
+	    	$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_DELETECATEGORY, $categoryEvent);
 
-    			try {
-			    	$category = CategoryQuery::create()->findPk($data['id']);
+	    	$category->delete();
 
-			    	$categoryEvent = new CategoryEvent($category);
+	    	AdminLog::append(sprintf("Category %s (ID %s) deleted", $category->getTitle(), $category->getId()), $request, $request->getSession()->getAdminUser());
 
-			    	$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_DELETECATEGORY, $categoryEvent);
+	    	$categoryEvent->category = $category;
 
-			    	$category->delete();
+	    	$event->getDispatcher()->dispatch(TheliaEvents::AFTER_DELETECATEGORY, $categoryEvent);
 
-			    	AdminLog::append(sprintf("Category %s (ID %s) deleted", $category->getTitle(), $category->getId()), $request, $request->getSession()->getAdminUser());
+	        // Substitute _ID_ in the URL with the ID of the created category
+	        $successUrl = str_replace('_ID_', $category->getParent(), $categoryDeletionForm->getSuccessUrl());
 
-			    	$categoryEvent->category = $category;
+			// Redirect to the success URL
+			Redirect::exec($successUrl);
+    	}
+        catch(PropelException $e) {
 
-			    	$event->getDispatcher()->dispatch(TheliaEvents::AFTER_DELETECATEGORY, $categoryEvent);
+        	Tlog::getInstance()->error(sprintf('error during deleting category ID=%s on action/modifyCustomer with message "%s"', $data['id'], $e->getMessage()));
 
-			        // Substitute _ID_ in the URL with the ID of the created category
-			        $successUrl = str_replace('_ID_', $category->getParent(), $categoryDeletionForm->getSuccessUrl());
-
-					// Redirect to the success URL
-					Redirect::exec($successUrl);
-    			}
-    			catch(PropelException $e) {
-
-                    Tlog::getInstance()->error(sprintf('error during deleting category ID=%s on action/modifyCustomer with message "%s"', $data['id'], $e->getMessage()));
-
-                    $message = "Failed to change your account, please try again.";
-                }
-    			}
-            else {
-            	$message = "Missing or invalid data";
-            }
+        	$message = "Failed to change your account, please try again.";
         }
-        else {
-        	$message = "Wrong form method !";
+        catch(FormValidationException $e) {
+
+         	$message = $e->getMessage();
         }
 
-        // The form has an error
-        $categoryDeletionForm->setError(true);
-        $categoryDeletionForm->setErrorMessage($message);
-
-        // Store the form in the parser context
-        $event->setErrorForm($categoryDeletionForm);
-
-        // Stop event propagation
-        $event->stopPropagation();
+        $this->propagateFormError($categoryDeletionForm, $message, $event);
     }
 
     /**

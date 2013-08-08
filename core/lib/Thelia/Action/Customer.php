@@ -41,107 +41,89 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
+use Thelia\Action\Exception\FormValidationException;
 
 
 class Customer extends BaseAction implements EventSubscriberInterface
 {
-	/**
-	 * @var Thelia\Core\Security\SecurityContext
-	 */
-	protected $securityContext;
+  /**
+   * @var Thelia\Core\Security\SecurityContext
+   */
+  protected $securityContext;
 
-	public function __construct(SecurityContext $securityContext) {
-		$this->securityContext = $securityContext;
-	}
+  public function __construct(SecurityContext $securityContext) {
+    $this->securityContext = $securityContext;
+  }
 
     public function create(ActionEvent $event)
     {
-        $request = $event->getRequest();
+    	$request = $event->getRequest();
 
-        $customerCreationForm = new CustomerCreation($request);
+    	try {
+      		$customerCreationForm = new CustomerCreation($request);
 
-        $form = $customerCreationForm->getForm();
+        	$form = $this->validateForm($customerCreationForm, "POST");
 
-        if ($request->isMethod("post")) {
+            $data = $form->getData();
+      		$customer = new CustomerModel();
 
-            $form->bind($request);
+      		$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
 
-            if ($form->isValid()) {
-                $data = $form->getData();
-                $customer = new CustomerModel();
+            $customer->createOrUpdate(
+				$data["title"],
+                $data["firstname"],
+                $data["lastname"],
+                $data["address1"],
+                $data["address2"],
+                $data["address3"],
+                $data["phone"],
+                $data["cellphone"],
+                $data["zipcode"],
+                $data["country"],
+                $data["email"],
+                $data["password"],
+                $request->getSession()->getLang()
+            );
 
-                try {
-        			$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
+     		$customerEvent = new CustomerEvent($customer);
+            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
 
-                	$customer->createOrUpdate(
-                        $data["title"],
-                        $data["firstname"],
-                        $data["lastname"],
-                        $data["address1"],
-                        $data["address2"],
-                        $data["address3"],
-                        $data["phone"],
-                        $data["cellphone"],
-                        $data["zipcode"],
-                        $data["country"],
-                        $data["email"],
-                        $data["password"],
-                        $request->getSession()->getLang()
-                    );
-                    $customerEvent = new CustomerEvent($customer);
-                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
+            // Connect the newly created user,and redirect to the success URL
+            $this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
+		}
+		catch (PropelException $e) {
+            Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
 
-                	// Connect the newly created user,and redirect to the success URL
-                	$this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
+            $message = "Failed to create your account, please try again.";
+		}
+        catch(FormValidationException $e) {
 
-                } catch (PropelException $e) {
-                    Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
-
-                    $message = "Failed to create your account, please try again.";
-                }
-            }
-            else {
-            	$message = "Missing or invalid data";
-            }
-        }
-        else {
-        	$message = "Wrong form method !";
+           $message = $e->getMessage();
         }
 
-        // The form has an error
-        $customerCreationForm->setError(true);
-        $customerCreationForm->setErrorMessage($message);
-
-        // Store the form in the parser context
-        $event->setErrorForm($customerCreationForm);
-
-        // Stop event propagation
-        $event->stopPropagation();
-    }
+        // The form has errors, propagate it.
+        $this->propagateFormError($customerCreationForm, $message, $event);
+	}
 
     public function modify(ActionEvent $event)
     {
-        $request = $event->getRequest();
+    	$request = $event->getRequest();
 
-        $customerModification = new CustomerModification($request);
+    	try {
+      		$customerModification = new CustomerModification($request);
 
-        $form = $customerModification->getForm();
+        	$form = $this->validateForm($customerModification, "POST");
 
-        if ($request->isMethod("post")) {
+            $data = $form->getData();
 
-            $form->bind($request);
+            $customer = CustomerQuery::create()->findPk(1);
 
-            if ($form->isValid()) {
-                $data = $form->getData();
+      		$customerEvent = new CustomerEvent($customer);
+        	$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
 
-                $customer = CustomerQuery::create()->findPk(1);
-                try {
-                    $customerEvent = new CustomerEvent($customer);
-    				$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
+            $data = $form->getData();
 
-                	$data = $form->getData();
-
-                    $customer->createOrUpdate(
+            $customer->createOrUpdate(
                         $data["title"],
                         $data["firstname"],
                         $data["lastname"],
@@ -152,37 +134,29 @@ class Customer extends BaseAction implements EventSubscriberInterface
                         $data["cellphone"],
                         $data["zipcode"],
                         $data["country"]
-                    );
+      		);
 
-                    $customerEvent->customer = $customer;
-                    $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
+            $customerEvent->customer = $customer;
+            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
 
-                    // Update the logged-in user, and redirect to the success URL (exits)
-                    // We don-t send the login event, as the customer si already logged.
-                    $this->processSuccessfulLogin($event, $customer, $customerModification);
-                 }
-                catch(PropelException $e) {
-
-                    Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
-
-                    $message = "Failed to change your account, please try again.";
-                }
-            }
-            else {
-            	$message = "Missing or invalid data";
-            }
+            // Update the logged-in user, and redirect to the success URL (exits)
+            // We don-t send the login event, as the customer si already logged.
+            $this->processSuccessfulLogin($event, $customer, $customerModification);
         }
-        else {
-        	$message = "Wrong form method !";
+        catch(PropelException $e) {
+
+      		Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
+
+            $message = "Failed to change your account, please try again.";
+    	}
+        catch(FormValidationException $e) {
+
+           $message = $e->getMessage();
         }
 
-        // The form has an error
-        $customerModification->setError(true);
-        $customerModification->setErrorMessage($message);
-
-        // Dispatch the errored form
-        $event->setErrorForm($customerModification);
-    }
+        // The form has errors, propagate it.
+        $this->propagateFormError($customerModification, $message, $event);
+	}
 
 
     /**
@@ -192,9 +166,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function logout(ActionEvent $event)
     {
-    	$event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
+		$event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
 
-    	$this->getSecurityContext()->clear();
+      	$this->getSecurityContext()->clear();
     }
 
     /**
@@ -207,43 +181,43 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function login(ActionEvent $event)
     {
-    	$request = $event->getRequest();
+		$request = $event->getRequest();
 
-    	$customerLoginForm = new CustomerLogin($request);
+      	$customerLoginForm = new CustomerLogin($request);
 
-    	$authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+      	$authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
-    	try {
-    		$user = $authenticator->getAuthentifiedUser();
+      	try {
+			$user = $authenticator->getAuthentifiedUser();
 
-    		$this->processSuccessfulLogin($event, $user, $customerLoginForm);
-     	}
-    	catch (ValidatorException $ex) {
-    		$message = "Missing or invalid information. Please check your input.";
-    	}
+        	$this->processSuccessfulLogin($event, $user, $customerLoginForm);
+      	}
+      	catch (ValidatorException $ex) {
+        	$message = "Missing or invalid information. Please check your input.";
+      	}
         catch (UsernameNotFoundException $ex) {
-    		$message = "This email address was not found.";
-    	}
-    	catch (AuthenticationException $ex) {
-    		$message = "Login failed. Please check your username and password.";
-    	}
-    	catch (\Exception $ex) {
-    		$message = sprintf("Unable to process your request. Please try again (%s in %s).", $ex->getMessage(), $ex->getFile());
-    	}
+        	$message = "This email address was not found.";
+      	}
+      	catch (AuthenticationException $ex) {
+        	$message = "Login failed. Please check your username and password.";
+      	}
+      	catch (\Exception $ex) {
+        	$message = sprintf("Unable to process your request. Please try again (%s in %s).", $ex->getMessage(), $ex->getFile());
+      	}
 
-    	// The for has an error
-    	$customerLoginForm->setError(true);
-    	$customerLoginForm->setErrorMessage($message);
+      	// The for has an error
+      	$customerLoginForm->setError(true);
+      	$customerLoginForm->setErrorMessage($message);
 
-    	// Dispatch the errored form
-    	$event->setErrorForm($customerLoginForm);
+      	// Dispatch the errored form
+      	$event->setErrorForm($customerLoginForm);
 
-    	// A this point, the same view is displayed again.
+      // A this point, the same view is displayed again.
     }
 
     public function changePassword(ActionEvent $event)
     {
-		// TODO
+    // TODO
     }
 
     /**
@@ -284,13 +258,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     protected function processSuccessfulLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
-    	// Success -> store user in security context
-    	$this->getSecurityContext()->setUser($user);
+      // Success -> store user in security context
+      $this->getSecurityContext()->setUser($user);
 
-    	if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+      if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
 
-    	// Redirect to the success URL
-    	$this->redirect($form->getSuccessUrl());
+      // Redirect to the success URL
+      $this->redirect($form->getSuccessUrl());
     }
 
     /**
@@ -299,8 +273,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
      * @return SecurityContext the security context
      */
     protected function getSecurityContext() {
-    	$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
+		$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
 
-    	return $this->securityContext;
+		return $this->securityContext;
     }
 }

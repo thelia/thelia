@@ -20,63 +20,10 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Form\CategoryDeletionForm;
-use Thelia\Form\BaseForm;
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Action\Exception\FormValidationException;
-use Thelia\Core\Event\ActionEvent;
+namespace Thelia\Action\Exception;
 
-abstract class BaseAction
+
+class FormValidationException extends ActionException
 {
-	protected function validateForm(BaseForm $aBaseForm, $expectedMethod = 'POST')
-	{
-    	$form = $aBaseForm->getForm();
-
-    	if ($aBaseForm->getRequest()->isMethod($expectedMethod)) {
-
-    		$form->bind($aBaseForm->getRequest());
-
-    		if ($form->isValid()) {
-
-    			return $form;
-    		}
-            else {
-              	throw new FormValidationException("Missing or invalid data");
-            }
-        }
-        else {
-        	throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
-        }
-	}
-
-	/**
-	 *
-	 * @param BaseForm $aBaseForm
-	 * @param string $error_message
-	 * @param ActionEvent $event
-	 */
-	protected function propagateFormError(BaseForm $aBaseForm, $error_message, ActionEvent $event) {
-
-        // The form has an error
-        $aBaseForm->setError(true);
-        $aBaseForm->setErrorMessage($error_message);
-
-        // Store the form in the parser context
-        $event->setErrorForm($aBaseForm);
-
-        // Stop event propagation
-        $event->stopPropagation();
-	}
-
-    protected function redirect($url, $status = 302)
-    {
-        $response = new RedirectResponse($url, $status);
-
-        $response->send();
-        exit;
-    }
-
 }
