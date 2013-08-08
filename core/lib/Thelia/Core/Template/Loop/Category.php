@@ -36,6 +36,7 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  *
@@ -122,7 +123,7 @@ class Category extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if ($this->getVisible() != '*')
+        if ($this->getVisible() != BooleanOrBothType::ANY)
         	$search->filterByVisible($this->getVisible() ? 1 : 0);
 
         $orders  = $this->getOrder();

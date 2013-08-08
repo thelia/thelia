@@ -38,6 +38,9 @@ use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Event\ActionEvent;
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Thelia\Core\Factory\ActionEventFactory;
+use Thelia\Core\Security\Exception\AuthorizationException;
 
 /**
  *
@@ -70,6 +73,19 @@ class BaseAdminController extends ContainerAware
 		return new Response($this->renderRaw(self::TEMPLATE_404), 404);
 	}
 
+	/**
+	 * Check current admin user authorisations. An ADMIN role is assumed.
+	 *
+	 * @param unknown $permissions a single permission or an array of permissions.
+	 *
+	 * @throws AuthenticationException if permissions are not granted ti the current user.
+	 */
+	protected function checkAuth($permissions) {
+
+		if (! $this->getSecurityContext()->isGranted(array("ADMIN"), is_array($permissions) ? $permissions : array($permissions))) {
+			throw new AuthorizationException("Sorry, you're not allowed to perform this action");
+		}
+	}
 
     /**
      * Render the givent template, and returns the result as an Http Response.
@@ -119,11 +135,42 @@ class BaseAdminController extends ContainerAware
     }
 
     /**
+     * Create an action event,
+     *
+     * @return EventDispatcher
+     */
+    protected function dispatchEvent($action)
+    {
+    	// Create the
+    	$eventFactory = new ActionEventFactory($this->getRequest(), $action, $this->container->getParameter("thelia.actionEvent"));
+
+    	$actionEvent = $eventFactory->createActionEvent();
+
+    	$this->getDispatcher()->dispatch("action.$action", $actionEvent);
+
+    	if ($actionEvent->hasErrorForm()) {
+    		$this->getParserContext()->setErrorForm($actionEvent->getErrorForm());
+    	}
+
+    	return $actionEvent;
+    }
+
+    /**
+     * Return the event dispatcher,
+     *
+     * @return EventDispatcherInterface
+     */
+    protected function getDispatcher()
+    {
+    	return $this->container->get('event_dispatcher');
+    }
+
+    /**
      * Return the parser context,
      *
      * @return ParserContext
      */
-    protected function getParserContext($context = false)
+    protected function getParserContext()
     {
     	return $this->container->get('thelia.parser.context');
     }
@@ -148,17 +195,6 @@ class BaseAdminController extends ContainerAware
     protected function getRequest()
     {
         return $this->container->get('request');
-    }
-
-    /**
-     * Dispatch a Thelia event to modules
-     *
-     * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param ActionEvent $event the event
-     */
-    protected function dispatch($eventName, ActionEvent $event = null) {
-
-    	$this->container->get("event_dispatcher")->dispatch($eventName, $event);
     }
 
     /**

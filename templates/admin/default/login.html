@@ -13,7 +13,7 @@
 	   	<div class="hero-unit">
 	        <h1>{intl l='Thelia Back Office'}</h1>
 
-			{form name="thelia.admin.login" success_url="home" error_url="login"}
+			{form name="thelia.admin.login"}
 			<form action="{url path='/admin/checklogin'}" method="post" class="well form-inline" {form_enctype form=$form}>
 
 				{if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}

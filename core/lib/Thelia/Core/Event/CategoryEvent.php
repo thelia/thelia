@@ -21,54 +21,17 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Factory;
+namespace Thelia\Core\Event;
 
-use Symfony\Component\HttpFoundation\Request;
 
-class ActionEventFactory
-{
+use Thelia\Model\Category;
 
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
+class CategoryEvent extends InternalEvent {
 
-    /**
-     * @var string
-     */
-    protected $action;
+    public $category;
 
-    /**
-     * array(
-     *  "action.addCart" => "Thelia\Core\Event\CartAction"
-     * )
-     *
-     * @var array key are action name and value the Event class to dispatch
-     */
-    protected $className;
-
-    protected $defaultClassName = "Thelia\Core\Event\DefaultActionEvent";
-
-    public function __construct(Request $request, $action, $className)
+    public function __construct(Category $category)
     {
-        $this->request = $request;
-        $this->action = $action;
-        $this->className = $className;
-    }
-
-    public function createActionEvent()
-    {
-        if (array_key_exists($this->action, $this->className)) {
-            $class = new \ReflectionClass($this->className[$this->action]);
-            // return $class->newInstance($this->request, $this->action);
-        } else {
-            $class = new \ReflectionClass($this->defaultClassName);
-        }
-
-        if ($class->isSubclassOf("Thelia\Core\Event\ActionEvent") === false) {
-            throw new \RuntimeException("%s must be a subclass of Thelia\Core\Event\ActionEvent", $class->getName());
-        }
-
-        return $class->newInstance($this->request, $this->action);
+        $this->category = $category;
     }
 }

@@ -22,6 +22,10 @@
             <argument type="service" id="thelia.securityContext"/>
         </service>
 
+        <service id="thelia.action.category" class="Thelia\Action\Category">
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
     </services>
 
 </config>

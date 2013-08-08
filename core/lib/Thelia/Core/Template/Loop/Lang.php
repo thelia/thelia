@@ -28,37 +28,24 @@ use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
-use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
-use Thelia\Model\CategoryQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
-use Thelia\Type\BooleanOrBothType;
+use Thelia\Model\LangQuery;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
 /**
+ * Language loop, to get a list of available languages
  *
- * Category path loop, to get the path to a given category.
+ * - id is the language id
+ * - exclude is a comma separated list of lang IDs that will be excluded from output
+ * - default if 1, the loop return only default lang. If 0, return all but the default language
  *
- * - category is the category id
- * - depth is the maximum depth to go, default unlimited
- * - level is the exact level to return. Example: if level = 2 and the path is c1 -> c2 -> c3 -> c4, the loop will return c2
- * - visible if true or missing, only visible categories will be displayed. If false, all categories (visible or not) are returned.
- *
- * example :
- *
- * <THELIA_cat type="category-path" category="3">
- *      <a href="#URL">#TITLE</a>
- * </THELIA_cat>
- *
- *
- * Class CategoryPath
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryPath extends BaseLoop
+class Lang extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -66,12 +53,11 @@ class CategoryPath extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('category', null, true),
-            Argument::createIntTypeArgument('depth'),
-            Argument::createIntTypeArgument('level'),
-        	Argument::createBooleanOrBothTypeArgument('visible', true, false)
+            Argument::createIntTypeArgument('id', null),
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanTypeArgument('default_only', false)
         );
-    }
+     }
 
     /**
      * @param $pagination (ignored)
@@ -80,57 +66,48 @@ class CategoryPath extends BaseLoop
      */
     public function exec(&$pagination)
     {
-		$id = $this->getCategory();
-		$visible = $this->getVisible();
+		$id      = $this->getId();
+		$exclude = $this->getExclude();
+		$default_only = $this->getDefaultOnly();
 
-        $search = CategoryQuery::create();
-		$search->filterById($id);
-		if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        $search = LangQuery::create();
 
-		$results = array();
+        if (! is_null($id))
+			$search->filterById($id);
 
-		$ids = array();
+        if ($default_only)
+        	$search->filterByByDefault(true);
 
-		do {
-			$category = $search->findOne();
+        if (! is_null($exclude)) {
+        	$search->filterById($exclude, Criteria::NOT_IN);
+        }
 
-			if ($category != null) {
+        $search->orderByPosition(Criteria::ASC);
 
-				$loopResultRow = new LoopResultRow();
-
-				$loopResultRow
-					->set("TITLE",$category->getTitle())
-					->set("URL", $category->getUrl())
-					->set("ID", $category->getId())
-				;
-
-				$results[] = $loopResultRow;
-
-				$parent = $category->getParent();
-
-				if ($parent > 0) {
-
-					// Prevent circular refererences
-					if (in_array($parent, $ids)) {
-						throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
-					}
-
-					$ids[] = $parent;
-
-					$search = CategoryQuery::create();
-					$search->filterById($parent);
-					if ($visible == true) $search->filterByVisible($visible);
-				}
-			}
-		}
-		while ($category != null && $parent > 0);
-
-        // Reverse list and build the final result
-        $results = array_reverse($results);
+        $results = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach($results as $result) $loopResult->addRow($result);
+        foreach ($results as $result) {
+
+        	$loopResultRow = new LoopResultRow();
+
+        	$loopResultRow
+	        	->set("ID", $result->getId())
+	        	->set("TITLE",$result->getTitle())
+	        	->set("CODE", $result->getCode())
+	        	->set("LOCALE", $result->getLocale())
+	        	->set("URL", $result->getUrl())
+	        	->set("IS_DEFAULT", $result->getByDefault())
+	        	->set("URL", $result->getUrl())
+	        	->set("POSITION", $result->getPosition())
+
+	        	->set("CREATE_DATE", $result->getCreatedAt())
+	        	->set("UPDATE_DATE", $result->getUpdatedAt())
+	        ;
+
+        	$loopResult->addRow($loopResultRow);
+        }
 
         return $loopResult;
     }

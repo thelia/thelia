@@ -91,6 +91,12 @@ abstract class Lang implements ActiveRecordInterface
     protected $by_default;
 
     /**
+     * The value for the position field.
+     * @var        int
+     */
+    protected $position;
+
+    /**
      * The value for the created_at field.
      * @var        string
      */
@@ -431,6 +437,17 @@ abstract class Lang implements ActiveRecordInterface
     }
 
     /**
+     * Get the [position] column value.
+     *
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
      * Get the [optionally formatted] temporal [created_at] column value.
      *
      *
@@ -597,6 +614,27 @@ abstract class Lang implements ActiveRecordInterface
     } // setByDefault()
 
     /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Lang The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[] = LangTableMap::POSITION;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Sets the value of [created_at] column to a normalized version of the date/time value specified.
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
@@ -693,13 +731,16 @@ abstract class Lang implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : LangTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->by_default = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : LangTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : LangTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : LangTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : LangTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 8 + $startcol : LangTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -712,7 +753,7 @@ abstract class Lang implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 8; // 8 = LangTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 9; // 9 = LangTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Lang object", 0, $e);
@@ -950,6 +991,9 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->isColumnModified(LangTableMap::BY_DEFAULT)) {
             $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
         }
+        if ($this->isColumnModified(LangTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
+        }
         if ($this->isColumnModified(LangTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
@@ -984,6 +1028,9 @@ abstract class Lang implements ActiveRecordInterface
                         break;
                     case 'BY_DEFAULT':
                         $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
+                        break;
+                    case 'POSITION':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'CREATED_AT':
                         $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
@@ -1072,9 +1119,12 @@ abstract class Lang implements ActiveRecordInterface
                 return $this->getByDefault();
                 break;
             case 6:
-                return $this->getCreatedAt();
+                return $this->getPosition();
                 break;
             case 7:
+                return $this->getCreatedAt();
+                break;
+            case 8:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1111,8 +1161,9 @@ abstract class Lang implements ActiveRecordInterface
             $keys[3] => $this->getLocale(),
             $keys[4] => $this->getUrl(),
             $keys[5] => $this->getByDefault(),
-            $keys[6] => $this->getCreatedAt(),
-            $keys[7] => $this->getUpdatedAt(),
+            $keys[6] => $this->getPosition(),
+            $keys[7] => $this->getCreatedAt(),
+            $keys[8] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1172,9 +1223,12 @@ abstract class Lang implements ActiveRecordInterface
                 $this->setByDefault($value);
                 break;
             case 6:
-                $this->setCreatedAt($value);
+                $this->setPosition($value);
                 break;
             case 7:
+                $this->setCreatedAt($value);
+                break;
+            case 8:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1207,8 +1261,9 @@ abstract class Lang implements ActiveRecordInterface
         if (array_key_exists($keys[3], $arr)) $this->setLocale($arr[$keys[3]]);
         if (array_key_exists($keys[4], $arr)) $this->setUrl($arr[$keys[4]]);
         if (array_key_exists($keys[5], $arr)) $this->setByDefault($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
-        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[6], $arr)) $this->setPosition($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setCreatedAt($arr[$keys[7]]);
+        if (array_key_exists($keys[8], $arr)) $this->setUpdatedAt($arr[$keys[8]]);
     }
 
     /**
@@ -1226,6 +1281,7 @@ abstract class Lang implements ActiveRecordInterface
         if ($this->isColumnModified(LangTableMap::LOCALE)) $criteria->add(LangTableMap::LOCALE, $this->locale);
         if ($this->isColumnModified(LangTableMap::URL)) $criteria->add(LangTableMap::URL, $this->url);
         if ($this->isColumnModified(LangTableMap::BY_DEFAULT)) $criteria->add(LangTableMap::BY_DEFAULT, $this->by_default);
+        if ($this->isColumnModified(LangTableMap::POSITION)) $criteria->add(LangTableMap::POSITION, $this->position);
         if ($this->isColumnModified(LangTableMap::CREATED_AT)) $criteria->add(LangTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(LangTableMap::UPDATED_AT)) $criteria->add(LangTableMap::UPDATED_AT, $this->updated_at);
 
@@ -1296,6 +1352,7 @@ abstract class Lang implements ActiveRecordInterface
         $copyObj->setLocale($this->getLocale());
         $copyObj->setUrl($this->getUrl());
         $copyObj->setByDefault($this->getByDefault());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
         if ($makeNew) {
@@ -1337,6 +1394,7 @@ abstract class Lang implements ActiveRecordInterface
         $this->locale = null;
         $this->url = null;
         $this->by_default = null;
+        $this->position = null;
         $this->created_at = null;
         $this->updated_at = null;
         $this->alreadyInSave = false;

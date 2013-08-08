@@ -23,6 +23,8 @@
 
 namespace Thelia\Admin\Controller;
 
+use Thelia\Model\CategoryQuery;
+use Thelia\Core\Security\Exception\AuthenticationException;
 class CategoryController extends BaseAdminController {
 
 	public function indexAction()
@@ -33,31 +35,83 @@ class CategoryController extends BaseAdminController {
 				'current_category_id' => 0
 		);
 
+		return $this->browseCategory($args);
+	}
+
+	public function createNewCategory($args) {
+
+		$this->checkAuth("ADMIN", "admin.category.create");
+
+		$this->dispatchEvent("createCategory");
+
+		// At this point, the form has error, and should be redisplayed.
 		return $this->render('categories', $args);
 	}
 
-    public function processAction($action)
+	public function editCategory($args) {
+
+		$this->checkAuth("AMIN", "admin.category.edit");
+
+		return $this->render('edit_category', $args);
+	}
+
+	public function deleteCategory($category_id) {
+
+		$this->checkAuth("AMIN", "admin.category.delete");
+
+		$category = CategoryQuery::create()->findPk($category_id);
+
+		$this->dispatchEvent("deleteCategory");
+
+		// Something was wrong, category was not deleted. Display parent category list
+		return $this->render(
+			'categories',
+			array('current_category_id' => $category->getParent())
+		);
+	}
+
+	public function browseCategory($args) {
+
+		$this->checkAuth("AMIN", "admin.catalog.view");
+
+		return $this->render('categories', $args);
+	}
+
+    public function processAction()
     {
-    	list($action, $id) = explode('/', $action);
+    	// Get the current action
+    	$action = $this->getRequest()->get('action', 'browse');
+
+    	// Get the category ID
+    	$id = $this->getRequest()->get('id', 0);
 
     	$args = array(
     		'action' 			  => $action,
     		'current_category_id' => $id
     	);
 
-    	// Browe categories
-    	if ($action == 'browse') {
-    		return $this->render('categories', $args);
+    	try {
+	    	// Browse categories
+	    	if ($action == 'browse') {
+	    		return $this->browseCategory($args);
+	    	}
+	    	// Create a new category
+	    	else if ($action == 'create') {
+	    		return $this->createNewCategory($args);
+	    	}
+	        	// Edit an existing category
+	    	else if ($action == 'edit') {
+	    		return $this->editCategory($args);
+	    	}
+	    	// Delete an existing category
+	    	else if ($action == 'delete') {
+	    		return $this->deleteCategory($id);
+	    	}
     	}
-    	// Create a new category
-    	else if ($action = 'create') {
-    		return $this->render('edit_category', $args);
+    	catch(AuthenticationException $ex) {
+    		return $this->render('general_error', array(
+    			"error_message" => $ex->getMessage())
+    		);
     	}
-    	// Edit an existing category
-    	else if ($action = 'edit') {
-    		return $this->render('edit_category', $args);
-    	}
-
-    	//return $this->render("categories");
     }
 }

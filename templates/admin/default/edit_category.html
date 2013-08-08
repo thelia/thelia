@@ -1,10 +1,6 @@
 {check_auth context="admin" roles="ADMIN" permissions="admin.catalog.view" login_tpl="/admin/login"}
 
-{if $action == 'create'}
-	{$page_title={intl l='Create a new category'}}
-{else}
-	{$page_title={intl l='Edit category'}}
-{/if}
+{$page_title={intl l='Edit category'}}
 
 {include file='includes/header.inc.html'}
 
@@ -19,29 +15,22 @@
             <div class="span12 general-block-decorator">
                 <div class="row-fluid">
                     <div class="span7 title">
-	                    {if $action == 'create'}
-						    {intl l='Create a new category'}
-						{else}
-						    {intl l='Edit category'}
-						{/if}
+						{intl l='Edit category'}
 		            </div>
 
 	                <div class="span5 actions">
-                        <button class="btn btn-primary" title="{intl l='Save and stay on this page'}">{intl l='Save'} <i class="icon icon-white icon-ok"></i></button>
-                        <button class="btn btn-info" title="{intl l='Save and close'}">{intl l='Save'} <i class="icon icon-remove icon-white"></i></button>
-                        {if $action != 'create'}
-			                <button class="btn" title="{intl l='Edit previous category'}"><i class="icon icon-arrow-left"></i></button>
-			                <button class="btn" title="{intl l='Preview category page'}"><i class="icon icon-eye-open"></i></button>
-			                <button class="btn" title="{intl l='Edit next category'}"><i class="icon icon-arrow-right"></i></button>
-		                {/if}
+		                <button class="btn" title="{intl l='Edit previous category'}"><i class="icon icon-arrow-left"></i></button>
+		                <button class="btn" title="{intl l='Preview category page'}"><i class="icon icon-eye-open"></i></button>
+		                <button class="btn" title="{intl l='Edit next category'}"><i class="icon icon-arrow-right"></i></button>
 	                </div>
                 </div>
 
                 <div class="tabbable">
-	                <ul class="nav nav-tabs" id="tabbed_menu">
+	                <ul class="nav nav-tabs admin-tabs" id="tabbed_menu">
 					    <li class="active">
 					        <a href="#general_description">{intl l="General description"}</a>
 					    </li>
+
 					    <li>
 	                        <a href="#details">{intl l="Details"}</a>
 	                    </li>
@@ -57,9 +46,13 @@
 				    </ul>
 
 					<div class="tab-content">
-					   <div class="tab-pane active" id="general_description">
+
+					   <div class="tab-pane active form-container" id="general_description">
 							<form class="form-horizontal span12">
                                 <fieldset>
+
+                                    {include file="includes/inner-form-toolbar.html"}
+
                                     <div class="row-fluid">
                                         <div class="span12">
 									        <div class="control-group">
@@ -133,7 +126,12 @@
 
 		                                        <div class="controls">
 		                                            <select required="required" name="parent" class="input-block-level">
-		                                                <option value="">{intl l="Choose a category"}</option>
+		                                                <option value="0">{intl l="Top level"}</option>
+
+			                                            {loop name="cat-parent" type="category-tree" visible="*" category="0" exclude="{$current_category_id}"}
+			                                                 <option value="#ID" style="padding-left: {3 + $LEVEL * 20}px" {if $parent_category_id == $ID}selected="selected"{/if}>{$TITLE}</option>
+			                                            {/loop}
+
 		                                            </select>
 		                                        </div>
 		                                    </div>
@@ -160,19 +158,22 @@
 					   </div>
 
                        <div class="tab-pane" id="details">
-                           <p>Infos générales</p>
+                           <p>Détails divers</p>
                        </div>
+
                        <div class="tab-pane" id="images">
                            <p>Images</p>
                        </div>
+
                        <div class="tab-pane" id="documents">
                            <p>Documents</p>
                        </div>
+
                        <div class="tab-pane" id="modules">
                            <p>Modules</p>
                        </div>
-					</div>
 
+					</div>
 			     </div>
 		    </div>
  		</div>

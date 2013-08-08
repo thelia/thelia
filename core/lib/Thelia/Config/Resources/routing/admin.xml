@@ -31,9 +31,8 @@
         <default key="_controller">Thelia\Admin\Controller\CategoryController::indexAction</default>
     </route>
 
-    <route id="admin.category" path="/admin/catalog/category/{action}">
+    <route id="admin.category" path="/admin/catalog/category">
         <default key="_controller">Thelia\Admin\Controller\CategoryController::processAction</default>
-        <requirement key="action">.*</requirement>
     </route>
 
 	<!-- The default route, to display a template -->

@@ -1,7 +1,7 @@
 <?php
 /*************************************************************************************/
 /*                                                                                   */
-/*      Thelia	                                                                     */
+/*      Thelia                                                                       */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
 /*      email : info@thelia.net                                                      */
@@ -17,58 +17,12 @@
 /*      GNU General Public License for more details.                                 */
 /*                                                                                   */
 /*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
+/*      along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Factory;
+namespace Thelia\Core\Security\Exception;
 
-use Symfony\Component\HttpFoundation\Request;
-
-class ActionEventFactory
+class AuthorizationException extends \Exception
 {
-
-    /**
-     * @var \Symfony\Component\HttpFoundation\Request
-     */
-    protected $request;
-
-    /**
-     * @var string
-     */
-    protected $action;
-
-    /**
-     * array(
-     *  "action.addCart" => "Thelia\Core\Event\CartAction"
-     * )
-     *
-     * @var array key are action name and value the Event class to dispatch
-     */
-    protected $className;
-
-    protected $defaultClassName = "Thelia\Core\Event\DefaultActionEvent";
-
-    public function __construct(Request $request, $action, $className)
-    {
-        $this->request = $request;
-        $this->action = $action;
-        $this->className = $className;
-    }
-
-    public function createActionEvent()
-    {
-        if (array_key_exists($this->action, $this->className)) {
-            $class = new \ReflectionClass($this->className[$this->action]);
-            // return $class->newInstance($this->request, $this->action);
-        } else {
-            $class = new \ReflectionClass($this->defaultClassName);
-        }
-
-        if ($class->isSubclassOf("Thelia\Core\Event\ActionEvent") === false) {
-            throw new \RuntimeException("%s must be a subclass of Thelia\Core\Event\ActionEvent", $class->getName());
-        }
-
-        return $class->newInstance($this->request, $this->action);
-    }
 }

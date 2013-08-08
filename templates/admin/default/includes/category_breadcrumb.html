@@ -1,16 +1,18 @@
+{* Breadcrumb for categories browsing and editing *}
 
 <li><a href="{url path='admin/home'}">Home</a> <span class="divider">/</span></li>
 <li><a href="{url path='admin/catalog'}">Catalog</a>
+
 {ifloop rel="category_path"}
 	 <span class="divider">/</span></li>
 
-    {loop name="category_path" type="category-path" category="{$current_category_id}"}
+    {loop name="category_path" type="category-path" visible="*" category="{$current_category_id}"}
     	{if $ID == $current_category_id}
     	    <li class="active">
                 {if $action == 'edit'}
                     {intl l='Editing %cat' cat="{$TITLE}"}
                 {else}
-				    {$TITLE} <a href="{url path="admin/catalog/category/edit/$ID"}" title="{intl l='Edit this category'}">{intl l="(edit)"}</a>
+                    {$TITLE} <a href="{url path="admin/catalog/category/edit/$ID"}" title="{intl l='Edit this category'}">{intl l="(edit)"}</a>
 				{/if}
     		</li>
     	{else}
@@ -18,11 +20,7 @@
     	{/if}
     {/loop}
 {/ifloop}
+
 {elseloop rel="category_path"}
-    {if $action == 'create'}<span class="divider">/</span>{/if}</li>
+    </li>
 {/elseloop}
-
-{if $action == 'create'}
-    <li class="active">{intl l='Create a new category'}</li>
-{/if}
-

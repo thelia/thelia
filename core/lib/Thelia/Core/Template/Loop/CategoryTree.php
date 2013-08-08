@@ -40,25 +40,16 @@ use Thelia\Type\BooleanOrBothType;
 
 /**
  *
- * Category path loop, to get the path to a given category.
+ * Category tree loop, to get a category tree from a given category to a given depth.
  *
  * - category is the category id
  * - depth is the maximum depth to go, default unlimited
- * - level is the exact level to return. Example: if level = 2 and the path is c1 -> c2 -> c3 -> c4, the loop will return c2
  * - visible if true or missing, only visible categories will be displayed. If false, all categories (visible or not) are returned.
  *
- * example :
- *
- * <THELIA_cat type="category-path" category="3">
- *      <a href="#URL">#TITLE</a>
- * </THELIA_cat>
- *
- *
- * Class CategoryPath
  * @package Thelia\Core\Template\Loop
  * @author Franck Allimant <franck@cqfdev.fr>
  */
-class CategoryPath extends BaseLoop
+class CategoryTree extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -67,10 +58,46 @@ class CategoryPath extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
-            Argument::createIntTypeArgument('depth'),
-            Argument::createIntTypeArgument('level'),
-        	Argument::createBooleanOrBothTypeArgument('visible', true, false)
+            Argument::createIntTypeArgument('depth', PHP_INT_MAX),
+        	Argument::createBooleanOrBothTypeArgument('visible', true, false),
+        	Argument::createIntListTypeArgument('exclude', array())
         );
+    }
+
+    // changement de rubrique
+    protected function buildCategoryTree($parent, $visible, $level, $max_level, array $exclude, LoopResult &$loopResult) {
+
+    	if ($level > $max_level) return;
+
+     	$search = CategoryQuery::create();
+
+    	$search->filterByParent($parent);
+
+    	if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+
+    	$search->filterById($exclude, Criteria::NOT_IN);
+
+    	$search->orderByPosition(Criteria::ASC);
+
+    	$results = $search->find();
+
+    	foreach($results as $result) {
+
+    		$loopResultRow = new LoopResultRow();
+
+           	$loopResultRow
+           		->set("ID", $result->getId())
+            	->set("TITLE",$result->getTitle())
+	            ->set("PARENT", $result->getParent())
+	            ->set("URL", $result->getUrl())
+	            ->set("VISIBLE", $result->getVisible() ? "1" : "0")
+	            ->set("LEVEL", $level)
+	        ;
+
+           	$loopResult->addRow($loopResultRow);
+
+           	$this->buildCategoryTree($result->getId(), $visible,  1 + $level, $max_level, $exclude, $loopResult);
+    	}
     }
 
     /**
@@ -81,56 +108,15 @@ class CategoryPath extends BaseLoop
     public function exec(&$pagination)
     {
 		$id = $this->getCategory();
+		$depth   = $this->getDepth();
 		$visible = $this->getVisible();
+		$exclude = $this->getExclude();
 
-        $search = CategoryQuery::create();
-		$search->filterById($id);
-		if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+		//echo "exclude=".print_r($exclude);
 
-		$results = array();
+		$loopResult = new LoopResult();
 
-		$ids = array();
-
-		do {
-			$category = $search->findOne();
-
-			if ($category != null) {
-
-				$loopResultRow = new LoopResultRow();
-
-				$loopResultRow
-					->set("TITLE",$category->getTitle())
-					->set("URL", $category->getUrl())
-					->set("ID", $category->getId())
-				;
-
-				$results[] = $loopResultRow;
-
-				$parent = $category->getParent();
-
-				if ($parent > 0) {
-
-					// Prevent circular refererences
-					if (in_array($parent, $ids)) {
-						throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
-					}
-
-					$ids[] = $parent;
-
-					$search = CategoryQuery::create();
-					$search->filterById($parent);
-					if ($visible == true) $search->filterByVisible($visible);
-				}
-			}
-		}
-		while ($category != null && $parent > 0);
-
-        // Reverse list and build the final result
-        $results = array_reverse($results);
-
-        $loopResult = new LoopResult();
-
-        foreach($results as $result) $loopResult->addRow($result);
+		$this->buildCategoryTree($id, $visible, 0, $depth, $exclude, $loopResult);
 
         return $loopResult;
     }

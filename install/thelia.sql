@@ -522,6 +522,7 @@ CREATE TABLE `lang`
     `locale` VARCHAR(45),
     `url` VARCHAR(255),
     `by_default` TINYINT,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -763,6 +764,7 @@ CREATE TABLE `currency`
     `symbol` VARCHAR(45),
     `rate` FLOAT,
     `by_default` TINYINT,
+    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)

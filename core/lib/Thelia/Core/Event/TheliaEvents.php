@@ -88,4 +88,25 @@ final class TheliaEvents
      * Sent before customer insertion, to allow modules to create a custom customer reference.
      */
     const CREATECUSTOMER_CUSTOMREF = "customer.creation.customref";
+
+
+    /**
+     * Sent once the category creation form has been successfully validated, and before category insertion in the database.
+     */
+    const BEFORE_CREATECATEGORY = "action.before_createcategory";
+
+    /**
+     * Sent just after a successful insert of a new category in the database.
+     */
+    const AFTER_CREATECATEGORY 	= "action.after_createcategory";
+    /**
+     * Sent befonre deleting a category
+     */
+    const BEFORE_DELETECATEGORY = "action.before_deletecategory";
+
+    /**
+     * Sent just after a successful delete of a category from the database.
+     */
+    const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
+
 }

@@ -24,6 +24,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery orderByLocale($order = Criteria::ASC) Order by the locale column
  * @method     ChildLangQuery orderByUrl($order = Criteria::ASC) Order by the url column
  * @method     ChildLangQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
+ * @method     ChildLangQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildLangQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildLangQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -33,6 +34,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLangQuery groupByLocale() Group by the locale column
  * @method     ChildLangQuery groupByUrl() Group by the url column
  * @method     ChildLangQuery groupByByDefault() Group by the by_default column
+ * @method     ChildLangQuery groupByPosition() Group by the position column
  * @method     ChildLangQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildLangQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -49,6 +51,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     ChildLang findOneByLocale(string $locale) Return the first ChildLang filtered by the locale column
  * @method     ChildLang findOneByUrl(string $url) Return the first ChildLang filtered by the url column
  * @method     ChildLang findOneByByDefault(int $by_default) Return the first ChildLang filtered by the by_default column
+ * @method     ChildLang findOneByPosition(int $position) Return the first ChildLang filtered by the position column
  * @method     ChildLang findOneByCreatedAt(string $created_at) Return the first ChildLang filtered by the created_at column
  * @method     ChildLang findOneByUpdatedAt(string $updated_at) Return the first ChildLang filtered by the updated_at column
  *
@@ -58,6 +61,7 @@ use Thelia\Model\Map\LangTableMap;
  * @method     array findByLocale(string $locale) Return ChildLang objects filtered by the locale column
  * @method     array findByUrl(string $url) Return ChildLang objects filtered by the url column
  * @method     array findByByDefault(int $by_default) Return ChildLang objects filtered by the by_default column
+ * @method     array findByPosition(int $position) Return ChildLang objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildLang objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildLang objects filtered by the updated_at column
  *
@@ -148,7 +152,7 @@ abstract class LangQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, TITLE, CODE, LOCALE, URL, BY_DEFAULT, CREATED_AT, UPDATED_AT FROM lang WHERE ID = :p0';
+        $sql = 'SELECT ID, TITLE, CODE, LOCALE, URL, BY_DEFAULT, POSITION, CREATED_AT, UPDATED_AT FROM lang WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -433,6 +437,47 @@ abstract class LangQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(LangTableMap::BY_DEFAULT, $byDefault, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildLangQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(LangTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(LangTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(LangTableMap::POSITION, $position, $comparison);
     }
 
     /**

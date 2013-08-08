@@ -590,6 +590,7 @@
     <column name="symbol" size="45" type="VARCHAR" />
     <column name="rate" type="FLOAT" />
     <column name="by_default" type="TINYINT" />
+    <column name="position" type="INTEGER" />
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="name" />
