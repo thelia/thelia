@@ -236,6 +236,29 @@ class Category implements EventSubscriberInterface
     }
 
     /**
+     * Toggle category visibility. No form used here
+     *
+     * @param ActionEvent $event
+     */
+    public function toggleVisibility(ActionEvent $event)
+    {
+    	$request = $event->getRequest();
+
+    	$category = CategoryQuery::create()->findPk($request->get('id', 0));
+
+    	if ($category !== null) {
+
+    		$category->setVisible($category->getVisible() ? false : true);
+
+    		$category->save();
+
+    		$categoryEvent = new CategoryEvent($category);
+
+    		$event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECATEGORY, $categoryEvent);
+    	}
+    }
+
+    /**
      * Returns an array of event names this subscriber listens to.
      *
      * The array keys are event names and the value can be:
@@ -261,6 +284,8 @@ class Category implements EventSubscriberInterface
             "action.createCategory" => array("create", 128),
             "action.modifyCategory" => array("modify", 128),
             "action.deleteCategory" => array("delete", 128),
-         );
+
+            "action.toggleCategoryVisibility" => array("toggleVisibility", 128),
+        );
     }
 }

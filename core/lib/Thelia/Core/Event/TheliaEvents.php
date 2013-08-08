@@ -109,4 +109,9 @@ final class TheliaEvents
      */
     const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
 
+    /**
+     * Sent just after a successful change of a category in the database.
+     */
+    const AFTER_CHANGECATEGORY 	= "action.after_changecategory";
+
 }
