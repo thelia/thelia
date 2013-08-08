@@ -1,6 +1,11 @@
 {include file="includes/header.html"}
 
 <h1>{intl l='cart'}</h1>
+<ul>
+{loop name="cart" type="cart"}
+    <li>Item {$LOOP_COUNT}/{$LOOP_TOTAL} : #TITLE - quantity : #QUANTITY</li>
+{/loop}
+</ul>
 
 {form name="thelia.cart.add" }
 {* We use $INDEX_PAGE as form action to avoid mixing post and get data *}

@@ -12,6 +12,7 @@ namespace Thelia\Core\Template\Loop;
 
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
 class Cart extends BaseLoop {
@@ -78,10 +79,24 @@ class Cart extends BaseLoop {
         }
 
 
-        
+        $cartItems = $cart->getCartItems();
 
+        foreach ($cartItems as $cartItem) {
+            $product = $cartItem->getProduct();
+            //$product->setLocale($this->request->getSession()->getLocale());
 
+            $loopResultRow = new LoopResultRow();
 
+            $loopResultRow->set("ITEM_ID", $cartItem->getId());
+            $loopResultRow->set("TITLE", $product->getTitle());
+            $loopResultRow->set("REF", $product->getRef());
+            $loopResultRow->set("QUANTITY", $cartItem->getQuantity());
+            $loopResultRow->set("PRICE", $cartItem->getPrice());
+            $loopResultRow->set("PRODUCT_ID", $product->getId());
+            $result->addRow($loopResultRow);
+        }
+
+        return $result;
     }
 
 
