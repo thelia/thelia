@@ -45,6 +45,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param string $phone customer phone number
      * @param string $cellphone customer cellphone number
      * @param string $zipcode customer zipcode
+     * @param string $city
      * @param int $countryId customer country id (from Country table)
      * @param string $email customer email, must be unique
      * @param string $plainPassword customer plain password, hash is made calling setPassword method. Not mandatory parameter but an exception is thrown if customer is new without password
@@ -53,7 +54,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param null $sponsor
      * @param int $discount
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
+    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
     {
         $this
         	->setTitleId($titleId)
@@ -79,7 +80,7 @@ class Customer extends BaseCustomer implements UserInterface
             $address = new Address();
 
             $address
-                ->setCustomerTitleId($titleId)
+                ->setTitleId($titleId)
                 ->setFirstname($firstname)
                 ->setLastname($lastname)
                 ->setAddress1($address1)
@@ -119,9 +120,15 @@ class Customer extends BaseCustomer implements UserInterface
         return uniqid(substr($this->getLastname(), 0, (strlen($this->getLastname()) >= 3) ? 3 : strlen($this->getLastname())), true);
     }
 
+    /**
+     * create hash for plain password and set it in Customer object
+     *
+     * @param string $password plain password before hashing
+     * @return $this|Customer
+     * @throws \Symfony\Component\DependencyInjection\Exception\InvalidArgumentException
+     */
     public function setPassword($password)
     {
-        \Thelia\Log\Tlog::getInstance()->debug($password);
         if ($this->isNew() && ($password === null || trim($password) == "")) {
             throw new InvalidArgumentException("customer password is mandatory on creation");
         }

@@ -57,28 +57,28 @@ class CartAdd extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("product", "hidden", array(
+            ->add("product", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array($this, "checkProduct")
-                    ))
+                    new Constraints\Callback(array("methods" => array(
+                            array($this, "checkProduct")
+                    )))
                 )
             ))
-            ->add("product_sale_elements_id", "hidden", array(
+            ->add("product_sale_elements_id", "text", array(
                 "constraints" => array(
-                    new Constraints\Callback(array(
-                        "methods" => array($this, "checkStockAvailability")
-                    ))
+                    new Constraints\Callback(array("methods" => array(
+                            array($this, "checkStockAvailability")
+                    )))
                 )
 
             ))
             ->add("quantity", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank(),
-                    new Constraints\Callback(array(
-                        "methods" => array($this, "checkStock")
-                    )),
+                    new Constraints\Callback(array("methods" => array(
+                            array($this, "checkStock")
+                    ))),
                     new Constraints\GreaterThanOrEqual(array(
                         "value" => 0
                     ))
@@ -89,7 +89,7 @@ class CartAdd extends BaseForm
         ;
     }
 
-    protected function checkProduct($value, ExecutionContextInterface $context)
+    public function checkProduct($value, ExecutionContextInterface $context)
     {
         $product = ProductQuery::create()->findPk($value);
 
@@ -98,7 +98,7 @@ class CartAdd extends BaseForm
         }
     }
 
-    protected function checkStockAvailability($value, ExecutionContextInterface $context)
+    public function checkStockAvailability($value, ExecutionContextInterface $context)
     {
         if ($value) {
             $data = $context->getRoot()->getData();
@@ -114,7 +114,7 @@ class CartAdd extends BaseForm
         }
     }
 
-    protected function checkStock($value, ExecutionContextInterface $context)
+    public function checkStock($value, ExecutionContextInterface $context)
     {
         $data = $context->getRoot()->getData();
 

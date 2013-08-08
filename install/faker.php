@@ -20,6 +20,28 @@ try {
         ->find();
     $product->delete();
 
+    $customer = Thelia\Model\CustomerQuery::create()
+        ->find();
+    $customer->delete();
+
+    $customer = new Thelia\Model\Customer();
+    $customer->createOrUpdate(
+        1,
+        "thelia",
+        "thelia",
+        "5 rue rochon",
+        "",
+        "",
+        "0102030405",
+        "0601020304",
+        "63000",
+        "clermont-ferrand",
+        64,
+        "test@thelia.net",
+        "azerty"
+    );
+
+
     $folder = Thelia\Model\FolderQuery::create()
         ->find();
     $folder->delete();

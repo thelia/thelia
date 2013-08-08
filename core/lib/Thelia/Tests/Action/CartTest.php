@@ -23,10 +23,13 @@
 namespace Thelia\Tests\Action;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
+use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
+use Thelia\Model\ProductQuery;
+use Thelia\Model\ProductSaleElementsQuery;
 
 class CartTest extends \PHPUnit_Framework_TestCase
 {
@@ -50,15 +53,25 @@ class CartTest extends \PHPUnit_Framework_TestCase
 
         $this->uniqid = uniqid('', true);
 
+        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
         $this->actionCart = $this->getMock(
             "\Thelia\Action\Cart",
-            array("generateCookie")
+            array("generateCookie", "redirect"),
+            array($dispatcher)
+
         );
 
         $this->actionCart
             ->expects($this->any())
             ->method("generateCookie")
             ->will($this->returnValue($this->uniqid));
+
+        $this->actionCart
+            ->expects($this->any())
+            ->method("redirect")
+            ->will($this->returnValue(true))
+        ;
     }
 
     /**
@@ -202,7 +215,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
      *
      * A new cart must be created (duplicated) containing customer id
      */
-    public function testGetCartWithExistinsCartAndCustomerButNotSameCustomerId()
+    public function testGetCartWithExistingCartAndCustomerButNotSameCustomerId()
     {
         $actionCart = $this->actionCart;
 
@@ -235,5 +248,43 @@ class CartTest extends \PHPUnit_Framework_TestCase
         $this->assertNotEquals($cart->getToken(), $getCart->getToken(), "token must be different");
         $this->assertEquals($customer->getId(), $getCart->getCustomerId());
     }
+
+
+    /**
+     * AddArticle action without data in the request, the form must not be valid
+     */
+/*    public function testAddArticleWithError()
+    {
+        $actionEvent = new DefaultActionEvent($this->request, "AddArticle");
+
+        $this->actionCart->addArticle($actionEvent);
+
+        $this->assertTrue($actionEvent->hasErrorForm(), "no data in the request, so the action must failed and a form error must be present");
+
+    }*/
+
+/*    public function testAddArticleWithValidDataInRequest()
+    {
+        $request = $this->request;
+        $actionCart = $this->actionCart;
+
+        //find valid product
+
+        $product = ProductQuery::create()->findOne();
+        $productSalementElements = ProductSaleElementsQuery::create()->filterByProduct($product)->findOne();
+
+        $request->query->set("thelia_cart_add[product]", $product->getId());
+        $request->query->set("thelia_cart_add[product_sale_elements_id]", $productSalementElements->getId());
+        $request->query->set("thelia_cart_add[quantity]", 1);
+        $request->setMethod('GET');
+
+        $actionEvent = new DefaultActionEvent($request, "AddArticle");
+
+        $actionCart->addArticle($actionEvent);
+
+        $this->assertFalse($actionEvent->hasErrorForm(), "there is data in the request, form must be valid");
+
+
+    }*/
 
 }

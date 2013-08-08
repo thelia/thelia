@@ -29,30 +29,13 @@ use Thelia\Model\Cart;
 
 class CartEvent extends InternalEvent {
 
-    protected $cart;
-    protected $modified;
+    public $cart;
 
     public function __construct(Cart $cart)
     {
         $this->cart = $cart;
-        $this->modified = false;
     }
 
-    public function setCart(Cart $cart)
-    {
-        $this->cart = $cart;
-        $this->modified = true;
-    }
-
-    public function getCart()
-    {
-        return $this->cart;
-    }
-
-    public function isModified()
-    {
-        return $this->modified;
-    }
 
 
 }

@@ -538,7 +538,6 @@ CREATE TABLE `folder`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `parent` INTEGER NOT NULL,
-    `link` VARCHAR(255),
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,
@@ -1274,7 +1273,7 @@ DROP TABLE IF EXISTS `cart`;
 CREATE TABLE `cart`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `token` VARCHAR(255) NOT NULL,
+    `token` VARCHAR(255),
     `customer_id` INTEGER,
     `address_delivery_id` INTEGER,
     `address_invoice_id` INTEGER,
@@ -1314,6 +1313,9 @@ CREATE TABLE `cart_item`
     `product_id` INTEGER NOT NULL,
     `quantity` FLOAT DEFAULT 1,
     `product_sale_elements_id` INTEGER NOT NULL,
+    `price` FLOAT,
+    `promo_price` FLOAT,
+    `price_end_of_life` DATETIME,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
@@ -1847,7 +1849,6 @@ CREATE TABLE `folder_version`
 (
     `id` INTEGER NOT NULL,
     `parent` INTEGER NOT NULL,
-    `link` VARCHAR(255),
     `visible` TINYINT,
     `position` INTEGER,
     `created_at` DATETIME,

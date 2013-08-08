@@ -37,14 +37,13 @@ use Thelia\Form\CustomerLogin;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\ConfigQuery;
-use Thelia\Tools\Redirect;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
 
 
-class Customer implements EventSubscriberInterface
+class Customer extends BaseAction implements EventSubscriberInterface
 {
 	/**
 	 * @var Thelia\Core\Security\SecurityContext
@@ -291,7 +290,7 @@ class Customer implements EventSubscriberInterface
     	if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
 
     	// Redirect to the success URL
-    	Redirect::exec($form->getSuccessUrl());
+    	$this->redirect($form->getSuccessUrl());
     }
 
     /**
