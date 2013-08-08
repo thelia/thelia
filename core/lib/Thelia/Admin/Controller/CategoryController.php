@@ -25,20 +25,10 @@ namespace Thelia\Admin\Controller;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Core\Security\Exception\AuthenticationException;
+
 class CategoryController extends BaseAdminController {
 
-	public function indexAction()
-	{
-		// Show top level categories and products
-		$args = array(
-				'action' => 'browse',
-				'current_category_id' => 0
-		);
-
-		return $this->browseCategory($args);
-	}
-
-	public function createNewCategory($args) {
+	protected function createNewCategory($args) {
 
 		$this->checkAuth("ADMIN", "admin.category.create");
 
@@ -48,14 +38,14 @@ class CategoryController extends BaseAdminController {
 		return $this->render('categories', $args);
 	}
 
-	public function editCategory($args) {
+	protected function editCategory($args) {
 
 		$this->checkAuth("AMIN", "admin.category.edit");
 
 		return $this->render('edit_category', $args);
 	}
 
-	public function deleteCategory($category_id) {
+	protected function deleteCategory($category_id) {
 
 		$this->checkAuth("AMIN", "admin.category.delete");
 
@@ -70,11 +60,40 @@ class CategoryController extends BaseAdminController {
 		);
 	}
 
-	public function browseCategory($args) {
+	protected function browseCategory($args) {
 
 		$this->checkAuth("AMIN", "admin.catalog.view");
 
 		return $this->render('categories', $args);
+	}
+
+	protected function visibilityToggle($args) {
+
+		$this->checkAuth("AMIN", "admin.category.edit");
+
+		$this->dispatchEvent("toggleCategoryVisibility");
+
+		return $this->nullResponse();
+	}
+
+	protected function changePosition($args) {
+
+		$this->checkAuth("AMIN", "admin.category.edit");
+
+		$this->dispatchEvent("changeCategoryPosition");
+
+		return $this->render('categories', $args);
+	}
+
+	public function indexAction()
+	{
+		// Show top level categories and products
+		$args = array(
+				'action' => 'browse',
+				'current_category_id' => 0
+		);
+
+		return $this->browseCategory($args);
 	}
 
     public function processAction()
@@ -91,21 +110,24 @@ class CategoryController extends BaseAdminController {
     	);
 
     	try {
-	    	// Browse categories
-	    	if ($action == 'browse') {
-	    		return $this->browseCategory($args);
-	    	}
-	    	// Create a new category
-	    	else if ($action == 'create') {
-	    		return $this->createNewCategory($args);
-	    	}
-	        	// Edit an existing category
-	    	else if ($action == 'edit') {
-	    		return $this->editCategory($args);
-	    	}
-	    	// Delete an existing category
-	    	else if ($action == 'delete') {
-	    		return $this->deleteCategory($id);
+    		switch($action) {
+	    		case 'browse' : // Browse categories
+	    			return $this->browseCategory($args);
+
+	    		case 'create' : // Create a new category
+	    			return $this->createNewCategory($args);
+
+	        	case 'edit' : // Edit an existing category
+	    			return $this->editCategory($args);
+
+	    		case 'delete' : // Delete an existing category
+	    			return $this->deleteCategory($id);
+
+    			case 'visibilityToggle' : // Toggle visibility
+	    			return $this->visibilityToggle($id);
+
+    	    	case 'changePosition' : // Change position
+	    			return $this->changePosition($args);
 	    	}
     	}
     	catch(AuthenticationException $ex) {

@@ -57,7 +57,13 @@
 	 							{module_include location='category_list_row'}
 
 		                    	<td>
-		                    		<input type="checkbox" data-id="{$ID}" class="displayToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    	    {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
+		                    		<input type="checkbox" data-id="{$ID}" class="categoryVisibleToggle" {if $VISIBLE == 1}checked="checked"{/if}>
+		                    		{/loop}
+
+		                    		{elseloop rel="can_change"}
+                                       <input type="checkbox" class="disabled" disabled="disabled" {if $VISIBLE == 1}checked="checked"{/if}>
+                                    {/elseloop}
 		                    	</td>
 
 		                    	<td>
@@ -220,6 +226,17 @@ $(function() {
     {* Set the proper category ID in the delete confirmation dialog *}
     $(document).on("click", ".category-delete", function () {
     	$('#'+'delete-category-id').val($(this).data('id'));
+    });
+
+    // Toggle category visibility
+    $(".categoryVisibleToggle").click(function() {
+        $.ajax({
+           url : "{url path='admin/catalog/category'}",
+           data : {
+               id : $(this).data('id'),
+               action : 'visibilityToggle'
+           }
+        });
     });
 
 })

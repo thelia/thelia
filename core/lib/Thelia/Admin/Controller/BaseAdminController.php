@@ -87,8 +87,16 @@ class BaseAdminController extends ContainerAware
 		}
 	}
 
+	/**
+	 * Return an empty response (after an ajax request, for example)
+	 */
+	protected function nullResponse()
+	{
+		return new Response();
+	}
+
     /**
-     * Render the givent template, and returns the result as an Http Response.
+     * Render the given template, and returns the result as an Http Response.
      *
      * @param $templateName the complete template name, with extension
      * @param array $args the template arguments

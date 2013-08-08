@@ -110,6 +110,12 @@ final class TheliaEvents
     const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
 
     /**
+     * Sent just after a successful change of a category in the database.
+     */
+    const AFTER_CHANGECATEGORY 	= "action.after_changecategory";
+
+
+    /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
      */
     const CART_DUPLICATE = "cart.duplicate";
@@ -123,5 +129,4 @@ final class TheliaEvents
      * sent when a cart item is modify
      */
     const CART_MODIFYITEM = "cart.modifyItem";
-
 }
