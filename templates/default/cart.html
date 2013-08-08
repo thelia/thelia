@@ -1,0 +1,47 @@
+{include file="includes/header.html"}
+
+<h1>{intl l='cart'}</h1>
+
+{form name="thelia.cart.add" }
+{* We use $INDEX_PAGE as form action to avoid mixing post and get data *}
+    <form action="http://thelia.local/index_dev.php?view=cart" method="post" {form_enctype form=$form}>
+
+        <input type="hidden" name="action" value="addArticle">
+
+        {*
+        The form error status and the form error messages are defined in Customer action,
+        and passed back to the form plugin through the ParserContext.
+        *}
+
+        {if #form_error}<div class="alert alert-error">#form_error_message</div>{/if}
+
+        {form_hidden_fields form=$form}
+
+        {form_field form=$form field="product"}
+        {form_error form=$form field="product"}
+        {$message}
+        {/form_error}
+            <label>{intl l="product"}: </label><input type="text" name="{$name}" value="{$value}" {$attr} ><br />
+        {/form_field}
+
+        {form_field form=$form field='product_sale_elements_id'}
+        {form_error form=$form field="product_sale_elements_id"}
+        {$message}
+        {/form_error}
+            <label>{intl l="product_sale_elements_id"}: </label><input type="text" name="{$name}" value="{$value}" {$attr}> <br />
+        {/form_field}
+
+        {form_field form=$form field='quantity'}
+        {form_error form=$form field="quantity"}
+        {$message}
+        {/form_error}
+            <label>{intl l="quantity"}: </label><input type="text" name="{$name}" value="{$value}" {$attr}> <br />
+        {/form_field}
+
+
+
+        <button type="submit">{intl l='Login'}</button>
+    </form>
+{/form}
+
+{include file='includes/footer.html'}

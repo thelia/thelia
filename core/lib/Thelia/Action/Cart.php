@@ -178,7 +178,16 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (null !== $cartItem = $request->get('cartItem')) {
+        if (null !== $cartItemId = $request->get('cartItem')) {
+            $cart = $this->getCart($request);
+            try {
+                $cartItem = CartItemQuery::create()
+                    ->filterByCartId($cart->getId())
+                    ->filterById($cartItemId)
+                    ->delete();
+            } catch (PropelException $e) {
+                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
+            }
 
         }
     }
@@ -195,18 +204,23 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $message = "";
-
         if(null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
-            $cart = $this->getCart($request);
-            $cartItem = CartItemQuery::create()
-                ->filterByCartId($cart->getId())
-                ->filterById($cartItemId)
-                ->findOne();
 
-            if($cartItem) {
-                $this->updateQuantity($cartItem, $quantity);
+            try {
+                $cart = $this->getCart($request);
+
+                $cartItem = CartItemQuery::create()
+                    ->filterByCartId($cart->getId())
+                    ->filterById($cartItemId)
+                    ->findOne();
+
+                if($cartItem) {
+                    $this->updateQuantity($cartItem, $quantity);
+                }
+            } catch (PropelException $e) {
+                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during updating cartItem with message : %s", $e->getMessage()));
             }
+
         }
     }
 
