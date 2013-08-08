@@ -209,8 +209,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $message = "";
-
         if(null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
 
             try {
