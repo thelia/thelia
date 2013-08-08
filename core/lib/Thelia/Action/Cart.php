@@ -23,19 +23,47 @@
 
 namespace Thelia\Action;
 
+use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\CartEvent;
+use Thelia\Core\Event\TheliaEvents;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Form\CartAdd;
+use Thelia\Model\ProductPrice;
+use Thelia\Model\ProductPriceQuery;
+use Thelia\Model\CartItem;
+use Thelia\Model\CartItemQuery;
 use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
+use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
 
-
-class Cart implements EventSubscriberInterface
+/**
+ *
+ * Class Cart where all actions are manage like adding, modifying or delete items.
+ *
+ * Class Cart
+ * @package Thelia\Action
+ */
+class Cart extends BaseAction implements EventSubscriberInterface
 {
+    /**
+     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
+     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
+     */
+    public function __construct(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
     /**
      *
      * add an article to cart
@@ -46,6 +74,88 @@ class Cart implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
+        $cartAdd = $this->getAddCartForm($request);
+        $form = $cartAdd->getForm();
+
+        $form->bind($request);
+
+        if($form->isValid()) {
+            try {
+                $cart = $this->getCart($request);
+                $newness = $form->get("newness")->getData();
+                $append = $form->get("append")->getData();
+                $quantity = $form->get("quantity")->getData();
+
+                $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
+                $productId = $form->get("product")->getData();
+
+                $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
+
+                if($cartItem === null || $newness)
+                {
+                    $productPrice = ProductPriceQuery::create()
+                        ->filterByProductSaleElementsId($productSaleElementsId)
+                        ->findOne()
+                    ;
+
+                    $this->addItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
+                }
+
+                if($append && $cartItem !== null) {
+                    $this->updateQuantity($cartItem, $quantity);
+                }
+
+
+                $this->redirect($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
+            } catch (PropelException $e) {
+                \Thelia\Log\Tlog::getInstance()->error(sptinf("error on adding item to cart with message : %s", $e->getMessage()));
+                $message = "Impossible to add this article to your cart, please try again";
+            }
+
+        } else {
+
+            $message = "Missing or invalid data";
+        }
+
+        $cartAdd->setError(true);
+        $cartAdd->setErrorMessage($message);
+
+        $event->setErrorForm($cartAdd);
+    }
+
+    protected function updateQuantity(CartItem $cartItem, $quantity)
+    {
+        $cartItem->setDisptacher($this->dispatcher);
+        $cartItem->addQuantity($quantity)
+            ->save();
+    }
+
+    protected function addItem(\Thelia\Model\Cart $cart, $productId, $productSaleElementsId, $quantity, ProductPrice $productPrice)
+    {
+        $cartItem = new CartItem();
+        $cartItem->setDisptacher($this->dispatcher);
+        $cartItem
+            ->setCart($cart)
+            ->setProductId($productId)
+            ->setProductSaleElementsId($productSaleElementsId)
+            ->setQuantity($quantity)
+            ->setPrice($productPrice->getPrice())
+            ->setPromoPrice($productPrice->getPromoPrice())
+            ->setPriceEndOfLife(time() + ConfigQuery::read("cart.priceEOF", 60*60*24*30))
+            ->save();
+    }
+
+    protected function findItem($cartId, $productId, $productSaleElementsId)
+    {
+        return CartItemQuery::create()
+            ->filterByCartId($cartId)
+            ->filterByProductId($productId)
+            ->filterByProductSaleElementsId($productSaleElementsId)
+            ->findOne();
+    }
+
+    private function getAddCartForm(Request $request)
+    {
         if ($request->isMethod("post")) {
             $cartAdd = new CartAdd($request);
         } else {
@@ -59,15 +169,7 @@ class Cart implements EventSubscriberInterface
             );
         }
 
-        $form = $cartAdd->getForm();
-
-        $form->bind($request);
-
-        if($form->isValid()) {
-
-        } else {
-            var_dump($form->createView());
-        }
+        return $cartAdd;
     }
 
 
@@ -79,18 +181,38 @@ class Cart implements EventSubscriberInterface
      */
     public function deleteArticle(ActionEvent $event)
     {
+        $request = $event->getRequest();
 
+        if (null !== $cartItem = $request->get('cartItem')) {
+
+        }
     }
 
     /**
      *
      * Modify article's quantity
      *
+     * don't use Form here just test the Request.
+     *
      * @param \Thelia\Core\Event\ActionEvent $event
      */
     public function modifyArticle(ActionEvent $event)
     {
+        $request = $event->getRequest();
 
+        $message = "";
+
+        if(null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
+            $cart = $this->getCart($request);
+            $cartItem = CartItemQuery::create()
+                ->filterByCartId($cart->getId())
+                ->filterById($cartItemId)
+                ->findOne();
+
+            if($cartItem) {
+                $this->updateQuantity($cartItem, $quantity);
+            }
+        }
     }
 
     /**
@@ -122,6 +244,13 @@ class Cart implements EventSubscriberInterface
         );
     }
 
+    /**
+     *
+     * search if cart already exists in session. If not try to create a new one or duplicate an old one.
+     *
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @return \Thelia\Model\Cart
+     */
     public function getCart(Request $request)
     {
 
@@ -163,8 +292,8 @@ class Cart implements EventSubscriberInterface
     }
 
     /**
-     * @param Session $session
-     * @return CartModel
+     * @param \Thelia\Core\HttpFoundation\Session\Session $session
+     * @return \Thelia\Model\Cart
      */
     protected function createCart(Session $session)
     {
@@ -184,24 +313,34 @@ class Cart implements EventSubscriberInterface
 
 
     /**
-     * @param CartModel $cart
-     * @param Session $session
-     * @param Customer $customer
-     * @return CartModel
+     * try to duplicate existing Cart. Customer is here to determine if this cart belong to him.
+     *
+     * @param \Thelia\Model\Cart $cart
+     * @param \Thelia\Core\HttpFoundation\Session\Session $session
+     * @param \Thelia\Model\Customer $customer
+     * @return \Thelia\Model\Cart
      */
     protected function duplicateCart(CartModel $cart, Session $session, Customer $customer = null)
     {
         $newCart = $cart->duplicate($this->generateCookie(), $customer);
         $session->setCart($newCart->getId());
 
-        return $newCart;
+        $cartEvent = new CartEvent($newCart);
+        $this->dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
+
+        return $cartEvent->cart;
     }
 
     protected function generateCookie()
     {
-        $id = uniqid('', true);
-        setcookie("thelia_cart", $id, time()+(60*60*24*365));
+        $id = null;
+        if (ConfigQuery::read("cart.session_only", 0) == 0) {
+            $id = uniqid('', true);
+            setcookie("thelia_cart", $id, time()+ConfigQuery::read("cart.cookie_lifetime", 60*60*24*365));
+
+        }
 
         return $id;
+
     }
 }

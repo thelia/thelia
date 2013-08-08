@@ -14,6 +14,8 @@
 
         <service id="thelia.action.cart" class="Thelia\Action\Cart">
             <tag name="kernel.event_subscriber"/>
+
+            <argument type="service" id="event_dispatcher"/>
         </service>
 
         <service id="thelia.action.customer" class="Thelia\Action\Customer" scope="request">

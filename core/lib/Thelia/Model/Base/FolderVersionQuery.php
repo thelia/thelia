@@ -23,7 +23,6 @@ use Thelia\Model\Map\FolderVersionTableMap;
  *
  * @method     ChildFolderVersionQuery orderById($order = Criteria::ASC) Order by the id column
  * @method     ChildFolderVersionQuery orderByParent($order = Criteria::ASC) Order by the parent column
- * @method     ChildFolderVersionQuery orderByLink($order = Criteria::ASC) Order by the link column
  * @method     ChildFolderVersionQuery orderByVisible($order = Criteria::ASC) Order by the visible column
  * @method     ChildFolderVersionQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildFolderVersionQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
@@ -34,7 +33,6 @@ use Thelia\Model\Map\FolderVersionTableMap;
  *
  * @method     ChildFolderVersionQuery groupById() Group by the id column
  * @method     ChildFolderVersionQuery groupByParent() Group by the parent column
- * @method     ChildFolderVersionQuery groupByLink() Group by the link column
  * @method     ChildFolderVersionQuery groupByVisible() Group by the visible column
  * @method     ChildFolderVersionQuery groupByPosition() Group by the position column
  * @method     ChildFolderVersionQuery groupByCreatedAt() Group by the created_at column
@@ -56,7 +54,6 @@ use Thelia\Model\Map\FolderVersionTableMap;
  *
  * @method     ChildFolderVersion findOneById(int $id) Return the first ChildFolderVersion filtered by the id column
  * @method     ChildFolderVersion findOneByParent(int $parent) Return the first ChildFolderVersion filtered by the parent column
- * @method     ChildFolderVersion findOneByLink(string $link) Return the first ChildFolderVersion filtered by the link column
  * @method     ChildFolderVersion findOneByVisible(int $visible) Return the first ChildFolderVersion filtered by the visible column
  * @method     ChildFolderVersion findOneByPosition(int $position) Return the first ChildFolderVersion filtered by the position column
  * @method     ChildFolderVersion findOneByCreatedAt(string $created_at) Return the first ChildFolderVersion filtered by the created_at column
@@ -67,7 +64,6 @@ use Thelia\Model\Map\FolderVersionTableMap;
  *
  * @method     array findById(int $id) Return ChildFolderVersion objects filtered by the id column
  * @method     array findByParent(int $parent) Return ChildFolderVersion objects filtered by the parent column
- * @method     array findByLink(string $link) Return ChildFolderVersion objects filtered by the link column
  * @method     array findByVisible(int $visible) Return ChildFolderVersion objects filtered by the visible column
  * @method     array findByPosition(int $position) Return ChildFolderVersion objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildFolderVersion objects filtered by the created_at column
@@ -163,7 +159,7 @@ abstract class FolderVersionQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PARENT, LINK, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM folder_version WHERE ID = :p0 AND VERSION = :p1';
+        $sql = 'SELECT ID, PARENT, VISIBLE, POSITION, CREATED_AT, UPDATED_AT, VERSION, VERSION_CREATED_AT, VERSION_CREATED_BY FROM folder_version WHERE ID = :p0 AND VERSION = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -346,35 +342,6 @@ abstract class FolderVersionQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(FolderVersionTableMap::PARENT, $parent, $comparison);
-    }
-
-    /**
-     * Filter the query on the link column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByLink('fooValue');   // WHERE link = 'fooValue'
-     * $query->filterByLink('%fooValue%'); // WHERE link LIKE '%fooValue%'
-     * </code>
-     *
-     * @param     string $link The value to use as filter.
-     *              Accepts wildcards (* and % trigger a LIKE)
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildFolderVersionQuery The current query, for fluid interface
-     */
-    public function filterByLink($link = null, $comparison = null)
-    {
-        if (null === $comparison) {
-            if (is_array($link)) {
-                $comparison = Criteria::IN;
-            } elseif (preg_match('/[\%\*]/', $link)) {
-                $link = str_replace('*', '%', $link);
-                $comparison = Criteria::LIKE;
-            }
-        }
-
-        return $this->addUsingAlias(FolderVersionTableMap::LINK, $link, $comparison);
     }
 
     /**

@@ -20,32 +20,19 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Action;
 
-namespace Thelia\Tests\Core\Template\Loop;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
-use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
-
-use Thelia\Core\Template\Loop\Product;
-
-/**
- *
- * @author Etienne Roudeix <eroudeix@openstudio.fr>
- *
- */
-/*class ProductTest extends BaseLoopTestor
+abstract class BaseAction
 {
-    public function getTestedClassName()
+
+    public function redirect($url, $status = 302)
     {
-        return 'Thelia\Core\Template\Loop\Product';
+        $response = new RedirectResponse($url, $status);
+
+        $response->send();
+        exit;
     }
 
-    public function getTestedInstance()
-    {
-        return new Product($this->request, $this->dispatcher, $this->securityContext);
-    }
-
-    public function getMandatoryArguments()
-    {
-        return array();
-    }
-}*/
+}

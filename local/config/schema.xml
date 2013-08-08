@@ -393,7 +393,6 @@
   <table name="folder" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="parent" required="true" type="INTEGER" />
-    <column name="link" size="255" type="VARCHAR" />
     <column name="visible" type="TINYINT" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
@@ -926,7 +925,7 @@
   </table>
   <table name="cart" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="token" required="true" size="255" type="VARCHAR" />
+    <column name="token" size="255" type="VARCHAR" />
     <column name="customer_id" type="INTEGER" />
     <column name="address_delivery_id" type="INTEGER" />
     <column name="address_invoice_id" type="INTEGER" />
@@ -943,9 +942,6 @@
     <foreign-key foreignTable="currency" name="fk_cart_currency_id">
       <reference foreign="id" local="currency_id" />
     </foreign-key>
-    <unique name="token_UNIQUE">
-      <unique-column name="token" />
-    </unique>
     <index name="idx_cart_customer_id">
       <index-column name="customer_id" />
     </index>
@@ -958,6 +954,9 @@
     <index name="idx_cart_currency_id">
       <index-column name="currency_id" />
     </index>
+    <unique name="token_UNIQUE">
+      <unique-column name="token" />
+    </unique>
     <behavior name="timestampable" />
   </table>
   <table name="cart_item" namespace="Thelia\Model">
@@ -966,6 +965,9 @@
     <column name="product_id" required="true" type="INTEGER" />
     <column defaultValue="1" name="quantity" type="FLOAT" />
     <column name="product_sale_elements_id" required="true" type="INTEGER" />
+    <column name="price" type="FLOAT" />
+    <column name="promo_price" type="FLOAT" />
+    <column name="price_end_of_life" type="TIMESTAMP" />
     <foreign-key foreignTable="cart" name="fk_cart_item_cart_id">
       <reference foreign="id" local="cart_id" />
     </foreign-key>

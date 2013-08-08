@@ -109,4 +109,19 @@ final class TheliaEvents
      */
     const AFTER_DELETECATEGORY 	= "action.after_deletecategory";
 
+    /**
+     * sent when a new existing cat id duplicated. This append when current customer is different from current cart
+     */
+    const CART_DUPLICATE = "cart.duplicate";
+
+    /**
+     * sent when a new item is added to current cart
+     */
+    const CART_ADDITEM = "cart.addItem";
+
+    /**
+     * sent when a cart item is modify
+     */
+    const CART_MODIFYITEM = "cart.modifyItem";
+
 }

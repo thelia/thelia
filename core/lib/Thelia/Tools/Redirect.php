@@ -28,11 +28,6 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 class Redirect
 {
 
-    public static function unauthorize($url)
-    {
-        self::exec($url, 401);
-    }
-
     public static function exec($url, $status = 302)
     {
     	$response = new RedirectResponse($url, $status);

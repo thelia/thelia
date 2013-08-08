@@ -21,19 +21,22 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Template\BaseParam;
+namespace Thelia\Core\Event;
 
-use Thelia\Tpex\BaseParam\BaseParam;
-use Thelia\Tools\Redirect;
 
-class Secure extends BaseParam
-{
-    public function exec()
+use Thelia\Model\CartItem;
+
+class CartItemEvent extends InternalEvent {
+
+    protected $cartItem;
+
+    public function __construct(CartItem $cartItem)
     {
-        $request = $this->getRequest();
+        $this->cartItem = $cartItem;
+    }
 
-        if (!$request->getSession()->get('connected') && $this->baseParamValue) {
-            Redirect::unauthorize();
-        }
+    public function getCartItem()
+    {
+        return $this->cartItem;
     }
 }
