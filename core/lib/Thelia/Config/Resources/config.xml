@@ -24,7 +24,7 @@
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>
         <loop class="Thelia\Core\Template\Loop\CategoryTree" name="category-tree"/>
-
+        <loop class="Thelia\Core\Template\Loop\Cart" name="cart"/>
     </loops>
 
     <forms>
