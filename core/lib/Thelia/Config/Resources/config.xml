@@ -33,14 +33,10 @@
 
         <form name="thelia.customer.login" class="Thelia\Form\CustomerLogin"/>
         <form name="thelia.admin.login" class="Thelia\Form\AdminLogin"/>
-<<<<<<< HEAD
 
         <form name="thelia.admin.category.creation" class="Thelia\Form\CategoryCreationForm"/>
         <form name="thelia.admin.category.deletion" class="Thelia\Form\CategoryDeletionForm"/>
-
-=======
         <form name="thelia.cart.add" class="Thelia\Form\CartAdd"/>
->>>>>>> cart
     </forms>
 
 
