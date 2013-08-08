@@ -181,18 +181,38 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function deleteArticle(ActionEvent $event)
     {
+        $request = $event->getRequest();
 
+        if (null !== $cartItem = $request->get('cartItem')) {
+
+        }
     }
 
     /**
      *
      * Modify article's quantity
      *
+     * don't use Form here just test the Request.
+     *
      * @param \Thelia\Core\Event\ActionEvent $event
      */
     public function modifyArticle(ActionEvent $event)
     {
+        $request = $event->getRequest();
 
+        $message = "";
+
+        if(null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
+            $cart = $this->getCart($request);
+            $cartItem = CartItemQuery::create()
+                ->filterByCartId($cart->getId())
+                ->filterById($cartItemId)
+                ->findOne();
+
+            if($cartItem) {
+                $this->updateQuantity($cartItem, $quantity);
+            }
+        }
     }
 
     /**
