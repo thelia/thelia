@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<phpdoc>
+    <title><![CDATA[<b>Thelia</b> e-commerce Project]]></title>
+    <parser>
+        <target>documentation/api</target>
+    </parser>
+    <transformer>
+        <target>documentation/api</target>
+    </transformer>
+    <files>
+        <ignore>core/lib/Thelia/Tests/*</ignore>
+        <directory>core/lib/Thelia</directory>
+
+    </files>
+</phpdoc>
