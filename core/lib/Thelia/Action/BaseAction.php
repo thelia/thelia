@@ -31,7 +31,7 @@ use Thelia\Core\Event\ActionEvent;
 
 abstract class BaseAction
 {
-	protected function validateForm(BaseForm $aBaseForm, $expectedMethod = 'POST')
+	protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
 	{
     	$form = $aBaseForm->getForm();
 

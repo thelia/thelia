@@ -72,55 +72,50 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function addArticle(ActionEvent $event)
     {
-        $request = $event->getRequest();
+    	$request = $event->getRequest();
 
-        $cartAdd = $this->getAddCartForm($request);
-        $form = $cartAdd->getForm();
+    	try {
+    		$cartAdd = $this->getAddCartForm($request);
 
-        $form->bind($request);
+    		$form = $this->validateForm($cartAdd);
 
-        if($form->isValid()) {
-            try {
-                $cart = $this->getCart($request);
-                $newness = $form->get("newness")->getData();
-                $append = $form->get("append")->getData();
-                $quantity = $form->get("quantity")->getData();
+            $cart = $this->getCart($request);
+            $newness = $form->get("newness")->getData();
+            $append = $form->get("append")->getData();
+            $quantity = $form->get("quantity")->getData();
 
-                $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
-                $productId = $form->get("product")->getData();
+            $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
+            $productId = $form->get("product")->getData();
 
-                $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
+            $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
-                if($cartItem === null || $newness)
-                {
-                    $productPrice = ProductPriceQuery::create()
-                        ->filterByProductSaleElementsId($productSaleElementsId)
-                        ->findOne()
-                    ;
+            if($cartItem === null || $newness)
+            {
+                $productPrice = ProductPriceQuery::create()
+                    ->filterByProductSaleElementsId($productSaleElementsId)
+                    ->findOne()
+                ;
 
-                    $this->addItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
-                }
-
-                if($append && $cartItem !== null) {
-                    $this->updateQuantity($cartItem, $quantity);
-                }
-
-
-                $this->redirect($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
-            } catch (PropelException $e) {
-                \Thelia\Log\Tlog::getInstance()->error(sptinf("error on adding item to cart with message : %s", $e->getMessage()));
-                $message = "Impossible to add this article to your cart, please try again";
+                $this->addItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
             }
 
-        } else {
+            if($append && $cartItem !== null) {
+                $this->updateQuantity($cartItem, $quantity);
+            }
 
-            $message = "Missing or invalid data";
+
+            $this->redirect($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
+        } catch (PropelException $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
+            $message = "Failed to add this article to your cart, please try again";
+        }
+        catch(FormValidationException $e) {
+
+        	$message = $e->getMessage();
         }
 
-        $cartAdd->setError(true);
-        $cartAdd->setErrorMessage($message);
-
-        $event->setErrorForm($cartAdd);
+        // The form has errors, propagate it.
+        $this->propagateFormError($cartAdd, $message, $event);
     }
 
     protected function updateQuantity(CartItem $cartItem, $quantity)
