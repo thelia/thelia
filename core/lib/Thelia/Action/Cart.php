@@ -41,6 +41,7 @@ use Thelia\Model\CartQuery;
 use Thelia\Model\Cart as CartModel;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\Customer;
+use Thelia\Action\Exception\FormValidationException;
 
 
 /**
