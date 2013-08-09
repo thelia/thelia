@@ -251,10 +251,13 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     *
      * Stores the current user in the security context, and redirect to the
      * success_url.
-     *
-     * @param CustomerModel $user the logged user
+     * @param ActionEvent $event
+     * @param CustomerModel $user
+     * @param BaseForm $form
+     * @param bool $sendLoginEvent
      */
     protected function processSuccessfullLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
