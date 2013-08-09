@@ -23,7 +23,6 @@
 
 namespace Thelia\Action\Exception;
 
-
-class ProductNotFoundException extends ActionException {
-
+class ProductNotFoundException extends ActionException
+{
 }

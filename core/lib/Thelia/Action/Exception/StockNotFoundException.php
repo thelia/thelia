@@ -23,7 +23,6 @@
 
 namespace Thelia\Action\Exception;
 
-
 class StockNotFoundException extends ActionException
 {
 

@@ -22,7 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Action\Exception;
 
-
 class ActionException extends \RuntimeException
 {
 

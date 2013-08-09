@@ -25,7 +25,6 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\CustomerEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerCreation;
@@ -36,13 +35,11 @@ use Thelia\Model\CustomerQuery;
 use Thelia\Form\CustomerLogin;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
 use Thelia\Core\Security\SecurityContext;
-use Thelia\Model\ConfigQuery;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Action\Exception\FormValidationException;
-
 
 class Customer extends BaseAction implements EventSubscriberInterface
 {
@@ -51,25 +48,26 @@ class Customer extends BaseAction implements EventSubscriberInterface
    */
   protected $securityContext;
 
-  public function __construct(SecurityContext $securityContext) {
+  public function __construct(SecurityContext $securityContext)
+  {
     $this->securityContext = $securityContext;
   }
 
     public function create(ActionEvent $event)
     {
-    	$request = $event->getRequest();
+        $request = $event->getRequest();
 
-    	try {
-      		$customerCreationForm = new CustomerCreation($request);
+        try {
+              $customerCreationForm = new CustomerCreation($request);
 
-        	$form = $this->validateForm($customerCreationForm, "POST");
+            $form = $this->validateForm($customerCreationForm, "POST");
 
             $data = $form->getData();
-      		$customer = new CustomerModel();
+              $customer = new CustomerModel();
             $customer->setDispatcher($event->getDispatcher());
 
             $customer->createOrUpdate(
-				$data["title"],
+                $data["title"],
                 $data["firstname"],
                 $data["lastname"],
                 $data["address1"],
@@ -84,39 +82,33 @@ class Customer extends BaseAction implements EventSubscriberInterface
                 $request->getSession()->getLang()
             );
 
-
-
             // Connect the newly created user,and redirect to the success URL
             $this->processSuccessfullLogin($event, $customer, $customerCreationForm, true);
-		}
-		catch (PropelException $e) {
+        } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
 
             $message = "Failed to create your account, please try again.";
-		}
-        catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
 
            $message = $e->getMessage();
         }
 
         // The form has errors, propagate it.
         $this->propagateFormError($customerCreationForm, $message, $event);
-	}
+    }
 
     public function modify(ActionEvent $event)
     {
-    	$request = $event->getRequest();
+        $request = $event->getRequest();
 
-    	try {
-      		$customerModification = new CustomerModification($request);
+        try {
+              $customerModification = new CustomerModification($request);
 
-        	$form = $this->validateForm($customerModification, "POST");
+            $form = $this->validateForm($customerModification, "POST");
 
             $data = $form->getData();
 
             $customer = CustomerQuery::create()->findPk(1);
-
-
 
             $data = $form->getData();
 
@@ -131,29 +123,24 @@ class Customer extends BaseAction implements EventSubscriberInterface
                         $data["cellphone"],
                         $data["zipcode"],
                         $data["country"]
-      		);
-
-
+              );
 
             // Update the logged-in user, and redirect to the success URL (exits)
             // We don-t send the login event, as the customer si already logged.
             $this->processSuccessfullLogin($event, $customer, $customerModification);
-        }
-        catch(PropelException $e) {
+        } catch (PropelException $e) {
 
-      		Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
+              Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
 
             $message = "Failed to change your account, please try again.";
-    	}
-        catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
 
            $message = $e->getMessage();
         }
 
         // The form has errors, propagate it.
         $this->propagateFormError($customerModification, $message, $event);
-	}
-
+    }
 
     /**
      * Perform user logout. The user is redirected to the provided view, if any.
@@ -162,9 +149,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function logout(ActionEvent $event)
     {
-		$event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
+        $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
 
-      	$this->getSecurityContext()->clear();
+          $this->getSecurityContext()->clear();
     }
 
     /**
@@ -177,36 +164,32 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     public function login(ActionEvent $event)
     {
-		$request = $event->getRequest();
+        $request = $event->getRequest();
 
-      	$customerLoginForm = new CustomerLogin($request);
+          $customerLoginForm = new CustomerLogin($request);
 
-      	$authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+          $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
 
-      	try {
-			$user = $authenticator->getAuthentifiedUser();
+          try {
+            $user = $authenticator->getAuthentifiedUser();
 
-        	$this->processSuccessfullLogin($event, $user, $customerLoginForm);
-      	}
-      	catch (ValidatorException $ex) {
-        	$message = "Missing or invalid information. Please check your input.";
-      	}
-        catch (UsernameNotFoundException $ex) {
-        	$message = "This email address was not found.";
-      	}
-      	catch (AuthenticationException $ex) {
-        	$message = "Login failed. Please check your username and password.";
-      	}
-      	catch (\Exception $ex) {
-        	$message = sprintf("Unable to process your request. Please try again (%s in %s).", $ex->getMessage(), $ex->getFile());
-      	}
+            $this->processSuccessfullLogin($event, $user, $customerLoginForm);
+          } catch (ValidatorException $ex) {
+            $message = "Missing or invalid information. Please check your input.";
+          } catch (UsernameNotFoundException $ex) {
+            $message = "This email address was not found.";
+          } catch (AuthenticationException $ex) {
+            $message = "Login failed. Please check your username and password.";
+          } catch (\Exception $ex) {
+            $message = sprintf("Unable to process your request. Please try again (%s in %s).", $ex->getMessage(), $ex->getFile());
+          }
 
-      	// The for has an error
-      	$customerLoginForm->setError(true);
-      	$customerLoginForm->setErrorMessage($message);
+          // The for has an error
+          $customerLoginForm->setError(true);
+          $customerLoginForm->setErrorMessage($message);
 
-      	// Dispatch the errored form
-      	$event->setErrorForm($customerLoginForm);
+          // Dispatch the errored form
+          $event->setErrorForm($customerLoginForm);
 
       // A this point, the same view is displayed again.
     }
@@ -250,10 +233,10 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * Stores the current user in the security context, and redirect to the
      * success_url.
-     * @param ActionEvent $event
+     * @param ActionEvent   $event
      * @param CustomerModel $user
-     * @param BaseForm $form
-     * @param bool $sendLoginEvent
+     * @param BaseForm      $form
+     * @param bool          $sendLoginEvent
      */
     protected function processSuccessfullLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
@@ -275,7 +258,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
         if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
 
-
     }
 
     /**
@@ -283,9 +265,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @return SecurityContext the security context
      */
-    protected function getSecurityContext() {
-		//$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
-
-		return $this->securityContext;
+    protected function getSecurityContext()
+    {
+        //$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
+        return $this->securityContext;
     }
 }

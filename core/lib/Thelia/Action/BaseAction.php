@@ -23,43 +23,38 @@
 namespace Thelia\Action;
 
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Form\CategoryDeletionForm;
 use Thelia\Form\BaseForm;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Action\Exception\FormValidationException;
 use Thelia\Core\Event\ActionEvent;
 
 abstract class BaseAction
 {
-	protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
-	{
-    	$form = $aBaseForm->getForm();
+    protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
+    {
+        $form = $aBaseForm->getForm();
 
-    	if ($aBaseForm->getRequest()->isMethod($expectedMethod)) {
+        if ($aBaseForm->getRequest()->isMethod($expectedMethod)) {
 
-    		$form->bind($aBaseForm->getRequest());
+            $form->bind($aBaseForm->getRequest());
 
-    		if ($form->isValid()) {
-
-    			return $form;
-    		}
-            else {
-              	throw new FormValidationException("Missing or invalid data");
+            if ($form->isValid()) {
+                return $form;
+            } else {
+                  throw new FormValidationException("Missing or invalid data");
             }
+        } else {
+            throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
         }
-        else {
-        	throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
-        }
-	}
+    }
 
-	/**
-	 *
-	 * @param BaseForm $aBaseForm
-	 * @param string $error_message
-	 * @param ActionEvent $event
-	 */
-	protected function propagateFormError(BaseForm $aBaseForm, $error_message, ActionEvent $event) {
-
+    /**
+     *
+     * @param BaseForm    $aBaseForm
+     * @param string      $error_message
+     * @param ActionEvent $event
+     */
+    protected function propagateFormError(BaseForm $aBaseForm, $error_message, ActionEvent $event)
+    {
         // The form has an error
         $aBaseForm->setError(true);
         $aBaseForm->setErrorMessage($error_message);
@@ -69,7 +64,7 @@ abstract class BaseAction
 
         // Stop event propagation
         $event->stopPropagation();
-	}
+    }
 
     protected function redirect($url, $status = 302)
     {
