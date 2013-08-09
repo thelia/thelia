@@ -69,7 +69,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     /**
      *
-     * add an article to cart
+     * add an article in the current cart
      *
      * @param \Thelia\Core\Event\ActionEvent $event
      */
