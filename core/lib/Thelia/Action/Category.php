@@ -152,7 +152,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
         // Dispatch the errored form
         $event->setErrorForm($customerModification);
-        */
+
     }
 
     /**
