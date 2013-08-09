@@ -84,10 +84,6 @@ final class TheliaEvents
      */
     const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
 
-    /**
-     * Sent before customer insertion, to allow modules to create a custom customer reference.
-     */
-    const CREATECUSTOMER_CUSTOMREF = "customer.creation.customref";
 
 
     /**
