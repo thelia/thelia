@@ -186,7 +186,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     	}
         catch(PropelException $e) {
 
-        	Tlog::getInstance()->error(sprintf('error during deleting category ID=%s on action/modifyCustomer with message "%s"', $data['id'], $e->getMessage()));
+        	\Thelia\Log\Tlog::getInstance()->error(sprintf('error during deleting category ID=%s on action/modifyCustomer with message "%s"', $data['id'], $e->getMessage()));
 
         	$message = "Failed to change your account, please try again.";
         }
