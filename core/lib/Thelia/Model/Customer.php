@@ -3,6 +3,7 @@
 namespace Thelia\Model;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
+use Thelia\Core\Event\CustomerEvent;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
@@ -105,14 +106,23 @@ class Customer extends BaseCustomer implements UserInterface
 
     public function preInsert(ConnectionInterface $con = null)
     {
-        $customerRef = new CustomRefEvent($this);
+        $this->setRef($this->generateRef());
+        $customerEvent = new CustomerEvent($this);
+
         if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch(TheliaEvents::CREATECUSTOMER_CUSTOMREF, $customerRef);
+            $this->dispatcher->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $customerEvent);
         }
 
-        $this->setRef($customerRef->hasRef()? $customerRef->getRef() : $this->generateRef());
-
         return true;
+    }
+
+    public function postInsert(ConnectionInterface $con = null)
+    {
+        $customerEvent = new CustomerEvent($this);
+        if (!is_null($this->dispatcher)) {
+            $this->dispatcher->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
+        }
+
     }
 
     protected function generateRef()

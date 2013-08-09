@@ -69,7 +69,7 @@ class Category extends BaseAction implements EventSubscriberInterface
             $successUrl = str_replace('_ID_', $category->getId(), $categoryCreationForm->getSuccessUrl());
 
 	    	// Redirect to the success URL
-	    	Redirect::exec($successUrl);
+	    	$this->redirect($successUrl);
 
         } catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf('error during creating category with message "%s"', $e->getMessage()));

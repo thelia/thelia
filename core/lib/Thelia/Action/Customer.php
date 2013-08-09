@@ -66,8 +66,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
             $data = $form->getData();
       		$customer = new CustomerModel();
-
-      		$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $event);
+            $customer->setDispatcher($event->getDispatcher());
 
             $customer->createOrUpdate(
 				$data["title"],
@@ -85,8 +84,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
                 $request->getSession()->getLang()
             );
 
-     		$customerEvent = new CustomerEvent($customer);
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
+
 
             // Connect the newly created user,and redirect to the success URL
             $this->processSuccessfullLogin($event, $customer, $customerCreationForm, true);
@@ -261,13 +259,25 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     protected function processSuccessfullLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
-      // Success -> store user in security context
-      $this->getSecurityContext()->setUser($user);
+        $successUrl = $form->getSuccessUrl();
+        if ($this->securityContext->getContext() === SecurityContext::CONTEXT_FRONT_OFFICE) {
+            $this->processSuccessfullFrontEndLogin($event, $user, $form, $sendLoginEvent);
+        } else {
+            $successUrl = str_replace("__ID__", $user->getId(), $successUrl);
+        }
 
-      if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+        // Redirect to the success URL
+        $this->redirect($successUrl);
+    }
 
-      // Redirect to the success URL
-      $this->redirect($form->getSuccessUrl());
+    protected function processSuccessfullFrontEndLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
+    {
+        // Success -> store user in security context
+        $this->getSecurityContext()->setUser($user);
+
+        if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+
+
     }
 
     /**
@@ -276,7 +286,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      * @return SecurityContext the security context
      */
     protected function getSecurityContext() {
-		$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
+		//$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
 
 		return $this->securityContext;
     }
