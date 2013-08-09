@@ -47,6 +47,10 @@ class CartTest extends \PHPUnit_Framework_TestCase
     {
     	$container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
 
+    	$dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
+
+    	$container->set("event_dispatcher", $dispatcher);
+
     	return $container;
     }
 
@@ -59,11 +63,7 @@ class CartTest extends \PHPUnit_Framework_TestCase
 
         $this->uniqid = uniqid('', true);
 
-        $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
-
         $container = $this->getContainer();
-
-        $container->set("event_dispatcher", $dispatcher);
 
         $this->actionCart = $this->getMock(
             "\Thelia\Action\Cart",
