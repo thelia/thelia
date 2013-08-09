@@ -121,7 +121,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
                     // Update the logged-in user, and redirect to the success URL (exits)
                     // We don-t send the login event, as the customer si already logged.
-                    $this->processSuccessfulLogin($event, $customer, $customerModification);
+                    $this->processSuccessfullLogin($event, $customer, $customerModification);
                  }
                 catch(PropelException $e) {
 

@@ -107,7 +107,7 @@ class SecurityContext {
     *
     * @return Boolean
     */
-    final public function isGranted($roles, $permissions)
+    final public function isGranted(array $roles, array $permissions)
     {
         if ($this->isAuthenticated() === true) {
 

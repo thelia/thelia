@@ -47,7 +47,7 @@ use Thelia\Action\Exception\FormValidationException;
 class Customer extends BaseAction implements EventSubscriberInterface
 {
   /**
-   * @var Thelia\Core\Security\SecurityContext
+   * @var \Thelia\Core\Security\SecurityContext
    */
   protected $securityContext;
 
@@ -89,7 +89,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
 
             // Connect the newly created user,and redirect to the success URL
-            $this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
+            $this->processSuccessfullLogin($event, $customer, $customerCreationForm, true);
 		}
 		catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
@@ -141,7 +141,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
             // Update the logged-in user, and redirect to the success URL (exits)
             // We don-t send the login event, as the customer si already logged.
-            $this->processSuccessfulLogin($event, $customer, $customerModification);
+            $this->processSuccessfullLogin($event, $customer, $customerModification);
         }
         catch(PropelException $e) {
 
@@ -190,7 +190,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
       	try {
 			$user = $authenticator->getAuthentifiedUser();
 
-        	$this->processSuccessfulLogin($event, $user, $customerLoginForm);
+        	$this->processSuccessfullLogin($event, $user, $customerLoginForm);
       	}
       	catch (ValidatorException $ex) {
         	$message = "Missing or invalid information. Please check your input.";
@@ -256,7 +256,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @param CustomerModel $user the logged user
      */
-    protected function processSuccessfulLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
+    protected function processSuccessfullLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
       // Success -> store user in security context
       $this->getSecurityContext()->setUser($user);

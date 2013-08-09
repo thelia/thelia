@@ -27,6 +27,7 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery orderBySymbol($order = Criteria::ASC) Order by the symbol column
  * @method     ChildCurrencyQuery orderByRate($order = Criteria::ASC) Order by the rate column
  * @method     ChildCurrencyQuery orderByByDefault($order = Criteria::ASC) Order by the by_default column
+ * @method     ChildCurrencyQuery orderByPosition($order = Criteria::ASC) Order by the position column
  * @method     ChildCurrencyQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
  * @method     ChildCurrencyQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
@@ -35,6 +36,7 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrencyQuery groupBySymbol() Group by the symbol column
  * @method     ChildCurrencyQuery groupByRate() Group by the rate column
  * @method     ChildCurrencyQuery groupByByDefault() Group by the by_default column
+ * @method     ChildCurrencyQuery groupByPosition() Group by the position column
  * @method     ChildCurrencyQuery groupByCreatedAt() Group by the created_at column
  * @method     ChildCurrencyQuery groupByUpdatedAt() Group by the updated_at column
  *
@@ -66,6 +68,7 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     ChildCurrency findOneBySymbol(string $symbol) Return the first ChildCurrency filtered by the symbol column
  * @method     ChildCurrency findOneByRate(double $rate) Return the first ChildCurrency filtered by the rate column
  * @method     ChildCurrency findOneByByDefault(int $by_default) Return the first ChildCurrency filtered by the by_default column
+ * @method     ChildCurrency findOneByPosition(int $position) Return the first ChildCurrency filtered by the position column
  * @method     ChildCurrency findOneByCreatedAt(string $created_at) Return the first ChildCurrency filtered by the created_at column
  * @method     ChildCurrency findOneByUpdatedAt(string $updated_at) Return the first ChildCurrency filtered by the updated_at column
  *
@@ -74,6 +77,7 @@ use Thelia\Model\Map\CurrencyTableMap;
  * @method     array findBySymbol(string $symbol) Return ChildCurrency objects filtered by the symbol column
  * @method     array findByRate(double $rate) Return ChildCurrency objects filtered by the rate column
  * @method     array findByByDefault(int $by_default) Return ChildCurrency objects filtered by the by_default column
+ * @method     array findByPosition(int $position) Return ChildCurrency objects filtered by the position column
  * @method     array findByCreatedAt(string $created_at) Return ChildCurrency objects filtered by the created_at column
  * @method     array findByUpdatedAt(string $updated_at) Return ChildCurrency objects filtered by the updated_at column
  *
@@ -164,7 +168,7 @@ abstract class CurrencyQuery extends ModelCriteria
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CODE, SYMBOL, RATE, BY_DEFAULT, CREATED_AT, UPDATED_AT FROM currency WHERE ID = :p0';
+        $sql = 'SELECT ID, CODE, SYMBOL, RATE, BY_DEFAULT, POSITION, CREATED_AT, UPDATED_AT FROM currency WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -432,6 +436,47 @@ abstract class CurrencyQuery extends ModelCriteria
         }
 
         return $this->addUsingAlias(CurrencyTableMap::BY_DEFAULT, $byDefault, $comparison);
+    }
+
+    /**
+     * Filter the query on the position column
+     *
+     * Example usage:
+     * <code>
+     * $query->filterByPosition(1234); // WHERE position = 1234
+     * $query->filterByPosition(array(12, 34)); // WHERE position IN (12, 34)
+     * $query->filterByPosition(array('min' => 12)); // WHERE position > 12
+     * </code>
+     *
+     * @param     mixed $position The value to use as filter.
+     *              Use scalar values for equality.
+     *              Use array values for in_array() equivalent.
+     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
+     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCurrencyQuery The current query, for fluid interface
+     */
+    public function filterByPosition($position = null, $comparison = null)
+    {
+        if (is_array($position)) {
+            $useMinMax = false;
+            if (isset($position['min'])) {
+                $this->addUsingAlias(CurrencyTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $useMinMax = true;
+            }
+            if (isset($position['max'])) {
+                $this->addUsingAlias(CurrencyTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $useMinMax = true;
+            }
+            if ($useMinMax) {
+                return $this;
+            }
+            if (null === $comparison) {
+                $comparison = Criteria::IN;
+            }
+        }
+
+        return $this->addUsingAlias(CurrencyTableMap::POSITION, $position, $comparison);
     }
 
     /**

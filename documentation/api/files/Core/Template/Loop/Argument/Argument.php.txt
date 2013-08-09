@@ -111,6 +111,19 @@ class Argument
         );
     }
 
+    public static function createBooleanOrBothTypeArgument($name, $default=null, $mandatory=false, $empty=true)
+    {
+    	return new Argument(
+    			$name,
+    			new TypeCollection(
+    					new Type\BooleanOrBothType()
+    			),
+    			$default,
+    			$mandatory,
+    			$empty
+    	);
+    }
+
     public static function createIntListTypeArgument($name, $default=null, $mandatory=false, $empty=true)
     {
         return new Argument(

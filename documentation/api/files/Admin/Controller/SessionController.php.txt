@@ -65,7 +65,7 @@ class SessionController extends BaseAdminController {
     		$this->getSecurityContext()->setUser($user);
 
     		// Log authentication success
-    		AdminLog::append("Authentication successuful", $request, $user);
+    		AdminLog::append("Authentication successful", $request, $user);
 
     		$this->dispatch(TheliaEvents::ADMIN_LOGIN);
 

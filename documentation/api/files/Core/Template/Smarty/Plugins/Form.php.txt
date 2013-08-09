@@ -101,7 +101,8 @@ class Form extends AbstractSmartyPlugin
             	// Re-use the errored form
             	$instance = $errorForm;
 
-            	$this->parserContext->clearErrorForm();
+            	// Don't do that, as we may want to use this form firther in the template code
+            	//$this->parserContext->clearErrorForm();
             }
 
             $instance->createView();

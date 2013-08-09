@@ -60,7 +60,6 @@ class ActionEventFactory
     {
         if (array_key_exists($this->action, $this->className)) {
             $class = new \ReflectionClass($this->className[$this->action]);
-
             // return $class->newInstance($this->request, $this->action);
         } else {
             $class = new \ReflectionClass($this->defaultClassName);
