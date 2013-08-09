@@ -30,7 +30,7 @@ class CategoryDeletionForm extends BaseForm {
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("id", "integer", array(
+            ->add("category_id", "integer", array(
                 "constraints" => array(
                 	new NotBlank()
                 )

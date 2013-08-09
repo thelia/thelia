@@ -2,6 +2,8 @@
 
 {$page_title={intl l='Catalog'}}
 
+{$thelia_page_css_file = "assets/bootstrap-editable/css/bootstrap-editable.css"}
+
 {include file='includes/header.inc.html'}
 
 <div class="catalog">
@@ -16,7 +18,7 @@
 		<div class="row-fluid">
 			<div class="span12">
 			    <div class="general-block-decorator">
-	               	<table class="table table-striped table-condensed">
+	               	<table class="table table-striped table-condensed" id="category_list">
 	                    <caption>
 	                    	{* display parent category name, and get current cat ID *}
 		                    {loop name="category_title" type="category" visible="*" id="{$current_category_id}"}
@@ -68,9 +70,9 @@
 
 		                    	<td>
 		                    	    {loop type="auth" name="can_change" context="admin" roles="ADMIN" permissions="admin.category.edit"}
-			                        	<a href="{url path='admin/catalog/category' id="{$ID}" action='positionUp'}"><i class="icon-arrow-up"></i></a>
-			                            <span class="object_classement_editable" data-action="changeCategoryPosition" data-name="category_id" data-id="{$ID}">{$POSITION}</span>
-			                          	<a href="{url path='admin/catalog/category' id="{$ID}" action='positionDown'}"><i class="icon-arrow-down"></i></a>
+			                        	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionUp'}"><i class="icon-arrow-up"></i></a>
+			                            <span class="categoryPositionChange" data-id="{$ID}">{$POSITION}</span>
+			                          	<a href="{url path='admin/catalog/category' category_id="{$ID}" action='positionDown'}"><i class="icon-arrow-down"></i></a>
 		                          	{/loop}
 
 		                          	{elseloop rel="can_change"}
@@ -200,6 +202,10 @@
 
 {include file='includes/js.inc.html'}
 
+{javascripts file='assets/bootstrap-editable/js/bootstrap-editable.js'}
+    <script src="{$asset_url}"></script>
+{/javascripts}
+
 <script>
 $(function() {
 
@@ -211,7 +217,8 @@ $(function() {
         {/if}
 	{/form}
 
-	{* Always reset dialog on close *}
+	{* Always reset create dialog on close *}
+
     $('#add_category_dialog').on('hidden',function() {
         // Hide error message
         $('#add_category_dialog_error').remove();
@@ -224,6 +231,7 @@ $(function() {
     });
 
     {* Set the proper category ID in the delete confirmation dialog *}
+
     $(document).on("click", ".category-delete", function () {
     	$('#'+'delete-category-id').val($(this).data('id'));
     });
@@ -237,6 +245,27 @@ $(function() {
                action : 'visibilityToggle'
            }
         });
+    });
+
+    {* Inline editing of object position using bootstrap-editable *}
+
+    $('.categoryPositionChange').editable({
+        type        : 'text',
+        title       : '{intl l="Enter new category position"}',
+        mode        : 'popup',
+        inputclass  : 'input-mini',
+        placement   : 'left',
+        success     : function(response, newValue) {
+        	// The URL template
+        	var url = "{url path='admin/catalog/category' action='changePosition' category_id='__ID__' position='__POS__'}";
+
+        	// Perform subtitutions
+            url = url.replace('__ID__', $(this).data('id'))
+                     .replace('__POS__', newValue);
+
+        	// Reload the page
+        	location.href = url;
+        }
     });
 
 })

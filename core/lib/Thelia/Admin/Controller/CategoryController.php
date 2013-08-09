@@ -25,13 +25,11 @@ namespace Thelia\Admin\Controller;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Security\Exception\AuthorizationException;
 
 class CategoryController extends BaseAdminController {
 
 	protected function createNewCategory($args) {
-
-		$this->checkAuth("ADMIN", "admin.category.create");
-
 		$this->dispatchEvent("createCategory");
 
 		// At this point, the form has error, and should be redisplayed.
@@ -40,24 +38,16 @@ class CategoryController extends BaseAdminController {
 
 	protected function editCategory($args) {
 
-		$this->checkAuth("AMIN", "admin.category.edit");
+		$this->checkAuth("ADMIN", "admin.category.edit");
 
 		return $this->render('edit_category', $args);
 	}
 
-	protected function deleteCategory($category_id) {
-
-		$this->checkAuth("AMIN", "admin.category.delete");
-
-		$category = CategoryQuery::create()->findPk($category_id);
-
+	protected function deleteCategory($args) {
 		$this->dispatchEvent("deleteCategory");
 
 		// Something was wrong, category was not deleted. Display parent category list
-		return $this->render(
-			'categories',
-			array('current_category_id' => $category->getParent())
-		);
+		return $this->render('categories', $args);
 	}
 
 	protected function browseCategory($args) {
@@ -68,32 +58,32 @@ class CategoryController extends BaseAdminController {
 	}
 
 	protected function visibilityToggle($args) {
-
-		$this->checkAuth("AMIN", "admin.category.edit");
-
 		$this->dispatchEvent("toggleCategoryVisibility");
 
 		return $this->nullResponse();
 	}
 
 	protected function changePosition($args) {
-
-		$this->checkAuth("AMIN", "admin.category.edit");
-
 		$this->dispatchEvent("changeCategoryPosition");
+
+		return $this->render('categories', $args);
+	}
+
+	protected function positionDown($args) {
+		$this->dispatchEvent("changeCategoryPositionDown");
+
+		return $this->render('categories', $args);
+	}
+
+	protected function positionUp($args) {
+		$this->dispatchEvent("changeCategoryPositionUp");
 
 		return $this->render('categories', $args);
 	}
 
 	public function indexAction()
 	{
-		// Show top level categories and products
-		$args = array(
-				'action' => 'browse',
-				'current_category_id' => 0
-		);
-
-		return $this->browseCategory($args);
+		return $this->processAction();
 	}
 
     public function processAction()
@@ -121,19 +111,29 @@ class CategoryController extends BaseAdminController {
 	    			return $this->editCategory($args);
 
 	    		case 'delete' : // Delete an existing category
-	    			return $this->deleteCategory($id);
+	    			return $this->deleteCategory($args);
 
     			case 'visibilityToggle' : // Toggle visibility
 	    			return $this->visibilityToggle($id);
 
     	    	case 'changePosition' : // Change position
 	    			return $this->changePosition($args);
-	    	}
+
+    	    	case 'positionUp' : // Move up category
+	    			return $this->positionUp($args);
+
+    	    	case 'positionDown' : // Move down category
+	    			return $this->positionDown($args);
+    		}
+    	}
+    	catch(AuthorizationException $ex) {
+    		return $this->errorPage($ex->getMessage());
     	}
     	catch(AuthenticationException $ex) {
-    		return $this->render('general_error', array(
-    			"error_message" => $ex->getMessage())
-    		);
+    		return $this->errorPage($ex->getMessage());
     	}
+
+    	// We did not recognized the action -> return a 404 page
+    	return $this->pageNotFound();
     }
 }

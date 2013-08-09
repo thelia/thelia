@@ -53,18 +53,6 @@ use Thelia\Model\Customer;
 class Cart extends BaseAction implements EventSubscriberInterface
 {
     use \Thelia\Cart\CartTrait;
-    /**
-     * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
-     */
-    protected $dispatcher;
-
-    /**
-     * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $dispatcher
-     */
-    public function __construct(EventDispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-    }
 
     /**
      *
@@ -122,7 +110,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     protected function updateQuantity(CartItem $cartItem, $quantity)
     {
-        $cartItem->setDisptacher($this->dispatcher);
+        $cartItem->setDisptacher($this->getDispatcher());
         $cartItem->addQuantity($quantity)
             ->save();
     }
@@ -130,7 +118,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function addItem(\Thelia\Model\Cart $cart, $productId, $productSaleElementsId, $quantity, ProductPrice $productPrice)
     {
         $cartItem = new CartItem();
-        $cartItem->setDisptacher($this->dispatcher);
+        $cartItem->setDisptacher($this->getDispatcher());
         $cartItem
             ->setCart($cart)
             ->setProductId($productId)

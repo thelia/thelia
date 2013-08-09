@@ -49,7 +49,13 @@ class UrlGenerator extends AbstractSmartyPlugin
     	// the path to process
    		$path = $this->getParam($params, 'path');
 
-   		return URL::absoluteUrl($path, $this->getArgsFromParam($params, array('path')));
+   		$target = $this->getParam($params, 'target', null);
+
+   		$url = URL::absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
+
+   		if ($target != null) $url .= '#'.$target;
+
+   		return $url;
      }
 
      /**
@@ -84,7 +90,7 @@ class UrlGenerator extends AbstractSmartyPlugin
       	// the related action (optionale)
      	$action = $this->getParam($params, 'action');
 
-     	$args = $this->getArgsFromParam($params, array('view', 'action'));
+     	$args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
 
      	if (! empty($action)) $args['action'] = $action;
 

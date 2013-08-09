@@ -43,18 +43,8 @@ use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
 use Thelia\Action\Exception\FormValidationException;
 
-
 class Customer extends BaseAction implements EventSubscriberInterface
 {
-  /**
-   * @var Thelia\Core\Security\SecurityContext
-   */
-  protected $securityContext;
-
-  public function __construct(SecurityContext $securityContext) {
-    $this->securityContext = $securityContext;
-  }
-
     public function create(ActionEvent $event)
     {
     	$request = $event->getRequest();
@@ -88,8 +78,14 @@ class Customer extends BaseAction implements EventSubscriberInterface
      		$customerEvent = new CustomerEvent($customer);
             $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
 
-            // Connect the newly created user,and redirect to the success URL
-            $this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
+
+            if (isset($data['auto_login']) && $data['auto_login']) {
+            	// Connect the newly created user,and redirect to the success URL
+            	$this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
+            }
+            else {
+            	$this->redirect($form->getSuccessUrl());
+            }
 		}
 		catch (PropelException $e) {
             Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
@@ -139,9 +135,14 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $customerEvent->customer = $customer;
             $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
 
-            // Update the logged-in user, and redirect to the success URL (exits)
-            // We don-t send the login event, as the customer si already logged.
-            $this->processSuccessfulLogin($event, $customer, $customerModification);
+            if (isset($data['update_logged_in_user']) && $data['update_logged_in_user']) {
+	            // Update the logged-in user, and redirect to the success URL (exits)
+    	        // We don't send the login event, as the customer si already logged.
+        	    $this->processSuccessfulLogin($event, $customer, $customerModification);
+            }
+            else {
+            	$this->redirect($form->getSuccessUrl());
+            }
         }
         catch(PropelException $e) {
 
@@ -168,7 +169,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
 		$event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
 
-      	$this->getSecurityContext()->clear();
+      	$this->getFrontSecurityContext()->clear();
     }
 
     /**
@@ -259,7 +260,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     protected function processSuccessfulLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
       // Success -> store user in security context
-      $this->getSecurityContext()->setUser($user);
+      $this->getFrontSecurityContext()->setUser($user);
 
       if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
 
@@ -272,9 +273,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @return SecurityContext the security context
      */
-    protected function getSecurityContext() {
-		$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
-
-		return $this->securityContext;
+    protected function getFrontSecurityContext() {
+		return $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE);
     }
 }
