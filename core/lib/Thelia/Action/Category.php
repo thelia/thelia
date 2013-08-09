@@ -34,6 +34,7 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\AdminLog;
 use Thelia\Form\CategoryDeletionForm;
 use Thelia\Action\Exception\FormValidationException;
+use Propel\Runtime\Exception\PropelException;
 
 class Category extends BaseAction implements EventSubscriberInterface
 {
