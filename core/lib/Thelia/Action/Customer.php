@@ -43,15 +43,6 @@ use Thelia\Action\Exception\FormValidationException;
 
 class Customer extends BaseAction implements EventSubscriberInterface
 {
-  /**
-   * @var \Thelia\Core\Security\SecurityContext
-   */
-  protected $securityContext;
-
-  public function __construct(SecurityContext $securityContext)
-  {
-    $this->securityContext = $securityContext;
-  }
 
     public function create(ActionEvent $event)
     {
@@ -85,6 +76,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             // Connect the newly created user,and redirect to the success URL
             $this->processSuccessfullLogin($event, $customer, $customerCreationForm, true);
         } catch (PropelException $e) {
+
             Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
 
             $message = "Failed to create your account, please try again.";
@@ -130,6 +122,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $this->processSuccessfullLogin($event, $customer, $customerModification);
         } catch (PropelException $e) {
 
+
               Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
 
             $message = "Failed to change your account, please try again.";
@@ -151,7 +144,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
 
-          $this->getSecurityContext()->clear();
+
+      	$this->getFrontSecurityContext()->clear();
     }
 
     /**
@@ -240,6 +234,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
      */
     protected function processSuccessfullLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
+
         $successUrl = $form->getSuccessUrl();
         if ($this->securityContext->getContext() === SecurityContext::CONTEXT_FRONT_OFFICE) {
             $this->processSuccessfullFrontEndLogin($event, $user, $form, $sendLoginEvent);
@@ -253,8 +248,9 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
     protected function processSuccessfullFrontEndLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
-        // Success -> store user in security context
-        $this->getSecurityContext()->setUser($user);
+
+      // Success -> store user in security context
+      $this->getFrontSecurityContext()->setUser($user);
 
         if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
 
@@ -265,9 +261,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
      *
      * @return SecurityContext the security context
      */
-    protected function getSecurityContext()
-    {
-        //$this->securityContext->setContext(SecurityContext::CONTEXT_FRONT_OFFICE);
-        return $this->securityContext;
+
+    protected function getFrontSecurityContext() {
+		return $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE);
     }
 }

@@ -133,7 +133,7 @@ class SecurityContext {
        			}
 
 	        	// Get permissions from profile
-	        	// $userPermissions = $user->getPermissions();
+	        	// $userPermissions = $user->getPermissions(); FIXME
 
        			// TODO: Finalize permissions system !;
 

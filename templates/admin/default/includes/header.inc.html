@@ -15,6 +15,14 @@
 		<link rel="stylesheet" href="{$asset_url}">
 	{/stylesheets}
 
+    {* Include here page specifc CSS file, if any *}
+
+    {if ! empty($thelia_page_css_file)}
+        {stylesheets file="../$thelia_page_css_file"  filters='less,cssembed'}
+            <link rel="stylesheet" href="{$asset_url}" target="screen">
+        {/stylesheets}
+    {/if}
+
 	{stylesheets file='../assets/css/*' filters='less,cssembed'}
 		<link rel="stylesheet" href="{$asset_url}">
 	{/stylesheets}
@@ -22,7 +30,7 @@
 	{* Include here page specifc CSS file, if any *}
 
 	{if ! empty($thelia_page_css_file)}
-		{stylesheets file='../assets/css/$thelia_page_css_file'  filters='less,cssembed'}
+		{stylesheets file="../$thelia_page_css_file"  filters='less,cssembed'}
 			<link rel="stylesheet" href="{$asset_url}" target="screen">
 		{/stylesheets}
 	{/if}

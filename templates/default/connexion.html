@@ -20,6 +20,10 @@
 	<input type="hidden" name="{$name}" value="{$RETURN_TO_URL}" /> {* the url the user is redirected to on login success *}
 	{/form_field}
 
+    {form_field form=$form field='auto_login'}
+    <input type="hidden" name="{$name}" value="1" /> {* the customer will be loogged-in automatically *}
+    {/form_field}
+
 	{*
 	The form error status and the form error messages are defined in Customer action,
 	and passed back to the form plugin through the ParserContext.

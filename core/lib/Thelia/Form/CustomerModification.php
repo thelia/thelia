@@ -53,6 +53,7 @@ class CustomerModification extends BaseForm {
     {
 
         $this->formBuilder
+        	->add('update_logged_in_user', 'boolean') // In a front office context, update the in-memory logged-in user data
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()

@@ -70,7 +70,27 @@ class BaseAdminController extends ContainerAware
 			// Nothing special
 		}
 
+		return $this->pageNotFound();
+	}
+
+	/**
+	 * Return a 404 error
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	protected function pageNotFound() {
 		return new Response($this->renderRaw(self::TEMPLATE_404), 404);
+	}
+
+	/**
+	 * Return a general error page
+	 *
+	 * @return \Symfony\Component\HttpFoundation\Response
+	 */
+	protected function errorPage($message) {
+		return $this->render('general_error', array(
+    			"error_message" => $message)
+    	);
 	}
 
 	/**

@@ -27,7 +27,7 @@ INSERT INTO `currency` (`id` ,`code` ,`symbol` ,`rate` ,`by_default`, `position`
 VALUES
 (1, 'EUR', '€', '1', '1', '1', NOW() , NOW()),
 (2, 'USD', '$', '1.26', '0', '2', NOW(), NOW()),
-(3, 'GBP', '£', '0.89', '0', '3', NOW(), NOW());
+(3, 'GBP', '£', '0.89', '0', '3',NOW(), NOW());
 
 INSERT INTO `currency_i18n` (`id` ,`locale` ,`name`)
 VALUES
