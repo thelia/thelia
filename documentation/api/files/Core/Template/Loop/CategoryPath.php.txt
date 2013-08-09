@@ -36,6 +36,7 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  *
@@ -68,7 +69,7 @@ class CategoryPath extends BaseLoop
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth'),
             Argument::createIntTypeArgument('level'),
-        	Argument::createBooleanTypeArgument('visible', true, false)
+        	Argument::createBooleanOrBothTypeArgument('visible', true, false)
         );
     }
 
@@ -84,9 +85,11 @@ class CategoryPath extends BaseLoop
 
         $search = CategoryQuery::create();
 		$search->filterById($id);
-		if ($visible == true) $search->filterByVisible($visible);
+		if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
 		$results = array();
+
+		$ids = array();
 
 		do {
 			$category = $search->findOne();
@@ -106,6 +109,14 @@ class CategoryPath extends BaseLoop
 				$parent = $category->getParent();
 
 				if ($parent > 0) {
+
+					// Prevent circular refererences
+					if (in_array($parent, $ids)) {
+						throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
+					}
+
+					$ids[] = $parent;
+
 					$search = CategoryQuery::create();
 					$search->filterById($parent);
 					if ($visible == true) $search->filterByVisible($visible);

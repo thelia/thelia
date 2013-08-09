@@ -34,9 +34,12 @@ use Thelia\Model\CategoryQuery;
 use Thelia\Model\AdminLog;
 use Thelia\Form\CategoryDeletionForm;
 use Thelia\Action\Exception\FormValidationException;
+
 use Propel\Runtime\ActiveQuery\Criteria;
 use Propel\Runtime\Propel;
 use Thelia\Model\Map\CategoryTableMap;
+use Propel\Runtime\Exception\PropelException;
+
 
 class Category extends BaseAction implements EventSubscriberInterface
 {
@@ -128,7 +131,7 @@ class Category extends BaseAction implements EventSubscriberInterface
 
                     // Update the logged-in user, and redirect to the success URL (exits)
                     // We don-t send the login event, as the customer si already logged.
-                    $this->processSuccessfulLogin($event, $customer, $customerModification);
+                    $this->processSuccessfullLogin($event, $customer, $customerModification);
                  }
                 catch(PropelException $e) {
 
@@ -194,7 +197,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     	}
         catch(PropelException $e) {
 
-        	Tlog::getInstance()->error(sprintf('error during deleting category ID=%s on action/modifyCustomer with message "%s"', $data['id'], $e->getMessage()));
+        	\Thelia\Log\Tlog::getInstance()->error(sprintf('error during deleting category ID=%s on action/modifyCustomer with message "%s"', $data['id'], $e->getMessage()));
 
         	$message = "Failed to change your account, please try again.";
         }

@@ -24,7 +24,7 @@
 namespace Thelia\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Symfony\Component\HttpFoundation\Request;
+use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
 use Thelia\Core\Security\SecurityContext;
 /**

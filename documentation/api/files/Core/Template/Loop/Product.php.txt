@@ -44,6 +44,7 @@ use Thelia\Model\ProductQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  *
@@ -80,7 +81,7 @@ class Product extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
-            Argument::createBooleanTypeArgument('visible', 1),
+            Argument::createBooleanOrBothTypeArgument('visible', 1),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -252,10 +253,9 @@ class Product extends BaseLoop
 
         $visible = $this->getVisible();
 
-        $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
         $orders  = $this->getOrder();
-
 
         foreach($orders as $order) {
             switch ($order) {

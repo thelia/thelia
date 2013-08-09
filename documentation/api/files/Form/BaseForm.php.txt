@@ -44,6 +44,8 @@ abstract class BaseForm {
      */
     protected $form;
 
+    protected $request;
+
 	private $view = null;
 
 	/**
@@ -60,6 +62,8 @@ abstract class BaseForm {
 
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
+    	$this->request = $request;
+
         $validator = Validation::createValidator();
 
         if(!isset($options["attr"]["name"])) {
@@ -92,6 +96,10 @@ abstract class BaseForm {
         }
 
         $this->form = $this->formBuilder->getForm();
+    }
+
+    public function getRequest() {
+    	return $this->request;
     }
 
     protected function cleanOptions($options)

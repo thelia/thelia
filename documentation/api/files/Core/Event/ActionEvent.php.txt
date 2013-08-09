@@ -59,7 +59,7 @@ abstract class ActionEvent extends Event
     public function __construct(Request $request, $action)
     {
         $this->request = $request;
-        $this->action = $action;
+        $this->action  = $action;
     }
 
     /**

@@ -78,7 +78,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
      		$customerEvent = new CustomerEvent($customer);
             $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
 
-
             if (isset($data['auto_login']) && $data['auto_login']) {
             	// Connect the newly created user,and redirect to the success URL
             	$this->processSuccessfulLogin($event, $customer, $customerCreationForm, true);
@@ -191,7 +190,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
       	try {
 			$user = $authenticator->getAuthentifiedUser();
 
-        	$this->processSuccessfulLogin($event, $user, $customerLoginForm);
+        	$this->processSuccessfullLogin($event, $user, $customerLoginForm);
       	}
       	catch (ValidatorException $ex) {
         	$message = "Missing or invalid information. Please check your input.";
@@ -252,12 +251,15 @@ class Customer extends BaseAction implements EventSubscriberInterface
     }
 
     /**
+     *
      * Stores the current user in the security context, and redirect to the
      * success_url.
-     *
-     * @param CustomerModel $user the logged user
+     * @param ActionEvent $event
+     * @param CustomerModel $user
+     * @param BaseForm $form
+     * @param bool $sendLoginEvent
      */
-    protected function processSuccessfulLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
+    protected function processSuccessfullLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
     {
       // Success -> store user in security context
       $this->getFrontSecurityContext()->setUser($user);

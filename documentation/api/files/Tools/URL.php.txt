@@ -44,7 +44,7 @@ class URL
      */
     public static function absoluteUrl($path, array $parameters = array(), $path_only = false)
     {
-    	// Already absolute ?
+     	// Already absolute ?
     	if (substr($path, 0, 4) != 'http') {
 
     		$root = $path_only ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
@@ -57,7 +57,7 @@ class URL
     	$queryString = '';
 
     	foreach($parameters as $name => $value) {
-    		$queryString = sprintf("%s=%s&", urlencode($name), urlencode($value));
+    		$queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
     	}
 
     	$sepChar = strstr($base, '?') === false ? '?' : '&';
@@ -77,7 +77,7 @@ class URL
      */
     public static function adminViewUrl($viewName, array $parameters = array()) {
 
-    	$path = sprintf("%s/admin/%s", self::getIndexPage(), $viewName); // FIXME ! view= should not be necessaray, check routing parameters
+    	$path = sprintf("%s/admin/%s", self::getIndexPage(), $viewName); // FIXME ! view= should not be required, check routing parameters
 
     	return self::absoluteUrl($path, $parameters);
     }

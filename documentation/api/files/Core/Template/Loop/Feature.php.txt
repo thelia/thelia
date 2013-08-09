@@ -40,6 +40,7 @@ use Thelia\Model\ConfigQuery;
 use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
+use Thelia\Type\BooleanOrBothType;
 
 /**
  *
@@ -61,7 +62,7 @@ class Feature extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('product'),
             Argument::createIntListTypeArgument('category'),
-            Argument::createBooleanTypeArgument('visible', 1),
+            Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
@@ -96,7 +97,7 @@ class Feature extends BaseLoop
 
         $visible = $this->getVisible();
 
-        $search->filterByVisible($visible);
+        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
         $product = $this->getProduct();
         $category = $this->getCategory();
