@@ -118,7 +118,7 @@ trait CartTrait {
         $session->setCart($newCart->getId());
 
         $cartEvent = new CartEvent($newCart);
-        $this->dispatcher->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
+        $this->getDispatcher()->dispatch(TheliaEvents::CART_DUPLICATE, $cartEvent);
 
         return $cartEvent->cart;
     }

@@ -43,6 +43,12 @@ class CartTest extends \PHPUnit_Framework_TestCase
     protected $uniqid;
 
 
+    public function getContainer()
+    {
+    	$container = new \Symfony\Component\DependencyInjection\ContainerBuilder();
+
+    	return $container;
+    }
 
     public function setUp()
     {
@@ -55,10 +61,14 @@ class CartTest extends \PHPUnit_Framework_TestCase
 
         $dispatcher = $this->getMock("Symfony\Component\EventDispatcher\EventDispatcherInterface");
 
+        $container = $this->getContainer();
+
+        $container->set("event_dispatcher", $dispatcher);
+
         $this->actionCart = $this->getMock(
             "\Thelia\Action\Cart",
             array("generateCookie", "redirect"),
-            array($dispatcher)
+            array($container)
 
         );
 
