@@ -116,8 +116,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
 
             $customer = CustomerQuery::create()->findPk(1);
 
-      		$customerEvent = new CustomerEvent($customer);
-        	$event->getDispatcher()->dispatch(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
+
 
             $data = $form->getData();
 
@@ -134,8 +133,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
                         $data["country"]
       		);
 
-            $customerEvent->customer = $customer;
-            $event->getDispatcher()->dispatch(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
+
 
             // Update the logged-in user, and redirect to the success URL (exits)
             // We don-t send the login event, as the customer si already logged.

@@ -109,9 +109,7 @@ class Customer extends BaseCustomer implements UserInterface
         $this->setRef($this->generateRef());
         $customerEvent = new CustomerEvent($this);
 
-        if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch(TheliaEvents::BEFORE_CREATECUSTOMER, $customerEvent);
-        }
+        $this->dispatchEvent(TheliaEvents::BEFORE_CREATECUSTOMER, $customerEvent);
 
         return true;
     }
@@ -119,10 +117,30 @@ class Customer extends BaseCustomer implements UserInterface
     public function postInsert(ConnectionInterface $con = null)
     {
         $customerEvent = new CustomerEvent($this);
-        if (!is_null($this->dispatcher)) {
-            $this->dispatcher->dispatch(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
-        }
 
+        $this->dispatchEvent(TheliaEvents::AFTER_CREATECUSTOMER, $customerEvent);
+
+    }
+
+    public function preUpdate(ConnectionInterface $con = null)
+    {
+        $customerEvent = new CustomerEvent($this);
+        $this->dispatchEvent(TheliaEvents::BEFORE_CHANGECUSTOMER, $customerEvent);
+
+        return true;
+    }
+
+    public function postUpdate(ConnectionInterface $con = null)
+    {
+        $customerEvent = new CustomerEvent($this);
+        $this->dispatchEvent(TheliaEvents::AFTER_CHANGECUSTOMER, $customerEvent);
+    }
+
+    protected function dispatchEvent($eventName, CustomerEvent $customerEvent)
+    {
+        if (!is_null($this->dispatcher)) {
+            $this->dispatcher->dispatch($eventName, $customerEvent);
+        }
     }
 
     protected function generateRef()
