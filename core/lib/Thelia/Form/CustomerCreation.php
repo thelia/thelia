@@ -33,7 +33,7 @@ class CustomerCreation extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
-            ->add("auto_login", "boolean")
+            ->add("auto_login", "integer")
         	->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()

@@ -32,8 +32,9 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Controller\BaseController;
 
-class SessionController extends BaseAdminController {
+class SessionController extends BaseController {
 
 	public function showLoginAction()
 	{

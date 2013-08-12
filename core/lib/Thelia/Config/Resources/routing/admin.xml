@@ -6,39 +6,39 @@
 
 	<!-- Route to administration base -->
     <route id="admin" path="/admin">
-        <default key="_controller">Thelia\Admin\Controller\AdminController::indexAction</default>
+        <default key="_controller">Thelia\Controller\Admin\AdminController::indexAction</default>
     </route>
 
 	<!-- Route to the administration login page -->
     <route id="admin.login" path="/admin/login">
-        <default key="_controller">Thelia\Admin\Controller\SessionController::showLoginAction</default>
+        <default key="_controller">Thelia\Controller\Admin\SessionController::showLoginAction</default>
     </route>
 
 	<!-- Route to the administration logout page -->
     <route id="admin.logout" path="/admin/logout">
-        <default key="_controller">Thelia\Admin\Controller\SessionController::checkLogoutAction</default>
+        <default key="_controller">Thelia\Controller\Admin\SessionController::checkLogoutAction</default>
     </route>
 
 	<!-- Route to the login check controller -->
     <route id="admin.checklogin" path="/admin/checklogin">
-        <default key="_controller">Thelia\Admin\Controller\SessionController::checkLoginAction</default>
+        <default key="_controller">Thelia\Controller\Admin\SessionController::checkLoginAction</default>
     </route>
 
 
 	<!-- Route to the catalog controller (process category browsing) -->
 
     <route id="admin.catalog" path="/admin/catalog">
-        <default key="_controller">Thelia\Admin\Controller\CategoryController::indexAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::indexAction</default>
     </route>
 
     <route id="admin.category" path="/admin/catalog/category">
-        <default key="_controller">Thelia\Admin\Controller\CategoryController::processAction</default>
+        <default key="_controller">Thelia\Controller\Admin\CategoryController::processAction</default>
     </route>
 
 	<!-- The default route, to display a template -->
 
     <route id="admin.processTemplate" path="/admin/{template}">
-        <default key="_controller">Thelia\Admin\Controller\AdminController::processTemplateAction</default>
+        <default key="_controller">Thelia\Controller\Admin\AdminController::processTemplateAction</default>
         <requirement key="template">.*</requirement>
     </route>
 </routes>

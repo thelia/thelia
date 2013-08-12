@@ -42,13 +42,23 @@
             <argument>%thelia.core_dir%/Config/Resources/routing</argument>
         </service>
 
-        <service id="router.admin.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
+        <service id="router.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
             <argument type="service" id="router.admin.fileLocator"/>
         </service>
 
         <service id="router.admin" class="%router.class%">
-            <argument type="service" id="router.admin.xmlLoader"/>
+            <argument type="service" id="router.xmlLoader"/>
             <argument>admin.xml</argument>
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%</argument>
+                <argument key="debug">%kernel.debug%</argument>
+            </argument>
+            <argument type="service" id="request.context"/>
+        </service>
+
+        <service id="router.front" class="%router.class%">
+            <argument type="service" id="router.xmlLoader"/>
+            <argument>front.xml</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
@@ -64,9 +74,14 @@
                 <argument type="service" id="router.default_route"/>
                 <argument>-255</argument>
             </call>
+
             <call method="add">
                 <argument type="service" id="router.admin"/>
                 <argument>0</argument>
+            </call>
+            <call method="add">
+                <argument type="service" id="router.front"/>
+                <argument>255</argument>
             </call>
         </service>
 

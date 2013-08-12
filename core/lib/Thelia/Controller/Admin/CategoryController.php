@@ -26,8 +26,9 @@ namespace Thelia\Admin\Controller;
 use Thelia\Model\CategoryQuery;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\AuthorizationException;
+use Thelia\Controller\BaseController;
 
-class CategoryController extends BaseAdminController {
+class CategoryController extends BaseController {
 
 	protected function createNewCategory($args) {
 		$this->dispatchEvent("createCategory");

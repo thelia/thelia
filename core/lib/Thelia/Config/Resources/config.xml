@@ -55,12 +55,6 @@
             <argument type="service" id="service_container" />
         </service>
 
-        <service id="thelia.controller_listener" class="Thelia\Core\EventListener\ControllerListener" scope="request">
-            <tag name="kernel.event_subscriber"/>
-            <argument type="service" id="thelia.parser.context"/>
-        </service>
-
-
 		<!--
 		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
 		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)

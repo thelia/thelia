@@ -20,12 +20,12 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Admin\Controller;
+namespace Thelia\Controller;
 
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\DependencyInjection\ContainerAware;
 
-use Thelia\Core\DependencyInjection\ContainerAwareAdmin;
 use Thelia\Form\BaseForm;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -51,7 +51,7 @@ use Thelia\Core\Security\Exception\AuthorizationException;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class BaseAdminController extends ContainerAwareAdmin
+class BaseController extends ContainerAware
 {
 	const TEMPLATE_404 = "404";
 
