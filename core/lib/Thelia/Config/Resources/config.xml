@@ -60,6 +60,7 @@
             <argument type="service" id="thelia.parser.context"/>
         </service>
 
+
 		<!--
 		A ControllerResolver that supports "a:b:c", "service:method" and class::method" notations,
 		thus allowing the definition of controllers as service (see http://symfony.com/fr/doc/current/cookbook/controller/service.html)
@@ -80,6 +81,8 @@
 		<service id="thelia.securityContext" class="Thelia\Core\Security\SecurityContext" scope="request">
             <argument type="service" id="request" />
 		</service>
+
+        <service id="thelia.envContext" class="Thelia\Core\Context"/>
 
 		<!--  Parser context -->
 

@@ -53,7 +53,7 @@ class BaseAction
      * @param BaseForm $aBaseForm the form
      * @param string $expectedMethod the expected method, POST or GET, or null for any of them
      * @throws FormValidationException is the form contains error, or the method is not the right one
-     * @return Symfony\Component\Form\Form Form the symfony form object
+     * @return \Symfony\Component\Form\Form Form the symfony form object
      */
     protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
     {
@@ -150,6 +150,17 @@ class BaseAction
         $securityContext->setContext($context === false ? SecurityContext::CONTEXT_BACK_OFFICE : $context);
 
         return $securityContext;
+    }
+
+    /**
+     *
+     * return the environnement context contain in \Thelia\Core\Context class
+     *
+     * @return string
+     */
+    protected function getContext()
+    {
+        return $this->container->get("thelia.envContext")->getContext();
     }
 
     protected function redirect($url, $status = 302)

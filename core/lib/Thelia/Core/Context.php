@@ -21,33 +21,36 @@
 /*                                                                                   */
 /*************************************************************************************/
 
+namespace Thelia\Core;
 
-namespace Thelia\Core\DependencyInjection;
 
+class Context
+{
+    const CONTEXT_FRONT_OFFICE = 'front';
+    const CONTEXT_BACK_OFFICE  = 'admin';
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Core\Context;
+    protected $defineContext = array(
+        self::CONTEXT_BACK_OFFICE,
+        self::CONTEXT_FRONT_OFFICE
+    );
 
-class ContainerAwareAdmin implements ContainerAwareInterface {
+    protected $currentContext = self::CONTEXT_FRONT_OFFICE;
 
-    /**
-     * @var ContainerInterface
-     *
-     * @api
-     */
-    protected $container;
-
-    /**
-     * Sets the Container.
-     *
-     * @param ContainerInterface|null $container A ContainerInterface instance or null
-     *
-     * @api
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function isValidContext($context)
     {
-        $container->get('thelia.envContext')->setContext(Context::CONTEXT_BACK_OFFICE);
-        $this->container = $container;
+        return in_array($context, $this->defineContext);
+    }
+
+    public function setContext($context)
+    {
+        if($this->isValidContext($context))
+        {
+            $this->currentContext = $context;
+        }
+    }
+
+    public function getContext()
+    {
+        return $this->currentContext;
     }
 }

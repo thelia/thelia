@@ -23,13 +23,10 @@
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
-use Thelia\Core\Security\SecurityContext;
-
+use Thelia\Core\Context;
 
 class Request extends BaseRequest
 {
-
-    protected $context = SecurityContext::CONTEXT_FRONT_OFFICE;
 
     public function getProductId()
     {
@@ -51,15 +48,4 @@ class Request extends BaseRequest
         }
         return $uri . $additionalQs;
     }
-
-    public function setContext($context)
-    {
-        $this->context = $context;
-    }
-
-    public function getContext()
-    {
-        return $this->context;
-    }
-
 }
