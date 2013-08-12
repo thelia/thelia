@@ -20,45 +20,12 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\Request as BaseRequest;
-use Thelia\Core\Context;
+namespace Thelia\Core;
 
-class Request extends BaseRequest
+
+class Context
 {
-
-    protected $context = Context::CONTEXT_FRONT_OFFICE;
-
-    public function getProductId()
-    {
-        return $this->get("product_id");
-    }
-
-    public function getUriAddingParameters(array $parameters = null)
-    {
-        $uri = $this->getUri();
-
-        $additionalQs = '';
-
-        foreach ($parameters as $key => $value) {
-            $additionalQs .= sprintf("&%s=%s", $key, $value);
-        }
-
-        if ('' == $this->getQueryString()) {
-            $additionalQs = '?'. ltrim($additionalQs, '&');
-        }
-        return $uri . $additionalQs;
-    }
-
-    public function setContext($context)
-    {
-        $this->context = $context;
-    }
-
-    public function getContext()
-    {
-        return $this->context;
-    }
-
+    const CONTEXT_FRONT_OFFICE = 'front';
+    const CONTEXT_BACK_OFFICE  = 'admin';
 }

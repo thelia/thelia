@@ -27,7 +27,7 @@ namespace Thelia\Core\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Core\Security\SecurityContext;
+use Thelia\Core\Context;
 
 class ContainerAwareAdmin implements ContainerAwareInterface {
 
@@ -47,7 +47,7 @@ class ContainerAwareAdmin implements ContainerAwareInterface {
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        $container->get('request')->setContext(SecurityContext::CONTEXT_BACK_OFFICE);
+        $container->get('request')->setContext(Context::CONTEXT_BACK_OFFICE);
         $this->container = $container;
     }
 }
