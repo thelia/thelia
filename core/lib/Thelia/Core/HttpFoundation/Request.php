@@ -28,8 +28,6 @@ use Thelia\Core\Context;
 class Request extends BaseRequest
 {
 
-    protected $context = Context::CONTEXT_FRONT_OFFICE;
-
     public function getProductId()
     {
         return $this->get("product_id");
@@ -50,15 +48,4 @@ class Request extends BaseRequest
         }
         return $uri . $additionalQs;
     }
-
-    public function setContext($context)
-    {
-        $this->context = $context;
-    }
-
-    public function getContext()
-    {
-        return $this->context;
-    }
-
 }

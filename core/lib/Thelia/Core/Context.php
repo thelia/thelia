@@ -28,4 +28,14 @@ class Context
 {
     const CONTEXT_FRONT_OFFICE = 'front';
     const CONTEXT_BACK_OFFICE  = 'admin';
+
+    protected $defineContext = array(
+        self::CONTEXT_BACK_OFFICE,
+        self::CONTEXT_FRONT_OFFICE
+    );
+
+    public function isValidContext($context)
+    {
+        return in_array($context, $this->defineContext);
+    }
 }
