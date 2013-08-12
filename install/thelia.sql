@@ -522,7 +522,6 @@ CREATE TABLE `lang`
     `locale` VARCHAR(45),
     `url` VARCHAR(255),
     `by_default` TINYINT,
-    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -604,89 +603,47 @@ CREATE TABLE `content_assoc`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- image
+-- produt_image
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `image`;
+DROP TABLE IF EXISTS `produt_image`;
 
-CREATE TABLE `image`
+CREATE TABLE `produt_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `product_id` INTEGER,
-    `category_id` INTEGER,
-    `folder_id` INTEGER,
-    `content_id` INTEGER,
+    `product_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_image_product_id` (`product_id`),
-    INDEX `idx_image_category_id` (`category_id`),
-    INDEX `idx_image_content_id` (`content_id`),
-    INDEX `idx_image_folder_id` (`folder_id`),
-    CONSTRAINT `fk_image_product_id`
+    INDEX `idx_product_id` (`product_id`),
+    CONSTRAINT `fk_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_image_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_image_content_id`
-        FOREIGN KEY (`content_id`)
-        REFERENCES `content` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_image_folder_id`
-        FOREIGN KEY (`folder_id`)
-        REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- document
+-- product_document
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `document`;
+DROP TABLE IF EXISTS `product_document`;
 
-CREATE TABLE `document`
+CREATE TABLE `product_document`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `product_id` INTEGER,
-    `category_id` INTEGER,
-    `folder_id` INTEGER,
-    `content_id` INTEGER,
+    `product_id` INTEGER NOT NULL,
     `file` VARCHAR(255) NOT NULL,
     `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_document_product_id` (`product_id`),
-    INDEX `idx_document_category_id` (`category_id`),
-    INDEX `idx_document_content_id` (`content_id`),
-    INDEX `idx_document_folder_id` (`folder_id`),
-    CONSTRAINT `fk_document_product_id`
+    INDEX `idx_product_id` (`product_id`),
+    CONSTRAINT `fk_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_document_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_document_content_id`
-        FOREIGN KEY (`content_id`)
-        REFERENCES `content` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_document_folder_id`
-        FOREIGN KEY (`folder_id`)
-        REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -763,7 +720,6 @@ CREATE TABLE `currency`
     `symbol` VARCHAR(45),
     `rate` FLOAT,
     `by_default` TINYINT,
-    `position` INTEGER,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`)
@@ -1362,6 +1318,144 @@ CREATE TABLE `product_price`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
+-- category_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `category_image`;
+
+CREATE TABLE `category_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `category_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_category_id` (`category_id`),
+    CONSTRAINT `fk_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- folder_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `folder_image`;
+
+CREATE TABLE `folder_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `folder_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_folder_id` (`folder_id`),
+    CONSTRAINT `fk_folder_id`
+        FOREIGN KEY (`folder_id`)
+        REFERENCES `folder` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- content_image
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `content_image`;
+
+CREATE TABLE `content_image`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `content_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_content_id` (`content_id`),
+    CONSTRAINT `fk_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- category_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `category_document`;
+
+CREATE TABLE `category_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `category_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_category_id` (`category_id`),
+    CONSTRAINT `fk_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- content_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `content_document`;
+
+CREATE TABLE `content_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `content_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_content_id` (`content_id`),
+    CONSTRAINT `fk_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- folder_document
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `folder_document`;
+
+CREATE TABLE `folder_document`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `folder_id` INTEGER NOT NULL,
+    `file` VARCHAR(255) NOT NULL,
+    `position` INTEGER,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_folder_id` (`folder_id`),
+    CONSTRAINT `fk_folder_id`
+        FOREIGN KEY (`folder_id`)
+        REFERENCES `folder` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
 -- category_i18n
 -- ---------------------------------------------------------------------
 
@@ -1627,12 +1721,12 @@ CREATE TABLE `content_i18n`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- image_i18n
+-- produt_image_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `image_i18n`;
+DROP TABLE IF EXISTS `produt_image_i18n`;
 
-CREATE TABLE `image_i18n`
+CREATE TABLE `produt_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
@@ -1641,19 +1735,19 @@ CREATE TABLE `image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `image_i18n_FK_1`
+    CONSTRAINT `produt_image_i18n_FK_1`
         FOREIGN KEY (`id`)
-        REFERENCES `image` (`id`)
+        REFERENCES `produt_image` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- document_i18n
+-- product_document_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `document_i18n`;
+DROP TABLE IF EXISTS `product_document_i18n`;
 
-CREATE TABLE `document_i18n`
+CREATE TABLE `product_document_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
@@ -1662,9 +1756,9 @@ CREATE TABLE `document_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `document_i18n_FK_1`
+    CONSTRAINT `product_document_i18n_FK_1`
         FOREIGN KEY (`id`)
-        REFERENCES `document` (`id`)
+        REFERENCES `product_document` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -1787,6 +1881,132 @@ CREATE TABLE `message_i18n`
     CONSTRAINT `message_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- category_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `category_image_i18n`;
+
+CREATE TABLE `category_image_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `category_image_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `category_image` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- folder_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `folder_image_i18n`;
+
+CREATE TABLE `folder_image_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `folder_image_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `folder_image` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- content_image_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `content_image_i18n`;
+
+CREATE TABLE `content_image_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `content_image_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `content_image` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- category_document_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `category_document_i18n`;
+
+CREATE TABLE `category_document_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `category_document_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `category_document` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- content_document_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `content_document_i18n`;
+
+CREATE TABLE `content_document_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `content_document_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `content_document` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- folder_document_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `folder_document_i18n`;
+
+CREATE TABLE `folder_document_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `title` VARCHAR(255),
+    `description` LONGTEXT,
+    `chapo` TEXT,
+    `postscriptum` TEXT,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `folder_document_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `folder_document` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

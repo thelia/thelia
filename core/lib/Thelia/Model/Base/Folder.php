@@ -21,16 +21,16 @@ use Thelia\Model\Content as ChildContent;
 use Thelia\Model\ContentFolder as ChildContentFolder;
 use Thelia\Model\ContentFolderQuery as ChildContentFolderQuery;
 use Thelia\Model\ContentQuery as ChildContentQuery;
-use Thelia\Model\Document as ChildDocument;
-use Thelia\Model\DocumentQuery as ChildDocumentQuery;
 use Thelia\Model\Folder as ChildFolder;
+use Thelia\Model\FolderDocument as ChildFolderDocument;
+use Thelia\Model\FolderDocumentQuery as ChildFolderDocumentQuery;
 use Thelia\Model\FolderI18n as ChildFolderI18n;
 use Thelia\Model\FolderI18nQuery as ChildFolderI18nQuery;
+use Thelia\Model\FolderImage as ChildFolderImage;
+use Thelia\Model\FolderImageQuery as ChildFolderImageQuery;
 use Thelia\Model\FolderQuery as ChildFolderQuery;
 use Thelia\Model\FolderVersion as ChildFolderVersion;
 use Thelia\Model\FolderVersionQuery as ChildFolderVersionQuery;
-use Thelia\Model\Image as ChildImage;
-use Thelia\Model\ImageQuery as ChildImageQuery;
 use Thelia\Model\Rewriting as ChildRewriting;
 use Thelia\Model\RewritingQuery as ChildRewritingQuery;
 use Thelia\Model\Map\FolderTableMap;
@@ -126,18 +126,6 @@ abstract class Folder implements ActiveRecordInterface
     protected $version_created_by;
 
     /**
-     * @var        ObjectCollection|ChildImage[] Collection to store aggregation of ChildImage objects.
-     */
-    protected $collImages;
-    protected $collImagesPartial;
-
-    /**
-     * @var        ObjectCollection|ChildDocument[] Collection to store aggregation of ChildDocument objects.
-     */
-    protected $collDocuments;
-    protected $collDocumentsPartial;
-
-    /**
      * @var        ObjectCollection|ChildRewriting[] Collection to store aggregation of ChildRewriting objects.
      */
     protected $collRewritings;
@@ -148,6 +136,18 @@ abstract class Folder implements ActiveRecordInterface
      */
     protected $collContentFolders;
     protected $collContentFoldersPartial;
+
+    /**
+     * @var        ObjectCollection|ChildFolderImage[] Collection to store aggregation of ChildFolderImage objects.
+     */
+    protected $collFolderImages;
+    protected $collFolderImagesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildFolderDocument[] Collection to store aggregation of ChildFolderDocument objects.
+     */
+    protected $collFolderDocuments;
+    protected $collFolderDocumentsPartial;
 
     /**
      * @var        ObjectCollection|ChildFolderI18n[] Collection to store aggregation of ChildFolderI18n objects.
@@ -206,18 +206,6 @@ abstract class Folder implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $imagesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $documentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
     protected $rewritingsScheduledForDeletion = null;
 
     /**
@@ -225,6 +213,18 @@ abstract class Folder implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $contentFoldersScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $folderImagesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $folderDocumentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -965,13 +965,13 @@ abstract class Folder implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collImages = null;
-
-            $this->collDocuments = null;
-
             $this->collRewritings = null;
 
             $this->collContentFolders = null;
+
+            $this->collFolderImages = null;
+
+            $this->collFolderDocuments = null;
 
             $this->collFolderI18ns = null;
 
@@ -1150,40 +1150,6 @@ abstract class Folder implements ActiveRecordInterface
                 }
             }
 
-            if ($this->imagesScheduledForDeletion !== null) {
-                if (!$this->imagesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\ImageQuery::create()
-                        ->filterByPrimaryKeys($this->imagesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->imagesScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collImages !== null) {
-            foreach ($this->collImages as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->documentsScheduledForDeletion !== null) {
-                if (!$this->documentsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\DocumentQuery::create()
-                        ->filterByPrimaryKeys($this->documentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->documentsScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collDocuments !== null) {
-            foreach ($this->collDocuments as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->rewritingsScheduledForDeletion !== null) {
                 if (!$this->rewritingsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\RewritingQuery::create()
@@ -1212,6 +1178,40 @@ abstract class Folder implements ActiveRecordInterface
 
                 if ($this->collContentFolders !== null) {
             foreach ($this->collContentFolders as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->folderImagesScheduledForDeletion !== null) {
+                if (!$this->folderImagesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\FolderImageQuery::create()
+                        ->filterByPrimaryKeys($this->folderImagesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->folderImagesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collFolderImages !== null) {
+            foreach ($this->collFolderImages as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->folderDocumentsScheduledForDeletion !== null) {
+                if (!$this->folderDocumentsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\FolderDocumentQuery::create()
+                        ->filterByPrimaryKeys($this->folderDocumentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->folderDocumentsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collFolderDocuments !== null) {
+            foreach ($this->collFolderDocuments as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1478,17 +1478,17 @@ abstract class Folder implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collImages) {
-                $result['Images'] = $this->collImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collDocuments) {
-                $result['Documents'] = $this->collDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collRewritings) {
                 $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collContentFolders) {
                 $result['ContentFolders'] = $this->collContentFolders->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFolderImages) {
+                $result['FolderImages'] = $this->collFolderImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collFolderDocuments) {
+                $result['FolderDocuments'] = $this->collFolderDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collFolderI18ns) {
                 $result['FolderI18ns'] = $this->collFolderI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1687,18 +1687,6 @@ abstract class Folder implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getImages() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addImage($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getDocuments() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addDocument($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getRewritings() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addRewriting($relObj->copy($deepCopy));
@@ -1708,6 +1696,18 @@ abstract class Folder implements ActiveRecordInterface
             foreach ($this->getContentFolders() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addContentFolder($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFolderImages() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFolderImage($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getFolderDocuments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addFolderDocument($relObj->copy($deepCopy));
                 }
             }
 
@@ -1764,17 +1764,17 @@ abstract class Folder implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('Image' == $relationName) {
-            return $this->initImages();
-        }
-        if ('Document' == $relationName) {
-            return $this->initDocuments();
-        }
         if ('Rewriting' == $relationName) {
             return $this->initRewritings();
         }
         if ('ContentFolder' == $relationName) {
             return $this->initContentFolders();
+        }
+        if ('FolderImage' == $relationName) {
+            return $this->initFolderImages();
+        }
+        if ('FolderDocument' == $relationName) {
+            return $this->initFolderDocuments();
         }
         if ('FolderI18n' == $relationName) {
             return $this->initFolderI18ns();
@@ -1782,592 +1782,6 @@ abstract class Folder implements ActiveRecordInterface
         if ('FolderVersion' == $relationName) {
             return $this->initFolderVersions();
         }
-    }
-
-    /**
-     * Clears out the collImages collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addImages()
-     */
-    public function clearImages()
-    {
-        $this->collImages = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collImages collection loaded partially.
-     */
-    public function resetPartialImages($v = true)
-    {
-        $this->collImagesPartial = $v;
-    }
-
-    /**
-     * Initializes the collImages collection.
-     *
-     * By default this just sets the collImages collection to an empty array (like clearcollImages());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initImages($overrideExisting = true)
-    {
-        if (null !== $this->collImages && !$overrideExisting) {
-            return;
-        }
-        $this->collImages = new ObjectCollection();
-        $this->collImages->setModel('\Thelia\Model\Image');
-    }
-
-    /**
-     * Gets an array of ChildImage objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildFolder is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildImage[] List of ChildImage objects
-     * @throws PropelException
-     */
-    public function getImages($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collImagesPartial && !$this->isNew();
-        if (null === $this->collImages || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collImages) {
-                // return empty collection
-                $this->initImages();
-            } else {
-                $collImages = ChildImageQuery::create(null, $criteria)
-                    ->filterByFolder($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collImagesPartial && count($collImages)) {
-                        $this->initImages(false);
-
-                        foreach ($collImages as $obj) {
-                            if (false == $this->collImages->contains($obj)) {
-                                $this->collImages->append($obj);
-                            }
-                        }
-
-                        $this->collImagesPartial = true;
-                    }
-
-                    $collImages->getInternalIterator()->rewind();
-
-                    return $collImages;
-                }
-
-                if ($partial && $this->collImages) {
-                    foreach ($this->collImages as $obj) {
-                        if ($obj->isNew()) {
-                            $collImages[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collImages = $collImages;
-                $this->collImagesPartial = false;
-            }
-        }
-
-        return $this->collImages;
-    }
-
-    /**
-     * Sets a collection of Image objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $images A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildFolder The current object (for fluent API support)
-     */
-    public function setImages(Collection $images, ConnectionInterface $con = null)
-    {
-        $imagesToDelete = $this->getImages(new Criteria(), $con)->diff($images);
-
-
-        $this->imagesScheduledForDeletion = $imagesToDelete;
-
-        foreach ($imagesToDelete as $imageRemoved) {
-            $imageRemoved->setFolder(null);
-        }
-
-        $this->collImages = null;
-        foreach ($images as $image) {
-            $this->addImage($image);
-        }
-
-        $this->collImages = $images;
-        $this->collImagesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Image objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Image objects.
-     * @throws PropelException
-     */
-    public function countImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collImagesPartial && !$this->isNew();
-        if (null === $this->collImages || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collImages) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getImages());
-            }
-
-            $query = ChildImageQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByFolder($this)
-                ->count($con);
-        }
-
-        return count($this->collImages);
-    }
-
-    /**
-     * Method called to associate a ChildImage object to this object
-     * through the ChildImage foreign key attribute.
-     *
-     * @param    ChildImage $l ChildImage
-     * @return   \Thelia\Model\Folder The current object (for fluent API support)
-     */
-    public function addImage(ChildImage $l)
-    {
-        if ($this->collImages === null) {
-            $this->initImages();
-            $this->collImagesPartial = true;
-        }
-
-        if (!in_array($l, $this->collImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddImage($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Image $image The image object to add.
-     */
-    protected function doAddImage($image)
-    {
-        $this->collImages[]= $image;
-        $image->setFolder($this);
-    }
-
-    /**
-     * @param  Image $image The image object to remove.
-     * @return ChildFolder The current object (for fluent API support)
-     */
-    public function removeImage($image)
-    {
-        if ($this->getImages()->contains($image)) {
-            $this->collImages->remove($this->collImages->search($image));
-            if (null === $this->imagesScheduledForDeletion) {
-                $this->imagesScheduledForDeletion = clone $this->collImages;
-                $this->imagesScheduledForDeletion->clear();
-            }
-            $this->imagesScheduledForDeletion[]= $image;
-            $image->setFolder(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Images from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildImage[] List of ChildImage objects
-     */
-    public function getImagesJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildImageQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getImages($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Images from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildImage[] List of ChildImage objects
-     */
-    public function getImagesJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildImageQuery::create(null, $criteria);
-        $query->joinWith('Category', $joinBehavior);
-
-        return $this->getImages($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Images from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildImage[] List of ChildImage objects
-     */
-    public function getImagesJoinContent($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildImageQuery::create(null, $criteria);
-        $query->joinWith('Content', $joinBehavior);
-
-        return $this->getImages($query, $con);
-    }
-
-    /**
-     * Clears out the collDocuments collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addDocuments()
-     */
-    public function clearDocuments()
-    {
-        $this->collDocuments = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collDocuments collection loaded partially.
-     */
-    public function resetPartialDocuments($v = true)
-    {
-        $this->collDocumentsPartial = $v;
-    }
-
-    /**
-     * Initializes the collDocuments collection.
-     *
-     * By default this just sets the collDocuments collection to an empty array (like clearcollDocuments());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initDocuments($overrideExisting = true)
-    {
-        if (null !== $this->collDocuments && !$overrideExisting) {
-            return;
-        }
-        $this->collDocuments = new ObjectCollection();
-        $this->collDocuments->setModel('\Thelia\Model\Document');
-    }
-
-    /**
-     * Gets an array of ChildDocument objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildFolder is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     * @throws PropelException
-     */
-    public function getDocuments($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                // return empty collection
-                $this->initDocuments();
-            } else {
-                $collDocuments = ChildDocumentQuery::create(null, $criteria)
-                    ->filterByFolder($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collDocumentsPartial && count($collDocuments)) {
-                        $this->initDocuments(false);
-
-                        foreach ($collDocuments as $obj) {
-                            if (false == $this->collDocuments->contains($obj)) {
-                                $this->collDocuments->append($obj);
-                            }
-                        }
-
-                        $this->collDocumentsPartial = true;
-                    }
-
-                    $collDocuments->getInternalIterator()->rewind();
-
-                    return $collDocuments;
-                }
-
-                if ($partial && $this->collDocuments) {
-                    foreach ($this->collDocuments as $obj) {
-                        if ($obj->isNew()) {
-                            $collDocuments[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collDocuments = $collDocuments;
-                $this->collDocumentsPartial = false;
-            }
-        }
-
-        return $this->collDocuments;
-    }
-
-    /**
-     * Sets a collection of Document objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $documents A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildFolder The current object (for fluent API support)
-     */
-    public function setDocuments(Collection $documents, ConnectionInterface $con = null)
-    {
-        $documentsToDelete = $this->getDocuments(new Criteria(), $con)->diff($documents);
-
-
-        $this->documentsScheduledForDeletion = $documentsToDelete;
-
-        foreach ($documentsToDelete as $documentRemoved) {
-            $documentRemoved->setFolder(null);
-        }
-
-        $this->collDocuments = null;
-        foreach ($documents as $document) {
-            $this->addDocument($document);
-        }
-
-        $this->collDocuments = $documents;
-        $this->collDocumentsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Document objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Document objects.
-     * @throws PropelException
-     */
-    public function countDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getDocuments());
-            }
-
-            $query = ChildDocumentQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByFolder($this)
-                ->count($con);
-        }
-
-        return count($this->collDocuments);
-    }
-
-    /**
-     * Method called to associate a ChildDocument object to this object
-     * through the ChildDocument foreign key attribute.
-     *
-     * @param    ChildDocument $l ChildDocument
-     * @return   \Thelia\Model\Folder The current object (for fluent API support)
-     */
-    public function addDocument(ChildDocument $l)
-    {
-        if ($this->collDocuments === null) {
-            $this->initDocuments();
-            $this->collDocumentsPartial = true;
-        }
-
-        if (!in_array($l, $this->collDocuments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddDocument($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Document $document The document object to add.
-     */
-    protected function doAddDocument($document)
-    {
-        $this->collDocuments[]= $document;
-        $document->setFolder($this);
-    }
-
-    /**
-     * @param  Document $document The document object to remove.
-     * @return ChildFolder The current object (for fluent API support)
-     */
-    public function removeDocument($document)
-    {
-        if ($this->getDocuments()->contains($document)) {
-            $this->collDocuments->remove($this->collDocuments->search($document));
-            if (null === $this->documentsScheduledForDeletion) {
-                $this->documentsScheduledForDeletion = clone $this->collDocuments;
-                $this->documentsScheduledForDeletion->clear();
-            }
-            $this->documentsScheduledForDeletion[]= $document;
-            $document->setFolder(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     */
-    public function getDocumentsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildDocumentQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     */
-    public function getDocumentsJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildDocumentQuery::create(null, $criteria);
-        $query->joinWith('Category', $joinBehavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Folder is new, it will return
-     * an empty collection; or if this Folder has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Folder.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     */
-    public function getDocumentsJoinContent($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildDocumentQuery::create(null, $criteria);
-        $query->joinWith('Content', $joinBehavior);
-
-        return $this->getDocuments($query, $con);
     }
 
     /**
@@ -2907,6 +2321,442 @@ abstract class Folder implements ActiveRecordInterface
         $query->joinWith('Content', $joinBehavior);
 
         return $this->getContentFolders($query, $con);
+    }
+
+    /**
+     * Clears out the collFolderImages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFolderImages()
+     */
+    public function clearFolderImages()
+    {
+        $this->collFolderImages = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collFolderImages collection loaded partially.
+     */
+    public function resetPartialFolderImages($v = true)
+    {
+        $this->collFolderImagesPartial = $v;
+    }
+
+    /**
+     * Initializes the collFolderImages collection.
+     *
+     * By default this just sets the collFolderImages collection to an empty array (like clearcollFolderImages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFolderImages($overrideExisting = true)
+    {
+        if (null !== $this->collFolderImages && !$overrideExisting) {
+            return;
+        }
+        $this->collFolderImages = new ObjectCollection();
+        $this->collFolderImages->setModel('\Thelia\Model\FolderImage');
+    }
+
+    /**
+     * Gets an array of ChildFolderImage objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildFolder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildFolderImage[] List of ChildFolderImage objects
+     * @throws PropelException
+     */
+    public function getFolderImages($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collFolderImagesPartial && !$this->isNew();
+        if (null === $this->collFolderImages || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFolderImages) {
+                // return empty collection
+                $this->initFolderImages();
+            } else {
+                $collFolderImages = ChildFolderImageQuery::create(null, $criteria)
+                    ->filterByFolder($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collFolderImagesPartial && count($collFolderImages)) {
+                        $this->initFolderImages(false);
+
+                        foreach ($collFolderImages as $obj) {
+                            if (false == $this->collFolderImages->contains($obj)) {
+                                $this->collFolderImages->append($obj);
+                            }
+                        }
+
+                        $this->collFolderImagesPartial = true;
+                    }
+
+                    $collFolderImages->getInternalIterator()->rewind();
+
+                    return $collFolderImages;
+                }
+
+                if ($partial && $this->collFolderImages) {
+                    foreach ($this->collFolderImages as $obj) {
+                        if ($obj->isNew()) {
+                            $collFolderImages[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFolderImages = $collFolderImages;
+                $this->collFolderImagesPartial = false;
+            }
+        }
+
+        return $this->collFolderImages;
+    }
+
+    /**
+     * Sets a collection of FolderImage objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $folderImages A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildFolder The current object (for fluent API support)
+     */
+    public function setFolderImages(Collection $folderImages, ConnectionInterface $con = null)
+    {
+        $folderImagesToDelete = $this->getFolderImages(new Criteria(), $con)->diff($folderImages);
+
+
+        $this->folderImagesScheduledForDeletion = $folderImagesToDelete;
+
+        foreach ($folderImagesToDelete as $folderImageRemoved) {
+            $folderImageRemoved->setFolder(null);
+        }
+
+        $this->collFolderImages = null;
+        foreach ($folderImages as $folderImage) {
+            $this->addFolderImage($folderImage);
+        }
+
+        $this->collFolderImages = $folderImages;
+        $this->collFolderImagesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FolderImage objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related FolderImage objects.
+     * @throws PropelException
+     */
+    public function countFolderImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collFolderImagesPartial && !$this->isNew();
+        if (null === $this->collFolderImages || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFolderImages) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getFolderImages());
+            }
+
+            $query = ChildFolderImageQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
+        }
+
+        return count($this->collFolderImages);
+    }
+
+    /**
+     * Method called to associate a ChildFolderImage object to this object
+     * through the ChildFolderImage foreign key attribute.
+     *
+     * @param    ChildFolderImage $l ChildFolderImage
+     * @return   \Thelia\Model\Folder The current object (for fluent API support)
+     */
+    public function addFolderImage(ChildFolderImage $l)
+    {
+        if ($this->collFolderImages === null) {
+            $this->initFolderImages();
+            $this->collFolderImagesPartial = true;
+        }
+
+        if (!in_array($l, $this->collFolderImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFolderImage($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param FolderImage $folderImage The folderImage object to add.
+     */
+    protected function doAddFolderImage($folderImage)
+    {
+        $this->collFolderImages[]= $folderImage;
+        $folderImage->setFolder($this);
+    }
+
+    /**
+     * @param  FolderImage $folderImage The folderImage object to remove.
+     * @return ChildFolder The current object (for fluent API support)
+     */
+    public function removeFolderImage($folderImage)
+    {
+        if ($this->getFolderImages()->contains($folderImage)) {
+            $this->collFolderImages->remove($this->collFolderImages->search($folderImage));
+            if (null === $this->folderImagesScheduledForDeletion) {
+                $this->folderImagesScheduledForDeletion = clone $this->collFolderImages;
+                $this->folderImagesScheduledForDeletion->clear();
+            }
+            $this->folderImagesScheduledForDeletion[]= clone $folderImage;
+            $folderImage->setFolder(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collFolderDocuments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addFolderDocuments()
+     */
+    public function clearFolderDocuments()
+    {
+        $this->collFolderDocuments = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collFolderDocuments collection loaded partially.
+     */
+    public function resetPartialFolderDocuments($v = true)
+    {
+        $this->collFolderDocumentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collFolderDocuments collection.
+     *
+     * By default this just sets the collFolderDocuments collection to an empty array (like clearcollFolderDocuments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initFolderDocuments($overrideExisting = true)
+    {
+        if (null !== $this->collFolderDocuments && !$overrideExisting) {
+            return;
+        }
+        $this->collFolderDocuments = new ObjectCollection();
+        $this->collFolderDocuments->setModel('\Thelia\Model\FolderDocument');
+    }
+
+    /**
+     * Gets an array of ChildFolderDocument objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildFolder is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildFolderDocument[] List of ChildFolderDocument objects
+     * @throws PropelException
+     */
+    public function getFolderDocuments($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collFolderDocumentsPartial && !$this->isNew();
+        if (null === $this->collFolderDocuments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collFolderDocuments) {
+                // return empty collection
+                $this->initFolderDocuments();
+            } else {
+                $collFolderDocuments = ChildFolderDocumentQuery::create(null, $criteria)
+                    ->filterByFolder($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collFolderDocumentsPartial && count($collFolderDocuments)) {
+                        $this->initFolderDocuments(false);
+
+                        foreach ($collFolderDocuments as $obj) {
+                            if (false == $this->collFolderDocuments->contains($obj)) {
+                                $this->collFolderDocuments->append($obj);
+                            }
+                        }
+
+                        $this->collFolderDocumentsPartial = true;
+                    }
+
+                    $collFolderDocuments->getInternalIterator()->rewind();
+
+                    return $collFolderDocuments;
+                }
+
+                if ($partial && $this->collFolderDocuments) {
+                    foreach ($this->collFolderDocuments as $obj) {
+                        if ($obj->isNew()) {
+                            $collFolderDocuments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collFolderDocuments = $collFolderDocuments;
+                $this->collFolderDocumentsPartial = false;
+            }
+        }
+
+        return $this->collFolderDocuments;
+    }
+
+    /**
+     * Sets a collection of FolderDocument objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $folderDocuments A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildFolder The current object (for fluent API support)
+     */
+    public function setFolderDocuments(Collection $folderDocuments, ConnectionInterface $con = null)
+    {
+        $folderDocumentsToDelete = $this->getFolderDocuments(new Criteria(), $con)->diff($folderDocuments);
+
+
+        $this->folderDocumentsScheduledForDeletion = $folderDocumentsToDelete;
+
+        foreach ($folderDocumentsToDelete as $folderDocumentRemoved) {
+            $folderDocumentRemoved->setFolder(null);
+        }
+
+        $this->collFolderDocuments = null;
+        foreach ($folderDocuments as $folderDocument) {
+            $this->addFolderDocument($folderDocument);
+        }
+
+        $this->collFolderDocuments = $folderDocuments;
+        $this->collFolderDocumentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related FolderDocument objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related FolderDocument objects.
+     * @throws PropelException
+     */
+    public function countFolderDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collFolderDocumentsPartial && !$this->isNew();
+        if (null === $this->collFolderDocuments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collFolderDocuments) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getFolderDocuments());
+            }
+
+            $query = ChildFolderDocumentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByFolder($this)
+                ->count($con);
+        }
+
+        return count($this->collFolderDocuments);
+    }
+
+    /**
+     * Method called to associate a ChildFolderDocument object to this object
+     * through the ChildFolderDocument foreign key attribute.
+     *
+     * @param    ChildFolderDocument $l ChildFolderDocument
+     * @return   \Thelia\Model\Folder The current object (for fluent API support)
+     */
+    public function addFolderDocument(ChildFolderDocument $l)
+    {
+        if ($this->collFolderDocuments === null) {
+            $this->initFolderDocuments();
+            $this->collFolderDocumentsPartial = true;
+        }
+
+        if (!in_array($l, $this->collFolderDocuments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddFolderDocument($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param FolderDocument $folderDocument The folderDocument object to add.
+     */
+    protected function doAddFolderDocument($folderDocument)
+    {
+        $this->collFolderDocuments[]= $folderDocument;
+        $folderDocument->setFolder($this);
+    }
+
+    /**
+     * @param  FolderDocument $folderDocument The folderDocument object to remove.
+     * @return ChildFolder The current object (for fluent API support)
+     */
+    public function removeFolderDocument($folderDocument)
+    {
+        if ($this->getFolderDocuments()->contains($folderDocument)) {
+            $this->collFolderDocuments->remove($this->collFolderDocuments->search($folderDocument));
+            if (null === $this->folderDocumentsScheduledForDeletion) {
+                $this->folderDocumentsScheduledForDeletion = clone $this->collFolderDocuments;
+                $this->folderDocumentsScheduledForDeletion->clear();
+            }
+            $this->folderDocumentsScheduledForDeletion[]= clone $folderDocument;
+            $folderDocument->setFolder(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -3572,16 +3422,6 @@ abstract class Folder implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collImages) {
-                foreach ($this->collImages as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collDocuments) {
-                foreach ($this->collDocuments as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collRewritings) {
                 foreach ($this->collRewritings as $o) {
                     $o->clearAllReferences($deep);
@@ -3589,6 +3429,16 @@ abstract class Folder implements ActiveRecordInterface
             }
             if ($this->collContentFolders) {
                 foreach ($this->collContentFolders as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFolderImages) {
+                foreach ($this->collFolderImages as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collFolderDocuments) {
+                foreach ($this->collFolderDocuments as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3613,14 +3463,6 @@ abstract class Folder implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collImages instanceof Collection) {
-            $this->collImages->clearIterator();
-        }
-        $this->collImages = null;
-        if ($this->collDocuments instanceof Collection) {
-            $this->collDocuments->clearIterator();
-        }
-        $this->collDocuments = null;
         if ($this->collRewritings instanceof Collection) {
             $this->collRewritings->clearIterator();
         }
@@ -3629,6 +3471,14 @@ abstract class Folder implements ActiveRecordInterface
             $this->collContentFolders->clearIterator();
         }
         $this->collContentFolders = null;
+        if ($this->collFolderImages instanceof Collection) {
+            $this->collFolderImages->clearIterator();
+        }
+        $this->collFolderImages = null;
+        if ($this->collFolderDocuments instanceof Collection) {
+            $this->collFolderDocuments->clearIterator();
+        }
+        $this->collFolderDocuments = null;
         if ($this->collFolderI18ns instanceof Collection) {
             $this->collFolderI18ns->clearIterator();
         }

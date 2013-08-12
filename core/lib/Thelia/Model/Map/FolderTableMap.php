@@ -190,10 +190,10 @@ class FolderTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Image', '\\Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Images');
-        $this->addRelation('Document', '\\Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Documents');
         $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('ContentFolder', '\\Thelia\\Model\\ContentFolder', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'ContentFolders');
+        $this->addRelation('FolderImage', '\\Thelia\\Model\\FolderImage', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'FolderImages');
+        $this->addRelation('FolderDocument', '\\Thelia\\Model\\FolderDocument', RelationMap::ONE_TO_MANY, array('id' => 'folder_id', ), 'CASCADE', 'RESTRICT', 'FolderDocuments');
         $this->addRelation('FolderI18n', '\\Thelia\\Model\\FolderI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FolderI18ns');
         $this->addRelation('FolderVersion', '\\Thelia\\Model\\FolderVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'FolderVersions');
         $this->addRelation('Content', '\\Thelia\\Model\\Content', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Contents');
@@ -220,10 +220,10 @@ class FolderTableMap extends TableMap
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ImageTableMap::clearInstancePool();
-                DocumentTableMap::clearInstancePool();
                 RewritingTableMap::clearInstancePool();
                 ContentFolderTableMap::clearInstancePool();
+                FolderImageTableMap::clearInstancePool();
+                FolderDocumentTableMap::clearInstancePool();
                 FolderI18nTableMap::clearInstancePool();
                 FolderVersionTableMap::clearInstancePool();
             }

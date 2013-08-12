@@ -387,7 +387,6 @@
     <column name="locale" size="45" type="VARCHAR" />
     <column name="url" size="255" type="VARCHAR" />
     <column name="by_default" type="TINYINT" />
-    <column name="position" type="INTEGER" />
     <behavior name="timestampable" />
   </table>
   <table name="folder" namespace="Thelia\Model">
@@ -451,82 +450,40 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="image" namespace="Thelia\Model">
+  <table name="produt_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="product_id" type="INTEGER" />
-    <column name="category_id" type="INTEGER" />
-    <column name="folder_id" type="INTEGER" />
-    <column name="content_id" type="INTEGER" />
+    <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="product" name="fk_image_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="product" name="fk_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
-    <foreign-key foreignTable="category" name="fk_image_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="category_id" />
-    </foreign-key>
-    <foreign-key foreignTable="content" name="fk_image_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="content_id" />
-    </foreign-key>
-    <foreign-key foreignTable="folder" name="fk_image_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="folder_id" />
-    </foreign-key>
-    <index name="idx_image_product_id">
+    <index name="idx_product_id">
       <index-column name="product_id" />
-    </index>
-    <index name="idx_image_category_id">
-      <index-column name="category_id" />
-    </index>
-    <index name="idx_image_content_id">
-      <index-column name="content_id" />
-    </index>
-    <index name="idx_image_folder_id">
-      <index-column name="folder_id" />
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
     </behavior>
   </table>
-  <table name="document" namespace="Thelia\Model">
+  <table name="product_document" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
-    <column name="product_id" type="INTEGER" />
-    <column name="category_id" type="INTEGER" />
-    <column name="folder_id" type="INTEGER" />
-    <column name="content_id" type="INTEGER" />
+    <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
     <column name="position" type="INTEGER" />
     <column name="title" size="255" type="VARCHAR" />
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="product" name="fk_document_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="product" name="fk_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
-    <foreign-key foreignTable="category" name="fk_document_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="category_id" />
-    </foreign-key>
-    <foreign-key foreignTable="content" name="fk_document_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="content_id" />
-    </foreign-key>
-    <foreign-key foreignTable="folder" name="fk_document_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
-      <reference foreign="id" local="folder_id" />
-    </foreign-key>
-    <index name="idx_document_product_id">
+    <index name="idx_product_id">
       <index-column name="product_id" />
-    </index>
-    <index name="idx_document_category_id">
-      <index-column name="category_id" />
-    </index>
-    <index name="idx_document_content_id">
-      <index-column name="content_id" />
-    </index>
-    <index name="idx_document_folder_id">
-      <index-column name="folder_id" />
     </index>
     <behavior name="timestampable" />
     <behavior name="i18n">
@@ -589,7 +546,6 @@
     <column name="symbol" size="45" type="VARCHAR" />
     <column name="rate" type="FLOAT" />
     <column name="by_default" type="TINYINT" />
-    <column name="position" type="INTEGER" />
     <behavior name="timestampable" />
     <behavior name="i18n">
       <parameter name="i18n_columns" value="name" />
@@ -1007,5 +963,125 @@
       <index-column name="currency_id" />
     </index>
     <behavior name="timestampable" />
+  </table>
+  <table name="category_image" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="category_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <foreign-key foreignTable="category" name="fk_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="category_id" />
+    </foreign-key>
+    <index name="idx_category_id">
+      <index-column name="category_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
+  <table name="folder_image" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="folder_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <foreign-key foreignTable="folder" name="fk_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="folder_id" />
+    </foreign-key>
+    <index name="idx_folder_id">
+      <index-column name="folder_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
+  <table name="content_image" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="content_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <foreign-key foreignTable="content" name="fk_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="content_id" />
+    </foreign-key>
+    <index name="idx_content_id">
+      <index-column name="content_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
+  <table name="category_document" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="category_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <foreign-key foreignTable="category" name="fk_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="category_id" />
+    </foreign-key>
+    <index name="idx_category_id">
+      <index-column name="category_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
+  <table name="content_document" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="content_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <foreign-key foreignTable="content" name="fk_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="content_id" />
+    </foreign-key>
+    <index name="idx_content_id">
+      <index-column name="content_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
+  </table>
+  <table name="folder_document" namespace="Thelia\Model">
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column name="folder_id" required="true" type="INTEGER" />
+    <column name="file" required="true" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
+    <column name="title" size="255" type="VARCHAR" />
+    <column name="description" type="CLOB" />
+    <column name="chapo" type="LONGVARCHAR" />
+    <column name="postscriptum" type="LONGVARCHAR" />
+    <foreign-key foreignTable="folder" name="fk_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
+      <reference foreign="id" local="folder_id" />
+    </foreign-key>
+    <index name="idx_folder_id">
+      <index-column name="folder_id" />
+    </index>
+    <behavior name="timestampable" />
+    <behavior name="i18n">
+      <parameter name="i18n_columns" value="title, description, chapo, postscriptum" />
+    </behavior>
   </table>
 </database>

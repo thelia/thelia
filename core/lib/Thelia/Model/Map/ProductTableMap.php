@@ -201,8 +201,8 @@ class ProductTableMap extends TableMap
         $this->addRelation('FeatureProduct', '\\Thelia\\Model\\FeatureProduct', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'FeatureProducts');
         $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductSaleElementss');
         $this->addRelation('ContentAssoc', '\\Thelia\\Model\\ContentAssoc', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ContentAssocs');
-        $this->addRelation('Image', '\\Thelia\\Model\\Image', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'Images');
-        $this->addRelation('Document', '\\Thelia\\Model\\Document', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'Documents');
+        $this->addRelation('ProdutImage', '\\Thelia\\Model\\ProdutImage', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProdutImages');
+        $this->addRelation('ProductDocument', '\\Thelia\\Model\\ProductDocument', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductDocuments');
         $this->addRelation('AccessoryRelatedByProductId', '\\Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'AccessoriesRelatedByProductId');
         $this->addRelation('AccessoryRelatedByAccessory', '\\Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'accessory', ), 'CASCADE', 'RESTRICT', 'AccessoriesRelatedByAccessory');
         $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
@@ -239,8 +239,8 @@ class ProductTableMap extends TableMap
                 FeatureProductTableMap::clearInstancePool();
                 ProductSaleElementsTableMap::clearInstancePool();
                 ContentAssocTableMap::clearInstancePool();
-                ImageTableMap::clearInstancePool();
-                DocumentTableMap::clearInstancePool();
+                ProdutImageTableMap::clearInstancePool();
+                ProductDocumentTableMap::clearInstancePool();
                 AccessoryTableMap::clearInstancePool();
                 RewritingTableMap::clearInstancePool();
                 ProductI18nTableMap::clearInstancePool();

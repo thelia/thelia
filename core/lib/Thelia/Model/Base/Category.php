@@ -22,21 +22,21 @@ use Thelia\Model\AttributeCategory as ChildAttributeCategory;
 use Thelia\Model\AttributeCategoryQuery as ChildAttributeCategoryQuery;
 use Thelia\Model\AttributeQuery as ChildAttributeQuery;
 use Thelia\Model\Category as ChildCategory;
+use Thelia\Model\CategoryDocument as ChildCategoryDocument;
+use Thelia\Model\CategoryDocumentQuery as ChildCategoryDocumentQuery;
 use Thelia\Model\CategoryI18n as ChildCategoryI18n;
 use Thelia\Model\CategoryI18nQuery as ChildCategoryI18nQuery;
+use Thelia\Model\CategoryImage as ChildCategoryImage;
+use Thelia\Model\CategoryImageQuery as ChildCategoryImageQuery;
 use Thelia\Model\CategoryQuery as ChildCategoryQuery;
 use Thelia\Model\CategoryVersion as ChildCategoryVersion;
 use Thelia\Model\CategoryVersionQuery as ChildCategoryVersionQuery;
 use Thelia\Model\ContentAssoc as ChildContentAssoc;
 use Thelia\Model\ContentAssocQuery as ChildContentAssocQuery;
-use Thelia\Model\Document as ChildDocument;
-use Thelia\Model\DocumentQuery as ChildDocumentQuery;
 use Thelia\Model\Feature as ChildFeature;
 use Thelia\Model\FeatureCategory as ChildFeatureCategory;
 use Thelia\Model\FeatureCategoryQuery as ChildFeatureCategoryQuery;
 use Thelia\Model\FeatureQuery as ChildFeatureQuery;
-use Thelia\Model\Image as ChildImage;
-use Thelia\Model\ImageQuery as ChildImageQuery;
 use Thelia\Model\Product as ChildProduct;
 use Thelia\Model\ProductCategory as ChildProductCategory;
 use Thelia\Model\ProductCategoryQuery as ChildProductCategoryQuery;
@@ -160,22 +160,22 @@ abstract class Category implements ActiveRecordInterface
     protected $collContentAssocsPartial;
 
     /**
-     * @var        ObjectCollection|ChildImage[] Collection to store aggregation of ChildImage objects.
-     */
-    protected $collImages;
-    protected $collImagesPartial;
-
-    /**
-     * @var        ObjectCollection|ChildDocument[] Collection to store aggregation of ChildDocument objects.
-     */
-    protected $collDocuments;
-    protected $collDocumentsPartial;
-
-    /**
      * @var        ObjectCollection|ChildRewriting[] Collection to store aggregation of ChildRewriting objects.
      */
     protected $collRewritings;
     protected $collRewritingsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCategoryImage[] Collection to store aggregation of ChildCategoryImage objects.
+     */
+    protected $collCategoryImages;
+    protected $collCategoryImagesPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCategoryDocument[] Collection to store aggregation of ChildCategoryDocument objects.
+     */
+    protected $collCategoryDocuments;
+    protected $collCategoryDocumentsPartial;
 
     /**
      * @var        ObjectCollection|ChildCategoryI18n[] Collection to store aggregation of ChildCategoryI18n objects.
@@ -280,19 +280,19 @@ abstract class Category implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $imagesScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
-    protected $documentsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
     protected $rewritingsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $categoryImagesScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $categoryDocumentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1041,11 +1041,11 @@ abstract class Category implements ActiveRecordInterface
 
             $this->collContentAssocs = null;
 
-            $this->collImages = null;
-
-            $this->collDocuments = null;
-
             $this->collRewritings = null;
+
+            $this->collCategoryImages = null;
+
+            $this->collCategoryDocuments = null;
 
             $this->collCategoryI18ns = null;
 
@@ -1348,40 +1348,6 @@ abstract class Category implements ActiveRecordInterface
                 }
             }
 
-            if ($this->imagesScheduledForDeletion !== null) {
-                if (!$this->imagesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\ImageQuery::create()
-                        ->filterByPrimaryKeys($this->imagesScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->imagesScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collImages !== null) {
-            foreach ($this->collImages as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
-            if ($this->documentsScheduledForDeletion !== null) {
-                if (!$this->documentsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\DocumentQuery::create()
-                        ->filterByPrimaryKeys($this->documentsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->documentsScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collDocuments !== null) {
-            foreach ($this->collDocuments as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->rewritingsScheduledForDeletion !== null) {
                 if (!$this->rewritingsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\RewritingQuery::create()
@@ -1393,6 +1359,40 @@ abstract class Category implements ActiveRecordInterface
 
                 if ($this->collRewritings !== null) {
             foreach ($this->collRewritings as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->categoryImagesScheduledForDeletion !== null) {
+                if (!$this->categoryImagesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\CategoryImageQuery::create()
+                        ->filterByPrimaryKeys($this->categoryImagesScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->categoryImagesScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCategoryImages !== null) {
+            foreach ($this->collCategoryImages as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->categoryDocumentsScheduledForDeletion !== null) {
+                if (!$this->categoryDocumentsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\CategoryDocumentQuery::create()
+                        ->filterByPrimaryKeys($this->categoryDocumentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->categoryDocumentsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCategoryDocuments !== null) {
+            foreach ($this->collCategoryDocuments as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1671,14 +1671,14 @@ abstract class Category implements ActiveRecordInterface
             if (null !== $this->collContentAssocs) {
                 $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collImages) {
-                $result['Images'] = $this->collImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
-            if (null !== $this->collDocuments) {
-                $result['Documents'] = $this->collDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collRewritings) {
                 $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCategoryImages) {
+                $result['CategoryImages'] = $this->collCategoryImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCategoryDocuments) {
+                $result['CategoryDocuments'] = $this->collCategoryDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collCategoryI18ns) {
                 $result['CategoryI18ns'] = $this->collCategoryI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1901,21 +1901,21 @@ abstract class Category implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getImages() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addImage($relObj->copy($deepCopy));
-                }
-            }
-
-            foreach ($this->getDocuments() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addDocument($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getRewritings() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addRewriting($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCategoryImages() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCategoryImage($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCategoryDocuments() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCategoryDocument($relObj->copy($deepCopy));
                 }
             }
 
@@ -1984,14 +1984,14 @@ abstract class Category implements ActiveRecordInterface
         if ('ContentAssoc' == $relationName) {
             return $this->initContentAssocs();
         }
-        if ('Image' == $relationName) {
-            return $this->initImages();
-        }
-        if ('Document' == $relationName) {
-            return $this->initDocuments();
-        }
         if ('Rewriting' == $relationName) {
             return $this->initRewritings();
+        }
+        if ('CategoryImage' == $relationName) {
+            return $this->initCategoryImages();
+        }
+        if ('CategoryDocument' == $relationName) {
+            return $this->initCategoryDocuments();
         }
         if ('CategoryI18n' == $relationName) {
             return $this->initCategoryI18ns();
@@ -3002,592 +3002,6 @@ abstract class Category implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collImages collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addImages()
-     */
-    public function clearImages()
-    {
-        $this->collImages = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collImages collection loaded partially.
-     */
-    public function resetPartialImages($v = true)
-    {
-        $this->collImagesPartial = $v;
-    }
-
-    /**
-     * Initializes the collImages collection.
-     *
-     * By default this just sets the collImages collection to an empty array (like clearcollImages());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initImages($overrideExisting = true)
-    {
-        if (null !== $this->collImages && !$overrideExisting) {
-            return;
-        }
-        $this->collImages = new ObjectCollection();
-        $this->collImages->setModel('\Thelia\Model\Image');
-    }
-
-    /**
-     * Gets an array of ChildImage objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCategory is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildImage[] List of ChildImage objects
-     * @throws PropelException
-     */
-    public function getImages($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collImagesPartial && !$this->isNew();
-        if (null === $this->collImages || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collImages) {
-                // return empty collection
-                $this->initImages();
-            } else {
-                $collImages = ChildImageQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collImagesPartial && count($collImages)) {
-                        $this->initImages(false);
-
-                        foreach ($collImages as $obj) {
-                            if (false == $this->collImages->contains($obj)) {
-                                $this->collImages->append($obj);
-                            }
-                        }
-
-                        $this->collImagesPartial = true;
-                    }
-
-                    $collImages->getInternalIterator()->rewind();
-
-                    return $collImages;
-                }
-
-                if ($partial && $this->collImages) {
-                    foreach ($this->collImages as $obj) {
-                        if ($obj->isNew()) {
-                            $collImages[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collImages = $collImages;
-                $this->collImagesPartial = false;
-            }
-        }
-
-        return $this->collImages;
-    }
-
-    /**
-     * Sets a collection of Image objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $images A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
-     */
-    public function setImages(Collection $images, ConnectionInterface $con = null)
-    {
-        $imagesToDelete = $this->getImages(new Criteria(), $con)->diff($images);
-
-
-        $this->imagesScheduledForDeletion = $imagesToDelete;
-
-        foreach ($imagesToDelete as $imageRemoved) {
-            $imageRemoved->setCategory(null);
-        }
-
-        $this->collImages = null;
-        foreach ($images as $image) {
-            $this->addImage($image);
-        }
-
-        $this->collImages = $images;
-        $this->collImagesPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Image objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Image objects.
-     * @throws PropelException
-     */
-    public function countImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collImagesPartial && !$this->isNew();
-        if (null === $this->collImages || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collImages) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getImages());
-            }
-
-            $query = ChildImageQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCategory($this)
-                ->count($con);
-        }
-
-        return count($this->collImages);
-    }
-
-    /**
-     * Method called to associate a ChildImage object to this object
-     * through the ChildImage foreign key attribute.
-     *
-     * @param    ChildImage $l ChildImage
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
-     */
-    public function addImage(ChildImage $l)
-    {
-        if ($this->collImages === null) {
-            $this->initImages();
-            $this->collImagesPartial = true;
-        }
-
-        if (!in_array($l, $this->collImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddImage($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Image $image The image object to add.
-     */
-    protected function doAddImage($image)
-    {
-        $this->collImages[]= $image;
-        $image->setCategory($this);
-    }
-
-    /**
-     * @param  Image $image The image object to remove.
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function removeImage($image)
-    {
-        if ($this->getImages()->contains($image)) {
-            $this->collImages->remove($this->collImages->search($image));
-            if (null === $this->imagesScheduledForDeletion) {
-                $this->imagesScheduledForDeletion = clone $this->collImages;
-                $this->imagesScheduledForDeletion->clear();
-            }
-            $this->imagesScheduledForDeletion[]= $image;
-            $image->setCategory(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Images from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildImage[] List of ChildImage objects
-     */
-    public function getImagesJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildImageQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getImages($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Images from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildImage[] List of ChildImage objects
-     */
-    public function getImagesJoinContent($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildImageQuery::create(null, $criteria);
-        $query->joinWith('Content', $joinBehavior);
-
-        return $this->getImages($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Images from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildImage[] List of ChildImage objects
-     */
-    public function getImagesJoinFolder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildImageQuery::create(null, $criteria);
-        $query->joinWith('Folder', $joinBehavior);
-
-        return $this->getImages($query, $con);
-    }
-
-    /**
-     * Clears out the collDocuments collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addDocuments()
-     */
-    public function clearDocuments()
-    {
-        $this->collDocuments = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collDocuments collection loaded partially.
-     */
-    public function resetPartialDocuments($v = true)
-    {
-        $this->collDocumentsPartial = $v;
-    }
-
-    /**
-     * Initializes the collDocuments collection.
-     *
-     * By default this just sets the collDocuments collection to an empty array (like clearcollDocuments());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initDocuments($overrideExisting = true)
-    {
-        if (null !== $this->collDocuments && !$overrideExisting) {
-            return;
-        }
-        $this->collDocuments = new ObjectCollection();
-        $this->collDocuments->setModel('\Thelia\Model\Document');
-    }
-
-    /**
-     * Gets an array of ChildDocument objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildCategory is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     * @throws PropelException
-     */
-    public function getDocuments($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                // return empty collection
-                $this->initDocuments();
-            } else {
-                $collDocuments = ChildDocumentQuery::create(null, $criteria)
-                    ->filterByCategory($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collDocumentsPartial && count($collDocuments)) {
-                        $this->initDocuments(false);
-
-                        foreach ($collDocuments as $obj) {
-                            if (false == $this->collDocuments->contains($obj)) {
-                                $this->collDocuments->append($obj);
-                            }
-                        }
-
-                        $this->collDocumentsPartial = true;
-                    }
-
-                    $collDocuments->getInternalIterator()->rewind();
-
-                    return $collDocuments;
-                }
-
-                if ($partial && $this->collDocuments) {
-                    foreach ($this->collDocuments as $obj) {
-                        if ($obj->isNew()) {
-                            $collDocuments[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collDocuments = $collDocuments;
-                $this->collDocumentsPartial = false;
-            }
-        }
-
-        return $this->collDocuments;
-    }
-
-    /**
-     * Sets a collection of Document objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $documents A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildCategory The current object (for fluent API support)
-     */
-    public function setDocuments(Collection $documents, ConnectionInterface $con = null)
-    {
-        $documentsToDelete = $this->getDocuments(new Criteria(), $con)->diff($documents);
-
-
-        $this->documentsScheduledForDeletion = $documentsToDelete;
-
-        foreach ($documentsToDelete as $documentRemoved) {
-            $documentRemoved->setCategory(null);
-        }
-
-        $this->collDocuments = null;
-        foreach ($documents as $document) {
-            $this->addDocument($document);
-        }
-
-        $this->collDocuments = $documents;
-        $this->collDocumentsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related Document objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related Document objects.
-     * @throws PropelException
-     */
-    public function countDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collDocumentsPartial && !$this->isNew();
-        if (null === $this->collDocuments || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collDocuments) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getDocuments());
-            }
-
-            $query = ChildDocumentQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByCategory($this)
-                ->count($con);
-        }
-
-        return count($this->collDocuments);
-    }
-
-    /**
-     * Method called to associate a ChildDocument object to this object
-     * through the ChildDocument foreign key attribute.
-     *
-     * @param    ChildDocument $l ChildDocument
-     * @return   \Thelia\Model\Category The current object (for fluent API support)
-     */
-    public function addDocument(ChildDocument $l)
-    {
-        if ($this->collDocuments === null) {
-            $this->initDocuments();
-            $this->collDocumentsPartial = true;
-        }
-
-        if (!in_array($l, $this->collDocuments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddDocument($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param Document $document The document object to add.
-     */
-    protected function doAddDocument($document)
-    {
-        $this->collDocuments[]= $document;
-        $document->setCategory($this);
-    }
-
-    /**
-     * @param  Document $document The document object to remove.
-     * @return ChildCategory The current object (for fluent API support)
-     */
-    public function removeDocument($document)
-    {
-        if ($this->getDocuments()->contains($document)) {
-            $this->collDocuments->remove($this->collDocuments->search($document));
-            if (null === $this->documentsScheduledForDeletion) {
-                $this->documentsScheduledForDeletion = clone $this->collDocuments;
-                $this->documentsScheduledForDeletion->clear();
-            }
-            $this->documentsScheduledForDeletion[]= $document;
-            $document->setCategory(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     */
-    public function getDocumentsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildDocumentQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     */
-    public function getDocumentsJoinContent($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildDocumentQuery::create(null, $criteria);
-        $query->joinWith('Content', $joinBehavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Category is new, it will return
-     * an empty collection; or if this Category has previously
-     * been saved, it will retrieve related Documents from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Category.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildDocument[] List of ChildDocument objects
-     */
-    public function getDocumentsJoinFolder($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildDocumentQuery::create(null, $criteria);
-        $query->joinWith('Folder', $joinBehavior);
-
-        return $this->getDocuments($query, $con);
-    }
-
-    /**
      * Clears out the collRewritings collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3878,6 +3292,442 @@ abstract class Category implements ActiveRecordInterface
         $query->joinWith('Content', $joinBehavior);
 
         return $this->getRewritings($query, $con);
+    }
+
+    /**
+     * Clears out the collCategoryImages collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCategoryImages()
+     */
+    public function clearCategoryImages()
+    {
+        $this->collCategoryImages = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCategoryImages collection loaded partially.
+     */
+    public function resetPartialCategoryImages($v = true)
+    {
+        $this->collCategoryImagesPartial = $v;
+    }
+
+    /**
+     * Initializes the collCategoryImages collection.
+     *
+     * By default this just sets the collCategoryImages collection to an empty array (like clearcollCategoryImages());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCategoryImages($overrideExisting = true)
+    {
+        if (null !== $this->collCategoryImages && !$overrideExisting) {
+            return;
+        }
+        $this->collCategoryImages = new ObjectCollection();
+        $this->collCategoryImages->setModel('\Thelia\Model\CategoryImage');
+    }
+
+    /**
+     * Gets an array of ChildCategoryImage objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCategory is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCategoryImage[] List of ChildCategoryImage objects
+     * @throws PropelException
+     */
+    public function getCategoryImages($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCategoryImagesPartial && !$this->isNew();
+        if (null === $this->collCategoryImages || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryImages) {
+                // return empty collection
+                $this->initCategoryImages();
+            } else {
+                $collCategoryImages = ChildCategoryImageQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCategoryImagesPartial && count($collCategoryImages)) {
+                        $this->initCategoryImages(false);
+
+                        foreach ($collCategoryImages as $obj) {
+                            if (false == $this->collCategoryImages->contains($obj)) {
+                                $this->collCategoryImages->append($obj);
+                            }
+                        }
+
+                        $this->collCategoryImagesPartial = true;
+                    }
+
+                    $collCategoryImages->getInternalIterator()->rewind();
+
+                    return $collCategoryImages;
+                }
+
+                if ($partial && $this->collCategoryImages) {
+                    foreach ($this->collCategoryImages as $obj) {
+                        if ($obj->isNew()) {
+                            $collCategoryImages[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCategoryImages = $collCategoryImages;
+                $this->collCategoryImagesPartial = false;
+            }
+        }
+
+        return $this->collCategoryImages;
+    }
+
+    /**
+     * Sets a collection of CategoryImage objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $categoryImages A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCategory The current object (for fluent API support)
+     */
+    public function setCategoryImages(Collection $categoryImages, ConnectionInterface $con = null)
+    {
+        $categoryImagesToDelete = $this->getCategoryImages(new Criteria(), $con)->diff($categoryImages);
+
+
+        $this->categoryImagesScheduledForDeletion = $categoryImagesToDelete;
+
+        foreach ($categoryImagesToDelete as $categoryImageRemoved) {
+            $categoryImageRemoved->setCategory(null);
+        }
+
+        $this->collCategoryImages = null;
+        foreach ($categoryImages as $categoryImage) {
+            $this->addCategoryImage($categoryImage);
+        }
+
+        $this->collCategoryImages = $categoryImages;
+        $this->collCategoryImagesPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CategoryImage objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CategoryImage objects.
+     * @throws PropelException
+     */
+    public function countCategoryImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCategoryImagesPartial && !$this->isNew();
+        if (null === $this->collCategoryImages || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryImages) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCategoryImages());
+            }
+
+            $query = ChildCategoryImageQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCategory($this)
+                ->count($con);
+        }
+
+        return count($this->collCategoryImages);
+    }
+
+    /**
+     * Method called to associate a ChildCategoryImage object to this object
+     * through the ChildCategoryImage foreign key attribute.
+     *
+     * @param    ChildCategoryImage $l ChildCategoryImage
+     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     */
+    public function addCategoryImage(ChildCategoryImage $l)
+    {
+        if ($this->collCategoryImages === null) {
+            $this->initCategoryImages();
+            $this->collCategoryImagesPartial = true;
+        }
+
+        if (!in_array($l, $this->collCategoryImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryImage($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CategoryImage $categoryImage The categoryImage object to add.
+     */
+    protected function doAddCategoryImage($categoryImage)
+    {
+        $this->collCategoryImages[]= $categoryImage;
+        $categoryImage->setCategory($this);
+    }
+
+    /**
+     * @param  CategoryImage $categoryImage The categoryImage object to remove.
+     * @return ChildCategory The current object (for fluent API support)
+     */
+    public function removeCategoryImage($categoryImage)
+    {
+        if ($this->getCategoryImages()->contains($categoryImage)) {
+            $this->collCategoryImages->remove($this->collCategoryImages->search($categoryImage));
+            if (null === $this->categoryImagesScheduledForDeletion) {
+                $this->categoryImagesScheduledForDeletion = clone $this->collCategoryImages;
+                $this->categoryImagesScheduledForDeletion->clear();
+            }
+            $this->categoryImagesScheduledForDeletion[]= clone $categoryImage;
+            $categoryImage->setCategory(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Clears out the collCategoryDocuments collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCategoryDocuments()
+     */
+    public function clearCategoryDocuments()
+    {
+        $this->collCategoryDocuments = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCategoryDocuments collection loaded partially.
+     */
+    public function resetPartialCategoryDocuments($v = true)
+    {
+        $this->collCategoryDocumentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCategoryDocuments collection.
+     *
+     * By default this just sets the collCategoryDocuments collection to an empty array (like clearcollCategoryDocuments());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCategoryDocuments($overrideExisting = true)
+    {
+        if (null !== $this->collCategoryDocuments && !$overrideExisting) {
+            return;
+        }
+        $this->collCategoryDocuments = new ObjectCollection();
+        $this->collCategoryDocuments->setModel('\Thelia\Model\CategoryDocument');
+    }
+
+    /**
+     * Gets an array of ChildCategoryDocument objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildCategory is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCategoryDocument[] List of ChildCategoryDocument objects
+     * @throws PropelException
+     */
+    public function getCategoryDocuments($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCategoryDocumentsPartial && !$this->isNew();
+        if (null === $this->collCategoryDocuments || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryDocuments) {
+                // return empty collection
+                $this->initCategoryDocuments();
+            } else {
+                $collCategoryDocuments = ChildCategoryDocumentQuery::create(null, $criteria)
+                    ->filterByCategory($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCategoryDocumentsPartial && count($collCategoryDocuments)) {
+                        $this->initCategoryDocuments(false);
+
+                        foreach ($collCategoryDocuments as $obj) {
+                            if (false == $this->collCategoryDocuments->contains($obj)) {
+                                $this->collCategoryDocuments->append($obj);
+                            }
+                        }
+
+                        $this->collCategoryDocumentsPartial = true;
+                    }
+
+                    $collCategoryDocuments->getInternalIterator()->rewind();
+
+                    return $collCategoryDocuments;
+                }
+
+                if ($partial && $this->collCategoryDocuments) {
+                    foreach ($this->collCategoryDocuments as $obj) {
+                        if ($obj->isNew()) {
+                            $collCategoryDocuments[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCategoryDocuments = $collCategoryDocuments;
+                $this->collCategoryDocumentsPartial = false;
+            }
+        }
+
+        return $this->collCategoryDocuments;
+    }
+
+    /**
+     * Sets a collection of CategoryDocument objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $categoryDocuments A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildCategory The current object (for fluent API support)
+     */
+    public function setCategoryDocuments(Collection $categoryDocuments, ConnectionInterface $con = null)
+    {
+        $categoryDocumentsToDelete = $this->getCategoryDocuments(new Criteria(), $con)->diff($categoryDocuments);
+
+
+        $this->categoryDocumentsScheduledForDeletion = $categoryDocumentsToDelete;
+
+        foreach ($categoryDocumentsToDelete as $categoryDocumentRemoved) {
+            $categoryDocumentRemoved->setCategory(null);
+        }
+
+        $this->collCategoryDocuments = null;
+        foreach ($categoryDocuments as $categoryDocument) {
+            $this->addCategoryDocument($categoryDocument);
+        }
+
+        $this->collCategoryDocuments = $categoryDocuments;
+        $this->collCategoryDocumentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CategoryDocument objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CategoryDocument objects.
+     * @throws PropelException
+     */
+    public function countCategoryDocuments(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCategoryDocumentsPartial && !$this->isNew();
+        if (null === $this->collCategoryDocuments || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryDocuments) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCategoryDocuments());
+            }
+
+            $query = ChildCategoryDocumentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByCategory($this)
+                ->count($con);
+        }
+
+        return count($this->collCategoryDocuments);
+    }
+
+    /**
+     * Method called to associate a ChildCategoryDocument object to this object
+     * through the ChildCategoryDocument foreign key attribute.
+     *
+     * @param    ChildCategoryDocument $l ChildCategoryDocument
+     * @return   \Thelia\Model\Category The current object (for fluent API support)
+     */
+    public function addCategoryDocument(ChildCategoryDocument $l)
+    {
+        if ($this->collCategoryDocuments === null) {
+            $this->initCategoryDocuments();
+            $this->collCategoryDocumentsPartial = true;
+        }
+
+        if (!in_array($l, $this->collCategoryDocuments->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryDocument($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CategoryDocument $categoryDocument The categoryDocument object to add.
+     */
+    protected function doAddCategoryDocument($categoryDocument)
+    {
+        $this->collCategoryDocuments[]= $categoryDocument;
+        $categoryDocument->setCategory($this);
+    }
+
+    /**
+     * @param  CategoryDocument $categoryDocument The categoryDocument object to remove.
+     * @return ChildCategory The current object (for fluent API support)
+     */
+    public function removeCategoryDocument($categoryDocument)
+    {
+        if ($this->getCategoryDocuments()->contains($categoryDocument)) {
+            $this->collCategoryDocuments->remove($this->collCategoryDocuments->search($categoryDocument));
+            if (null === $this->categoryDocumentsScheduledForDeletion) {
+                $this->categoryDocumentsScheduledForDeletion = clone $this->collCategoryDocuments;
+                $this->categoryDocumentsScheduledForDeletion->clear();
+            }
+            $this->categoryDocumentsScheduledForDeletion[]= clone $categoryDocument;
+            $categoryDocument->setCategory(null);
+        }
+
+        return $this;
     }
 
     /**
@@ -4929,18 +4779,18 @@ abstract class Category implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collImages) {
-                foreach ($this->collImages as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
-            if ($this->collDocuments) {
-                foreach ($this->collDocuments as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collRewritings) {
                 foreach ($this->collRewritings as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCategoryImages) {
+                foreach ($this->collCategoryImages as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCategoryDocuments) {
+                foreach ($this->collCategoryDocuments as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -4991,18 +4841,18 @@ abstract class Category implements ActiveRecordInterface
             $this->collContentAssocs->clearIterator();
         }
         $this->collContentAssocs = null;
-        if ($this->collImages instanceof Collection) {
-            $this->collImages->clearIterator();
-        }
-        $this->collImages = null;
-        if ($this->collDocuments instanceof Collection) {
-            $this->collDocuments->clearIterator();
-        }
-        $this->collDocuments = null;
         if ($this->collRewritings instanceof Collection) {
             $this->collRewritings->clearIterator();
         }
         $this->collRewritings = null;
+        if ($this->collCategoryImages instanceof Collection) {
+            $this->collCategoryImages->clearIterator();
+        }
+        $this->collCategoryImages = null;
+        if ($this->collCategoryDocuments instanceof Collection) {
+            $this->collCategoryDocuments->clearIterator();
+        }
+        $this->collCategoryDocuments = null;
         if ($this->collCategoryI18ns instanceof Collection) {
             $this->collCategoryI18ns->clearIterator();
         }
