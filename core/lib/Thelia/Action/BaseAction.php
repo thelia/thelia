@@ -152,6 +152,11 @@ class BaseAction
         return $securityContext;
     }
 
+    protected function getContext()
+    {
+        return $this->container->get("thelia.envContext");
+    }
+
     protected function redirect($url, $status = 302)
     {
         $response = new RedirectResponse($url, $status);

@@ -34,8 +34,23 @@ class Context
         self::CONTEXT_FRONT_OFFICE
     );
 
+    protected $currentContext = self::CONTEXT_FRONT_OFFICE;
+
     public function isValidContext($context)
     {
         return in_array($context, $this->defineContext);
+    }
+
+    public function setContext($context)
+    {
+        if($this->isValidContext($context))
+        {
+            $this->currentContext = $context;
+        }
+    }
+
+    public function getContext()
+    {
+        return $this->currentContext;
     }
 }

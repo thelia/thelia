@@ -47,7 +47,7 @@ class ContainerAwareAdmin implements ContainerAwareInterface {
      */
     public function setContainer(ContainerInterface $container = null)
     {
-        $container->get('request')->setContext(Context::CONTEXT_BACK_OFFICE);
+        $container->get('thelia.envContext')->setContext(Context::CONTEXT_BACK_OFFICE);
         $this->container = $container;
     }
 }
