@@ -29,7 +29,7 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Security\SecurityContext;
 
-class ContainerAware implements ContainerAwareInterface {
+class ContainerAwareAdmin implements ContainerAwareInterface {
 
     /**
      * @var ContainerInterface

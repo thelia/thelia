@@ -25,7 +25,7 @@ namespace Thelia\Admin\Controller;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\Response;
 
-use Thelia\Core\DependencyInjection\ContainerAware;
+use Thelia\Core\DependencyInjection\ContainerAwareAdmin;
 use Thelia\Form\BaseForm;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -51,7 +51,7 @@ use Thelia\Core\Security\Exception\AuthorizationException;
  * @author Manuel Raynaud <mraynaud@openstudio.fr>
  */
 
-class BaseAdminController extends ContainerAware
+class BaseAdminController extends ContainerAwareAdmin
 {
 	const TEMPLATE_404 = "404";
 
