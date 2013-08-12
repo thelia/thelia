@@ -23,9 +23,9 @@
 namespace Thelia\Admin\Controller;
 
 use Symfony\Component\Routing\RequestContext;
-use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\Response;
 
+use Thelia\Core\DependencyInjection\ContainerAware;
 use Thelia\Form\BaseForm;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\HttpKernelInterface;

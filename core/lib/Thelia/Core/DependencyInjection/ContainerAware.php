@@ -20,46 +20,34 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\Request as BaseRequest;
+
+namespace Thelia\Core\DependencyInjection;
+
+
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Thelia\Core\Security\SecurityContext;
 
+class ContainerAware implements ContainerAwareInterface {
 
-class Request extends BaseRequest
-{
+    /**
+     * @var ContainerInterface
+     *
+     * @api
+     */
+    protected $container;
 
-    protected $context = SecurityContext::CONTEXT_FRONT_OFFICE;
-
-    public function getProductId()
+    /**
+     * Sets the Container.
+     *
+     * @param ContainerInterface|null $container A ContainerInterface instance or null
+     *
+     * @api
+     */
+    public function setContainer(ContainerInterface $container = null)
     {
-        return $this->get("product_id");
+        $container->get('request')->setContext(SecurityContext::CONTEXT_BACK_OFFICE);
+        $this->container = $container;
     }
-
-    public function getUriAddingParameters(array $parameters = null)
-    {
-        $uri = $this->getUri();
-
-        $additionalQs = '';
-
-        foreach ($parameters as $key => $value) {
-            $additionalQs .= sprintf("&%s=%s", $key, $value);
-        }
-
-        if ('' == $this->getQueryString()) {
-            $additionalQs = '?'. ltrim($additionalQs, '&');
-        }
-        return $uri . $additionalQs;
-    }
-
-    public function setContext($context)
-    {
-        $this->context = $context;
-    }
-
-    public function getContext()
-    {
-        return $this->context;
-    }
-
 }

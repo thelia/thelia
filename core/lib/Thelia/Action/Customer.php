@@ -236,7 +236,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
 
         $successUrl = $form->getSuccessUrl();
-        if ($this->securityContext->getContext() === SecurityContext::CONTEXT_FRONT_OFFICE) {
+        if ($this->getSecurityContext(SecurityContext::CONTEXT_BACK_OFFICE)->getUser() === null) {
             $this->processSuccessfullFrontEndLogin($event, $user, $form, $sendLoginEvent);
         } else {
             $successUrl = str_replace("__ID__", $user->getId(), $successUrl);
@@ -252,7 +252,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
       // Success -> store user in security context
       $this->getFrontSecurityContext()->setUser($user);
 
-        if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+      if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
 
     }
 
