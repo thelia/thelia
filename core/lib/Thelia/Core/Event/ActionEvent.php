@@ -51,6 +51,8 @@ abstract class ActionEvent extends Event
 
     protected $errorForm = null;
 
+    protected $parameters = array();
+
     /**
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
@@ -60,6 +62,21 @@ abstract class ActionEvent extends Event
     {
         $this->request = $request;
         $this->action  = $action;
+    }
+
+
+    public function __set($name, $value)
+    {
+        $this->parameters[$name] = $value;
+    }
+
+    public function __get($name)
+    {
+        if (array_key_exists($name, $this->parameters)) {
+            return $this->parameters[$name];
+        }
+
+        return null;
     }
 
     /**

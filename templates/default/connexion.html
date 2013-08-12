@@ -2,13 +2,12 @@
 
 {form name="thelia.customer.creation"}
 {* We use $INDEX_PAGE as form action to avoid mixing post and get data *}
-<form action="{$INDEX_PAGE}" method="post" {form_enctype form=$form}>
+<form action="{url path="/customer/create" }" method="post" {form_enctype form=$form}>
 	{*
 	The two fields below are not par of the form, they are here to defines
 	the action to process, and the view to render once the form is submited
 	*}
 	<input type="hidden" name="action" value="createCustomer" /> {* the action triggered by this form *}
-	<input type="hidden" name="view" value="connexion" /> 		{* the view to return to if the form cannot be validated *}
 
 	{*
 	This field is common to all BaseForm instances (thus, this one), and defines

@@ -38,14 +38,6 @@ use Thelia\Core\Security\Exception\AuthorizationException;
 
 class BaseAction
 {
-    /**
-     * @var The container
-     */
-    protected $container;
-
-    public function __construct(ContainerInterface $container) {
-        $this->container = $container;
-    }
 
     /**
      * Validate a BaseForm
@@ -96,78 +88,4 @@ class BaseAction
         $event->stopPropagation();
     }
 
-    /**
-     * Check current user authorisations.
-     *
-     * @param mixed $roles a single role or an array of roles.
-     * @param mixed $permissions a single permission or an array of permissions.
-     *
-     * @throws AuthenticationException if permissions are not granted to the current user.
-     */
-    protected function checkAuth($roles, $permissions, $context = false) {
-
-        if (! $this->getSecurityContext($context)->isGranted(
-            is_array($roles) ? $roles : array($roles),
-            is_array($permissions) ? $permissions : array($permissions)) ) {
-
-            Tlog::getInstance()->addAlert("Authorization roles:", $roles, " permissions:", $permissions, " refused.");
-
-            throw new AuthorizationException("Sorry, you're not allowed to perform this action");
-        }
-    }
-
-    /**
-     * Return the event dispatcher,
-     *
-     * @return ParserContext
-     */
-    protected function getDispatcher()
-    {
-        return $this->container->get('event_dispatcher');
-    }
-
-    /**
-     * Return the parser context,
-     *
-     * @return ParserContext
-     */
-    protected function getParserContext()
-    {
-        return $this->container->get('thelia.parser.context');
-    }
-
-    /**
-     * Return the security context, by default in admin mode.
-     *
-     * @param string the context, either SecurityContext::CONTEXT_BACK_OFFICE or SecurityContext::CONTEXT_FRONT_OFFICE
-     *
-     * @return Thelia\Core\Security\SecurityContext
-     */
-    protected function getSecurityContext($context = false)
-    {
-        $securityContext = $this->container->get('thelia.securityContext');
-
-        $securityContext->setContext($context === false ? SecurityContext::CONTEXT_BACK_OFFICE : $context);
-
-        return $securityContext;
-    }
-
-    /**
-     *
-     * return the environnement context contain in \Thelia\Core\Context class
-     *
-     * @return string
-     */
-    protected function getContext()
-    {
-        return $this->container->get("thelia.envContext")->getContext();
-    }
-
-    protected function redirect($url, $status = 302)
-    {
-        $response = new RedirectResponse($url, $status);
-
-        $response->send();
-        exit;
-    }
 }

@@ -13,17 +13,14 @@
     <services>
 
         <service id="thelia.action.cart" class="Thelia\Action\Cart">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.customer" class="Thelia\Action\Customer">
-            <argument type="service" id="service_container"/>
             <tag name="kernel.event_subscriber"/>
         </service>
 
         <service id="thelia.action.category" class="Thelia\Action\Category">
-            <argument type="service" id="service_container"/>
              <tag name="kernel.event_subscriber"/>
         </service>
 

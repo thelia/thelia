@@ -73,8 +73,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
                 $request->getSession()->getLang()
             );
 
-            // Connect the newly created user,and redirect to the success URL
-            $this->processSuccessfullLogin($event, $customer, $customerCreationForm, true);
+            $event->customer = $customer;
+
         } catch (PropelException $e) {
 
             Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
@@ -167,7 +167,8 @@ class Customer extends BaseAction implements EventSubscriberInterface
           try {
             $user = $authenticator->getAuthentifiedUser();
 
-            $this->processSuccessfullLogin($event, $user, $customerLoginForm);
+              $event->customer = $customer;
+
           } catch (ValidatorException $ex) {
             $message = "Missing or invalid information. Please check your input.";
           } catch (UsernameNotFoundException $ex) {
@@ -221,48 +222,5 @@ class Customer extends BaseAction implements EventSubscriberInterface
             "action.loginCustomer"  => array("login", 128),
             "action.logoutCustomer" => array("logout", 128),
         );
-    }
-
-    /**
-     *
-     * Stores the current user in the security context, and redirect to the
-     * success_url.
-     * @param ActionEvent   $event
-     * @param CustomerModel $user
-     * @param BaseForm      $form
-     * @param bool          $sendLoginEvent
-     */
-    protected function processSuccessfullLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
-    {
-
-        $successUrl = $form->getSuccessUrl();
-        if ($this->getSecurityContext(SecurityContext::CONTEXT_BACK_OFFICE)->getUser() === null) {
-            $this->processSuccessfullFrontEndLogin($event, $user, $form, $sendLoginEvent);
-        } else {
-            $successUrl = str_replace("__ID__", $user->getId(), $successUrl);
-        }
-
-        // Redirect to the success URL
-        $this->redirect($successUrl);
-    }
-
-    protected function processSuccessfullFrontEndLogin(ActionEvent $event, CustomerModel $user, BaseForm $form, $sendLoginEvent = false)
-    {
-
-      // Success -> store user in security context
-      $this->getFrontSecurityContext()->setUser($user);
-
-      if ($sendLoginEvent) $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
-
-    }
-
-    /**
-     * Return the security context, beeing sure that we're in the CONTEXT_FRONT_OFFICE context
-     *
-     * @return SecurityContext the security context
-     */
-
-    protected function getFrontSecurityContext() {
-		return $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE);
     }
 }

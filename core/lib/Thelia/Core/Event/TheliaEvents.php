@@ -65,6 +65,8 @@ final class TheliaEvents
      */
     const ADMIN_LOGIN  = "action.admin_login";
 
+
+
     /**
      * Sent once the customer creation form has been successfully validated, and before customer insertion in the database.
      */

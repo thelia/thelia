@@ -24,13 +24,42 @@ namespace Thelia\Controller\Front;
 
 use Thelia\Controller\BaseController;
 use Symfony\Component\DependencyInjection\ContainerAware;
+use Thelia\Core\Event\CustomerEvent;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Model\Customer;
+use Thelia\Core\Event\TheliaEvents;
 
 class CustomerController extends BaseController {
 
     public function createAction()
     {
 
+        $event = $this->dispatchEvent("createCustomer");
+        if(null !== $customer = $event->customer) {
+            $this->processLogin($event->customer);
+        }
+
+    }
+
+    public function displayCreateAction()
+    {
+
+    }
+
+    public function loginAction()
+    {
+        $event = $this->dispatchEvent("loginCustomer");
+
+        $customerEvent = new CustomerEvent($event->getCustomer());
+
+        $this->processLogin($event->getCustomer(), $customerEvent, true);
+    }
+
+    public function processLogin(Customer $customer,$event = null, $sendLogin = false)
+    {
+        $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->setUser($customer);
+
+        if($sendLogin) $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
     }
 
 }
