@@ -29,6 +29,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\CartEvent;
 use Thelia\Form\CartAdd;
 use Thelia\Model\ProductPrice;
 use Thelia\Model\ProductPriceQuery;
@@ -46,15 +47,13 @@ use Thelia\Action\Exception\FormValidationException;
  */
 class Cart extends BaseAction implements EventSubscriberInterface
 {
-    use \Thelia\Cart\CartTrait;
-
     /**
      *
      * add an article in the current cart
      *
      * @param \Thelia\Core\Event\ActionEvent $event
      */
-    public function addArticle(ActionEvent $event)
+    public function addArticle(CartEvent $event)
     {
         $request = $event->getRequest();
 
@@ -63,7 +62,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             $form = $this->validateForm($cartAdd);
 
-            $cart = $this->getCart($request);
+            $cart = $event->getCart();
             $newness = $form->get("newness")->getData();
             $append = $form->get("append")->getData();
             $quantity = $form->get("quantity")->getData();
@@ -154,12 +153,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Core\Event\ActionEvent $event
      */
-    public function deleteArticle(ActionEvent $event)
+    public function deleteArticle(CartEvent $event)
     {
         $request = $event->getRequest();
 
         if (null !== $cartItemId = $request->get('cartItem')) {
-            $cart = $this->getCart($request);
+            $cart = $event->getCart();
             try {
                 $cartItem = CartItemQuery::create()
                     ->filterByCartId($cart->getId())
@@ -180,14 +179,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Core\Event\ActionEvent $event
      */
-    public function modifyArticle(ActionEvent $event)
+    public function modifyArticle(CartEvent $event)
     {
         $request = $event->getRequest();
 
         if (null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
 
             try {
-                $cart = $this->getCart($request);
+                $cart = $event->getCart($request);
 
                 $cartItem = CartItemQuery::create()
                     ->filterByCartId($cart->getId())

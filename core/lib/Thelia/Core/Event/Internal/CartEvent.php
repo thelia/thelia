@@ -21,23 +21,21 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Core\Event;
 
-use Thelia\Core\HttpFoundation\Request;
+namespace Thelia\Core\Event\Internal;
+
+
 use Thelia\Model\Cart;
 
-class CartEvent extends ActionEvent {
+class CartEvent extends InternalEvent {
 
-    protected $cart;
+    public $cart;
 
-    public function __construct(Request $request, $action, Cart $cart)
+    public function __construct(Cart $cart)
     {
-        parent::__construct($request, $action);
         $this->cart = $cart;
     }
 
-    public function getCart()
-    {
-        return $this->cart;
-    }
+
+
 }

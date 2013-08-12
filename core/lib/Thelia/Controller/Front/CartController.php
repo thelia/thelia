@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,24 +20,21 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Controller\Front;
 
-namespace Thelia\Core\Event;
 
-use Thelia\Core\HttpFoundation\Request;
-use Thelia\Model\Cart;
+use Thelia\Core\Event\CartEvent;
 
-class CartEvent extends ActionEvent {
+class CartController extends BaseFrontController
+{
+    use \Thelia\Cart\CartTrait;
 
-    protected $cart;
-
-    public function __construct(Request $request, $action, Cart $cart)
+    public function addArticle()
     {
-        parent::__construct($request, $action);
-        $this->cart = $cart;
-    }
+        $cart = $this->getCart($this->getRequest);
 
-    public function getCart()
-    {
-        return $this->cart;
+        $cartEvent = new CartEvent($this->getRequest(), "action.addArticle", $cart);
+
+        $this->dispatch("action.addArticle", $cartEvent);
     }
 }

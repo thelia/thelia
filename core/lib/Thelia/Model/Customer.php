@@ -3,7 +3,7 @@
 namespace Thelia\Model;
 
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Thelia\Core\Event\CustomerEvent;
+use Thelia\Core\Event\Internal\CustomerEvent;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
