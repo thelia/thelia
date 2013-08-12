@@ -23,9 +23,7 @@
 
 namespace Thelia\Admin\Controller;
 
-use Thelia\Controller\BaseController;
-
-class AdminController extends BaseController {
+class AdminController extends BaseAdminController {
 
     public function indexAction()
     {

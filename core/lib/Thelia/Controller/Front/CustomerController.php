@@ -29,7 +29,7 @@ use Thelia\Core\Security\SecurityContext;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
 
-class CustomerController extends BaseController {
+class CustomerController extends BaseFrontController {
 
     public function createAction()
     {
