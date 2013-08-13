@@ -55,6 +55,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public function addArticle(CartEvent $event)
     {
         $request = $event->getRequest();
+        $message = null;
 
         try {
             $cartAdd = $this->getAddCartForm($request);
@@ -91,11 +92,19 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             $message = $e->getMessage();
         }
+        if($message) {
+            // The form has errors, propagate it.
+            $this->propagateFormError($cartAdd, $message, $event);
+        }
 
-        // The form has errors, propagate it.
-        $this->propagateFormError($cartAdd, $message, $event);
     }
 
+    /**
+     * increase the quantity for an existing cartItem
+     *
+     * @param CartItem $cartItem
+     * @param float $quantity
+     */
     protected function updateQuantity(CartItem $cartItem, $quantity)
     {
         $cartItem->setDisptacher($this->getDispatcher());
@@ -103,6 +112,15 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->save();
     }
 
+    /**
+     * try to attach a new item to an existing cart
+     *
+     * @param \Thelia\Model\Cart $cart
+     * @param int $productId
+     * @param int $productSaleElementsId
+     * @param float $quantity
+     * @param ProductPrice $productPrice
+     */
     protected function addItem(\Thelia\Model\Cart $cart, $productId, $productSaleElementsId, $quantity, ProductPrice $productPrice)
     {
         $cartItem = new CartItem();
@@ -118,6 +136,15 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->save();
     }
 
+    /**
+     * find a specific record in CartItem table using the Cart id, the product id
+     * and the product_sale_elements id
+     *
+     * @param int $cartId
+     * @param int $productId
+     * @param int $productSaleElementsId
+     * @return ChildCartItem
+     */
     protected function findItem($cartId, $productId, $productSaleElementsId)
     {
         return CartItemQuery::create()
@@ -127,6 +154,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->findOne();
     }
 
+    /**
+     * Find the good way to construct the cart form
+     *
+     * @param Request $request
+     * @return CartAdd
+     */
     private function getAddCartForm(Request $request)
     {
         if ($request->isMethod("post")) {

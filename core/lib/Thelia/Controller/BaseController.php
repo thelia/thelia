@@ -199,7 +199,7 @@ class BaseController extends ContainerAware
      *
      * @return EventDispatcherInterface
      */
-    protected function getDispatcher()
+    public function getDispatcher()
     {
     	return $this->container->get('event_dispatcher');
     }

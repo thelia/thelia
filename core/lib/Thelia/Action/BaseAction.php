@@ -22,22 +22,26 @@
 /*************************************************************************************/
 namespace Thelia\Action;
 
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Thelia\Form\CategoryDeletionForm;
+
 use Thelia\Form\BaseForm;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Action\Exception\FormValidationException;
 use Thelia\Core\Event\ActionEvent;
 use Symfony\Component\Form\Form;
-use Symfony\Component\DependencyInjection\ContainerAware;
-use Thelia\Core\Template\ParserContext;
-use Thelia\Log\Tlog;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Thelia\Core\Security\SecurityContext;
-use Thelia\Core\Security\Exception\AuthorizationException;
+
+
 
 class BaseAction
 {
+
+    /**
+     * @var The container
+     */
+    protected $container;
+
+    public function __construct(ContainerInterface $container) {
+        $this->container = $container;
+    }
 
     /**
      * Validate a BaseForm
@@ -86,6 +90,16 @@ class BaseAction
 
         // Stop event propagation
         $event->stopPropagation();
+    }
+
+    /**
+     * Return the event dispatcher,
+     *
+     * @return \Symfony\Component\EventDispatcher\EventDispatcherInterface
+     */
+    public function getDispatcher()
+    {
+        return $this->container->get('event_dispatcher');
     }
 
 }
