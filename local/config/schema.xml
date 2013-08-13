@@ -459,10 +459,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="product" name="fk_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="product" name="fk_product_image_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
-    <index name="idx_product_id">
+    <index name="idx_product_image_product_id">
       <index-column name="product_id" />
     </index>
     <behavior name="timestampable" />
@@ -479,10 +479,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="product" name="fk_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="product" name="fk_product_document_product_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="product_id" />
     </foreign-key>
-    <index name="idx_product_id">
+    <index name="idx_product_document_product_id">
       <index-column name="product_id" />
     </index>
     <behavior name="timestampable" />
@@ -629,7 +629,7 @@
     </behavior>
   </table>
   <table isCrossRef="true" name="accessory" namespace="Thelia\Model">
-    <column name="id" primaryKey="true" required="true" type="INTEGER" />
+    <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="accessory" required="true" type="INTEGER" />
     <column name="position" required="true" type="INTEGER" />
@@ -973,10 +973,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="category" name="fk_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="category" name="fk_category_image_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="category_id" />
     </foreign-key>
-    <index name="idx_category_id">
+    <index name="idx_category_image_category_id">
       <index-column name="category_id" />
     </index>
     <behavior name="timestampable" />
@@ -993,10 +993,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="folder" name="fk_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="folder" name="fk_folder_image_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="folder_id" />
     </foreign-key>
-    <index name="idx_folder_id">
+    <index name="idx_folder_image_folder_id">
       <index-column name="folder_id" />
     </index>
     <behavior name="timestampable" />
@@ -1013,10 +1013,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="content" name="fk_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="content" name="fk_content_image_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="content_id" />
     </foreign-key>
-    <index name="idx_content_id">
+    <index name="idx_content_image_content_id">
       <index-column name="content_id" />
     </index>
     <behavior name="timestampable" />
@@ -1033,10 +1033,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="category" name="fk_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="category" name="fk_catgory_document_category_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="category_id" />
     </foreign-key>
-    <index name="idx_category_id">
+    <index name="idx_category_document_category_id">
       <index-column name="category_id" />
     </index>
     <behavior name="timestampable" />
@@ -1053,10 +1053,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="content" name="fk_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="content" name="fk_content_document_content_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="content_id" />
     </foreign-key>
-    <index name="idx_content_id">
+    <index name="idx_content_document_content_id">
       <index-column name="content_id" />
     </index>
     <behavior name="timestampable" />
@@ -1073,10 +1073,10 @@
     <column name="description" type="CLOB" />
     <column name="chapo" type="LONGVARCHAR" />
     <column name="postscriptum" type="LONGVARCHAR" />
-    <foreign-key foreignTable="folder" name="fk_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
+    <foreign-key foreignTable="folder" name="fk_folder_document_folder_id" onDelete="CASCADE" onUpdate="RESTRICT">
       <reference foreign="id" local="folder_id" />
     </foreign-key>
-    <index name="idx_folder_id">
+    <index name="idx_folder_document_folder_id">
       <index-column name="folder_id" />
     </index>
     <behavior name="timestampable" />

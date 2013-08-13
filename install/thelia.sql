@@ -617,8 +617,8 @@ CREATE TABLE `produt_image`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_product_id` (`product_id`),
-    CONSTRAINT `fk_product_id`
+    INDEX `idx_product_image_product_id` (`product_id`),
+    CONSTRAINT `fk_product_image_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
@@ -640,8 +640,8 @@ CREATE TABLE `product_document`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_product_id` (`product_id`),
-    CONSTRAINT `fk_product_id`
+    INDEX `idx_product_document_product_id` (`product_id`),
+    CONSTRAINT `fk_product_document_product_id`
         FOREIGN KEY (`product_id`)
         REFERENCES `product` (`id`)
         ON UPDATE RESTRICT
@@ -844,7 +844,7 @@ DROP TABLE IF EXISTS `accessory`;
 
 CREATE TABLE `accessory`
 (
-    `id` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
     `accessory` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
@@ -1332,8 +1332,8 @@ CREATE TABLE `category_image`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_category_id` (`category_id`),
-    CONSTRAINT `fk_category_id`
+    INDEX `idx_category_image_category_id` (`category_id`),
+    CONSTRAINT `fk_category_image_category_id`
         FOREIGN KEY (`category_id`)
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
@@ -1355,8 +1355,8 @@ CREATE TABLE `folder_image`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_folder_id` (`folder_id`),
-    CONSTRAINT `fk_folder_id`
+    INDEX `idx_folder_image_folder_id` (`folder_id`),
+    CONSTRAINT `fk_folder_image_folder_id`
         FOREIGN KEY (`folder_id`)
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
@@ -1378,8 +1378,8 @@ CREATE TABLE `content_image`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_content_id` (`content_id`),
-    CONSTRAINT `fk_content_id`
+    INDEX `idx_content_image_content_id` (`content_id`),
+    CONSTRAINT `fk_content_image_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
@@ -1401,8 +1401,8 @@ CREATE TABLE `category_document`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_category_id` (`category_id`),
-    CONSTRAINT `fk_category_id`
+    INDEX `idx_category_document_category_id` (`category_id`),
+    CONSTRAINT `fk_catgory_document_category_id`
         FOREIGN KEY (`category_id`)
         REFERENCES `category` (`id`)
         ON UPDATE RESTRICT
@@ -1424,8 +1424,8 @@ CREATE TABLE `content_document`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_content_id` (`content_id`),
-    CONSTRAINT `fk_content_id`
+    INDEX `idx_content_document_content_id` (`content_id`),
+    CONSTRAINT `fk_content_document_content_id`
         FOREIGN KEY (`content_id`)
         REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
@@ -1447,8 +1447,8 @@ CREATE TABLE `folder_document`
     `created_at` DATETIME,
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `idx_folder_id` (`folder_id`),
-    CONSTRAINT `fk_folder_id`
+    INDEX `idx_folder_document_folder_id` (`folder_id`),
+    CONSTRAINT `fk_folder_document_folder_id`
         FOREIGN KEY (`folder_id`)
         REFERENCES `folder` (`id`)
         ON UPDATE RESTRICT
