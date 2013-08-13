@@ -180,7 +180,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
         return array(
             "action.addArticle" => array("addArticle", 128),
             "action.deleteArticle" => array("deleteArticle", 128),
-            "action.modifyArticle" => array("modifyArticle", 128),
+            "action.changeArticle" => array("modifyArticle", 128),
         );
     }
 

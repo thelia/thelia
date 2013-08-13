@@ -126,7 +126,7 @@ final class TheliaEvents
     /**
      * sent when a cart item is modify
      */
-    const AFTER_CARTMODIFYITEM = "cart.modifyItem";
+    const AFTER_CARTCHANGEITEM = "cart.modifyItem";
 
     /**
      * sent for addArticle action
@@ -136,5 +136,5 @@ final class TheliaEvents
     /**
      * sent on modify article action
      */
-    const CART_MODIFYARTICLE = "action.modifyArticle";
+    const CART_CHANGEARTICLE = "action.changeArticle";
 }

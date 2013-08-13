@@ -41,7 +41,7 @@ class CartController extends BaseFrontController
     {
         $cartEvent = $this->getCartEvent();
 
-        $this->dispatch(TheliaEvents::CART_MODIFYARTICLE, $cartEvent);
+        $this->dispatch(TheliaEvents::CART_CHANGEARTICLE, $cartEvent);
     }
 
     protected function getCartEvent()
