@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
+/*	    email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,34 +20,35 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Routing\Matcher;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
-use Thelia\Controller\NullControllerInterface;
+namespace Thelia\Core\DependencyInjection\Compiler;
 
-/**
- * Default matcher when no action is needed and there is no result for urlmatcher
- *
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
- */
-class DefaultMatcher implements RequestMatcherInterface
+
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Reference;
+
+class RegisterRouterPass implements CompilerPassInterface
 {
-    protected $controller;
 
-    public function __construct(NullControllerInterface $controller)
+    /**
+     * You can modify the container here before it is dumped to PHP code.
+     *
+     * @param ContainerBuilder $container
+     *
+     * @api
+     */
+    public function process(ContainerBuilder $container)
     {
-        $this->controller = $controller;
-    }
+        if (!$container->hasDefinition("router.chainRequest")) {
+           return ;
+        }
 
-    public function matchRequest(Request $request)
-    {
-        $objectInformation = new \ReflectionObject($this->controller);
+        $chainRouter = $container->getDefinition("router.chainRequest");
 
-        $parameter = array(
-          '_controller' => $objectInformation->getName().'::noAction'
-        );
-
-        return $parameter;
+        foreach ($container->findTaggedServiceIds("router.register") as $id => $router) {
+            $priority = isset($router[0]['priority']) ? $router[0]['priority'] : 0;
+            $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
+        }
     }
 }

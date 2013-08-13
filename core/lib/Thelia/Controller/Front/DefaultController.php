@@ -20,7 +20,7 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Controller;
+namespace Thelia\Controller\Front;
 
 use Thelia\Controller\NullControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +32,7 @@ use Symfony\Component\HttpFoundation\Request;
  * @author Manuel Raynaud <mraynadu@openstudio.fr>
  */
 
-class DefaultController implements NullControllerInterface
+class DefaultController extends BaseFrontController
 {
     /**
      *
