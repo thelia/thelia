@@ -39,6 +39,7 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use Thelia\Core\Bundle;
+use Thelia\Core\DependencyInjection\Loader\CollectionXmlFileLoader;
 use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;
@@ -149,6 +150,14 @@ class Thelia extends Kernel
         $this->loadConfiguration($container);
         $container->customCompile();
 
+        $collectionFileLoader = new CollectionXmlFileLoader(
+            $container->getParameter("kernel.cache_dir"),
+            $container->getParameter("router.xmlFileName"),
+            $container->getParameter("thelia.routing.files")
+        );
+
+        $collectionFileLoader->process();
+
         return $container;
     }
 
@@ -196,6 +205,7 @@ class Thelia extends Kernel
 
         $parameters["thelia.root_dir"] = THELIA_ROOT;
         $parameters["thelia.core_dir"] = THELIA_ROOT . "core/lib/Thelia";
+        $parameters["thelia.module_dir"] = THELIA_MODULE_DIR;
 
         return $parameters;
     }

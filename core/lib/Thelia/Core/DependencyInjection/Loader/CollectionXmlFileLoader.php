@@ -4,7 +4,7 @@
 /*      Thelia	                                                                     */
 /*                                                                                   */
 /*      Copyright (c) OpenStudio                                                     */
-/*	    email : info@thelia.net                                                      */
+/*      email : info@thelia.net                                                      */
 /*      web : http://www.thelia.net                                                  */
 /*                                                                                   */
 /*      This program is free software; you can redistribute it and/or modify         */
@@ -20,35 +20,49 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
+namespace Thelia\Core\DependencyInjection\Loader;
 
-namespace Thelia\Core\DependencyInjection\Compiler;
 
+class CollectionXmlFileLoader {
 
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
+    protected $files = array();
+    protected $cacheDir;
+    protected $outputName;
 
-class RegisterRouterPass implements CompilerPassInterface
-{
-
-    /**
-     * You can modify the container here before it is dumped to PHP code.
-     *
-     * @param ContainerBuilder $container
-     *
-     * @api
-     */
-    public function process(ContainerBuilder $container)
+    public function __construct($cacheDir, $outputName, array $files = array())
     {
-        if (!$container->hasDefinition("router.chainRequest")) {
-           return ;
-        }
-
-        $chainRouter = $container->getDefinition("router.chainRequest");
-
-        foreach ($container->findTaggedServiceIds("router.register") as $id => $router) {
-            $priority = isset($router[0]['priority']) ? $router[0]['priority'] : 0;
-            $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
-        }
+        $this->cacheDir = $cacheDir;
+        $this->outputName = $outputName;
+        $this->files = $files;
     }
+
+    public function addFile($file)
+    {
+        $this->files[] = $file;
+    }
+
+    public function process()
+    {
+        $pattern = '<import resource="%s" />';
+
+        $outputPattern = <<<EOF
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<routes xmlns="http://symfony.com/schema/routing"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
+        %s
+</routes>
+EOF;
+        $imports = array();
+        foreach ($this->files as $file) {
+            $imports[] = sprintf($pattern, $file);
+        }
+
+
+        $output = sprintf($outputPattern, implode($imports));
+        file_put_contents($this->cacheDir .'/'. $this->outputName, $output);
+
+    }
+
 }

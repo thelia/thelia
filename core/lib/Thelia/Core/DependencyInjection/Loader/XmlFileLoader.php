@@ -65,6 +65,8 @@ class XmlFileLoader extends FileLoader
 
         $this->parseForms($xml);
 
+        $this->parseRouting($xml);
+
         $this->parseDefinitions($xml, $path);
     }
 
@@ -164,6 +166,30 @@ class XmlFileLoader extends FileLoader
         }
 
         $this->container->setParameter("Thelia.parser.filters", $filterConfig);
+    }
+
+    /**
+     * parse routing properties
+     *
+     * @param SimpleXMLElement $xml
+     */
+    protected function parseRouting(SimpleXMLElement $xml)
+    {
+        if (false === $routing = $xml->xpath("//config:routing/config:file")) {
+            return;
+        }
+
+        try {
+            $routingConfig = $this->container->getParameter("thelia.routing.files");
+        } catch (ParameterNotFoundException $e) {
+            $routingConfig = array();
+        }
+
+        foreach ($routing as $file) {
+            $routingConfig[] = $file->getAttributeAsPhp("path");
+        }
+
+        $this->container->setParameter("thelia.routing.files", $routingConfig);
     }
 
     /**

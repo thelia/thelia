@@ -10,7 +10,13 @@
         <parameter key="router.dynamicRouter.class">Symfony\Cmf\Component\Routing\DynamicRouter</parameter>
         <parameter key="router.chainRouter.class">Symfony\Cmf\Component\Routing\ChainRouter</parameter>
         <parameter key="router.class">Symfony\Component\Routing\Router</parameter>
+        <parameter key="router.xmlFileName">routing.xml</parameter>
     </parameters>
+
+    <routing>
+        <file path="%thelia.core_dir%/Config/Resources/routing/admin.xml"/>
+        <file path="%thelia.core_dir%/Config/Resources/routing/front.xml"/>
+    </routing>
 
     <services>
         <service id="thelia.listener.view" class="Thelia\Core\EventListener\ViewListener">
@@ -29,38 +35,29 @@
 
 
         <service id="router.admin.fileLocator" class="Symfony\Component\Config\FileLocator">
-            <argument>%thelia.core_dir%/Config/Resources/routing</argument>
+            <argument>%kernel.cache_dir%</argument>
         </service>
 
         <service id="router.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
             <argument type="service" id="router.admin.fileLocator"/>
         </service>
 
-        <service id="router.admin" class="%router.class%">
+        <service id="router" class="%router.class%">
             <argument type="service" id="router.xmlLoader"/>
-            <argument>admin.xml</argument>
+            <argument>%router.xmlFileName%</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
             <argument type="service" id="request.context"/>
-            <tag name="router.register" priority="0"/>
-        </service>
-
-        <service id="router.front" class="%router.class%">
-            <argument type="service" id="router.xmlLoader"/>
-            <argument>front.xml</argument>
-            <argument type="collection">
-                <argument key="cache_dir">%kernel.cache_dir%</argument>
-                <argument key="debug">%kernel.debug%</argument>
-            </argument>
-            <argument type="service" id="request.context"/>
-            <tag name="router.register" priority="255"/>
         </service>
 
         <service id="router.chainRequest" class="%router.chainRouter.class%">
             <call method="setContext">
                 <argument type="service" id="request.context"/>
+            </call>
+            <call method="add">
+                <argument type="service" id="router"/>
             </call>
         </service>
 

@@ -59,7 +59,6 @@ class TheliaBundle extends Bundle
         $container
             ->addCompilerPass(new RegisterListenersPass())
             ->addCompilerPass(new RegisterParserPluginPass())
-            ->addCompilerPass(new RegisterRouterPass())
         ;
 
     }
