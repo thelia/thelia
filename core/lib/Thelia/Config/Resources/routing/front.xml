@@ -14,4 +14,7 @@
         <default key="_view">connexion</default>
     </route>
 
+    <route id="cart.add.process" path="/cart/add" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CartController::addArticle</default>
+    </route>
 </routes>

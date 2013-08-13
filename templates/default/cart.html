@@ -9,9 +9,7 @@
 
 {form name="thelia.cart.add" }
 {* We use $INDEX_PAGE as form action to avoid mixing post and get data *}
-    <form action="http://thelia.local/index_dev.php?view=cart" method="post" {form_enctype form=$form}>
-
-        <input type="hidden" name="action" value="addArticle">
+    <form action="{url path="/cart/add" }" method="post" {form_enctype form=$form}>
 
         {*
         The form error status and the form error messages are defined in Customer action,

@@ -50,8 +50,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      *
      * add an article in the current cart
-     *
-     * @param \Thelia\Core\Event\ActionEvent $event
+     * @param \Thelia\Core\Event\CartEvent $event
      */
     public function addArticle(CartEvent $event)
     {
@@ -85,7 +84,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 $this->updateQuantity($cartItem, $quantity);
             }
 
-            $this->redirect($cartAdd->getSuccessUrl($request->getUriAddingParameters(array("addCart" => 1))));
         } catch (PropelException $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
             $message = "Failed to add this article to your cart, please try again";

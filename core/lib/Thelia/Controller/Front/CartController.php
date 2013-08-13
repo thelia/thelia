@@ -31,9 +31,10 @@ class CartController extends BaseFrontController
 
     public function addArticle()
     {
-        $cart = $this->getCart($this->getRequest);
+        $request = $this->getRequest();
+        $cart = $this->getCart($request);
 
-        $cartEvent = new CartEvent($this->getRequest(), "action.addArticle", $cart);
+        $cartEvent = new CartEvent($request, "action.addArticle", $cart);
 
         $this->dispatch("action.addArticle", $cartEvent);
     }
