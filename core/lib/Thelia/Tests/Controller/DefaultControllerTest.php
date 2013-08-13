@@ -24,7 +24,7 @@
 namespace Thelia\Tests\Controller;
 
 use Symfony\Component\HttpFoundation\Request;
-use Thelia\Controller\DefaultController;
+use Thelia\Controller\Front\DefaultController;
 
 class DefaultControllerTest extends \PHPUnit_Framework_TestCase
 {
