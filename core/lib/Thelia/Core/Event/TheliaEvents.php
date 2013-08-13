@@ -136,5 +136,7 @@ final class TheliaEvents
     /**
      * sent on modify article action
      */
-    const CART_CHANGEARTICLE = "action.changeArticle";
+    const CART_CHANGEITEM = "action.changeArticle";
+
+    const CART_DELETEITEM = "action.deleteArticle";
 }

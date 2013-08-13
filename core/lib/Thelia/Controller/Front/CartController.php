@@ -35,13 +35,26 @@ class CartController extends BaseFrontController
         $cartEvent = $this->getCartEvent();
 
         $this->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
+
+        $this->redirectInternal();
     }
 
     public function modifyArticle()
     {
         $cartEvent = $this->getCartEvent();
 
-        $this->dispatch(TheliaEvents::CART_CHANGEARTICLE, $cartEvent);
+        $this->dispatch(TheliaEvents::CART_CHANGEITEM, $cartEvent);
+
+        $this->redirectInternal();
+    }
+
+    public function deleteArticle()
+    {
+        $cartEvent = $this->getCartEvent();
+
+        $this->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
+
+        $this->redirectInternal();
     }
 
     protected function getCartEvent()
@@ -50,5 +63,12 @@ class CartController extends BaseFrontController
         $cart = $this->getCart($request);
 
         return new CartEvent($request, $cart);
+    }
+
+    protected function redirectInternal()
+    {
+        if (null !== $url = $this->getRequest()->get("success_url")) {
+            $this->redirect($url);
+        }
     }
 }

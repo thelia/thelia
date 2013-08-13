@@ -15,10 +15,10 @@
     </route>
 
     <route id="cart.add.process" path="/cart/add" methods="post">
-        <default key="_controller">Thelia\Controller\Front\CartController::addArticle</default>
+        <default key="_controller">Thelia\Controller\Front\CartController::changeArticle</default>
     </route>
 
-    <route id="cart.change.process" path="/cart/change" methods="post">
-        <default key="_controller">Thelia\Controller\Front\CartController::addArticle</default>
+    <route id="cart.change.process" path="/cart/delete" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CartController::deleteArticle</default>
     </route>
 </routes>

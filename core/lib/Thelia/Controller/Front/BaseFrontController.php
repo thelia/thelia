@@ -24,7 +24,11 @@ namespace Thelia\Controller\Front;
 
 
 use Thelia\Controller\BaseController;
+use Thelia\Tools\Redirect;
 
 class BaseFrontController extends BaseController {
 
+    public function redirect($url) {
+        Redirect::exec($url);
+    }
 }
