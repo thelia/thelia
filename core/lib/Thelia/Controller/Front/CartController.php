@@ -22,7 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-
 use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -65,10 +64,4 @@ class CartController extends BaseFrontController
         return new CartEvent($request, $cart);
     }
 
-    protected function redirectInternal()
-    {
-        if (null !== $url = $this->getRequest()->get("success_url")) {
-            $this->redirect($url);
-        }
-    }
 }

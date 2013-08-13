@@ -50,7 +50,7 @@ class DefaultController implements NullControllerInterface
                 $view = $request->request->get('view');
             }
         }
-        
+
         $request->attributes->set('_view', $view);
     }
 }

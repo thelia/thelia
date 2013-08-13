@@ -22,17 +22,9 @@
 /*************************************************************************************/
 namespace Thelia\Controller;
 
-use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\DependencyInjection\ContainerAware;
 
-use Thelia\Form\BaseForm;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpKernel\HttpKernelInterface;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Thelia\Core\Security\Exception\AuthenticationTokenNotFoundException;
-use Thelia\Model\ConfigQuery;
-use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
@@ -40,7 +32,6 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Event\ActionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Core\Factory\ActionEventFactory;
-use Thelia\Core\Security\Exception\AuthorizationException;
 
 /**
  *
@@ -53,113 +44,13 @@ use Thelia\Core\Security\Exception\AuthorizationException;
 
 class BaseController extends ContainerAware
 {
-	const TEMPLATE_404 = "404";
-
-	public function processTemplateAction($template)
-	{
-		try {
-			if (! empty($template)) {
-				// If we have a view in the URL, render this view
-				return $this->render($template);
-			}
-			else if (null != $view = $this->getRequest()->get('view')) {
-				return $this->render($view);
-			}
-		}
-		catch (\Exception $ex) {
-			// Nothing special
-		}
-
-		return $this->pageNotFound();
-	}
-
-	/**
-	 * Return a 404 error
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	protected function pageNotFound() {
-		return new Response($this->renderRaw(self::TEMPLATE_404), 404);
-	}
-
-	/**
-	 * Return a general error page
-	 *
-	 * @return \Symfony\Component\HttpFoundation\Response
-	 */
-	protected function errorPage($message) {
-		return $this->render('general_error', array(
-    			"error_message" => $message)
-    	);
-	}
-
-	/**
-	 * Check current admin user authorisations. An ADMIN role is assumed.
-	 *
-	 * @param unknown $permissions a single permission or an array of permissions.
-	 *
-	 * @throws AuthenticationException if permissions are not granted ti the current user.
-	 */
-	protected function checkAuth($permissions) {
-
-		if (! $this->getSecurityContext()->isGranted(array("ADMIN"), is_array($permissions) ? $permissions : array($permissions))) {
-			throw new AuthorizationException("Sorry, you're not allowed to perform this action");
-		}
-	}
-
-	/**
-	 * Return an empty response (after an ajax request, for example)
-	 */
-	protected function nullResponse()
-	{
-		return new Response();
-	}
 
     /**
-     * Render the given template, and returns the result as an Http Response.
-     *
-     * @param $templateName the complete template name, with extension
-     * @param array $args the template arguments
-     * @return \Symfony\Component\HttpFoundation\Response
+     * Return an empty response (after an ajax request, for example)
      */
-    protected function render($templateName, $args = array())
+    protected function nullResponse()
     {
-        $response = new Response();
-
-        return $response->setContent($this->renderRaw($templateName, $args));
-    }
-
-    /**
-     * Render the given template, and returns the result as a string.
-     *
-     * @param $templateName the complete template name, with extension
-     * @param array $args the template arguments
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function renderRaw($templateName, $args = array())
-    {
-    	// Add the template standard extension
-    	$templateName .= '.html';
-
-    	$session = $this->getSession();
-
-        $args = array_merge($args, array(
-        		'locale' => $session->getLocale(),
-        		'lang'   => $session->getLang()
-        ));
-
-        try {
-        	$data = $this->getParser()->render($templateName, $args);
-
-        	return $data;
-        }
-        catch (AuthenticationException $ex) {
-
-			// User is not authenticated, and templates requires authentication -> redirect to login page
-			// We user login_tpl as a path, not a template.
-
-        	Redirect::exec(URL::absoluteUrl($ex->getLoginTemplate()));
-        }
+        return new Response();
     }
 
     /**
@@ -169,29 +60,29 @@ class BaseController extends ContainerAware
      */
     protected function dispatchEvent($action)
     {
-    	// Create the
-    	$eventFactory = new ActionEventFactory($this->getRequest(), $action, $this->container->getParameter("thelia.actionEvent"));
+        // Create the
+        $eventFactory = new ActionEventFactory($this->getRequest(), $action, $this->container->getParameter("thelia.actionEvent"));
 
-    	$actionEvent = $eventFactory->createActionEvent();
+        $actionEvent = $eventFactory->createActionEvent();
 
-    	$this->dispatch("action.$action", $actionEvent);
+        $this->dispatch("action.$action", $actionEvent);
 
-    	if ($actionEvent->hasErrorForm()) {
-    		$this->getParserContext()->setErrorForm($actionEvent->getErrorForm());
-    	}
+        if ($actionEvent->hasErrorForm()) {
+            $this->getParserContext()->setErrorForm($actionEvent->getErrorForm());
+        }
 
-    	return $actionEvent;
+        return $actionEvent;
     }
 
     /**
      * Dispatch a Thelia event to modules
      *
-     * @param string $eventName a TheliaEvent name, as defined in TheliaEvents class
-     * @param ActionEvent $event the event
+     * @param string      $eventName a TheliaEvent name, as defined in TheliaEvents class
+     * @param ActionEvent $event     the event
      */
-    protected function dispatch($eventName, ActionEvent $event = null) {
-
-    	$this->getDispatcher()->dispatch($eventName, $event);
+    protected function dispatch($eventName, ActionEvent $event = null)
+    {
+        $this->getDispatcher()->dispatch($eventName, $event);
     }
 
     /**
@@ -201,7 +92,7 @@ class BaseController extends ContainerAware
      */
     public function getDispatcher()
     {
-    	return $this->container->get('event_dispatcher');
+        return $this->container->get('event_dispatcher');
     }
 
     /**
@@ -211,21 +102,21 @@ class BaseController extends ContainerAware
      */
     protected function getParserContext()
     {
-    	return $this->container->get('thelia.parser.context');
+        return $this->container->get('thelia.parser.context');
     }
 
     /**
      * Return the security context, by default in admin mode.
      *
-     * @return Thelia\Core\Security\SecurityContext
+     * @return \Thelia\Core\Security\SecurityContext
      */
     protected function getSecurityContext($context = false)
     {
-    	$securityContext = $this->container->get('thelia.securityContext');
+        $securityContext = $this->container->get('thelia.securityContext');
 
-    	$securityContext->setContext($context === false ? SecurityContext::CONTEXT_BACK_OFFICE : $context);
+        $securityContext->setContext($context === false ? SecurityContext::CONTEXT_BACK_OFFICE : $context);
 
-    	return $securityContext;
+        return $securityContext;
     }
 
     /**
@@ -241,40 +132,30 @@ class BaseController extends ContainerAware
      *
      * @return \Symfony\Component\HttpFoundation\Session\SessionInterface
      */
-    protected function getSession() {
+    protected function getSession()
+    {
+        $request = $this->getRequest();
 
-    	$request = $this->getRequest();
-
-    	return $request->getSession();
+        return $request->getSession();
     }
 
     /**
-     * @return a ParserInterfac instance parser
+     *
+     * redirect request to specify url
+     * @param string $url
      */
-    protected function getParser()
+    public function redirect($url)
     {
-        $parser = $this->container->get("thelia.parser");
-
-		// Define the template thant shoud be used
-        $parser->setTemplate(ConfigQuery::read('base_admin_template', 'admin/default'));
-
-        return $parser;
+        Redirect::exec($url);
     }
 
     /**
-     * Forwards the request to another controller.
-     *
-     * @param string $controller The controller name (a string like BlogBundle:Post:index)
-     * @param array  $path       An array of path parameters
-     * @param array  $query      An array of query parameters
-     *
-     * @return Response A Response instance
+     * If success_url param is present in request, follow this link.
      */
-    protected function forward($controller, array $path = array(), array $query = array())
+    protected function redirectSuccess()
     {
-    	$path['_controller'] = $controller;
-    	$subRequest = $this->container->get('request')->duplicate($query, null, $path);
-
-    	return $this->container->get('http_kernel')->handle($subRequest, HttpKernelInterface::SUB_REQUEST);
+        if (null !== $url = $this->getRequest()->get("success_url")) {
+            $this->redirect($url);
+        }
     }
 }

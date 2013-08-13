@@ -21,9 +21,8 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Admin\Controller;
+namespace Thelia\Controller\Admin;
 
-use Symfony\Component\HttpFoundation\Response;
 use Thelia\Form\AdminLogin;
 use Thelia\Core\Security\Authentication\AdminUsernamePasswordFormAuthenticator;
 use Thelia\Model\AdminLog;
@@ -33,73 +32,70 @@ use Thelia\Tools\URL;
 use Thelia\Tools\Redirect;
 use Thelia\Core\Event\TheliaEvents;
 
-class SessionController extends BaseAdminController {
+class SessionController extends BaseAdminController
+{
+    public function showLoginAction()
+    {
+        return $this->render("login");
+    }
 
-	public function showLoginAction()
-	{
-		return $this->render("login");
-	}
+    public function checkLogoutAction()
+    {
+        $this->dispatch(TheliaEvents::ADMIN_LOGOUT);
 
-	public function checkLogoutAction()
-	{
-    	$this->dispatch(TheliaEvents::ADMIN_LOGOUT);
+        $this->getSecurityContext()->clear();
 
-		$this->getSecurityContext()->clear();
-
-		// Go back to login page.
-		return Redirect::exec(URL::absoluteUrl('/admin/login')); // FIXME - should be a parameter
-	}
+        // Go back to login page.
+        return Redirect::exec(URL::absoluteUrl('/admin/login')); // FIXME - should be a parameter
+    }
 
     public function checkLoginAction()
     {
-		$adminLoginForm = new AdminLogin($this->getRequest());
+        $adminLoginForm = new AdminLogin($this->getRequest());
 
-    	$request = $this->getRequest();
+        $request = $this->getRequest();
 
-    	$authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
+        $authenticator = new AdminUsernamePasswordFormAuthenticator($request, $adminLoginForm);
 
-    	try {
-    		$user = $authenticator->getAuthentifiedUser();
+        try {
+            $user = $authenticator->getAuthentifiedUser();
 
-    		// Success -> store user in security context
-    		$this->getSecurityContext()->setUser($user);
+            // Success -> store user in security context
+            $this->getSecurityContext()->setUser($user);
 
-    		// Log authentication success
-    		AdminLog::append("Authentication successful", $request, $user);
+            // Log authentication success
+            AdminLog::append("Authentication successful", $request, $user);
 
-    		$this->dispatch(TheliaEvents::ADMIN_LOGIN);
+            $this->dispatch(TheliaEvents::ADMIN_LOGIN);
 
-    		// Redirect to the success URL
-    		return Redirect::exec($adminLoginForm->getSuccessUrl());
-     	}
-         catch (ValidatorException $ex) {
+            // Redirect to the success URL
+            return Redirect::exec($adminLoginForm->getSuccessUrl());
+         } catch (ValidatorException $ex) {
 
-         	// Validation problem
-     		$message = "Missing or invalid information. Please check your input.";
-     	}
-     	catch (AuthenticationException $ex) {
+             // Validation problem
+             $message = "Missing or invalid information. Please check your input.";
+         } catch (AuthenticationException $ex) {
 
-     		// Log authentication failure
-     		AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
+             // Log authentication failure
+             AdminLog::append(sprintf("Authentication failure for username '%s'", $authenticator->getUsername()), $request);
 
-     		$message = "Login failed. Please check your username and password.";
-     	}
-     	catch (\Exception $ex) {
+             $message = "Login failed. Please check your username and password.";
+         } catch (\Exception $ex) {
 
-     		// Log authentication failure
-     		AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
+             // Log authentication failure
+             AdminLog::append(sprintf("Undefined error: %s", $ex->getMessage()), $request);
 
-     		$message = "Unable to process your request. Please try again.";
-     	}
+             $message = "Unable to process your request. Please try again.";
+         }
 
-     	// Store error information in the form
-     	$adminLoginForm->setError(true);
-     	$adminLoginForm->setErrorMessage($message);
+         // Store error information in the form
+         $adminLoginForm->setError(true);
+         $adminLoginForm->setErrorMessage($message);
 
-     	// Store the form name in session (see Form Smarty plugin to find usage of this parameter)
-     	$this->getParserContext()->setErrorForm($adminLoginForm);
+         // Store the form name in session (see Form Smarty plugin to find usage of this parameter)
+         $this->getParserContext()->setErrorForm($adminLoginForm);
 
-      	// Display the login form again
-    	return $this->render("login");
+          // Display the login form again
+        return $this->render("login");
     }
 }
