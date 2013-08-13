@@ -99,6 +99,93 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
     }
 
+
+    /**
+     *
+     * Delete specify article present into cart
+     *
+     * @param \Thelia\Core\Event\CartEvent $event
+     */
+    public function deleteArticle(CartEvent $event)
+    {
+        $request = $event->getRequest();
+
+        if (null !== $cartItemId = $request->get('cartItem')) {
+            $cart = $event->getCart();
+            try {
+                $cartItem = CartItemQuery::create()
+                    ->filterByCartId($cart->getId())
+                    ->filterById($cartItemId)
+                    ->delete();
+            } catch (PropelException $e) {
+                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
+            }
+
+        }
+    }
+
+    /**
+     *
+     * Modify article's quantity
+     *
+     * don't use Form here just test the Request.
+     *
+     * @param \Thelia\Core\Event\CartEvent $event
+     */
+    public function modifyArticle(CartEvent $event)
+    {
+        $request = $event->getRequest();
+
+        if (null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
+
+            try {
+                $cart = $event->getCart($request);
+
+                $cartItem = CartItemQuery::create()
+                    ->filterByCartId($cart->getId())
+                    ->filterById($cartItemId)
+                    ->findOne();
+
+                if ($cartItem) {
+                    $this->updateQuantity($cartItem, $quantity);
+                }
+            } catch (PropelException $e) {
+                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during updating cartItem with message : %s", $e->getMessage()));
+            }
+        }
+    }
+
+    /**
+     * Returns an array of event names this subscriber wants to listen to.
+     *
+     * The array keys are event names and the value can be:
+     *
+     *  * The method name to call (priority defaults to 0)
+     *  * An array composed of the method name to call and the priority
+     *  * An array of arrays composed of the method names to call and respective
+     *    priorities, or 0 if unset
+     *
+     * For instance:
+     *
+     *  * array('eventName' => 'methodName')
+     *  * array('eventName' => array('methodName', $priority))
+     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
+     *
+     * @return array The event names to listen to
+     *
+     * @api
+     */
+    public static function getSubscribedEvents()
+    {
+        return array(
+            "action.addArticle" => array("addArticle", 128),
+            "action.deleteArticle" => array("deleteArticle", 128),
+            "action.modifyArticle" => array("modifyArticle", 128),
+        );
+    }
+
+
+
     /**
      * increase the quantity for an existing cartItem
      *
@@ -176,91 +263,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
         }
 
         return $cartAdd;
-    }
-
-    /**
-     *
-     * Delete specify article present into cart
-     *
-     * @param \Thelia\Core\Event\ActionEvent $event
-     */
-    public function deleteArticle(CartEvent $event)
-    {
-        $request = $event->getRequest();
-
-        if (null !== $cartItemId = $request->get('cartItem')) {
-            $cart = $event->getCart();
-            try {
-                $cartItem = CartItemQuery::create()
-                    ->filterByCartId($cart->getId())
-                    ->filterById($cartItemId)
-                    ->delete();
-            } catch (PropelException $e) {
-                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
-            }
-
-        }
-    }
-
-    /**
-     *
-     * Modify article's quantity
-     *
-     * don't use Form here just test the Request.
-     *
-     * @param \Thelia\Core\Event\ActionEvent $event
-     */
-    public function modifyArticle(CartEvent $event)
-    {
-        $request = $event->getRequest();
-
-        if (null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
-
-            try {
-                $cart = $event->getCart($request);
-
-                $cartItem = CartItemQuery::create()
-                    ->filterByCartId($cart->getId())
-                    ->filterById($cartItemId)
-                    ->findOne();
-
-                if ($cartItem) {
-                    $this->updateQuantity($cartItem, $quantity);
-                }
-            } catch (PropelException $e) {
-                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during updating cartItem with message : %s", $e->getMessage()));
-            }
-
-        }
-    }
-
-    /**
-     * Returns an array of event names this subscriber wants to listen to.
-     *
-     * The array keys are event names and the value can be:
-     *
-     *  * The method name to call (priority defaults to 0)
-     *  * An array composed of the method name to call and the priority
-     *  * An array of arrays composed of the method names to call and respective
-     *    priorities, or 0 if unset
-     *
-     * For instance:
-     *
-     *  * array('eventName' => 'methodName')
-     *  * array('eventName' => array('methodName', $priority))
-     *  * array('eventName' => array(array('methodName1', $priority), array('methodName2'))
-     *
-     * @return array The event names to listen to
-     *
-     * @api
-     */
-    public static function getSubscribedEvents()
-    {
-        return array(
-            "action.addArticle" => array("addArticle", 128),
-            "action.deleteArticle" => array("deleteArticle", 128),
-            "action.modifyArticle" => array("modifyArticle", 128),
-        );
     }
 
 }

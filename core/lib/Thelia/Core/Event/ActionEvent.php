@@ -43,11 +43,6 @@ abstract class ActionEvent extends Event
      */
     protected $request;
 
-    /**
-     *
-     * @var string
-     */
-    protected $action;
 
     protected $errorForm = null;
 
@@ -58,10 +53,9 @@ abstract class ActionEvent extends Event
      * @param \Symfony\Component\HttpFoundation\Request $request
      * @param string                                    $action
      */
-    public function __construct(Request $request, $action)
+    public function __construct(Request $request)
     {
         $this->request = $request;
-        $this->action  = $action;
     }
 
 
@@ -77,15 +71,6 @@ abstract class ActionEvent extends Event
         }
 
         return null;
-    }
-
-    /**
-     *
-     * @return string
-     */
-    public function getAction()
-    {
-        return $this->action;
     }
 
     /**

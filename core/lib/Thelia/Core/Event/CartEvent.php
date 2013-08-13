@@ -30,9 +30,9 @@ class CartEvent extends ActionEvent {
 
     protected $cart;
 
-    public function __construct(Request $request, $action, Cart $cart)
+    public function __construct(Request $request, Cart $cart)
     {
-        parent::__construct($request, $action);
+        parent::__construct($request);
         $this->cart = $cart;
     }
 

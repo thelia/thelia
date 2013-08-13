@@ -24,6 +24,7 @@ namespace Thelia\Controller\Front;
 
 
 use Thelia\Core\Event\CartEvent;
+use Thelia\Core\Event\TheliaEvents;
 
 class CartController extends BaseFrontController
 {
@@ -31,11 +32,23 @@ class CartController extends BaseFrontController
 
     public function addArticle()
     {
+        $cartEvent = $this->getCartEvent();
+
+        $this->dispatch(TheliaEvents::CART_ADD, $cartEvent);
+    }
+
+    public function modifyArticle()
+    {
+        $cartEvent = $this->getCartEvent();
+
+        $this->dispatch(TheliaEvents::CART_MODIFYARTICLE, $cartEvent);
+    }
+
+    protected function getCartEvent()
+    {
         $request = $this->getRequest();
         $cart = $this->getCart($request);
 
-        $cartEvent = new CartEvent($request, "action.addArticle", $cart);
-
-        $this->dispatch("action.addArticle", $cartEvent);
+        return new CartEvent($request, $cart);
     }
 }

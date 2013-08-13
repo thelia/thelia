@@ -121,10 +121,20 @@ final class TheliaEvents
     /**
      * sent when a new item is added to current cart
      */
-    const CART_ADDITEM = "cart.addItem";
+    const AFTER_CARTADDITEM = "cart.addItem";
 
     /**
      * sent when a cart item is modify
      */
-    const CART_MODIFYITEM = "cart.modifyItem";
+    const AFTER_CARTMODIFYITEM = "cart.modifyItem";
+
+    /**
+     * sent for addArticle action
+     */
+    const CART_ADDITEM = "action.addArticle";
+
+    /**
+     * sent on modify article action
+     */
+    const CART_MODIFYARTICLE = "action.modifyArticle";
 }
