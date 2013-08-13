@@ -54,8 +54,9 @@ class BaseController extends ContainerAware
     }
 
     /**
-     * Create an action event,
-     *
+     * Create an action event
+     * 
+     * @param string $action
      * @return EventDispatcher
      */
     protected function dispatchEvent($action)
