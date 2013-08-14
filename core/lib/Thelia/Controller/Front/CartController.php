@@ -23,7 +23,7 @@
 namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Action\Exception\FormValidationException;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -54,10 +54,10 @@ class CartController extends BaseFrontController
 
             $this->redirectSuccess();
 
-        } catch(PropelException $e) {
+        } catch (PropelException $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
             $message = "Failed to add this article to your cart, please try again";
-        } catch(FormValidationException $e) {
+        } catch (FormValidationException $e) {
             $message = $e->getMessage();
         }
 

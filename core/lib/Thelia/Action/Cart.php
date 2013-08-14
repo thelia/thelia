@@ -34,7 +34,6 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Action\Exception\FormValidationException;
 
 /**
  *
@@ -52,7 +51,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function addArticle(CartEvent $event)
     {
-
 
         $cart = $event->cart;
         $newness = $event->newness;

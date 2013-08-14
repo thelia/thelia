@@ -20,9 +20,9 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Action\Exception;
 
-class ActionException extends \RuntimeException
+namespace Thelia\Form\Exception;
+
+class FormValidationException extends \RuntimeException
 {
-
 }

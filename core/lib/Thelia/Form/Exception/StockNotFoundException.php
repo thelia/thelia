@@ -21,8 +21,9 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Action\Exception;
+namespace Thelia\Form\Exception;
 
-class FormValidationException extends ActionException
+class StockNotFoundException extends FormValidationException
 {
+
 }

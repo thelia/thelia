@@ -33,7 +33,7 @@ use Thelia\Core\Event\ActionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Core\Factory\ActionEventFactory;
 use Thelia\Form\BaseForm;
-use Thelia\Action\Exception\FormValidationException;
+use Thelia\Form\Exception\FormValidationException;
 
 /**
  *

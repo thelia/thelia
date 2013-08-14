@@ -24,7 +24,6 @@
 namespace Thelia\Core\Event;
 
 use Symfony\Component\EventDispatcher\Event;
-use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Cart;
 
 class CartEvent extends Event

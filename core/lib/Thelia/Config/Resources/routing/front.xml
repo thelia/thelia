@@ -21,6 +21,7 @@
 
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addArticle</default>
+        <default key="_view">cart</default>
     </route>
 
     <route id="cart.change.process" path="/cart/delete">

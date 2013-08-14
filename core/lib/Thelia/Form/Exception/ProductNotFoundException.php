@@ -21,8 +21,8 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Action\Exception;
+namespace Thelia\Form\Exception;
 
-class ProductNotFoundException extends ActionException
+class ProductNotFoundException extends FormValidationException
 {
 }
