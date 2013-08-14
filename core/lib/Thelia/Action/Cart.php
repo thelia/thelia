@@ -201,28 +201,4 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->findOne();
     }
 
-    /**
-     * Find the good way to construct the cart form
-     *
-     * @param  Request $request
-     * @return CartAdd
-     */
-    private function getAddCartForm(Request $request)
-    {
-        if ($request->isMethod("post")) {
-            $cartAdd = new CartAdd($request);
-        } else {
-            $cartAdd = new CartAdd(
-                $request,
-                "form",
-                array(),
-                array(
-                    'csrf_protection'   => false,
-                )
-            );
-        }
-
-        return $cartAdd;
-    }
-
 }
