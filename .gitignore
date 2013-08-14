@@ -18,3 +18,4 @@ local/cache/*
 web/assets/*
 web/.htaccess
 phpdoc*.log
+php-cs
