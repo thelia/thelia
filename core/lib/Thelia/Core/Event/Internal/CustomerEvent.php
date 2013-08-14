@@ -23,11 +23,10 @@
 
 namespace Thelia\Core\Event\Internal;
 
-
 use Thelia\Model\Customer;
 
-class CustomerEvent extends InternalEvent {
-
+class CustomerEvent extends InternalEvent
+{
     public $customer;
 
     public function __construct(Customer $customer)

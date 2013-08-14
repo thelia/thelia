@@ -58,7 +58,7 @@ class Assetic extends AbstractSmartyPlugin
 
     public function functionImage($params, \Smarty_Internal_Template $template)
     {
-    	return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template);
+        return $this->assetManager->computeAssetUrl(SmartyAssetsManager::ASSET_TYPE_AUTO, $params, $template);
     }
 
     /**

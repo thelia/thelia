@@ -39,7 +39,6 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 
 use Thelia\Core\Bundle;
-use Thelia\Core\DependencyInjection\Loader\CollectionXmlFileLoader;
 use Thelia\Log\Tlog;
 use Thelia\Config\DatabaseConfiguration;
 use Thelia\Config\DefinePropel;

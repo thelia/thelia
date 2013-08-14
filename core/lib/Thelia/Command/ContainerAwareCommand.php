@@ -32,7 +32,8 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class ContainerAwareCommand extends Command implements ContainerAwareInterface {
+class ContainerAwareCommand extends Command implements ContainerAwareInterface
+{
     /**
      * @var ContainerInterface
      */

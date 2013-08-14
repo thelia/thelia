@@ -37,8 +37,9 @@ class IntListType implements TypeInterface
 
     public function isValid($values)
     {
-        foreach(explode(',', $values) as $value) {
+        foreach (explode(',', $values) as $value) {
             if(filter_var($value, FILTER_VALIDATE_INT) === false)
+
                 return false;
         }
 

@@ -22,7 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-use Thelia\Controller\NullControllerInterface;
 use Symfony\Component\HttpFoundation\Request;
 
 /**

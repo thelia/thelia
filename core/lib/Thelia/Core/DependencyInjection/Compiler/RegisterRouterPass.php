@@ -22,10 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Core\DependencyInjection\Compiler;
 
-
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -43,7 +41,7 @@ class RegisterRouterPass implements CompilerPassInterface
     {
         try {
             $chainRouter = $container->getDefinition("router.chainRequest");
-        } catch(InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             return;
         }
 
@@ -54,8 +52,6 @@ class RegisterRouterPass implements CompilerPassInterface
             $router->addMethodCall("setOption", array("matcher_cache_class", $container::camelize("ProjectUrlMatcher".$id)));
 
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
-
-
 
         }
     }

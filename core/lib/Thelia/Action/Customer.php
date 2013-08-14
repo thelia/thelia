@@ -26,7 +26,6 @@ namespace Thelia\Action;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\TheliaEvents;
-use Thelia\Form\BaseForm;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\CustomerModification;
 use Thelia\Model\Customer as CustomerModel;
@@ -34,7 +33,6 @@ use Thelia\Log\Tlog;
 use Thelia\Model\CustomerQuery;
 use Thelia\Form\CustomerLogin;
 use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
-use Thelia\Core\Security\SecurityContext;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
@@ -122,7 +120,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
             $this->processSuccessfullLogin($event, $customer, $customerModification);
         } catch (PropelException $e) {
 
-
               Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
 
             $message = "Failed to change your account, please try again.";
@@ -144,8 +141,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
     {
         $event->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_LOGOUT, $event);
 
-
-      	$this->getFrontSecurityContext()->clear();
+          $this->getFrontSecurityContext()->clear();
     }
 
     /**

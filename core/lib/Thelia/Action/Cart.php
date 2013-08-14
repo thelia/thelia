@@ -25,10 +25,8 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\CartEvent;
 use Thelia\Form\CartAdd;
 use Thelia\Model\ProductPrice;
@@ -92,13 +90,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
 
             $message = $e->getMessage();
         }
-        if($message) {
+        if ($message) {
             // The form has errors, propagate it.
             $this->propagateFormError($cartAdd, $message, $event);
         }
 
     }
-
 
     /**
      *
@@ -184,13 +181,11 @@ class Cart extends BaseAction implements EventSubscriberInterface
         );
     }
 
-
-
     /**
      * increase the quantity for an existing cartItem
      *
      * @param CartItem $cartItem
-     * @param float $quantity
+     * @param float    $quantity
      */
     protected function updateQuantity(CartItem $cartItem, $quantity)
     {
@@ -203,10 +198,10 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * try to attach a new item to an existing cart
      *
      * @param \Thelia\Model\Cart $cart
-     * @param int $productId
-     * @param int $productSaleElementsId
-     * @param float $quantity
-     * @param ProductPrice $productPrice
+     * @param int                $productId
+     * @param int                $productSaleElementsId
+     * @param float              $quantity
+     * @param ProductPrice       $productPrice
      */
     protected function addItem(\Thelia\Model\Cart $cart, $productId, $productSaleElementsId, $quantity, ProductPrice $productPrice)
     {
@@ -227,9 +222,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * find a specific record in CartItem table using the Cart id, the product id
      * and the product_sale_elements id
      *
-     * @param int $cartId
-     * @param int $productId
-     * @param int $productSaleElementsId
+     * @param  int           $cartId
+     * @param  int           $productId
+     * @param  int           $productSaleElementsId
      * @return ChildCartItem
      */
     protected function findItem($cartId, $productId, $productSaleElementsId)
@@ -244,7 +239,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     /**
      * Find the good way to construct the cart form
      *
-     * @param Request $request
+     * @param  Request $request
      * @return CartAdd
      */
     private function getAddCartForm(Request $request)

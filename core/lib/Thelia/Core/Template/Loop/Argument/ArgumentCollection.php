@@ -37,12 +37,14 @@ class ArgumentCollection implements \Iterator
         $this->addArguments(func_get_args(), true);
     }
 
-    public function hasKey($key) {
-    	return isset($this->arguments[$key]);
+    public function hasKey($key)
+    {
+        return isset($this->arguments[$key]);
     }
 
-    public function get($key) {
-    	return $this->hasKey($key) ? $this->arguments[$key] : null;
+    public function get($key)
+    {
+        return $this->hasKey($key) ? $this->arguments[$key] : null;
     }
 
     public function isEmpty()
@@ -51,14 +53,14 @@ class ArgumentCollection implements \Iterator
     }
 
     /**
-     * @param array    $argumentList
-     * @param          $force
+     * @param array $argumentList
+     * @param       $force
      *
      * @return ArgumentCollection
      */
     public function addArguments(array $argumentList, $force = true)
     {
-        foreach($argumentList as $argument) {
+        foreach ($argumentList as $argument) {
             $this->addArgument($argument, $force);
         }
 
@@ -73,7 +75,7 @@ class ArgumentCollection implements \Iterator
      */
     public function addArgument(Argument $argument, $force = true)
     {
-        if(isset($this->arguments[$argument->name]) && ! $force) {
+        if (isset($this->arguments[$argument->name]) && ! $force) {
             return $this;
         }
 

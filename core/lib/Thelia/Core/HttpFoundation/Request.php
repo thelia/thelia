@@ -23,7 +23,6 @@
 namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
-use Thelia\Core\Context;
 
 class Request extends BaseRequest
 {
@@ -46,6 +45,7 @@ class Request extends BaseRequest
         if ('' == $this->getQueryString()) {
             $additionalQs = '?'. ltrim($additionalQs, '&');
         }
+
         return $uri . $additionalQs;
     }
 }

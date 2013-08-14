@@ -26,7 +26,6 @@ namespace Thelia\Core\Event;
 use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Form\BaseForm;
-use Thelia\Core\Security\SecurityContext;
 /**
  *
  * Class thrown on Thelia.action event
@@ -43,7 +42,6 @@ abstract class ActionEvent extends Event
      */
     protected $request;
 
-
     protected $errorForm = null;
 
     protected $parameters = array();
@@ -57,7 +55,6 @@ abstract class ActionEvent extends Event
     {
         $this->request = $request;
     }
-
 
     public function __set($name, $value)
     {
@@ -82,17 +79,20 @@ abstract class ActionEvent extends Event
         return $this->request;
     }
 
-    public function setErrorForm(BaseForm $form) {
-    	$this->errorForm = $form;
+    public function setErrorForm(BaseForm $form)
+    {
+        $this->errorForm = $form;
 
-    	if ($form != null) $this->stopPropagation();
+        if ($form != null) $this->stopPropagation();
     }
 
-    public function getErrorForm() {
-    	return $this->errorForm;
+    public function getErrorForm()
+    {
+        return $this->errorForm;
     }
 
-    public function hasErrorForm() {
-    	return $this->errorForm != null ? true : false;
+    public function hasErrorForm()
+    {
+        return $this->errorForm != null ? true : false;
     }
 }

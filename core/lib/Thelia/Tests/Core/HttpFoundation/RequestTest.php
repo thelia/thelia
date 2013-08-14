@@ -4,7 +4,6 @@ namespace Thelia\Tests\Core\HttpFoundation;
 
 use Thelia\Core\HttpFoundation\Request;
 
-
 class RequestTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -36,7 +35,6 @@ class RequestTest extends \PHPUnit_Framework_TestCase
         $result = $request->getUriAddingParameters(array("foo" => "bar"));
 
         $this->assertEquals("http://localhost/?test=fu&foo=bar", $result);
-
 
     }
 

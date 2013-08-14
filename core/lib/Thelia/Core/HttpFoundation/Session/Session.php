@@ -120,7 +120,7 @@ class Session extends BaseSession
     /**
      *
      *
-     * @param \Thelia\Model\Cart $cart
+     * @param  \Thelia\Model\Cart                     $cart
      * @throws \Thelia\Exception\InvalidCartException
      */
     protected function verifyValidCart(Cart $cart)
@@ -128,7 +128,7 @@ class Session extends BaseSession
         $customer = $this->getCustomerUser();
         if ($customer && $cart->getCustomerId() != $customer->getId()) {
             throw new InvalidCartException("customer in session and customer_id in cart are not the same");
-        } else if($customer === null && $cart->getCustomerId() !== null) {
+        } elseif ($customer === null && $cart->getCustomerId() !== null) {
             throw new InvalidCartException("Customer exists in cart and not in session");
         }
     }

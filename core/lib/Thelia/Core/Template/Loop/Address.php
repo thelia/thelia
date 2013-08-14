@@ -30,10 +30,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\AddressQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -77,7 +75,7 @@ class Address extends BaseLoop
     {
         $search = AddressQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
@@ -87,7 +85,7 @@ class Address extends BaseLoop
 
         if ($customer === 'current') {
             $currentCustomer = $this->request->getSession()->getCustomerUser();
-            if($currentCustomer === null) {
+            if ($currentCustomer === null) {
                 return new LoopResult();
             } else {
                 $search->filterByCustomerId($currentCustomer->getId(), Criteria::EQUAL);
@@ -100,7 +98,7 @@ class Address extends BaseLoop
 
         if ($default === true) {
             $search->filterByIsDefault(1, Criteria::EQUAL);
-        } elseif($default === false) {
+        } elseif ($default === false) {
             $search->filterByIsDefault(1, Criteria::NOT_EQUAL);
         }
 

@@ -23,7 +23,6 @@
 
 namespace Thelia\Core;
 
-
 class Context
 {
     const CONTEXT_FRONT_OFFICE = 'front';
@@ -43,8 +42,7 @@ class Context
 
     public function setContext($context)
     {
-        if($this->isValidContext($context))
-        {
+        if ($this->isValidContext($context)) {
             $this->currentContext = $context;
         }
     }

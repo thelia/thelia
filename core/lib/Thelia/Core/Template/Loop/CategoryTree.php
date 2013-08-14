@@ -30,11 +30,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\ConfigQuery;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
@@ -59,45 +56,45 @@ class CategoryTree extends BaseLoop
         return new ArgumentCollection(
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth', PHP_INT_MAX),
-        	Argument::createBooleanOrBothTypeArgument('visible', true, false),
-        	Argument::createIntListTypeArgument('exclude', array())
+            Argument::createBooleanOrBothTypeArgument('visible', true, false),
+            Argument::createIntListTypeArgument('exclude', array())
         );
     }
 
     // changement de rubrique
-    protected function buildCategoryTree($parent, $visible, $level, $max_level, array $exclude, LoopResult &$loopResult) {
+    protected function buildCategoryTree($parent, $visible, $level, $max_level, array $exclude, LoopResult &$loopResult)
+    {
+        if ($level > $max_level) return;
 
-    	if ($level > $max_level) return;
+         $search = CategoryQuery::create();
 
-     	$search = CategoryQuery::create();
+        $search->filterByParent($parent);
 
-    	$search->filterByParent($parent);
+        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
-    	if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        $search->filterById($exclude, Criteria::NOT_IN);
 
-    	$search->filterById($exclude, Criteria::NOT_IN);
+        $search->orderByPosition(Criteria::ASC);
 
-    	$search->orderByPosition(Criteria::ASC);
+        $results = $search->find();
 
-    	$results = $search->find();
+        foreach ($results as $result) {
 
-    	foreach($results as $result) {
+            $loopResultRow = new LoopResultRow();
 
-    		$loopResultRow = new LoopResultRow();
+               $loopResultRow
+                   ->set("ID", $result->getId())
+                ->set("TITLE",$result->getTitle())
+                ->set("PARENT", $result->getParent())
+                ->set("URL", $result->getUrl())
+                ->set("VISIBLE", $result->getVisible() ? "1" : "0")
+                ->set("LEVEL", $level)
+            ;
 
-           	$loopResultRow
-           		->set("ID", $result->getId())
-            	->set("TITLE",$result->getTitle())
-	            ->set("PARENT", $result->getParent())
-	            ->set("URL", $result->getUrl())
-	            ->set("VISIBLE", $result->getVisible() ? "1" : "0")
-	            ->set("LEVEL", $level)
-	        ;
+               $loopResult->addRow($loopResultRow);
 
-           	$loopResult->addRow($loopResultRow);
-
-           	$this->buildCategoryTree($result->getId(), $visible,  1 + $level, $max_level, $exclude, $loopResult);
-    	}
+               $this->buildCategoryTree($result->getId(), $visible,  1 + $level, $max_level, $exclude, $loopResult);
+        }
     }
 
     /**
@@ -107,16 +104,16 @@ class CategoryTree extends BaseLoop
      */
     public function exec(&$pagination)
     {
-		$id = $this->getCategory();
-		$depth   = $this->getDepth();
-		$visible = $this->getVisible();
-		$exclude = $this->getExclude();
+        $id = $this->getCategory();
+        $depth   = $this->getDepth();
+        $visible = $this->getVisible();
+        $exclude = $this->getExclude();
 
-		//echo "exclude=".print_r($exclude);
+        //echo "exclude=".print_r($exclude);
 
-		$loopResult = new LoopResult();
+        $loopResult = new LoopResult();
 
-		$this->buildCategoryTree($id, $visible, 0, $depth, $exclude, $loopResult);
+        $this->buildCategoryTree($id, $visible, 0, $depth, $exclude, $loopResult);
 
         return $loopResult;
     }

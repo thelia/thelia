@@ -24,7 +24,6 @@
 namespace Thelia\Core\Template\Smarty\Assets;
 
 use Thelia\Core\Template\Assets\AsseticHelper;
-use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
 class SmartyAssetsManager
@@ -50,7 +49,8 @@ class SmartyAssetsManager
         $this->assetic_manager = new AsseticHelper();
     }
 
-    public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template) {
+    public function computeAssetUrl($assetType, $params, \Smarty_Internal_Template $template)
+    {
             $file    = $params['file'];
             $filters = isset($params['filters']) ? $params['filters'] : '';
             $debug   = isset($params['debug']) ? trim(strtolower($params['debug'])) == 'true' : false;
@@ -83,7 +83,7 @@ class SmartyAssetsManager
     {
         // Opening tag (first call only)
         if ($repeat) {
-			$url = $this->computeAssetUrl($assetType, $params, $template);
+            $url = $this->computeAssetUrl($assetType, $params, $template);
 
             $template->assign('asset_url', $url);
 

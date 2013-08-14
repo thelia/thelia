@@ -22,8 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Tests\Command;
 
-
-abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase {
+abstract class BaseCommandTest extends \PHPUnit_Framework_TestCase
+{
     public function getKernel()
     {
         $kernel = $this->getMock("Symfony\Component\HttpKernel\KernelInterface");

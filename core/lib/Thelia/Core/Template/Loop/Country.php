@@ -30,12 +30,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\CountryQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 
 /**
  *
@@ -71,7 +68,7 @@ class Country extends BaseLoop
     {
         $search = CountryQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);

@@ -30,10 +30,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\CustomerQuery;
-use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -76,18 +74,18 @@ class Customer extends BaseLoop
     {
         $search = CustomerQuery::create();
 
-		$current = $this->getCurrent();
+        $current = $this->getCurrent();
 
         if ($current === true) {
             $currentCustomer = $this->request->getSession()->getCustomerUser();
-            if($currentCustomer === null) {
+            if ($currentCustomer === null) {
                 return new LoopResult();
             } else {
                 $search->filterById($currentCustomer->getId(), Criteria::EQUAL);
             }
         }
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
@@ -103,7 +101,7 @@ class Customer extends BaseLoop
 
         if ($reseller === true) {
             $search->filterByReseller(1, Criteria::EQUAL);
-        } else if($reseller === false) {
+        } elseif ($reseller === false) {
             $search->filterByReseller(0, Criteria::EQUAL);
         }
 

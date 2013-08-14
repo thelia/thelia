@@ -30,11 +30,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 /**
  *
  * @package Thelia\Core\Template\Loop
@@ -46,24 +41,24 @@ class Auth extends BaseLoop
     public function getArgDefinitions()
     {
         return new ArgumentCollection(
-        	Argument::createAnyTypeArgument('roles', null, true),
-        	Argument::createAnyTypeArgument('permissions'),
-        	Argument::createAnyTypeArgument('context', 'front', false)
+            Argument::createAnyTypeArgument('roles', null, true),
+            Argument::createAnyTypeArgument('permissions'),
+            Argument::createAnyTypeArgument('context', 'front', false)
          );
     }
 
     private function _explode($commaSeparatedValues)
     {
 
-    	$array = explode(',', $commaSeparatedValues);
+        $array = explode(',', $commaSeparatedValues);
 
-    	if (array_walk($array, function(&$item) {
-    		$item = strtoupper(trim($item));
-    	})) {
-    		return $array;
-    	}
+        if (array_walk($array, function(&$item) {
+            $item = strtoupper(trim($item));
+        })) {
+            return $array;
+        }
 
-    	return array();
+        return array();
     }
 
     /**
@@ -73,25 +68,24 @@ class Auth extends BaseLoop
      */
     public function exec(&$pagination)
     {
-    	$context = $this->getContext();
-    	$roles = $this->_explode($this->getRoles());
-    	$permissions = $this->_explode($this->getPermissions());
+        $context = $this->getContext();
+        $roles = $this->_explode($this->getRoles());
+        $permissions = $this->_explode($this->getPermissions());
 
-    	$loopResult = new LoopResult();
+        $loopResult = new LoopResult();
 
-    	try {
-    		$this->securityContext->setContext($context);
+        try {
+            $this->securityContext->setContext($context);
 
-	    	if (true === $this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions)) {
+            if (true === $this->securityContext->isGranted($roles, $permissions == null ? array() : $permissions)) {
 
-	    		// Create an empty row: loop is no longer empty :)
-            	$loopResult->addRow(new LoopResultRow());
-	    	}
-    	}
-    	catch (\Exception $ex) {
-    		// Not granted, loop is empty
-    	}
+                // Create an empty row: loop is no longer empty :)
+                $loopResult->addRow(new LoopResultRow());
+            }
+        } catch (\Exception $ex) {
+            // Not granted, loop is empty
+        }
 
-    	return $loopResult;
+        return $loopResult;
     }
 }

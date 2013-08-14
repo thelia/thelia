@@ -24,7 +24,6 @@ namespace Thelia\Form;
 
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Form\Extension\HttpFoundation\HttpFoundationExtension;
 use Symfony\Component\Form\Extension\Csrf\CsrfExtension;
@@ -33,7 +32,8 @@ use Symfony\Component\Validator\Validation;
 use Thelia\Model\ConfigQuery;
 use Thelia\Tools\URL;
 
-abstract class BaseForm {
+abstract class BaseForm
+{
     /**
      * @var \Symfony\Component\Form\FormFactoryInterface
      */
@@ -46,33 +46,33 @@ abstract class BaseForm {
 
     protected $request;
 
-	private $view = null;
+    private $view = null;
 
-	/**
-	 * true if the form has an error, false otherwise.
-	 * @var boolean
-	 */
-	private $has_error = false;
+    /**
+     * true if the form has an error, false otherwise.
+     * @var boolean
+     */
+    private $has_error = false;
 
-	/**
-	 * The form error message.
-	 * @var string
-	 */
-	private $error_message = '';
+    /**
+     * The form error message.
+     * @var string
+     */
+    private $error_message = '';
 
     public function __construct(Request $request, $type= "form", $data = array(), $options = array())
     {
-    	$this->request = $request;
+        $this->request = $request;
 
         $validator = Validation::createValidator();
 
-        if(!isset($options["attr"]["name"])) {
+        if (!isset($options["attr"]["name"])) {
             $options["attr"]["thelia_name"] = $this->getName();
         }
 
         $builder =  Forms::createFormFactoryBuilder()
             ->addExtension(new HttpFoundationExtension());
-        if(!isset($options["csrf_protection"]) || $options["csrf_protection"] !== false) {
+        if (!isset($options["csrf_protection"]) || $options["csrf_protection"] !== false) {
             $builder->addExtension(
                 new CsrfExtension(
                     new SessionCsrfProvider(
@@ -92,14 +92,15 @@ abstract class BaseForm {
 
         // If not already set, define the success_url field
         if (! $this->formBuilder->has('success_url')) {
-        	$this->formBuilder->add("success_url", "text");
+            $this->formBuilder->add("success_url", "text");
         }
 
         $this->form = $this->formBuilder->getForm();
     }
 
-    public function getRequest() {
-    	return $this->request;
+    public function getRequest()
+    {
+        return $this->request;
     }
 
     protected function cleanOptions($options)
@@ -116,28 +117,29 @@ abstract class BaseForm {
      *
      * @return string an absolute URL
      */
-    public function getSuccessUrl($default = null) {
+    public function getSuccessUrl($default = null)
+    {
+        $successUrl = $this->form->get('success_url')->getData();
 
-    	$successUrl = $this->form->get('success_url')->getData();
+        if (empty($successUrl)) {
 
-    	if (empty($successUrl)) {
+            if ($default === null) $default = ConfigQuery::read('base_url', '/');
 
-    		if ($default === null) $default = ConfigQuery::read('base_url', '/');
+            $successUrl = $default;
+        }
 
-    		$successUrl = $default;
-    	}
-
-    	return URL::absoluteUrl($successUrl);
+        return URL::absoluteUrl($successUrl);
     }
 
-    public function createView() {
-    	$this->view = $this->form->createView();
+    public function createView()
+    {
+        $this->view = $this->form->createView();
     }
 
-    public function getView() {
-    	if ($this->view === null) throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
-
-    	return $this->view;
+    public function getView()
+    {
+        if ($this->view === null) throw new \LogicException("View was not created. Please call BaseForm::createView() first.");
+        return $this->view;
     }
 
     // -- Error and errro message ----------------------------------------------
@@ -149,7 +151,7 @@ abstract class BaseForm {
      */
     public function setError($has_error = true)
     {
-    	$this->has_error = $has_error;
+        $this->has_error = $has_error;
     }
 
     /**
@@ -159,7 +161,7 @@ abstract class BaseForm {
      */
     public function hasError()
     {
-    	return $this->has_error;
+        return $this->has_error;
     }
 
     /**
@@ -169,7 +171,7 @@ abstract class BaseForm {
      */
     public function setErrorMessage($message)
     {
-    	$this->error_message = $message;
+        $this->error_message = $message;
     }
 
     /**
@@ -179,7 +181,7 @@ abstract class BaseForm {
      */
     public function getErrorMessage()
     {
-    	return $this->error_message;
+        return $this->error_message;
     }
 
     /**
@@ -217,4 +219,3 @@ abstract class BaseForm {
      */
     abstract public function getName();
 }
-

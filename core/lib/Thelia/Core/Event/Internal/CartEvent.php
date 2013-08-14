@@ -21,21 +21,17 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-
 namespace Thelia\Core\Event\Internal;
-
 
 use Thelia\Model\Cart;
 
-class CartEvent extends InternalEvent {
-
+class CartEvent extends InternalEvent
+{
     public $cart;
 
     public function __construct(Cart $cart)
     {
         $this->cart = $cart;
     }
-
-
 
 }

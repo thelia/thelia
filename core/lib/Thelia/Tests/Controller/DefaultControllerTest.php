@@ -28,37 +28,37 @@ use Thelia\Controller\Front\DefaultController;
 
 class DefaultControllerTest extends \PHPUnit_Framework_TestCase
 {
-    
+
     public function testNoAction()
     {
         $defaultController = new DefaultController();
         $request = new Request();
         $defaultController->noAction($request);
-        
+
         $this->assertEquals($request->attributes->get('_view'), "index");
     }
-    
+
     public function testNoActionWithQuery()
     {
         $defaultController = new DefaultController();
         $request = new Request(array(
             "view" => "foo"
         ));
-        
+
         $defaultController->noAction($request);
-        
+
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
-    
+
     public function testNoActionWithRequest()
     {
         $defaultController = new DefaultController();
         $request = new Request(array(), array(
             "view" => "foo"
         ));
-        
+
         $defaultController->noAction($request);
-        
+
         $this->assertEquals($request->attributes->get('_view'), 'foo');
     }
 }

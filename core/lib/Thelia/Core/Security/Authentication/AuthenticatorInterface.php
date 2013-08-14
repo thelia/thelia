@@ -23,10 +23,10 @@
 
 namespace Thelia\Core\Security\Authentication;
 
-interface AuthenticatorInterface {
-
-	/**
-	 * Returns a UserInterface instance, authentified using the authenticator specific method
-	 */
-	public function getAuthentifiedUser();
+interface AuthenticatorInterface
+{
+    /**
+     * Returns a UserInterface instance, authentified using the authenticator specific method
+     */
+    public function getAuthentifiedUser();
 }

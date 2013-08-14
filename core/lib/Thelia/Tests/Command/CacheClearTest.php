@@ -62,7 +62,6 @@ class CacheClearTest extends \PHPUnit_Framework_TestCase
 
         $this->assertFalse($fs->exists($this->cache_dir));
 
-
     }
 
     /**

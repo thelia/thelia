@@ -65,8 +65,6 @@ final class TheliaEvents
      */
     const ADMIN_LOGIN  = "action.admin_login";
 
-
-
     /**
      * Sent once the customer creation form has been successfully validated, and before customer insertion in the database.
      */
@@ -85,8 +83,6 @@ final class TheliaEvents
      * Sent just after a successful update of a customer in the database.
      */
     const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
-
-
 
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.
@@ -111,7 +107,6 @@ final class TheliaEvents
      * Sent just after a successful change of a category in the database.
      */
     const AFTER_CHANGECATEGORY 	= "action.after_changecategory";
-
 
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart

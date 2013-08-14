@@ -22,7 +22,6 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
 use Thelia\Action\Exception\StockNotFoundException;

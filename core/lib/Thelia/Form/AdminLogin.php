@@ -22,13 +22,11 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Choice;
 
-class AdminLogin extends BaseForm {
-
+class AdminLogin extends BaseForm
+{
     protected function buildForm()
     {
         $this->formBuilder
@@ -40,11 +38,11 @@ class AdminLogin extends BaseForm {
             ))
             ->add("password", "password", array(
                 "constraints" => array(
-                	new NotBlank()
+                    new NotBlank()
                 )
             ))
             ->add("remember_me", "checkbox", array(
-            		'value' => 'yes'
+                    'value' => 'yes'
             ))
             ;
     }

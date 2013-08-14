@@ -26,8 +26,8 @@ namespace Thelia\Core\Event;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Cart;
 
-class CartEvent extends ActionEvent {
-
+class CartEvent extends ActionEvent
+{
     protected $cart;
 
     public function __construct(Request $request, Cart $cart)

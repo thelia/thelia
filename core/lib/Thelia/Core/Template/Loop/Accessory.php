@@ -26,19 +26,12 @@ namespace Thelia\Core\Template\Loop;
 use Thelia\Core\Template\Loop\Product;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
-use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\AccessoryQuery;
-use Thelia\Model\ProductQuery;
-use Thelia\Model\ConfigQuery;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
@@ -86,12 +79,12 @@ class Accessory extends Product
         $order = $this->getOrder();
         $orderByAccessory = array_search('accessory', $order);
         $orderByAccessoryReverse = array_search('accessory_reverse', $order);
-        if($orderByAccessory !== false) {
+        if ($orderByAccessory !== false) {
             $search->orderByPosition(Criteria::ASC);
             $order[$orderByAccessory] = 'given_id';
             $this->args->get('order')->setValue( implode(',', $order) );
         }
-        if($orderByAccessoryReverse !== false) {
+        if ($orderByAccessoryReverse !== false) {
             $search->orderByPosition(Criteria::DESC);
             $order[$orderByAccessoryReverse] = 'given_id';
             $this->args->get('order')->setValue( implode(',', $order) );
@@ -107,7 +100,7 @@ class Accessory extends Product
         $receivedIdList = $this->getId();
 
         /* if an Id list is receive, loop will only match accessories from this list */
-        if($receivedIdList === null) {
+        if ($receivedIdList === null) {
             $this->args->get('id')->setValue( implode(',', $accessoryIdList) );
         } else {
             $this->args->get('id')->setValue( implode(',', array_intersect($receivedIdList, $accessoryIdList)) );

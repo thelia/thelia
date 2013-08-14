@@ -35,7 +35,7 @@ class TheliaSyntax extends AbstractSmartyPlugin
 {
     public function dieseCancel($value, $diese)
     {
-        if($value === null) {
+        if ($value === null) {
             return $diese;
         }
 
