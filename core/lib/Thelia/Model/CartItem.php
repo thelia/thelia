@@ -41,27 +41,25 @@ class CartItem extends BaseCartItem
      * @param $value
      * @return $this
      */
-    public function addQuantity($value)
+    public function updateQuantity($value)
     {
         $currentQuantity = $this->getQuantity();
 
-        $newQuantity = $currentQuantity + $value;
-
-        if($newQuantity <= 0)
+        if($value <= 0)
         {
-            $newQuantity = $currentQuantity;
+            $value = $currentQuantity;
         }
 
         if(ConfigQuery::read("verifyStock", 1) == 1)
         {
             $productSaleElements = $this->getProductSaleElements();
 
-            if($productSaleElements->getQuantity() < $newQuantity) {
-                $newQuantity = $currentQuantity;
+            if($productSaleElements->getQuantity() < $value) {
+                $value = $currentQuantity;
             }
         }
 
-        $this->setQuantity($newQuantity);
+        $this->setQuantity($value);
 
         return $this;
     }

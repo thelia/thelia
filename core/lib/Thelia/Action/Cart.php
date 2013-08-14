@@ -110,7 +110,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
                 ->filterByCartId($cart->getId())
                 ->filterById($cartItemId)
                 ->findOne();
-            
+
             if ($cartItem) {
                 $this->updateQuantity($cartItem, $quantity);
             }
@@ -155,7 +155,7 @@ class Cart extends BaseAction implements EventSubscriberInterface
     protected function updateQuantity(CartItem $cartItem, $quantity)
     {
         $cartItem->setDisptacher($this->getDispatcher());
-        $cartItem->addQuantity($quantity)
+        $cartItem->updateQuantity($quantity)
             ->save();
     }
 
