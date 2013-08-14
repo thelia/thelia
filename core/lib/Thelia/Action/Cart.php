@@ -83,8 +83,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function deleteArticle(CartEvent $event)
     {
-        $request = $event->getRequest();
-
         if (null !== $cartItemId = $event->cartItem) {
             $cart = $event->cart;
             $cartItem = CartItemQuery::create()
