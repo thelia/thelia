@@ -20,49 +20,43 @@
 /*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
 /*                                                                                   */
 /*************************************************************************************/
-namespace Thelia\Core\DependencyInjection\Loader;
+namespace Thelia\Core\DependencyInjection\Compiler;
 
 
-class CollectionXmlFileLoader {
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Symfony\Component\DependencyInjection\Reference;
 
-    protected $files = array();
-    protected $cacheDir;
-    protected $outputName;
+class RegisterRouterPass implements CompilerPassInterface
+{
 
-    public function __construct($cacheDir, $outputName, array $files = array())
+    /**
+     * You can modify the container here before it is dumped to PHP code.
+     *
+     * @param ContainerBuilder $container
+     *
+     * @api
+     */
+    public function process(ContainerBuilder $container)
     {
-        $this->cacheDir = $cacheDir;
-        $this->outputName = $outputName;
-        $this->files = $files;
-    }
-
-    public function addFile($file)
-    {
-        $this->files[] = $file;
-    }
-
-    public function process()
-    {
-        $pattern = '<import resource="%s" />';
-
-        $outputPattern = <<<EOF
-<?xml version="1.0" encoding="UTF-8" ?>
-
-<routes xmlns="http://symfony.com/schema/routing"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://symfony.com/schema/routing http://symfony.com/schema/routing/routing-1.0.xsd">
-        %s
-</routes>
-EOF;
-        $imports = array();
-        foreach ($this->files as $file) {
-            $imports[] = sprintf($pattern, $file);
+        try {
+            $chainRouter = $container->getDefinition("router.chainRequest");
+        } catch(InvalidArgumentException $e) {
+            return;
         }
 
+        foreach ($container->findTaggedServiceIds("router.register") as $id => $attributes) {
+            $priority = isset($attributes[0]["priority"]) ? $attributes[0]["priority"] : 0;
+            $router = $container->getDefinition($id);
 
-        $output = sprintf($outputPattern, implode($imports));
-        file_put_contents($this->cacheDir .'/'. $this->outputName, $output);
+            $router->addMethodCall("setOption", array("matcher_cache_class", $container::camelize("ProjectUrlMatcher".$id)));
 
+            $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
+
+
+
+        }
     }
-
 }
