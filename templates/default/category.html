@@ -84,7 +84,7 @@
     <li>
         #TITLE
         <ul>
-            {loop name="ftav" type="feature_available" order="manual" feature="#ID"}
+            {loop name="ftav" type="feature_availability" order="manual" feature="#ID"}
                 <li>#TITLE</li>
             {/loop}
         </ul>
@@ -101,7 +101,7 @@
     <li>
         #TITLE
         <ul>
-            {loop name="attrav" type="attribute_available" order="manual" attribute="#ID"}
+            {loop name="attrav" type="attribute_availability" order="manual" attribute="#ID"}
             <li>#TITLE</li>
             {/loop}
         </ul>
@@ -117,7 +117,7 @@
     <h3>PRODUCT : #REF / #TITLE</h3>
     {/loop}
 
-    {*loop name="product" type="product" order="ref" feature_available="1: (1 | 2) , 2: 4, 3: 433"}
+    {*loop name="product" type="product" order="ref" feature_availability="1: (1 | 2) , 2: 4, 3: 433"}
     <h3>PRODUCT : #REF / #TITLE</h3>
     price : #PRICE €<br />
     promo price : #PROMO_PRICE €<br />
