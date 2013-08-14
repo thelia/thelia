@@ -52,13 +52,13 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public function addItem(CartEvent $event)
     {
 
-        $cart = $event->cart;
-        $newness = $event->newness;
-        $append = $event->append;
-        $quantity = $event->quantity;
+        $cart = $event->getCart();
+        $newness = $event->getNewness();
+        $append = $event->getAppend();
+        $quantity = $event->getQuantity();
 
-        $productSaleElementsId = $event->productSaleElementsId;
-        $productId = $event->product;
+        $productSaleElementsId = $event->getProductSaleElementsId();
+        $productId = $event->getProduct();
 
         $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
@@ -83,8 +83,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function deleteItem(CartEvent $event)
     {
-        if (null !== $cartItemId = $event->cartItem) {
-            $cart = $event->cart;
+        if (null !== $cartItemId = $event->getCartItem()) {
+            $cart = $event->getCart();
             $cartItem = CartItemQuery::create()
                 ->filterByCartId($cart->getId())
                 ->filterById($cartItemId)
@@ -103,8 +103,8 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function changeItem(CartEvent $event)
     {
-        if ((null !== $cartItemId = $event->cartItem) && (null !== $quantity = $event->quantity)) {
-            $cart = $event->cart;
+        if ((null !== $cartItemId = $event->getCartItem()) && (null !== $quantity = $event->getQuantity())) {
+            $cart = $event->getCart();
 
             $cartItem = CartItemQuery::create()
                 ->filterByCartId($cart->getId())

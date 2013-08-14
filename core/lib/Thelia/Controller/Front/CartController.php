@@ -44,11 +44,11 @@ class CartController extends BaseFrontController
             $form = $this->validateForm($cartAdd);
 
             $cartEvent = $this->getCartEvent();
-            $cartEvent->newness = $form->get("newness")->getData();
-            $cartEvent->append = $form->get("append")->getData();
-            $cartEvent->quantity = $form->get("quantity")->getData();
-            $cartEvent->productSaleElementsId = $form->get("product_sale_elements_id")->getData();
-            $cartEvent->product = $form->get("product")->getData();
+            $cartEvent->setNewness($form->get("newness")->getData());
+            $cartEvent->setAppend($form->get("append")->getData());
+            $cartEvent->setQuantity($form->get("quantity")->getData());
+            $cartEvent->setProductSaleElementsId($form->get("product_sale_elements_id")->getData());
+            $cartEvent->setProduct($form->get("product")->getData());
 
             $this->getDispatcher()->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
 
@@ -70,8 +70,8 @@ class CartController extends BaseFrontController
     public function changeItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->cartItem = $this->getRequest()->get("cart_item");
-        $cartEvent->quantity = $this->getRequest()->get("quantity");
+        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
+        $cartEvent->setQuantity($this->getRequest()->get("quantity"));
 
         try {
             $this->getDispatcher()->dispatch(TheliaEvents::CART_CHANGEITEM, $cartEvent);
@@ -86,7 +86,7 @@ class CartController extends BaseFrontController
     public function deleteItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->cartItem = $this->getRequest()->get("cart_item");
+        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
 
         try {
             $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
