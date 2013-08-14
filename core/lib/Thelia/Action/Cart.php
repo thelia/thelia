@@ -85,16 +85,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        if (null !== $cartItemId = $request->get('cartItem')) {
-            $cart = $event->getCart();
-            try {
-                $cartItem = CartItemQuery::create()
-                    ->filterByCartId($cart->getId())
-                    ->filterById($cartItemId)
-                    ->delete();
-            } catch (PropelException $e) {
-                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
-            }
+        if (null !== $cartItemId = $event->cartItem) {
+            $cart = $event->cart;
+            $cartItem = CartItemQuery::create()
+                ->filterByCartId($cart->getId())
+                ->filterById($cartItemId)
+                ->delete();
 
         }
     }

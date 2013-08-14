@@ -79,8 +79,14 @@ class CartController extends BaseFrontController
     public function deleteArticle()
     {
         $cartEvent = $this->getCartEvent();
+        $cartEvent->cartItem = $this->getRequest()->get("cartItem");
 
-        $this->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
+        try {
+            $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
+        } catch (PropelException $e)
+        {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
+        }
 
         $this->redirectSuccess();
     }
