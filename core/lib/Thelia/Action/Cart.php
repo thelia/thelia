@@ -52,49 +52,29 @@ class Cart extends BaseAction implements EventSubscriberInterface
      */
     public function addArticle(CartEvent $event)
     {
-        $request = $event->getRequest();
-        $message = null;
 
-        try {
-            $cartAdd = $this->getAddCartForm($request);
 
-            $form = $this->validateForm($cartAdd);
+        $cart = $event->cart;
+        $newness = $event->newness;
+        $append = $event->append;
+        $quantity = $event->quantity;
 
-            $cart = $event->getCart();
-            $newness = $form->get("newness")->getData();
-            $append = $form->get("append")->getData();
-            $quantity = $form->get("quantity")->getData();
+        $productSaleElementsId = $event->productSaleElementsId;
+        $productId = $event->product;
 
-            $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
-            $productId = $form->get("product")->getData();
+        $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
-            $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
+        if ($cartItem === null || $newness) {
+            $productPrice = ProductPriceQuery::create()
+                ->filterByProductSaleElementsId($productSaleElementsId)
+                ->findOne();
 
-            if ($cartItem === null || $newness) {
-                $productPrice = ProductPriceQuery::create()
-                    ->filterByProductSaleElementsId($productSaleElementsId)
-                    ->findOne()
-                ;
-
-                $this->addItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
-            }
-
-            if ($append && $cartItem !== null) {
-                $this->updateQuantity($cartItem, $quantity);
-            }
-
-        } catch (PropelException $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
-            $message = "Failed to add this article to your cart, please try again";
-        } catch (FormValidationException $e) {
-
-            $message = $e->getMessage();
-        }
-        if ($message) {
-            // The form has errors, propagate it.
-            $this->propagateFormError($cartAdd, $message, $event);
+            $this->addItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
         }
 
+        if ($append && $cartItem !== null) {
+            $this->updateQuantity($cartItem, $quantity);
+        }
     }
 
     /**

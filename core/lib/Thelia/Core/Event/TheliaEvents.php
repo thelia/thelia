@@ -116,7 +116,7 @@ final class TheliaEvents
     /**
      * sent when a new item is added to current cart
      */
-    const AFTER_CARTADDITEM = "cart.addItem";
+    const AFTER_CARTADDITEM = "cart.after.addItem";
 
     /**
      * sent when a cart item is modify

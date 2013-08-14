@@ -32,6 +32,8 @@ use Thelia\Core\Template\ParserContext;
 use Thelia\Core\Event\ActionEvent;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Thelia\Core\Factory\ActionEventFactory;
+use Thelia\Form\BaseForm;
+use Thelia\Action\Exception\FormValidationException;
 
 /**
  *
@@ -89,7 +91,7 @@ class BaseController extends ContainerAware
     /**
      * Return the event dispatcher,
      *
-     * @return EventDispatcherInterface
+     * @return \Symfony\Component\EventDispatcher\EventDispatcher
      */
     public function getDispatcher()
     {
@@ -138,6 +140,32 @@ class BaseController extends ContainerAware
         $request = $this->getRequest();
 
         return $request->getSession();
+    }
+
+    /**
+     * Validate a BaseForm
+     *
+     * @param  BaseForm                     $aBaseForm      the form
+     * @param  string                       $expectedMethod the expected method, POST or GET, or null for any of them
+     * @throws FormValidationException      is the form contains error, or the method is not the right one
+     * @return \Symfony\Component\Form\Form Form the symfony form object
+     */
+    protected function validateForm(BaseForm $aBaseForm, $expectedMethod = null)
+    {
+        $form = $aBaseForm->getForm();
+
+        if ($expectedMethod == null || $aBaseForm->getRequest()->isMethod($expectedMethod)) {
+
+            $form->bind($aBaseForm->getRequest());
+
+            if ($form->isValid()) {
+                return $form;
+            } else {
+                throw new FormValidationException("Missing or invalid data");
+            }
+        } else {
+            throw new FormValidationException(sprintf("Wrong form method, %s expected.", $expectedMethod));
+        }
     }
 
     /**

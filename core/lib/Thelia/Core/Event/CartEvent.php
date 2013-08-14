@@ -23,21 +23,22 @@
 
 namespace Thelia\Core\Event;
 
+use Symfony\Component\EventDispatcher\Event;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Model\Cart;
 
-class CartEvent extends ActionEvent
+class CartEvent extends Event
 {
-    protected $cart;
+    public $cart;
+    public $quantity;
+    public $append;
+    public $newness;
+    public $productSaleElementsId;
+    public $product;
+    public $cartItem;
 
-    public function __construct(Request $request, Cart $cart)
+    public function __construct(Cart $cart)
     {
-        parent::__construct($request);
         $this->cart = $cart;
-    }
-
-    public function getCart()
-    {
-        return $this->cart;
     }
 }

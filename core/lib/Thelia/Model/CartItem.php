@@ -23,7 +23,7 @@ class CartItem extends BaseCartItem
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 
-            $this->dispatcher->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
+            $this->dispatcher->dispatch(TheliaEvents::AFTER_CARTADDITEM, $cartEvent);
         }
     }
 
@@ -32,7 +32,7 @@ class CartItem extends BaseCartItem
         if ($this->dispatcher) {
             $cartEvent = new CartEvent($this->getCart());
 
-            $this->dispatcher->dispatch(TheliaEvents::CART_MODIFYITEM, $cartEvent);
+            $this->dispatcher->dispatch(TheliaEvents::AFTER_CARTCHANGEITEM, $cartEvent);
         }
     }
 

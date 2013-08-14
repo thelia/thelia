@@ -171,6 +171,7 @@ abstract class BaseForm
      */
     public function setErrorMessage($message)
     {
+        $this->setError(true);
         $this->error_message = $message;
     }
 

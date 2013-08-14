@@ -22,8 +22,12 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
+use Propel\Runtime\Exception\PropelException;
+use Thelia\Action\Exception\FormValidationException;
 use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Symfony\Component\HttpFoundation\Request;
+use Thelia\Form\CartAdd;
 
 class CartController extends BaseFrontController
 {
@@ -31,14 +35,39 @@ class CartController extends BaseFrontController
 
     public function addArticle()
     {
-        $cartEvent = $this->getCartEvent();
+        $request = $this->getRequest();
 
-        $this->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
+        $cartAdd = $this->getAddCartForm($request);
+        $message = null;
 
-        $this->redirectSuccess();
+        try {
+            $form = $this->validateForm($cartAdd);
+
+            $cartEvent = $this->getCartEvent();
+            $cartEvent->newness = $form->get("newness")->getData();
+            $cartEvent->append = $form->get("append")->getData();
+            $cartEvent->quantity = $form->get("quantity")->getData();
+            $cartEvent->productSaleElementsId = $form->get("product_sale_elements_id")->getData();
+            $cartEvent->product = $form->get("product")->getData();
+
+            $this->getDispatcher()->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
+
+            $this->redirectSuccess();
+
+        } catch(PropelException $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
+            $message = "Failed to add this article to your cart, please try again";
+        } catch(FormValidationException $e) {
+            $message = $e->getMessage();
+        }
+
+        if ($message) {
+            $cartAdd->setErrorMessage($e->getMessage());
+            $this->getParserContext()->setErrorForm($cartAdd);
+        }
     }
 
-    public function modifyArticle()
+    public function changeArticle()
     {
         $cartEvent = $this->getCartEvent();
 
@@ -56,12 +85,40 @@ class CartController extends BaseFrontController
         $this->redirectSuccess();
     }
 
+    /**
+     * use Thelia\Cart\CartTrait for searching current cart or create a new one
+     *
+     * @return CartEvent
+     */
     protected function getCartEvent()
     {
-        $request = $this->getRequest();
-        $cart = $this->getCart($request);
+        $cart = $this->getCart($this->getRequest());
 
-        return new CartEvent($request, $cart);
+        return new CartEvent($cart);
+    }
+
+    /**
+     * Find the good way to construct the cart form
+     *
+     * @param  Request $request
+     * @return CartAdd
+     */
+    private function getAddCartForm(Request $request)
+    {
+        if ($request->isMethod("post")) {
+            $cartAdd = new CartAdd($request);
+        } else {
+            $cartAdd = new CartAdd(
+                $request,
+                "form",
+                array(),
+                array(
+                    'csrf_protection'   => false,
+                )
+            );
+        }
+
+        return $cartAdd;
     }
 
 }
