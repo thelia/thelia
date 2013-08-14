@@ -54,30 +54,32 @@ class RegisterRouterPass implements CompilerPassInterface
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
 
         }
+        if (defined("THELIA_INSTALL_MODE") === false) {
+            $modules = \Thelia\Model\ModuleQuery::getActivated();
 
-        $modules = \Thelia\Model\ModuleQuery::getActivated();
-
-        foreach ($modules as $module) {
-            $moduleCode = ucfirst($module->getCode());
-            if (file_exists(THELIA_MODULE_DIR . "/" . $moduleCode . "/Config/routing.xml")) {
-                $definition = new Definition(
-                    $container->getParameter("router.class"),
-                    array(
-                        new Reference("router.module.xmlLoader"),
-                        ucfirst($module->getCode()) . "/Config/routing.xml",
+            foreach ($modules as $module) {
+                $moduleCode = ucfirst($module->getCode());
+                if (file_exists(THELIA_MODULE_DIR . "/" . $moduleCode . "/Config/routing.xml")) {
+                    $definition = new Definition(
+                        $container->getParameter("router.class"),
                         array(
-                            "cache_dir" => $container->getParameter("kernel.cache_dir"),
-                            "debug" => $container->getParameter("kernel.debug"),
-                            "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleCode)
-                        ),
-                        new Reference("request.context")
-                    )
-                );
+                            new Reference("router.module.xmlLoader"),
+                            ucfirst($module->getCode()) . "/Config/routing.xml",
+                            array(
+                                "cache_dir" => $container->getParameter("kernel.cache_dir"),
+                                "debug" => $container->getParameter("kernel.debug"),
+                                "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleCode)
+                            ),
+                            new Reference("request.context")
+                        )
+                    );
 
-                $container->setDefinition("router.".$moduleCode, $definition);
+                    $container->setDefinition("router.".$moduleCode, $definition);
 
-                $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleCode), -1));
+                    $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleCode), -1));
+                }
             }
         }
+
     }
 }
