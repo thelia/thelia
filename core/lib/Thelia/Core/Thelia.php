@@ -150,14 +150,6 @@ class Thelia extends Kernel
         $this->loadConfiguration($container);
         $container->customCompile();
 
-        $collectionFileLoader = new CollectionXmlFileLoader(
-            $container->getParameter("kernel.cache_dir"),
-            $container->getParameter("router.xmlFileName"),
-            $container->getParameter("thelia.routing.files")
-        );
-
-        $collectionFileLoader->process();
-
         return $container;
     }
 

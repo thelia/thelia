@@ -13,11 +13,6 @@
         <parameter key="router.xmlFileName">routing.xml</parameter>
     </parameters>
 
-    <routing>
-        <file path="%thelia.core_dir%/Config/Resources/routing/admin.xml"/>
-        <file path="%thelia.core_dir%/Config/Resources/routing/front.xml"/>
-    </routing>
-
     <services>
         <service id="thelia.listener.view" class="Thelia\Core\EventListener\ViewListener">
             <tag name="kernel.event_subscriber"/>
@@ -35,29 +30,39 @@
 
 
         <service id="router.admin.fileLocator" class="Symfony\Component\Config\FileLocator">
-            <argument>%kernel.cache_dir%</argument>
+            <argument>%thelia.core_dir%/Config/Resources/routing</argument>
         </service>
 
         <service id="router.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
             <argument type="service" id="router.admin.fileLocator"/>
         </service>
 
-        <service id="router" class="%router.class%">
+
+        <service id="router.admin" class="%router.class%">
             <argument type="service" id="router.xmlLoader"/>
-            <argument>%router.xmlFileName%</argument>
+            <argument>admin.xml</argument>
             <argument type="collection">
                 <argument key="cache_dir">%kernel.cache_dir%</argument>
                 <argument key="debug">%kernel.debug%</argument>
             </argument>
             <argument type="service" id="request.context"/>
+            <tag name="router.register" priority="0"/>
+        </service>
+
+        <service id="router.front" class="%router.class%">
+            <argument type="service" id="router.xmlLoader"/>
+            <argument>front.xml</argument>
+            <argument type="collection">
+                <argument key="cache_dir">%kernel.cache_dir%</argument>
+                <argument key="debug">%kernel.debug%</argument>
+            </argument>
+            <argument type="service" id="request.context"/>
+            <tag name="router.register" priority="255"/>
         </service>
 
         <service id="router.chainRequest" class="%router.chainRouter.class%">
             <call method="setContext">
                 <argument type="service" id="request.context"/>
-            </call>
-            <call method="add">
-                <argument type="service" id="router"/>
             </call>
         </service>
 
