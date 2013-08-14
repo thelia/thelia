@@ -33,7 +33,10 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\FeatureAvQuery;
+use Thelia\Model\FeatureQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
@@ -68,13 +71,13 @@ class Product extends BaseLoop
                 )
             ),
             Argument::createIntListTypeArgument('category'),
-            Argument::createBooleanTypeArgument('new'),
-            Argument::createBooleanTypeArgument('promo'),
-            Argument::createFloatTypeArgument('min_price'),
-            Argument::createFloatTypeArgument('max_price'),
-            Argument::createIntTypeArgument('min_stock'),
-            Argument::createFloatTypeArgument('min_weight'),
-            Argument::createFloatTypeArgument('max_weight'),
+            //Argument::createBooleanTypeArgument('new'),
+            //Argument::createBooleanTypeArgument('promo'),
+            //Argument::createFloatTypeArgument('min_price'),
+            //Argument::createFloatTypeArgument('max_price'),
+            //Argument::createIntTypeArgument('min_stock'),
+            //Argument::createFloatTypeArgument('min_weight'),
+            //Argument::createFloatTypeArgument('max_weight'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
@@ -82,7 +85,7 @@ class Product extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', /*'min_price', 'max_price',*/ 'manual', 'manual_reverse', 'ref', /*'promo', 'new',*/ 'random', 'given_id'))
                 ),
                 'alpha'
             ),
@@ -146,24 +149,20 @@ class Product extends BaseLoop
             );
         }
 
-        $new = $this->getNew();
+        /*$new = $this->getNew();
 
         if ($new === true) {
-            $search->joinProductSaleElements('is_new', Criteria::INNER_JOIN)
-                ->addJoinCondition('is_new', "`is_new`.NEWNESS = 1");
+            $search->filterByNewness(1, Criteria::EQUAL);
         } else if($new === false) {
-            $search->joinProductSaleElements('is_new', Criteria::INNER_JOIN)
-                ->addJoinCondition('is_new', "`is_new`.NEWNESS = 0");
+            $search->filterByNewness(0, Criteria::EQUAL);
         }
 
         $promo = $this->getPromo();
 
         if ($promo === true) {
-            $search->joinProductSaleElements('is_promo', Criteria::INNER_JOIN)
-                ->addJoinCondition('is_promo', "`is_promo`.PROMO = 1");
+            $search->filterByPromo(1, Criteria::EQUAL);
         } else if($promo === false) {
-            $search->joinProductSaleElements('is_promo', Criteria::INNER_JOIN)
-                ->addJoinCondition('is_promo', "`is_promo`.PROMO = 0");
+            $search->filterByNewness(0, Criteria::EQUAL);
         }
 
         $min_stock = $this->getMin_stock();
@@ -172,7 +171,7 @@ class Product extends BaseLoop
             $search->filterByQuantity($min_stock, Criteria::GREATER_EQUAL);
         }
 
-        //$min_price = $this->getMin_price();
+        $min_price = $this->getMin_price();*/
 
         //if(null !== $min_price) {
             /**

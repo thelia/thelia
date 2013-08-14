@@ -24,6 +24,7 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
@@ -32,37 +33,25 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\CategoryQuery;
+use Thelia\Model\Base\CategoryQuery;
+use Thelia\Model\Base\ProductCategoryQuery;
+use Thelia\Model\Base\AttributeQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\ProductCategoryTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
 /**
  *
- * Category loop, all params available :
- *
- * - id : can be an id (eq : 3) or a "string list" (eg: 3, 4, 5)
- * - parent : categories having this parent id
- * - current : current id is used if you are on a category page
- * - not_empty : if value is 1, category and subcategories must have at least 1 product
- * - visible : default 1, if you want category not visible put 0
- * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual_reverse', 'random'
- * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
- *
- * example :
- *
- * <THELIA_cat type="category" parent="3" limit="4">
- *      #TITLE : #ID
- * </THELIA_cat>
+ * Attribute loop
  *
  *
- * Class Category
+ * Class Attribute
  * @package Thelia\Core\Template\Loop
- * @author Manuel Raynaud <mraynaud@openstudio.fr>
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Category extends BaseLoop
+class Attribute extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -71,18 +60,17 @@ class Category extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntTypeArgument('parent'),
-            Argument::createBooleanTypeArgument('current'),
-            Argument::createBooleanTypeArgument('not_empty', 0),
+            Argument::createIntListTypeArgument('product'),
+            Argument::createIntListTypeArgument('category'),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
-            ),
-            Argument::createIntListTypeArgument('exclude')
+            )
         );
     }
 
@@ -93,65 +81,65 @@ class Category extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CategoryQuery::create();
+        $search = AttributeQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
-        if (!is_null($id)) {
+        if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
-        $parent = $this->getParent();
+        $exclude = $this->getExclude();
 
-        if (!is_null($parent)) {
-            $search->filterByParent($parent);
-        }
-
-
-		$current = $this->getCurrent();
-
-        if ($current === true) {
-            $search->filterById($this->request->get("category_id"));
-        } elseif ($current === false) {
-            $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
-        }
-
-
-         $exclude = $this->getExclude();
-
-        if (!is_null($exclude)) {
+        if (null !== $exclude) {
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        if ($this->getVisible() != BooleanOrBothType::ANY)
-        	$search->filterByVisible($this->getVisible() ? 1 : 0);
+        $visible = $this->getVisible();
+
+        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+
+        $product = $this->getProduct();
+        $category = $this->getCategory();
+
+        if(null !== $product) {
+            $productCategories = ProductCategoryQuery::create()->select(array(ProductCategoryTableMap::CATEGORY_ID))->filterByProductId($product, Criteria::IN)->find()->getData();
+
+            if(null === $category) {
+                $category = $productCategories;
+            } else {
+                $category = array_merge($category, $productCategories);
+            }
+        }
+
+        if(null !== $category) {
+            $search->filterByCategory(
+                CategoryQuery::create()->filterById($category)->find(),
+                Criteria::IN
+            );
+        }
 
         $orders  = $this->getOrder();
 
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
-                    break;
-                case "manual_reverse":
-                    $search->orderByPosition(Criteria::DESC);
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
                     break;
-                case "random":
-                    $search->clearOrderByColumns();
-                    $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
+                case "manual_reverse":
+                    $search->orderByPosition(Criteria::DESC);
                     break;
             }
         }
 
         /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
+         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
          *
          * @todo : verify here if we want results for row without translations.
          */
@@ -161,37 +149,17 @@ class Category extends BaseLoop
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
-        $categories = $this->search($search, $pagination);
-
-        $notEmpty  = $this->getNot_empty();
+        $attributes = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($categories as $category) {
-
-            if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
-
-
+        foreach ($attributes as $attribute) {
             $loopResultRow = new LoopResultRow();
-
-            $loopResultRow
-            	->set("ID", $category->getId())
-            	->set("TITLE",$category->getTitle())
-	            ->set("CHAPO", $category->getChapo())
-	            ->set("DESCRIPTION", $category->getDescription())
-	            ->set("POSTSCRIPTUM", $category->getPostscriptum())
-	            ->set("PARENT", $category->getParent())
-	            ->set("URL", $category->getUrl())
-	            ->set("PRODUCT_COUNT", $category->countChild())
-	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
-	            ->set("POSITION", $category->getPosition())
-
-	            ->set("CREATE_DATE", $category->getCreatedAt())
-	            ->set("UPDATE_DATE", $category->getUpdatedAt())
-	            ->set("VERSION", $category->getVersion())
-	            ->set("VERSION_DATE", $category->getVersionCreatedAt())
-	            ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
-			;
+            $loopResultRow->set("ID", $attribute->getId());
+            $loopResultRow->set("TITLE",$attribute->getTitle());
+            $loopResultRow->set("CHAPO", $attribute->getChapo());
+            $loopResultRow->set("DESCRIPTION", $attribute->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $attribute->getPostscriptum());
 
             $loopResult->addRow($loopResultRow);
         }

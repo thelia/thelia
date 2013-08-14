@@ -33,21 +33,20 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\FeatureAvQuery;
+use Thelia\Model\Base\AttributeAvQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
- *todo : to be finished
- * FeatureAvailable loop
+ * AttributeAvailability loop
  *
  *
- * Class FeatureAvailable
+ * Class AttributeAvailability
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class FeatureAvailable extends BaseLoop
+class AttributeAvailability extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -56,7 +55,7 @@ class FeatureAvailable extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('feature'),
+            Argument::createIntListTypeArgument('attribute'),
             Argument::createIntListTypeArgument('exclude'),
             new Argument(
                 'order',
@@ -75,7 +74,7 @@ class FeatureAvailable extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = FeatureAvQuery::create();
+        $search = AttributeAvQuery::create();
 
         $id = $this->getId();
 
@@ -89,10 +88,10 @@ class FeatureAvailable extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $feature = $this->getFeature();
+        $attribute = $this->getAttribute();
 
-        if(null !== $feature) {
-            $search->filterByFeatureId($feature, Criteria::IN);
+        if(null !== $attribute) {
+            $search->filterByAttributeId($attribute, Criteria::IN);
         }
 
         $orders  = $this->getOrder();
@@ -100,10 +99,10 @@ class FeatureAvailable extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\AttributeAvI18nTableMap::TITLE);
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\AttributeAvI18nTableMap::TITLE);
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
@@ -125,17 +124,17 @@ class FeatureAvailable extends BaseLoop
             (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
         );
 
-        $featuresAv = $this->search($search, $pagination);
+        $attributesAv = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($featuresAv as $featureAv) {
+        foreach ($attributesAv as $attributeAv) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $featureAv->getId());
-            $loopResultRow->set("TITLE",$featureAv->getTitle());
-            $loopResultRow->set("CHAPO", $featureAv->getChapo());
-            $loopResultRow->set("DESCRIPTION", $featureAv->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $featureAv->getPostscriptum());
+            $loopResultRow->set("ID", $attributeAv->getId());
+            $loopResultRow->set("TITLE",$attributeAv->getTitle());
+            $loopResultRow->set("CHAPO", $attributeAv->getChapo());
+            $loopResultRow->set("DESCRIPTION", $attributeAv->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $attributeAv->getPostscriptum());
 
             $loopResult->addRow($loopResultRow);
         }

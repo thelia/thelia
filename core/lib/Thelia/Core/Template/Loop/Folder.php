@@ -60,7 +60,7 @@ class Folder extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual-reverse', 'random'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -119,7 +119,7 @@ class Folder extends BaseLoop
                 case "alpha_reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
                     break;
-                case "manual-reverse":
+                case "manual_reverse":
                     $search->orderByPosition(Criteria::DESC);
                     break;
                 case "manual":

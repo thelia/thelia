@@ -12,6 +12,22 @@ $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne(
 
 try {
 
+    $feature = Thelia\Model\FeatureQuery::create()
+        ->find();
+    $feature->delete();
+
+    $featureAv = Thelia\Model\FeatureAvQuery::create()
+        ->find();
+    $featureAv->delete();
+
+    $attribute = Thelia\Model\AttributeQuery::create()
+        ->find();
+    $attribute->delete();
+
+    $attributeAv = Thelia\Model\AttributeAvQuery::create()
+        ->find();
+    $attributeAv->delete();
+
     $category = Thelia\Model\CategoryQuery::create()
         ->find();
     $category->delete();
@@ -54,6 +70,14 @@ try {
         ->find();
     $accessory->delete();
 
+    $stock = \Thelia\Model\ProductSaleElementsQuery::create()
+        ->find();
+    $stock->delete();
+
+    $productPrice = \Thelia\Model\ProductPriceQuery::create()
+        ->find();
+    $productPrice->delete();
+
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {
@@ -79,78 +103,46 @@ try {
         }
     }
 
+    //attributes and attributes_av
+    $attributeList = array();
+    for($i=0; $i<4; $i++) {
+        $attribute = new Thelia\Model\Attribute();
+        $attribute->setPosition($i);
+        $attribute->setTitle($faker->text(20));
+        $attribute->setDescription($faker->text(50));
+
+        $attribute->save();
+        $attributeId = $attribute->getId();
+        $attributeList[$attributeId] = array();
+
+        for($j=0; $j<rand(1, 5); $j++) {
+            $attributeAv = new Thelia\Model\AttributeAv();
+            $attributeAv->setAttribute($attribute);
+            $attributeAv->setPosition($j);
+            $attributeAv->setTitle($faker->text(20));
+            $attributeAv->setDescription($faker->text(255));
+
+            $attributeAv->save();
+            $attributeList[$attributeId][] = $attributeAv->getId();
+        }
+    }
+
     //categories and products
     $productIdList = array();
     $categoryIdList = array();
     for($i=0; $i<4; $i++) {
-        $category = new Thelia\Model\Category();
-        $category->setParent(0);
-        $category->setVisible(rand(1, 10)>7 ? 0 : 1);
-        $category->setPosition($i);
-        $category->setTitle($faker->text(20));
-        $category->setDescription($faker->text(255));
+        $category = createCategory($faker, 0, $i, $categoryIdList);
 
-        $category->save();
-        $categoryIdList[] = $category->getId();
+        for($j=1; $j<rand(0, 5); $j++) {
+            $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList);
 
-        for($j=0; $j<rand(0, 4); $j++) {
-            $subcategory = new Thelia\Model\Category();
-            $subcategory->setParent($category->getId());
-            $subcategory->setVisible(rand(1, 10)>7 ? 0 : 1);
-            $subcategory->setPosition($j);
-            $subcategory->setTitle($faker->text(20));
-            $subcategory->setDescription($faker->text(255));
-
-            $subcategory->save();
-            $categoryIdList[] = $subcategory->getId();
-
-            for($k=0; $k<rand(1, 5); $k++) {
-                $product = new Thelia\Model\Product();
-                $product->setRef($subcategory->getId() . '_' . $k . '_' . $faker->randomNumber(8));
-                $product->addCategory($subcategory);
-                $product->setVisible(rand(1, 10)>7 ? 0 : 1);
-                $product->setPosition($k);
-                $product->setTitle($faker->text(20));
-                $product->setDescription($faker->text(255));
-
-                $product->save();
-                $productId = $product->getId();
-                $productIdList[] = $productId;
-
-                //add random accessories - or not
-                for($l=0; $l<rand(0, 3); $l++) {
-                    $accessory = new Thelia\Model\Accessory();
-                    $accessory->setAccessory($productIdList[array_rand($productIdList, 1)]);
-                    $accessory->setProductId($productId);
-                    $accessory->setPosition($l);
-
-                    $accessory->save();
-                }
+            for($k=0; $k<rand(0, 5); $k++) {
+                createProduct($faker, $subcategory, $k, $currency, $productIdList);
             }
         }
 
         for($k=0; $k<rand(1, 5); $k++) {
-            $product = new Thelia\Model\Product();
-            $product->setRef($category->getId() . '_' . $k . '_' . $faker->randomNumber(8));
-            $product->addCategory($category);
-            $product->setVisible(rand(1, 10)>7 ? 0 : 1);
-            $product->setPosition($k);
-            $product->setTitle($faker->text(20));
-            $product->setDescription($faker->text(255));
-
-            $product->save();
-            $productId = $product->getId();
-            $productIdList[] = $productId;
-
-            //add random accessories
-            for($l=0; $l<rand(0, 3); $l++) {
-                $accessory = new Thelia\Model\Accessory();
-                $accessory->setAccessory($productIdList[array_rand($productIdList, 1)]);
-                $accessory->setProductId($productId);
-                $accessory->setPosition($l);
-
-                $accessory->save();
-            }
+            createProduct($faker, $category, $k, $currency, $productIdList);
         }
     }
 
@@ -165,7 +157,7 @@ try {
 
         $folder->save();
 
-        for($j=0; $j<rand(0, 4); $j++) {
+        for($j=1; $j<rand(0, 5); $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(rand(1, 10)>7 ? 0 : 1);
@@ -175,7 +167,7 @@ try {
 
             $subfolder->save();
 
-            for($k=0; $k<rand(1, 5); $k++) {
+            for($k=0; $k<rand(0, 5); $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
                 $content->setVisible(rand(1, 10)>7 ? 0 : 1);
@@ -194,5 +186,60 @@ try {
     $con->rollBack();
 }
 
+function createProduct($faker, $category, $position, $currency, &$productIdList)
+{
+    $product = new Thelia\Model\Product();
+    $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
+    $product->addCategory($category);
+    $product->setVisible(rand(1, 10)>7 ? 0 : 1);
+    $product->setPosition($position);
+    $product->setTitle($faker->text(20));
+    $product->setDescription($faker->text(255));
 
+    $product->save();
+    $productId = $product->getId();
+    $productIdList[] = $productId;
+
+    $stock = new \Thelia\Model\ProductSaleElements();
+    $stock->setProduct($product);
+    $stock->setQuantity($faker->randomNumber(1,50));
+    $stock->setPromo($faker->randomNumber(0,1));
+    $stock->setNewness($faker->randomNumber(0,1));
+    $stock->setWeight($faker->randomFloat(2, 100,10000));
+    $stock->save();
+
+    $productPrice = new \Thelia\Model\ProductPrice();
+    $productPrice->setProductSaleElements($stock);
+    $productPrice->setCurrency($currency);
+    $productPrice->setPrice($faker->randomFloat(2, 20, 250));
+    $productPrice->setPromoPrice($faker->randomFloat(2, 20, 250));
+    $productPrice->save();
+
+    //add random accessories - or not
+    for($i=1; $i<rand(0, 4); $i++) {
+        $accessory = new Thelia\Model\Accessory();
+        $accessory->setAccessory($productIdList[array_rand($productIdList, 1)]);
+        $accessory->setProductId($productId);
+        $accessory->setPosition($i);
+
+        $accessory->save();
+    }
+
+    return $product;
+}
+
+function createCategory($faker, $parent, $position, &$categoryIdList)
+{
+    $category = new Thelia\Model\Category();
+    $category->setParent($parent);
+    $category->setVisible(rand(1, 10)>7 ? 0 : 1);
+    $category->setPosition($position);
+    $category->setTitle($faker->text(20));
+    $category->setDescription($faker->text(255));
+
+    $category->save();
+    $categoryIdList[] = $category->getId();
+
+    return $category;
+}
 

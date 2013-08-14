@@ -1,3 +1,5 @@
+<h1>Category page</h1>
+
 <div style="border: solid 8px; margin: 0px; padding: 0px; width: 30%; float: left">
 
 <h2>CATALOG</h2>
@@ -90,17 +92,30 @@
     {/loop}
 </ul>
 
+<hr />
+
+<h2>ALL ATTRIBUTES AND THEIR AVAILABILITY</h2>
+
+<ul>
+    {loop name="attr" type="attribute" order="manual"}
+    <li>
+        #TITLE
+        <ul>
+            {loop name="attrav" type="attribute_available" order="manual" attribute="#ID"}
+            <li>#TITLE</li>
+            {/loop}
+        </ul>
+    </li>
+    {/loop}
+</ul>
+
 </div>
 
 <div style="border: solid 8px; margin: 0px; padding: 0px; width: 30%; float: left">
-    {*loop name="product" type="product" order="promo,min_price" exclude_category="3"}
+
+    {loop name="product" type="product" order="promo,min_price" exclude_category="3" new="on" promo="off"}
     <h3>PRODUCT : #REF / #TITLE</h3>
-    price : #PRICE €<br />
-    promo price : #PROMO_PRICE €<br />
-    is promo : #PROMO<br />
-    is new : #NEW<br />
-    weight : #WEIGHT<br />
-    {/loop*}
+    {/loop}
 
     {*loop name="product" type="product" order="ref" feature_available="1: (1 | 2) , 2: 4, 3: 433"}
     <h3>PRODUCT : #REF / #TITLE</h3>
