@@ -24,6 +24,7 @@ namespace Thelia\Core\DependencyInjection\Compiler;
 
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -48,11 +49,35 @@ class RegisterRouterPass implements CompilerPassInterface
         foreach ($container->findTaggedServiceIds("router.register") as $id => $attributes) {
             $priority = isset($attributes[0]["priority"]) ? $attributes[0]["priority"] : 0;
             $router = $container->getDefinition($id);
-
             $router->addMethodCall("setOption", array("matcher_cache_class", $container::camelize("ProjectUrlMatcher".$id)));
 
             $chainRouter->addMethodCall("add", array(new Reference($id), $priority));
 
+        }
+
+        $modules = \Thelia\Model\ModuleQuery::getActivated();
+
+        foreach ($modules as $module) {
+            $moduleCode = ucfirst($module->getCode());
+            if (file_exists(THELIA_MODULE_DIR . "/" . $moduleCode . "/Config/routing.xml")) {
+                $definition = new Definition(
+                    $container->getParameter("router.class"),
+                    array(
+                        new Reference("router.module.xmlLoader"),
+                        ucfirst($module->getCode()) . "/Config/routing.xml",
+                        array(
+                            "cache_dir" => $container->getParameter("kernel.cache_dir"),
+                            "debug" => $container->getParameter("kernel.debug"),
+                            "matcher_cache_class" => $container::camelize("ProjectUrlMatcher".$moduleCode)
+                        ),
+                        new Reference("request.context")
+                    )
+                );
+
+                $container->setDefinition("router.".$moduleCode, $definition);
+
+                $chainRouter->addMethodCall("add", array(new Reference("router.".$moduleCode), -1));
+            }
         }
     }
 }

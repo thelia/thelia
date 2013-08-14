@@ -29,14 +29,21 @@
         <service id="request.context" class="%router.request_context.class%" />
 
 
-        <service id="router.admin.fileLocator" class="Symfony\Component\Config\FileLocator">
+        <service id="router.fileLocator" class="Symfony\Component\Config\FileLocator">
             <argument>%thelia.core_dir%/Config/Resources/routing</argument>
         </service>
 
         <service id="router.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
-            <argument type="service" id="router.admin.fileLocator"/>
+            <argument type="service" id="router.fileLocator"/>
         </service>
 
+        <service id="router.module.fileLocator" class="Symfony\Component\Config\FileLocator">
+            <argument>%thelia.module_dir%</argument>
+        </service>
+
+        <service id="router.module.xmlLoader" class="Symfony\Component\Routing\Loader\XmlFileLoader">
+            <argument type="service" id="router.module.fileLocator"/>
+        </service>
 
         <service id="router.admin" class="%router.class%">
             <argument type="service" id="router.xmlLoader"/>
