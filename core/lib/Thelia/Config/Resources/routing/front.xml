@@ -20,11 +20,17 @@
     </route>
 
     <route id="cart.add.process" path="/cart/add">
-        <default key="_controller">Thelia\Controller\Front\CartController::addArticle</default>
+        <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
         <default key="_view">cart</default>
     </route>
 
-    <route id="cart.change.process" path="/cart/delete">
-        <default key="_controller">Thelia\Controller\Front\CartController::changeArticle</default>
+    <route id="cart.change.process" path="/cart/delete/{cart_item}">
+        <default key="_controller">Thelia\Controller\Front\CartController::deleteItem</default>
+        <default key="_view">cart</default>
+    </route>
+
+    <route id="cart.update.quantity" path="/cart/update">
+        <default key="_controller">Thelia\Controller\Front\CartController::changeItem</default>
+        <default key="_view">cart</default>
     </route>
 </routes>

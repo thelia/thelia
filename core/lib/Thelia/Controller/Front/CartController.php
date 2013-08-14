@@ -33,7 +33,7 @@ class CartController extends BaseFrontController
 {
     use \Thelia\Cart\CartTrait;
 
-    public function addArticle()
+    public function addItem()
     {
         $request = $this->getRequest();
 
@@ -67,28 +67,37 @@ class CartController extends BaseFrontController
         }
     }
 
-    public function changeArticle()
+    public function changeItem()
     {
         $cartEvent = $this->getCartEvent();
+        $cartEvent->cartItem = $this->getRequest()->get("cart_item");
+        $cartEvent->quantity = $this->getRequest()->get("quantity");
 
-        $this->dispatch(TheliaEvents::CART_CHANGEITEM, $cartEvent);
+        try {
+            $this->getDispatcher()->dispatch(TheliaEvents::CART_CHANGEITEM, $cartEvent);
 
-        $this->redirectSuccess();
+            $this->redirectSuccess();
+        } catch(PropelException $e) {
+            $this->getParserContext()->setGeneralError($e->getMessage());
+        }
+
     }
 
-    public function deleteArticle()
+    public function deleteItem()
     {
         $cartEvent = $this->getCartEvent();
-        $cartEvent->cartItem = $this->getRequest()->get("cartItem");
+        $cartEvent->cartItem = $this->getRequest()->get("cart_item");
 
         try {
             $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
-        } catch (PropelException $e)
-        {
+
+            $this->redirectSuccess();
+        } catch (PropelException $e) {
             \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
+            $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
-        $this->redirectSuccess();
+
     }
 
     /**

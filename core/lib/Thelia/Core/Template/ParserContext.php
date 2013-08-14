@@ -58,6 +58,11 @@ class ParserContext implements \IteratorAggregate
         $this->set('error_form', $form);
     }
 
+    public function setGeneralError($error)
+    {
+        $this->set('general_error', $error);
+    }
+
     public function getErrorForm()
     {
         return $this->get('error_form', null);
