@@ -76,12 +76,14 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass() {
         $dir = THELIA_WEB_DIR."/cache/tests";
-        if ($dh = opendir($dir)) {
+        if ($dh = @opendir($dir)) {
             while ($file = readdir($dh)) {
                 if ($file == '.' || $file == '..') continue;
 
                 unlink(sprintf("%s/%s", $dir, $file));
             }
+
+            closedir($dir);
         }
     }
 
