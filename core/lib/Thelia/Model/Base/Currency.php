@@ -88,6 +88,12 @@ abstract class Currency implements ActiveRecordInterface
     protected $rate;
 
     /**
+     * The value for the position field.
+     * @var        int
+     */
+    protected $position;
+
+    /**
      * The value for the by_default field.
      * @var        int
      */
@@ -474,6 +480,17 @@ abstract class Currency implements ActiveRecordInterface
     }
 
     /**
+     * Get the [position] column value.
+     *
+     * @return   int
+     */
+    public function getPosition()
+    {
+
+        return $this->position;
+    }
+
+    /**
      * Get the [by_default] column value.
      *
      * @return   int
@@ -609,6 +626,27 @@ abstract class Currency implements ActiveRecordInterface
     } // setRate()
 
     /**
+     * Set the value of [position] column.
+     *
+     * @param      int $v new value
+     * @return   \Thelia\Model\Currency The current object (for fluent API support)
+     */
+    public function setPosition($v)
+    {
+        if ($v !== null) {
+            $v = (int) $v;
+        }
+
+        if ($this->position !== $v) {
+            $this->position = $v;
+            $this->modifiedColumns[] = CurrencyTableMap::POSITION;
+        }
+
+
+        return $this;
+    } // setPosition()
+
+    /**
      * Set the value of [by_default] column.
      *
      * @param      int $v new value
@@ -720,16 +758,19 @@ abstract class Currency implements ActiveRecordInterface
             $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CurrencyTableMap::translateFieldName('Rate', TableMap::TYPE_PHPNAME, $indexType)];
             $this->rate = (null !== $col) ? (double) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CurrencyTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CurrencyTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->position = (null !== $col) ? (int) $col : null;
+
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CurrencyTableMap::translateFieldName('ByDefault', TableMap::TYPE_PHPNAME, $indexType)];
             $this->by_default = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CurrencyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CurrencyTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : CurrencyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 7 + $startcol : CurrencyTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -742,7 +783,7 @@ abstract class Currency implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = CurrencyTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 8; // 8 = CurrencyTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
             throw new PropelException("Error populating \Thelia\Model\Currency object", 0, $e);
@@ -1052,6 +1093,9 @@ abstract class Currency implements ActiveRecordInterface
         if ($this->isColumnModified(CurrencyTableMap::RATE)) {
             $modifiedColumns[':p' . $index++]  = 'RATE';
         }
+        if ($this->isColumnModified(CurrencyTableMap::POSITION)) {
+            $modifiedColumns[':p' . $index++]  = 'POSITION';
+        }
         if ($this->isColumnModified(CurrencyTableMap::BY_DEFAULT)) {
             $modifiedColumns[':p' . $index++]  = 'BY_DEFAULT';
         }
@@ -1083,6 +1127,9 @@ abstract class Currency implements ActiveRecordInterface
                         break;
                     case 'RATE':
                         $stmt->bindValue($identifier, $this->rate, PDO::PARAM_STR);
+                        break;
+                    case 'POSITION':
+                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
                         break;
                     case 'BY_DEFAULT':
                         $stmt->bindValue($identifier, $this->by_default, PDO::PARAM_INT);
@@ -1168,12 +1215,15 @@ abstract class Currency implements ActiveRecordInterface
                 return $this->getRate();
                 break;
             case 4:
-                return $this->getByDefault();
+                return $this->getPosition();
                 break;
             case 5:
-                return $this->getCreatedAt();
+                return $this->getByDefault();
                 break;
             case 6:
+                return $this->getCreatedAt();
+                break;
+            case 7:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1209,9 +1259,10 @@ abstract class Currency implements ActiveRecordInterface
             $keys[1] => $this->getCode(),
             $keys[2] => $this->getSymbol(),
             $keys[3] => $this->getRate(),
-            $keys[4] => $this->getByDefault(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[4] => $this->getPosition(),
+            $keys[5] => $this->getByDefault(),
+            $keys[6] => $this->getCreatedAt(),
+            $keys[7] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1279,12 +1330,15 @@ abstract class Currency implements ActiveRecordInterface
                 $this->setRate($value);
                 break;
             case 4:
-                $this->setByDefault($value);
+                $this->setPosition($value);
                 break;
             case 5:
-                $this->setCreatedAt($value);
+                $this->setByDefault($value);
                 break;
             case 6:
+                $this->setCreatedAt($value);
+                break;
+            case 7:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1315,9 +1369,10 @@ abstract class Currency implements ActiveRecordInterface
         if (array_key_exists($keys[1], $arr)) $this->setCode($arr[$keys[1]]);
         if (array_key_exists($keys[2], $arr)) $this->setSymbol($arr[$keys[2]]);
         if (array_key_exists($keys[3], $arr)) $this->setRate($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setByDefault($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setByDefault($arr[$keys[5]]);
+        if (array_key_exists($keys[6], $arr)) $this->setCreatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[7], $arr)) $this->setUpdatedAt($arr[$keys[7]]);
     }
 
     /**
@@ -1333,6 +1388,7 @@ abstract class Currency implements ActiveRecordInterface
         if ($this->isColumnModified(CurrencyTableMap::CODE)) $criteria->add(CurrencyTableMap::CODE, $this->code);
         if ($this->isColumnModified(CurrencyTableMap::SYMBOL)) $criteria->add(CurrencyTableMap::SYMBOL, $this->symbol);
         if ($this->isColumnModified(CurrencyTableMap::RATE)) $criteria->add(CurrencyTableMap::RATE, $this->rate);
+        if ($this->isColumnModified(CurrencyTableMap::POSITION)) $criteria->add(CurrencyTableMap::POSITION, $this->position);
         if ($this->isColumnModified(CurrencyTableMap::BY_DEFAULT)) $criteria->add(CurrencyTableMap::BY_DEFAULT, $this->by_default);
         if ($this->isColumnModified(CurrencyTableMap::CREATED_AT)) $criteria->add(CurrencyTableMap::CREATED_AT, $this->created_at);
         if ($this->isColumnModified(CurrencyTableMap::UPDATED_AT)) $criteria->add(CurrencyTableMap::UPDATED_AT, $this->updated_at);
@@ -1402,6 +1458,7 @@ abstract class Currency implements ActiveRecordInterface
         $copyObj->setCode($this->getCode());
         $copyObj->setSymbol($this->getSymbol());
         $copyObj->setRate($this->getRate());
+        $copyObj->setPosition($this->getPosition());
         $copyObj->setByDefault($this->getByDefault());
         $copyObj->setCreatedAt($this->getCreatedAt());
         $copyObj->setUpdatedAt($this->getUpdatedAt());
@@ -2578,6 +2635,7 @@ abstract class Currency implements ActiveRecordInterface
         $this->code = null;
         $this->symbol = null;
         $this->rate = null;
+        $this->position = null;
         $this->by_default = null;
         $this->created_at = null;
         $this->updated_at = null;

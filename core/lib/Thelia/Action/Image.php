@@ -36,12 +36,37 @@ use Imagine\Image\Box;
 use Imagine\Image\Color;
 use Imagine\Image\Point;
 use Thelia\Exception\ImageException;
-use Thelia\Log\Tlog;
 use Thelia\Core\Event\TheliaEvents;
 
 /**
  *
- * Image management actions
+ * Image management actions. This class handles image processing an caching.
+ *
+ * Basically, images are stored outside the web space (by default in local/media/images),
+ * and cached in the web space (by default in web/local/images).
+ *
+ * In the images caches directory, a subdirectory for images categories (eg. product, category, folder, etc.) is
+ * automatically created, and the cached image is created here. Plugin may use their own subdirectory as required.
+ *
+ * The cached image name contains a hash of the processing options, and the original (normalized) name of the image.
+ *
+ * A copy (or symbolic link, by default) of the original image is always created in the cache, so that the full
+ * resolution image is always available.
+ *
+ * Various image processing options are available :
+ *
+ * - resizing, with border, crop, or by keeping image aspect ratio
+ * - rotation, in degrees, positive or negative
+ * - background color, applyed to empty background when creating borders or rotating
+ * - effects. The effects are applied in the specified order. The following effects are available:
+ *    - gamma:value : change the image Gamma to the specified value. Example: gamma:0.7
+ *    - grayscale or greyscale: switch image to grayscale
+ *    - colorize:color : apply a color mask to the image. Exemple: colorize:#ff2244
+ *    - negative : transform the image in its negative equivalent
+ *    - vflip or vertical_flip : vertical flip
+ *    - hflip or horizontal_flip : horizontal flip
+ *
+ * If a problem occurs, an ImageException may be thrown.
  *
  * @package Thelia\Action
  * @author Franck Allimant <franck@cqfdev.fr>
@@ -53,6 +78,42 @@ class Image extends BaseAction implements EventSubscriberInterface
     const EXACT_RATIO_WITH_BORDERS = 1;
     const EXACT_RATIO_WITH_CROP = 2;
     const KEEP_IMAGE_RATIO = 3;
+
+    /**
+     * Clear the image cache. Is a subdirectory is specified, only this directory is cleared.
+     * If no directory is specified, the whole cache is cleared.
+     * Only files are deleted, directories will remain.
+     *
+     * @param ImageEvent $event
+     */
+    public function clearCache(ImageEvent $event) {
+
+        $path = $this->getCachePath($event->getCacheSubdirectory(), false);
+
+        $this->clearDirectory($path);
+    }
+
+    /**
+     * Recursively clears the specified directory.
+     *
+     * @param string $path the directory path
+     */
+    protected function clearDirectory($path) {
+
+        $iterator = new \DirectoryIterator($path);
+
+        foreach ($iterator as $fileinfo) {
+
+            if ($fileinfo->isDot()) continue;
+
+            if ($fileinfo->isFile() || $fileinfo->isLink()) {
+                @unlink($fileinfo->getPathname());
+            }
+            else if ($fileinfo->isDir()) {
+                $this->clearDirectory($fileinfo->getPathname());
+            }
+        }
+    }
 
     /**
      * Process image and write the result in the image cache.
@@ -85,23 +146,24 @@ class Image extends BaseAction implements EventSubscriberInterface
 
         if (! file_exists($cacheFilePath)) {
 
+            if (! file_exists($source_file)) {
+                throw new ImageException(sprintf("Source image file %s does not exists.", $source_file));
+            }
+
             // Create a chached version of the original image in the web space, if not exists
 
             if (! file_exists($originalImagePathInCache)) {
+
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
                 if ($mode == 'symlink') {
-                    if (false == @symlink($source_file, $originalImagePathInCache)) {
-                        $error_message = sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir);
-                        Tlog::getInstance()->addError($error_message);
-                        throw new ImageException($error_message);
+                    if (false == symlink($source_file, $originalImagePathInCache)) {
+                         throw new ImageException(sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir));
                     }
                 }
                 else {// mode = 'copy'
                     if (false == @copy($source_file, $originalImagePathInCache)) {
-                        $error_message = sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir);
-                        Tlog::getInstance()->addError($error_message);
-                        throw new ImageException($error_message);
+                        throw new ImageException(sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir));
                     }
                 }
             }
@@ -191,10 +253,10 @@ class Image extends BaseAction implements EventSubscriberInterface
                             array('quality' => $quality)
                      );
                 }
+                else {
+                    throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
+                }
             }
-        }
-        else {
-            throw new ImageException(sprintf("Source file %s cannot be opened.", basename($source_file)));
         }
 
         // Compute the image URL
@@ -207,8 +269,8 @@ class Image extends BaseAction implements EventSubscriberInterface
         $event->setCacheFilepath($cacheFilePath);
         $event->setCacheOriginalFilepath($originalImagePathInCache);
 
-        $event->setFileUrl(URL::absoluteUrl($processed_image_url));
-        $event->setOriginalFileUrl(URL::absoluteUrl($original_image_url));
+        $event->setFileUrl(URL::absoluteUrl($processed_image_url, null, URL::PATH_TO_FILE));
+        $event->setOriginalFileUrl(URL::absoluteUrl($original_image_url, null, URL::PATH_TO_FILE));
     }
 
     /**
@@ -320,7 +382,7 @@ class Image extends BaseAction implements EventSubscriberInterface
     {
         $path = $this->getCachePathFromWebRoot($subdir);
 
-        return URL::absoluteUrl(sprintf("%s/%s", $path, $safe_filename));
+        return URL::absoluteUrl(sprintf("%s/%s", $path, $safe_filename), null, URL::PATH_TO_FILE);
     }
 
     /**
@@ -341,22 +403,28 @@ class Image extends BaseAction implements EventSubscriberInterface
        if ($forceOriginalImage || $event->isOriginalImage())
             return sprintf("%s/%s", $path, $safe_filename);
         else
-            return sprintf("%s/%s-%s", $path, $event->getSignature(), $safe_filename);
+            return sprintf("%s/%s-%s", $path, $event->getOptionsHash(), $safe_filename);
     }
 
     /**
      * Return the cache directory path relative to Web Root
      *
-     * @param string $subdir the subdirectory related to cache base
+     * @param string $subdir the subdirectory related to cache base, or null to get the cache directory only.
      * @return string the cache directory path relative to Web Root
      */
-    protected function getCachePathFromWebRoot($subdir)
+    protected function getCachePathFromWebRoot($subdir = null)
     {
-        $safe_subdir = basename($subdir);
-
         $cache_dir_from_web_root = ConfigQuery::read('image_cache_dir_from_web_root', 'cache');
 
-        $path = sprintf("%s/%s", $cache_dir_from_web_root, $safe_subdir);
+        if ($subdir != null) {
+            $safe_subdir = basename($subdir);
+
+            $path = sprintf("%s/%s", $cache_dir_from_web_root, $safe_subdir);
+        }
+        else
+            $path = $cache_dir_from_web_root;
+
+        // Check if path is valid, e.g. in the cache dir
 
         return $path;
     }
@@ -364,11 +432,11 @@ class Image extends BaseAction implements EventSubscriberInterface
     /**
      * Return the absolute cache directory path
      *
-     * @param string $subdir the subdirectory related to cache base
+     * @param string $subdir the subdirectory related to cache base, or null to get the cache base directory.
      * @throws \RuntimeException if cache directory cannot be created
      * @return string the absolute cache directory path
      */
-    protected function getCachePath($subdir)
+    protected function getCachePath($subdir = null, $create_if_not_exists = true)
     {
         $cache_base = $this->getCachePathFromWebRoot($subdir);
 
@@ -377,13 +445,17 @@ class Image extends BaseAction implements EventSubscriberInterface
         $path = sprintf("%s/%s", $web_root, $cache_base);
 
         // Create directory (recursively) if it does not exists.
-        if (!is_dir($path)) {
+        if ($create_if_not_exists && !is_dir($path)) {
             if (!@mkdir($path, 0777, true)) {
-                $error_message = sprintf("Failed to create %s/%s image cache directory",  $cache_base);
-                Tlog::getInstance()->addError($error_message);
-
-                throw new ImageException($error_message);
+                throw new ImageException(sprintf("Failed to create %s/%s image cache directory",  $cache_base));
             }
+        }
+
+        // Check if path is valid, e.g. in the cache dir
+        $cache_base = realpath(sprintf("%s/%s", $web_root, $this->getCachePathFromWebRoot()));
+
+        if (strpos(realpath($path), $cache_base) !== 0) {
+            throw new \InvalidArgumentException(sprintf("Invalid cache path %s, with subdirectory %s", $path, $subdir));
         }
 
         return $path;
@@ -396,7 +468,7 @@ class Image extends BaseAction implements EventSubscriberInterface
      */
     protected function createImagineInstance()
     {
-        $driver = ConfigQuery::read("imagine_driver", "gd");
+        $driver = ConfigQuery::read("imagine_graphic_driver", "gd");
 
         switch ($driver) {
         case 'imagik':

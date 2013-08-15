@@ -28,6 +28,15 @@ use Thelia\Core\Event\ImageEvent;
 use Thelia\Model\CategoryImageQuery;
 use Thelia\Model\ProductImageQuery;
 use Thelia\Core\Event\TheliaEvents;
+use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
+use Thelia\Type\TypeCollection;
+use Thelia\Type\EnumListType;
+use Propel\Runtime\ActiveQuery\Criteria;
+use Thelia\Model\ConfigQuery;
+use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\LoopResult;
+use Thelia\Type\EnumType;
+use Thelia\Log\Tlog;
 
 /**
  * The image loop
@@ -44,61 +53,101 @@ class Image extends BaseLoop
     /**
      * Dynamically create the search query, and set the proper filter and order
      *
+     * @param string $source a valid source identifier (@see $possible_sources)
+     * @param int $object_id the source object ID
      * @return ModelCriteria the propel Query object
      */
-    protected function getSearchQuery() {
+    protected function createSearchQuery($source, $object_id) {
+
+        $object = ucfirst($source);
+
+        $queryClass   = sprintf("\Thelia\Model\%sImageQuery", $object);
+        $filterMethod = sprintf("filterBy%sId", $object);
+        $mapClass     = sprintf("\Thelia\Model\Map\%sI18nTableMap", $object);
+
+        // xxxImageQuery::create()
+        $method = new \ReflectionMethod($queryClass, 'create');
+        $search = $method->invoke(null); // Static !
+
+        // $query->filterByXXX(id)
+        $method = new \ReflectionMethod($queryClass, $filterMethod);
+        $method->invoke($search, $object_id);
+
+        $map = new \ReflectionClass($mapClass);
+        $title_map = $map->getConstant('TITLE');
+
+        $orders  = $this->getOrder();
+
+        // Results ordering
+        foreach ($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn($title_map);
+                    break;
+                case "alpha-reverse":
+                    $search->addDescendingOrderByColumn($title_map);
+                    break;
+                case "manual-reverse":
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "manual":
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
+                    break;
+            }
+        }
+
+        return $search;
+    }
+
+    /**
+     * Dynamically create the search query, and set the proper filter and order
+     *
+     * @param string $object_type (returned) the a valid source identifier (@see $possible_sources)
+     * @param string $object_id (returned) the ID of the source object
+     * @return ModelCriteria the propel Query object
+     */
+    protected function getSearchQuery(&$object_type, &$object_id) {
 
         $search = null;
 
-        foreach($this->possible_sources as $source) {
+        // Check form source="product" source_id="123" style arguments
+        $source = $this->getSource();
 
-            $argValue = intval($this->getArgValue($source));
+        if (! is_null($source)) {
 
-            if ($argValue > 0) {
+            $source_id = $this->getSourceId();
 
-                $object = ucfirst($source);
+            // echo "source = ".$this->getSource().", id=".$id."<br />";
 
-                $queryClass   = sprintf("%sImageQuery", $object);
-                $filterMethod = sprintf("filterBy%s", $object);
-                $mapClass     = sprintf("\Thelia\Model\Map\%sI18nTableMap", $object);
+            if (is_null($source_id)) {
+                throw new \InvalidArgumentException("'source_id' argument cannot be null if 'source' argument is specified.");
+            }
 
-                // xxxImageQuery::create()
-                $method = new \ReflectionMethod($queryClass, 'create');
-                $search = $reflectionMethod->invoke(null); // Static !
+            $search = $this->createSearchQuery($source, $source_id);
 
-                // $query->filterByXXX($id)
-                $method = new \ReflectionMethod($queryClass, $filterMethod);
-                $method->invoke($search, $argValue);
+            $object_type = $source;
+            $object_id   = $source_id;
+        }
+        else {
+            // Check for product="id" folder="id", etc. style arguments
+            foreach($this->possible_sources as $source) {
 
-                $map = new \ReflectionClass($mapClass);
-                $title_map = $map->getConstant('TITLE');
+                $argValue = intval($this->getArgValue($source));
 
-                $orders  = $this->getOrder();
+                if ($argValue > 0) {
 
-                // Results ordering
-                foreach ($orders as $order) {
-                    switch ($order) {
-                        case "alpha":
-                            $search->addAscendingOrderByColumn($title_map);
-                            break;
-                        case "alpha-reverse":
-                            $search->addDescendingOrderByColumn($title_map);
-                            break;
-                        case "manual-reverse":
-                            $search->orderByPosition(Criteria::DESC);
-                            break;
-                        case "manual":
-                            $search->orderByPosition(Criteria::ASC);
-                            break;
-                        case "random":
-                            $search->clearOrderByColumns();
-                            $search->addAscendingOrderByColumn('RAND()');
-                            break(2);
-                            break;
-                    }
+                    $search = $this->createSearchQuery($source, $argValue);
+
+                    $object_type = $source;
+                    $object_id   = $argValue;
+
+                    break;
                 }
-
-                break;
             }
         }
 
@@ -111,10 +160,12 @@ class Image extends BaseLoop
     /**
      * @param unknown $pagination
      */
-    public function exec($pagination)
+    public function exec(&$pagination)
     {
-        // Select the proper query to use
-        $search = $this->getSearchQuery();
+        // Select the proper query to use, and get the object type
+        $object_type = $object_id = null;
+
+        $search = $this->getSearchQuery($object_type, $object_id);
 
         $id = $this->getId();
 
@@ -130,10 +181,8 @@ class Image extends BaseLoop
         $event = new ImageEvent($this->request);
 
         // Prepare tranformations
-        // Setup required transformations
         $width = $this->getWidth();
         $height = $this->getHeight();
-        $resize_mode = $this->getResizeMode();
         $rotation = $this->getRotation();
         $background_color = $this->getBackgroundColor();
         $quality = $this->getQuality();
@@ -141,6 +190,21 @@ class Image extends BaseLoop
         $effects = $this->getEffects();
         if (! is_null($effects)) {
             $effects = explode(',', $effects);
+        }
+
+        switch($this->getResizeMode()) {
+            case 'crop' :
+                $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_CROP;
+                break;
+
+            case 'borders' :
+                $resize_mode = \Thelia\Action\Image::EXACT_RATIO_WITH_BORDERS;
+                break;
+
+            case 'none' :
+            default:
+                $resize_mode = \Thelia\Action\Image::KEEP_IMAGE_RATIO;
+
         }
 
         /**
@@ -165,25 +229,51 @@ class Image extends BaseLoop
 
             // Setup required transformations
             if (! is_null($width)) $event->setWidth($width);
-            if (! is_null($height)) $event->setHeigth($height);
-            if (! is_null($resize_mode)) $event->setResizeMode($resize_mode);
+            if (! is_null($height)) $event->setHeight($height);
+            $event->setResizeMode($resize_mode);
             if (! is_null($rotation)) $event->setRotation($rotation);
             if (! is_null($background_color)) $event->setBackgroundColor($background_color);
             if (! is_null($quality)) $event->setQuality($quality);
             if (! is_null($effects)) $event->setEffects($effects);
 
-            // Dispatch image processing event
-            $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
+            // Put source image file path
+            $source_filepath = sprintf("%s%s/%s/%s",
+                THELIA_ROOT,
+                ConfigQuery::read('documents_library_path', 'local/media/images'),
+                $object_type,
+                $result->getFile()
+             );
 
-            $loopResultRow = new LoopResultRow();
+            $event->setSourceFilepath($source_filepath);
+            $event->setCacheSubdirectory($object_type);
 
-            $loopResultRow
-                ->set("ID", $result->getId())
-                ->set("IMAGE_URL", $event->getFileUrl())
-                ->set("FILE_URL", $event->
-            ;
+            try {
+                // Dispatch image processing event
+                $this->dispatcher->dispatch(TheliaEvents::IMAGE_PROCESS, $event);
 
-            $loopResult->addRow($loopResultRow);
+                $loopResultRow = new LoopResultRow();
+
+                $loopResultRow
+                    ->set("ID", $result->getId())
+                    ->set("IMAGE_URL", $event->getFileUrl())
+                    ->set("ORIGINAL_IMAGE_URL", $event->getOriginalFileUrl())
+                    ->set("IMAGE_PATH", $event->getCacheFilepath())
+                    ->set("ORIGINAL_IMAGE_PATH", $source_filepath)
+                    ->set("TITLE", $result->getTitle())
+                    ->set("CHAPO", $result->getChapo())
+                    ->set("DESCRIPTION", $result->getDescription())
+                    ->set("POSTSCRIPTUM", $result->getPostscriptum())
+                    ->set("POSITION", $result->getPosition())
+                    ->set("OBJECT_TYPE", $object_type)
+                    ->set("OBJECT_ID", $object_id)
+                ;
+
+                $loopResult->addRow($loopResultRow);
+            }
+            catch (\Exception $ex) {
+                // Ignore the result and log an error
+                Tlog::getInstance()->addError("Failed to process image in image loop: ", $this->args);
+            }
         }
 
         return $loopResult;
@@ -200,6 +290,7 @@ class Image extends BaseLoop
 #IMAGE : URL de l'image transformée (redimensionnée, inversée, etc. suivant les paramètres d'entrée de la boucle).
 #FICHIER : URL de l'image originale
 #ID : identifiant de l'image
+
 #TITRE : titre de l'image
 #CHAPO : description courte de l'image
 #DESCRIPTION : description longue de l'image
@@ -219,7 +310,7 @@ class Image extends BaseLoop
             new Argument(
                     'order',
                     new TypeCollection(
-                            new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                            new EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
                     ),
                     'manual'
             ),
@@ -232,7 +323,7 @@ class Image extends BaseLoop
             new Argument(
                 'resize_mode',
                 new TypeCollection(
-                        new Type\EnumListType(array('crop', 'borders', 'none'))
+                        new EnumType(array('crop', 'borders', 'none'))
                 ),
                 'none'
             ),
@@ -246,16 +337,17 @@ class Image extends BaseLoop
             new Argument(
                 'source',
                 new TypeCollection(
-                        new Type\EnumListType($this->possible_sources)
+                        new EnumType($this->possible_sources)
                 )
             ),
+            Argument::createIntTypeArgument('source_id'),
 
             Argument::createIntListTypeArgument('lang')
         );
 
         // Add possible image sources
-        foreach($possible_sources as $source) {
-            $collection->addArgument(Argument::createIntTypeArgument($source))
+        foreach($this->possible_sources as $source) {
+            $collection->addArgument(Argument::createIntTypeArgument($source));
         }
 
         return $collection;

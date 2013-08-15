@@ -113,7 +113,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
      /**
       *
-      * Tru to process a non-existent file
+      * Try to process a non-existent file
       *
       * @expectedException \InvalidArgumentException
       */
@@ -125,6 +125,24 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
          $event->setCacheFilepath("blablabla.png");
          $event->setCacheSubdirectory("tests");
+
+         $image->processImage($event);
+     }
+
+     /**
+      *
+      * Try to process a file outside of the cache
+      *
+      * @expectedException \InvalidArgumentException
+      */
+     public function testProcessImageOutsideValidPath()
+     {
+         $event = new ImageEvent($this->request);
+
+         $image = new Image($this->getContainer());
+
+         $event->setCacheFilepath("blablabla.png");
+         $event->setCacheSubdirectory("../../../");
 
          $image->processImage($event);
      }
@@ -315,6 +333,39 @@ class ImageTest extends \PHPUnit_Framework_TestCase
          $image = new Image($this->getContainer());
 
          $image->processImage($event);
+     }
+
+     public function testClearTestsCache() {
+         $event = new ImageEvent($this->request);
+
+         $event->setCacheSubdirectory('tests');
+
+         $image = new Image($this->getContainer());
+
+         $image->clearCache($event);
+     }
+
+     public function testClearWholeCache() {
+         $event = new ImageEvent($this->request);
+
+         $image = new Image($this->getContainer());
+
+         $image->clearCache($event);
+     }
+
+     /**
+      * Try to clear directory ouside of the cache
+      *
+      * @expectedException \InvalidArgumentException
+      */
+     public function testClearUnallowedPathCache() {
+         $event = new ImageEvent($this->request);
+
+         $event->setCacheSubdirectory('../../../..');
+
+         $image = new Image($this->getContainer());
+
+         $image->clearCache($event);
      }
 
 }

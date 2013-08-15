@@ -97,18 +97,18 @@ class ImageEvent extends ActionEvent
     protected $quality = null;
 
     /**
-     * @return boolean true if the required image is the original image
+     * @return boolean true if the required image is the original image (resize_mode and background_color are not significant)
      */
     public function isOriginalImage()
     {
-        return empty($this->width) && empty($this->height) && empty($this->resize_mode) && empty($this->background_color)
-                && empty($this->effects) && empty($this->rotation);
+        return empty($this->width) && empty($this->height) /* && empty($this->resize_mode) && empty($this->background_color) not significant */
+                && empty($this->effects) && empty($this->rotation) && empty($this->quality);
     }
 
     /**
      * @return string a hash identifiying the processing options
      */
-    public function getSignature()
+    public function getOptionsHash()
     {
         return md5(
                 $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
