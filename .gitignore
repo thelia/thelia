@@ -16,6 +16,7 @@ coverage
 .settings/
 local/cache/*
 web/assets/*
+web/cache/*
 web/.htaccess
 phpdoc*.log
 php-cs
