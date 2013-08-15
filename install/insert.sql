@@ -10,6 +10,8 @@ INSERT INTO `config` (`name`, `value`, `secured`, `hidden`, `created_at`, `updat
 ('imagine_graphic_driver', 'gd', 1, 0, NOW(), NOW());
 ('default_images_quality_percent', '75', 1, 0, NOW(), NOW());
 ('original_image_delivery_mode', 'symlink', 1, 0, NOW(), NOW());
+('images_library_path', 'local/media/images', 1, 0, NOW(), NOW());
+('image_cache_dir_from_web_root', 'cache/images', 1, 0, NOW(), NOW());
 
 
 

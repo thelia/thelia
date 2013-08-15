@@ -140,4 +140,9 @@ final class TheliaEvents
      */
     const IMAGE_PROCESS = "action.processImage";
 
+    /**
+     * Sent on cimage cache clear request
+     */
+    const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
 }

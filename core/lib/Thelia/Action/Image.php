@@ -490,9 +490,8 @@ class Image extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            TheliaEvents::IMAGE_PROCESS => array(
-                "processImage", 128
-            ),
+            TheliaEvents::IMAGE_PROCESS => array("processImage", 128),
+            TheliaEvents::IMAGE_CLEAR_CACHE => array("clearCache", 128),
         );
     }
 }
