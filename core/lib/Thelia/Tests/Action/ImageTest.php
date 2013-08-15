@@ -83,7 +83,7 @@ class ImageTest extends \PHPUnit_Framework_TestCase
                 unlink(sprintf("%s/%s", $dir, $file));
             }
 
-            closedir($dir);
+            closedir($dh);
         }
     }
 

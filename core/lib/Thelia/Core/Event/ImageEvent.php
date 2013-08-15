@@ -47,6 +47,16 @@ class ImageEvent extends ActionEvent
     protected $cache_filepath = null;
 
     /**
+     * @var string The absolute URL of the cached version of the original image (in the web space)
+     */
+    protected $original_file_url = null;
+
+    /**
+     * @var string The absolute path of the cached version of the original image file
+     */
+    protected $cache_original_filepath = null;
+
+    /**
      *  @var string The image category (i.e. the subdirectory in image cache)
      */
     protected $category = null;
@@ -89,29 +99,20 @@ class ImageEvent extends ActionEvent
     /**
      * @return boolean true if the required image is the original image
      */
-    public function isOriginalImage() {
-        return
-            empty($this->width)
-            && empty($this->height)
-            && empty($this->resize_mode)
-            && empty($this->background_color)
-            && empty($this->effects)
-            && empty($this->rotation)
-        ;
+    public function isOriginalImage()
+    {
+        return empty($this->width) && empty($this->height) && empty($this->resize_mode) && empty($this->background_color)
+                && empty($this->effects) && empty($this->rotation);
     }
 
     /**
      * @return string a hash identifiying the processing options
      */
-    public function getSignature() {
+    public function getSignature()
+    {
         return md5(
-              $this->width
-            . $this->height
-            . $this->resize_mode
-            . $this->background_color
-            . implode(',', $this->effects)
-            . $this->rotation
-         );
+                $this->width . $this->height . $this->resize_mode . $this->background_color . implode(',', $this->effects)
+                        . $this->rotation);
     }
 
     public function getCategory()
@@ -234,4 +235,23 @@ class ImageEvent extends ActionEvent
         $this->quality = $quality;
     }
 
+    public function getOriginalFileUrl()
+    {
+        return $this->original_file_url;
+    }
+
+    public function setOriginalFileUrl($original_file_url)
+    {
+        $this->original_file_url = $original_file_url;
+    }
+
+    public function getCacheOriginalFilepath()
+    {
+        return $this->cache_original_filepath;
+    }
+
+    public function setCacheOriginalFilepath($cache_original_filepath)
+    {
+        $this->cache_original_filepath = $cache_original_filepath;
+    }
 }

@@ -81,30 +81,33 @@ class Image extends BaseAction implements EventSubscriberInterface
         // Find cached file path
         $cacheFilePath = $this->getCacheFilePath($subdir, $source_file, $event);
 
+        $originalImagePathInCache = $this->getCacheFilePath($subdir, $source_file, $event, true);
+
         if (! file_exists($cacheFilePath)) {
 
-            // If the original image is required, either create a copy of make a symbolic link,
-            // depending of the current configuration
-            if ($event->isOriginalImage()) {
+            // Create a chached version of the original image in the web space, if not exists
 
+            if (! file_exists($originalImagePathInCache)) {
                 $mode = ConfigQuery::read('original_image_delivery_mode', 'symlink');
 
                 if ($mode == 'symlink') {
-                    if (false == @symlink($source_file, $cacheFilePath)) {
+                    if (false == @symlink($source_file, $originalImagePathInCache)) {
                         $error_message = sprintf("Failed to create symbolic link for %s in %s image cache directory", basename($source_file), $subdir);
                         Tlog::getInstance()->addError($error_message);
                         throw new ImageException($error_message);
                     }
                 }
                 else {// mode = 'copy'
-                    if (false == @copy($source_file, $cacheFilePath)) {
+                    if (false == @copy($source_file, $originalImagePathInCache)) {
                         $error_message = sprintf("Failed to copy %s in %s image cache directory", basename($source_file), $subdir);
                         Tlog::getInstance()->addError($error_message);
                         throw new ImageException($error_message);
                     }
                 }
             }
-            else {
+
+            // Process image only if we have some transformations to do.
+            if (! $event->isOriginalImage()) {
 
                 // We have to process the image.
                 $imagine = $this->createImagineInstance();
@@ -195,12 +198,17 @@ class Image extends BaseAction implements EventSubscriberInterface
         }
 
         // Compute the image URL
-        $image_url = $this->getCacheFileURL($subdir, basename($cacheFilePath));
+        $processed_image_url = $this->getCacheFileURL($subdir, basename($cacheFilePath));
+
+        // compute the full resulution image path in cache
+        $original_image_url = $this->getCacheFileURL($subdir, basename($originalImagePathInCache));
 
         // Update the event with file path and file URL
         $event->setCacheFilepath($cacheFilePath);
+        $event->setCacheOriginalFilepath($originalImagePathInCache);
 
-        $event->setFileUrl(URL::absoluteUrl($image_url));
+        $event->setFileUrl(URL::absoluteUrl($processed_image_url));
+        $event->setOriginalFileUrl(URL::absoluteUrl($original_image_url));
     }
 
     /**
@@ -320,16 +328,17 @@ class Image extends BaseAction implements EventSubscriberInterface
      *
      * @param string $subdir the subdirectory related to cache base
      * @param string $filename the filename
+     * @param boolean $forceOriginalImage if true, the origiunal image path in the cache dir is returned.
      * @return string the cache directory path relative to Web Root
      */
-    protected function getCacheFilePath($subdir, $filename, ImageEvent $event)
+    protected function getCacheFilePath($subdir, $filename, ImageEvent $event, $forceOriginalImage = false)
     {
         $path = $this->getCachePath($subdir);
 
         $safe_filename = preg_replace("[^:alnum:\-\._]", "-", strtolower(basename($filename)));
 
        // Keep original safe name if no tranformations are applied
-       if ($event->isOriginalImage())
+       if ($forceOriginalImage || $event->isOriginalImage())
             return sprintf("%s/%s", $path, $safe_filename);
         else
             return sprintf("%s/%s-%s", $path, $event->getSignature(), $safe_filename);
