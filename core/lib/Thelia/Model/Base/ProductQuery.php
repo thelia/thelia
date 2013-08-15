@@ -68,9 +68,9 @@ use Thelia\Model\Map\ProductTableMap;
  * @method     ChildProductQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
  * @method     ChildProductQuery innerJoinContentAssoc($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentAssoc relation
  *
- * @method     ChildProductQuery leftJoinProdutImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProdutImage relation
- * @method     ChildProductQuery rightJoinProdutImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProdutImage relation
- * @method     ChildProductQuery innerJoinProdutImage($relationAlias = null) Adds a INNER JOIN clause to the query using the ProdutImage relation
+ * @method     ChildProductQuery leftJoinProductImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductImage relation
+ * @method     ChildProductQuery rightJoinProductImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductImage relation
+ * @method     ChildProductQuery innerJoinProductImage($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductImage relation
  *
  * @method     ChildProductQuery leftJoinProductDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductDocument relation
  * @method     ChildProductQuery rightJoinProductDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductDocument relation
@@ -1070,40 +1070,40 @@ abstract class ProductQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\ProdutImage object
+     * Filter the query by a related \Thelia\Model\ProductImage object
      *
-     * @param \Thelia\Model\ProdutImage|ObjectCollection $produtImage  the related object to use as filter
+     * @param \Thelia\Model\ProductImage|ObjectCollection $productImage  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
-    public function filterByProdutImage($produtImage, $comparison = null)
+    public function filterByProductImage($productImage, $comparison = null)
     {
-        if ($produtImage instanceof \Thelia\Model\ProdutImage) {
+        if ($productImage instanceof \Thelia\Model\ProductImage) {
             return $this
-                ->addUsingAlias(ProductTableMap::ID, $produtImage->getProductId(), $comparison);
-        } elseif ($produtImage instanceof ObjectCollection) {
+                ->addUsingAlias(ProductTableMap::ID, $productImage->getProductId(), $comparison);
+        } elseif ($productImage instanceof ObjectCollection) {
             return $this
-                ->useProdutImageQuery()
-                ->filterByPrimaryKeys($produtImage->getPrimaryKeys())
+                ->useProductImageQuery()
+                ->filterByPrimaryKeys($productImage->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByProdutImage() only accepts arguments of type \Thelia\Model\ProdutImage or Collection');
+            throw new PropelException('filterByProductImage() only accepts arguments of type \Thelia\Model\ProductImage or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ProdutImage relation
+     * Adds a JOIN clause to the query using the ProductImage relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
      * @return ChildProductQuery The current query, for fluid interface
      */
-    public function joinProdutImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function joinProductImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ProdutImage');
+        $relationMap = $tableMap->getRelation('ProductImage');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -1118,14 +1118,14 @@ abstract class ProductQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ProdutImage');
+            $this->addJoinObject($join, 'ProductImage');
         }
 
         return $this;
     }
 
     /**
-     * Use the ProdutImage relation ProdutImage object
+     * Use the ProductImage relation ProductImage object
      *
      * @see useQuery()
      *
@@ -1133,13 +1133,13 @@ abstract class ProductQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProdutImageQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductImageQuery A secondary query class using the current class as primary query
      */
-    public function useProdutImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    public function useProductImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
-            ->joinProdutImage($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ProdutImage', '\Thelia\Model\ProdutImageQuery');
+            ->joinProductImage($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductImage', '\Thelia\Model\ProductImageQuery');
     }
 
     /**

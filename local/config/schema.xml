@@ -450,7 +450,7 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="produt_image" namespace="Thelia\Model">
+  <table name="product_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
