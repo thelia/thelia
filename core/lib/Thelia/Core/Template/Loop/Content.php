@@ -66,7 +66,7 @@ class Content extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random', 'given_id'))
+                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse', 'random', 'given_id'))
                 ),
                 'alpha'
             ),
@@ -155,7 +155,7 @@ class Content extends BaseLoop
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
                     break;
-                case "alpha_reverse":
+                case "alpha-reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
                     break;
                 case "manual":

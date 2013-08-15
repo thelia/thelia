@@ -79,7 +79,7 @@ class Product extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', /*'min_price', 'max_price',*/ 'manual', 'manual_reverse', 'ref', /*'promo', 'new',*/ 'random', 'given_id'))
+                    new Type\EnumListType(array('alpha', 'alpha-reverse', /*'min_price', 'max_price',*/ 'manual', 'manual_reverse', 'ref', /*'promo', 'new',*/ 'random', 'given_id'))
                 ),
                 'alpha'
             ),
@@ -256,7 +256,7 @@ class Product extends BaseLoop
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
                     break;
-                case "alpha_reverse":
+                case "alpha-reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
                     break;
                 /*case "min_price":

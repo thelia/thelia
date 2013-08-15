@@ -61,7 +61,7 @@ class FeatureValue extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             )
@@ -108,7 +108,7 @@ class FeatureValue extends BaseLoop
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
                     break;
-                case "alpha_reverse":
+                case "alpha-reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
                     break;
                 case "manual":
