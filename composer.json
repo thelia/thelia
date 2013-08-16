@@ -27,7 +27,7 @@
         "symfony-cmf/routing": "1.0.0",
 
         "symfony/form": "2.2.*",
-        "symfony/validator": "2.3.*",
+        "symfony/validator": "2.3.*@dev",
 
         "smarty/smarty": "v3.1.14",
         "kriswallsmith/assetic": "1.2.*@dev",

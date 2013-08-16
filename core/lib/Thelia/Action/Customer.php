@@ -25,7 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
-use Thelia\Core\Event\CustomerCreateEvent;
+use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\CustomerModification;
@@ -42,7 +42,7 @@ use Propel\Runtime\Exception\PropelException;
 class Customer extends BaseAction implements EventSubscriberInterface
 {
 
-    public function create(CustomerCreateEvent $event)
+    public function create(CustomerCreateOrUpdateEvent $event)
     {
 
         $customer = new CustomerModel();

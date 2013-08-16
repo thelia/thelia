@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "978f18a84f0206422f94441fd85bb387",
+    "hash": "458aeccc06b7394d7653a9063b6fd981",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -1509,17 +1509,17 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v2.3.3",
+            "version": "2.3.x-dev",
             "target-dir": "Symfony/Component/Validator",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Validator.git",
-                "reference": "v2.3.3"
+                "reference": "55808a75bf373a8edb6400239268d315f0a326c7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Validator/zipball/v2.3.3",
-                "reference": "v2.3.3",
+                "url": "https://api.github.com/repos/symfony/Validator/zipball/55808a75bf373a8edb6400239268d315f0a326c7",
+                "reference": "55808a75bf373a8edb6400239268d315f0a326c7",
                 "shasum": ""
             },
             "require": {
@@ -1566,7 +1566,7 @@
             ],
             "description": "Symfony Validator Component",
             "homepage": "http://symfony.com",
-            "time": "2013-08-06 05:59:49"
+            "time": "2013-08-13 20:18:00"
         },
         {
             "name": "symfony/yaml",
@@ -2039,6 +2039,7 @@
         "ezyang/htmlpurifier": 20,
         "ircmaxell/password-compat": 20,
         "propel/propel": 15,
+        "symfony/validator": 20,
         "kriswallsmith/assetic": 20,
         "leafo/lessphp": 20,
         "ptachoire/cssembed": 20,

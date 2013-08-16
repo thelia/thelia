@@ -23,8 +23,7 @@
 namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Core\Event\CustomerCreateEvent;
-use Thelia\Core\Event\CustomerEvent;
+use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\Exception\FormValidationException;
@@ -47,7 +46,7 @@ class CustomerController extends BaseFrontController
 
             $data = $form->getData();
 
-            $customerCreateEvent = new CustomerCreateEvent(
+            $customerCreateEvent = new CustomerCreateOrUpdateEvent(
                 $data["title"],
                 $data["firstname"],
                 $data["lastname"],
@@ -81,7 +80,11 @@ class CustomerController extends BaseFrontController
             $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
+    }
 
+    public function updateAction()
+    {
+        $request = $this->getRequest();
     }
 
     public function loginAction()
