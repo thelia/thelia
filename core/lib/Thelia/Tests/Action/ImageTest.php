@@ -171,7 +171,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
          if ($config != null) $config->setValue($oldval)->save();
 
-         $this->assertFileExists(THELIA_WEB_DIR."/cache/tests/test-image-1.png");
+         $imgdir = ConfigQuery::read('image_cache_dir_from_web_root');
+
+         $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-image-1.png");
      }
 
      /**
@@ -198,7 +200,9 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
          if ($config != null) $config->setValue($oldval)->save();
 
-         $this->assertFileExists(THELIA_WEB_DIR."/cache/tests/test-image-9.png");
+         $imgdir = ConfigQuery::read('image_cache_dir_from_web_root');
+
+         $this->assertFileExists(THELIA_WEB_DIR."/$imgdir/tests/test-image-9.png");
      }
 
      /**
@@ -367,5 +371,4 @@ class ImageTest extends \PHPUnit_Framework_TestCase
 
          $image->clearCache($event);
      }
-
 }
