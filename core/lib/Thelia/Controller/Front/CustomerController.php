@@ -26,6 +26,7 @@ use Propel\Runtime\Exception\PropelException;
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Form\CustomerCreation;
+use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
@@ -44,27 +45,7 @@ class CustomerController extends BaseFrontController
         try {
             $form = $this->validateForm($customerCreation, "post");
 
-            $data = $form->getData();
-
-            $customerCreateEvent = new CustomerCreateOrUpdateEvent(
-                $data["title"],
-                $data["firstname"],
-                $data["lastname"],
-                $data["address1"],
-                $data["address2"],
-                $data["address3"],
-                $data["phone"],
-                $data["cellphone"],
-                $data["zipcode"],
-                $data["city"],
-                $data["country"],
-                $data["email"],
-                $data["password"],
-                $request->getSession()->getLang(),
-                isset($data["reseller"])?$data["reseller"]:null,
-                isset($data["sponsor"])?$data["sponsor"]:null,
-                isset($data["discount"])?$data["discount"]:nullsch
-            );
+            $customerCreateEvent = $this->createEventInstance($form->getData());
 
             $this->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
 
@@ -85,6 +66,28 @@ class CustomerController extends BaseFrontController
     public function updateAction()
     {
         $request = $this->getRequest();
+        $customerModification = new CustomerModification($request);
+
+        try {
+
+            $customer = $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->getUser();
+
+            $form = $this->validateForm($customerModification, "post");
+
+            $customerChangeEvent = $this->createEventInstance($form->getData());
+            $customerChangeEvent->setCustomer($customer);
+
+            $this->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
+
+            $this->redirectSuccess();
+
+        } catch (FormValidationException $e) {
+            $customerModification->setErrorMessage($e->getMessage());
+            $this->getParserContext()->setErrorForm($customerModification);
+        } catch (PropelException $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during updating customer in front context with message : %s", $e->getMessage()));
+            $this->getParserContext()->setGeneralError($e->getMessage());
+        }
     }
 
     public function loginAction()
@@ -101,6 +104,35 @@ class CustomerController extends BaseFrontController
         $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->setUser($customer);
 
         if($sendLogin) $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+    }
+
+    /**
+     * @param $data
+     * @return CustomerCreateOrUpdateEvent
+     */
+    private function createEventInstance($data)
+    {
+        $customerCreateEvent = new CustomerCreateOrUpdateEvent(
+            $data["title"],
+            $data["firstname"],
+            $data["lastname"],
+            $data["address1"],
+            $data["address2"],
+            $data["address3"],
+            $data["phone"],
+            $data["cellphone"],
+            $data["zipcode"],
+            $data["city"],
+            $data["country"],
+            isset($data["email"])?$data["email"]:null,
+            isset($data["password"]) ? $data["password"]:null,
+            $this->getRequest()->getSession()->getLang(),
+            isset($data["reseller"])?$data["reseller"]:null,
+            isset($data["sponsor"])?$data["sponsor"]:null,
+            isset($data["discount"])?$data["discount"]:nullsch
+        );
+
+        return $customerCreateEvent;
     }
 
 }

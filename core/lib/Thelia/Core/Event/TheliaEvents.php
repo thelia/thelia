@@ -62,6 +62,11 @@ final class TheliaEvents
     const CUSTOMER_CREATEACCOUNT = "action.createCustomer";
 
     /**
+     * sent on customer account update
+     */
+    const CUSTOMER_UPDATEACCOUNT = "action.modifyCustomer";
+
+    /**
      * Sent before the logout of the administrator.
      */
     const ADMIN_LOGOUT = "action.admin_logout";

@@ -48,6 +48,22 @@ class Customer extends BaseAction implements EventSubscriberInterface
         $customer = new CustomerModel();
         $customer->setDispatcher($this->getDispatcher());
 
+        $this->createOrUpdateCustomer($customer, $event);
+
+    }
+
+    public function modify(CustomerCreateOrUpdateEvent $event)
+    {
+
+        $customer = $event->getCustomer();
+        $customer->setDispatcher($this->getDispatcher());
+
+        $this->createOrUpdateCustomer($customer, $event);
+
+    }
+
+    private function createOrUpdateCustomer(CustomerModel $customer, CustomerCreateOrUpdateEvent $event)
+    {
         $customer->createOrUpdate(
             $event->getTitle(),
             $event->getFirstname(),
@@ -69,51 +85,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
         );
 
         $event->setCustomer($customer);
-    }
-
-    public function modify(ActionEvent $event)
-    {
-        $request = $event->getRequest();
-
-        try {
-              $customerModification = new CustomerModification($request);
-
-            $form = $this->validateForm($customerModification, "POST");
-
-            $data = $form->getData();
-
-            $customer = CustomerQuery::create()->findPk(1);
-
-            $data = $form->getData();
-
-            $customer->createOrUpdate(
-                        $data["title"],
-                        $data["firstname"],
-                        $data["lastname"],
-                        $data["address1"],
-                        $data["address2"],
-                        $data["address3"],
-                        $data["phone"],
-                        $data["cellphone"],
-                        $data["zipcode"],
-                        $data["country"]
-              );
-
-            // Update the logged-in user, and redirect to the success URL (exits)
-            // We don-t send the login event, as the customer si already logged.
-            $this->processSuccessfullLogin($event, $customer, $customerModification);
-        } catch (PropelException $e) {
-
-              Tlog::getInstance()->error(sprintf('error during modifying customer on action/modifyCustomer with message "%s"', $e->getMessage()));
-
-            $message = "Failed to change your account, please try again.";
-        } catch (FormValidationException $e) {
-
-           $message = $e->getMessage();
-        }
-
-        // The form has errors, propagate it.
-        $this->propagateFormError($customerModification, $message, $event);
     }
 
     /**
@@ -147,7 +118,7 @@ class Customer extends BaseAction implements EventSubscriberInterface
           try {
             $user = $authenticator->getAuthentifiedUser();
 
-              $event->customer = $customer;
+              $event->customer = $user;
 
           } catch (ValidatorException $ex) {
             $message = "Missing or invalid information. Please check your input.";

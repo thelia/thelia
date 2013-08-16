@@ -6,7 +6,7 @@ use Symfony\Component\Config\Definition\Exception\Exception;
 use Thelia\Core\Event\Internal\CustomerEvent;
 use Thelia\Model\Base\Customer as BaseCustomer;
 
-use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
+use Thelia\Model\Exception\InvalidArgumentException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Thelia\Core\Event\CustomRefEvent;
@@ -56,7 +56,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param int $discount
      * @throws \Exception|\Symfony\Component\Config\Definition\Exception\Exception
      */
-    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
+    public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email = null, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
     {
         $this
         	->setTitleId($titleId)
@@ -167,6 +167,21 @@ class Customer extends BaseCustomer implements UserInterface
             return parent::setPassword(password_hash($password, PASSWORD_BCRYPT));
         }
         return $this;
+    }
+
+    public function setEmail($email, $force = false)
+    {
+        $email = trim($email);
+
+        if ($this->isNew() && ($email === null || $email == "")) {
+            throw new InvalidArgumentException("customer email is mandatory on creation");
+        }
+
+        if (!$this->isNew() && $force === false) {
+            return $this;
+        }
+
+        return parent::setEmail($email);
     }
 
     public function setDispatcher(EventDispatcherInterface $dispatcher)
