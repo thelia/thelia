@@ -18,6 +18,10 @@
         <default key="_controller">Thelia\Controller\Front\CustomerController::updateAction</default>
     </route>
 
+    <route id="customler.login.process" path="/customer/login" methods="post">
+        <default key="_controller">Thelia\Controller\Front\CustomerController::loginAction</default>
+    </route>
+
     <route id="cart.add.process" path="/cart/add">
         <default key="_controller">Thelia\Controller\Front\CartController::addItem</default>
         <default key="_view">cart</default>
