@@ -11,7 +11,7 @@
         "php": ">=5.4",
         "ezyang/htmlpurifier": "dev-master",
         "ircmaxell/password-compat": "dev-master",
-        "propel/propel": "dev-master",
+        "propel/propel": "2.0.0-alpha1",
         "psr/log" : "1.0",
         "symfony/class-loader": "2.2.*",
         "symfony/config" : "2.2.*",
@@ -27,7 +27,7 @@
         "symfony-cmf/routing": "1.0.0",
 
         "symfony/form": "2.2.*",
-        "symfony/validator": "2.2.*",
+        "symfony/validator": "2.3.*",
 
         "smarty/smarty": "v3.1.14",
         "kriswallsmith/assetic": "1.2.*@dev",

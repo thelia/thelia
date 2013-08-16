@@ -3,7 +3,7 @@
         "This file locks the dependencies of your project to a known state",
         "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file"
     ],
-    "hash": "21a698b038efa96e592a3673a760c065",
+    "hash": "978f18a84f0206422f94441fd85bb387",
     "packages": [
         {
             "name": "ezyang/htmlpurifier",
@@ -254,30 +254,30 @@
         },
         {
             "name": "propel/propel",
-            "version": "dev-master",
+            "version": "2.0.0-alpha1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/propelorm/Propel2.git",
-                "reference": "c33b5ade89d0d6c1be7dd9252102ddee6b620890"
+                "reference": "2.0.0-alpha1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/c33b5ade89d0d6c1be7dd9252102ddee6b620890",
-                "reference": "c33b5ade89d0d6c1be7dd9252102ddee6b620890",
+                "url": "https://api.github.com/repos/propelorm/Propel2/zipball/2.0.0-alpha1",
+                "reference": "2.0.0-alpha1",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.4",
-                "psr/log": "~1.0",
-                "symfony/console": "~2.2",
-                "symfony/filesystem": "~2.2",
-                "symfony/finder": "~2.2",
-                "symfony/validator": "2.2.*@dev",
-                "symfony/yaml": "~2.2"
+                "psr/log": ">=1.0,<2.0",
+                "symfony/console": ">=2.2,<3.0",
+                "symfony/filesystem": ">=2.2,<3.0",
+                "symfony/finder": ">=2.2,<3.0",
+                "symfony/validator": ">=2.2,<3.0",
+                "symfony/yaml": ">=2.2,<3.0"
             },
             "require-dev": {
-                "behat/behat": "~2.4",
-                "monolog/monolog": "~1.3",
+                "behat/behat": ">=2.4,<3.0",
+                "monolog/monolog": ">=1.3,<2.0",
                 "phpunit/phpunit": "3.7.*"
             },
             "suggest": {
@@ -310,7 +310,7 @@
                 "orm",
                 "persistence"
             ],
-            "time": "2013-08-14 23:15:50"
+            "time": "2013-06-05 06:46:14"
         },
         {
             "name": "psr/log",
@@ -1066,20 +1066,21 @@
         },
         {
             "name": "symfony/icu",
-            "version": "v1.0.0",
+            "version": "v1.2.0",
             "target-dir": "Symfony/Component/Icu",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Icu.git",
-                "reference": "v1.0.0"
+                "reference": "v1.2.0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Icu/zipball/v1.0.0",
-                "reference": "v1.0.0",
+                "url": "https://api.github.com/repos/symfony/Icu/zipball/v1.2.0",
+                "reference": "v1.2.0",
                 "shasum": ""
             },
             "require": {
+                "lib-icu": ">=4.4",
                 "php": ">=5.3.3",
                 "symfony/intl": ">=2.3,<3.0"
             },
@@ -1109,7 +1110,7 @@
                 "icu",
                 "intl"
             ],
-            "time": "2013-06-03 18:32:07"
+            "time": "2013-06-03 18:32:58"
         },
         {
             "name": "symfony/intl",
@@ -1508,17 +1509,17 @@
         },
         {
             "name": "symfony/validator",
-            "version": "v2.2.5",
+            "version": "v2.3.3",
             "target-dir": "Symfony/Component/Validator",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/Validator.git",
-                "reference": "v2.2.5"
+                "reference": "v2.3.3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/Validator/zipball/v2.2.5",
-                "reference": "v2.2.5",
+                "url": "https://api.github.com/repos/symfony/Validator/zipball/v2.3.3",
+                "reference": "v2.3.3",
                 "shasum": ""
             },
             "require": {
@@ -1526,22 +1527,22 @@
                 "symfony/translation": "~2.0"
             },
             "require-dev": {
-                "symfony/config": ">=2.2,<2.3-dev",
+                "symfony/config": "~2.2",
                 "symfony/http-foundation": "~2.1",
-                "symfony/locale": "~2.0",
+                "symfony/intl": "~2.3",
                 "symfony/yaml": "~2.0"
             },
             "suggest": {
-                "doctrine/common": "~2.2",
-                "symfony/config": "2.2.*",
-                "symfony/http-foundation": "2.2.*",
-                "symfony/locale": "2.2.*",
-                "symfony/yaml": "2.2.*"
+                "doctrine/common": "",
+                "symfony/config": "",
+                "symfony/http-foundation": "",
+                "symfony/intl": "",
+                "symfony/yaml": ""
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.2-dev"
+                    "dev-master": "2.3-dev"
                 }
             },
             "autoload": {
@@ -1565,7 +1566,7 @@
             ],
             "description": "Symfony Validator Component",
             "homepage": "http://symfony.com",
-            "time": "2013-08-06 05:59:38"
+            "time": "2013-08-06 05:59:49"
         },
         {
             "name": "symfony/yaml",
@@ -2037,7 +2038,7 @@
     "stability-flags": {
         "ezyang/htmlpurifier": 20,
         "ircmaxell/password-compat": 20,
-        "propel/propel": 20,
+        "propel/propel": 15,
         "kriswallsmith/assetic": 20,
         "leafo/lessphp": 20,
         "ptachoire/cssembed": 20,
