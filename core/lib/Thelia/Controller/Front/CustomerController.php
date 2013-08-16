@@ -22,9 +22,12 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
+use Propel\Runtime\Exception\PropelException;
+use Thelia\Core\Event\CustomerCreateEvent;
 use Thelia\Core\Event\CustomerEvent;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Form\CustomerCreation;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -34,8 +37,41 @@ class CustomerController extends BaseFrontController
     {
         $request = $this->getRequest();
         $customerCreation = new CustomerCreation($$request);
+        try {
+            $form = $this->validateForm($customerCreation, "post");
 
-        $form = $this->validateForm($customerCreation, "post");
+            $data = $form->getData();
+
+            $customerCreateEvent = new CustomerCreateEvent(
+                $data["title"],
+                $data["firstname"],
+                $data["lastname"],
+                $data["address1"],
+                $data["address2"],
+                $data["address3"],
+                $data["phone"],
+                $data["cellphone"],
+                $data["zipcode"],
+                $data["city"],
+                $data["country"],
+                $data["email"],
+                $data["password"],
+                $request->getSession()->getLang(),
+                $data["reseller"],
+                $data["sponsor"],
+                $data["discount"]
+            );
+
+            $this->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
+
+            $this->processLogin($customerCreateEvent->getCustomer());
+
+        } catch (FormValidationException $e) {
+
+        } catch (PropelException $e) {
+
+        }
+
 
     }
 

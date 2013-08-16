@@ -54,6 +54,7 @@ class Customer extends BaseCustomer implements UserInterface
      * @param int $reseller
      * @param null $sponsor
      * @param int $discount
+     * @throws \Exception|\Symfony\Component\Config\Definition\Exception\Exception
      */
     public function createOrUpdate($titleId, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $countryId, $email, $plainPassword = null, $lang = null, $reseller = 0, $sponsor = null, $discount = 0)
     {

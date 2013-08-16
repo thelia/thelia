@@ -57,6 +57,11 @@ final class TheliaEvents
     const CUSTOMER_LOGIN  = "action.customer_login";
 
     /**
+     * sent on customer account creation
+     */
+    const CUSTOMER_CREATEACCOUNT = "action.createCustomer";
+
+    /**
      * Sent before the logout of the administrator.
      */
     const ADMIN_LOGOUT = "action.admin_logout";

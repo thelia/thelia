@@ -25,6 +25,7 @@ namespace Thelia\Action;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Thelia\Core\Event\ActionEvent;
+use Thelia\Core\Event\CustomerCreateEvent;
 use Thelia\Core\Event\TheliaEvents;
 use Thelia\Form\CustomerCreation;
 use Thelia\Form\CustomerModification;
@@ -37,54 +38,37 @@ use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Security\Exception\AuthenticationException;
 use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Action\Exception\FormValidationException;
 
 class Customer extends BaseAction implements EventSubscriberInterface
 {
 
-    public function create(ActionEvent $event)
+    public function create(CustomerCreateEvent $event)
     {
-        $request = $event->getRequest();
 
-        try {
-              $customerCreationForm = new CustomerCreation($request);
+        $customer = new CustomerModel();
+        $customer->setDispatcher($this->getDispatcher());
 
-            $form = $this->validateForm($customerCreationForm, "POST");
+        $customer->createOrUpdate(
+            $event->getTitle(),
+            $event->getFirstname(),
+            $event->getLastname(),
+            $event->getAddress1(),
+            $event->getAddress2(),
+            $event->getAddress3(),
+            $event->getPhone(),
+            $event->getCellphone(),
+            $event->getZipcode(),
+            $event->getCity(),
+            $event->getCountry(),
+            $event->getEmail(),
+            $event->getPassword(),
+            $event->getLang(),
+            $event->getReseller(),
+            $event->getSponsor(),
+            $event->getDiscount()
+        );
 
-            $data = $form->getData();
-              $customer = new CustomerModel();
-            $customer->setDispatcher($event->getDispatcher());
-
-            $customer->createOrUpdate(
-                $data["title"],
-                $data["firstname"],
-                $data["lastname"],
-                $data["address1"],
-                $data["address2"],
-                $data["address3"],
-                $data["phone"],
-                $data["cellphone"],
-                $data["zipcode"],
-                $data["country"],
-                $data["email"],
-                $data["password"],
-                $request->getSession()->getLang()
-            );
-
-            $event->customer = $customer;
-
-        } catch (PropelException $e) {
-
-            Tlog::getInstance()->error(sprintf('error during creating customer on action/createCustomer with message "%s"', $e->getMessage()));
-
-            $message = "Failed to create your account, please try again.";
-        } catch (FormValidationException $e) {
-
-           $message = $e->getMessage();
-        }
-
-        // The form has errors, propagate it.
-        $this->propagateFormError($customerCreationForm, $message, $event);
+        $event->setCustomer($customer);
     }
 
     public function modify(ActionEvent $event)

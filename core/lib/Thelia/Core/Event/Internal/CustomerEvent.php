@@ -34,4 +34,13 @@ class CustomerEvent extends InternalEvent
         $this->customer = $customer;
     }
 
+    /**
+     * @return \Thelia\Model\Customer
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
+    }
+
+
 }

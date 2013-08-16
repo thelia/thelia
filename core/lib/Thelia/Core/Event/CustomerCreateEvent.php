@@ -10,7 +10,12 @@
 namespace Thelia\Core\Event;
 
 
-class CustomerCreateEvent {
+use Symfony\Component\EventDispatcher\Event;
+use Thelia\Model\Customer;
+
+class CustomerCreateEvent extends Event {
+
+    //base parameters for creating new customer
     protected $title;
     protected $firstname;
     protected $lastname;
@@ -18,11 +23,22 @@ class CustomerCreateEvent {
     protected $address2;
     protected $address3;
     protected $phone;
+    protected $cellphone;
     protected $zipcode;
+    protected $city;
     protected $country;
     protected $email;
     protected $password;
     protected $lang;
+    protected $reseller;
+    protected $sponsor;
+    protected $discount;
+
+    /**
+     * @var \Thelia\Model\Customer
+     */
+    protected $customer;
+
 
     /**
      * @param int $title the title customer id
@@ -32,13 +48,18 @@ class CustomerCreateEvent {
      * @param string $address2
      * @param string $address3
      * @param string $phone
+     * @param string $cellphone
      * @param string $zipcode
+     * @param string $city
      * @param int $country the country id
      * @param string $email
      * @param string $password plain password, don't put hash password, it will hashes again
      * @param $lang
+     * @param int $reseller if customer is a reseller
+     * @param int $sponsor customer's id sponsor
+     * @param float $discount
      */
-    function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $zipcode, $country, $email, $password, $lang)
+    function __construct($title, $firstname, $lastname, $address1, $address2, $address3, $phone, $cellphone, $zipcode, $city, $country, $email, $password, $lang, $reseller, $sponsor, $discount)
     {
         $this->address1 = $address1;
         $this->address2 = $address2;
@@ -50,8 +71,12 @@ class CustomerCreateEvent {
         $this->lastname = $lastname;
         $this->password = $password;
         $this->phone = $phone;
+        $this->cellphone = $cellphone;
         $this->title = $title;
         $this->zipcode = $zipcode;
+        $this->reseller = $reseller;
+        $this->sponsor = $sponsor;
+        $this->discount = $discount;
     }
 
     /**
@@ -135,6 +160,14 @@ class CustomerCreateEvent {
     }
 
     /**
+     * @return string
+     */
+    public function getCellphone()
+    {
+        return $this->cellphone;
+    }
+
+    /**
      * @return int
      */
     public function getTitle()
@@ -150,6 +183,55 @@ class CustomerCreateEvent {
         return $this->zipcode;
     }
 
-    
+    /**
+     * @return string
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * @return float
+     */
+    public function getDiscount()
+    {
+        return $this->discount;
+    }
+
+    /**
+     * @return int
+     */
+    public function getReseller()
+    {
+        return $this->reseller;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSponsor()
+    {
+        return $this->sponsor;
+    }
+
+    /**
+     * @param Customer $customer
+     */
+    public function setCustomer(Customer $customer)
+    {
+        $this->customer = $customer;
+    }
+
+    /**
+     * @return Customer
+     */
+    public function getCustomer()
+    {
+        return $this->customer;
+    }
+
+
+
 
 }
