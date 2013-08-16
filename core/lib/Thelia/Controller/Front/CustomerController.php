@@ -41,7 +41,7 @@ class CustomerController extends BaseFrontController
     public function createAction()
     {
         $request = $this->getRequest();
-        $customerCreation = new CustomerCreation($$request);
+        $customerCreation = new CustomerCreation($request);
         try {
             $form = $this->validateForm($customerCreation, "post");
 
@@ -62,9 +62,9 @@ class CustomerController extends BaseFrontController
                 $data["email"],
                 $data["password"],
                 $request->getSession()->getLang(),
-                $data["reseller"],
-                $data["sponsor"],
-                $data["discount"]
+                isset($data["reseller"])?$data["reseller"]:null,
+                isset($data["sponsor"])?$data["sponsor"]:null,
+                isset($data["discount"])?$data["discount"]:nullsch
             );
 
             $this->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_CREATEACCOUNT, $customerCreateEvent);
