@@ -15,7 +15,10 @@ coverage
 .project
 .settings/
 local/cache/*
+local/media/documents/*
+local/media/images/*
 web/assets/*
+web/cache/*
 web/.htaccess
 phpdoc*.log
 php-cs

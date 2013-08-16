@@ -18,19 +18,19 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Product as ChildProduct;
+use Thelia\Model\ProductImage as ChildProductImage;
+use Thelia\Model\ProductImageI18n as ChildProductImageI18n;
+use Thelia\Model\ProductImageI18nQuery as ChildProductImageI18nQuery;
+use Thelia\Model\ProductImageQuery as ChildProductImageQuery;
 use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\ProdutImage as ChildProdutImage;
-use Thelia\Model\ProdutImageI18n as ChildProdutImageI18n;
-use Thelia\Model\ProdutImageI18nQuery as ChildProdutImageI18nQuery;
-use Thelia\Model\ProdutImageQuery as ChildProdutImageQuery;
-use Thelia\Model\Map\ProdutImageTableMap;
+use Thelia\Model\Map\ProductImageTableMap;
 
-abstract class ProdutImage implements ActiveRecordInterface
+abstract class ProductImage implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProdutImageTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\ProductImageTableMap';
 
 
     /**
@@ -101,10 +101,10 @@ abstract class ProdutImage implements ActiveRecordInterface
     protected $aProduct;
 
     /**
-     * @var        ObjectCollection|ChildProdutImageI18n[] Collection to store aggregation of ChildProdutImageI18n objects.
+     * @var        ObjectCollection|ChildProductImageI18n[] Collection to store aggregation of ChildProductImageI18n objects.
      */
-    protected $collProdutImageI18ns;
-    protected $collProdutImageI18nsPartial;
+    protected $collProductImageI18ns;
+    protected $collProductImageI18nsPartial;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -124,7 +124,7 @@ abstract class ProdutImage implements ActiveRecordInterface
 
     /**
      * Current translation objects
-     * @var        array[ChildProdutImageI18n]
+     * @var        array[ChildProductImageI18n]
      */
     protected $currentTranslations;
 
@@ -132,10 +132,10 @@ abstract class ProdutImage implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $produtImageI18nsScheduledForDeletion = null;
+    protected $productImageI18nsScheduledForDeletion = null;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\ProdutImage object.
+     * Initializes internal state of Thelia\Model\Base\ProductImage object.
      */
     public function __construct()
     {
@@ -230,9 +230,9 @@ abstract class ProdutImage implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ProdutImage</code> instance.  If
-     * <code>obj</code> is an instance of <code>ProdutImage</code>, delegates to
-     * <code>equals(ProdutImage)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>ProductImage</code> instance.  If
+     * <code>obj</code> is an instance of <code>ProductImage</code>, delegates to
+     * <code>equals(ProductImage)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -313,7 +313,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return ProdutImage The current object, for fluid interface
+     * @return ProductImage The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -345,7 +345,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return ProdutImage The current object, for fluid interface
+     * @return ProductImage The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -476,7 +476,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductImage The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -486,7 +486,7 @@ abstract class ProdutImage implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ProdutImageTableMap::ID;
+            $this->modifiedColumns[] = ProductImageTableMap::ID;
         }
 
 
@@ -497,7 +497,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * Set the value of [product_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductImage The current object (for fluent API support)
      */
     public function setProductId($v)
     {
@@ -507,7 +507,7 @@ abstract class ProdutImage implements ActiveRecordInterface
 
         if ($this->product_id !== $v) {
             $this->product_id = $v;
-            $this->modifiedColumns[] = ProdutImageTableMap::PRODUCT_ID;
+            $this->modifiedColumns[] = ProductImageTableMap::PRODUCT_ID;
         }
 
         if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
@@ -522,7 +522,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * Set the value of [file] column.
      *
      * @param      string $v new value
-     * @return   \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductImage The current object (for fluent API support)
      */
     public function setFile($v)
     {
@@ -532,7 +532,7 @@ abstract class ProdutImage implements ActiveRecordInterface
 
         if ($this->file !== $v) {
             $this->file = $v;
-            $this->modifiedColumns[] = ProdutImageTableMap::FILE;
+            $this->modifiedColumns[] = ProductImageTableMap::FILE;
         }
 
 
@@ -543,7 +543,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * Set the value of [position] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductImage The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -553,7 +553,7 @@ abstract class ProdutImage implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = ProdutImageTableMap::POSITION;
+            $this->modifiedColumns[] = ProductImageTableMap::POSITION;
         }
 
 
@@ -565,7 +565,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductImage The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -573,7 +573,7 @@ abstract class ProdutImage implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ProdutImageTableMap::CREATED_AT;
+                $this->modifiedColumns[] = ProductImageTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -586,7 +586,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @return   \Thelia\Model\ProductImage The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -594,7 +594,7 @@ abstract class ProdutImage implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ProdutImageTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = ProductImageTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -639,25 +639,25 @@ abstract class ProdutImage implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProdutImageTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ProductImageTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProdutImageTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ProductImageTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->product_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProdutImageTableMap::translateFieldName('File', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ProductImageTableMap::translateFieldName('File', TableMap::TYPE_PHPNAME, $indexType)];
             $this->file = (null !== $col) ? (string) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProdutImageTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ProductImageTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProdutImageTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ProductImageTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProdutImageTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ProductImageTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -670,10 +670,10 @@ abstract class ProdutImage implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = ProdutImageTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = ProductImageTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\ProdutImage object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\ProductImage object", 0, $e);
         }
     }
 
@@ -718,13 +718,13 @@ abstract class ProdutImage implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProductImageTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildProdutImageQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildProductImageQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -735,7 +735,7 @@ abstract class ProdutImage implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aProduct = null;
-            $this->collProdutImageI18ns = null;
+            $this->collProductImageI18ns = null;
 
         } // if (deep)
     }
@@ -746,8 +746,8 @@ abstract class ProdutImage implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ProdutImage::setDeleted()
-     * @see ProdutImage::isDeleted()
+     * @see ProductImage::setDeleted()
+     * @see ProductImage::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -756,12 +756,12 @@ abstract class ProdutImage implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildProdutImageQuery::create()
+            $deleteQuery = ChildProductImageQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -798,7 +798,7 @@ abstract class ProdutImage implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -808,16 +808,16 @@ abstract class ProdutImage implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(ProdutImageTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(ProductImageTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(ProdutImageTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(ProductImageTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(ProdutImageTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(ProductImageTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -829,7 +829,7 @@ abstract class ProdutImage implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ProdutImageTableMap::addInstanceToPool($this);
+                ProductImageTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -882,17 +882,17 @@ abstract class ProdutImage implements ActiveRecordInterface
                 $this->resetModified();
             }
 
-            if ($this->produtImageI18nsScheduledForDeletion !== null) {
-                if (!$this->produtImageI18nsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\ProdutImageI18nQuery::create()
-                        ->filterByPrimaryKeys($this->produtImageI18nsScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->productImageI18nsScheduledForDeletion !== null) {
+                if (!$this->productImageI18nsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductImageI18nQuery::create()
+                        ->filterByPrimaryKeys($this->productImageI18nsScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->produtImageI18nsScheduledForDeletion = null;
+                    $this->productImageI18nsScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collProdutImageI18ns !== null) {
-            foreach ($this->collProdutImageI18ns as $referrerFK) {
+                if ($this->collProductImageI18ns !== null) {
+            foreach ($this->collProductImageI18ns as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -919,33 +919,33 @@ abstract class ProdutImage implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ProdutImageTableMap::ID;
+        $this->modifiedColumns[] = ProductImageTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProdutImageTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ProductImageTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ProdutImageTableMap::ID)) {
+        if ($this->isColumnModified(ProductImageTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(ProdutImageTableMap::PRODUCT_ID)) {
+        if ($this->isColumnModified(ProductImageTableMap::PRODUCT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
         }
-        if ($this->isColumnModified(ProdutImageTableMap::FILE)) {
+        if ($this->isColumnModified(ProductImageTableMap::FILE)) {
             $modifiedColumns[':p' . $index++]  = 'FILE';
         }
-        if ($this->isColumnModified(ProdutImageTableMap::POSITION)) {
+        if ($this->isColumnModified(ProductImageTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
-        if ($this->isColumnModified(ProdutImageTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(ProductImageTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(ProdutImageTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(ProductImageTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO produt_image (%s) VALUES (%s)',
+            'INSERT INTO product_image (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -1018,7 +1018,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProdutImageTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProductImageTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1075,11 +1075,11 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ProdutImage'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['ProductImage'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ProdutImage'][$this->getPrimaryKey()] = true;
-        $keys = ProdutImageTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['ProductImage'][$this->getPrimaryKey()] = true;
+        $keys = ProductImageTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getProductId(),
@@ -1098,8 +1098,8 @@ abstract class ProdutImage implements ActiveRecordInterface
             if (null !== $this->aProduct) {
                 $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
-            if (null !== $this->collProdutImageI18ns) {
-                $result['ProdutImageI18ns'] = $this->collProdutImageI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProductImageI18ns) {
+                $result['ProductImageI18ns'] = $this->collProductImageI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
         }
 
@@ -1119,7 +1119,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ProdutImageTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = ProductImageTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1175,7 +1175,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ProdutImageTableMap::getFieldNames($keyType);
+        $keys = ProductImageTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
@@ -1192,14 +1192,14 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ProdutImageTableMap::DATABASE_NAME);
+        $criteria = new Criteria(ProductImageTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ProdutImageTableMap::ID)) $criteria->add(ProdutImageTableMap::ID, $this->id);
-        if ($this->isColumnModified(ProdutImageTableMap::PRODUCT_ID)) $criteria->add(ProdutImageTableMap::PRODUCT_ID, $this->product_id);
-        if ($this->isColumnModified(ProdutImageTableMap::FILE)) $criteria->add(ProdutImageTableMap::FILE, $this->file);
-        if ($this->isColumnModified(ProdutImageTableMap::POSITION)) $criteria->add(ProdutImageTableMap::POSITION, $this->position);
-        if ($this->isColumnModified(ProdutImageTableMap::CREATED_AT)) $criteria->add(ProdutImageTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(ProdutImageTableMap::UPDATED_AT)) $criteria->add(ProdutImageTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(ProductImageTableMap::ID)) $criteria->add(ProductImageTableMap::ID, $this->id);
+        if ($this->isColumnModified(ProductImageTableMap::PRODUCT_ID)) $criteria->add(ProductImageTableMap::PRODUCT_ID, $this->product_id);
+        if ($this->isColumnModified(ProductImageTableMap::FILE)) $criteria->add(ProductImageTableMap::FILE, $this->file);
+        if ($this->isColumnModified(ProductImageTableMap::POSITION)) $criteria->add(ProductImageTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(ProductImageTableMap::CREATED_AT)) $criteria->add(ProductImageTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(ProductImageTableMap::UPDATED_AT)) $criteria->add(ProductImageTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1214,8 +1214,8 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ProdutImageTableMap::DATABASE_NAME);
-        $criteria->add(ProdutImageTableMap::ID, $this->id);
+        $criteria = new Criteria(ProductImageTableMap::DATABASE_NAME);
+        $criteria->add(ProductImageTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1256,7 +1256,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\ProdutImage (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\ProductImage (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1274,9 +1274,9 @@ abstract class ProdutImage implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getProdutImageI18ns() as $relObj) {
+            foreach ($this->getProductImageI18ns() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addProdutImageI18n($relObj->copy($deepCopy));
+                    $copyObj->addProductImageI18n($relObj->copy($deepCopy));
                 }
             }
 
@@ -1297,7 +1297,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\ProdutImage Clone of current object.
+     * @return                 \Thelia\Model\ProductImage Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1314,7 +1314,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      * Declares an association between this object and a ChildProduct object.
      *
      * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @return                 \Thelia\Model\ProductImage The current object (for fluent API support)
      * @throws PropelException
      */
     public function setProduct(ChildProduct $v = null)
@@ -1330,7 +1330,7 @@ abstract class ProdutImage implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildProduct object, it will not be re-added.
         if ($v !== null) {
-            $v->addProdutImage($this);
+            $v->addProductImage($this);
         }
 
 
@@ -1354,7 +1354,7 @@ abstract class ProdutImage implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProduct->addProdutImages($this);
+                $this->aProduct->addProductImages($this);
              */
         }
 
@@ -1372,37 +1372,37 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('ProdutImageI18n' == $relationName) {
-            return $this->initProdutImageI18ns();
+        if ('ProductImageI18n' == $relationName) {
+            return $this->initProductImageI18ns();
         }
     }
 
     /**
-     * Clears out the collProdutImageI18ns collection
+     * Clears out the collProductImageI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addProdutImageI18ns()
+     * @see        addProductImageI18ns()
      */
-    public function clearProdutImageI18ns()
+    public function clearProductImageI18ns()
     {
-        $this->collProdutImageI18ns = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProductImageI18ns = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collProdutImageI18ns collection loaded partially.
+     * Reset is the collProductImageI18ns collection loaded partially.
      */
-    public function resetPartialProdutImageI18ns($v = true)
+    public function resetPartialProductImageI18ns($v = true)
     {
-        $this->collProdutImageI18nsPartial = $v;
+        $this->collProductImageI18nsPartial = $v;
     }
 
     /**
-     * Initializes the collProdutImageI18ns collection.
+     * Initializes the collProductImageI18ns collection.
      *
-     * By default this just sets the collProdutImageI18ns collection to an empty array (like clearcollProdutImageI18ns());
+     * By default this just sets the collProductImageI18ns collection to an empty array (like clearcollProductImageI18ns());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -1411,192 +1411,192 @@ abstract class ProdutImage implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initProdutImageI18ns($overrideExisting = true)
+    public function initProductImageI18ns($overrideExisting = true)
     {
-        if (null !== $this->collProdutImageI18ns && !$overrideExisting) {
+        if (null !== $this->collProductImageI18ns && !$overrideExisting) {
             return;
         }
-        $this->collProdutImageI18ns = new ObjectCollection();
-        $this->collProdutImageI18ns->setModel('\Thelia\Model\ProdutImageI18n');
+        $this->collProductImageI18ns = new ObjectCollection();
+        $this->collProductImageI18ns->setModel('\Thelia\Model\ProductImageI18n');
     }
 
     /**
-     * Gets an array of ChildProdutImageI18n objects which contain a foreign key that references this object.
+     * Gets an array of ChildProductImageI18n objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
      * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildProdutImage is new, it will return
+     * If this ChildProductImage is new, it will return
      * an empty collection or the current collection; the criteria is ignored on a new object.
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildProdutImageI18n[] List of ChildProdutImageI18n objects
+     * @return Collection|ChildProductImageI18n[] List of ChildProductImageI18n objects
      * @throws PropelException
      */
-    public function getProdutImageI18ns($criteria = null, ConnectionInterface $con = null)
+    public function getProductImageI18ns($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collProdutImageI18nsPartial && !$this->isNew();
-        if (null === $this->collProdutImageI18ns || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collProdutImageI18ns) {
+        $partial = $this->collProductImageI18nsPartial && !$this->isNew();
+        if (null === $this->collProductImageI18ns || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductImageI18ns) {
                 // return empty collection
-                $this->initProdutImageI18ns();
+                $this->initProductImageI18ns();
             } else {
-                $collProdutImageI18ns = ChildProdutImageI18nQuery::create(null, $criteria)
-                    ->filterByProdutImage($this)
+                $collProductImageI18ns = ChildProductImageI18nQuery::create(null, $criteria)
+                    ->filterByProductImage($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collProdutImageI18nsPartial && count($collProdutImageI18ns)) {
-                        $this->initProdutImageI18ns(false);
+                    if (false !== $this->collProductImageI18nsPartial && count($collProductImageI18ns)) {
+                        $this->initProductImageI18ns(false);
 
-                        foreach ($collProdutImageI18ns as $obj) {
-                            if (false == $this->collProdutImageI18ns->contains($obj)) {
-                                $this->collProdutImageI18ns->append($obj);
+                        foreach ($collProductImageI18ns as $obj) {
+                            if (false == $this->collProductImageI18ns->contains($obj)) {
+                                $this->collProductImageI18ns->append($obj);
                             }
                         }
 
-                        $this->collProdutImageI18nsPartial = true;
+                        $this->collProductImageI18nsPartial = true;
                     }
 
-                    $collProdutImageI18ns->getInternalIterator()->rewind();
+                    $collProductImageI18ns->getInternalIterator()->rewind();
 
-                    return $collProdutImageI18ns;
+                    return $collProductImageI18ns;
                 }
 
-                if ($partial && $this->collProdutImageI18ns) {
-                    foreach ($this->collProdutImageI18ns as $obj) {
+                if ($partial && $this->collProductImageI18ns) {
+                    foreach ($this->collProductImageI18ns as $obj) {
                         if ($obj->isNew()) {
-                            $collProdutImageI18ns[] = $obj;
+                            $collProductImageI18ns[] = $obj;
                         }
                     }
                 }
 
-                $this->collProdutImageI18ns = $collProdutImageI18ns;
-                $this->collProdutImageI18nsPartial = false;
+                $this->collProductImageI18ns = $collProductImageI18ns;
+                $this->collProductImageI18nsPartial = false;
             }
         }
 
-        return $this->collProdutImageI18ns;
+        return $this->collProductImageI18ns;
     }
 
     /**
-     * Sets a collection of ProdutImageI18n objects related by a one-to-many relationship
+     * Sets a collection of ProductImageI18n objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $produtImageI18ns A Propel collection.
+     * @param      Collection $productImageI18ns A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildProdutImage The current object (for fluent API support)
+     * @return   ChildProductImage The current object (for fluent API support)
      */
-    public function setProdutImageI18ns(Collection $produtImageI18ns, ConnectionInterface $con = null)
+    public function setProductImageI18ns(Collection $productImageI18ns, ConnectionInterface $con = null)
     {
-        $produtImageI18nsToDelete = $this->getProdutImageI18ns(new Criteria(), $con)->diff($produtImageI18ns);
+        $productImageI18nsToDelete = $this->getProductImageI18ns(new Criteria(), $con)->diff($productImageI18ns);
 
 
         //since at least one column in the foreign key is at the same time a PK
         //we can not just set a PK to NULL in the lines below. We have to store
         //a backup of all values, so we are able to manipulate these items based on the onDelete value later.
-        $this->produtImageI18nsScheduledForDeletion = clone $produtImageI18nsToDelete;
+        $this->productImageI18nsScheduledForDeletion = clone $productImageI18nsToDelete;
 
-        foreach ($produtImageI18nsToDelete as $produtImageI18nRemoved) {
-            $produtImageI18nRemoved->setProdutImage(null);
+        foreach ($productImageI18nsToDelete as $productImageI18nRemoved) {
+            $productImageI18nRemoved->setProductImage(null);
         }
 
-        $this->collProdutImageI18ns = null;
-        foreach ($produtImageI18ns as $produtImageI18n) {
-            $this->addProdutImageI18n($produtImageI18n);
+        $this->collProductImageI18ns = null;
+        foreach ($productImageI18ns as $productImageI18n) {
+            $this->addProductImageI18n($productImageI18n);
         }
 
-        $this->collProdutImageI18ns = $produtImageI18ns;
-        $this->collProdutImageI18nsPartial = false;
+        $this->collProductImageI18ns = $productImageI18ns;
+        $this->collProductImageI18nsPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related ProdutImageI18n objects.
+     * Returns the number of related ProductImageI18n objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related ProdutImageI18n objects.
+     * @return int             Count of related ProductImageI18n objects.
      * @throws PropelException
      */
-    public function countProdutImageI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countProductImageI18ns(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collProdutImageI18nsPartial && !$this->isNew();
-        if (null === $this->collProdutImageI18ns || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collProdutImageI18ns) {
+        $partial = $this->collProductImageI18nsPartial && !$this->isNew();
+        if (null === $this->collProductImageI18ns || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductImageI18ns) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getProdutImageI18ns());
+                return count($this->getProductImageI18ns());
             }
 
-            $query = ChildProdutImageI18nQuery::create(null, $criteria);
+            $query = ChildProductImageI18nQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
 
             return $query
-                ->filterByProdutImage($this)
+                ->filterByProductImage($this)
                 ->count($con);
         }
 
-        return count($this->collProdutImageI18ns);
+        return count($this->collProductImageI18ns);
     }
 
     /**
-     * Method called to associate a ChildProdutImageI18n object to this object
-     * through the ChildProdutImageI18n foreign key attribute.
+     * Method called to associate a ChildProductImageI18n object to this object
+     * through the ChildProductImageI18n foreign key attribute.
      *
-     * @param    ChildProdutImageI18n $l ChildProdutImageI18n
-     * @return   \Thelia\Model\ProdutImage The current object (for fluent API support)
+     * @param    ChildProductImageI18n $l ChildProductImageI18n
+     * @return   \Thelia\Model\ProductImage The current object (for fluent API support)
      */
-    public function addProdutImageI18n(ChildProdutImageI18n $l)
+    public function addProductImageI18n(ChildProductImageI18n $l)
     {
         if ($l && $locale = $l->getLocale()) {
             $this->setLocale($locale);
             $this->currentTranslations[$locale] = $l;
         }
-        if ($this->collProdutImageI18ns === null) {
-            $this->initProdutImageI18ns();
-            $this->collProdutImageI18nsPartial = true;
+        if ($this->collProductImageI18ns === null) {
+            $this->initProductImageI18ns();
+            $this->collProductImageI18nsPartial = true;
         }
 
-        if (!in_array($l, $this->collProdutImageI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddProdutImageI18n($l);
+        if (!in_array($l, $this->collProductImageI18ns->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductImageI18n($l);
         }
 
         return $this;
     }
 
     /**
-     * @param ProdutImageI18n $produtImageI18n The produtImageI18n object to add.
+     * @param ProductImageI18n $productImageI18n The productImageI18n object to add.
      */
-    protected function doAddProdutImageI18n($produtImageI18n)
+    protected function doAddProductImageI18n($productImageI18n)
     {
-        $this->collProdutImageI18ns[]= $produtImageI18n;
-        $produtImageI18n->setProdutImage($this);
+        $this->collProductImageI18ns[]= $productImageI18n;
+        $productImageI18n->setProductImage($this);
     }
 
     /**
-     * @param  ProdutImageI18n $produtImageI18n The produtImageI18n object to remove.
-     * @return ChildProdutImage The current object (for fluent API support)
+     * @param  ProductImageI18n $productImageI18n The productImageI18n object to remove.
+     * @return ChildProductImage The current object (for fluent API support)
      */
-    public function removeProdutImageI18n($produtImageI18n)
+    public function removeProductImageI18n($productImageI18n)
     {
-        if ($this->getProdutImageI18ns()->contains($produtImageI18n)) {
-            $this->collProdutImageI18ns->remove($this->collProdutImageI18ns->search($produtImageI18n));
-            if (null === $this->produtImageI18nsScheduledForDeletion) {
-                $this->produtImageI18nsScheduledForDeletion = clone $this->collProdutImageI18ns;
-                $this->produtImageI18nsScheduledForDeletion->clear();
+        if ($this->getProductImageI18ns()->contains($productImageI18n)) {
+            $this->collProductImageI18ns->remove($this->collProductImageI18ns->search($productImageI18n));
+            if (null === $this->productImageI18nsScheduledForDeletion) {
+                $this->productImageI18nsScheduledForDeletion = clone $this->collProductImageI18ns;
+                $this->productImageI18nsScheduledForDeletion->clear();
             }
-            $this->produtImageI18nsScheduledForDeletion[]= clone $produtImageI18n;
-            $produtImageI18n->setProdutImage(null);
+            $this->productImageI18nsScheduledForDeletion[]= clone $productImageI18n;
+            $productImageI18n->setProductImage(null);
         }
 
         return $this;
@@ -1632,8 +1632,8 @@ abstract class ProdutImage implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collProdutImageI18ns) {
-                foreach ($this->collProdutImageI18ns as $o) {
+            if ($this->collProductImageI18ns) {
+                foreach ($this->collProductImageI18ns as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -1643,10 +1643,10 @@ abstract class ProdutImage implements ActiveRecordInterface
         $this->currentLocale = 'en_US';
         $this->currentTranslations = null;
 
-        if ($this->collProdutImageI18ns instanceof Collection) {
-            $this->collProdutImageI18ns->clearIterator();
+        if ($this->collProductImageI18ns instanceof Collection) {
+            $this->collProductImageI18ns->clearIterator();
         }
-        $this->collProdutImageI18ns = null;
+        $this->collProductImageI18ns = null;
         $this->aProduct = null;
     }
 
@@ -1657,7 +1657,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ProdutImageTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(ProductImageTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1665,11 +1665,11 @@ abstract class ProdutImage implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildProdutImage The current object (for fluent API support)
+     * @return     ChildProductImage The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ProdutImageTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = ProductImageTableMap::UPDATED_AT;
 
         return $this;
     }
@@ -1681,7 +1681,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      *
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      *
-     * @return    ChildProdutImage The current object (for fluent API support)
+     * @return    ChildProductImage The current object (for fluent API support)
      */
     public function setLocale($locale = 'en_US')
     {
@@ -1706,12 +1706,12 @@ abstract class ProdutImage implements ActiveRecordInterface
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildProdutImageI18n */
+     * @return ChildProductImageI18n */
     public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
-            if (null !== $this->collProdutImageI18ns) {
-                foreach ($this->collProdutImageI18ns as $translation) {
+            if (null !== $this->collProductImageI18ns) {
+                foreach ($this->collProductImageI18ns as $translation) {
                     if ($translation->getLocale() == $locale) {
                         $this->currentTranslations[$locale] = $translation;
 
@@ -1720,15 +1720,15 @@ abstract class ProdutImage implements ActiveRecordInterface
                 }
             }
             if ($this->isNew()) {
-                $translation = new ChildProdutImageI18n();
+                $translation = new ChildProductImageI18n();
                 $translation->setLocale($locale);
             } else {
-                $translation = ChildProdutImageI18nQuery::create()
+                $translation = ChildProductImageI18nQuery::create()
                     ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
                     ->findOneOrCreate($con);
                 $this->currentTranslations[$locale] = $translation;
             }
-            $this->addProdutImageI18n($translation);
+            $this->addProductImageI18n($translation);
         }
 
         return $this->currentTranslations[$locale];
@@ -1740,21 +1740,21 @@ abstract class ProdutImage implements ActiveRecordInterface
      * @param     string $locale Locale to use for the translation, e.g. 'fr_FR'
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return    ChildProdutImage The current object (for fluent API support)
+     * @return    ChildProductImage The current object (for fluent API support)
      */
     public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
-            ChildProdutImageI18nQuery::create()
+            ChildProductImageI18nQuery::create()
                 ->filterByPrimaryKey(array($this->getPrimaryKey(), $locale))
                 ->delete($con);
         }
         if (isset($this->currentTranslations[$locale])) {
             unset($this->currentTranslations[$locale]);
         }
-        foreach ($this->collProdutImageI18ns as $key => $translation) {
+        foreach ($this->collProductImageI18ns as $key => $translation) {
             if ($translation->getLocale() == $locale) {
-                unset($this->collProdutImageI18ns[$key]);
+                unset($this->collProductImageI18ns[$key]);
                 break;
             }
         }
@@ -1767,7 +1767,7 @@ abstract class ProdutImage implements ActiveRecordInterface
      *
      * @param     ConnectionInterface $con an optional connection object
      *
-     * @return ChildProdutImageI18n */
+     * @return ChildProductImageI18n */
     public function getCurrentTranslation(ConnectionInterface $con = null)
     {
         return $this->getTranslation($this->getLocale(), $con);
@@ -1789,7 +1789,7 @@ abstract class ProdutImage implements ActiveRecordInterface
          * Set the value of [title] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\ProdutImageI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProductImageI18n The current object (for fluent API support)
          */
         public function setTitle($v)
         {    $this->getCurrentTranslation()->setTitle($v);
@@ -1813,7 +1813,7 @@ abstract class ProdutImage implements ActiveRecordInterface
          * Set the value of [description] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\ProdutImageI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProductImageI18n The current object (for fluent API support)
          */
         public function setDescription($v)
         {    $this->getCurrentTranslation()->setDescription($v);
@@ -1837,7 +1837,7 @@ abstract class ProdutImage implements ActiveRecordInterface
          * Set the value of [chapo] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\ProdutImageI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProductImageI18n The current object (for fluent API support)
          */
         public function setChapo($v)
         {    $this->getCurrentTranslation()->setChapo($v);
@@ -1861,7 +1861,7 @@ abstract class ProdutImage implements ActiveRecordInterface
          * Set the value of [postscriptum] column.
          *
          * @param      string $v new value
-         * @return   \Thelia\Model\ProdutImageI18n The current object (for fluent API support)
+         * @return   \Thelia\Model\ProductImageI18n The current object (for fluent API support)
          */
         public function setPostscriptum($v)
         {    $this->getCurrentTranslation()->setPostscriptum($v);

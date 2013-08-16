@@ -12,89 +12,89 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\ProdutImage as ChildProdutImage;
-use Thelia\Model\ProdutImageI18nQuery as ChildProdutImageI18nQuery;
-use Thelia\Model\ProdutImageQuery as ChildProdutImageQuery;
-use Thelia\Model\Map\ProdutImageTableMap;
+use Thelia\Model\ProductImage as ChildProductImage;
+use Thelia\Model\ProductImageI18nQuery as ChildProductImageI18nQuery;
+use Thelia\Model\ProductImageQuery as ChildProductImageQuery;
+use Thelia\Model\Map\ProductImageTableMap;
 
 /**
- * Base class that represents a query for the 'produt_image' table.
+ * Base class that represents a query for the 'product_image' table.
  *
  *
  *
- * @method     ChildProdutImageQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildProdutImageQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
- * @method     ChildProdutImageQuery orderByFile($order = Criteria::ASC) Order by the file column
- * @method     ChildProdutImageQuery orderByPosition($order = Criteria::ASC) Order by the position column
- * @method     ChildProdutImageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildProdutImageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildProductImageQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildProductImageQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
+ * @method     ChildProductImageQuery orderByFile($order = Criteria::ASC) Order by the file column
+ * @method     ChildProductImageQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildProductImageQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildProductImageQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildProdutImageQuery groupById() Group by the id column
- * @method     ChildProdutImageQuery groupByProductId() Group by the product_id column
- * @method     ChildProdutImageQuery groupByFile() Group by the file column
- * @method     ChildProdutImageQuery groupByPosition() Group by the position column
- * @method     ChildProdutImageQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildProdutImageQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildProductImageQuery groupById() Group by the id column
+ * @method     ChildProductImageQuery groupByProductId() Group by the product_id column
+ * @method     ChildProductImageQuery groupByFile() Group by the file column
+ * @method     ChildProductImageQuery groupByPosition() Group by the position column
+ * @method     ChildProductImageQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildProductImageQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildProdutImageQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildProdutImageQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildProdutImageQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildProductImageQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildProductImageQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildProductImageQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildProdutImageQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method     ChildProdutImageQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method     ChildProdutImageQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method     ChildProductImageQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
+ * @method     ChildProductImageQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
+ * @method     ChildProductImageQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
  *
- * @method     ChildProdutImageQuery leftJoinProdutImageI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProdutImageI18n relation
- * @method     ChildProdutImageQuery rightJoinProdutImageI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProdutImageI18n relation
- * @method     ChildProdutImageQuery innerJoinProdutImageI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ProdutImageI18n relation
+ * @method     ChildProductImageQuery leftJoinProductImageI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductImageI18n relation
+ * @method     ChildProductImageQuery rightJoinProductImageI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductImageI18n relation
+ * @method     ChildProductImageQuery innerJoinProductImageI18n($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductImageI18n relation
  *
- * @method     ChildProdutImage findOne(ConnectionInterface $con = null) Return the first ChildProdutImage matching the query
- * @method     ChildProdutImage findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProdutImage matching the query, or a new ChildProdutImage object populated from the query conditions when no match is found
+ * @method     ChildProductImage findOne(ConnectionInterface $con = null) Return the first ChildProductImage matching the query
+ * @method     ChildProductImage findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProductImage matching the query, or a new ChildProductImage object populated from the query conditions when no match is found
  *
- * @method     ChildProdutImage findOneById(int $id) Return the first ChildProdutImage filtered by the id column
- * @method     ChildProdutImage findOneByProductId(int $product_id) Return the first ChildProdutImage filtered by the product_id column
- * @method     ChildProdutImage findOneByFile(string $file) Return the first ChildProdutImage filtered by the file column
- * @method     ChildProdutImage findOneByPosition(int $position) Return the first ChildProdutImage filtered by the position column
- * @method     ChildProdutImage findOneByCreatedAt(string $created_at) Return the first ChildProdutImage filtered by the created_at column
- * @method     ChildProdutImage findOneByUpdatedAt(string $updated_at) Return the first ChildProdutImage filtered by the updated_at column
+ * @method     ChildProductImage findOneById(int $id) Return the first ChildProductImage filtered by the id column
+ * @method     ChildProductImage findOneByProductId(int $product_id) Return the first ChildProductImage filtered by the product_id column
+ * @method     ChildProductImage findOneByFile(string $file) Return the first ChildProductImage filtered by the file column
+ * @method     ChildProductImage findOneByPosition(int $position) Return the first ChildProductImage filtered by the position column
+ * @method     ChildProductImage findOneByCreatedAt(string $created_at) Return the first ChildProductImage filtered by the created_at column
+ * @method     ChildProductImage findOneByUpdatedAt(string $updated_at) Return the first ChildProductImage filtered by the updated_at column
  *
- * @method     array findById(int $id) Return ChildProdutImage objects filtered by the id column
- * @method     array findByProductId(int $product_id) Return ChildProdutImage objects filtered by the product_id column
- * @method     array findByFile(string $file) Return ChildProdutImage objects filtered by the file column
- * @method     array findByPosition(int $position) Return ChildProdutImage objects filtered by the position column
- * @method     array findByCreatedAt(string $created_at) Return ChildProdutImage objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildProdutImage objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildProductImage objects filtered by the id column
+ * @method     array findByProductId(int $product_id) Return ChildProductImage objects filtered by the product_id column
+ * @method     array findByFile(string $file) Return ChildProductImage objects filtered by the file column
+ * @method     array findByPosition(int $position) Return ChildProductImage objects filtered by the position column
+ * @method     array findByCreatedAt(string $created_at) Return ChildProductImage objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildProductImage objects filtered by the updated_at column
  *
  */
-abstract class ProdutImageQuery extends ModelCriteria
+abstract class ProductImageQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\ProdutImageQuery object.
+     * Initializes internal state of \Thelia\Model\Base\ProductImageQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProdutImage', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProductImage', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildProdutImageQuery object.
+     * Returns a new ChildProductImageQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildProdutImageQuery
+     * @return ChildProductImageQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\ProdutImageQuery) {
+        if ($criteria instanceof \Thelia\Model\ProductImageQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\ProdutImageQuery();
+        $query = new \Thelia\Model\ProductImageQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -117,19 +117,19 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildProdutImage|array|mixed the result, formatted by the current formatter
+     * @return ChildProductImage|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = ProdutImageTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = ProductImageTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProductImageTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -148,11 +148,11 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildProdutImage A model object, or null if the key is not found
+     * @return   ChildProductImage A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, PRODUCT_ID, FILE, POSITION, CREATED_AT, UPDATED_AT FROM produt_image WHERE ID = :p0';
+        $sql = 'SELECT ID, PRODUCT_ID, FILE, POSITION, CREATED_AT, UPDATED_AT FROM product_image WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -163,9 +163,9 @@ abstract class ProdutImageQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildProdutImage();
+            $obj = new ChildProductImage();
             $obj->hydrate($row);
-            ProdutImageTableMap::addInstanceToPool($obj, (string) $key);
+            ProductImageTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -178,7 +178,7 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildProdutImage|array|mixed the result, formatted by the current formatter
+     * @return ChildProductImage|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -220,12 +220,12 @@ abstract class ProdutImageQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(ProdutImageTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(ProductImageTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -233,12 +233,12 @@ abstract class ProdutImageQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(ProdutImageTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(ProductImageTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -257,18 +257,18 @@ abstract class ProdutImageQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(ProdutImageTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(ProdutImageTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -279,7 +279,7 @@ abstract class ProdutImageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(ProductImageTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -300,18 +300,18 @@ abstract class ProdutImageQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByProductId($productId = null, $comparison = null)
     {
         if (is_array($productId)) {
             $useMinMax = false;
             if (isset($productId['min'])) {
-                $this->addUsingAlias(ProdutImageTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($productId['max'])) {
-                $this->addUsingAlias(ProdutImageTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -322,7 +322,7 @@ abstract class ProdutImageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageTableMap::PRODUCT_ID, $productId, $comparison);
+        return $this->addUsingAlias(ProductImageTableMap::PRODUCT_ID, $productId, $comparison);
     }
 
     /**
@@ -338,7 +338,7 @@ abstract class ProdutImageQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByFile($file = null, $comparison = null)
     {
@@ -351,7 +351,7 @@ abstract class ProdutImageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageTableMap::FILE, $file, $comparison);
+        return $this->addUsingAlias(ProductImageTableMap::FILE, $file, $comparison);
     }
 
     /**
@@ -370,18 +370,18 @@ abstract class ProdutImageQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByPosition($position = null, $comparison = null)
     {
         if (is_array($position)) {
             $useMinMax = false;
             if (isset($position['min'])) {
-                $this->addUsingAlias(ProdutImageTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($position['max'])) {
-                $this->addUsingAlias(ProdutImageTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -392,7 +392,7 @@ abstract class ProdutImageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageTableMap::POSITION, $position, $comparison);
+        return $this->addUsingAlias(ProductImageTableMap::POSITION, $position, $comparison);
     }
 
     /**
@@ -413,18 +413,18 @@ abstract class ProdutImageQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(ProdutImageTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(ProdutImageTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -435,7 +435,7 @@ abstract class ProdutImageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(ProductImageTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -456,18 +456,18 @@ abstract class ProdutImageQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(ProdutImageTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(ProdutImageTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductImageTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -478,7 +478,7 @@ abstract class ProdutImageQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(ProductImageTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -487,20 +487,20 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function filterByProduct($product, $comparison = null)
     {
         if ($product instanceof \Thelia\Model\Product) {
             return $this
-                ->addUsingAlias(ProdutImageTableMap::PRODUCT_ID, $product->getId(), $comparison);
+                ->addUsingAlias(ProductImageTableMap::PRODUCT_ID, $product->getId(), $comparison);
         } elseif ($product instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ProdutImageTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ProductImageTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByProduct() only accepts arguments of type \Thelia\Model\Product or Collection');
         }
@@ -512,7 +512,7 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
     public function joinProduct($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
@@ -557,40 +557,40 @@ abstract class ProdutImageQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\ProdutImageI18n object
+     * Filter the query by a related \Thelia\Model\ProductImageI18n object
      *
-     * @param \Thelia\Model\ProdutImageI18n|ObjectCollection $produtImageI18n  the related object to use as filter
+     * @param \Thelia\Model\ProductImageI18n|ObjectCollection $productImageI18n  the related object to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
-    public function filterByProdutImageI18n($produtImageI18n, $comparison = null)
+    public function filterByProductImageI18n($productImageI18n, $comparison = null)
     {
-        if ($produtImageI18n instanceof \Thelia\Model\ProdutImageI18n) {
+        if ($productImageI18n instanceof \Thelia\Model\ProductImageI18n) {
             return $this
-                ->addUsingAlias(ProdutImageTableMap::ID, $produtImageI18n->getId(), $comparison);
-        } elseif ($produtImageI18n instanceof ObjectCollection) {
+                ->addUsingAlias(ProductImageTableMap::ID, $productImageI18n->getId(), $comparison);
+        } elseif ($productImageI18n instanceof ObjectCollection) {
             return $this
-                ->useProdutImageI18nQuery()
-                ->filterByPrimaryKeys($produtImageI18n->getPrimaryKeys())
+                ->useProductImageI18nQuery()
+                ->filterByPrimaryKeys($productImageI18n->getPrimaryKeys())
                 ->endUse();
         } else {
-            throw new PropelException('filterByProdutImageI18n() only accepts arguments of type \Thelia\Model\ProdutImageI18n or Collection');
+            throw new PropelException('filterByProductImageI18n() only accepts arguments of type \Thelia\Model\ProductImageI18n or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ProdutImageI18n relation
+     * Adds a JOIN clause to the query using the ProductImageI18n relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
-    public function joinProdutImageI18n($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function joinProductImageI18n($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ProdutImageI18n');
+        $relationMap = $tableMap->getRelation('ProductImageI18n');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -605,14 +605,14 @@ abstract class ProdutImageQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ProdutImageI18n');
+            $this->addJoinObject($join, 'ProductImageI18n');
         }
 
         return $this;
     }
 
     /**
-     * Use the ProdutImageI18n relation ProdutImageI18n object
+     * Use the ProductImageI18n relation ProductImageI18n object
      *
      * @see useQuery()
      *
@@ -620,33 +620,33 @@ abstract class ProdutImageQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProdutImageI18nQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductImageI18nQuery A secondary query class using the current class as primary query
      */
-    public function useProdutImageI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function useProductImageI18nQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinProdutImageI18n($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ProdutImageI18n', '\Thelia\Model\ProdutImageI18nQuery');
+            ->joinProductImageI18n($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductImageI18n', '\Thelia\Model\ProductImageI18nQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildProdutImage $produtImage Object to remove from the list of results
+     * @param   ChildProductImage $productImage Object to remove from the list of results
      *
-     * @return ChildProdutImageQuery The current query, for fluid interface
+     * @return ChildProductImageQuery The current query, for fluid interface
      */
-    public function prune($produtImage = null)
+    public function prune($productImage = null)
     {
-        if ($produtImage) {
-            $this->addUsingAlias(ProdutImageTableMap::ID, $produtImage->getId(), Criteria::NOT_EQUAL);
+        if ($productImage) {
+            $this->addUsingAlias(ProductImageTableMap::ID, $productImage->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the produt_image table.
+     * Deletes all rows from the product_image table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -654,7 +654,7 @@ abstract class ProdutImageQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -665,8 +665,8 @@ abstract class ProdutImageQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            ProdutImageTableMap::clearInstancePool();
-            ProdutImageTableMap::clearRelatedInstancePool();
+            ProductImageTableMap::clearInstancePool();
+            ProductImageTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -678,9 +678,9 @@ abstract class ProdutImageQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildProdutImage or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildProductImage or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildProdutImage object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildProductImage object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -691,13 +691,13 @@ abstract class ProdutImageQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(ProdutImageTableMap::DATABASE_NAME);
+        $criteria->setDbName(ProductImageTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -707,10 +707,10 @@ abstract class ProdutImageQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        ProdutImageTableMap::removeInstanceFromPool($criteria);
+        ProductImageTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            ProdutImageTableMap::clearRelatedInstancePool();
+            ProductImageTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -727,11 +727,11 @@ abstract class ProdutImageQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildProdutImageQuery The current query, for fluid interface
+     * @return     ChildProductImageQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(ProdutImageTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProductImageTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -739,51 +739,51 @@ abstract class ProdutImageQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildProdutImageQuery The current query, for fluid interface
+     * @return     ChildProductImageQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(ProdutImageTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(ProductImageTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildProdutImageQuery The current query, for fluid interface
+     * @return     ChildProductImageQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ProdutImageTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(ProductImageTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildProdutImageQuery The current query, for fluid interface
+     * @return     ChildProductImageQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ProdutImageTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(ProductImageTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildProdutImageQuery The current query, for fluid interface
+     * @return     ChildProductImageQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ProdutImageTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(ProductImageTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildProdutImageQuery The current query, for fluid interface
+     * @return     ChildProductImageQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ProdutImageTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(ProductImageTableMap::CREATED_AT);
     }
 
     // i18n behavior
@@ -795,14 +795,14 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildProdutImageQuery The current query, for fluid interface
+     * @return    ChildProductImageQuery The current query, for fluid interface
      */
     public function joinI18n($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
-        $relationName = $relationAlias ? $relationAlias : 'ProdutImageI18n';
+        $relationName = $relationAlias ? $relationAlias : 'ProductImageI18n';
 
         return $this
-            ->joinProdutImageI18n($relationAlias, $joinType)
+            ->joinProductImageI18n($relationAlias, $joinType)
             ->addJoinCondition($relationName, $relationName . '.Locale = ?', $locale);
     }
 
@@ -813,14 +813,14 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param     string $locale Locale to use for the join condition, e.g. 'fr_FR'
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildProdutImageQuery The current query, for fluid interface
+     * @return    ChildProductImageQuery The current query, for fluid interface
      */
     public function joinWithI18n($locale = 'en_US', $joinType = Criteria::LEFT_JOIN)
     {
         $this
             ->joinI18n($locale, null, $joinType)
-            ->with('ProdutImageI18n');
-        $this->with['ProdutImageI18n']->setIsWithOneToMany(false);
+            ->with('ProductImageI18n');
+        $this->with['ProductImageI18n']->setIsWithOneToMany(false);
 
         return $this;
     }
@@ -834,13 +834,13 @@ abstract class ProdutImageQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'. Defaults to left join.
      *
-     * @return    ChildProdutImageI18nQuery A secondary query class using the current class as primary query
+     * @return    ChildProductImageI18nQuery A secondary query class using the current class as primary query
      */
     public function useI18nQuery($locale = 'en_US', $relationAlias = null, $joinType = Criteria::LEFT_JOIN)
     {
         return $this
             ->joinI18n($locale, $relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ProdutImageI18n', '\Thelia\Model\ProdutImageI18nQuery');
+            ->useQuery($relationAlias ? $relationAlias : 'ProductImageI18n', '\Thelia\Model\ProductImageI18nQuery');
     }
 
-} // ProdutImageQuery
+} // ProductImageQuery

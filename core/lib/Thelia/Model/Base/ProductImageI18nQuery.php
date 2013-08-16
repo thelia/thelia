@@ -12,84 +12,84 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\ProdutImageI18n as ChildProdutImageI18n;
-use Thelia\Model\ProdutImageI18nQuery as ChildProdutImageI18nQuery;
-use Thelia\Model\Map\ProdutImageI18nTableMap;
+use Thelia\Model\ProductImageI18n as ChildProductImageI18n;
+use Thelia\Model\ProductImageI18nQuery as ChildProductImageI18nQuery;
+use Thelia\Model\Map\ProductImageI18nTableMap;
 
 /**
- * Base class that represents a query for the 'produt_image_i18n' table.
+ * Base class that represents a query for the 'product_image_i18n' table.
  *
  *
  *
- * @method     ChildProdutImageI18nQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildProdutImageI18nQuery orderByLocale($order = Criteria::ASC) Order by the locale column
- * @method     ChildProdutImageI18nQuery orderByTitle($order = Criteria::ASC) Order by the title column
- * @method     ChildProdutImageI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
- * @method     ChildProdutImageI18nQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
- * @method     ChildProdutImageI18nQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
+ * @method     ChildProductImageI18nQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildProductImageI18nQuery orderByLocale($order = Criteria::ASC) Order by the locale column
+ * @method     ChildProductImageI18nQuery orderByTitle($order = Criteria::ASC) Order by the title column
+ * @method     ChildProductImageI18nQuery orderByDescription($order = Criteria::ASC) Order by the description column
+ * @method     ChildProductImageI18nQuery orderByChapo($order = Criteria::ASC) Order by the chapo column
+ * @method     ChildProductImageI18nQuery orderByPostscriptum($order = Criteria::ASC) Order by the postscriptum column
  *
- * @method     ChildProdutImageI18nQuery groupById() Group by the id column
- * @method     ChildProdutImageI18nQuery groupByLocale() Group by the locale column
- * @method     ChildProdutImageI18nQuery groupByTitle() Group by the title column
- * @method     ChildProdutImageI18nQuery groupByDescription() Group by the description column
- * @method     ChildProdutImageI18nQuery groupByChapo() Group by the chapo column
- * @method     ChildProdutImageI18nQuery groupByPostscriptum() Group by the postscriptum column
+ * @method     ChildProductImageI18nQuery groupById() Group by the id column
+ * @method     ChildProductImageI18nQuery groupByLocale() Group by the locale column
+ * @method     ChildProductImageI18nQuery groupByTitle() Group by the title column
+ * @method     ChildProductImageI18nQuery groupByDescription() Group by the description column
+ * @method     ChildProductImageI18nQuery groupByChapo() Group by the chapo column
+ * @method     ChildProductImageI18nQuery groupByPostscriptum() Group by the postscriptum column
  *
- * @method     ChildProdutImageI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildProdutImageI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildProdutImageI18nQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildProductImageI18nQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildProductImageI18nQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildProductImageI18nQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildProdutImageI18nQuery leftJoinProdutImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProdutImage relation
- * @method     ChildProdutImageI18nQuery rightJoinProdutImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProdutImage relation
- * @method     ChildProdutImageI18nQuery innerJoinProdutImage($relationAlias = null) Adds a INNER JOIN clause to the query using the ProdutImage relation
+ * @method     ChildProductImageI18nQuery leftJoinProductImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the ProductImage relation
+ * @method     ChildProductImageI18nQuery rightJoinProductImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ProductImage relation
+ * @method     ChildProductImageI18nQuery innerJoinProductImage($relationAlias = null) Adds a INNER JOIN clause to the query using the ProductImage relation
  *
- * @method     ChildProdutImageI18n findOne(ConnectionInterface $con = null) Return the first ChildProdutImageI18n matching the query
- * @method     ChildProdutImageI18n findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProdutImageI18n matching the query, or a new ChildProdutImageI18n object populated from the query conditions when no match is found
+ * @method     ChildProductImageI18n findOne(ConnectionInterface $con = null) Return the first ChildProductImageI18n matching the query
+ * @method     ChildProductImageI18n findOneOrCreate(ConnectionInterface $con = null) Return the first ChildProductImageI18n matching the query, or a new ChildProductImageI18n object populated from the query conditions when no match is found
  *
- * @method     ChildProdutImageI18n findOneById(int $id) Return the first ChildProdutImageI18n filtered by the id column
- * @method     ChildProdutImageI18n findOneByLocale(string $locale) Return the first ChildProdutImageI18n filtered by the locale column
- * @method     ChildProdutImageI18n findOneByTitle(string $title) Return the first ChildProdutImageI18n filtered by the title column
- * @method     ChildProdutImageI18n findOneByDescription(string $description) Return the first ChildProdutImageI18n filtered by the description column
- * @method     ChildProdutImageI18n findOneByChapo(string $chapo) Return the first ChildProdutImageI18n filtered by the chapo column
- * @method     ChildProdutImageI18n findOneByPostscriptum(string $postscriptum) Return the first ChildProdutImageI18n filtered by the postscriptum column
+ * @method     ChildProductImageI18n findOneById(int $id) Return the first ChildProductImageI18n filtered by the id column
+ * @method     ChildProductImageI18n findOneByLocale(string $locale) Return the first ChildProductImageI18n filtered by the locale column
+ * @method     ChildProductImageI18n findOneByTitle(string $title) Return the first ChildProductImageI18n filtered by the title column
+ * @method     ChildProductImageI18n findOneByDescription(string $description) Return the first ChildProductImageI18n filtered by the description column
+ * @method     ChildProductImageI18n findOneByChapo(string $chapo) Return the first ChildProductImageI18n filtered by the chapo column
+ * @method     ChildProductImageI18n findOneByPostscriptum(string $postscriptum) Return the first ChildProductImageI18n filtered by the postscriptum column
  *
- * @method     array findById(int $id) Return ChildProdutImageI18n objects filtered by the id column
- * @method     array findByLocale(string $locale) Return ChildProdutImageI18n objects filtered by the locale column
- * @method     array findByTitle(string $title) Return ChildProdutImageI18n objects filtered by the title column
- * @method     array findByDescription(string $description) Return ChildProdutImageI18n objects filtered by the description column
- * @method     array findByChapo(string $chapo) Return ChildProdutImageI18n objects filtered by the chapo column
- * @method     array findByPostscriptum(string $postscriptum) Return ChildProdutImageI18n objects filtered by the postscriptum column
+ * @method     array findById(int $id) Return ChildProductImageI18n objects filtered by the id column
+ * @method     array findByLocale(string $locale) Return ChildProductImageI18n objects filtered by the locale column
+ * @method     array findByTitle(string $title) Return ChildProductImageI18n objects filtered by the title column
+ * @method     array findByDescription(string $description) Return ChildProductImageI18n objects filtered by the description column
+ * @method     array findByChapo(string $chapo) Return ChildProductImageI18n objects filtered by the chapo column
+ * @method     array findByPostscriptum(string $postscriptum) Return ChildProductImageI18n objects filtered by the postscriptum column
  *
  */
-abstract class ProdutImageI18nQuery extends ModelCriteria
+abstract class ProductImageI18nQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\ProdutImageI18nQuery object.
+     * Initializes internal state of \Thelia\Model\Base\ProductImageI18nQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProdutImageI18n', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ProductImageI18n', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildProdutImageI18nQuery object.
+     * Returns a new ChildProductImageI18nQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildProdutImageI18nQuery
+     * @return ChildProductImageI18nQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\ProdutImageI18nQuery) {
+        if ($criteria instanceof \Thelia\Model\ProductImageI18nQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\ProdutImageI18nQuery();
+        $query = new \Thelia\Model\ProductImageI18nQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -112,19 +112,19 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      * @param array[$id, $locale] $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildProdutImageI18n|array|mixed the result, formatted by the current formatter
+     * @return ChildProductImageI18n|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = ProdutImageI18nTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
+        if ((null !== ($obj = ProductImageI18nTableMap::getInstanceFromPool(serialize(array((string) $key[0], (string) $key[1]))))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ProdutImageI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(ProductImageI18nTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -143,11 +143,11 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildProdutImageI18n A model object, or null if the key is not found
+     * @return   ChildProductImageI18n A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM FROM produt_image_i18n WHERE ID = :p0 AND LOCALE = :p1';
+        $sql = 'SELECT ID, LOCALE, TITLE, DESCRIPTION, CHAPO, POSTSCRIPTUM FROM product_image_i18n WHERE ID = :p0 AND LOCALE = :p1';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key[0], PDO::PARAM_INT);
@@ -159,9 +159,9 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildProdutImageI18n();
+            $obj = new ChildProductImageI18n();
             $obj->hydrate($row);
-            ProdutImageI18nTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
+            ProductImageI18nTableMap::addInstanceToPool($obj, serialize(array((string) $key[0], (string) $key[1])));
         }
         $stmt->closeCursor();
 
@@ -174,7 +174,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildProdutImageI18n|array|mixed the result, formatted by the current formatter
+     * @return ChildProductImageI18n|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -216,12 +216,12 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
-        $this->addUsingAlias(ProdutImageI18nTableMap::ID, $key[0], Criteria::EQUAL);
-        $this->addUsingAlias(ProdutImageI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
+        $this->addUsingAlias(ProductImageI18nTableMap::ID, $key[0], Criteria::EQUAL);
+        $this->addUsingAlias(ProductImageI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
 
         return $this;
     }
@@ -231,7 +231,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
@@ -239,8 +239,8 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             return $this->add(null, '1<>1', Criteria::CUSTOM);
         }
         foreach ($keys as $key) {
-            $cton0 = $this->getNewCriterion(ProdutImageI18nTableMap::ID, $key[0], Criteria::EQUAL);
-            $cton1 = $this->getNewCriterion(ProdutImageI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
+            $cton0 = $this->getNewCriterion(ProductImageI18nTableMap::ID, $key[0], Criteria::EQUAL);
+            $cton1 = $this->getNewCriterion(ProductImageI18nTableMap::LOCALE, $key[1], Criteria::EQUAL);
             $cton0->addAnd($cton1);
             $this->addOr($cton0);
         }
@@ -258,7 +258,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      * $query->filterById(array('min' => 12)); // WHERE id > 12
      * </code>
      *
-     * @see       filterByProdutImage()
+     * @see       filterByProductImage()
      *
      * @param     mixed $id The value to use as filter.
      *              Use scalar values for equality.
@@ -266,18 +266,18 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(ProdutImageI18nTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(ProductImageI18nTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(ProdutImageI18nTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(ProductImageI18nTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -288,7 +288,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageI18nTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(ProductImageI18nTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -304,7 +304,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterByLocale($locale = null, $comparison = null)
     {
@@ -317,7 +317,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageI18nTableMap::LOCALE, $locale, $comparison);
+        return $this->addUsingAlias(ProductImageI18nTableMap::LOCALE, $locale, $comparison);
     }
 
     /**
@@ -333,7 +333,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterByTitle($title = null, $comparison = null)
     {
@@ -346,7 +346,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageI18nTableMap::TITLE, $title, $comparison);
+        return $this->addUsingAlias(ProductImageI18nTableMap::TITLE, $title, $comparison);
     }
 
     /**
@@ -362,7 +362,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterByDescription($description = null, $comparison = null)
     {
@@ -375,7 +375,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageI18nTableMap::DESCRIPTION, $description, $comparison);
+        return $this->addUsingAlias(ProductImageI18nTableMap::DESCRIPTION, $description, $comparison);
     }
 
     /**
@@ -391,7 +391,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterByChapo($chapo = null, $comparison = null)
     {
@@ -404,7 +404,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageI18nTableMap::CHAPO, $chapo, $comparison);
+        return $this->addUsingAlias(ProductImageI18nTableMap::CHAPO, $chapo, $comparison);
     }
 
     /**
@@ -420,7 +420,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *              Accepts wildcards (* and % trigger a LIKE)
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
     public function filterByPostscriptum($postscriptum = null, $comparison = null)
     {
@@ -433,46 +433,46 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ProdutImageI18nTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
+        return $this->addUsingAlias(ProductImageI18nTableMap::POSTSCRIPTUM, $postscriptum, $comparison);
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\ProdutImage object
+     * Filter the query by a related \Thelia\Model\ProductImage object
      *
-     * @param \Thelia\Model\ProdutImage|ObjectCollection $produtImage The related object(s) to use as filter
+     * @param \Thelia\Model\ProductImage|ObjectCollection $productImage The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
-    public function filterByProdutImage($produtImage, $comparison = null)
+    public function filterByProductImage($productImage, $comparison = null)
     {
-        if ($produtImage instanceof \Thelia\Model\ProdutImage) {
+        if ($productImage instanceof \Thelia\Model\ProductImage) {
             return $this
-                ->addUsingAlias(ProdutImageI18nTableMap::ID, $produtImage->getId(), $comparison);
-        } elseif ($produtImage instanceof ObjectCollection) {
+                ->addUsingAlias(ProductImageI18nTableMap::ID, $productImage->getId(), $comparison);
+        } elseif ($productImage instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ProdutImageI18nTableMap::ID, $produtImage->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(ProductImageI18nTableMap::ID, $productImage->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
-            throw new PropelException('filterByProdutImage() only accepts arguments of type \Thelia\Model\ProdutImage or Collection');
+            throw new PropelException('filterByProductImage() only accepts arguments of type \Thelia\Model\ProductImage or Collection');
         }
     }
 
     /**
-     * Adds a JOIN clause to the query using the ProdutImage relation
+     * Adds a JOIN clause to the query using the ProductImage relation
      *
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
-    public function joinProdutImage($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function joinProductImage($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('ProdutImage');
+        $relationMap = $tableMap->getRelation('ProductImage');
 
         // create a ModelJoin object for this join
         $join = new ModelJoin();
@@ -487,14 +487,14 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
             $this->addJoinObject($join, $relationAlias);
         } else {
-            $this->addJoinObject($join, 'ProdutImage');
+            $this->addJoinObject($join, 'ProductImage');
         }
 
         return $this;
     }
 
     /**
-     * Use the ProdutImage relation ProdutImage object
+     * Use the ProductImage relation ProductImage object
      *
      * @see useQuery()
      *
@@ -502,27 +502,27 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      *                                   to be used as main alias in the secondary query
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return   \Thelia\Model\ProdutImageQuery A secondary query class using the current class as primary query
+     * @return   \Thelia\Model\ProductImageQuery A secondary query class using the current class as primary query
      */
-    public function useProdutImageQuery($relationAlias = null, $joinType = 'LEFT JOIN')
+    public function useProductImageQuery($relationAlias = null, $joinType = 'LEFT JOIN')
     {
         return $this
-            ->joinProdutImage($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'ProdutImage', '\Thelia\Model\ProdutImageQuery');
+            ->joinProductImage($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'ProductImage', '\Thelia\Model\ProductImageQuery');
     }
 
     /**
      * Exclude object from result
      *
-     * @param   ChildProdutImageI18n $produtImageI18n Object to remove from the list of results
+     * @param   ChildProductImageI18n $productImageI18n Object to remove from the list of results
      *
-     * @return ChildProdutImageI18nQuery The current query, for fluid interface
+     * @return ChildProductImageI18nQuery The current query, for fluid interface
      */
-    public function prune($produtImageI18n = null)
+    public function prune($productImageI18n = null)
     {
-        if ($produtImageI18n) {
-            $this->addCond('pruneCond0', $this->getAliasedColName(ProdutImageI18nTableMap::ID), $produtImageI18n->getId(), Criteria::NOT_EQUAL);
-            $this->addCond('pruneCond1', $this->getAliasedColName(ProdutImageI18nTableMap::LOCALE), $produtImageI18n->getLocale(), Criteria::NOT_EQUAL);
+        if ($productImageI18n) {
+            $this->addCond('pruneCond0', $this->getAliasedColName(ProductImageI18nTableMap::ID), $productImageI18n->getId(), Criteria::NOT_EQUAL);
+            $this->addCond('pruneCond1', $this->getAliasedColName(ProductImageI18nTableMap::LOCALE), $productImageI18n->getLocale(), Criteria::NOT_EQUAL);
             $this->combine(array('pruneCond0', 'pruneCond1'), Criteria::LOGICAL_OR);
         }
 
@@ -530,7 +530,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
     }
 
     /**
-     * Deletes all rows from the produt_image_i18n table.
+     * Deletes all rows from the product_image_i18n table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -538,7 +538,7 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageI18nTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -549,8 +549,8 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            ProdutImageI18nTableMap::clearInstancePool();
-            ProdutImageI18nTableMap::clearRelatedInstancePool();
+            ProductImageI18nTableMap::clearInstancePool();
+            ProductImageI18nTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -562,9 +562,9 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildProdutImageI18n or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildProductImageI18n or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildProdutImageI18n object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildProductImageI18n object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -575,13 +575,13 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageI18nTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageI18nTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(ProdutImageI18nTableMap::DATABASE_NAME);
+        $criteria->setDbName(ProductImageI18nTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -591,10 +591,10 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        ProdutImageI18nTableMap::removeInstanceFromPool($criteria);
+        ProductImageI18nTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            ProdutImageI18nTableMap::clearRelatedInstancePool();
+            ProductImageI18nTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -604,4 +604,4 @@ abstract class ProdutImageI18nQuery extends ModelCriteria
         }
     }
 
-} // ProdutImageI18nQuery
+} // ProductImageI18nQuery

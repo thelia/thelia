@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\ProdutImageQuery as BaseProdutImageQuery;
+use Thelia\Model\Base\ProductImageQuery as BaseProductImageQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'produt_image' table.
+ * Skeleton subclass for performing query and update operations on the 'product_image' table.
  *
  *
  *
@@ -15,7 +15,7 @@ use Thelia\Model\Base\ProdutImageQuery as BaseProdutImageQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ProdutImageQuery extends BaseProdutImageQuery
+class ProductImageQuery extends BaseProductImageQuery
 {
 
-} // ProdutImageQuery
+} // ProductImageQuery

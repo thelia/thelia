@@ -163,7 +163,7 @@ abstract class BaseLoop
      * @throws \InvalidArgumentException if argument is not found in loop argument list
      * @return Argument                  the loop argument.
      */
-    public function getArg($argumentName)
+    protected function getArg($argumentName)
     {
         $arg = $this->args->get($argumentName);
 
@@ -181,7 +181,7 @@ abstract class BaseLoop
      * @throws \InvalidArgumentException if argument is not found in loop argument list
      * @return Argument                  the loop argument.
      */
-    public function getArgValue($argumentName)
+    protected function getArgValue($argumentName)
     {
         return $this->getArg($argumentName)->getValue();
     }
@@ -192,7 +192,7 @@ abstract class BaseLoop
      *
      * @return array|mixed|\PropelModelPager|\PropelObjectCollection
      */
-    public function search(ModelCriteria $search, &$pagination = null)
+    protected function search(ModelCriteria $search, &$pagination = null)
     {
         if ($this->getArgValue('page') !== null) {
             return $this->searchWithPagination($search, $pagination);
@@ -206,7 +206,7 @@ abstract class BaseLoop
      *
      * @return array|mixed|\PropelObjectCollection
      */
-    public function searchWithOffset(ModelCriteria $search)
+    protected function searchWithOffset(ModelCriteria $search)
     {
         if ($this->getArgValue('limit') >= 0) {
             $search->limit($this->getArgValue('limit'));
@@ -222,7 +222,7 @@ abstract class BaseLoop
      *
      * @return array|\PropelModelPager
      */
-    public function searchWithPagination(ModelCriteria $search, &$pagination)
+    protected function searchWithPagination(ModelCriteria $search, &$pagination)
     {
         $pagination = $search->paginate($this->getArgValue('page'), $this->getArgValue('limit'));
 

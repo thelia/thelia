@@ -386,6 +386,7 @@
     <column name="code" size="10" type="VARCHAR" />
     <column name="locale" size="45" type="VARCHAR" />
     <column name="url" size="255" type="VARCHAR" />
+    <column name="position" type="INTEGER" />
     <column name="by_default" type="TINYINT" />
     <behavior name="timestampable" />
   </table>
@@ -450,7 +451,7 @@
     </index>
     <behavior name="timestampable" />
   </table>
-  <table name="produt_image" namespace="Thelia\Model">
+  <table name="product_image" namespace="Thelia\Model">
     <column autoIncrement="true" name="id" primaryKey="true" required="true" type="INTEGER" />
     <column name="product_id" required="true" type="INTEGER" />
     <column name="file" required="true" size="255" type="VARCHAR" />
@@ -545,6 +546,7 @@
     <column name="code" size="45" type="VARCHAR" />
     <column name="symbol" size="45" type="VARCHAR" />
     <column name="rate" type="FLOAT" />
+    <column name="position" type="INTEGER" />
     <column name="by_default" type="TINYINT" />
     <behavior name="timestampable" />
     <behavior name="i18n">

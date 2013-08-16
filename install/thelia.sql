@@ -521,6 +521,7 @@ CREATE TABLE `lang`
     `code` VARCHAR(10),
     `locale` VARCHAR(45),
     `url` VARCHAR(255),
+    `position` INTEGER NOT NULL,
     `by_default` TINYINT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -603,12 +604,12 @@ CREATE TABLE `content_assoc`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- produt_image
+-- product_image
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `produt_image`;
+DROP TABLE IF EXISTS `product_image`;
 
-CREATE TABLE `produt_image`
+CREATE TABLE `product_image`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
@@ -719,6 +720,7 @@ CREATE TABLE `currency`
     `code` VARCHAR(45),
     `symbol` VARCHAR(45),
     `rate` FLOAT,
+    `position` INTEGER NOT NULL,
     `by_default` TINYINT,
     `created_at` DATETIME,
     `updated_at` DATETIME,
@@ -1721,12 +1723,12 @@ CREATE TABLE `content_i18n`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- produt_image_i18n
+-- product_image_i18n
 -- ---------------------------------------------------------------------
 
-DROP TABLE IF EXISTS `produt_image_i18n`;
+DROP TABLE IF EXISTS `product_image_i18n`;
 
-CREATE TABLE `produt_image_i18n`
+CREATE TABLE `product_image_i18n`
 (
     `id` INTEGER NOT NULL,
     `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
@@ -1735,9 +1737,9 @@ CREATE TABLE `produt_image_i18n`
     `chapo` TEXT,
     `postscriptum` TEXT,
     PRIMARY KEY (`id`,`locale`),
-    CONSTRAINT `produt_image_i18n_FK_1`
+    CONSTRAINT `product_image_i18n_FK_1`
         FOREIGN KEY (`id`)
-        REFERENCES `produt_image` (`id`)
+        REFERENCES `product_image` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

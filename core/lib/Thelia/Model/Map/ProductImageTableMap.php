@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\ProdutImage;
-use Thelia\Model\ProdutImageQuery;
+use Thelia\Model\ProductImage;
+use Thelia\Model\ProductImageQuery;
 
 
 /**
- * This class defines the structure of the 'produt_image' table.
+ * This class defines the structure of the 'product_image' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\ProdutImageQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ProdutImageTableMap extends TableMap
+class ProductImageTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ProdutImageTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.ProductImageTableMap';
 
     /**
      * The default database name for this class
@@ -42,17 +42,17 @@ class ProdutImageTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'produt_image';
+    const TABLE_NAME = 'product_image';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\ProdutImage';
+    const OM_CLASS = '\\Thelia\\Model\\ProductImage';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.ProdutImage';
+    const CLASS_DEFAULT = 'Thelia.Model.ProductImage';
 
     /**
      * The total number of columns
@@ -72,32 +72,32 @@ class ProdutImageTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'produt_image.ID';
+    const ID = 'product_image.ID';
 
     /**
      * the column name for the PRODUCT_ID field
      */
-    const PRODUCT_ID = 'produt_image.PRODUCT_ID';
+    const PRODUCT_ID = 'product_image.PRODUCT_ID';
 
     /**
      * the column name for the FILE field
      */
-    const FILE = 'produt_image.FILE';
+    const FILE = 'product_image.FILE';
 
     /**
      * the column name for the POSITION field
      */
-    const POSITION = 'produt_image.POSITION';
+    const POSITION = 'product_image.POSITION';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'produt_image.CREATED_AT';
+    const CREATED_AT = 'product_image.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'produt_image.UPDATED_AT';
+    const UPDATED_AT = 'product_image.UPDATED_AT';
 
     /**
      * The default string format for model objects of the related table
@@ -122,7 +122,7 @@ class ProdutImageTableMap extends TableMap
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'ProductId', 'File', 'Position', 'CreatedAt', 'UpdatedAt', ),
         self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'file', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ProdutImageTableMap::ID, ProdutImageTableMap::PRODUCT_ID, ProdutImageTableMap::FILE, ProdutImageTableMap::POSITION, ProdutImageTableMap::CREATED_AT, ProdutImageTableMap::UPDATED_AT, ),
+        self::TYPE_COLNAME       => array(ProductImageTableMap::ID, ProductImageTableMap::PRODUCT_ID, ProductImageTableMap::FILE, ProductImageTableMap::POSITION, ProductImageTableMap::CREATED_AT, ProductImageTableMap::UPDATED_AT, ),
         self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'FILE', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
         self::TYPE_FIELDNAME     => array('id', 'product_id', 'file', 'position', 'created_at', 'updated_at', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
@@ -137,7 +137,7 @@ class ProdutImageTableMap extends TableMap
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'File' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
         self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'file' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(ProdutImageTableMap::ID => 0, ProdutImageTableMap::PRODUCT_ID => 1, ProdutImageTableMap::FILE => 2, ProdutImageTableMap::POSITION => 3, ProdutImageTableMap::CREATED_AT => 4, ProdutImageTableMap::UPDATED_AT => 5, ),
+        self::TYPE_COLNAME       => array(ProductImageTableMap::ID => 0, ProductImageTableMap::PRODUCT_ID => 1, ProductImageTableMap::FILE => 2, ProductImageTableMap::POSITION => 3, ProductImageTableMap::CREATED_AT => 4, ProductImageTableMap::UPDATED_AT => 5, ),
         self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'FILE' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'file' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
@@ -153,9 +153,9 @@ class ProdutImageTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('produt_image');
-        $this->setPhpName('ProdutImage');
-        $this->setClassName('\\Thelia\\Model\\ProdutImage');
+        $this->setName('product_image');
+        $this->setPhpName('ProductImage');
+        $this->setClassName('\\Thelia\\Model\\ProductImage');
         $this->setPackage('Thelia.Model');
         $this->setUseIdGenerator(true);
         // columns
@@ -173,7 +173,7 @@ class ProdutImageTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ProdutImageI18n', '\\Thelia\\Model\\ProdutImageI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProdutImageI18ns');
+        $this->addRelation('ProductImageI18n', '\\Thelia\\Model\\ProductImageI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'ProductImageI18ns');
     } // buildRelations()
 
     /**
@@ -190,13 +190,13 @@ class ProdutImageTableMap extends TableMap
         );
     } // getBehaviors()
     /**
-     * Method to invalidate the instance pool of all tables related to produt_image     * by a foreign key with ON DELETE CASCADE
+     * Method to invalidate the instance pool of all tables related to product_image     * by a foreign key with ON DELETE CASCADE
      */
     public static function clearRelatedInstancePool()
     {
         // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
         // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                ProdutImageI18nTableMap::clearInstancePool();
+                ProductImageI18nTableMap::clearInstancePool();
             }
 
     /**
@@ -255,7 +255,7 @@ class ProdutImageTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ProdutImageTableMap::CLASS_DEFAULT : ProdutImageTableMap::OM_CLASS;
+        return $withPrefix ? ProductImageTableMap::CLASS_DEFAULT : ProductImageTableMap::OM_CLASS;
     }
 
     /**
@@ -269,21 +269,21 @@ class ProdutImageTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (ProdutImage object, last column rank)
+     * @return array (ProductImage object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ProdutImageTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ProdutImageTableMap::getInstanceFromPool($key))) {
+        $key = ProductImageTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = ProductImageTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ProdutImageTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + ProductImageTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ProdutImageTableMap::OM_CLASS;
+            $cls = ProductImageTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ProdutImageTableMap::addInstanceToPool($obj, $key);
+            ProductImageTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -306,8 +306,8 @@ class ProdutImageTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ProdutImageTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ProdutImageTableMap::getInstanceFromPool($key))) {
+            $key = ProductImageTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = ProductImageTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -316,7 +316,7 @@ class ProdutImageTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ProdutImageTableMap::addInstanceToPool($obj, $key);
+                ProductImageTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -337,12 +337,12 @@ class ProdutImageTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ProdutImageTableMap::ID);
-            $criteria->addSelectColumn(ProdutImageTableMap::PRODUCT_ID);
-            $criteria->addSelectColumn(ProdutImageTableMap::FILE);
-            $criteria->addSelectColumn(ProdutImageTableMap::POSITION);
-            $criteria->addSelectColumn(ProdutImageTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ProdutImageTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(ProductImageTableMap::ID);
+            $criteria->addSelectColumn(ProductImageTableMap::PRODUCT_ID);
+            $criteria->addSelectColumn(ProductImageTableMap::FILE);
+            $criteria->addSelectColumn(ProductImageTableMap::POSITION);
+            $criteria->addSelectColumn(ProductImageTableMap::CREATED_AT);
+            $criteria->addSelectColumn(ProductImageTableMap::UPDATED_AT);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.PRODUCT_ID');
@@ -362,7 +362,7 @@ class ProdutImageTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ProdutImageTableMap::DATABASE_NAME)->getTable(ProdutImageTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(ProductImageTableMap::DATABASE_NAME)->getTable(ProductImageTableMap::TABLE_NAME);
     }
 
     /**
@@ -370,16 +370,16 @@ class ProdutImageTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProdutImageTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ProdutImageTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ProdutImageTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ProductImageTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(ProductImageTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new ProductImageTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a ProdutImage or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ProductImage or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ProdutImage object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ProductImage object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -390,25 +390,25 @@ class ProdutImageTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\ProdutImage) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\ProductImage) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ProdutImageTableMap::DATABASE_NAME);
-            $criteria->add(ProdutImageTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(ProductImageTableMap::DATABASE_NAME);
+            $criteria->add(ProductImageTableMap::ID, (array) $values, Criteria::IN);
         }
 
-        $query = ProdutImageQuery::create()->mergeWith($criteria);
+        $query = ProductImageQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ProdutImageTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { ProductImageTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ProdutImageTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { ProductImageTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -416,20 +416,20 @@ class ProdutImageTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the produt_image table.
+     * Deletes all rows from the product_image table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ProdutImageQuery::create()->doDeleteAll($con);
+        return ProductImageQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ProdutImage or Criteria object.
+     * Performs an INSERT on the database, given a ProductImage or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ProdutImage object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or ProductImage object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -438,22 +438,22 @@ class ProdutImageTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ProdutImageTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(ProductImageTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ProdutImage object
+            $criteria = $criteria->buildCriteria(); // build Criteria from ProductImage object
         }
 
-        if ($criteria->containsKey(ProdutImageTableMap::ID) && $criteria->keyContainsValue(ProdutImageTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProdutImageTableMap::ID.')');
+        if ($criteria->containsKey(ProductImageTableMap::ID) && $criteria->keyContainsValue(ProductImageTableMap::ID) ) {
+            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ProductImageTableMap::ID.')');
         }
 
 
         // Set the correct dbName
-        $query = ProdutImageQuery::create()->mergeWith($criteria);
+        $query = ProductImageQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -469,7 +469,7 @@ class ProdutImageTableMap extends TableMap
         return $pk;
     }
 
-} // ProdutImageTableMap
+} // ProductImageTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ProdutImageTableMap::buildTableMap();
+ProductImageTableMap::buildTableMap();

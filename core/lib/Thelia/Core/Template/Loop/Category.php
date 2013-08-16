@@ -46,7 +46,7 @@ use Thelia\Type\BooleanOrBothType;
  * - current : current id is used if you are on a category page
  * - not_empty : if value is 1, category and subcategories must have at least 1 product
  * - visible : default 1, if you want category not visible put 0
- * - order : all value available :  'alpha', 'alpha_reverse', 'manual' (default), 'manual-reverse', 'random'
+ * - order : all value available :  'alpha', 'alpha-reverse', 'manual' (default), 'manual-reverse', 'random'
  * - exclude : all category id you want to exclude (as for id, an integer or a "string list" can be used)
  *
  * example :
@@ -77,7 +77,7 @@ class Category extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual-reverse', 'random'))
+                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -130,7 +130,7 @@ class Category extends BaseLoop
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
                     break;
-                case "alpha_reverse":
+                case "alpha-reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
                     break;
                 case "manual-reverse":
