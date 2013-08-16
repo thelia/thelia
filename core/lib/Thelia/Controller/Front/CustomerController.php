@@ -23,9 +23,15 @@
 namespace Thelia\Controller\Front;
 
 use Propel\Runtime\Exception\PropelException;
+use Symfony\Component\Validator\Exception\ValidatorException;
 use Thelia\Core\Event\CustomerCreateOrUpdateEvent;
+use Thelia\Core\Event\CustomerLoginEvent;
+use Thelia\Core\Security\Authentication\CustomerUsernamePasswordFormAuthenticator;
+use Thelia\Core\Security\Exception\AuthenticationException;
+use Thelia\Core\Security\Exception\UsernameNotFoundException;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Form\CustomerCreation;
+use Thelia\Form\CustomerLogin;
 use Thelia\Form\CustomerModification;
 use Thelia\Form\Exception\FormValidationException;
 use Thelia\Model\Customer;
@@ -79,6 +85,8 @@ class CustomerController extends BaseFrontController
 
             $this->getDispatcher()->dispatch(TheliaEvents::CUSTOMER_UPDATEACCOUNT, $customerChangeEvent);
 
+            $this->processLogin($customerChangeEvent->getCustomer());
+
             $this->redirectSuccess();
 
         } catch (FormValidationException $e) {
@@ -90,20 +98,45 @@ class CustomerController extends BaseFrontController
         }
     }
 
+    /**
+     * Perform user login. On a successful login, the user is redirected to the URL
+     * found in the success_url form parameter, or / if none was found.
+     *
+     * If login is not successfull, the same view is dispolyed again.
+     *
+     */
     public function loginAction()
     {
-        $event = $this->dispatchEvent("loginCustomer");
+        $request = $this->getRequest();
 
-        $customerEvent = new CustomerEvent($event->getCustomer());
+        $customerLoginForm = new CustomerLogin($request);
 
-        $this->processLogin($event->getCustomer(), $customerEvent, true);
+        $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
+
+        try {
+            $customer = $authenticator->getAuthentifiedUser();
+
+            $customerLoginEvent = new CustomerLoginEvent($customer);
+
+            $this->processLogin($customer, $customerLoginEvent);
+
+            $this->redirectSuccess();
+        } catch (ValidatorException $e) {
+
+        } catch(UsernameNotFoundException $e) {
+
+        } catch(AuthenticationException $e) {
+
+        } catch (\Exception $e) {
+
+        }
     }
 
-    public function processLogin(Customer $customer,$event = null, $sendLogin = false)
+    public function processLogin(Customer $customer,$event = null)
     {
         $this->getSecurityContext(SecurityContext::CONTEXT_FRONT_OFFICE)->setUser($customer);
 
-        if($sendLogin) $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
+        if($event) $this->dispatch(TheliaEvents::CUSTOMER_LOGIN, $event);
     }
 
     /**

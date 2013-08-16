@@ -99,47 +99,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
           $this->getFrontSecurityContext()->clear();
     }
 
-    /**
-     * Perform user login. On a successful login, the user is redirected to the URL
-     * found in the success_url form parameter, or / if none was found.
-     *
-     * If login is not successfull, the same view is dispolyed again.
-     *
-     * @param ActionEvent $event
-     */
-    public function login(ActionEvent $event)
-    {
-        $request = $event->getRequest();
-
-          $customerLoginForm = new CustomerLogin($request);
-
-          $authenticator = new CustomerUsernamePasswordFormAuthenticator($request, $customerLoginForm);
-
-          try {
-            $user = $authenticator->getAuthentifiedUser();
-
-              $event->customer = $user;
-
-          } catch (ValidatorException $ex) {
-            $message = "Missing or invalid information. Please check your input.";
-          } catch (UsernameNotFoundException $ex) {
-            $message = "This email address was not found.";
-          } catch (AuthenticationException $ex) {
-            $message = "Login failed. Please check your username and password.";
-          } catch (\Exception $ex) {
-            $message = sprintf("Unable to process your request. Please try again (%s in %s).", $ex->getMessage(), $ex->getFile());
-          }
-
-          // The for has an error
-          $customerLoginForm->setError(true);
-          $customerLoginForm->setErrorMessage($message);
-
-          // Dispatch the errored form
-          $event->setErrorForm($customerLoginForm);
-
-      // A this point, the same view is displayed again.
-    }
-
     public function changePassword(ActionEvent $event)
     {
     // TODO
@@ -170,8 +129,6 @@ class Customer extends BaseAction implements EventSubscriberInterface
         return array(
             "action.createCustomer" => array("create", 128),
             "action.modifyCustomer" => array("modify", 128),
-            "action.loginCustomer"  => array("login", 128),
-            "action.logoutCustomer" => array("logout", 128),
         );
     }
 }
