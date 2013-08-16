@@ -1,6 +1,4 @@
 <?php
-use Thelia\Core\Event\ImageEvent;
-use Thelia\Action\Image;
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
