@@ -33,6 +33,7 @@ class CustomerCreation extends BaseForm
     protected function buildForm()
     {
         $this->formBuilder
+            ->add("auto_login", "integer")
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
@@ -163,3 +164,4 @@ class CustomerCreation extends BaseForm
         return "thelia_customer_creation";
     }
 }
+

@@ -27,6 +27,9 @@ use Thelia\Model\ConfigQuery;
 
 class URL
 {
+    const PATH_TO_FILE = true;
+    const WITH_INDEX_PAGE = false;
+
     public static function getIndexPage()
     {
         return ConfigQuery::read('base_url', '/') . "index_dev.php"; // FIXME !
@@ -39,25 +42,28 @@ class URL
      *
      * @param string  $path       the relative path
      * @param array   $parameters An array of parameters
-     * @param boolean $path_only  if true, getIndexPage() will  not be added
+     * @param boolean $path_only  if true (PATH_TO_FILE), getIndexPage() will  not be added
      *
      * @return string The generated URL
      */
-    public static function absoluteUrl($path, array $parameters = array(), $path_only = false)
+    public static function absoluteUrl($path, array $parameters = null, $path_only = self::WITH_INDEX_PAGE)
     {
          // Already absolute ?
         if (substr($path, 0, 4) != 'http') {
 
-            $root = $path_only ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+            $root = $path_only == self::PATH_TO_FILE ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
 
-            $base = $root . '/' . ltrim($path, '/');
+            $base = rtrim($root, '/') . '/' . ltrim($path, '/');
         } else
             $base = $path;
 
+
         $queryString = '';
 
-        foreach ($parameters as $name => $value) {
-            $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
+        if (! is_null($parameters)) {
+            foreach ($parameters as $name => $value) {
+                $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
+            }
         }
 
         $sepChar = strstr($base, '?') === false ? '?' : '&';

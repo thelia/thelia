@@ -34,13 +34,13 @@ use Thelia\Model\ProductDocument as ChildProductDocument;
 use Thelia\Model\ProductDocumentQuery as ChildProductDocumentQuery;
 use Thelia\Model\ProductI18n as ChildProductI18n;
 use Thelia\Model\ProductI18nQuery as ChildProductI18nQuery;
+use Thelia\Model\ProductImage as ChildProductImage;
+use Thelia\Model\ProductImageQuery as ChildProductImageQuery;
 use Thelia\Model\ProductQuery as ChildProductQuery;
 use Thelia\Model\ProductSaleElements as ChildProductSaleElements;
 use Thelia\Model\ProductSaleElementsQuery as ChildProductSaleElementsQuery;
 use Thelia\Model\ProductVersion as ChildProductVersion;
 use Thelia\Model\ProductVersionQuery as ChildProductVersionQuery;
-use Thelia\Model\ProdutImage as ChildProdutImage;
-use Thelia\Model\ProdutImageQuery as ChildProdutImageQuery;
 use Thelia\Model\Rewriting as ChildRewriting;
 use Thelia\Model\RewritingQuery as ChildRewritingQuery;
 use Thelia\Model\TaxRule as ChildTaxRule;
@@ -174,10 +174,10 @@ abstract class Product implements ActiveRecordInterface
     protected $collContentAssocsPartial;
 
     /**
-     * @var        ObjectCollection|ChildProdutImage[] Collection to store aggregation of ChildProdutImage objects.
+     * @var        ObjectCollection|ChildProductImage[] Collection to store aggregation of ChildProductImage objects.
      */
-    protected $collProdutImages;
-    protected $collProdutImagesPartial;
+    protected $collProductImages;
+    protected $collProductImagesPartial;
 
     /**
      * @var        ObjectCollection|ChildProductDocument[] Collection to store aggregation of ChildProductDocument objects.
@@ -312,7 +312,7 @@ abstract class Product implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $produtImagesScheduledForDeletion = null;
+    protected $productImagesScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -1139,7 +1139,7 @@ abstract class Product implements ActiveRecordInterface
 
             $this->collContentAssocs = null;
 
-            $this->collProdutImages = null;
+            $this->collProductImages = null;
 
             $this->collProductDocuments = null;
 
@@ -1464,17 +1464,17 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
-            if ($this->produtImagesScheduledForDeletion !== null) {
-                if (!$this->produtImagesScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\ProdutImageQuery::create()
-                        ->filterByPrimaryKeys($this->produtImagesScheduledForDeletion->getPrimaryKeys(false))
+            if ($this->productImagesScheduledForDeletion !== null) {
+                if (!$this->productImagesScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductImageQuery::create()
+                        ->filterByPrimaryKeys($this->productImagesScheduledForDeletion->getPrimaryKeys(false))
                         ->delete($con);
-                    $this->produtImagesScheduledForDeletion = null;
+                    $this->productImagesScheduledForDeletion = null;
                 }
             }
 
-                if ($this->collProdutImages !== null) {
-            foreach ($this->collProdutImages as $referrerFK) {
+                if ($this->collProductImages !== null) {
+            foreach ($this->collProductImages as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1851,8 +1851,8 @@ abstract class Product implements ActiveRecordInterface
             if (null !== $this->collContentAssocs) {
                 $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
-            if (null !== $this->collProdutImages) {
-                $result['ProdutImages'] = $this->collProdutImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            if (null !== $this->collProductImages) {
+                $result['ProductImages'] = $this->collProductImages->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collProductDocuments) {
                 $result['ProductDocuments'] = $this->collProductDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -2096,9 +2096,9 @@ abstract class Product implements ActiveRecordInterface
                 }
             }
 
-            foreach ($this->getProdutImages() as $relObj) {
+            foreach ($this->getProductImages() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addProdutImage($relObj->copy($deepCopy));
+                    $copyObj->addProductImage($relObj->copy($deepCopy));
                 }
             }
 
@@ -2248,8 +2248,8 @@ abstract class Product implements ActiveRecordInterface
         if ('ContentAssoc' == $relationName) {
             return $this->initContentAssocs();
         }
-        if ('ProdutImage' == $relationName) {
-            return $this->initProdutImages();
+        if ('ProductImage' == $relationName) {
+            return $this->initProductImages();
         }
         if ('ProductDocument' == $relationName) {
             return $this->initProductDocuments();
@@ -3275,31 +3275,31 @@ abstract class Product implements ActiveRecordInterface
     }
 
     /**
-     * Clears out the collProdutImages collection
+     * Clears out the collProductImages collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
      * them to be refetched by subsequent calls to accessor method.
      *
      * @return void
-     * @see        addProdutImages()
+     * @see        addProductImages()
      */
-    public function clearProdutImages()
+    public function clearProductImages()
     {
-        $this->collProdutImages = null; // important to set this to NULL since that means it is uninitialized
+        $this->collProductImages = null; // important to set this to NULL since that means it is uninitialized
     }
 
     /**
-     * Reset is the collProdutImages collection loaded partially.
+     * Reset is the collProductImages collection loaded partially.
      */
-    public function resetPartialProdutImages($v = true)
+    public function resetPartialProductImages($v = true)
     {
-        $this->collProdutImagesPartial = $v;
+        $this->collProductImagesPartial = $v;
     }
 
     /**
-     * Initializes the collProdutImages collection.
+     * Initializes the collProductImages collection.
      *
-     * By default this just sets the collProdutImages collection to an empty array (like clearcollProdutImages());
+     * By default this just sets the collProductImages collection to an empty array (like clearcollProductImages());
      * however, you may wish to override this method in your stub class to provide setting appropriate
      * to your application -- for example, setting the initial array to the values stored in database.
      *
@@ -3308,17 +3308,17 @@ abstract class Product implements ActiveRecordInterface
      *
      * @return void
      */
-    public function initProdutImages($overrideExisting = true)
+    public function initProductImages($overrideExisting = true)
     {
-        if (null !== $this->collProdutImages && !$overrideExisting) {
+        if (null !== $this->collProductImages && !$overrideExisting) {
             return;
         }
-        $this->collProdutImages = new ObjectCollection();
-        $this->collProdutImages->setModel('\Thelia\Model\ProdutImage');
+        $this->collProductImages = new ObjectCollection();
+        $this->collProductImages->setModel('\Thelia\Model\ProductImage');
     }
 
     /**
-     * Gets an array of ChildProdutImage objects which contain a foreign key that references this object.
+     * Gets an array of ChildProductImage objects which contain a foreign key that references this object.
      *
      * If the $criteria is not null, it is used to always fetch the results from the database.
      * Otherwise the results are fetched from the database the first time, then cached.
@@ -3328,109 +3328,109 @@ abstract class Product implements ActiveRecordInterface
      *
      * @param      Criteria $criteria optional Criteria object to narrow the query
      * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildProdutImage[] List of ChildProdutImage objects
+     * @return Collection|ChildProductImage[] List of ChildProductImage objects
      * @throws PropelException
      */
-    public function getProdutImages($criteria = null, ConnectionInterface $con = null)
+    public function getProductImages($criteria = null, ConnectionInterface $con = null)
     {
-        $partial = $this->collProdutImagesPartial && !$this->isNew();
-        if (null === $this->collProdutImages || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collProdutImages) {
+        $partial = $this->collProductImagesPartial && !$this->isNew();
+        if (null === $this->collProductImages || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductImages) {
                 // return empty collection
-                $this->initProdutImages();
+                $this->initProductImages();
             } else {
-                $collProdutImages = ChildProdutImageQuery::create(null, $criteria)
+                $collProductImages = ChildProductImageQuery::create(null, $criteria)
                     ->filterByProduct($this)
                     ->find($con);
 
                 if (null !== $criteria) {
-                    if (false !== $this->collProdutImagesPartial && count($collProdutImages)) {
-                        $this->initProdutImages(false);
+                    if (false !== $this->collProductImagesPartial && count($collProductImages)) {
+                        $this->initProductImages(false);
 
-                        foreach ($collProdutImages as $obj) {
-                            if (false == $this->collProdutImages->contains($obj)) {
-                                $this->collProdutImages->append($obj);
+                        foreach ($collProductImages as $obj) {
+                            if (false == $this->collProductImages->contains($obj)) {
+                                $this->collProductImages->append($obj);
                             }
                         }
 
-                        $this->collProdutImagesPartial = true;
+                        $this->collProductImagesPartial = true;
                     }
 
-                    $collProdutImages->getInternalIterator()->rewind();
+                    $collProductImages->getInternalIterator()->rewind();
 
-                    return $collProdutImages;
+                    return $collProductImages;
                 }
 
-                if ($partial && $this->collProdutImages) {
-                    foreach ($this->collProdutImages as $obj) {
+                if ($partial && $this->collProductImages) {
+                    foreach ($this->collProductImages as $obj) {
                         if ($obj->isNew()) {
-                            $collProdutImages[] = $obj;
+                            $collProductImages[] = $obj;
                         }
                     }
                 }
 
-                $this->collProdutImages = $collProdutImages;
-                $this->collProdutImagesPartial = false;
+                $this->collProductImages = $collProductImages;
+                $this->collProductImagesPartial = false;
             }
         }
 
-        return $this->collProdutImages;
+        return $this->collProductImages;
     }
 
     /**
-     * Sets a collection of ProdutImage objects related by a one-to-many relationship
+     * Sets a collection of ProductImage objects related by a one-to-many relationship
      * to the current object.
      * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
      * and new objects from the given Propel collection.
      *
-     * @param      Collection $produtImages A Propel collection.
+     * @param      Collection $productImages A Propel collection.
      * @param      ConnectionInterface $con Optional connection object
      * @return   ChildProduct The current object (for fluent API support)
      */
-    public function setProdutImages(Collection $produtImages, ConnectionInterface $con = null)
+    public function setProductImages(Collection $productImages, ConnectionInterface $con = null)
     {
-        $produtImagesToDelete = $this->getProdutImages(new Criteria(), $con)->diff($produtImages);
+        $productImagesToDelete = $this->getProductImages(new Criteria(), $con)->diff($productImages);
 
 
-        $this->produtImagesScheduledForDeletion = $produtImagesToDelete;
+        $this->productImagesScheduledForDeletion = $productImagesToDelete;
 
-        foreach ($produtImagesToDelete as $produtImageRemoved) {
-            $produtImageRemoved->setProduct(null);
+        foreach ($productImagesToDelete as $productImageRemoved) {
+            $productImageRemoved->setProduct(null);
         }
 
-        $this->collProdutImages = null;
-        foreach ($produtImages as $produtImage) {
-            $this->addProdutImage($produtImage);
+        $this->collProductImages = null;
+        foreach ($productImages as $productImage) {
+            $this->addProductImage($productImage);
         }
 
-        $this->collProdutImages = $produtImages;
-        $this->collProdutImagesPartial = false;
+        $this->collProductImages = $productImages;
+        $this->collProductImagesPartial = false;
 
         return $this;
     }
 
     /**
-     * Returns the number of related ProdutImage objects.
+     * Returns the number of related ProductImage objects.
      *
      * @param      Criteria $criteria
      * @param      boolean $distinct
      * @param      ConnectionInterface $con
-     * @return int             Count of related ProdutImage objects.
+     * @return int             Count of related ProductImage objects.
      * @throws PropelException
      */
-    public function countProdutImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    public function countProductImages(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
     {
-        $partial = $this->collProdutImagesPartial && !$this->isNew();
-        if (null === $this->collProdutImages || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collProdutImages) {
+        $partial = $this->collProductImagesPartial && !$this->isNew();
+        if (null === $this->collProductImages || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductImages) {
                 return 0;
             }
 
             if ($partial && !$criteria) {
-                return count($this->getProdutImages());
+                return count($this->getProductImages());
             }
 
-            $query = ChildProdutImageQuery::create(null, $criteria);
+            $query = ChildProductImageQuery::create(null, $criteria);
             if ($distinct) {
                 $query->distinct();
             }
@@ -3440,53 +3440,53 @@ abstract class Product implements ActiveRecordInterface
                 ->count($con);
         }
 
-        return count($this->collProdutImages);
+        return count($this->collProductImages);
     }
 
     /**
-     * Method called to associate a ChildProdutImage object to this object
-     * through the ChildProdutImage foreign key attribute.
+     * Method called to associate a ChildProductImage object to this object
+     * through the ChildProductImage foreign key attribute.
      *
-     * @param    ChildProdutImage $l ChildProdutImage
+     * @param    ChildProductImage $l ChildProductImage
      * @return   \Thelia\Model\Product The current object (for fluent API support)
      */
-    public function addProdutImage(ChildProdutImage $l)
+    public function addProductImage(ChildProductImage $l)
     {
-        if ($this->collProdutImages === null) {
-            $this->initProdutImages();
-            $this->collProdutImagesPartial = true;
+        if ($this->collProductImages === null) {
+            $this->initProductImages();
+            $this->collProductImagesPartial = true;
         }
 
-        if (!in_array($l, $this->collProdutImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddProdutImage($l);
+        if (!in_array($l, $this->collProductImages->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductImage($l);
         }
 
         return $this;
     }
 
     /**
-     * @param ProdutImage $produtImage The produtImage object to add.
+     * @param ProductImage $productImage The productImage object to add.
      */
-    protected function doAddProdutImage($produtImage)
+    protected function doAddProductImage($productImage)
     {
-        $this->collProdutImages[]= $produtImage;
-        $produtImage->setProduct($this);
+        $this->collProductImages[]= $productImage;
+        $productImage->setProduct($this);
     }
 
     /**
-     * @param  ProdutImage $produtImage The produtImage object to remove.
+     * @param  ProductImage $productImage The productImage object to remove.
      * @return ChildProduct The current object (for fluent API support)
      */
-    public function removeProdutImage($produtImage)
+    public function removeProductImage($productImage)
     {
-        if ($this->getProdutImages()->contains($produtImage)) {
-            $this->collProdutImages->remove($this->collProdutImages->search($produtImage));
-            if (null === $this->produtImagesScheduledForDeletion) {
-                $this->produtImagesScheduledForDeletion = clone $this->collProdutImages;
-                $this->produtImagesScheduledForDeletion->clear();
+        if ($this->getProductImages()->contains($productImage)) {
+            $this->collProductImages->remove($this->collProductImages->search($productImage));
+            if (null === $this->productImagesScheduledForDeletion) {
+                $this->productImagesScheduledForDeletion = clone $this->collProductImages;
+                $this->productImagesScheduledForDeletion->clear();
             }
-            $this->produtImagesScheduledForDeletion[]= clone $produtImage;
-            $produtImage->setProduct(null);
+            $this->productImagesScheduledForDeletion[]= clone $productImage;
+            $productImage->setProduct(null);
         }
 
         return $this;
@@ -5757,8 +5757,8 @@ abstract class Product implements ActiveRecordInterface
                     $o->clearAllReferences($deep);
                 }
             }
-            if ($this->collProdutImages) {
-                foreach ($this->collProdutImages as $o) {
+            if ($this->collProductImages) {
+                foreach ($this->collProductImages as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -5834,10 +5834,10 @@ abstract class Product implements ActiveRecordInterface
             $this->collContentAssocs->clearIterator();
         }
         $this->collContentAssocs = null;
-        if ($this->collProdutImages instanceof Collection) {
-            $this->collProdutImages->clearIterator();
+        if ($this->collProductImages instanceof Collection) {
+            $this->collProductImages->clearIterator();
         }
-        $this->collProdutImages = null;
+        $this->collProductImages = null;
         if ($this->collProductDocuments instanceof Collection) {
             $this->collProductDocuments->clearIterator();
         }

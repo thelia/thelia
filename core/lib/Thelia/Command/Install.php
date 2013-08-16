@@ -189,7 +189,8 @@ class Install extends ContainerAwareCommand
 
         file_put_contents($configFile, $configContent);
 
-        $fs->remove($sampleConfigFile);
+        // FA - no, as no further install will be possible
+        // $fs->remove($sampleConfigFile);
 
         $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
 

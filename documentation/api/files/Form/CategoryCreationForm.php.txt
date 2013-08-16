@@ -22,11 +22,10 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class CategoryCreationForm extends BaseForm {
-
+class CategoryCreationForm extends BaseForm
+{
     protected function buildForm()
     {
         $this->formBuilder
@@ -37,13 +36,13 @@ class CategoryCreationForm extends BaseForm {
             ))
             ->add("parent", "integer", array(
                 "constraints" => array(
-                	new NotBlank()
+                    new NotBlank()
                 )
             ))
             ->add("locale", "text", array(
-            	"constraints" => array(
-            		new NotBlank()
-            	)
+                "constraints" => array(
+                    new NotBlank()
+                )
             ))
         ;
     }

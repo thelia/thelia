@@ -51,12 +51,14 @@ class Argument
         $this->setValue($value);
     }
 
-    public function getValue() {
-    	return $this->type->getFormattedValue($this->value);
+    public function getValue()
+    {
+        return $this->type->getFormattedValue($this->value);
     }
 
-    public function setValue($value) {
-    	$this->value = $value === null ? null : (string)$value;
+    public function setValue($value)
+    {
+        $this->value = $value === null ? null : (string) $value;
     }
 
     public static function createAnyTypeArgument($name, $default=null, $mandatory=false, $empty=true)
@@ -113,15 +115,15 @@ class Argument
 
     public static function createBooleanOrBothTypeArgument($name, $default=null, $mandatory=false, $empty=true)
     {
-    	return new Argument(
-    			$name,
-    			new TypeCollection(
-    					new Type\BooleanOrBothType()
-    			),
-    			$default,
-    			$mandatory,
-    			$empty
-    	);
+        return new Argument(
+                $name,
+                new TypeCollection(
+                        new Type\BooleanOrBothType()
+                ),
+                $default,
+                $mandatory,
+                $empty
+        );
     }
 
     public static function createIntListTypeArgument($name, $default=null, $mandatory=false, $empty=true)

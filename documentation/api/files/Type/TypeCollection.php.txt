@@ -30,12 +30,12 @@ namespace Thelia\Type;
 
 class TypeCollection implements \Iterator
 {
-    private     $position;
-    protected   $types = array();
+    private $position;
+    protected $types = array();
 
     public function __construct()
     {
-        foreach(func_get_args() as $type) {
+        foreach (func_get_args() as $type) {
             $this->addType($type);
         }
     }
@@ -53,6 +53,7 @@ class TypeCollection implements \Iterator
     public function addType(TypeInterface $type)
     {
         $this->types[] = $type;
+
         return $this;
     }
 
@@ -124,8 +125,8 @@ class TypeCollection implements \Iterator
      */
     public function isValid($value)
     {
-        foreach($this as $type) {
-            if($type->isValid($value)) {
+        foreach ($this as $type) {
+            if ($type->isValid($value)) {
                 return true;
             }
         }
@@ -133,9 +134,10 @@ class TypeCollection implements \Iterator
         return false;
     }
 
-    public function getFormattedValue($value) {
-        foreach($this as $type) {
-            if($type->isValid($value)) {
+    public function getFormattedValue($value)
+    {
+        foreach ($this as $type) {
+            if ($type->isValid($value)) {
                 return $type->getFormattedValue($value);
             }
         }

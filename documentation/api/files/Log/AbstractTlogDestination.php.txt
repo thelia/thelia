@@ -38,7 +38,7 @@ abstract class AbstractTlogDestination
     {
         $this->_configs = array();
         $this->_logs = array();
-        
+
         // Initialiser les variables de configuration
          $this->_configs = $this->getConfigs();
 

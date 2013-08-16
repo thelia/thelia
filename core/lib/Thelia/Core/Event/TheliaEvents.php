@@ -134,4 +134,15 @@ final class TheliaEvents
     const CART_CHANGEITEM = "action.changeArticle";
 
     const CART_DELETEITEM = "action.deleteArticle";
+
+    /**
+     * Sent on image processing
+     */
+    const IMAGE_PROCESS = "action.processImage";
+
+    /**
+     * Sent on cimage cache clear request
+     */
+    const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
 }

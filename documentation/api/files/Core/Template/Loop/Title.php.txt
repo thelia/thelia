@@ -30,12 +30,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 
 /**
  *
@@ -67,7 +64,7 @@ class Title extends BaseLoop
     {
         $search = CustomerTitleQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
@@ -103,3 +100,4 @@ class Title extends BaseLoop
         return $loopResult;
     }
 }
+

@@ -27,74 +27,73 @@ use Thelia\Model\ConfigQuery;
 
 class URL
 {
-	public static function getIndexPage() {
-		return ConfigQuery::read('base_url', '/') . "index_dev.php"; // FIXME !
-	}
+    public static function getIndexPage()
+    {
+        return ConfigQuery::read('base_url', '/') . "index_dev.php"; // FIXME !
+    }
 
-	/**
-	 * Returns the Absolute URL for a given path relative to web root. By default,
-	 * the index.php (or index_dev.php) script name is added to the URL, use
-	 * $path_only = true to get a path without the index script.
+    /**
+     * Returns the Absolute URL for a given path relative to web root. By default,
+     * the index.php (or index_dev.php) script name is added to the URL, use
+     * $path_only = true to get a path without the index script.
      *
-     * @param string    $path         the relative path
-     * @param array     $parameters   An array of parameters
-     * @param boolean	$path_only    if true, getIndexPage() will  not be added
+     * @param string  $path       the relative path
+     * @param array   $parameters An array of parameters
+     * @param boolean $path_only  if true, getIndexPage() will  not be added
      *
      * @return string The generated URL
      */
     public static function absoluteUrl($path, array $parameters = array(), $path_only = false)
     {
-     	// Already absolute ?
-    	if (substr($path, 0, 4) != 'http') {
+         // Already absolute ?
+        if (substr($path, 0, 4) != 'http') {
 
-    		$root = $path_only ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
+            $root = $path_only ? ConfigQuery::read('base_url', '/') : self::getIndexPage();
 
-    		$base = $root . '/' . ltrim($path, '/');
-    	}
-    	else
-    		$base = $path;
+            $base = $root . '/' . ltrim($path, '/');
+        } else
+            $base = $path;
 
-    	$queryString = '';
+        $queryString = '';
 
-    	foreach($parameters as $name => $value) {
-    		$queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
-    	}
+        foreach ($parameters as $name => $value) {
+            $queryString .= sprintf("%s=%s&", urlencode($name), urlencode($value));
+        }
 
-    	$sepChar = strstr($base, '?') === false ? '?' : '&';
+        $sepChar = strstr($base, '?') === false ? '?' : '&';
 
-    	if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
-
-    	return $base . $queryString;
+        if ('' !== $queryString = rtrim($queryString, "&")) $queryString = $sepChar . $queryString;
+        return $base . $queryString;
     }
 
     /**
      * Returns the Absolute URL to a administration view
      *
-     * @param string    $viewName      the view name (e.g. login for login.html)
-     * @param mixed     $parameters    An array of parameters
+     * @param string $viewName   the view name (e.g. login for login.html)
+     * @param mixed  $parameters An array of parameters
      *
      * @return string The generated URL
      */
-    public static function adminViewUrl($viewName, array $parameters = array()) {
+    public static function adminViewUrl($viewName, array $parameters = array())
+    {
+        $path = sprintf("%s/admin/%s", self::getIndexPage(), $viewName); // FIXME ! view= should not be required, check routing parameters
 
-    	$path = sprintf("%s/admin/%s", self::getIndexPage(), $viewName); // FIXME ! view= should not be required, check routing parameters
-
-    	return self::absoluteUrl($path, $parameters);
+        return self::absoluteUrl($path, $parameters);
     }
 
-	/**
-	 * Returns the Absolute URL to a view
+    /**
+     * Returns the Absolute URL to a view
      *
-     * @param string    $viewName      the view name (e.g. login for login.html)
-     * @param mixed     $parameters    An array of parameters
+     * @param string $viewName   the view name (e.g. login for login.html)
+     * @param mixed  $parameters An array of parameters
      *
      * @return string The generated URL
      */
-     public static function viewUrl($viewName, array $parameters = array()) {
+     public static function viewUrl($viewName, array $parameters = array())
+     {
+         $path = sprintf("%s?view=%s", self::getIndexPage(), $viewName);
 
-     	$path = sprintf("%s?view=%s", self::getIndexPage(), $viewName);
-
-     	return self::absoluteUrl($path, $parameters);
+         return self::absoluteUrl($path, $parameters);
      }
 }
 

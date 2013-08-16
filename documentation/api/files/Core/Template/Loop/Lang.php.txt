@@ -30,8 +30,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 use Thelia\Model\LangQuery;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
@@ -66,20 +64,20 @@ class Lang extends BaseLoop
      */
     public function exec(&$pagination)
     {
-		$id      = $this->getId();
-		$exclude = $this->getExclude();
-		$default_only = $this->getDefaultOnly();
+        $id      = $this->getId();
+        $exclude = $this->getExclude();
+        $default_only = $this->getDefaultOnly();
 
         $search = LangQuery::create();
 
         if (! is_null($id))
-			$search->filterById($id);
+            $search->filterById($id);
 
         if ($default_only)
-        	$search->filterByByDefault(true);
+            $search->filterByByDefault(true);
 
         if (! is_null($exclude)) {
-        	$search->filterById($exclude, Criteria::NOT_IN);
+            $search->filterById($exclude, Criteria::NOT_IN);
         }
 
         $search->orderByPosition(Criteria::ASC);
@@ -90,25 +88,26 @@ class Lang extends BaseLoop
 
         foreach ($results as $result) {
 
-        	$loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow();
 
-        	$loopResultRow
-	        	->set("ID", $result->getId())
-	        	->set("TITLE",$result->getTitle())
-	        	->set("CODE", $result->getCode())
-	        	->set("LOCALE", $result->getLocale())
-	        	->set("URL", $result->getUrl())
-	        	->set("IS_DEFAULT", $result->getByDefault())
-	        	->set("URL", $result->getUrl())
-	        	->set("POSITION", $result->getPosition())
+            $loopResultRow
+                ->set("ID", $result->getId())
+                ->set("TITLE",$result->getTitle())
+                ->set("CODE", $result->getCode())
+                ->set("LOCALE", $result->getLocale())
+                ->set("URL", $result->getUrl())
+                ->set("IS_DEFAULT", $result->getByDefault())
+                ->set("URL", $result->getUrl())
+                ->set("POSITION", $result->getPosition())
 
-	        	->set("CREATE_DATE", $result->getCreatedAt())
-	        	->set("UPDATE_DATE", $result->getUpdatedAt())
-	        ;
+                ->set("CREATE_DATE", $result->getCreatedAt())
+                ->set("UPDATE_DATE", $result->getUpdatedAt())
+            ;
 
-        	$loopResult->addRow($loopResultRow);
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;
     }
 }
+

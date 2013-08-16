@@ -30,7 +30,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class BaseAction
 {
-
     /**
      * @var The container
      */

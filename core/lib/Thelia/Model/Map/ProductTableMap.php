@@ -201,7 +201,7 @@ class ProductTableMap extends TableMap
         $this->addRelation('FeatureProduct', '\\Thelia\\Model\\FeatureProduct', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'FeatureProducts');
         $this->addRelation('ProductSaleElements', '\\Thelia\\Model\\ProductSaleElements', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductSaleElementss');
         $this->addRelation('ContentAssoc', '\\Thelia\\Model\\ContentAssoc', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ContentAssocs');
-        $this->addRelation('ProdutImage', '\\Thelia\\Model\\ProdutImage', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProdutImages');
+        $this->addRelation('ProductImage', '\\Thelia\\Model\\ProductImage', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductImages');
         $this->addRelation('ProductDocument', '\\Thelia\\Model\\ProductDocument', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'ProductDocuments');
         $this->addRelation('AccessoryRelatedByProductId', '\\Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'product_id', ), 'CASCADE', 'RESTRICT', 'AccessoriesRelatedByProductId');
         $this->addRelation('AccessoryRelatedByAccessory', '\\Thelia\\Model\\Accessory', RelationMap::ONE_TO_MANY, array('id' => 'accessory', ), 'CASCADE', 'RESTRICT', 'AccessoriesRelatedByAccessory');
@@ -239,7 +239,7 @@ class ProductTableMap extends TableMap
                 FeatureProductTableMap::clearInstancePool();
                 ProductSaleElementsTableMap::clearInstancePool();
                 ContentAssocTableMap::clearInstancePool();
-                ProdutImageTableMap::clearInstancePool();
+                ProductImageTableMap::clearInstancePool();
                 ProductDocumentTableMap::clearInstancePool();
                 AccessoryTableMap::clearInstancePool();
                 RewritingTableMap::clearInstancePool();

@@ -33,3 +33,4 @@ interface RoleInterface
      */
     public function getRole();
 }
+

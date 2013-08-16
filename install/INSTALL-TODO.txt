@@ -19,3 +19,8 @@ Variables Config à initialiser:
 - password.length : longueur du mot de passe, défaut 4
 - form.secret : token csrf
 - verifyStock : vérification du stock lors du paiement/ajout au panier. Defaut 1
+- default_images_quality_percent : qualité par défaut des images générées (0 à 100, défaut: 75).
+- original_image_delivery_mode : mode de mise à disposition des images originales (full resolution) dans le cache. 'symlink' pour un lien symbolique, 'copy' pour une copie
+- images_library_path : chemin vers le répertoire où sont stockés les images source (defaut: local/media/images)
+- image_cache_dir_from_web_root : le repértoire de base où sont cachées les images, relatif à /web (cache/images)
+- imagine_graphic_driver : le drivers utilisé par Imagine (gd, imagik, gmagick), defaut: 'gd'

@@ -37,27 +37,31 @@ class IntToCombinedStringsListType implements TypeInterface
 
     public function isValid($values)
     {
-        foreach(explode(',', $values) as $intToCombinedStrings) {
+        foreach (explode(',', $values) as $intToCombinedStrings) {
             $parts = explode(':', $intToCombinedStrings);
             if(count($parts) != 2)
+
                 return false;
             if(filter_var($parts[0], FILTER_VALIDATE_INT) === false)
+
                 return false;
 
             if(false === $this->checkLogicalFormat($parts[1]))
+
                 return false;
         }
         $x = 3;
+
         return true;
     }
 
     public function getFormattedValue($values)
     {
-        if( $this->isValid($values) ) {
+        if ( $this->isValid($values) ) {
             $return = '';
 
             $values = preg_replace('#[\s]#', '', $values);
-            foreach(explode(',', $values) as $intToCombinedStrings) {
+            foreach (explode(',', $values) as $intToCombinedStrings) {
                 $parts = explode(':', $intToCombinedStrings);
 
                 $return[trim($parts[0])] = array(
@@ -79,26 +83,27 @@ class IntToCombinedStringsListType implements TypeInterface
         $noParentheseString = preg_replace('#[\(\)]#', '', $noSpaceString);
 
         if(!preg_match('#^([a-zA-Z0-9_\-]+([\&\|][a-zA-Z0-9_\-]+)*|\*)$#', $noParentheseString))
+
             return false;
 
         /* check parenteses use */
         $openingParenthesesCount = 0;
         $closingParenthesesCount = 0;
 
-        for($i=0; $i<strlen($noSpaceString); $i++) {
+        for ($i=0; $i<strlen($noSpaceString); $i++) {
             $char = $noSpaceString[$i];
-            if($char == '(') {
+            if ($char == '(') {
                 /* must be :
                  * - after a &| or () or at the begining of expression
                  * - before a number or ()
                  * must not be :
                  * - at the end of expression
                  */
-                if(($i!=0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i-1])) || !isset($noSpaceString[$i+1]) || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i+1])) {
+                if (($i!=0 && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i-1])) || !isset($noSpaceString[$i+1]) || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i+1])) {
                     return false;
                 }
                 $openingParenthesesCount++;
-            } elseif($char == ')') {
+            } elseif ($char == ')') {
                 /* must be :
                  * - after a number or ()
                  * - before a &| or () or at the end of expression
@@ -106,14 +111,14 @@ class IntToCombinedStringsListType implements TypeInterface
                  * - at the begining of expression
                  * - if no ( remain unclose
                  */
-                if($i == 0 || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i-1]) || (isset($noSpaceString[$i+1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i+1])) || $openingParenthesesCount-$closingParenthesesCount==0) {
+                if ($i == 0 || !preg_match('#[\(\)a-zA-Z0-9_\-]#', $noSpaceString[$i-1]) || (isset($noSpaceString[$i+1]) && !preg_match('#[\(\)\&\|]#', $noSpaceString[$i+1])) || $openingParenthesesCount-$closingParenthesesCount==0) {
                     return false;
                 }
                 $closingParenthesesCount++;
             }
         }
 
-        if($openingParenthesesCount != $closingParenthesesCount) {
+        if ($openingParenthesesCount != $closingParenthesesCount) {
             return false;
         }
 

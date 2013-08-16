@@ -70,7 +70,7 @@ class SmartyAssetsManager
             $url = $this->assetic_manager->asseticize(
                     $asset_dir.'/'.$asset_file,
                     $this->web_root."/".$this->path_relative_to_web_root,
-                    URL::absoluteUrl($this->path_relative_to_web_root, array(), true /* path only */),
+                    URL::absoluteUrl($this->path_relative_to_web_root, null, URL::PATH_TO_FILE /* path only */),
                     $assetType,
                     $filters,
                     $debug

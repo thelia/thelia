@@ -38,6 +38,7 @@ class JsonType implements TypeInterface
     public function isValid($value)
     {
         json_decode($value, true);
+
         return (json_last_error() == JSON_ERROR_NONE);
     }
 
