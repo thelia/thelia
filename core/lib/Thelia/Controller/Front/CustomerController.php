@@ -24,6 +24,7 @@ namespace Thelia\Controller\Front;
 
 use Thelia\Core\Event\CustomerEvent;
 use Thelia\Core\Security\SecurityContext;
+use Thelia\Form\CustomerCreation;
 use Thelia\Model\Customer;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -31,16 +32,10 @@ class CustomerController extends BaseFrontController
 {
     public function createAction()
     {
+        $request = $this->getRequest();
+        $customerCreation = new CustomerCreation($$request);
 
-        $event = $this->dispatchEvent("createCustomer");
-        if (null !== $customer = $event->customer) {
-            $this->processLogin($event->customer);
-        }
-
-    }
-
-    public function displayCreateAction()
-    {
+        $form = $this->validateForm($customerCreation, "post");
 
     }
 
