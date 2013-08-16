@@ -24,8 +24,8 @@ namespace Thelia\Core\HttpFoundation;
 
 use Symfony\Component\HttpFoundation\Request as BaseRequest;
 
-
-class Request extends BaseRequest{
+class Request extends BaseRequest
+{
 
     public function getProductId()
     {
@@ -45,7 +45,8 @@ class Request extends BaseRequest{
         if ('' == $this->getQueryString()) {
             $additionalQs = '?'. ltrim($additionalQs, '&');
         }
+
         return $uri . $additionalQs;
     }
-
 }
+

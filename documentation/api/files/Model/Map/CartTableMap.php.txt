@@ -161,7 +161,7 @@ class CartTableMap extends TableMap
         $this->setUseIdGenerator(true);
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addColumn('TOKEN', 'Token', 'VARCHAR', true, 255, null);
+        $this->addColumn('TOKEN', 'Token', 'VARCHAR', false, 255, null);
         $this->addForeignKey('CUSTOMER_ID', 'CustomerId', 'INTEGER', 'customer', 'ID', false, null, null);
         $this->addForeignKey('ADDRESS_DELIVERY_ID', 'AddressDeliveryId', 'INTEGER', 'address', 'ID', false, null, null);
         $this->addForeignKey('ADDRESS_INVOICE_ID', 'AddressInvoiceId', 'INTEGER', 'address', 'ID', false, null, null);

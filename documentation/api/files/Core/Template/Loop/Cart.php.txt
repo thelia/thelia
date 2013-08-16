@@ -9,13 +9,13 @@
 
 namespace Thelia\Core\Template\Loop;
 
-
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 
-class Cart extends BaseLoop {
+class Cart extends BaseLoop
+{
     use \Thelia\Cart\CartTrait;
     /**
      *
@@ -74,10 +74,9 @@ class Cart extends BaseLoop {
         $result = new LoopResult();
         $cart = $this->getCart($this->request);
 
-        if($cart === null) {
+        if ($cart === null) {
             return $result;
         }
-
 
         $cartItems = $cart->getCartItems();
 
@@ -99,5 +98,5 @@ class Cart extends BaseLoop {
         return $result;
     }
 
-
 }
+

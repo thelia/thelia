@@ -51,7 +51,6 @@ abstract class BaseLoop
      */
     protected $securityContext;
 
-
     protected $args;
 
     /**
@@ -77,11 +76,11 @@ abstract class BaseLoop
      */
     protected function getDefaultArgs()
     {
-    	return array(
+        return array(
             Argument::createIntTypeArgument('offset', 0),
             Argument::createIntTypeArgument('page'),
             Argument::createIntTypeArgument('limit', PHP_INT_MAX),
-    	);
+        );
     }
 
     /**
@@ -93,17 +92,17 @@ abstract class BaseLoop
      * @return null
      * @throws \InvalidArgumentException if the parameter is unknown or the method name is not supported.
      */
-    public function __call($name, $arguments) {
+    public function __call($name, $arguments)
+    {
+        if (substr($name, 0, 3) == 'get') {
 
-    	if (substr($name, 0, 3) == 'get') {
+            // camelCase to underscore: getNotEmpty -> not_empty
+            $argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', "$1_$2", substr($name, 3)));
 
-    		// camelCase to underscore: getNotEmpty -> not_empty
-    		$argName = strtolower(preg_replace('/([^A-Z])([A-Z])/', "$1_$2", substr($name, 3)));
+            return $this->getArg($argName)->getValue();
+        }
 
-    		return $this->getArg($argName)->getValue();
-    	}
-
-    	throw new \InvalidArgumentException(sprintf("Unsupported magic method %s. only getArgname() is supported.", $name));
+        throw new \InvalidArgumentException(sprintf("Unsupported magic method %s. only getArgname() is supported.", $name));
     }
 
     /**
@@ -113,8 +112,8 @@ abstract class BaseLoop
      *
      * @throws \InvalidArgumentException if somùe argument values are missing, or invalid
      */
-    public function initializeArgs(array $nameValuePairs) {
-
+    public function initializeArgs(array $nameValuePairs)
+    {
         $faultActor = array();
         $faultDetails = array();
 
@@ -127,29 +126,26 @@ abstract class BaseLoop
             $value = isset($nameValuePairs[$argument->name]) ? $nameValuePairs[$argument->name] : null;
 
             /* check if mandatory */
-            if($value === null && $argument->mandatory) {
+            if ($value === null && $argument->mandatory) {
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('"%s" parameter is missing in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
-            }
-			else  if($value === '' && !$argument->empty) {
-           		/* check if empty */
+            } else  if ($value === '' && !$argument->empty) {
+                   /* check if empty */
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('"%s" parameter cannot be empty in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
-            }
-            else if($value !== null && !$argument->type->isValid($value)) {
-            	/* check type */
+            } elseif ($value !== null && !$argument->type->isValid($value)) {
+                /* check type */
                 $faultActor[] = $argument->name;
                 $faultDetails[] = sprintf('Invalid value for "%s" argument in loop type: %s, name: %s', $argument->name, $loopType, $loopName);
-            }
-			else {
-	            /* set default */
-	            /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
-	            if($value === null) {
-	                $value = $argument->default;
-	            }
+            } else {
+                /* set default */
+                /* did it as last checking for we consider default value is acceptable no matter type or empty restriction */
+                if ($value === null) {
+                    $value = $argument->default;
+                }
 
-	            $argument->setValue($value);
-			}
+                $argument->setValue($value);
+            }
         }
 
         if (!empty($faultActor)) {
@@ -165,16 +161,16 @@ abstract class BaseLoop
      * @param string $argumentName the argument name
      *
      * @throws \InvalidArgumentException if argument is not found in loop argument list
-     * @return Argument the loop argument.
+     * @return Argument                  the loop argument.
      */
-    public function getArg($argumentName) {
+    public function getArg($argumentName)
+    {
+        $arg = $this->args->get($argumentName);
 
-    	$arg = $this->args->get($argumentName);
+        if ($arg === null)
+            throw new \InvalidArgumentException("Undefined loop argument '$argumentName'");
 
-    	if ($arg === null)
-    		throw new \InvalidArgumentException("Undefined loop argument '$argumentName'");
-
-    	return $arg;
+        return $arg;
     }
 
     /**
@@ -183,11 +179,11 @@ abstract class BaseLoop
      * @param string $argumentName the argument name
      *
      * @throws \InvalidArgumentException if argument is not found in loop argument list
-     * @return Argument the loop argument.
+     * @return Argument                  the loop argument.
      */
-    public function getArgValue($argumentName) {
-
-    	return $this->getArg($argumentName)->getValue();
+    public function getArgValue($argumentName)
+    {
+        return $this->getArg($argumentName)->getValue();
     }
 
     /**
@@ -198,7 +194,7 @@ abstract class BaseLoop
      */
     public function search(ModelCriteria $search, &$pagination = null)
     {
-        if($this->getArgValue('page') !== null) {
+        if ($this->getArgValue('page') !== null) {
             return $this->searchWithPagination($search, $pagination);
         } else {
             return $this->searchWithOffset($search);
@@ -212,7 +208,7 @@ abstract class BaseLoop
      */
     public function searchWithOffset(ModelCriteria $search)
     {
-        if($this->getArgValue('limit') >= 0) {
+        if ($this->getArgValue('limit') >= 0) {
             $search->limit($this->getArgValue('limit'));
         }
         $search->offset($this->getArgValue('offset'));
@@ -230,7 +226,7 @@ abstract class BaseLoop
     {
         $pagination = $search->paginate($this->getArgValue('page'), $this->getArgValue('limit'));
 
-        if($this->getArgValue('page') > $pagination->getLastPage()) {
+        if ($this->getArgValue('page') > $pagination->getLastPage()) {
             return array();
         } else {
             return $pagination;

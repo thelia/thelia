@@ -2,7 +2,8 @@
 
 namespace Thelia\Core\Security\UserProvider;
 
-interface UserProviderInterface {
+interface UserProviderInterface
+{
     /**
      * Returns a UserInterface instance
      *
@@ -11,4 +12,4 @@ interface UserProviderInterface {
      */
     public function getUser($key);
 }
-?>
+

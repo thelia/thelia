@@ -30,7 +30,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ConfigQuery;
@@ -77,7 +76,7 @@ class Folder extends BaseLoop
     {
         $search = FolderQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
@@ -89,15 +88,13 @@ class Folder extends BaseLoop
             $search->filterByParent($parent);
         }
 
-
-		$current = $this->getCurrent();
+        $current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("folder_id"));
         } elseif ($current === false) {
             $search->filterById($this->request->get("folder_id"), Criteria::NOT_IN);
         }
-
 
          $exclude = $this->getExclude();
 
@@ -111,7 +108,7 @@ class Folder extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
@@ -157,22 +154,22 @@ class Folder extends BaseLoop
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
-            	->set("ID", $folder->getId())
-            	->set("TITLE",$folder->getTitle())
-	            ->set("CHAPO", $folder->getChapo())
-	            ->set("DESCRIPTION", $folder->getDescription())
-	            ->set("POSTSCRIPTUM", $folder->getPostscriptum())
-	            ->set("PARENT", $folder->getParent())
-	            ->set("CONTENT_COUNT", $folder->countChild())
-	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
-	            ->set("POSITION", $folder->getPosition())
+                ->set("ID", $folder->getId())
+                ->set("TITLE",$folder->getTitle())
+                ->set("CHAPO", $folder->getChapo())
+                ->set("DESCRIPTION", $folder->getDescription())
+                ->set("POSTSCRIPTUM", $folder->getPostscriptum())
+                ->set("PARENT", $folder->getParent())
+                ->set("CONTENT_COUNT", $folder->countChild())
+                ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
+                ->set("POSITION", $folder->getPosition())
 
-	            ->set("CREATE_DATE", $folder->getCreatedAt())
-	            ->set("UPDATE_DATE", $folder->getUpdatedAt())
-	            ->set("VERSION", $folder->getVersion())
-	            ->set("VERSION_DATE", $folder->getVersionCreatedAt())
-	            ->set("VERSION_AUTHOR", $folder->getVersionCreatedBy())
-			;
+                ->set("CREATE_DATE", $folder->getCreatedAt())
+                ->set("UPDATE_DATE", $folder->getUpdatedAt())
+                ->set("VERSION", $folder->getVersion())
+                ->set("VERSION_DATE", $folder->getVersionCreatedAt())
+                ->set("VERSION_AUTHOR", $folder->getVersionCreatedBy())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
@@ -180,3 +177,4 @@ class Folder extends BaseLoop
         return $loopResult;
     }
 }
+

@@ -41,8 +41,8 @@ class SmartyParser extends Smarty implements ParserInterface
      * @param bool                     $debug
      */
     public function __construct(
-    		Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
-    		$template = false, $env = "prod", $debug = false)
+            Request $request, EventDispatcherInterface $dispatcher, ParserContext $parserContext,
+            $template = false, $env = "prod", $debug = false)
     {
         parent::__construct();
 
@@ -69,7 +69,7 @@ class SmartyParser extends Smarty implements ParserInterface
         $this->error_reporting = E_ALL ^ E_NOTICE;
 
         // Si on n'est pas en mode debug, activer le cache, avec une lifetime de 15mn, et en vérifiant que les templates sources n'ont pas été modifiés.
-        if($debug === false) {
+        if ($debug === false) {
             $this->caching        = Smarty::CACHING_LIFETIME_CURRENT;
             $this->cache_lifetime = 300;
             $this->compile_check  = true;
@@ -87,15 +87,15 @@ class SmartyParser extends Smarty implements ParserInterface
 
     public function preThelia($tpl_source, \Smarty_Internal_Template $template)
     {
-    	$new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
-    	$new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
+        $new_source = preg_replace('`{#([a-zA-Z][a-zA-Z0-9\-_]*)(.*)}`', '{\$$1$2}', $tpl_source);
+        $new_source = preg_replace('`#([a-zA-Z][a-zA-Z0-9\-_]*)`', '{\$$1|dieseCanceller:\'#$1\'}', $new_source);
 
-    	return $new_source;
+        return $new_source;
     }
 
     public function removeBlankLines($tpl_source, \Smarty_Internal_Template $template)
     {
-    	return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
+        return preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/", "\n", $tpl_source);
     }
 
     public function setTemplate($template_path_from_template_base)
@@ -119,10 +119,10 @@ class SmartyParser extends Smarty implements ParserInterface
      */
     public function render($realTemplateName, array $parameters = array())
     {
-    	// Assign the parserContext variables
-    	foreach($this->parserContext as $var => $value) {
-    		$this->assign($var, $value);
-    	}
+        // Assign the parserContext variables
+        foreach ($this->parserContext as $var => $value) {
+            $this->assign($var, $value);
+        }
 
         $this->assign($parameters);
 
@@ -138,8 +138,7 @@ class SmartyParser extends Smarty implements ParserInterface
     {
         try {
             $templateFile = $this->getTemplateFilePath();
-        }
-        catch(\RuntimeException $e) {
+        } catch (\RuntimeException $e) {
             return new Response($e->getMessage(), "404");
         }
 
@@ -219,7 +218,7 @@ class SmartyParser extends Smarty implements ParserInterface
         if (!file_exists($fileName)) {
             $fileName .= ".html";
 
-            if(!file_exists($fileName)) {
+            if (!file_exists($fileName)) {
                 throw new ResourceNotFoundException(sprintf("%s file not found in %s template", $file, $this->template));
             }
         }

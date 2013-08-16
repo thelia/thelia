@@ -46,7 +46,7 @@ class LoopResultRow
 
     public function getVars()
     {
-    	return array_keys($this->substitution);
+        return array_keys($this->substitution);
     }
 
 }
