@@ -33,6 +33,11 @@ use Thelia\Core\Event\TheliaEvents;
 
 class CustomerController extends BaseFrontController
 {
+    /**
+     * create a new Customer. Retrieve data in form and dispatch a action.createCustomer event
+     *
+     * if error occurs, message is set in the parserContext
+     */
     public function createAction()
     {
         $request = $this->getRequest();
@@ -66,10 +71,14 @@ class CustomerController extends BaseFrontController
 
             $this->processLogin($customerCreateEvent->getCustomer());
 
+            $this->redirectSuccess();
+
         } catch (FormValidationException $e) {
-
+            $customerCreation->setErrorMessage($e->getMessage());
+            $this->getParserContext()->setErrorForm($customerCreation);
         } catch (PropelException $e) {
-
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during customer creation process in front context with message : %s", $e->getMessage()));
+            $this->getParserContext()->setGeneralError($e->getMessage());
         }
 
 

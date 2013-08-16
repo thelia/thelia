@@ -62,7 +62,7 @@ class CartController extends BaseFrontController
         }
 
         if ($message) {
-            $cartAdd->setErrorMessage($e->getMessage());
+            $cartAdd->setErrorMessage($message);
             $this->getParserContext()->setErrorForm($cartAdd);
         }
     }
