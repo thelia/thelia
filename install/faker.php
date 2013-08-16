@@ -4,6 +4,8 @@ use Propel\Runtime\Exception\PropelException;
 use Thelia\Model\CategoryImage;
 use Thelia\Model\FolderImage;
 use Thelia\Model\ContentImage;
+use Imagine\Image\Color;
+use Imagine\Image\Point;
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);
@@ -30,15 +32,38 @@ function generate_image($image, $position, $typeobj, $id) {
     ;
 
     // Generate images
-    $image_data = file_get_contents("http://placehold.it/320x200&text=Image+for+$typeobj+ID+".$id);
+    $imagine = new Imagine\Gd\Imagine();
+    $image   = $imagine->create(new Imagine\Image\Box(320,240), new Color('#E9730F'));
+
+    $white = new Color('#FFF');
+
+    $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 14, $white);
+
+    $tbox = $font->box("THELIA");
+    $image->draw()->text("THELIA", $font, new Point((320 - $tbox->getWidth()) / 2, 30));
+
+    $str = sprintf("%s sample image", ucfirst($typeobj));
+    $tbox = $font->box($str);
+    $image->draw()->text($str, $font, new Point((320 - $tbox->getWidth()) / 2, 80));
+
+    $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 18, $white);
+
+    $str = sprintf("%s ID %d", strtoupper($typeobj), $id);
+    $tbox = $font->box($str);
+    $image->draw()->text($str, $font, new Point((320 - $tbox->getWidth()) / 2, 180));
+
+    $image->draw()
+        ->line(new Point(0, 0), new Point(319, 0), $white)
+        ->line(new Point(319, 0), new Point(319, 239), $white)
+        ->line(new Point(319, 239), new Point(0,239), $white)
+        ->line(new Point(0, 239), new Point(0, 0), $white)
+    ;
+
     $image_file = sprintf("%s/../local/media/images/%s/sample-image-%s.png", __DIR__, $typeobj, $id);
 
     if (! is_dir(dirname($image_file))) mkdir(dirname($image_file), 0777, true);
 
-    if ($fh = fopen($image_file, "w")) {
-        fwrite($fh, $image_data);
-        fclose($fh);
-    }
+    $image->save($image_file);
 }
 
 try {

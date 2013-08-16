@@ -277,25 +277,6 @@ class Image extends BaseLoop
         }
 
         return $loopResult;
-/*
-#PRODUIT : identifiant du produit associé (valué si le paramètre "produit" a été indiqué)
-#PRODTITRE : titre du produit associé (valué si le paramètre "produit" a été indiqué)
-#PRODREF : référence du produit associé (valué si le paramètre "produit" a été indiqué)
-#RUBRIQUE : identifiant de la rubrique associée (valué si le paramètre "rubrique" a été indiqué)
-#RUBTITRE : titre de la rubrique associée (valué si le paramètre "rubrique" a été indiqué)
-#DOSSIER : identifiant du dossier associée (valué si le paramètre "dossier" a été indiqué)
-#DOSTITRE : titre du dossier associée (valué si le paramètre "dossier" a été indiqué)
-#CONTENU : identifiant du contenu associée (valué si le paramètre "contenu" a été indiqué)
-#CONTTITRE : titre du contenu associée (valué si le paramètre "contenu" a été indiqué)
-#IMAGE : URL de l'image transformée (redimensionnée, inversée, etc. suivant les paramètres d'entrée de la boucle).
-#FICHIER : URL de l'image originale
-#ID : identifiant de l'image
-
-#TITRE : titre de l'image
-#CHAPO : description courte de l'image
-#DESCRIPTION : description longue de l'image
-#COMPT : compteur débutant à 1. Utile pour l'utilisation de Javascript.
- */
     }
 
     /**
