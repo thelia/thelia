@@ -12,7 +12,7 @@
         <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
         <h4>#TITLE</h4>
         <p>#DESCRIPTION</p>
-        {ifloop rel="acc"}
+        {*ifloop rel="acc"}
             <h5>Accessories</h5>
             <ul>
                 {loop name="acc" type="accessory" product="#ID" order="accessory"}
@@ -22,7 +22,7 @@
         {/ifloop}
         {elseloop rel="acc"}
             <h5>No accessory</h5>
-        {/elseloop}
+        {/elseloop*}
         {ifloop rel="ft"}
             <h5>Features</h5>
             <ul>
@@ -44,7 +44,7 @@
             <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
             <h4>#TITLE</h4>
             <p>#DESCRIPTION</p>
-            {ifloop rel="acc"}
+            {*ifloop rel="acc"}
             <h5>Accessories</h5>
             <ul>
                 {loop name="acc" type="accessory" product="#ID" order="accessory"}
@@ -54,7 +54,7 @@
             {/ifloop}
             {elseloop rel="acc"}
             <h5>No accessory</h5>
-            {/elseloop}
+            {/elseloop*}
             {ifloop rel="ft"}
             <h5>Features</h5>
             <ul>
@@ -113,9 +113,15 @@
 
 <div style="border: solid 8px; margin: 0px; padding: 0px; width: 30%; float: left">
 
-    {loop name="product" type="product" order="promo,min_price" exclude_category="3" new="on" promo="off"}
+    {*loop name="product" type="product" order="promo,min_price" exclude_category="3" new="on" promo="off"}
     <h3>PRODUCT : #REF / #TITLE</h3>
-    {/loop}
+    {/loop*}
+
+{loop name="product" type="product" new="on" promo="off"}
+<h3>PRODUCT : #REF / #TITLE</h3>
+{/loop}
+
+
 
     {*loop name="product" type="product" order="ref" feature_availability="1: (1 | 2) , 2: 4, 3: 433"}
     <h3>PRODUCT : #REF / #TITLE</h3>

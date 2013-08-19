@@ -75,8 +75,9 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
     	$type = $this->getParam($params, 'type');
 
-    	if (null == $type)
+    	if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in count arguments");
+        }
 
         $loop = $this->createLoopInstance($params);
 
@@ -101,13 +102,15 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
     	$name = $this->getParam($params, 'name');
 
-        if (null == $name)
+        if (null == $name) {
             throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
+        }
 
         $type = $this->getParam($params, 'type');
 
-        if (null == $type)
+        if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
+        }
 
         if ($content === null) {
             // Check if a loop with the same name exists in the current scope, and abort if it's the case.
@@ -273,6 +276,105 @@ class TheliaLoop extends AbstractSmartyPlugin
     }
 
     /**
+     * Process {unionloop name="loop name" type="loop type" ... } ... {/unionloop} block
+     *
+     * @param $params
+     * @param $content
+     * @param $template
+     * @param $repeat
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    public function theliaUnion($params, $content, $template, &$repeat)
+    {
+        return;
+
+        $name = $this->getParam($params, 'name');
+
+        if (null == $name)
+            throw new \InvalidArgumentException("Missing 'name' parameter in unionloop arguments");
+
+        $type = $this->getParam($params, 'type');
+
+        if (null == $type)
+            throw new \InvalidArgumentException("Missing 'type' parameter in unionloop arguments");
+
+        if ($content === null) {
+            // Check if a loop with the same name exists in the current scope, and abort if it's the case.
+            if (array_key_exists($name, $this->varstack)) {
+                throw new \InvalidArgumentException("A loop named '$name' already exists in the current scope.");
+            }
+
+            $loop = $this->createLoopInstance($params);
+
+            self::$pagination[$name] = null;
+
+            $loopResults = $loop->exec(self::$pagination[$name]);
+
+            $this->loopstack[$name] = $loopResults;
+
+            // Pas de résultat ? la boucle est terminée, ne pas évaluer le contenu.
+            if ($loopResults->isEmpty()) $repeat = false;
+
+        } else {
+            $loopResults = $this->loopstack[$name];
+
+            $loopResults->next();
+        }
+
+        if ($loopResults->valid()) {
+            $loopResultRow = $loopResults->current();
+
+            // On first iteration, save variables that may be overwritten by this loop
+            if (! isset($this->varstack[$name])) {
+
+                $saved_vars = array();
+
+                $varlist = $loopResultRow->getVars();
+                $varlist[] = 'LOOP_COUNT';
+                $varlist[] = 'LOOP_TOTAL';
+
+                foreach($varlist as $var) {
+                    $saved_vars[$var] = $template->getTemplateVars($var);
+                }
+
+                $this->varstack[$name] = $saved_vars;
+            }
+
+            foreach($loopResultRow->getVarVal() as $var => $val) {
+                $template->assign($var, $val);
+            }
+
+            $repeat = true;
+        }
+
+        // Assign meta information
+        $template->assign('LOOP_COUNT', 1 + $loopResults->key());
+        $template->assign('LOOP_TOTAL', $loopResults->getCount());
+
+        // Loop is terminated. Cleanup.
+        if (! $repeat) {
+            // Restore previous variables values before terminating
+            if (isset($this->varstack[$name])) {
+                foreach($this->varstack[$name] as $var => $value) {
+                    $template->assign($var, $value);
+                }
+
+                unset($this->varstack[$name]);
+            }
+        }
+
+        if ($content !== null) {
+            if ($loopResults->isEmpty()) {
+                $content = "";
+            }
+
+            return $content;
+        }
+    }
+
+    /**
      * Check if a loop has returned results. The loop shoud have been executed before, or an
      * InvalidArgumentException is thrown
      *
@@ -367,11 +469,12 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         return array(
 
-    		new SmartyPluginDescriptor('function', 'count'    , $this, 'theliaCount'),
-    		new SmartyPluginDescriptor('block'   , 'loop'     , $this, 'theliaLoop'),
-        	new SmartyPluginDescriptor('block'   , 'elseloop' , $this, 'theliaElseloop'),
-    		new SmartyPluginDescriptor('block'   , 'ifloop'   , $this, 'theliaIfLoop'),
-    		new SmartyPluginDescriptor('block'   , 'pageloop' , $this, 'theliaPageLoop'),
+    		new SmartyPluginDescriptor('function', 'count',     $this, 'theliaCount'),
+    		new SmartyPluginDescriptor('block'   , 'loop',      $this, 'theliaLoop'),
+        	new SmartyPluginDescriptor('block'   , 'elseloop',  $this, 'theliaElseloop'),
+    		new SmartyPluginDescriptor('block'   , 'ifloop',    $this, 'theliaIfLoop'),
+    		new SmartyPluginDescriptor('block'   , 'pageloop',  $this, 'theliaPageLoop'),
+    		new SmartyPluginDescriptor('block'   , 'union',     $this, 'theliaUnion'),
         );
      }
 }
