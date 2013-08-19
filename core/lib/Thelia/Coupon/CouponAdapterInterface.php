@@ -57,4 +57,26 @@ interface CouponAdapterInterface
      * @return \Thelia\Model\Customer
      */
     public function getCustomer();
+
+    /**
+     * Return Checkout total price
+     *
+     * @return float
+     */
+    public function getCheckoutTotalPrice();
+
+    /**
+     * Return Products total price
+     *
+     * @return float
+     */
+    public function getCheckoutTotalPriceWithoutDiscountAndPostagePrice();
+
+    /**
+     * Return Checkout total postage (only) price
+     *
+     * @return float
+     */
+    public function getCheckoutPostagePrice();
+
 }
