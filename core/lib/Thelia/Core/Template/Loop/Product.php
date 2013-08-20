@@ -143,7 +143,7 @@ class Product extends BaseLoop
         );
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
-        $usedAttributeNonStrictMatchList = array();
+        $isPSELeftJoinList = array();
 
         $id = $this->getId();
 
@@ -179,12 +179,12 @@ class Product extends BaseLoop
         $new = $this->getNew();
 
         if ($new === true) {
-            $usedAttributeNonStrictMatchList[] = 'new';
+            $isPSELeftJoinList[] = 'is_new';
             $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
                 ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '1')
                 ->where('NOT ISNULL(`is_new`.ID)');
         } else if($new === false) {
-            $usedAttributeNonStrictMatchList[] = 'new';
+            $isPSELeftJoinList[] = 'is_new';
             $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
                 ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '0')
                 ->where('NOT ISNULL(`is_new`.ID)');
@@ -193,12 +193,12 @@ class Product extends BaseLoop
         $promo = $this->getPromo();
 
         if ($promo === true) {
-            $usedAttributeNonStrictMatchList[] = 'promo';
+            $isPSELeftJoinList[] = 'is_promo';
             $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
                 ->where('`is_promo`.PROMO' . Criteria::EQUAL . '1')
                 ->where('NOT ISNULL(`is_promo`.ID)');
         } else if($promo === false) {
-            $usedAttributeNonStrictMatchList[] = 'promo';
+            $isPSELeftJoinList[] = 'is_promo';
             $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
                 ->where('`is_promo`.PROMO' . Criteria::EQUAL . '0')
                 ->where('NOT ISNULL(`is_promo`.ID)');
@@ -207,7 +207,7 @@ class Product extends BaseLoop
         $min_stock = $this->getMin_stock();
 
         if (null != $min_stock) {
-            $usedAttributeNonStrictMatchList[] = 'min_stock';
+            $isPSELeftJoinList[] = 'is_min_stock';
             $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
                 ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_THAN . '?', $min_stock, \PDO::PARAM_INT)
                 ->where('NOT ISNULL(`is_min_stock`.ID)');
@@ -216,7 +216,7 @@ class Product extends BaseLoop
         $min_weight = $this->getMin_weight();
 
         if (null != $min_weight) {
-            $usedAttributeNonStrictMatchList[] = 'min_weight';
+            $isPSELeftJoinList[] = 'is_min_weight';
             $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
                 ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_THAN . '?', $min_weight, \PDO::PARAM_STR)
                 ->where('NOT ISNULL(`is_min_weight`.ID)');
@@ -225,7 +225,7 @@ class Product extends BaseLoop
         $max_weight = $this->getMax_weight();
 
         if (null != $max_weight) {
-            $usedAttributeNonStrictMatchList[] = 'max_weight';
+            $isPSELeftJoinList[] = 'is_max_weight';
             $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
                 ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_THAN . '?', $max_weight, \PDO::PARAM_STR)
                 ->where('NOT ISNULL(`is_max_weight`.ID)');
@@ -234,7 +234,7 @@ class Product extends BaseLoop
         $min_price = $this->getMin_price();
 
         if(null !== $min_price) {
-
+            $isPSELeftJoinList[] = 'is_min_price';
             $minPriceJoin = new Join();
             $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'min_price_pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'is_min_price');
             $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
@@ -253,7 +253,7 @@ class Product extends BaseLoop
         $max_price = $this->getMax_price();
 
         if(null !== $max_price) {
-
+            $isPSELeftJoinList[] = 'is_max_price';
             $minPriceJoin = new Join();
             $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'max_price_pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'is_max_price');
             $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
@@ -271,17 +271,39 @@ class Product extends BaseLoop
 
         if( $attributeNonStrictMatch != '*' ) {
             if($attributeNonStrictMatch == 'none') {
-                $actuallyUsedAttributeNonStrictMatchList = $usedAttributeNonStrictMatchList;
+                $actuallyUsedAttributeNonStrictMatchList = $isPSELeftJoinList;
             } else {
-                $actuallyUsedAttributeNonStrictMatchList = array_values(array_intersect($usedAttributeNonStrictMatchList, $attributeNonStrictMatch));
+                $actuallyUsedAttributeNonStrictMatchList = array_values(array_intersect($isPSELeftJoinList, $attributeNonStrictMatch));
             }
 
             foreach($actuallyUsedAttributeNonStrictMatchList as $key => $actuallyUsedAttributeNonStrictMatch) {
                 if($key == 0)
                     continue;
-                $search->where('`is_' . $actuallyUsedAttributeNonStrictMatch . '`.ID=' . '`is_' . $actuallyUsedAttributeNonStrictMatchList[$key-1] . '`.ID');
+                $search->where('`' . $actuallyUsedAttributeNonStrictMatch . '`.ID=' . '`' . $actuallyUsedAttributeNonStrictMatchList[$key-1] . '`.ID');
             }
         }
+
+        /*
+         * for ordering and outputs, the product will be :
+         * - new if at least one the criteria matching PSE is new
+         * - in promo if at least one the criteria matching PSE is in promo
+         */
+
+        if(count($isPSELeftJoinList) == 0) {
+            //
+            $isPSELeftJoinList[] = "global";
+            $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);
+        }
+
+        $booleanMatchesPromoList = array();
+        $booleanMatchesNewnessList = array();
+        foreach($isPSELeftJoinList as $isPSELeftJoin) {
+            $booleanMatchesPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
+            $booleanMatchesNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
+        }
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchesPromoList) . ')', 'main_product_is_promo');
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchesNewnessList) . ')', 'main_product_is_new');
+
 
         $current = $this->getCurrent();
 
@@ -404,12 +426,12 @@ class Product extends BaseLoop
                 case "alpha_reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
                     break;
-                /*case "min_price":
-                    $search->orderBy('real_price', Criteria::ASC);
+                case "min_price":
+                    $search->addAscendingOrderByColumn('real_price', Criteria::ASC);
                     break;
                 case "max_price":
-                    $search->orderBy('real_price', Criteria::DESC);
-                    break;*/
+                    $search->addDescendingOrderByColumn('real_price');
+                    break;
                 case "manual":
                     if(null === $category || count($category) != 1)
                         throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
@@ -423,12 +445,12 @@ class Product extends BaseLoop
                 case "ref":
                     $search->orderByRef(Criteria::ASC);
                     break;
-                /*case "promo":
-                    $search->orderByPromo(Criteria::DESC);
+                case "promo":
+                    $search->addDescendingOrderByColumn('main_product_is_promo');
                     break;
                 case "new":
-                    $search->orderByNewness(Criteria::DESC);
-                    break;*/
+                    $search->addDescendingOrderByColumn('main_product_is_new');
+                    break;
                 case "given_id":
                     if(null === $id)
                         throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
