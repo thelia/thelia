@@ -21,69 +21,75 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Coupon\Parameter;
+
+use Thelia\Coupon\Parameter\Comparable;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Allow a CouponManager class to be fed with relevant Thelia data
+ * Represent a DateTime
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface CouponAdapterInterface
+class DateParam implements Comparable
 {
+    /** @var \DateTime Date  */
+    protected $dateTime = null;
 
     /**
-     * Return a Cart a CouponManager can process
+     * Constructor
      *
-     * @return \Thelia\Model\Cart
+     * @param \DateTime $dateTime DateTime
      */
-    public function getCart();
+    public function __construct(\DateTime $dateTime)
+    {
+        $this->dateTime = $dateTime;
+    }
 
     /**
-     * Return an Address a CouponManager can process
+     * Get DateTime
      *
-     * @return \Thelia\Model\Address
+     * @return \DateTime
      */
-    public function getDeliveryAddress();
+    public function getDateTime()
+    {
+        return clone $this->dateTime;
+    }
 
     /**
-     * Return an Customer a CouponManager can process
+     * Compare the current object to the passed $other.
      *
-     * @return \Thelia\Model\Customer
-     */
-    public function getCustomer();
-
-    /**
-     * Return Checkout total price
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
      *
-     * @return float
-     */
-    public function getCheckoutTotalPrice();
-
-    /**
-     * Return Products total price
+     * This method should not check for identity using ===, only for semantical equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
      *
-     * @return float
-     */
-    public function getCheckoutTotalPriceWithoutDiscountAndPostagePrice();
-
-    /**
-     * Return Checkout total postage (only) price
-     *
-     * @return float
-     */
-    public function getCheckoutPostagePrice();
-
-    /**
-     * Return the number of Products in the Cart
+     * @param mixed $other Object
      *
      * @return int
      */
-    public  function getNbArticlesInTheCart();
+    public function compareTo($other)
+    {
+        if (!$other instanceof \DateTime) {
+            throw new \InvalidArgumentException('DateParam can compare only DateTime');
+        }
+
+        $ret = -1;
+        if ($this->dateTime == $other) {
+            $ret = 0;
+        } elseif ($this->dateTime > $other) {
+            $ret = 1;
+        } else {
+            $ret = -1;
+        }
+
+        return $ret;
+    }
 
 }

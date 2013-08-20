@@ -84,4 +84,25 @@ class CouponBaseAdapter implements CouponAdapterInterface
         // TODO: Implement getCheckoutPostagePrice() method.
     }
 
+    /**
+     * Return Products total price
+     *
+     * @return float
+     */
+    public function getCheckoutTotalPriceWithoutDiscountAndPostagePrice()
+    {
+        // TODO: Implement getCheckoutTotalPriceWithoutDiscountAndPostagePrice() method.
+    }
+
+    /**
+     * Return the number of Products in the Cart
+     *
+     * @return int
+     */
+    public function getNbArticlesInTheCart()
+    {
+        // TODO: Implement getNbArticlesInTheCart() method.
+    }
+
+
 }

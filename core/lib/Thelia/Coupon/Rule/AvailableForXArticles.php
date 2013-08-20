@@ -21,69 +21,57 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Coupon\Rule;
+
+use Thelia\Type\IntType;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Allow a CouponManager class to be fed with relevant Thelia data
+ * Check a Checkout against its Product number
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-interface CouponAdapterInterface
+class AvailableForXArticles extends CouponRuleAbstract
 {
-
     /**
-     * Return a Cart a CouponManager can process
-     *
-     * @return \Thelia\Model\Cart
+     * @inheritdoc
      */
-    public function getCart();
+    public function checkBackOfficeIntput()
+    {
+        $ret = false;
+        $validator = new IntType();
+        $firstParam = reset($this->validators);
+        if ($firstParam) {
+            $ret = $validator->isValid($firstParam);
+        }
 
-    /**
-     * Return an Address a CouponManager can process
-     *
-     * @return \Thelia\Model\Address
-     */
-    public function getDeliveryAddress();
+        return $ret;
+    }
 
-    /**
-     * Return an Customer a CouponManager can process
-     *
-     * @return \Thelia\Model\Customer
-     */
-    public function getCustomer();
+    public function checkCheckoutInput()
+    {
+        $ret = false;
+        $validator = new IntType();
+        $firstParam = reset($this->validated);
+        if ($firstParam) {
+            $ret = $validator->isValid($firstParam);
+        }
 
-    /**
-     * Return Checkout total price
-     *
-     * @return float
-     */
-    public function getCheckoutTotalPrice();
+        return $ret;
+    }
 
-    /**
-     * Return Products total price
-     *
-     * @return float
-     */
-    public function getCheckoutTotalPriceWithoutDiscountAndPostagePrice();
-
-    /**
-     * Return Checkout total postage (only) price
-     *
-     * @return float
-     */
-    public function getCheckoutPostagePrice();
-
-    /**
-     * Return the number of Products in the Cart
-     *
-     * @return int
-     */
-    public  function getNbArticlesInTheCart();
+    public function isMatching()
+    {
+        if ($this->checkBackOfficeIntput() && $this->checkCheckoutInput()) {
+            $firstValidatorsParam = reset($this->validators);
+            $firstValidatedParam = reset($this->validated);
+//            if($firstValidatedParam >= $firstValidatedParam)
+        }
+    }
 
 }

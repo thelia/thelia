@@ -21,69 +21,28 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Coupon\Parameter;
 
 /**
- * Created by JetBrains PhpStorm.
- * Date: 8/19/13
- * Time: 3:24 PM
+ * Comparable interface that allows to compare two value objects to each other for similarity.
  *
- * Allow a CouponManager class to be fed with relevant Thelia data
- *
- * @package Coupon
- * @author  Guillaume MOREL <gmorel@openstudio.fr>
- *
+ * @author      Benjamin Eberlei <kontakt@beberlei.de>
+ * @author      Guilherme Blanco <guilhermeblanco@hotmail.com>
  */
-interface CouponAdapterInterface
+interface Comparable
 {
-
     /**
-     * Return a Cart a CouponManager can process
+     * Compare the current object to the passed $other.
      *
-     * @return \Thelia\Model\Cart
-     */
-    public function getCart();
-
-    /**
-     * Return an Address a CouponManager can process
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
      *
-     * @return \Thelia\Model\Address
-     */
-    public function getDeliveryAddress();
-
-    /**
-     * Return an Customer a CouponManager can process
+     * This method should not check for identity using ===, only for semantical equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
      *
-     * @return \Thelia\Model\Customer
-     */
-    public function getCustomer();
-
-    /**
-     * Return Checkout total price
-     *
-     * @return float
-     */
-    public function getCheckoutTotalPrice();
-
-    /**
-     * Return Products total price
-     *
-     * @return float
-     */
-    public function getCheckoutTotalPriceWithoutDiscountAndPostagePrice();
-
-    /**
-     * Return Checkout total postage (only) price
-     *
-     * @return float
-     */
-    public function getCheckoutPostagePrice();
-
-    /**
-     * Return the number of Products in the Cart
+     * @param mixed $other Object
      *
      * @return int
      */
-    public  function getNbArticlesInTheCart();
-
+    public function compareTo($other);
 }

@@ -36,6 +36,24 @@ namespace Thelia\Coupon\Rule;
  */
 class CouponRuleAbstract implements CuponRuleInterface
 {
+    /** @var array Parameters validating $validated against */
+    protected $validators = array();
+
+    /** @var array Parameters to be validated */
+    protected $validated = array();
+
+    /**
+     * Constructor
+     *
+     * @param array $validators Parameters validating $validated against
+     * @param array $validated  Parameters to be validated
+     */
+    public function __construct(array $validators, array $validated)
+    {
+        $this->validators = $validators;
+        $this->validated = $validated;
+    }
+
     /**
      * Check if backoffice inputs are relevant or not
      *
