@@ -109,6 +109,8 @@ class Product extends BaseLoop
              *      ie : attribute_non_strict_match="promo,new"
              *      loop will return the product if he has at least an attribute in promo and at least an attribute as new ; even if it's not the same attribute.
              * you can set all the attributes as non strict : attribute_non_strict_match="*"
+             *
+             * In order to allow such a process, we will have to make a LEFT JOIN foreach of the following case.
             */
             new Argument(
                 'attribute_non_strict_match',
@@ -144,6 +146,7 @@ class Product extends BaseLoop
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
+        $isProductPriceLeftJoinList = array();
 
         $id = $this->getId();
 
@@ -235,16 +238,17 @@ class Product extends BaseLoop
 
         if(null !== $min_price) {
             $isPSELeftJoinList[] = 'is_min_price';
+            $isProductPriceLeftJoinList['is_min_price'] = 'min_price_data';
             $minPriceJoin = new Join();
-            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'min_price_pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'is_min_price');
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data');
             $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
 
-            $search->joinProductSaleElements('min_price_pse', Criteria::LEFT_JOIN)
+            $search->joinProductSaleElements('is_min_price', Criteria::LEFT_JOIN)
                 ->addJoinObject($minPriceJoin)
-                ->condition('in_promo', '`min_price_pse`.promo'. Criteria::EQUAL .'1')
-                ->condition('not_in_promo', '`min_price_pse`.promo'. Criteria::NOT_EQUAL .'1')
-                ->condition('min_promo_price', '`is_min_price`.promo_price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
-                ->condition('min_price', '`is_min_price`.price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
+                ->condition('in_promo', '`is_min_price`.promo'. Criteria::EQUAL .'1')
+                ->condition('not_in_promo', '`is_min_price`.promo'. Criteria::NOT_EQUAL .'1')
+                ->condition('min_promo_price', '`min_price_data`.promo_price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
+                ->condition('min_price', '`min_price_data`.price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
                 ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_min_price')
                 ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
                 ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
@@ -254,16 +258,17 @@ class Product extends BaseLoop
 
         if(null !== $max_price) {
             $isPSELeftJoinList[] = 'is_max_price';
+            $isProductPriceLeftJoinList['is_max_price'] = 'max_price_data';
             $minPriceJoin = new Join();
-            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'max_price_pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'is_max_price');
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data');
             $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
 
-            $search->joinProductSaleElements('max_price_pse', Criteria::LEFT_JOIN)
+            $search->joinProductSaleElements('is_max_price', Criteria::LEFT_JOIN)
                 ->addJoinObject($minPriceJoin)
-                ->condition('in_promo', '`max_price_pse`.promo'. Criteria::EQUAL .'1')
-                ->condition('not_in_promo', '`max_price_pse`.promo'. Criteria::NOT_EQUAL .'1')
-                ->condition('min_promo_price', '`is_max_price`.promo_price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
-                ->condition('max_price', '`is_max_price`.price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
+                ->condition('in_promo', '`is_max_price`.promo'. Criteria::EQUAL .'1')
+                ->condition('not_in_promo', '`is_max_price`.promo'. Criteria::NOT_EQUAL .'1')
+                ->condition('min_promo_price', '`max_price_data`.promo_price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
+                ->condition('max_price', '`max_price_data`.price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
                 ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_max_price')
                 ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
                 ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
@@ -290,19 +295,46 @@ class Product extends BaseLoop
          */
 
         if(count($isPSELeftJoinList) == 0) {
-            //
             $isPSELeftJoinList[] = "global";
             $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);
+        }  if(count($isProductPriceLeftJoinList) == 0) {
+            $isProductPriceLeftJoinList['global'] = 'global_price_data';
+
+            $minPriceJoin = new Join();
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'global', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
+            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->addJoinObject($minPriceJoin);
         }
 
-        $booleanMatchesPromoList = array();
-        $booleanMatchesNewnessList = array();
+        /*
+         * we need to test all promo field from our previous conditions. Indeed ie:
+         * product P0, attributes color : red
+         * P0red is in promo and is the only attribute combinaton available.
+         * so the product might be consider as in promo (in outputs and ordering)
+         * We got the following loop to display in promo AND new product but we don't care it's the same attribute which is new and in promo :
+         * {loop type="product" promo="1" new="1" attribute_non_strict_match="promo,new"} {/loop}
+         * our request will so far returns 1 line
+         *
+         * is_promo.ID | is_promo.PROMO | is_promo.NEWNESS | is_new.ID | is_new.PROMO | is_new.NEWNESS
+         *      NULL            NULL              NULL        red_id         1               0
+         *
+         * So that we can say the product is in global promo only with is_promo.PROMO, we must acknowledge it with (is_promo.PROMO OR is_new.PROMO)
+         */
+        $booleanMatchedPromoList = array();
+        $booleanMatchedNewnessList = array();
         foreach($isPSELeftJoinList as $isPSELeftJoin) {
-            $booleanMatchesPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
-            $booleanMatchesNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
+            $booleanMatchedPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
+            $booleanMatchedNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
         }
-        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchesPromoList) . ')', 'main_product_is_promo');
-        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchesNewnessList) . ')', 'main_product_is_new');
+        $booleanMatchedPriceList = array();
+        foreach($isProductPriceLeftJoinList as $pSE => $isProductPriceLeftJoin) {
+            $booleanMatchedPriceList[] = 'CASE WHEN `' . $pSE . '`.PROMO=1 THEN `' . $isProductPriceLeftJoin . '`.PROMO_PRICE ELSE `' . $isProductPriceLeftJoin . '`.PRICE END';
+        }
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedPromoList) . ')', 'main_product_is_promo');
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedNewnessList) . ')', 'main_product_is_new');
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedPriceList) . ')', 'real_highest_price');
+        $search->withColumn('MIN(' . implode(' OR ', $booleanMatchedPriceList) . ')', 'real_lowest_price');
 
 
         $current = $this->getCurrent();
@@ -427,10 +459,10 @@ class Product extends BaseLoop
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
                     break;
                 case "min_price":
-                    $search->addAscendingOrderByColumn('real_price', Criteria::ASC);
+                    $search->addAscendingOrderByColumn('real_lowest_price', Criteria::ASC);
                     break;
                 case "max_price":
-                    $search->addDescendingOrderByColumn('real_price');
+                    $search->addDescendingOrderByColumn('real_lowest_price');
                     break;
                 case "manual":
                     if(null === $category || count($category) != 1)
