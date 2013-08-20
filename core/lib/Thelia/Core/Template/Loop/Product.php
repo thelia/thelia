@@ -53,6 +53,8 @@ use Thelia\Type\BooleanOrBothType;
  * Class Product
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * @todo : manage currency in price filter
  */
 class Product extends BaseLoop
 {
@@ -512,11 +514,9 @@ class Product extends BaseLoop
                 ->set("CHAPO", $product->getChapo())
                 ->set("DESCRIPTION", $product->getDescription())
                 ->set("POSTSCRIPTUM", $product->getPostscriptum())
-                //->set("PRICE", $product->getPrice())
-                //->set("PROMO_PRICE", $product->getPrice2())
-                //->set("WEIGHT", $product->getWeight())
-                //->set("PROMO", $product->getPromo())
-                //->set("NEW", $product->getNewness())
+                ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
+                ->set("PROMO", $product->getVirtualColumn('main_product_is_promo'))
+                ->set("NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())
             ;
 

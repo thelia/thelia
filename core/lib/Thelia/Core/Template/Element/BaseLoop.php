@@ -191,8 +191,8 @@ abstract class BaseLoop
     }
 
     /**
-     * @param \ModelCriteria $search
-     * @param null           $pagination
+     * @param ModelCriteria $search
+     * @param null          $pagination
      *
      * @return array|mixed|\PropelModelPager|\PropelObjectCollection
      */
@@ -206,7 +206,7 @@ abstract class BaseLoop
     }
 
     /**
-     * @param \ModelCriteria $search
+     * @param ModelCriteria $search
      *
      * @return array|mixed|\PropelObjectCollection
      */
