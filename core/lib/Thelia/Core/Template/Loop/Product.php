@@ -296,14 +296,19 @@ class Product extends BaseLoop
          * - in promo if at least one the criteria matching PSE is in promo
          */
 
-        if(count($isPSELeftJoinList) == 0) {
-            $isPSELeftJoinList[] = "global";
-            $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);
-        }  if(count($isProductPriceLeftJoinList) == 0) {
-            $isProductPriceLeftJoinList['global'] = 'global_price_data';
+        if(count($isProductPriceLeftJoinList) == 0) {
+            if(count($isPSELeftJoinList) == 0) {
+                $joiningTable = "global";
+                $isPSELeftJoinList[] = $joiningTable;
+                $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);
+            } else {
+                $joiningTable = $isPSELeftJoinList[0];
+            }
+
+            $isProductPriceLeftJoinList[$joiningTable] = 'global_price_data';
 
             $minPriceJoin = new Join();
-            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'global', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
             $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
 
             $search->addJoinObject($minPriceJoin);

@@ -35,6 +35,7 @@ use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\FeatureAvQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -108,30 +109,19 @@ class FeatureValue extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    //$search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    //$search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
                     break;
                 case "manual":
-                    $search->orderByPosition(Criteria::ASC);
+                    //$search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    $search->orderByPosition(Criteria::DESC);
+                    //$search->orderByPosition(Criteria::DESC);
                     break;
             }
         }
-
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        /*$search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );*/
 
         $featureValues = $this->search($search, $pagination);
 
@@ -140,10 +130,13 @@ class FeatureValue extends BaseLoop
         foreach ($featureValues as $featureValue) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $featureValue->getId());
-            /*$loopResultRow->set("TITLE",$featureValue->getTitle());
-            $loopResultRow->set("CHAPO", $featureValue->getChapo());
-            $loopResultRow->set("DESCRIPTION", $featureValue->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $featureValue->getPostscriptum());*/
+
+            $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault());
+
+            $loopResultRow->set("TITLE", $featureValue->getFeatureAv()->getTitle());
+            $loopResultRow->set("CHAPO", $featureValue->getFeatureAv()->getChapo());
+            $loopResultRow->set("DESCRIPTION", $featureValue->getFeatureAv()->getDescription());
+            $loopResultRow->set("POSTSCRIPTUM", $featureValue->getFeatureAv()->getPostscriptum());
 
             $loopResult->addRow($loopResultRow);
         }

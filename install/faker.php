@@ -12,6 +12,22 @@ $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne(
 
 try {
 
+    $attributeCategory = Thelia\Model\AttributeCategoryQuery::create()
+        ->find();
+    $attributeCategory->delete();
+
+    $featureCategory = Thelia\Model\FeatureCategoryQuery::create()
+        ->find();
+    $featureCategory->delete();
+
+    $featureProduct = Thelia\Model\FeatureProductQuery::create()
+        ->find();
+    $featureProduct->delete();
+
+    $attributeCombination = Thelia\Model\AttributeCombinationQuery::create()
+        ->find();
+    $attributeCombination->delete();
+
     $feature = Thelia\Model\FeatureQuery::create()
         ->find();
     $feature->delete();
@@ -91,7 +107,7 @@ try {
         $featureId = $feature->getId();
         $featureList[$featureId] = array();
 
-        for($j=0; $j<rand(1, 5); $j++) {
+        for($j=0; $j<rand(-2, 5); $j++) { //let a chance for no av
             $featureAv = new Thelia\Model\FeatureAv();
             $featureAv->setFeature($feature);
             $featureAv->setPosition($j);
@@ -137,12 +153,103 @@ try {
             $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList);
 
             for($k=0; $k<rand(0, 5); $k++) {
-                createProduct($faker, $subcategory, $k, $currency, $productIdList);
+                createProduct($faker, $subcategory, $k, $productIdList);
             }
         }
 
         for($k=0; $k<rand(1, 5); $k++) {
-            createProduct($faker, $category, $k, $currency, $productIdList);
+            createProduct($faker, $category, $k, $productIdList);
+        }
+    }
+
+    //attribute_category and feature_category (all categories got all features/attributes)
+    foreach($categoryIdList as $categoryId) {
+        foreach($attributeList as $attributeId => $attributeAvId) {
+            $attributeCategory = new Thelia\Model\AttributeCategory();
+            $attributeCategory->setCategoryId($categoryId)
+                ->setAttributeId($attributeId)
+                ->save();
+        }
+        foreach($featureList as $featureId => $featureAvId) {
+            $featureCategory = new Thelia\Model\FeatureCategory();
+            $featureCategory->setCategoryId($categoryId)
+                ->setFeatureId($featureId)
+                ->save();
+        }
+    }
+
+    foreach($productIdList as $productId) {
+        //add random accessories - or not
+        $alreadyPicked = array();
+        for($i=1; $i<rand(0, 4); $i++) {
+            $accessory = new Thelia\Model\Accessory();
+            do {
+                $pick = array_rand($productIdList, 1);
+            } while(in_array($pick, $alreadyPicked));
+
+            $alreadyPicked[] = $pick;
+
+            $accessory->setAccessory($productIdList[$pick])
+                ->setProductId($productId)
+                ->setPosition($i)
+                ->save();
+        }
+
+        //associate PSE and stocks to products
+        for($i=0; $i<rand(1,7); $i++) {
+            $stock = new \Thelia\Model\ProductSaleElements();
+            $stock->setProductId($productId);
+            $stock->setQuantity($faker->randomNumber(1,50));
+            $stock->setPromo($faker->randomNumber(0,1));
+            $stock->setNewness($faker->randomNumber(0,1));
+            $stock->setWeight($faker->randomFloat(2, 100,10000));
+            $stock->save();
+
+            $productPrice = new \Thelia\Model\ProductPrice();
+            $productPrice->setProductSaleElements($stock);
+            $productPrice->setCurrency($currency);
+            $productPrice->setPrice($faker->randomFloat(2, 20, 250));
+            $productPrice->setPromoPrice($faker->randomFloat(2, 20, 250));
+            $productPrice->save();
+
+            //associate attributes - or not - to PSE
+
+            $alreadyPicked = array();
+            for($i=0; $i<rand(-2,count($attributeList)); $i++) {
+                $featureProduct = new Thelia\Model\AttributeCombination();
+                do {
+                    $pick = array_rand($attributeList, 1);
+                } while(in_array($pick, $alreadyPicked));
+
+                $alreadyPicked[] = $pick;
+
+                $featureProduct->setAttributeId($pick)
+                    ->setAttributeAvId($attributeList[$pick][array_rand($attributeList[$pick], 1)])
+                    ->setProductSaleElements($stock)
+                    ->save();
+            }
+        }
+
+
+        foreach($attributeList as $attributeId => $attributeAvId) {
+
+        }
+
+        //associate features to products
+        foreach($featureList as $featureId => $featureAvId) {
+            $featureProduct = new Thelia\Model\FeatureProduct();
+            $featureProduct->setProductId($productId)
+                ->setFeatureId($featureId);
+
+            if(count($featureAvId) > 0) { //got some av
+                $featureProduct->setFeatureAvId(
+                    $featureAvId[array_rand($featureAvId, 1)]
+                );
+            } else { //no av
+                $featureProduct->setByDefault($faker->text(10));
+            }
+
+            $featureProduct->save();
         }
     }
 
@@ -186,7 +293,7 @@ try {
     $con->rollBack();
 }
 
-function createProduct($faker, $category, $position, $currency, &$productIdList)
+function createProduct($faker, $category, $position, &$productIdList)
 {
     $product = new Thelia\Model\Product();
     $product->setRef($category->getId() . '_' . $position . '_' . $faker->randomNumber(8));
@@ -199,31 +306,6 @@ function createProduct($faker, $category, $position, $currency, &$productIdList)
     $product->save();
     $productId = $product->getId();
     $productIdList[] = $productId;
-
-    $stock = new \Thelia\Model\ProductSaleElements();
-    $stock->setProduct($product);
-    $stock->setQuantity($faker->randomNumber(1,50));
-    $stock->setPromo($faker->randomNumber(0,1));
-    $stock->setNewness($faker->randomNumber(0,1));
-    $stock->setWeight($faker->randomFloat(2, 100,10000));
-    $stock->save();
-
-    $productPrice = new \Thelia\Model\ProductPrice();
-    $productPrice->setProductSaleElements($stock);
-    $productPrice->setCurrency($currency);
-    $productPrice->setPrice($faker->randomFloat(2, 20, 250));
-    $productPrice->setPromoPrice($faker->randomFloat(2, 20, 250));
-    $productPrice->save();
-
-    //add random accessories - or not
-    for($i=1; $i<rand(0, 4); $i++) {
-        $accessory = new Thelia\Model\Accessory();
-        $accessory->setAccessory($productIdList[array_rand($productIdList, 1)]);
-        $accessory->setProductId($productId);
-        $accessory->setPosition($i);
-
-        $accessory->save();
-    }
 
     return $product;
 }

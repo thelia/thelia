@@ -12,7 +12,7 @@
         <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
         <h4>#TITLE</h4>
         <p>#DESCRIPTION</p>
-        {*ifloop rel="acc"}
+        {ifloop rel="acc"}
             <h5>Accessories</h5>
             <ul>
                 {loop name="acc" type="accessory" product="#ID" order="accessory"}
@@ -22,12 +22,18 @@
         {/ifloop}
         {elseloop rel="acc"}
             <h5>No accessory</h5>
-        {/elseloop*}
+        {/elseloop}
         {ifloop rel="ft"}
             <h5>Features</h5>
             <ul>
+                {assign var=current_product value=#ID}
                 {loop name="ft" type="feature" order="manual" product="#ID"}
-                <li>#TITLE</li>
+                <li>
+                    <strong>#TITLE</strong> :
+                    {loop name="ft_v" type="feature_value" product="{$current_product}" feature="#ID"}
+                        #TITLE / #PERSONAL_VALUE
+                    {/loop}
+                </li>
                 {/loop}
             </ul>
         {/ifloop}
@@ -44,7 +50,7 @@
             <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
             <h4>#TITLE</h4>
             <p>#DESCRIPTION</p>
-            {*ifloop rel="acc"}
+            {ifloop rel="acc"}
             <h5>Accessories</h5>
             <ul>
                 {loop name="acc" type="accessory" product="#ID" order="accessory"}
@@ -54,7 +60,7 @@
             {/ifloop}
             {elseloop rel="acc"}
             <h5>No accessory</h5>
-            {/elseloop*}
+            {/elseloop}
             {ifloop rel="ft"}
             <h5>Features</h5>
             <ul>
@@ -113,13 +119,15 @@
 
 <div style="border: solid 8px; margin: 0px; padding: 0px; width: 30%; float: left">
 
+    <h2>SANDBOX</h2>
+
     {*loop name="product" type="product" order="promo,min_price" exclude_category="3" new="on" promo="off"}
     <h3>PRODUCT : #REF / #TITLE</h3>
     {/loop*}
 
-{loop name="product" type="product" new="on" promo="off"}
+{*loop name="product" type="product" new="on" promo="off"}
 <h3>PRODUCT : #REF / #TITLE</h3>
-{/loop}
+{/loop*}
 
 
 

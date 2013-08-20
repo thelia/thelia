@@ -14,6 +14,10 @@
 <h3>PRODUCT : #REF / #TITLE (#ID)</h3>
 {/loop*}
 
-{loop name="product" type="product" order="promo,min_price"}
+{*loop name="product" type="product" order="promo,min_price"}
 <h3>PRODUCT : #REF / #TITLE (#ID) / NEW : #NEW / PROMO : #PROMO / best price : #BEST_PRICE</h3>
+{/loop*}
+
+{loop name="product" type="product"}
+<h3>PRODUCT : #REF / #TITLE</h3>
 {/loop}
