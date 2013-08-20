@@ -35,6 +35,8 @@ use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
+use Thelia\Model\Map\ProductPriceTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -101,7 +103,7 @@ class Product extends BaseLoop
                 )
             ),
             /*
-             * promo, new, quantity and weight may differ depending on the different attributes
+             * promo, new, quantity, weight or price may differ depending on the different attributes
              * by default, product loop will look for at least 1 attribute which matches all the loop criteria : attribute_non_strict_match="none"
              * you can also provide a list of non-strict attributes.
              *      ie : attribute_non_strict_match="promo,new"
@@ -128,8 +130,6 @@ class Product extends BaseLoop
     public function exec(&$pagination)
     {
         $search = ProductQuery::create();
-
-        //$search->withColumn('CASE WHEN ' . ProductTableMap::PROMO . '=1 THEN ' . ProductTableMap::PRICE2 . ' ELSE ' . ProductTableMap::PRICE . ' END', 'real_price');
 
         /**
          * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
@@ -181,12 +181,12 @@ class Product extends BaseLoop
         if ($new === true) {
             $usedAttributeNonStrictMatchList[] = 'new';
             $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                ->addJoinCondition('is_new', '`is_new`.NEWNESS = 1')
+                ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '1')
                 ->where('NOT ISNULL(`is_new`.ID)');
         } else if($new === false) {
             $usedAttributeNonStrictMatchList[] = 'new';
             $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
-                ->addJoinCondition('is_new', '`is_new`.NEWNESS = 0')
+                ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '0')
                 ->where('NOT ISNULL(`is_new`.ID)');
         }
 
@@ -195,12 +195,12 @@ class Product extends BaseLoop
         if ($promo === true) {
             $usedAttributeNonStrictMatchList[] = 'promo';
             $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                ->addJoinCondition('is_promo', "`is_promo`.PROMO = 1")
+                ->where('`is_promo`.PROMO' . Criteria::EQUAL . '1')
                 ->where('NOT ISNULL(`is_promo`.ID)');
         } else if($promo === false) {
             $usedAttributeNonStrictMatchList[] = 'promo';
             $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
-                ->addJoinCondition('is_promo', "`is_promo`.PROMO = 0")
+                ->where('`is_promo`.PROMO' . Criteria::EQUAL . '0')
                 ->where('NOT ISNULL(`is_promo`.ID)');
         }
 
@@ -209,7 +209,7 @@ class Product extends BaseLoop
         if (null != $min_stock) {
             $usedAttributeNonStrictMatchList[] = 'min_stock';
             $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
-                ->addJoinCondition('is_min_stock', "`is_min_stock`.QUANTITY > ?", $min_stock, null, \PDO::PARAM_INT)
+                ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_THAN . '?', $min_stock, \PDO::PARAM_INT)
                 ->where('NOT ISNULL(`is_min_stock`.ID)');
         }
 
@@ -218,7 +218,7 @@ class Product extends BaseLoop
         if (null != $min_weight) {
             $usedAttributeNonStrictMatchList[] = 'min_weight';
             $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
-                ->addJoinCondition('is_min_weight', "`is_min_weight`.WEIGHT > ?", $min_weight, null, \PDO::PARAM_INT)
+                ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_THAN . '?', $min_weight, \PDO::PARAM_STR)
                 ->where('NOT ISNULL(`is_min_weight`.ID)');
         }
 
@@ -227,8 +227,46 @@ class Product extends BaseLoop
         if (null != $max_weight) {
             $usedAttributeNonStrictMatchList[] = 'max_weight';
             $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
-                ->addJoinCondition('is_max_weight', "`is_max_weight`.WEIGHT < ?", $max_weight, null, \PDO::PARAM_INT)
+                ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_THAN . '?', $max_weight, \PDO::PARAM_STR)
                 ->where('NOT ISNULL(`is_max_weight`.ID)');
+        }
+
+        $min_price = $this->getMin_price();
+
+        if(null !== $min_price) {
+
+            $minPriceJoin = new Join();
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'min_price_pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'is_min_price');
+            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->joinProductSaleElements('min_price_pse', Criteria::LEFT_JOIN)
+                ->addJoinObject($minPriceJoin)
+                ->condition('in_promo', '`min_price_pse`.promo'. Criteria::EQUAL .'1')
+                ->condition('not_in_promo', '`min_price_pse`.promo'. Criteria::NOT_EQUAL .'1')
+                ->condition('min_promo_price', '`is_min_price`.promo_price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
+                ->condition('min_price', '`is_min_price`.price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
+                ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_min_price')
+                ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
+                ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
+        }
+
+        $max_price = $this->getMax_price();
+
+        if(null !== $max_price) {
+
+            $minPriceJoin = new Join();
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'max_price_pse', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'is_max_price');
+            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->joinProductSaleElements('max_price_pse', Criteria::LEFT_JOIN)
+                ->addJoinObject($minPriceJoin)
+                ->condition('in_promo', '`max_price_pse`.promo'. Criteria::EQUAL .'1')
+                ->condition('not_in_promo', '`max_price_pse`.promo'. Criteria::NOT_EQUAL .'1')
+                ->condition('min_promo_price', '`is_max_price`.promo_price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
+                ->condition('max_price', '`is_max_price`.price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
+                ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_max_price')
+                ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
+                ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
         }
 
         if( $attributeNonStrictMatch != '*' ) {
@@ -237,49 +275,13 @@ class Product extends BaseLoop
             } else {
                 $actuallyUsedAttributeNonStrictMatchList = array_values(array_intersect($usedAttributeNonStrictMatchList, $attributeNonStrictMatch));
             }
-            
+
             foreach($actuallyUsedAttributeNonStrictMatchList as $key => $actuallyUsedAttributeNonStrictMatch) {
                 if($key == 0)
                     continue;
                 $search->where('`is_' . $actuallyUsedAttributeNonStrictMatch . '`.ID=' . '`is_' . $actuallyUsedAttributeNonStrictMatchList[$key-1] . '`.ID');
             }
         }
-
-        //$min_price = $this->getMin_price();
-
-        //if(null !== $min_price) {
-        /**
-         * Following should work but does not :
-         *
-         *  $search->filterBy('real_price', $max_price, Criteria::GREATER_EQUAL);
-         */
-        /*$search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
-                ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
-                ->condition('min_price2', ProductTableMap::PRICE2 . Criteria::GREATER_EQUAL . '?', $min_price)
-                ->condition('min_price', ProductTableMap::PRICE . Criteria::GREATER_EQUAL . '?', $min_price)
-                ->combine(array('in_promo', 'min_price2'), Criteria::LOGICAL_AND, 'in_promo_min_price')
-                ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
-                ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
-        }
-
-        $max_price = $this->getMax_price();*/
-
-        //if(null !== $max_price) {
-        /**
-         * Following should work but does not :
-         *
-         *  $search->filterBy('real_price', $max_price, Criteria::LESS_EQUAL);
-         */
-        /*$search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
-                ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
-                ->condition('max_price2', ProductTableMap::PRICE2 . Criteria::LESS_EQUAL . '?', $max_price)
-                ->condition('max_price', ProductTableMap::PRICE . Criteria::LESS_EQUAL . '?', $max_price)
-                ->combine(array('in_promo', 'max_price2'), Criteria::LOGICAL_AND, 'in_promo_max_price')
-                ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
-                ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
-        }*/
-
-        /**/
 
         $current = $this->getCurrent();
 

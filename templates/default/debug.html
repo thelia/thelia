@@ -5,3 +5,11 @@
 {*loop name="product" type="product" min_weight="1000" max_weight="6000" attribute_non_strict_match="*"}
 <h3>PRODUCT : #REF / #TITLE (#ID)</h3>
 {/loop*}
+
+{*loop name="product" type="product" min_price="100" max_price="300" min_stock="4" min_weight="6000" max_weight="7000" attribute_non_strict_match="*" promo="on"}
+<h3>PRODUCT : #REF / #TITLE (#ID)</h3>
+{/loop*}
+
+{loop name="product" type="product" order="promo,min_price"}
+<h3>PRODUCT : #REF / #TITLE (#ID)</h3>
+{/loop}
