@@ -133,10 +133,12 @@ class FeatureValue extends BaseLoop
 
             $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault());
 
-            $loopResultRow->set("TITLE", $featureValue->getFeatureAv()->getTitle());
-            $loopResultRow->set("CHAPO", $featureValue->getFeatureAv()->getChapo());
-            $loopResultRow->set("DESCRIPTION", $featureValue->getFeatureAv()->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $featureValue->getFeatureAv()->getPostscriptum());
+            $featureAvailability = $featureValue->getFeatureAv();
+
+            $loopResultRow->set("TITLE", ($featureAvailability === null ? '' : $featureAvailability->getTitle()));
+            $loopResultRow->set("CHAPO", ($featureAvailability === null ? '' : $featureAvailability->getChapo()));
+            $loopResultRow->set("DESCRIPTION", ($featureAvailability === null ? '' : $featureAvailability->getDescription()));
+            $loopResultRow->set("POSTSCRIPTUM", ($featureAvailability === null ? '' : $featureAvailability->getPostscriptum()));
 
             $loopResult->addRow($loopResultRow);
         }
