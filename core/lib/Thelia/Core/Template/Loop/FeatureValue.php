@@ -35,7 +35,6 @@ use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\FeatureAvQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -58,8 +57,8 @@ class FeatureValue extends BaseLoop
         return new ArgumentCollection(
             Argument::createIntTypeArgument('feature', null, true),
             Argument::createIntTypeArgument('product', null, true),
-            Argument::createIntListTypeArgument('feature_available'),
-            Argument::createBooleanTypeArgument('exclude_feature_available', 0),
+            Argument::createIntListTypeArgument('feature_availability'),
+            Argument::createBooleanTypeArgument('exclude_feature_availability', 0),
             Argument::createBooleanTypeArgument('exclude_default_values', 0),
             new Argument(
                 'order',
@@ -88,14 +87,14 @@ class FeatureValue extends BaseLoop
 
         $search->filterByProductId($product, Criteria::EQUAL);
 
-        $featureAvailable = $this->getFeature_available();
+        $featureAvailability = $this->getFeature_availability();
 
-        if (null !== $featureAvailable) {
-            $search->filterByFeatureAvId($featureAvailable, Criteria::IN);
+        if (null !== $featureAvailability) {
+            $search->filterByFeatureAvId($featureAvailability, Criteria::IN);
         }
 
-        $excludeFeatureAvailable = $this->getExclude_feature_available();
-        if($excludeFeatureAvailable == true) {
+        $excludeFeatureAvailability = $this->getExclude_feature_availability();
+        if($excludeFeatureAvailability == true) {
             $search->filterByFeatureAvId(null, Criteria::NULL);
         }
 

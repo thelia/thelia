@@ -9,6 +9,7 @@
         <loop class="Thelia\Core\Template\Loop\Address" name="address"/>
         <loop class="Thelia\Core\Template\Loop\Attribute" name="attribute"/>
         <loop class="Thelia\Core\Template\Loop\AttributeAvailability" name="attribute_availability"/>
+        <loop class="Thelia\Core\Template\Loop\AttributeCombination" name="attribute_combination"/>
         <loop class="Thelia\Core\Template\Loop\Auth" name="auth"/>
         <loop class="Thelia\Core\Template\Loop\Category" name="category"/>
         <loop class="Thelia\Core\Template\Loop\Content" name="content"/>
@@ -22,7 +23,7 @@
         <loop class="Thelia\Core\Template\Loop\OrderStatus" name="order-status"/>
         <loop class="Thelia\Core\Template\Loop\CategoryPath" name="category-path"/>
         <loop class="Thelia\Core\Template\Loop\Product" name="product"/>
-        <loop class="Thelia\Core\Template\Loop\ProductSaleElement" name="product_sale_element"/>
+        <loop class="Thelia\Core\Template\Loop\ProductSaleElements" name="product_sale_elements"/>
         <loop class="Thelia\Core\Template\Loop\Feed" name="feed"/>
         <loop class="Thelia\Core\Template\Loop\Title" name="title"/>
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>

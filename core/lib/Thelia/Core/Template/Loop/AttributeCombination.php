@@ -33,22 +33,20 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\ProductSaleElementsQuery;
+use Thelia\Model\Base\AttributeCombinationQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
 /**
  *
- * Product Sale Elements loop
+ * Attribute Combination loop
  *
- * @todo : manage currency
- *
- * Class ProductSaleElements
+ * Class AttributeCombination
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class ProductSaleElements extends BaseLoop
+class AttributeCombination extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -56,18 +54,11 @@ class ProductSaleElements extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('devise'),
-            Argument::createIntTypeArgument('product', null, true),
-            new Argument(
-                'attribute_availability',
-                new TypeCollection(
-                    new Type\IntToCombinedIntsListType()
-                )
-            ),
+            Argument::createIntTypeArgument('product_sale_element', null, true),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'attribute', 'attribute_reverse'))
+                    new Type\EnumListType(array('attribute_availability', 'attribute_availability_reverse', 'attribute', 'attribute_reverse'))
                 ),
                 'attribute'
             )
@@ -81,20 +72,20 @@ class ProductSaleElements extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = ProductSaleElementsQuery::create();
+        $search = AttributeCombinationQuery::create();
 
-        $product = $this->getProduct();
+        $productSaleElement = $this->getProduct_sale_element();
 
-        $search->filterByProductId($product, Criteria::EQUAL);
+        $search->filterByProductSaleElementsId($productSaleElement, Criteria::EQUAL);
 
         $orders  = $this->getOrder();
 
         foreach($orders as $order) {
             switch ($order) {
-                case "alpha":
+                case "attribute_availability":
                     //$search->addAscendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
                     break;
-                case "alpha_reverse":
+                case "attribute_availability_reverse":
                     //$search->addDescendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
                     break;
                 case "attribute":
@@ -106,41 +97,25 @@ class ProductSaleElements extends BaseLoop
             }
         }
 
-        $devise = $this->getDevise();
-
-        $search->joinProductPrice('price', Criteria::INNER_JOIN);
-            //->addJoinCondition('price', '');
-
-        $search->withColumn('`price`.CURRENCY_ID', 'price_CURRENCY_ID')
-            ->withColumn('`price`.PRICE', 'price_PRICE')
-            ->withColumn('`price`.PROMO_PRICE', 'price_PROMO_PRICE');
-
-        $PSEValues = $this->search($search, $pagination);
+        $attributeCombinations = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($PSEValues as $PSEValue) {
+        foreach ($attributeCombinations as $attributeCombination) {
             $loopResultRow = new LoopResultRow();
 
-            $loopResultRow->set("ID", $PSEValue->getId())
-                ->set("QUANTITY", $PSEValue->getQuantity())
-                ->set("IS_PROMO", $PSEValue->getPromo() === 1 ? 1 : 0)
-                ->set("IS_NEW", $PSEValue->getNewness() === 1 ? 1 : 0)
-                ->set("WEIGHT", $PSEValue->getWeight())
+            $attribute = $attributeCombination->getAttribute();
+            $attributeAvailability = $attributeCombination->getAttributeAv();
 
-                ->set("CURRENCY", $PSEValue->getVirtualColumn('price_CURRENCY_ID'))
-                ->set("PRICE", $PSEValue->getVirtualColumn('price_PRICE'))
-                ->set("PROMO_PRICE", $PSEValue->getVirtualColumn('price_PROMO_PRICE'));
-
-            //$price = $PSEValue->getAttributeAv();
-
-            /*
-            $attributeAvailability = $PSEValue->getAttributeAv();
-
-            $loopResultRow->set("TITLE", ($attributeAvailability === null ? '' : $attributeAvailability->getTitle()));
-            $loopResultRow->set("CHAPO", ($attributeAvailability === null ? '' : $attributeAvailability->getChapo()));
-            $loopResultRow->set("DESCRIPTION", ($attributeAvailability === null ? '' : $attributeAvailability->getDescription()));
-            $loopResultRow->set("POSTSCRIPTUM", ($attributeAvailability === null ? '' : $attributeAvailability->getPostscriptum()));*/
+            $loopResultRow
+                ->set("ATTRIBUTE_TITLE", $attribute->getTitle())
+                ->set("ATTRIBUTE_CHAPO", $attribute->getChapo())
+                ->set("ATTRIBUTE_DESCRIPTION", $attribute->getDescription())
+                ->set("ATTRIBUTE_POSTSCRIPTUM", $attribute->getPostscriptum())
+                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $attributeAvailability->getTitle())
+                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $attributeAvailability->getChapo())
+                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $attributeAvailability->getDescription())
+                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $attributeAvailability->getPostscriptum());
 
             $loopResult->addRow($loopResultRow);
         }

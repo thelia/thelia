@@ -40,6 +40,32 @@
         {elseloop rel="ft"}
             <h5>No feature</h5>
         {/elseloop}
+        {ifloop rel="pse"}
+        <h5>Product sale elements</h5>
+
+        {assign var=current_product value=#ID}
+        {loop name="pse" type="product_sale_elements" product="#ID"}
+            <div style="border: solid 2px darkorange; padding: 5px; margin: 5px;">
+                {loop name="combi" type="attribute_combination" product_sale_element="#ID"}
+                    #ATTRIBUTE_TITLE = #ATTRIBUTE_AVAILABILITY_TITLE<br />
+                {/loop}
+                <br />#WEIGHT g
+                <br /><strong>{if #IS_PROMO == 1} #PROMO_PRICE € (instead of #PRICE) {else} #PRICE € {/if}</strong>
+                <br /><br />
+                Add
+                <select>
+                    {for $will=1 to #QUANTITY}
+                        <option>{$will}</option>
+                    {/for}
+                </select>
+                to my cart
+                </ul>
+            </div>
+        {/loop}
+        {/ifloop}
+        {elseloop rel="ft"}
+        <h5>No feature</h5>
+        {/elseloop}
     </div>
     {/loop}
     {loop name="catgory1" type="category" parent="#ID"}
@@ -65,7 +91,12 @@
             <h5>Features</h5>
             <ul>
                 {loop name="ft" type="feature" order="manual" product="#ID"}
-                <li>#TITLE</li>
+                <li>
+                    <strong>#TITLE</strong> :
+                    {loop name="ft_v" type="feature_value" product="{$current_product}" feature="#ID"}
+                    #TITLE / #PERSONAL_VALUE
+                    {/loop}
+                </li>
                 {/loop}
             </ul>
             {/ifloop}

@@ -93,7 +93,7 @@ class Product extends BaseLoop
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_category'),
             new Argument(
-                'feature_available',
+                'feature_availability',
                 new TypeCollection(
                     new Type\IntToCombinedIntsListType()
                 )
@@ -317,7 +317,7 @@ class Product extends BaseLoop
         /*
          * we need to test all promo field from our previous conditions. Indeed ie:
          * product P0, attributes color : red
-         * P0red is in promo and is the only attribute combinaton available.
+         * P0red is in promo and is the only attribute combinaton availability.
          * so the product might be consider as in promo (in outputs and ordering)
          * We got the following loop to display in promo AND new product but we don't care it's the same attribute which is new and in promo :
          * {loop type="product" promo="1" new="1" attribute_non_strict_match="promo,new"} {/loop}
@@ -397,10 +397,10 @@ class Product extends BaseLoop
             );
         }
 
-        $feature_available = $this->getFeature_available();
+        $feature_availability = $this->getFeature_availability();
 
-        if(null !== $feature_available) {
-            foreach($feature_available as $feature => $feature_choice) {
+        if(null !== $feature_availability) {
+            foreach($feature_availability as $feature => $feature_choice) {
                 foreach($feature_choice['values'] as $feature_av) {
                     $featureAlias = 'fa_' . $feature;
                     if($feature_av != '*')
@@ -520,8 +520,8 @@ class Product extends BaseLoop
                 ->set("DESCRIPTION", $product->getDescription())
                 ->set("POSTSCRIPTUM", $product->getPostscriptum())
                 ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
-                ->set("PROMO", $product->getVirtualColumn('main_product_is_promo'))
-                ->set("NEW", $product->getVirtualColumn('main_product_is_new'))
+                ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
+                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())
             ;
 
