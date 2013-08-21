@@ -1,0 +1,249 @@
+<?php
+/**********************************************************************************/
+/*                                                                                */
+/*      Thelia	                                                                  */
+/*                                                                                */
+/*      Copyright (c) OpenStudio                                                  */
+/*      email : info@thelia.net                                                   */
+/*      web : http://www.thelia.net                                               */
+/*                                                                                */
+/*      This program is free software; you can redistribute it and/or modify      */
+/*      it under the terms of the GNU General Public License as published by      */
+/*      the Free Software Foundation; either version 3 of the License             */
+/*                                                                                */
+/*      This program is distributed in the hope that it will be useful,           */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
+/*      GNU General Public License for more details.                              */
+/*                                                                                */
+/*      You should have received a copy of the GNU General Public License         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
+/*                                                                                */
+/**********************************************************************************/
+
+namespace Thelia\Coupon\Type;
+
+use Symfony\Component\Intl\Exception\NotImplementedException;
+use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Coupon\Rule\CouponRuleInterface;
+use Thelia\Coupon\RuleOrganizerInterface;
+use Thelia\Exception\InvalidRuleException;
+
+/**
+ * Created by JetBrains PhpStorm.
+ * Date: 8/19/13
+ * Time: 3:24 PM
+ *
+ * Assist in writing a CouponInterface
+ *
+ * @package Coupon
+ * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ *
+ */
+abstract class CouponAbstract implements CouponInterface
+{
+    /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
+    protected $adapter;
+
+    /** @var RuleOrganizerInterface  */
+    protected $organizer = null;
+
+    /** @var array Array of CouponRuleInterface */
+    protected $rules = null;
+
+    /** @var string Coupon code (ex: XMAS) */
+    protected $code = null;
+
+    /** @var string Coupon title (ex: Coupon for XMAS) */
+    protected $title = null;
+
+    /** @var string Coupon short description */
+    protected $shortDescription = null;
+
+    /** @var string Coupon description */
+    protected $description = null;
+
+    /** @var bool if Coupon is cumulative */
+    protected $isCumulative = false;
+
+    /** @var bool if Coupon is removing postage */
+    protected $isRemovingPostage = false;
+
+    /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
+    protected $amount = 0;
+
+    /**
+     * Set Adapter containing all relevant data
+     *
+     * @param CouponAdapterInterface $adapter Adapter
+     *
+     * @return $this
+     */
+    public function setAdapter($adapter)
+    {
+        $this->adapter = $adapter;
+
+        return $this;
+    }
+
+    /**
+     * Set Rule Organizer
+     *
+     * @param RuleOrganizerInterface $organizer Manage Rule groups (&& and ||)
+     *
+     * @return $this
+     */
+    public function setOrganizer($organizer)
+    {
+        $this->organizer = $organizer;
+
+        return $this;
+    }
+
+    /**
+     * Return Coupon code (ex: XMAS)
+     *
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * Return Coupon title (ex: Coupon for XMAS)
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * Return Coupon short description
+     *
+     * @return string
+     */
+    public function getShortDescription()
+    {
+        return $this->shortDescription;
+    }
+
+    /**
+     * Return Coupon description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * If Coupon is cumulative or prevent any accumulation
+     * If is cumulative you can sum Coupon effects
+     * If not cancel all other Coupon and take the last given
+     *
+     * @return bool
+     */
+    public function isCumulative()
+    {
+        return $this->isCumulative;
+    }
+
+    /**
+     * If Coupon is removing Checkout Postage
+     *
+     * @return bool
+     */
+    public function isRemovingPostage()
+    {
+        return $this->isRemovingPostage;
+    }
+
+    /**
+     * Return effects generated by the coupon
+     * A negative value
+     * @
+     * @return float Amount removed from the Total Checkout
+     */
+    public function getEffect()
+    {
+        return -$this->amount;
+    }
+
+    /**
+     * Return condition to validate the Coupon or not
+     *
+     * @return array An array of CouponRuleInterface
+     */
+    public function getRules()
+    {
+        $arrayObject = new \ArrayObject($this->rules);
+
+        return $arrayObject->getArrayCopy();
+    }
+
+    /**
+     * Add a Rule to the Coupon
+     *
+     * @param CouponRuleInterface $rule Condition needed to match
+     *                                  in order to get the Coupon effect
+     *
+     * @return $this
+     */
+    public function addRule(CouponRuleInterface $rule)
+    {
+        $this->rules[] = $rule;
+
+        return $this;
+    }
+
+    /**
+     * Replace the existing Rules by those given in parameter
+     * If one Rule is badly implemented, no Rule will be added
+     *
+     * @param array $rules CouponRuleInterface to add
+     *
+     * @return $this
+     * @throws \Thelia\Exception\InvalidRuleException
+     */
+    public function setRules(array $rules)
+    {
+        foreach ($rules as $rule) {
+            if (!$rule instanceof CouponRuleInterface) {
+                throw new InvalidRuleException(get_class());
+            }
+        }
+        $this->rules = array();
+        foreach ($rules as $rule) {
+            $this->addRule($rule);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if the current Coupon is matching its conditions (Rules)
+     * Thelia variables are given by the CouponAdapterInterface
+     * In $this->adapter
+     *
+     * @return bool
+     */
+    public function isMatching()
+    {
+        $isMatching = true;
+
+        /** @var CouponRuleInterface $rule */
+        foreach ($this->rules as $rule) {
+            if (!$rule->isMatching()) {
+                $isMatching = false;
+            }
+        }
+
+        return $isMatching;
+    }
+
+
+}

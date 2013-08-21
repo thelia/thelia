@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use InvalidArgumentException;
-use Thelia\Coupon\Parameter\IntervalParam;
+use Thelia\Coupon\Parameter\PriceParam;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -37,7 +37,7 @@ use Thelia\Coupon\Parameter\IntervalParam;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class IntervalParamTest extends \PHPUnit_Framework_TestCase
+class PriceParamTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -50,92 +50,134 @@ class IntervalParamTest extends \PHPUnit_Framework_TestCase
 
     /**
      *
-     * @covers Thelia\Coupon\Parameter\IntervalParam::compareTo
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
      *
      */
-    public function testInferiorDate()
+    public function testInferiorPrice()
     {
-        $dateValidatorStart = new \DateTime("2012-07-08");
-        $dateValidatorInterval = new \DateInterval("P1M"); //1month
-        $dateToValidate = new \DateTime("2012-07-07");
+        $priceValidator = 42.50;
+        $priceToValidate = 1.00;
 
-        $dateParam = new IntervalParam($dateValidatorStart, $dateValidatorInterval);
+        $integerParam = new PriceParam($priceValidator, 'EUR');
 
         $expected = 1;
-        $actual = $dateParam->compareTo($dateToValidate);
+        $actual = $integerParam->compareTo($priceToValidate);
         $this->assertEquals($expected, $actual);
     }
 
     /**
      *
-     * @covers Thelia\Coupon\Parameter\IntervalParam::compareTo
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
      *
      */
-    public function testEqualsDate()
+    public function testInferiorPrice2()
     {
-        $dateValidatorStart = new \DateTime("2012-07-08");
-        $dateValidatorInterval = new \DateInterval("P1M"); //1month
-        $dateToValidate = new \DateTime("2012-07-08");
+        $priceValidator = 42.50;
+        $priceToValidate = 42.49;
 
-        echo '1 ' . date_format($dateValidatorStart, 'g:ia \o\n l jS F Y') . "\n";
-        echo '2 ' . date_format($dateToValidate, 'g:ia \o\n l jS F Y') . "\n";
+        $integerParam = new PriceParam($priceValidator, 'EUR');
 
-        $dateParam = new IntervalParam($dateValidatorStart, $dateValidatorInterval);
+        $expected = 1;
+        $actual = $integerParam->compareTo($priceToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     *
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
+     *
+     */
+    public function testEqualsPrice()
+    {
+        $priceValidator = 42.50;
+        $priceToValidate = 42.50;
+
+        $integerParam = new PriceParam($priceValidator, 'EUR');
 
         $expected = 0;
-        $actual = $dateParam->compareTo($dateToValidate);
+        $actual = $integerParam->compareTo($priceToValidate);
         $this->assertEquals($expected, $actual);
     }
 
     /**
      *
-     * @covers Thelia\Coupon\Parameter\IntervalParam::compareTo
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
      *
      */
-    public function testEqualsDate2()
+    public function testSuperiorPrice()
     {
-        $dateValidatorStart = new \DateTime("2012-07-08");
-        $dateValidatorInterval = new \DateInterval("P1M"); //1month
-        $dateToValidate = new \DateTime("2012-08-08");
+        $priceValidator = 42.50;
+        $priceToValidate = 42.51;
 
-        $dateParam = new IntervalParam($dateValidatorStart, $dateValidatorInterval);
-
-        $expected = 0;
-        $actual = $dateParam->compareTo($dateToValidate);
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     *
-     * @covers Thelia\Coupon\Parameter\IntervalParam::compareTo
-     *
-     */
-    public function testSuperiorDate()
-    {
-        $dateValidatorStart = new \DateTime("2012-07-08");
-        $dateValidatorInterval = new \DateInterval("P1M"); //1month
-        $dateToValidate = new \DateTime("2012-08-09");
-
-        $dateParam = new IntervalParam($dateValidatorStart, $dateValidatorInterval);
+        $integerParam = new PriceParam($priceValidator, 'EUR');
 
         $expected = -1;
-        $actual = $dateParam->compareTo($dateToValidate);
+        $actual = $integerParam->compareTo($priceToValidate);
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * @covers Thelia\Coupon\Parameter\DateParam::compareTo
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
      * @expectedException InvalidArgumentException
      */
     public function testInvalidArgumentException()
     {
-        $dateValidatorStart = new \DateTime("2012-07-08");
-        $dateValidatorInterval = new \DateInterval("P1M"); //1month
-        $dateToValidate = 1377012588;
+        $priceValidator = 42.50;
+        $priceToValidate = '42.50';
 
-        $dateParam = new IntervalParam($dateValidatorStart, $dateValidatorInterval);
+        $integerParam = new PriceParam($priceValidator, 'EUR');
 
-        $dateParam->compareTo($dateToValidate);
+        $expected = 0;
+        $actual = $integerParam->compareTo($priceToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidArgumentException2()
+    {
+        $priceValidator = 42.50;
+        $priceToValidate = -1;
+
+        $integerParam = new PriceParam($priceValidator, 'EUR');
+
+        $expected = 0;
+        $actual = $integerParam->compareTo($priceToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidArgumentException3()
+    {
+        $priceValidator = 42.50;
+        $priceToValidate = 0;
+
+        $integerParam = new PriceParam($priceValidator, 'EUR');
+
+        $expected = 0;
+        $actual = $integerParam->compareTo($priceToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\Parameter\PriceParam::compareTo
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidArgumentException4()
+    {
+        $priceValidator = 42.50;
+        $priceToValidate = 1;
+
+        $integerParam = new PriceParam($priceValidator, 'EUR');
+
+        $expected = 0;
+        $actual = $integerParam->compareTo($priceToValidate);
+        $this->assertEquals($expected, $actual);
     }
 
 

@@ -21,36 +21,77 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Coupon\Parameter;
+
+use Thelia\Coupon\Parameter\ComparableInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when a Rule receive an invalid Parameter
+ * Represent an Integer
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmountForCategoryYTest extends \PHPUnit_Framework_TestCase
+class IntegerParam implements ComparableInterface
 {
+    /** @var int Integer to compare with */
+    protected $integer = 0;
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * Constructor
+     *
+     * @param int $integer Integer
      */
-    protected function setUp()
+    public function __construct($integer)
     {
+        $this->integer = $integer;
     }
 
     /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
+     * Get integer
+     *
+     * @return int
      */
-    protected function tearDown()
+    public function getInteger()
     {
+        return $this->integer;
+    }
+
+
+    /**
+     * Compare the current object to the passed $other.
+     *
+     * Returns 0 if they are semantically equal, 1 if the other object
+     * is less than the current one, or -1 if its more than the current one.
+     *
+     * This method should not check for identity using ===, only for semantically equality for example
+     * when two different DateTime instances point to the exact same Date + TZ.
+     *
+     * @param mixed $other Object
+     *
+     * @throws \InvalidArgumentException
+     * @return int
+     */
+    public function compareTo($other)
+    {
+        if (!is_integer($other)) {
+            throw new \InvalidArgumentException('IntegerParam can compare only int');
+        }
+
+        $ret = -1;
+        if ($this->integer == $other) {
+            $ret = 0;
+        } elseif ($this->integer > $other) {
+            $ret = 1;
+        } else {
+            $ret = -1;
+        }
+
+        return $ret;
     }
 
 }

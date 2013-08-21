@@ -1,25 +1,25 @@
 <?php
-/*************************************************************************************/
-/*                                                                                   */
-/*      Thelia	                                                                     */
-/*                                                                                   */
-/*      Copyright (c) OpenStudio                                                     */
-/*      email : info@thelia.net                                                      */
-/*      web : http://www.thelia.net                                                  */
-/*                                                                                   */
-/*      This program is free software; you can redistribute it and/or modify         */
-/*      it under the terms of the GNU General Public License as published by         */
-/*      the Free Software Foundation; either version 3 of the License                */
-/*                                                                                   */
-/*      This program is distributed in the hope that it will be useful,              */
-/*      but WITHOUT ANY WARRANTY; without even the implied warranty of               */
-/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the                */
-/*      GNU General Public License for more details.                                 */
-/*                                                                                   */
-/*      You should have received a copy of the GNU General Public License            */
-/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.         */
-/*                                                                                   */
-/*************************************************************************************/
+/**********************************************************************************/
+/*                                                                                */
+/*      Thelia	                                                                  */
+/*                                                                                */
+/*      Copyright (c) OpenStudio                                                  */
+/*      email : info@thelia.net                                                   */
+/*      web : http://www.thelia.net                                               */
+/*                                                                                */
+/*      This program is free software; you can redistribute it and/or modify      */
+/*      it under the terms of the GNU General Public License as published by      */
+/*      the Free Software Foundation; either version 3 of the License             */
+/*                                                                                */
+/*      This program is distributed in the hope that it will be useful,           */
+/*      but WITHOUT ANY WARRANTY; without even the implied warranty of            */
+/*      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the             */
+/*      GNU General Public License for more details.                              */
+/*                                                                                */
+/*      You should have received a copy of the GNU General Public License         */
+/*	    along with this program. If not, see <http://www.gnu.org/licenses/>.      */
+/*                                                                                */
+/**********************************************************************************/
 
 namespace Thelia\Coupon\Parameter;
 
@@ -38,7 +38,7 @@ use DateTime;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class RepeatedParam implements Comparable
+abstract class RepeatedParam implements ComparableInterface
 {
     /** @var DateTime The start date of the period. */
     protected $from = null;
@@ -46,7 +46,7 @@ abstract class RepeatedParam implements Comparable
     /** @var DateInterval The interval between recurrences within the period. */
     protected $interval = null;
 
-    /** @var int The number of recurrences. */
+    /** @var int Nb time the object will be repeated (1st occurrence excluded). */
     protected $recurrences = null;
 
     /** @var DatePeriod dates recurring at regular intervals, over a given period */
@@ -87,12 +87,13 @@ abstract class RepeatedParam implements Comparable
     
     /**
      * Set the Object to be repeated every days
-     * Ex : $obj->repeatEveryDay() will be repeated every days indefinitely
-     *      $obj->repeatEveryDay(10) will be repeated every 10 days indefinitely
-     *      $obj->repeatEveryDay(10, 4) will be repeated every 10 days only 4 times
+     * Ex : $obj->repeatEveryDay() will occur once
+     *      $obj->repeatEveryDay(10) will occur once
+     *      $obj->repeatEveryDay(10, 0) will occur once
+     *      $obj->repeatEveryDay(10, 4) will occur every 10 days 5 times
      *
      * @param int $frequency    Frequency the object will be repeated
-     * @param int $nbRepetition Time the object will be repeated (0 = infinite)
+     * @param int $nbRepetition Time the object will be repeated
      *
      * @return $this
      */
@@ -105,16 +106,17 @@ abstract class RepeatedParam implements Comparable
 
     /**
      * Set the Object to be repeated every week
-     * Ex : $obj->repeatEveryWeek() will be repeated every week indefinitely
-     *      $obj->repeatEveryWeek(10) will be repeated every 10 weeks (70days) indefinitely
-     *      $obj->repeatEveryWeek(10, 4) will be repeated every 10 weeks (70days) only 4 times
+     * Ex : $obj->repeatEveryWeek() will occur once
+     *      $obj->repeatEveryWeek(10) will occur once
+     *      $obj->repeatEveryWeek(10, 0) will occur once
+     *      $obj->repeatEveryWeek(10, 4) will occur every 10 weeks (70days) 5 times
      *
      * @param int $frequency    Frequency the object will be repeated
-     * @param int $nbRepetition Time the object will be repeated (0 = infinite)
+     * @param int $nbRepetition Time the object will be repeated
      *
      * @return $this
      */
-    public function repeatEveryWeek($frequency = 1, $nbRepetition = null)
+    public function repeatEveryWeek($frequency = 1, $nbRepetition = 0)
     {
         $this->_repeatEveryPeriod($period = 'W', $frequency, $nbRepetition);
 
@@ -123,16 +125,17 @@ abstract class RepeatedParam implements Comparable
 
     /**
      * Set the Object to be repeated every month
-     * Ex : $obj->repeatEveryWeek() will be repeated every month indefinitely
-     *      $obj->repeatEveryWeek(10) will be repeated every 10 month (70days) indefinitely
-     *      $obj->repeatEveryWeek(10, 4) will be repeated every 10 month (70days) only 4 times
+     * Ex : $obj->repeatEveryWeek() will occur once
+     *      $obj->repeatEveryWeek(10) will occur once
+     *      $obj->repeatEveryWeek(10, 0) will occur once
+     *      $obj->repeatEveryWeek(10, 4) will occur every 10 month (70days) 5times
      *
      * @param int $frequency    Frequency the object will be repeated
-     * @param int $nbRepetition Time the object will be repeated (0 = infinite)
+     * @param int $nbRepetition Time the object will be repeated
      *
      * @return $this
      */
-    public function repeatEveryMonth($frequency = 1, $nbRepetition = null)
+    public function repeatEveryMonth($frequency = 1, $nbRepetition = 0)
     {
         $this->_repeatEveryPeriod($period = 'M', $frequency, $nbRepetition);
 
@@ -141,16 +144,17 @@ abstract class RepeatedParam implements Comparable
 
     /**
      * Set the Object to be repeated every year
-     * Ex : $obj->repeatEveryWeek() will be repeated every year indefinitely
-     *      $obj->repeatEveryWeek(10) will be repeated every 10 year indefinitely
-     *      $obj->repeatEveryWeek(10, 4) will be repeated every 10 year only 4 times
+     * Ex : $obj->repeatEveryWeek() will occur once
+     *      $obj->repeatEveryWeek(10) will occur once
+     *      $obj->repeatEveryWeek(10, 0) will occur once
+     *      $obj->repeatEveryWeek(10, 4) will occur every 10 year 5 times
      *
      * @param int $frequency    Frequency the object will be repeated
      * @param int $nbRepetition Time the object will be repeated
      *
      * @return $this
      */
-    public function repeatEveryYear($frequency = 1, $nbRepetition = null)
+    public function repeatEveryYear($frequency = 1, $nbRepetition = 0)
     {
         $this->_repeatEveryPeriod($period = 'Y', $frequency, $nbRepetition);
 
@@ -159,9 +163,10 @@ abstract class RepeatedParam implements Comparable
 
     /**
      * Set the Object to be repeated every Period
-     * Ex : $obj->repeatEveryPeriod('D') will be repeated every day once
-     *      $obj->repeatEveryPeriod('W', 10) will be repeated every 10 week once
-     *      $obj->repeatEveryPeriod('M', 10, 4) will be repeated every 10 month only 4 times
+     * Ex : $obj->repeatEveryPeriod('D') will occur once
+     *      $obj->repeatEveryPeriod('W', 10) will occur once
+     *      $obj->repeatEveryPeriod('W', 10, 0) will occur once
+     *      $obj->repeatEveryPeriod('M', 10, 4) will occur every 10 month 5 times
      *
      * @param string $period       Period Y|M||D|W
      * @param int    $frequency    Frequency the object will be repeated
@@ -169,13 +174,13 @@ abstract class RepeatedParam implements Comparable
      *
      * @return $this
      */
-    private function _repeatEveryPeriod($period, $frequency = 1, $nbRepetition = null)
+    private function _repeatEveryPeriod($period, $frequency = 1, $nbRepetition = 0)
     {
         if (is_numeric($frequency) && $frequency > 0) {
             $this->interval = new \DateInterval('P' . $frequency . $period);
         }
 
-        if (is_numeric($nbRepetition) && $nbRepetition > 0) {
+        if (is_numeric($nbRepetition) && $nbRepetition >= 0) {
             $this->recurrences = $nbRepetition;
         }
 

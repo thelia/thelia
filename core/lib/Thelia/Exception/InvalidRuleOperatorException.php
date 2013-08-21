@@ -21,36 +21,34 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Exception;
+
+use Thelia\Log\Tlog;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when a Rule receive an invalid Parameter
+ * Thrown when a Rule receive an invalid Operator
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmountForCategoryYTest extends \PHPUnit_Framework_TestCase
+class InvalidRuleOperatorException extends \RuntimeException
 {
-
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * InvalidRuleOperatorException thrown when a Rule is given a bad Operator
+     *
+     * @param string $className Class name
+     * @param string $parameter array key parameter
      */
-    protected function setUp()
-    {
-    }
+    public function __construct($className, $parameter) {
 
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
+        $message = 'Invalid Operator for Rule ' . $className . ' on parameter ' . $parameter;
+        Tlog::getInstance()->addError($message);
 
+        parent::__construct($message);
+    }
 }

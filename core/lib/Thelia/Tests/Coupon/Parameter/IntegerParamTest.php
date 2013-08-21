@@ -23,6 +23,9 @@
 
 namespace Thelia\Coupon;
 
+use InvalidArgumentException;
+use Thelia\Coupon\Parameter\IntegerParam;
+
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
@@ -34,7 +37,7 @@ namespace Thelia\Coupon;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmountForCategoryYTest extends \PHPUnit_Framework_TestCase
+class IntegerParamTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -44,6 +47,75 @@ class RemoveXAmountForCategoryYTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
     }
+
+    /**
+     *
+     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
+     *
+     */
+    public function testInferiorInteger()
+    {
+        $intValidator = 42;
+        $intToValidate = 41;
+
+        $integerParam = new IntegerParam($intValidator);
+
+        $expected = 1;
+        $actual = $integerParam->compareTo($intToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     *
+     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
+     *
+     */
+    public function testEqualsInteger()
+    {
+        $intValidator = 42;
+        $intToValidate = 42;
+
+        $integerParam = new IntegerParam($intValidator);
+
+        $expected = 0;
+        $actual = $integerParam->compareTo($intToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     *
+     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
+     *
+     */
+    public function testSuperiorInteger()
+    {
+        $intValidator = 42;
+        $intToValidate = 43;
+
+        $integerParam = new IntegerParam($intValidator);
+
+        $expected = -1;
+        $actual = $integerParam->compareTo($intToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidArgumentException()
+    {
+        $intValidator = 42;
+        $intToValidate = '42';
+
+        $integerParam = new IntegerParam($intValidator);
+
+        $expected = 0;
+        $actual = $integerParam->compareTo($intToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+
 
     /**
      * Tears down the fixture, for example, closes a network connection.

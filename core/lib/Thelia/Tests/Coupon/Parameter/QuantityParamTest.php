@@ -24,7 +24,7 @@
 namespace Thelia\Coupon;
 
 use InvalidArgumentException;
-use Thelia\Coupon\Parameter\DateParam;
+use Thelia\Coupon\Parameter\QuantityParam;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -37,7 +37,7 @@ use Thelia\Coupon\Parameter\DateParam;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class DateParamTest extends \PHPUnit_Framework_TestCase
+class QuantityParamTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -50,67 +50,102 @@ class DateParamTest extends \PHPUnit_Framework_TestCase
 
     /**
      *
-     * @covers Thelia\Coupon\Parameter\DateParam::compareTo
+     * @covers Thelia\Coupon\Parameter\QuantityParam::compareTo
      *
      */
-    public function testInferiorDate()
+    public function testInferiorQuantity()
     {
-        $dateValidator = new \DateTime("2012-07-08");
-        $dateToValidate = new \DateTime("2012-07-07");
+        $intValidator = 42;
+        $intToValidate = 0;
 
-        $dateParam = new DateParam($dateValidator);
+        $integerParam = new QuantityParam($intValidator);
 
         $expected = 1;
-        $actual = $dateParam->compareTo($dateToValidate);
+        $actual = $integerParam->compareTo($intToValidate);
         $this->assertEquals($expected, $actual);
     }
 
     /**
      *
-     * @covers Thelia\Coupon\Parameter\DateParam::compareTo
+     * @covers Thelia\Coupon\Parameter\QuantityParam::compareTo
      *
      */
-    public function testEqualsDate()
+    public function testInferiorQuantity2()
     {
-        $dateValidator = new \DateTime("2012-07-08");
-        $dateToValidate = new \DateTime("2012-07-08");
+        $intValidator = 42;
+        $intToValidate = 41;
 
-        $dateParam = new DateParam($dateValidator);
+        $integerParam = new QuantityParam($intValidator);
+
+        $expected = 1;
+        $actual = $integerParam->compareTo($intToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     *
+     * @covers Thelia\Coupon\Parameter\QuantityParam::compareTo
+     *
+     */
+    public function testEqualsQuantity()
+    {
+        $intValidator = 42;
+        $intToValidate = 42;
+
+        $integerParam = new QuantityParam($intValidator);
 
         $expected = 0;
-        $actual = $dateParam->compareTo($dateToValidate);
+        $actual = $integerParam->compareTo($intToValidate);
         $this->assertEquals($expected, $actual);
     }
 
     /**
      *
-     * @covers Thelia\Coupon\Parameter\DateParam::compareTo
+     * @covers Thelia\Coupon\Parameter\QuantityParam::compareTo
      *
      */
-    public function testSuperiorDate()
+    public function testSuperiorQuantity()
     {
-        $dateValidator = new \DateTime("2012-07-08");
-        $dateToValidate = new \DateTime("2012-07-09");
+        $intValidator = 42;
+        $intToValidate = 43;
 
-        $dateParam = new DateParam($dateValidator);
+        $integerParam = new QuantityParam($intValidator);
 
         $expected = -1;
-        $actual = $dateParam->compareTo($dateToValidate);
+        $actual = $integerParam->compareTo($intToValidate);
         $this->assertEquals($expected, $actual);
     }
 
     /**
-     * @covers Thelia\Coupon\Parameter\DateParam::compareTo
+     * @covers Thelia\Coupon\Parameter\QuantityParam::compareTo
      * @expectedException InvalidArgumentException
      */
     public function testInvalidArgumentException()
     {
-        $dateValidator = new \DateTime("2012-07-08");
-        $dateToValidate = 1377012588;
+        $intValidator = 42;
+        $intToValidate = '42';
 
-        $dateParam = new DateParam($dateValidator);
+        $integerParam = new QuantityParam($intValidator);
 
-        $dateParam->compareTo($dateToValidate);
+        $expected = 0;
+        $actual = $integerParam->compareTo($intToValidate);
+        $this->assertEquals($expected, $actual);
+    }
+
+    /**
+     * @covers Thelia\Coupon\Parameter\QuantityParam::compareTo
+     * @expectedException InvalidArgumentException
+     */
+    public function testInvalidArgumentException2()
+    {
+        $intValidator = 42;
+        $intToValidate = -1;
+
+        $integerParam = new QuantityParam($intValidator);
+
+        $expected = 0;
+        $actual = $integerParam->compareTo($intToValidate);
+        $this->assertEquals($expected, $actual);
     }
 
 

@@ -21,36 +21,71 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon;
+namespace Thelia\Coupon\Rule;
+
+use Thelia\Coupon\CouponAdapterInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when a Rule receive an invalid Parameter
+ * Represents a condition of whether the Rule is applied or not
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class RemoveXAmountForCategoryYTest extends \PHPUnit_Framework_TestCase
+interface CouponRuleInterface
 {
+    /**
+     * Check if backoffice inputs are relevant or not
+     *
+     * @return bool
+     */
+    public function checkBackOfficeInput();
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * Check if Checkout inputs are relevant or not
+     *
+     * @return bool
      */
-    protected function setUp()
-    {
-    }
+    public function checkCheckoutInput();
 
     /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
+     * Check if the current Checkout matches this condition
+     *
+     * @return bool
      */
-    protected function tearDown()
-    {
-    }
+    public function isMatching();
+
+    /**
+     * Return all available Operators for this Rule
+     *
+     * @return array Operators::CONST
+     */
+    public function getAvailableOperators();
+
+//    /**
+//     * Generate current Rule validator from adapter
+//     * Ex :
+//     * $validator = array(
+//     *
+//     * @param CouponAdapterInterface $adapter allowing to gather
+//     *                               all necessary Thelia variables
+//     *
+//     * @return array Validators : array of ComparableInterface
+//     */
+//    public function getValidators(CouponAdapterInterface $adapter);
+//
+//    /**
+//     * Retrieve all param to validate from adapter
+//     *
+//     * @param CouponAdapterInterface $adapter allowing to gather
+//     *                               all necessary Thelia variables
+//     *
+//     * @return array Validators : array of ComparableInterface
+//     */
+//    public function getParamToValidate(CouponAdapterInterface $adapter);
 
 }

@@ -21,86 +21,87 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Parameter;
+namespace Thelia\Coupon\Rule;
+
+use Thelia\Coupon\Parameter\ComparableInterface;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent an DateTime period
+ * Represent available Operations in rule checking
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class IntervalParam implements ComparableInterface
+abstract class Operators
 {
-    /** @var \DatePeriod Date period  */
-    protected $datePeriod = null;
+    /** Param1 is inferior to Param2 */
+    CONST INFERIOR          =    '<';
+    /** Param1 is inferior to Param2 */
+    CONST INFERIOR_OR_EQUAL =    '<=';
+    /** Param1 is equal to Param2 */
+    CONST EQUAL             =     '==';
+    /** Param1 is superior to Param2 */
+    CONST SUPERIOR_OR_EQUAL =     '>=';
+    /** Param1 is superior to Param2 */
+    CONST SUPERIOR          =     '>';
+    /** Param1 is different to Param2 */
+    CONST DIFFERENT         =     '!=';
 
     /**
-     * Constructor
+     * Check if a parameter is valid against a ComparableInterface from its operator
      *
-     * @param \DateTime     $start    Start interval
-     * @param \DateInterval $interval Period
+     * @param mixed               $a        Parameter to validate
+     * @param string              $operator Operator to validate against
+     * @param ComparableInterface $b        Comparable  to validate against
+     *
+     * @return bool
      */
-    public function __construct(\DateTime $start, \DateInterval $interval)
+    public static function isValidAccordingToOperator($a, $operator, ComparableInterface $b)
     {
-        $this->datePeriod = new \DatePeriod($start, $interval, 1);
-    }
+        $ret = false;
 
-    /**
-     * Get DatePeriod
-     *
-     * @return \DatePeriod
-     */
-    public function getDatePeriod()
-    {
-        return clone $this->datePeriod;
-    }
-
-    /**
-     * Compare the current object to the passed $other.
-     *
-     * Returns 0 if they are semantically equal, 1 if the other object
-     * is less than the current one, or -1 if its more than the current one.
-     *
-     * This method should not check for identity using ===, only for semantically equality for example
-     * when two different DateTime instances point to the exact same Date + TZ.
-     *
-     * @param mixed $other Object
-     *
-     * @throws \InvalidArgumentException
-     * @return int
-     */
-    public function compareTo($other)
-    {
-        if (!$other instanceof \DateTime) {
-            throw new \InvalidArgumentException('IntervalParam can compare only DateTime');
+        try {
+            $comparison = $b->compareTo($a);
+        } catch (\Exception $e) {
+            return false;
         }
 
-        /** @var \DateTime Start Date */
-        $startDate = null;
-        /** @var \DateTime End Date */
-        $endDate = null;
-
-        foreach ($this->datePeriod as $key => $value) {
-            if ($key == 0) {
-                $startDate = $value;
+        switch ($operator) {
+        case self::INFERIOR:
+            if ($comparison == 1) {
+                return true;
             }
-            if ($key == 1) {
-                $endDate = $value;
+            break;
+        case self::INFERIOR_OR_EQUAL:
+            if ($comparison == 1 || $comparison == 0) {
+                return true;
             }
-        }
-
-        $ret = -1;
-        if ($startDate <= $other && $other <= $endDate) {
-            $ret = 0;
-        } elseif ($startDate > $other) {
-            $ret = 1;
-        } else {
-            $ret = -1;
+            break;
+        case self::EQUAL:
+            if ($comparison == 0) {
+                return true;
+            }
+            break;
+        case self::SUPERIOR_OR_EQUAL:
+            if ($comparison == -1 || $comparison == 0) {
+                return true;
+            }
+            break;
+        case self::SUPERIOR:
+            if ($comparison == -1) {
+                return true;
+            }
+            break;
+        case self::DIFFERENT:
+            if ($comparison != 0) {
+                return true;
+            }
+            break;
+        default:
         }
 
         return $ret;
