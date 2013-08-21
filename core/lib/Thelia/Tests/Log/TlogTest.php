@@ -32,11 +32,10 @@ class TlogTest extends \PHPUnit_Framework_TestCase
     protected $regex = "/[0-9]+:[\s](%s)+[\s]\[[a-zA-Z\.]+:[a-zA-Z]+\(\)\][\s]\{[0-9]+\}[\s][0-9]{4}-[0-9]{2}-[0-9]{2}[\s][0-9]{1,2}:[0-9]{2}:[0-9]{2}:[\s](%s).*$/is";
 
     public static function setUpBeforeClass()
-    {   
+    {
 
-        
         self::$logger = Tlog::getInstance();
-        
+
         self::$logger->setDestinations("Thelia\Log\Destination\TlogDestinationText");
         self::$logger->setLevel(Tlog::DEBUG);
         self::$logger->setFiles("*");
@@ -61,7 +60,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputRegex("/^$/");
         $logger->debug("foo");
     }
-    
+
     public function testDebugWithInfoLevel()
     {
 
@@ -81,7 +80,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputRegex("/^$/");
         $logger->info("foo");
     }
-    
+
     public function testDebugWithNoticeLevel()
     {
 
@@ -141,7 +140,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputRegex("/^$/");
         $logger->error("foo");
     }
-    
+
     public function testErrorWithCriticalLevel()
     {
 
@@ -161,7 +160,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputRegex("/^$/");
         $logger->critical("foo");
     }
-    
+
     public function testErrorWithAlertLevel()
     {
 
@@ -181,7 +180,7 @@ class TlogTest extends \PHPUnit_Framework_TestCase
         $this->expectOutputRegex("/^$/");
         $logger->alert("foo");
     }
-    
+
     public function testErrorWithEmergencyLevel()
     {
 

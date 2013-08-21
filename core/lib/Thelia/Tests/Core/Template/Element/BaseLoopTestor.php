@@ -46,10 +46,12 @@ abstract class BaseLoopTestor extends \PHPUnit_Framework_TestCase
     abstract public function getTestedInstance();
     abstract public function getMandatoryArguments();
 
-    protected function getMethod($name) {
+    protected function getMethod($name)
+    {
         $class = new \ReflectionClass($this->getTestedClassName());
         $method = $class->getMethod($name);
         $method->setAccessible(true);
+
         return $method;
     }
 

@@ -22,33 +22,118 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-
+use Propel\Runtime\Exception\PropelException;
+use Thelia\Form\Exception\FormValidationException;
 use Thelia\Core\Event\CartEvent;
 use Thelia\Core\Event\TheliaEvents;
+use Symfony\Component\HttpFoundation\Request;
+use Thelia\Form\CartAdd;
 
 class CartController extends BaseFrontController
 {
     use \Thelia\Cart\CartTrait;
 
-    public function addArticle()
-    {
-        $cartEvent = $this->getCartEvent();
-
-        $this->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
-    }
-
-    public function modifyArticle()
-    {
-        $cartEvent = $this->getCartEvent();
-
-        $this->dispatch(TheliaEvents::CART_CHANGEARTICLE, $cartEvent);
-    }
-
-    protected function getCartEvent()
+    public function addItem()
     {
         $request = $this->getRequest();
-        $cart = $this->getCart($request);
 
-        return new CartEvent($request, $cart);
+        $cartAdd = $this->getAddCartForm($request);
+        $message = null;
+
+        try {
+            $form = $this->validateForm($cartAdd);
+
+            $cartEvent = $this->getCartEvent();
+            $cartEvent->setNewness($form->get("newness")->getData());
+            $cartEvent->setAppend($form->get("append")->getData());
+            $cartEvent->setQuantity($form->get("quantity")->getData());
+            $cartEvent->setProductSaleElementsId($form->get("product_sale_elements_id")->getData());
+            $cartEvent->setProduct($form->get("product")->getData());
+
+            $this->getDispatcher()->dispatch(TheliaEvents::CART_ADDITEM, $cartEvent);
+
+            $this->redirectSuccess();
+
+        } catch (PropelException $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
+            $message = "Failed to add this article to your cart, please try again";
+        } catch (FormValidationException $e) {
+            $message = $e->getMessage();
+        }
+
+        if ($message) {
+            $cartAdd->setErrorMessage($message);
+            $this->getParserContext()->setErrorForm($cartAdd);
+        }
     }
+
+    public function changeItem()
+    {
+        $cartEvent = $this->getCartEvent();
+        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
+        $cartEvent->setQuantity($this->getRequest()->get("quantity"));
+
+        try {
+            $this->getDispatcher()->dispatch(TheliaEvents::CART_CHANGEITEM, $cartEvent);
+
+            $this->redirectSuccess();
+        } catch(PropelException $e) {
+            $this->getParserContext()->setGeneralError($e->getMessage());
+        }
+
+    }
+
+    public function deleteItem()
+    {
+        $cartEvent = $this->getCartEvent();
+        $cartEvent->setCartItem($this->getRequest()->get("cart_item"));
+
+        try {
+            $this->getDispatcher()->dispatch(TheliaEvents::CART_DELETEITEM, $cartEvent);
+
+            $this->redirectSuccess();
+        } catch (PropelException $e) {
+            \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
+            $this->getParserContext()->setGeneralError($e->getMessage());
+        }
+
+
+    }
+
+    /**
+     * use Thelia\Cart\CartTrait for searching current cart or create a new one
+     *
+     * @return CartEvent
+     */
+    protected function getCartEvent()
+    {
+        $cart = $this->getCart($this->getRequest());
+
+        return new CartEvent($cart);
+    }
+
+    /**
+     * Find the good way to construct the cart form
+     *
+     * @param  Request $request
+     * @return CartAdd
+     */
+    private function getAddCartForm(Request $request)
+    {
+        if ($request->isMethod("post")) {
+            $cartAdd = new CartAdd($request);
+        } else {
+            $cartAdd = new CartAdd(
+                $request,
+                "form",
+                array(),
+                array(
+                    'csrf_protection'   => false,
+                )
+            );
+        }
+
+        return $cartAdd;
+    }
+
 }

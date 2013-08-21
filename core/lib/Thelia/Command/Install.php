@@ -29,7 +29,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Command\ContainerAwareCommand;
 
-
 class Install extends ContainerAwareCommand
 {
     /**
@@ -80,7 +79,6 @@ class Install extends ContainerAwareCommand
 
         $this->checkPermission($output);
 
-
         $connectionInfo = array(
             "host" => $input->getOption("db_host"),
             "dbName" => $input->getOption("db_name"),
@@ -88,9 +86,7 @@ class Install extends ContainerAwareCommand
             "password" => $input->getOption("db_password")
         );
 
-
-
-        while(false === $connection = $this->tryConnection($connectionInfo, $output)) {
+        while (false === $connection = $this->tryConnection($connectionInfo, $output)) {
                 $connectionInfo = $this->getConnectionInfo($input, $output);
         }
 
@@ -164,8 +160,6 @@ class Install extends ContainerAwareCommand
             exit;
         }
 
-
-
     }
 
     /**
@@ -179,7 +173,6 @@ class Install extends ContainerAwareCommand
 
         $sampleConfigFile = THELIA_ROOT . "/local/config/database.yml.sample";
         $configFile = THELIA_ROOT . "/local/config/database.yml";
-
 
         $fs->copy($sampleConfigFile, $configFile, true);
 
@@ -196,10 +189,10 @@ class Install extends ContainerAwareCommand
 
         file_put_contents($configFile, $configContent);
 
-        $fs->remove($sampleConfigFile);
+        // FA - no, as no further install will be possible
+        // $fs->remove($sampleConfigFile);
 
         $fs->remove($this->getContainer()->getParameter("kernel.cache_dir"));
-
 
     }
 
@@ -237,7 +230,7 @@ class Install extends ContainerAwareCommand
 
         $tab = explode(";", $sql);
 
-        for($i=0; $i<count($tab); $i++){
+        for ($i=0; $i<count($tab); $i++) {
             $queryTemp = str_replace("-CODE-", ";',", $tab[$i]);
             $queryTemp = str_replace("|", ";", $queryTemp);
             $query[] = $queryTemp;
@@ -266,7 +259,7 @@ class Install extends ContainerAwareCommand
      * test database access
      *
      * @param $connectionInfo
-     * @param OutputInterface $output
+     * @param  OutputInterface $output
      * @return bool|\PDO
      */
     protected function tryConnection($connectionInfo, OutputInterface $output)
@@ -288,10 +281,9 @@ class Install extends ContainerAwareCommand
             $output->writeln(array(
                 "<error>Wrong connection information</error>"
             ));
+
             return false;
         }
-
-
 
         return $connection;
     }
@@ -299,8 +291,8 @@ class Install extends ContainerAwareCommand
     /**
      * Ask to user all needed information
      *
-     * @param InputInterface $input
-     * @param OutputInterface $output
+     * @param  InputInterface  $input
+     * @param  OutputInterface $output
      * @return array
      */
     protected function getConnectionInfo(InputInterface $input, OutputInterface $output)

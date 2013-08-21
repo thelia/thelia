@@ -46,14 +46,6 @@ use Thelia\Model\Map\FolderTableMap;
  * @method     ChildFolderQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
  * @method     ChildFolderQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildFolderQuery leftJoinImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the Image relation
- * @method     ChildFolderQuery rightJoinImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Image relation
- * @method     ChildFolderQuery innerJoinImage($relationAlias = null) Adds a INNER JOIN clause to the query using the Image relation
- *
- * @method     ChildFolderQuery leftJoinDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the Document relation
- * @method     ChildFolderQuery rightJoinDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Document relation
- * @method     ChildFolderQuery innerJoinDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the Document relation
- *
  * @method     ChildFolderQuery leftJoinRewriting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Rewriting relation
  * @method     ChildFolderQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
  * @method     ChildFolderQuery innerJoinRewriting($relationAlias = null) Adds a INNER JOIN clause to the query using the Rewriting relation
@@ -61,6 +53,14 @@ use Thelia\Model\Map\FolderTableMap;
  * @method     ChildFolderQuery leftJoinContentFolder($relationAlias = null) Adds a LEFT JOIN clause to the query using the ContentFolder relation
  * @method     ChildFolderQuery rightJoinContentFolder($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentFolder relation
  * @method     ChildFolderQuery innerJoinContentFolder($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentFolder relation
+ *
+ * @method     ChildFolderQuery leftJoinFolderImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the FolderImage relation
+ * @method     ChildFolderQuery rightJoinFolderImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FolderImage relation
+ * @method     ChildFolderQuery innerJoinFolderImage($relationAlias = null) Adds a INNER JOIN clause to the query using the FolderImage relation
+ *
+ * @method     ChildFolderQuery leftJoinFolderDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the FolderDocument relation
+ * @method     ChildFolderQuery rightJoinFolderDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FolderDocument relation
+ * @method     ChildFolderQuery innerJoinFolderDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the FolderDocument relation
  *
  * @method     ChildFolderQuery leftJoinFolderI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the FolderI18n relation
  * @method     ChildFolderQuery rightJoinFolderI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the FolderI18n relation
@@ -640,152 +640,6 @@ abstract class FolderQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Image object
-     *
-     * @param \Thelia\Model\Image|ObjectCollection $image  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildFolderQuery The current query, for fluid interface
-     */
-    public function filterByImage($image, $comparison = null)
-    {
-        if ($image instanceof \Thelia\Model\Image) {
-            return $this
-                ->addUsingAlias(FolderTableMap::ID, $image->getFolderId(), $comparison);
-        } elseif ($image instanceof ObjectCollection) {
-            return $this
-                ->useImageQuery()
-                ->filterByPrimaryKeys($image->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByImage() only accepts arguments of type \Thelia\Model\Image or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Image relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildFolderQuery The current query, for fluid interface
-     */
-    public function joinImage($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Image');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Image');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Image relation Image object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ImageQuery A secondary query class using the current class as primary query
-     */
-    public function useImageQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinImage($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Image', '\Thelia\Model\ImageQuery');
-    }
-
-    /**
-     * Filter the query by a related \Thelia\Model\Document object
-     *
-     * @param \Thelia\Model\Document|ObjectCollection $document  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildFolderQuery The current query, for fluid interface
-     */
-    public function filterByDocument($document, $comparison = null)
-    {
-        if ($document instanceof \Thelia\Model\Document) {
-            return $this
-                ->addUsingAlias(FolderTableMap::ID, $document->getFolderId(), $comparison);
-        } elseif ($document instanceof ObjectCollection) {
-            return $this
-                ->useDocumentQuery()
-                ->filterByPrimaryKeys($document->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByDocument() only accepts arguments of type \Thelia\Model\Document or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Document relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildFolderQuery The current query, for fluid interface
-     */
-    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Document');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Document');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Document relation Document object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
-     */
-    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinDocument($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Document', '\Thelia\Model\DocumentQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\Rewriting object
      *
      * @param \Thelia\Model\Rewriting|ObjectCollection $rewriting  the related object to use as filter
@@ -929,6 +783,152 @@ abstract class FolderQuery extends ModelCriteria
         return $this
             ->joinContentFolder($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'ContentFolder', '\Thelia\Model\ContentFolderQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\FolderImage object
+     *
+     * @param \Thelia\Model\FolderImage|ObjectCollection $folderImage  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFolderQuery The current query, for fluid interface
+     */
+    public function filterByFolderImage($folderImage, $comparison = null)
+    {
+        if ($folderImage instanceof \Thelia\Model\FolderImage) {
+            return $this
+                ->addUsingAlias(FolderTableMap::ID, $folderImage->getFolderId(), $comparison);
+        } elseif ($folderImage instanceof ObjectCollection) {
+            return $this
+                ->useFolderImageQuery()
+                ->filterByPrimaryKeys($folderImage->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFolderImage() only accepts arguments of type \Thelia\Model\FolderImage or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FolderImage relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildFolderQuery The current query, for fluid interface
+     */
+    public function joinFolderImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FolderImage');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FolderImage');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FolderImage relation FolderImage object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\FolderImageQuery A secondary query class using the current class as primary query
+     */
+    public function useFolderImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinFolderImage($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FolderImage', '\Thelia\Model\FolderImageQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\FolderDocument object
+     *
+     * @param \Thelia\Model\FolderDocument|ObjectCollection $folderDocument  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildFolderQuery The current query, for fluid interface
+     */
+    public function filterByFolderDocument($folderDocument, $comparison = null)
+    {
+        if ($folderDocument instanceof \Thelia\Model\FolderDocument) {
+            return $this
+                ->addUsingAlias(FolderTableMap::ID, $folderDocument->getFolderId(), $comparison);
+        } elseif ($folderDocument instanceof ObjectCollection) {
+            return $this
+                ->useFolderDocumentQuery()
+                ->filterByPrimaryKeys($folderDocument->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByFolderDocument() only accepts arguments of type \Thelia\Model\FolderDocument or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the FolderDocument relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildFolderQuery The current query, for fluid interface
+     */
+    public function joinFolderDocument($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('FolderDocument');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'FolderDocument');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the FolderDocument relation FolderDocument object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\FolderDocumentQuery A secondary query class using the current class as primary query
+     */
+    public function useFolderDocumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinFolderDocument($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'FolderDocument', '\Thelia\Model\FolderDocumentQuery');
     }
 
     /**

@@ -24,14 +24,12 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\FeatureAvQuery;
 use Thelia\Model\ConfigQuery;
@@ -60,7 +58,7 @@ class FeatureAvailability extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             )
@@ -90,18 +88,18 @@ class FeatureAvailability extends BaseLoop
 
         $feature = $this->getFeature();
 
-        if(null !== $feature) {
+        if (null !== $feature) {
             $search->filterByFeatureId($feature, Criteria::IN);
         }
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
                     break;
-                case "alpha_reverse":
+                case "alpha-reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureAvI18nTableMap::TITLE);
                     break;
                 case "manual":

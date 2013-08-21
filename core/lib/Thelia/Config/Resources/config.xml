@@ -28,6 +28,7 @@
         <loop class="Thelia\Core\Template\Loop\Lang" name="lang"/>
         <loop class="Thelia\Core\Template\Loop\CategoryTree" name="category-tree"/>
         <loop class="Thelia\Core\Template\Loop\Cart" name="cart"/>
+        <loop class="Thelia\Core\Template\Loop\Image" name="image"/>
     </loops>
 
     <forms>
@@ -45,6 +46,7 @@
 
 
     <commands>
+        <command class="Thelia\Command\ClearImageCache"/>
         <command class="Thelia\Command\CacheClear"/>
         <command class="Thelia\Command\Install"/>
         <command class="Thelia\Command\ModuleGenerateCommand"/>

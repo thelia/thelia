@@ -40,15 +40,14 @@ use Propel\Runtime\Propel;
 use Thelia\Model\Map\CategoryTableMap;
 use Propel\Runtime\Exception\PropelException;
 
-
 class Category extends BaseAction implements EventSubscriberInterface
 {
     public function create(ActionEvent $event)
     {
 
-    	$this->checkAuth("ADMIN", "admin.category.create");
+        $this->checkAuth("ADMIN", "admin.category.create");
 
-    	$request = $event->getRequest();
+        $request = $event->getRequest();
 
         try {
             $categoryCreationForm = new CategoryCreationForm($request);
@@ -92,7 +91,7 @@ class Category extends BaseAction implements EventSubscriberInterface
     public function modify(ActionEvent $event)
     {
 
-    	$this->checkAuth("ADMIN", "admin.category.delete");
+        $this->checkAuth("ADMIN", "admin.category.delete");
 
         $request = $event->getRequest();
 
@@ -163,9 +162,9 @@ class Category extends BaseAction implements EventSubscriberInterface
     public function delete(ActionEvent $event)
     {
 
-    	$this->checkAuth("ADMIN", "admin.category.delete");
+        $this->checkAuth("ADMIN", "admin.category.delete");
 
-    	$request = $event->getRequest();
+        $request = $event->getRequest();
 
         try {
             $categoryDeletionForm = new CategoryDeletionForm($request);
@@ -214,11 +213,11 @@ class Category extends BaseAction implements EventSubscriberInterface
     public function toggleVisibility(ActionEvent $event)
     {
 
-    	$this->checkAuth("ADMIN", "admin.category.edit");
+        $this->checkAuth("ADMIN", "admin.category.edit");
 
-    	$request = $event->getRequest();
+        $request = $event->getRequest();
 
-    	$category = CategoryQuery::create()->findPk($request->get('category_id', 0));
+        $category = CategoryQuery::create()->findPk($request->get('category_id', 0));
 
         if ($category !== null) {
 
@@ -237,8 +236,9 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param ActionEvent $event
      */
-    public function changePositionUp(ActionEvent $event) {
-    	return $this->exchangePosition($event, 'up');
+    public function changePositionUp(ActionEvent $event)
+    {
+        return $this->exchangePosition($event, 'up');
     }
 
     /**
@@ -246,67 +246,65 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param ActionEvent $event
      */
-    public function changePositionDown(ActionEvent $event) {
-    	return $this->exchangePosition($event, 'down');
+    public function changePositionDown(ActionEvent $event)
+    {
+        return $this->exchangePosition($event, 'down');
     }
 
     /**
      * Move up or down a category
      *
      * @param ActionEvent $event
-     * @param string $direction up to move up, down to move down
+     * @param string      $direction up to move up, down to move down
      */
-    protected function exchangePosition(ActionEvent $event, $direction) {
+    protected function exchangePosition(ActionEvent $event, $direction)
+    {
+        $this->checkAuth("ADMIN", "admin.category.edit");
 
-    	$this->checkAuth("ADMIN", "admin.category.edit");
+        $request = $event->getRequest();
 
-    	$request = $event->getRequest();
+        $category = CategoryQuery::create()->findPk($request->get('category_id', 0));
 
-    	$category = CategoryQuery::create()->findPk($request->get('category_id', 0));
+        if ($category !== null) {
 
-    	if ($category !== null) {
+            // The current position of the category
+            $my_position = $category->getPosition();
 
-    		// The current position of the category
-    		$my_position = $category->getPosition();
+            // Find category to exchange position with
+            $search = CategoryQuery::create()
+                ->filterByParent($category->getParent());
 
-    		// Find category to exchange position with
-    		$search = CategoryQuery::create()
-    			->filterByParent($category->getParent());
+            // Up or down ?
+            if ($direction == 'up') {
+                // Find the category immediately before me
+                $search->filterByPosition(array('max' => $my_position-1))->orderByPosition(Criteria::DESC);
+            } elseif ($direction == 'down') {
+                // Find the category immediately after me
+                $search->filterByPosition(array('min' => $my_position+1))->orderByPosition(Criteria::ASC);
+            } else
 
-    		// Up or down ?
-    		if ($direction == 'up') {
-    			// Find the category immediately before me
-    			$search->filterByPosition(array('max' => $my_position-1))->orderByPosition(Criteria::DESC);
-    		}
-    		else if ($direction == 'down') {
-    			// Find the category immediately after me
-    			$search->filterByPosition(array('min' => $my_position+1))->orderByPosition(Criteria::ASC);
-    		}
-    		else
-    			return;
+                return;
 
-    		$result = $search->findOne();
+            $result = $search->findOne();
 
+            // If we found the proper category, exchange their positions
+            if ($result) {
 
-    		// If we found the proper category, exchange their positions
-    		if ($result) {
+                $cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
 
-    			$cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
+                $cnx->beginTransaction();
 
-	    		$cnx->beginTransaction();
+                try {
+                    $category->setPosition($result->getPosition())->save();
 
-	    		try {
-    				$category->setPosition($result->getPosition())->save();
+                    $result->setPosition($my_position)->save();
 
-    				$result->setPosition($my_position)->save();
-
-	    			$cnx->commit();
-	    		}
-	    		catch(Exception $e) {
-	    			$cnx->rollback();
-	    		}
-    		}
-    	}
+                    $cnx->commit();
+                } catch (Exception $e) {
+                    $cnx->rollback();
+                }
+            }
+        }
     }
 
     /**
@@ -314,61 +312,59 @@ class Category extends BaseAction implements EventSubscriberInterface
      *
      * @param ActionEvent $event
      */
-    public function changePosition(ActionEvent $event) {
+    public function changePosition(ActionEvent $event)
+    {
+        $this->checkAuth("ADMIN", "admin.category.edit");
 
-    	$this->checkAuth("ADMIN", "admin.category.edit");
+        $request = $event->getRequest();
 
-    	$request = $event->getRequest();
+        $category = CategoryQuery::create()->findPk($request->get('category_id', 0));
 
-    	$category = CategoryQuery::create()->findPk($request->get('category_id', 0));
+        if ($category !== null) {
 
-    	if ($category !== null) {
+            // The required position
+            $new_position = $request->get('position', null);
 
-    		// The required position
-    		$new_position = $request->get('position', null);
+            // The current position
+            $current_position = $category->getPosition();
 
-    		// The current position
-    		$current_position = $category->getPosition();
+            if ($new_position != null && $new_position > 0 && $new_position != $current_position) {
 
-    		if ($new_position != null && $new_position > 0 && $new_position != $current_position) {
+                 // Find categories to offset
+                $search = CategoryQuery::create()->filterByParent($category->getParent());
 
- 	    		// Find categories to offset
-	    		$search = CategoryQuery::create()->filterByParent($category->getParent());
+                if ($new_position > $current_position) {
+                    // The new position is after the current position -> we will offset + 1 all categories located between us and the new position
+                    $search->filterByPosition(array('min' => 1+$current_position, 'max' => $new_position));
 
-	    		if ($new_position > $current_position) {
-	    			// The new position is after the current position -> we will offset + 1 all categories located between us and the new position
-	    			$search->filterByPosition(array('min' => 1+$current_position, 'max' => $new_position));
+                    $delta = -1;
+                } else {
+                    // The new position is brefore the current position -> we will offset - 1 all categories located between us and the new position
+                    $search->filterByPosition(array('min' => $new_position, 'max' => $current_position - 1));
 
-	    			$delta = -1;
-	    		}
-	    		else {
-	    			// The new position is brefore the current position -> we will offset - 1 all categories located between us and the new position
-	    			$search->filterByPosition(array('min' => $new_position, 'max' => $current_position - 1));
+                    $delta = 1;
+                }
 
-	    			$delta = 1;
-	    		}
+                $results = $search->find();
 
-	    		$results = $search->find();
+                $cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
 
-	    		$cnx = Propel::getWriteConnection(CategoryTableMap::DATABASE_NAME);
+                $cnx->beginTransaction();
 
-	    		$cnx->beginTransaction();
+                try {
+                    foreach ($results as $result) {
+                        $result->setPosition($result->getPosition() + $delta)->save($cnx);
+                    }
 
-	    		try {
-	    			foreach($results as $result) {
-	    				$result->setPosition($result->getPosition() + $delta)->save($cnx);
-	    			}
+                    $category->setPosition($new_position)->save($cnx);
 
-	    			$category->setPosition($new_position)->save($cnx);
-
-	    			$cnx->commit();
-	    		}
-	    		catch(Exception $e) {
-	    			$cnx->rollback();
-	    		}
-    		}
-    	}
-	}
+                    $cnx->commit();
+                } catch (Exception $e) {
+                    $cnx->rollback();
+                }
+            }
+        }
+    }
 
     /**
      * Returns an array of event names this subscriber listens to.

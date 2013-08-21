@@ -8,8 +8,8 @@ namespace Thelia\Core\Security\User;
  * @author Franck Allimant <franck@cqfdev.fr>
  *
  */
-interface UserInterface {
-
+interface UserInterface
+{
     /**
      * Return the user unique name
      */

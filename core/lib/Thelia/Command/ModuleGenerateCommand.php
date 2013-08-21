@@ -22,16 +22,13 @@
 /*************************************************************************************/
 namespace Thelia\Command;
 
-
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ModuleGenerateCommand extends BaseModuleGenerate {
-
-
-
+class ModuleGenerateCommand extends BaseModuleGenerate
+{
     protected function configure()
     {
         $this
@@ -53,7 +50,7 @@ class ModuleGenerateCommand extends BaseModuleGenerate {
 
         $this->createDirectories();
         $this->createFiles();
-        if(method_exists($this, "renderBlock")) {
+        if (method_exists($this, "renderBlock")) {
             //impossible to change output class in CommandTester...
             $output->renderBlock(array(
                 '',
@@ -98,7 +95,5 @@ class ModuleGenerateCommand extends BaseModuleGenerate {
 
         file_put_contents($this->moduleDirectory . DIRECTORY_SEPARATOR . "Config". DIRECTORY_SEPARATOR . "schema.xml", $schemaContent);
     }
-
-
 
 }

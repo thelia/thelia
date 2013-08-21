@@ -22,14 +22,13 @@
 /*************************************************************************************/
 namespace Thelia\Tests\Command;
 
-
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Filesystem\Filesystem;
 use Thelia\Core\Application;
 use Thelia\Command\ModuleGenerateCommand;
 
-class ModuleGenerateCommandTest extends BaseCommandTest {
-
+class ModuleGenerateCommandTest extends BaseCommandTest
+{
     protected $command;
     protected $commandTester;
 

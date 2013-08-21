@@ -22,17 +22,16 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class CategoryDeletionForm extends BaseForm {
-
+class CategoryDeletionForm extends BaseForm
+{
     protected function buildForm()
     {
         $this->formBuilder
             ->add("category_id", "integer", array(
                 "constraints" => array(
-                	new NotBlank()
+                    new NotBlank()
                 )
             ))
         ;

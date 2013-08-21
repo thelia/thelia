@@ -23,18 +23,14 @@
 
 namespace Thelia\Core\Template\Loop;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\ConfigQuery;
-use Thelia\Type\TypeCollection;
 use Thelia\Type;
 use Thelia\Type\BooleanOrBothType;
 
@@ -69,7 +65,7 @@ class CategoryPath extends BaseLoop
             Argument::createIntTypeArgument('category', null, true),
             Argument::createIntTypeArgument('depth'),
             Argument::createIntTypeArgument('level'),
-        	Argument::createBooleanOrBothTypeArgument('visible', true, false)
+            Argument::createBooleanOrBothTypeArgument('visible', true, false)
         );
     }
 
@@ -80,50 +76,49 @@ class CategoryPath extends BaseLoop
      */
     public function exec(&$pagination)
     {
-		$id = $this->getCategory();
-		$visible = $this->getVisible();
+        $id = $this->getCategory();
+        $visible = $this->getVisible();
 
         $search = CategoryQuery::create();
-		$search->filterById($id);
-		if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
+        $search->filterById($id);
+        if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible);
 
-		$results = array();
+        $results = array();
 
-		$ids = array();
+        $ids = array();
 
-		do {
-			$category = $search->findOne();
+        do {
+            $category = $search->findOne();
 
-			if ($category != null) {
+            if ($category != null) {
 
-				$loopResultRow = new LoopResultRow();
+                $loopResultRow = new LoopResultRow();
 
-				$loopResultRow
-					->set("TITLE",$category->getTitle())
-					->set("URL", $category->getUrl())
-					->set("ID", $category->getId())
-				;
+                $loopResultRow
+                    ->set("TITLE",$category->getTitle())
+                    ->set("URL", $category->getUrl())
+                    ->set("ID", $category->getId())
+                ;
 
-				$results[] = $loopResultRow;
+                $results[] = $loopResultRow;
 
-				$parent = $category->getParent();
+                $parent = $category->getParent();
 
-				if ($parent > 0) {
+                if ($parent > 0) {
 
-					// Prevent circular refererences
-					if (in_array($parent, $ids)) {
-						throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
-					}
+                    // Prevent circular refererences
+                    if (in_array($parent, $ids)) {
+                        throw new \LogicException(sprintf("Circular reference detected in category ID=%d hierarchy (category ID=%d appears more than one times in path)", $id, $parent));
+                    }
 
-					$ids[] = $parent;
+                    $ids[] = $parent;
 
-					$search = CategoryQuery::create();
-					$search->filterById($parent);
-					if ($visible == true) $search->filterByVisible($visible);
-				}
-			}
-		}
-		while ($category != null && $parent > 0);
+                    $search = CategoryQuery::create();
+                    $search->filterById($parent);
+                    if ($visible == true) $search->filterByVisible($visible);
+                }
+            }
+        } while ($category != null && $parent > 0);
 
         // Reverse list and build the final result
         $results = array_reverse($results);

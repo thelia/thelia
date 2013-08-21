@@ -30,9 +30,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
-
 /**
  *
  * @package Thelia\Core\Template\Loop
@@ -44,8 +41,8 @@ class Feed extends BaseLoop
     public function getArgDefinitions()
     {
         return new ArgumentCollection(
-        	Argument::createAnyTypeArgument('url', null, true),
-        	Argument::createIntTypeArgument('timeout', 10)
+            Argument::createAnyTypeArgument('url', null, true),
+            Argument::createIntTypeArgument('timeout', 10)
         );
     }
 
@@ -56,13 +53,13 @@ class Feed extends BaseLoop
      */
     public function exec(&$pagination)
     {
-    	$cachedir = THELIA_ROOT . 'cache/feeds';
+        $cachedir = THELIA_ROOT . 'cache/feeds';
 
-    	if (! is_dir($cachedir)) {
-    		if (! mkdir($cachedir)) {
-    			throw new \Exception(sprintf("Failed to create cache directory '%s'", $cachedir));
-    		}
-    	}
+        if (! is_dir($cachedir)) {
+            if (! mkdir($cachedir)) {
+                throw new \Exception(sprintf("Failed to create cache directory '%s'", $cachedir));
+            }
+        }
 
         $feed = new \SimplePie($this->getUrl(), THELIA_ROOT . 'cache/feeds');
 
@@ -78,27 +75,27 @@ class Feed extends BaseLoop
 
         $loopResult = new LoopResult();
 
-        for($idx = 0; $idx < $limit; $idx++) {
+        for ($idx = 0; $idx < $limit; $idx++) {
 
-        	$item = $items[$idx];
+            $item = $items[$idx];
 
-        	$link = $item->get_permalink();
+            $link = $item->get_permalink();
 
-        	$title = $item->get_title();
-        	$author = $item->get_author();
-        	$description = $item->get_description();
+            $title = $item->get_title();
+            $author = $item->get_author();
+            $description = $item->get_description();
 
-        	$date = $item->get_date('d/m/Y');
+            $date = $item->get_date('d/m/Y');
 
-        	$loopResultRow = new LoopResultRow();
+            $loopResultRow = new LoopResultRow();
 
-        	$loopResultRow->set("URL", $item->get_permalink());
-        	$loopResultRow->set("TITLE", $item->get_title());
-        	$loopResultRow->set("AUTHOR", $item->get_author());
-        	$loopResultRow->set("DESCRIPTION", $item->get_description());
-        	$loopResultRow->set("DATE", $item->get_date('d/m/Y')); // FIXME - date format should be an intl parameter
+            $loopResultRow->set("URL", $item->get_permalink());
+            $loopResultRow->set("TITLE", $item->get_title());
+            $loopResultRow->set("AUTHOR", $item->get_author());
+            $loopResultRow->set("DESCRIPTION", $item->get_description());
+            $loopResultRow->set("DATE", $item->get_date('d/m/Y')); // FIXME - date format should be an intl parameter
 
-        	$loopResult->addRow($loopResultRow);
+            $loopResult->addRow($loopResultRow);
         }
 
         return $loopResult;

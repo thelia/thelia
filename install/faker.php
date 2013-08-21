@@ -1,4 +1,11 @@
 <?php
+use Thelia\Model\ProductImage;
+use Thelia\Model\CategoryImage;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ContentImage;
+use Imagine\Image\Color;
+use Imagine\Image\Point;
+
 require __DIR__ . '/../core/bootstrap.php';
 
 $thelia = new Thelia\Core\Thelia("dev", true);
@@ -11,7 +18,9 @@ $con->beginTransaction();
 $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne();
 
 try {
-
+    $stmt = $con->prepare("SET foreign_key_checks = 0");
+    $stmt->execute();
+    
     $attributeCategory = Thelia\Model\AttributeCategoryQuery::create()
         ->find();
     $attributeCategory->delete();
@@ -94,6 +103,9 @@ try {
         ->find();
     $productPrice->delete();
 
+    $stmt = $con->prepare("SET foreign_key_checks = 1");
+    $stmt->execute();
+    
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {
@@ -264,6 +276,10 @@ try {
 
         $folder->save();
 
+        $image = new FolderImage();
+        $image->setFolderId($folder->getId());
+        generate_image($image, 1, 'folder', $folder->getId());
+
         for($j=1; $j<rand(0, 5); $j++) {
             $subfolder = new Thelia\Model\Folder();
             $subfolder->setParent($folder->getId());
@@ -274,6 +290,10 @@ try {
 
             $subfolder->save();
 
+            $image = new FolderImage();
+            $image->setFolderId($subfolder->getId());
+            generate_image($image, 1, 'folder', $subfolder->getId());
+
             for($k=0; $k<rand(0, 5); $k++) {
                 $content = new Thelia\Model\Content();
                 $content->addFolder($subfolder);
@@ -283,6 +303,10 @@ try {
                 $content->setDescription($faker->text(255));
 
                 $content->save();
+
+                $image = new ContentImage();
+                $image->setContentId($content->getId());
+                generate_image($image, 1, 'content', $content->getId());
             }
         }
     }
@@ -307,6 +331,10 @@ function createProduct($faker, $category, $position, &$productIdList)
     $productId = $product->getId();
     $productIdList[] = $productId;
 
+    $image = new ProductImage();
+    $image->setProductId($productId);
+    generate_image($image, 1, 'product', $productId);
+    
     return $product;
 }
 
@@ -320,8 +348,62 @@ function createCategory($faker, $parent, $position, &$categoryIdList)
     $category->setDescription($faker->text(255));
 
     $category->save();
-    $categoryIdList[] = $category->getId();
+    $cateogoryId = $category->getId();
+    $categoryIdList[] = $cateogoryId;
 
+    $image = new CategoryImage();
+    $image->setCategoryId($cateogoryId);
+    generate_image($image, 1, 'category', $cateogoryId);
+    
     return $category;
+}
+
+function generate_image($image, $position, $typeobj, $id) {
+
+    global $faker;
+
+    $image
+        ->setTitle($faker->text(20))
+        ->setDescription($faker->text(250))
+        ->setChapo($faker->text(40))
+        ->setPostscriptum($faker->text(40))
+        ->setPosition($position)
+        ->setFile(sprintf("sample-image-%s.png", $id))
+        ->save()
+    ;
+
+    // Generate images
+    $imagine = new Imagine\Gd\Imagine();
+    $image   = $imagine->create(new Imagine\Image\Box(320,240), new Color('#E9730F'));
+
+    $white = new Color('#FFF');
+
+    $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 14, $white);
+
+    $tbox = $font->box("THELIA");
+    $image->draw()->text("THELIA", $font, new Point((320 - $tbox->getWidth()) / 2, 30));
+
+    $str = sprintf("%s sample image", ucfirst($typeobj));
+    $tbox = $font->box($str);
+    $image->draw()->text($str, $font, new Point((320 - $tbox->getWidth()) / 2, 80));
+
+    $font = $imagine->font(__DIR__.'/faker-assets/FreeSans.ttf', 18, $white);
+
+    $str = sprintf("%s ID %d", strtoupper($typeobj), $id);
+    $tbox = $font->box($str);
+    $image->draw()->text($str, $font, new Point((320 - $tbox->getWidth()) / 2, 180));
+
+    $image->draw()
+        ->line(new Point(0, 0), new Point(319, 0), $white)
+        ->line(new Point(319, 0), new Point(319, 239), $white)
+        ->line(new Point(319, 239), new Point(0,239), $white)
+        ->line(new Point(0, 239), new Point(0, 0), $white)
+    ;
+
+    $image_file = sprintf("%s/../local/media/images/%s/sample-image-%s.png", __DIR__, $typeobj, $id);
+
+    if (! is_dir(dirname($image_file))) mkdir(dirname($image_file), 0777, true);
+
+    $image->save($image_file);
 }
 

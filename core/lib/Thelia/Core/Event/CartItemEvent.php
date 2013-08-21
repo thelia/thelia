@@ -23,11 +23,10 @@
 
 namespace Thelia\Core\Event;
 
-
 use Thelia\Model\CartItem;
 
-class CartItemEvent extends InternalEvent {
-
+class CartItemEvent extends InternalEvent
+{
     protected $cartItem;
 
     public function __construct(CartItem $cartItem)

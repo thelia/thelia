@@ -39,14 +39,15 @@ use Thelia\Core\Template\ParserContext;
  */
 class ControllerListener implements EventSubscriberInterface
 {
-	/**
-	 * @var ParserContext the parser context
-	 */
-	protected $parserContext;
+    /**
+     * @var ParserContext the parser context
+     */
+    protected $parserContext;
 
-	public function __construct(ParserContext $parserContext) {
-		$this->parserContext = $parserContext;
-	}
+    public function __construct(ParserContext $parserContext)
+    {
+        $this->parserContext = $parserContext;
+    }
 
     public function onKernelController(FilterControllerEvent $event)
     {
@@ -61,7 +62,7 @@ class ControllerListener implements EventSubscriberInterface
 
             // Process form errors
             if ($actionEvent->hasErrorForm()) {
-            	$this->parserContext->setErrorForm($actionEvent->getErrorForm());
+                $this->parserContext->setErrorForm($actionEvent->getErrorForm());
             }
         }
     }

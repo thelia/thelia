@@ -34,7 +34,7 @@ class CustomerCreation extends BaseForm
     {
         $this->formBuilder
             ->add("auto_login", "integer")
-        	->add("firstname", "text", array(
+            ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()
                 ),

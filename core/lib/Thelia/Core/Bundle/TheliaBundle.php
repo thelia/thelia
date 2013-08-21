@@ -28,6 +28,7 @@ use Symfony\Component\DependencyInjection\Scope;
 
 use Thelia\Core\DependencyInjection\Compiler\RegisterListenersPass;
 use Thelia\Core\DependencyInjection\Compiler\RegisterParserPluginPass;
+use Thelia\Core\DependencyInjection\Compiler\RegisterRouterPass;
 
 /**
  * First Bundle use in Thelia
@@ -55,7 +56,11 @@ class TheliaBundle extends Bundle
 
         $container->addScope(new Scope('request'));
 
-        $container->addCompilerPass(new RegisterListenersPass());
-        $container->addCompilerPass(new RegisterParserPluginPass());
+        $container
+            ->addCompilerPass(new RegisterListenersPass())
+            ->addCompilerPass(new RegisterParserPluginPass())
+            ->addCompilerPass(new RegisterRouterPass())
+        ;
+
     }
 }

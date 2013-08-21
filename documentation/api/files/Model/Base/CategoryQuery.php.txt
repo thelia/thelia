@@ -62,17 +62,17 @@ use Thelia\Model\Map\CategoryTableMap;
  * @method     ChildCategoryQuery rightJoinContentAssoc($relationAlias = null) Adds a RIGHT JOIN clause to the query using the ContentAssoc relation
  * @method     ChildCategoryQuery innerJoinContentAssoc($relationAlias = null) Adds a INNER JOIN clause to the query using the ContentAssoc relation
  *
- * @method     ChildCategoryQuery leftJoinImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the Image relation
- * @method     ChildCategoryQuery rightJoinImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Image relation
- * @method     ChildCategoryQuery innerJoinImage($relationAlias = null) Adds a INNER JOIN clause to the query using the Image relation
- *
- * @method     ChildCategoryQuery leftJoinDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the Document relation
- * @method     ChildCategoryQuery rightJoinDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Document relation
- * @method     ChildCategoryQuery innerJoinDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the Document relation
- *
  * @method     ChildCategoryQuery leftJoinRewriting($relationAlias = null) Adds a LEFT JOIN clause to the query using the Rewriting relation
  * @method     ChildCategoryQuery rightJoinRewriting($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Rewriting relation
  * @method     ChildCategoryQuery innerJoinRewriting($relationAlias = null) Adds a INNER JOIN clause to the query using the Rewriting relation
+ *
+ * @method     ChildCategoryQuery leftJoinCategoryImage($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryImage relation
+ * @method     ChildCategoryQuery rightJoinCategoryImage($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryImage relation
+ * @method     ChildCategoryQuery innerJoinCategoryImage($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryImage relation
+ *
+ * @method     ChildCategoryQuery leftJoinCategoryDocument($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryDocument relation
+ * @method     ChildCategoryQuery rightJoinCategoryDocument($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryDocument relation
+ * @method     ChildCategoryQuery innerJoinCategoryDocument($relationAlias = null) Adds a INNER JOIN clause to the query using the CategoryDocument relation
  *
  * @method     ChildCategoryQuery leftJoinCategoryI18n($relationAlias = null) Adds a LEFT JOIN clause to the query using the CategoryI18n relation
  * @method     ChildCategoryQuery rightJoinCategoryI18n($relationAlias = null) Adds a RIGHT JOIN clause to the query using the CategoryI18n relation
@@ -944,152 +944,6 @@ abstract class CategoryQuery extends ModelCriteria
     }
 
     /**
-     * Filter the query by a related \Thelia\Model\Image object
-     *
-     * @param \Thelia\Model\Image|ObjectCollection $image  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCategoryQuery The current query, for fluid interface
-     */
-    public function filterByImage($image, $comparison = null)
-    {
-        if ($image instanceof \Thelia\Model\Image) {
-            return $this
-                ->addUsingAlias(CategoryTableMap::ID, $image->getCategoryId(), $comparison);
-        } elseif ($image instanceof ObjectCollection) {
-            return $this
-                ->useImageQuery()
-                ->filterByPrimaryKeys($image->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByImage() only accepts arguments of type \Thelia\Model\Image or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Image relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildCategoryQuery The current query, for fluid interface
-     */
-    public function joinImage($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Image');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Image');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Image relation Image object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ImageQuery A secondary query class using the current class as primary query
-     */
-    public function useImageQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinImage($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Image', '\Thelia\Model\ImageQuery');
-    }
-
-    /**
-     * Filter the query by a related \Thelia\Model\Document object
-     *
-     * @param \Thelia\Model\Document|ObjectCollection $document  the related object to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildCategoryQuery The current query, for fluid interface
-     */
-    public function filterByDocument($document, $comparison = null)
-    {
-        if ($document instanceof \Thelia\Model\Document) {
-            return $this
-                ->addUsingAlias(CategoryTableMap::ID, $document->getCategoryId(), $comparison);
-        } elseif ($document instanceof ObjectCollection) {
-            return $this
-                ->useDocumentQuery()
-                ->filterByPrimaryKeys($document->getPrimaryKeys())
-                ->endUse();
-        } else {
-            throw new PropelException('filterByDocument() only accepts arguments of type \Thelia\Model\Document or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Document relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildCategoryQuery The current query, for fluid interface
-     */
-    public function joinDocument($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Document');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Document');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Document relation Document object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\DocumentQuery A secondary query class using the current class as primary query
-     */
-    public function useDocumentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinDocument($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Document', '\Thelia\Model\DocumentQuery');
-    }
-
-    /**
      * Filter the query by a related \Thelia\Model\Rewriting object
      *
      * @param \Thelia\Model\Rewriting|ObjectCollection $rewriting  the related object to use as filter
@@ -1160,6 +1014,152 @@ abstract class CategoryQuery extends ModelCriteria
         return $this
             ->joinRewriting($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Rewriting', '\Thelia\Model\RewritingQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\CategoryImage object
+     *
+     * @param \Thelia\Model\CategoryImage|ObjectCollection $categoryImage  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCategoryQuery The current query, for fluid interface
+     */
+    public function filterByCategoryImage($categoryImage, $comparison = null)
+    {
+        if ($categoryImage instanceof \Thelia\Model\CategoryImage) {
+            return $this
+                ->addUsingAlias(CategoryTableMap::ID, $categoryImage->getCategoryId(), $comparison);
+        } elseif ($categoryImage instanceof ObjectCollection) {
+            return $this
+                ->useCategoryImageQuery()
+                ->filterByPrimaryKeys($categoryImage->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCategoryImage() only accepts arguments of type \Thelia\Model\CategoryImage or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CategoryImage relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCategoryQuery The current query, for fluid interface
+     */
+    public function joinCategoryImage($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CategoryImage');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CategoryImage');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CategoryImage relation CategoryImage object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CategoryImageQuery A secondary query class using the current class as primary query
+     */
+    public function useCategoryImageQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCategoryImage($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CategoryImage', '\Thelia\Model\CategoryImageQuery');
+    }
+
+    /**
+     * Filter the query by a related \Thelia\Model\CategoryDocument object
+     *
+     * @param \Thelia\Model\CategoryDocument|ObjectCollection $categoryDocument  the related object to use as filter
+     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
+     *
+     * @return ChildCategoryQuery The current query, for fluid interface
+     */
+    public function filterByCategoryDocument($categoryDocument, $comparison = null)
+    {
+        if ($categoryDocument instanceof \Thelia\Model\CategoryDocument) {
+            return $this
+                ->addUsingAlias(CategoryTableMap::ID, $categoryDocument->getCategoryId(), $comparison);
+        } elseif ($categoryDocument instanceof ObjectCollection) {
+            return $this
+                ->useCategoryDocumentQuery()
+                ->filterByPrimaryKeys($categoryDocument->getPrimaryKeys())
+                ->endUse();
+        } else {
+            throw new PropelException('filterByCategoryDocument() only accepts arguments of type \Thelia\Model\CategoryDocument or Collection');
+        }
+    }
+
+    /**
+     * Adds a JOIN clause to the query using the CategoryDocument relation
+     *
+     * @param     string $relationAlias optional alias for the relation
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return ChildCategoryQuery The current query, for fluid interface
+     */
+    public function joinCategoryDocument($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        $tableMap = $this->getTableMap();
+        $relationMap = $tableMap->getRelation('CategoryDocument');
+
+        // create a ModelJoin object for this join
+        $join = new ModelJoin();
+        $join->setJoinType($joinType);
+        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
+        if ($previousJoin = $this->getPreviousJoin()) {
+            $join->setPreviousJoin($previousJoin);
+        }
+
+        // add the ModelJoin to the current object
+        if ($relationAlias) {
+            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
+            $this->addJoinObject($join, $relationAlias);
+        } else {
+            $this->addJoinObject($join, 'CategoryDocument');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Use the CategoryDocument relation CategoryDocument object
+     *
+     * @see useQuery()
+     *
+     * @param     string $relationAlias optional alias for the relation,
+     *                                   to be used as main alias in the secondary query
+     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
+     *
+     * @return   \Thelia\Model\CategoryDocumentQuery A secondary query class using the current class as primary query
+     */
+    public function useCategoryDocumentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
+    {
+        return $this
+            ->joinCategoryDocument($relationAlias, $joinType)
+            ->useQuery($relationAlias ? $relationAlias : 'CategoryDocument', '\Thelia\Model\CategoryDocumentQuery');
     }
 
     /**

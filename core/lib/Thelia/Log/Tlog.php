@@ -54,7 +54,7 @@ class Tlog Implements LoggerInterface
     const ALERT                 = 700;
     const EMERGENCY             = 800;
     const MUET                  = PHP_INT_MAX;
-    
+
     protected $levels = array(
         100 => "DEBUG",
         200 => "INFO",
@@ -101,15 +101,16 @@ class Tlog Implements LoggerInterface
     public $dir_destinations = array();
 
     /**
-     * 
+     *
      */
     private function __construct(){}
 
     /**
-     * 
+     *
      * @return \Thelia\Log\Tlog
      */
-    public static function getInstance() {
+    public static function getInstance()
+    {
         if (self::$instance == false) {
             self::$instance = new Tlog();
 
@@ -149,7 +150,7 @@ class Tlog Implements LoggerInterface
     // -------------
 
     /**
-     * 
+     *
      * @param string $destinations
      */
     public function setDestinations($destinations)
@@ -162,11 +163,11 @@ class Tlog Implements LoggerInterface
             $this->loadDestinations($this->destinations, $classes_destinations);
         }
     }
-    
+
     /**
-     * 
+     *
      * change the debug level. Use Tlog constant : \Thelia\Log\Tlog::DEBUG set level to Debug
-     * 
+     *
      * @param int $level
      */
     public function setLevel($level)
@@ -221,26 +222,26 @@ class Tlog Implements LoggerInterface
     /**
      * Detailed debug information.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function debug($message, array $context = array())
     {
         $this->log(self::DEBUG, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of debug method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addDebug($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addDebug()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::DEBUG, $arg);
         }
@@ -251,54 +252,54 @@ class Tlog Implements LoggerInterface
      *
      * Example: User logs in, SQL logs.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function info($message, array $context = array())
     {
         $this->log(self::INFO, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of info method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addInfo($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addInfo()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::INFO, $arg);
         }
     }
-    
+
     /**
      * Normal but significant events.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function notice($message, array $context = array())
     {
         $this->log(self::NOTICE, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of notice method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addNotice($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addNotice()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::NOTICE, $arg);
         }
@@ -310,26 +311,26 @@ class Tlog Implements LoggerInterface
      * Example: Use of deprecated APIs, poor use of an API, undesirable things
      * that are not necessarily wrong.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function warning($message, array $context = array())
     {
         $this->log(self::WARNING, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of warning method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addWarning($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addWarning()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::WARNING, $arg);
         }
@@ -339,154 +340,156 @@ class Tlog Implements LoggerInterface
      * Runtime errors that do not require immediate action but should typically
      * be logged and monitored.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function error($message, array $context = array())
     {
         $this->log(self::ERROR, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of error method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addError($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addError()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::ERROR, $arg);
         }
     }
-    
+
     /**
-     * 
+     *
      * @see error()
      */
     public function err($message, array $context = array())
     {
         $this->error($message, $context);
     }
-    
+
     /**
      * Critical conditions.
      *
      * Example: Application component unavailable, unexpected exception.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function critical($message, array $context = array())
     {
         $this->log(self::CRITICAL, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of critical method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addCritical($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addCritical()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::CRITICAL, $arg);
         }
     }
-    
+
     /**
-     * 
+     *
      * @see critical()
      */
     public function crit($message, array $context = array())
     {
         $this->critical($message, $context);
     }
-    
+
     /**
      * Action must be taken immediately.
      *
      * Example: Entire website down, database unavailable, etc. This should
      * trigger the SMS alerts and wake you up.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function alert($message, array $context = array())
     {
         $this->log(self::ALERT, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of alert method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addAlert($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addAlert()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::ALERT, $arg);
         }
     }
-    
+
     /**
      * System is unusable.
      *
-     * @param string $message
-     * @param array $context
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
     public function emergency($message, array $context = array())
     {
         $this->log(self::EMERGENCY, $message, $context);
     }
-    
+
     /**
-     * 
+     *
      * Alias of emergency method. With this method you can put all parameter you want
-     * 
+     *
      * ex : Tlog::getInstance()->addEmergency($arg1, $arg2, $arg3);
-     * 
+     *
      */
     public function addEmergency()
     {
         $args = func_get_args();
-        
+
         foreach ($args as $arg) {
             $this->log(self::EMERGENCY, $arg);
         }
     }
-    
+
     /**
      * Logs with an arbitrary level.
      *
-     * @param mixed $level
-     * @param string $message
-     * @param array $context
+     * @param  mixed  $level
+     * @param  string $message
+     * @param  array  $context
      * @return null
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = array())
+    {
         if($this->level > $level || array_key_exists($level, $this->levels) === false)
+
             return;
-        
+
         $this->out($this->levels[$level], $message, $context);
     }
 
-    
+
 
     // Mode back office
     public static function SetBackOfficeMode($booleen)
@@ -497,10 +500,10 @@ class Tlog Implements LoggerInterface
     }
 
     /**
-     * 
+     *
      * final end method. Write log for each destination handler
-     * 
-     * @param string $res
+     *
+     * @param  string $res
      * @return void
      */
     public function write(&$res)
@@ -550,10 +553,10 @@ class Tlog Implements LoggerInterface
     }
 
     /**
-     * 
+     *
      * check if level is activated and control if current file is activated
-     * 
-     * @param int $level
+     *
+     * @param  int     $level
      * @return boolean
      */
     public function isActivated($level)
@@ -571,12 +574,12 @@ class Tlog Implements LoggerInterface
 
         return false;
     }
-    
+
     /**
-     * 
+     *
      * check if $file is in authorized files
-     * 
-     * @param string $file
+     *
+     * @param  string  $file
      * @return boolean
      */
     public function isActivedFile($file)
@@ -586,7 +589,6 @@ class Tlog Implements LoggerInterface
 
     /* -- Methodes privees ---------------------------------------- */
 
-    
     private function findOrigin()
     {
         $origine = array();
@@ -629,7 +631,7 @@ class Tlog Implements LoggerInterface
 
         return $origine;
     }
-    
+
     protected function interpolate($message, array $context = array())
     {
         // build a replacement array with braces around the context keys
@@ -645,7 +647,7 @@ class Tlog Implements LoggerInterface
     private function out($level, $message, array $context = array())
     {
         $text = '';
-        
+
         /*if (is_array($message)) {
             foreach ($message as $arg) {
                 $text .= is_scalar($arg) ? $arg : print_r($arg, true);
@@ -655,7 +657,7 @@ class Tlog Implements LoggerInterface
         } else {
             $text = $message;
         }
-         
+
         $text = $this->interpolate($text, $context);
 
         $origine = $this->findOrigin();

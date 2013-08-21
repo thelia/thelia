@@ -24,7 +24,6 @@
 namespace Thelia\Log;
 
 use Thelia\Model\Config;
-use Thelia\Model\ConfigDesc;
 use Thelia\Model\ConfigQuery;
 
 class TlogDestinationConfig
@@ -51,11 +50,9 @@ class TlogDestinationConfig
         $this->load();
     }
 
-    
     public function load()
     {
-        if (null === $config = ConfigQuery::create()->findOneByName($this->name))
-        {
+        if (null === $config = ConfigQuery::create()->findOneByName($this->name)) {
             $config = new Config();
             $config->setName($this->name);
             $config->setValue($this->default);
@@ -63,7 +60,7 @@ class TlogDestinationConfig
             $config->setSecured(1);
             $config->save();
         }
-        
+
         $this->value = $config->getValue();
     }
 }

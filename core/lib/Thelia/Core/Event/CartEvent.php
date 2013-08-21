@@ -23,21 +23,127 @@
 
 namespace Thelia\Core\Event;
 
-use Thelia\Core\HttpFoundation\Request;
+use Symfony\Component\EventDispatcher\Event;
 use Thelia\Model\Cart;
 
-class CartEvent extends ActionEvent {
-
+class CartEvent extends Event
+{
     protected $cart;
+    protected $quantity;
+    protected $append;
+    protected $newness;
+    protected $productSaleElementsId;
+    protected $product;
+    protected $cartItem;
 
-    public function __construct(Request $request, Cart $cart)
+    public function __construct(Cart $cart)
     {
-        parent::__construct($request);
         $this->cart = $cart;
     }
 
+    /**
+     * @param mixed $append
+     */
+    public function setAppend($append)
+    {
+        $this->append = $append;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAppend()
+    {
+        return $this->append;
+    }
+
+    /**
+     * @param mixed $cartItem
+     */
+    public function setCartItem($cartItem)
+    {
+        $this->cartItem = $cartItem;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCartItem()
+    {
+        return $this->cartItem;
+    }
+
+    /**
+     * @param mixed $newness
+     */
+    public function setNewness($newness)
+    {
+        $this->newness = $newness;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNewness()
+    {
+        return $this->newness;
+    }
+
+    /**
+     * @param mixed $product
+     */
+    public function setProduct($product)
+    {
+        $this->product = $product;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProduct()
+    {
+        return $this->product;
+    }
+
+    /**
+     * @param mixed $productSaleElementsId
+     */
+    public function setProductSaleElementsId($productSaleElementsId)
+    {
+        $this->productSaleElementsId = $productSaleElementsId;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getProductSaleElementsId()
+    {
+        return $this->productSaleElementsId;
+    }
+
+    /**
+     * @param mixed $quantity
+     */
+    public function setQuantity($quantity)
+    {
+        $this->quantity = $quantity;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQuantity()
+    {
+        return $this->quantity;
+    }
+
+    /**
+     * @return \Thelia\Model\Cart
+     */
     public function getCart()
     {
         return $this->cart;
     }
+
+
 }

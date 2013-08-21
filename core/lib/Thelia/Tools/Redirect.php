@@ -30,7 +30,7 @@ class Redirect
 
     public static function exec($url, $status = 302)
     {
-    	$response = new RedirectResponse($url, $status);
+        $response = new RedirectResponse($url, $status);
 
         $response->send();
         exit;

@@ -23,11 +23,10 @@
 
 namespace Thelia\Core\Event;
 
-
 use Thelia\Model\Category;
 
-class CategoryEvent extends InternalEvent {
-
+class CategoryEvent extends InternalEvent
+{
     public $category;
 
     public function __construct(Category $category)

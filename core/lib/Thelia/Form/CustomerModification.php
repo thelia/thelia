@@ -24,11 +24,9 @@
 namespace Thelia\Form;
 
 use Symfony\Component\Validator\Constraints;
-use Thelia\Model\Customer;
 
-
-class CustomerModification extends BaseForm {
-
+class CustomerModification extends BaseForm
+{
     /**
      *
      * in this function you add all the fields you need for your Form.
@@ -53,7 +51,7 @@ class CustomerModification extends BaseForm {
     {
 
         $this->formBuilder
-        	->add('update_logged_in_user', 'boolean') // In a front office context, update the in-memory logged-in user data
+            ->add('update_logged_in_user', 'boolean') // In a front office context, update the in-memory logged-in user data
             ->add("firstname", "text", array(
                 "constraints" => array(
                     new Constraints\NotBlank()

@@ -21,10 +21,8 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-
 namespace Thelia\Exception;
 
-
-class InvalidCartException extends \RuntimeException {
-
+class InvalidCartException extends \RuntimeException
+{
 }

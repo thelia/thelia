@@ -24,20 +24,14 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\CategoryQuery;
-use Thelia\Model\FeatureAvQuery;
-use Thelia\Model\FeatureQuery;
-use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -130,15 +124,15 @@ class Product extends BaseLoop
             $search->filterByRef($ref, Criteria::IN);
         }
 
-      	$category = $this->getCategory();
+          $category = $this->getCategory();
 
         if (!is_null($category)) {
             $categories = CategoryQuery::create()->filterById($category, Criteria::IN)->find();
 
             $depth = $this->getDepth();
 
-            if(null !== $depth) {
-                foreach(CategoryQuery::findAllChild($category, $depth) as $subCategory) {
+            if (null !== $depth) {
+                foreach (CategoryQuery::findAllChild($category, $depth) as $subCategory) {
                     $categories->prepend($subCategory);
                 }
             }
@@ -153,7 +147,7 @@ class Product extends BaseLoop
 
         if ($new === true) {
             $search->filterByNewness(1, Criteria::EQUAL);
-        } else if($new === false) {
+        } elseif ($new === false) {
             $search->filterByNewness(0, Criteria::EQUAL);
         }
 
@@ -161,7 +155,7 @@ class Product extends BaseLoop
 
         if ($promo === true) {
             $search->filterByPromo(1, Criteria::EQUAL);
-        } else if($promo === false) {
+        } elseif ($promo === false) {
             $search->filterByNewness(0, Criteria::EQUAL);
         }
 
@@ -173,7 +167,7 @@ class Product extends BaseLoop
 
         $min_price = $this->getMin_price();*/
 
-        //if(null !== $min_price) {
+        //if (null !== $min_price) {
             /**
              * Following should work but does not :
              *
@@ -190,7 +184,7 @@ class Product extends BaseLoop
 
         $max_price = $this->getMax_price();*/
 
-        //if(null !== $max_price) {
+        //if (null !== $max_price) {
             /**
              * Following should work but does not :
              *
@@ -207,13 +201,13 @@ class Product extends BaseLoop
 
         /*$min_weight = $this->getMin_weight();
 
-        if(null !== $min_weight) {
+        if (null !== $min_weight) {
             $search->filterByWeight($min_weight, Criteria::GREATER_EQUAL);
         }
 
         $max_weight = $this->getMax_weight();
 
-        if(null !== $max_weight) {
+        if (null !== $max_weight) {
             $search->filterByWeight($max_weight, Criteria::LESS_EQUAL);
         }*/
 
@@ -221,7 +215,7 @@ class Product extends BaseLoop
 
         if ($current === true) {
             $search->filterById($this->request->get("product_id"));
-        } elseif($current === false) {
+        } elseif ($current === false) {
             $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
         }
 
@@ -238,7 +232,7 @@ class Product extends BaseLoop
                 )->find(),
                 Criteria::IN
             );
-        } elseif($current_category === false) {
+        } elseif ($current_category === false) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
                     ProductCategoryQuery::create()->filterByProductId(
@@ -257,7 +251,7 @@ class Product extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
@@ -293,7 +287,7 @@ class Product extends BaseLoop
                 case "given_id":
                     if(null === $id)
                         throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
-                    foreach($id as $singleId) {
+                    foreach ($id as $singleId) {
                         $givenIdMatched = 'given_id_matched_' . $singleId;
                         $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
@@ -323,9 +317,9 @@ class Product extends BaseLoop
 
         $feature_available = $this->getFeature_available();
 
-        if(null !== $feature_available) {
-            foreach($feature_available as $feature => $feature_choice) {
-                foreach($feature_choice['values'] as $feature_av) {
+        if (null !== $feature_available) {
+            foreach ($feature_available as $feature => $feature_choice) {
+                foreach ($feature_choice['values'] as $feature_av) {
                     $featureAlias = 'fa_' . $feature;
                     if($feature_av != '*')
                         $featureAlias .= '_' . $feature_av;
@@ -337,7 +331,7 @@ class Product extends BaseLoop
 
                 /* format for mysql */
                 $sqlWhereString = $feature_choice['expression'];
-                if($sqlWhereString == '*') {
+                if ($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
                 } else {
                     $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
@@ -351,9 +345,9 @@ class Product extends BaseLoop
 
         $feature_values = $this->getFeature_values();
 
-        if(null !== $feature_values) {
-            foreach($feature_values as $feature => $feature_choice) {
-                foreach($feature_choice['values'] as $feature_value) {
+        if (null !== $feature_values) {
+            foreach ($feature_values as $feature => $feature_choice) {
+                foreach ($feature_choice['values'] as $feature_value) {
                     $featureAlias = 'fv_' . $feature;
                     if($feature_value != '*')
                         $featureAlias .= '_' . $feature_value;
@@ -365,7 +359,7 @@ class Product extends BaseLoop
 
                 /* format for mysql */
                 $sqlWhereString = $feature_choice['expression'];
-                if($sqlWhereString == '*') {
+                if ($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
                 } else {
                     $sqlWhereString = preg_replace('#([a-zA-Z0-9_\-]+)#', 'NOT ISNULL(`fv_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
@@ -398,18 +392,18 @@ class Product extends BaseLoop
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow->set("ID", $product->getId())
-	            ->set("REF",$product->getRef())
-	            ->set("TITLE",$product->getTitle())
-	            ->set("CHAPO", $product->getChapo())
-	            ->set("DESCRIPTION", $product->getDescription())
-	            ->set("POSTSCRIPTUM", $product->getPostscriptum())
-	            //->set("PRICE", $product->getPrice())
-	            //->set("PROMO_PRICE", $product->getPrice2())
-	            //->set("WEIGHT", $product->getWeight())
-	            //->set("PROMO", $product->getPromo())
-	            //->set("NEW", $product->getNewness())
-	            ->set("POSITION", $product->getPosition())
-			;
+                ->set("REF",$product->getRef())
+                ->set("TITLE",$product->getTitle())
+                ->set("CHAPO", $product->getChapo())
+                ->set("DESCRIPTION", $product->getDescription())
+                ->set("POSTSCRIPTUM", $product->getPostscriptum())
+                //->set("PRICE", $product->getPrice())
+                //->set("PROMO_PRICE", $product->getPrice2())
+                //->set("WEIGHT", $product->getWeight())
+                //->set("PROMO", $product->getPromo())
+                //->set("NEW", $product->getNewness())
+                ->set("POSITION", $product->getPosition())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

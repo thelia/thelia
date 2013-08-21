@@ -57,6 +57,16 @@ final class TheliaEvents
     const CUSTOMER_LOGIN  = "action.customer_login";
 
     /**
+     * sent on customer account creation
+     */
+    const CUSTOMER_CREATEACCOUNT = "action.createCustomer";
+
+    /**
+     * sent on customer account update
+     */
+    const CUSTOMER_UPDATEACCOUNT = "action.modifyCustomer";
+
+    /**
      * Sent before the logout of the administrator.
      */
     const ADMIN_LOGOUT = "action.admin_logout";
@@ -64,8 +74,6 @@ final class TheliaEvents
      * Sent once the administrator is successfully logged in.
      */
     const ADMIN_LOGIN  = "action.admin_login";
-
-
 
     /**
      * Sent once the customer creation form has been successfully validated, and before customer insertion in the database.
@@ -85,8 +93,6 @@ final class TheliaEvents
      * Sent just after a successful update of a customer in the database.
      */
     const AFTER_CHANGECUSTOMER 	= "action.after_changecustomer";
-
-
 
     /**
      * Sent once the category creation form has been successfully validated, and before category insertion in the database.
@@ -112,7 +118,6 @@ final class TheliaEvents
      */
     const AFTER_CHANGECATEGORY 	= "action.after_changecategory";
 
-
     /**
      * sent when a new existing cat id duplicated. This append when current customer is different from current cart
      */
@@ -121,7 +126,7 @@ final class TheliaEvents
     /**
      * sent when a new item is added to current cart
      */
-    const AFTER_CARTADDITEM = "cart.addItem";
+    const AFTER_CARTADDITEM = "cart.after.addItem";
 
     /**
      * sent when a cart item is modify
@@ -136,5 +141,18 @@ final class TheliaEvents
     /**
      * sent on modify article action
      */
-    const CART_CHANGEARTICLE = "action.changeArticle";
+    const CART_CHANGEITEM = "action.changeArticle";
+
+    const CART_DELETEITEM = "action.deleteArticle";
+
+    /**
+     * Sent on image processing
+     */
+    const IMAGE_PROCESS = "action.processImage";
+
+    /**
+     * Sent on cimage cache clear request
+     */
+    const IMAGE_CLEAR_CACHE = "action.clearImageCache";
+
 }

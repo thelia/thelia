@@ -41,3 +41,4 @@ abstract class BaseModule
     abstract public function destroy();
 
 }
+

@@ -25,10 +25,8 @@ namespace Thelia\Action;
 
 use Propel\Runtime\Exception\PropelException;
 use Symfony\Component\Config\Definition\Exception\Exception;
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Thelia\Core\Event\ActionEvent;
 use Thelia\Core\Event\CartEvent;
 use Thelia\Form\CartAdd;
 use Thelia\Model\ProductPrice;
@@ -36,7 +34,6 @@ use Thelia\Model\ProductPriceQuery;
 use Thelia\Model\CartItem;
 use Thelia\Model\CartItemQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Action\Exception\FormValidationException;
 
 /**
  *
@@ -52,53 +49,31 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * add an article in the current cart
      * @param \Thelia\Core\Event\CartEvent $event
      */
-    public function addArticle(CartEvent $event)
+    public function addItem(CartEvent $event)
     {
-        $request = $event->getRequest();
-        $message = null;
 
-        try {
-            $cartAdd = $this->getAddCartForm($request);
+        $cart = $event->getCart();
+        $newness = $event->getNewness();
+        $append = $event->getAppend();
+        $quantity = $event->getQuantity();
 
-            $form = $this->validateForm($cartAdd);
+        $productSaleElementsId = $event->getProductSaleElementsId();
+        $productId = $event->getProduct();
 
-            $cart = $event->getCart();
-            $newness = $form->get("newness")->getData();
-            $append = $form->get("append")->getData();
-            $quantity = $form->get("quantity")->getData();
+        $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
 
-            $productSaleElementsId = $form->get("product_sale_elements_id")->getData();
-            $productId = $form->get("product")->getData();
+        if ($cartItem === null || $newness) {
+            $productPrice = ProductPriceQuery::create()
+                ->filterByProductSaleElementsId($productSaleElementsId)
+                ->findOne();
 
-            $cartItem = $this->findItem($cart->getId(), $productId, $productSaleElementsId);
-
-            if ($cartItem === null || $newness) {
-                $productPrice = ProductPriceQuery::create()
-                    ->filterByProductSaleElementsId($productSaleElementsId)
-                    ->findOne()
-                ;
-
-                $this->addItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
-            }
-
-            if ($append && $cartItem !== null) {
-                $this->updateQuantity($cartItem, $quantity);
-            }
-
-        } catch (PropelException $e) {
-            \Thelia\Log\Tlog::getInstance()->error(sprintf("Failed to add item to cart with message : %s", $e->getMessage()));
-            $message = "Failed to add this article to your cart, please try again";
-        } catch (FormValidationException $e) {
-
-            $message = $e->getMessage();
-        }
-        if($message) {
-            // The form has errors, propagate it.
-            $this->propagateFormError($cartAdd, $message, $event);
+            $this->doAddItem($cart, $productId, $productSaleElementsId, $quantity, $productPrice);
         }
 
+        if ($append && $cartItem !== null) {
+            $this->updateQuantity($cartItem, $quantity);
+        }
     }
-
 
     /**
      *
@@ -106,20 +81,14 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Core\Event\CartEvent $event
      */
-    public function deleteArticle(CartEvent $event)
+    public function deleteItem(CartEvent $event)
     {
-        $request = $event->getRequest();
-
-        if (null !== $cartItemId = $request->get('cartItem')) {
+        if (null !== $cartItemId = $event->getCartItem()) {
             $cart = $event->getCart();
-            try {
-                $cartItem = CartItemQuery::create()
-                    ->filterByCartId($cart->getId())
-                    ->filterById($cartItemId)
-                    ->delete();
-            } catch (PropelException $e) {
-                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during deleting cartItem with message : %s", $e->getMessage()));
-            }
+            $cartItem = CartItemQuery::create()
+                ->filterByCartId($cart->getId())
+                ->filterById($cartItemId)
+                ->delete();
 
         }
     }
@@ -132,25 +101,18 @@ class Cart extends BaseAction implements EventSubscriberInterface
      *
      * @param \Thelia\Core\Event\CartEvent $event
      */
-    public function modifyArticle(CartEvent $event)
+    public function changeItem(CartEvent $event)
     {
-        $request = $event->getRequest();
+        if ((null !== $cartItemId = $event->getCartItem()) && (null !== $quantity = $event->getQuantity())) {
+            $cart = $event->getCart();
 
-        if (null !== $cartItemId = $request->get("cartItem") && null !== $quantity = $request->get("quantity")) {
+            $cartItem = CartItemQuery::create()
+                ->filterByCartId($cart->getId())
+                ->filterById($cartItemId)
+                ->findOne();
 
-            try {
-                $cart = $event->getCart($request);
-
-                $cartItem = CartItemQuery::create()
-                    ->filterByCartId($cart->getId())
-                    ->filterById($cartItemId)
-                    ->findOne();
-
-                if ($cartItem) {
-                    $this->updateQuantity($cartItem, $quantity);
-                }
-            } catch (PropelException $e) {
-                \Thelia\Log\Tlog::getInstance()->error(sprintf("error during updating cartItem with message : %s", $e->getMessage()));
+            if ($cartItem) {
+                $this->updateQuantity($cartItem, $quantity);
             }
         }
     }
@@ -178,24 +140,22 @@ class Cart extends BaseAction implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return array(
-            "action.addArticle" => array("addArticle", 128),
-            "action.deleteArticle" => array("deleteArticle", 128),
-            "action.changeArticle" => array("modifyArticle", 128),
+            "action.addArticle" => array("addItem", 128),
+            "action.deleteArticle" => array("deleteItem", 128),
+            "action.changeArticle" => array("changeItem", 128),
         );
     }
-
-
 
     /**
      * increase the quantity for an existing cartItem
      *
      * @param CartItem $cartItem
-     * @param float $quantity
+     * @param float    $quantity
      */
     protected function updateQuantity(CartItem $cartItem, $quantity)
     {
         $cartItem->setDisptacher($this->getDispatcher());
-        $cartItem->addQuantity($quantity)
+        $cartItem->updateQuantity($quantity)
             ->save();
     }
 
@@ -203,12 +163,12 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * try to attach a new item to an existing cart
      *
      * @param \Thelia\Model\Cart $cart
-     * @param int $productId
-     * @param int $productSaleElementsId
-     * @param float $quantity
-     * @param ProductPrice $productPrice
+     * @param int                $productId
+     * @param int                $productSaleElementsId
+     * @param float              $quantity
+     * @param ProductPrice       $productPrice
      */
-    protected function addItem(\Thelia\Model\Cart $cart, $productId, $productSaleElementsId, $quantity, ProductPrice $productPrice)
+    protected function doAddItem(\Thelia\Model\Cart $cart, $productId, $productSaleElementsId, $quantity, ProductPrice $productPrice)
     {
         $cartItem = new CartItem();
         $cartItem->setDisptacher($this->getDispatcher());
@@ -227,9 +187,9 @@ class Cart extends BaseAction implements EventSubscriberInterface
      * find a specific record in CartItem table using the Cart id, the product id
      * and the product_sale_elements id
      *
-     * @param int $cartId
-     * @param int $productId
-     * @param int $productSaleElementsId
+     * @param  int           $cartId
+     * @param  int           $productId
+     * @param  int           $productSaleElementsId
      * @return ChildCartItem
      */
     protected function findItem($cartId, $productId, $productSaleElementsId)
@@ -239,30 +199,6 @@ class Cart extends BaseAction implements EventSubscriberInterface
             ->filterByProductId($productId)
             ->filterByProductSaleElementsId($productSaleElementsId)
             ->findOne();
-    }
-
-    /**
-     * Find the good way to construct the cart form
-     *
-     * @param Request $request
-     * @return CartAdd
-     */
-    private function getAddCartForm(Request $request)
-    {
-        if ($request->isMethod("post")) {
-            $cartAdd = new CartAdd($request);
-        } else {
-            $cartAdd = new CartAdd(
-                $request,
-                "form",
-                array(),
-                array(
-                    'csrf_protection'   => false,
-                )
-            );
-        }
-
-        return $cartAdd;
     }
 
 }

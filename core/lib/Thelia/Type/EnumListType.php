@@ -51,8 +51,9 @@ class EnumListType implements TypeInterface
 
     public function isValid($values)
     {
-        foreach(explode(',', $values) as $value) {
+        foreach (explode(',', $values) as $value) {
             if(!$this->isSingleValueValid($value))
+
                 return false;
         }
 

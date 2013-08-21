@@ -35,62 +35,67 @@ use Thelia\Form\BaseForm;
  */
 class ParserContext implements \IteratorAggregate
 {
-	private $store = array();
+    private $store = array();
 
-	public function __construct(Request $request) {
+    public function __construct(Request $request)
+    {
+        // Setup basic variables
+        $this
+            ->set('BASE_URL'		, ConfigQuery::read('base_url', '/'))
+            ->set('INDEX_PAGE'		, URL::getIndexPage())
+            ->set('RETURN_TO_URL'	, URL::absoluteUrl($request->getSession()->getReturnToUrl()))
+            ->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
+        ;
+    }
 
-		// Setup basic variables
-		$this
-			->set('BASE_URL'		, ConfigQuery::read('base_url', '/'))
-			->set('INDEX_PAGE'		, URL::getIndexPage())
-			->set('RETURN_TO_URL'	, URL::absoluteUrl($request->getSession()->getReturnToUrl()))
-			->set('THELIA_VERSION'	, ConfigQuery::read('thelia_version', 'undefined'))
-		;
-	}
+    // -- Error form -----------------------------------------------------------
 
-	// -- Error form -----------------------------------------------------------
+    /**
+     * @param BaseForm $form the errored form
+     */
+    public function setErrorForm(BaseForm $form)
+    {
+        $this->set('error_form', $form);
+    }
 
-	/**
-	 * @param BaseForm $form the errored form
-	 */
-	public function setErrorForm(BaseForm $form)
-	{
-		$this->set('error_form', $form);
-	}
+    public function setGeneralError($error)
+    {
+        $this->set('general_error', $error);
+    }
 
-	public function getErrorForm()
-	{
-		return $this->get('error_form', null);
-	}
+    public function getErrorForm()
+    {
+        return $this->get('error_form', null);
+    }
 
-	public function clearErrorForm()
-	{
-		return $this->remove('error_form');
-	}
+    public function clearErrorForm()
+    {
+        return $this->remove('error_form');
+    }
 
-	// -- Internal table manipulation ------------------------------------------
+    // -- Internal table manipulation ------------------------------------------
 
-	public function set($name, $value)
-	{
-		$this->store[$name] = $value;
+    public function set($name, $value)
+    {
+        $this->store[$name] = $value;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function remove($name)
-	{
-		unset($this->store[$name]);
+    public function remove($name)
+    {
+        unset($this->store[$name]);
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function get($name, $default = null)
-	{
-		return isset($this->store[$name]) ? $this->store[$name] : $default;
-	}
+    public function get($name, $default = null)
+    {
+        return isset($this->store[$name]) ? $this->store[$name] : $default;
+    }
 
-	public function getIterator()
-	{
-		return new \ArrayIterator( $this->store );
-	}
+    public function getIterator()
+    {
+        return new \ArrayIterator( $this->store );
+    }
 }

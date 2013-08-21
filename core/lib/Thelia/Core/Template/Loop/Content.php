@@ -24,16 +24,13 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
-use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
-use Thelia\Model\Base\FeatureContentQuery;
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\ContentFolderQuery;
@@ -69,7 +66,7 @@ class Content extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random', 'given_id'))
+                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse', 'random', 'given_id'))
                 ),
                 'alpha'
             ),
@@ -101,8 +98,8 @@ class Content extends BaseLoop
 
             $depth = $this->getDepth();
 
-            if(null !== $depth) {
-                foreach(FolderQuery::findAllChild($folder, $depth) as $subFolder) {
+            if (null !== $depth) {
+                foreach (FolderQuery::findAllChild($folder, $depth) as $subFolder) {
                     $folders->prepend($subFolder);
                 }
             }
@@ -117,7 +114,7 @@ class Content extends BaseLoop
 
         if ($current === true) {
             $search->filterById($this->request->get("content_id"));
-        } elseif($current === false) {
+        } elseif ($current === false) {
             $search->filterById($this->request->get("content_id"), Criteria::NOT_IN);
         }
 
@@ -134,7 +131,7 @@ class Content extends BaseLoop
                 )->find(),
                 Criteria::IN
             );
-        } elseif($current_folder === false) {
+        } elseif ($current_folder === false) {
             $search->filterByFolder(
                 FolderQuery::create()->filterByContent(
                     ContentFolderQuery::create()->filterByContentId(
@@ -153,12 +150,12 @@ class Content extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
                     break;
-                case "alpha_reverse":
+                case "alpha-reverse":
                     $search->addDescendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
                     break;
                 case "manual":
@@ -174,7 +171,7 @@ class Content extends BaseLoop
                 case "given_id":
                     if(null === $id)
                         throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
-                    foreach($id as $singleId) {
+                    foreach ($id as $singleId) {
                         $givenIdMatched = 'given_id_matched_' . $singleId;
                         $search->withColumn(ContentTableMap::ID . "='$singleId'", $givenIdMatched);
                         $search->orderBy($givenIdMatched, Criteria::DESC);
@@ -223,12 +220,12 @@ class Content extends BaseLoop
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow->set("ID", $content->getId())
-	            ->set("TITLE",$content->getTitle())
-	            ->set("CHAPO", $content->getChapo())
-	            ->set("DESCRIPTION", $content->getDescription())
-	            ->set("POSTSCRIPTUM", $content->getPostscriptum())
-	            ->set("POSITION", $content->getPosition())
-			;
+                ->set("TITLE",$content->getTitle())
+                ->set("CHAPO", $content->getChapo())
+                ->set("DESCRIPTION", $content->getDescription())
+                ->set("POSTSCRIPTUM", $content->getPostscriptum())
+                ->set("POSITION", $content->getPosition())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }

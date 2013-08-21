@@ -25,54 +25,53 @@ namespace Thelia\Core\Template\Smarty\Plugins;
 
 use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
 use Thelia\Core\Template\Smarty\AbstractSmartyPlugin;
-use Thelia\Core\Template\Smarty\Assets\SmartyAssetsManager;
 use Thelia\Core\Security\SecurityContext;
 use Thelia\Core\Security\Exception\AuthenticationException;
 
 class Security extends AbstractSmartyPlugin
 {
-	private $securityContext;
+    private $securityContext;
 
-	public function __construct(SecurityContext $securityContext)
-	{
-		$this->securityContext = $securityContext;
-	}
+    public function __construct(SecurityContext $securityContext)
+    {
+        $this->securityContext = $securityContext;
+    }
 
     /**
      * Process security check function
      *
-     * @param  array $params
+     * @param  array   $params
      * @param  unknown $smarty
-     * @return string no text is returned.
+     * @return string  no text is returned.
      */
     public function checkAuthFunction($params, &$smarty)
     {
-    	// Context: 'front' or 'admin'
-   		$context = $this->getNormalizedParam($params, 'context');
+        // Context: 'front' or 'admin'
+           $context = $this->getNormalizedParam($params, 'context');
 
-   		$this->securityContext->setContext($context);
+           $this->securityContext->setContext($context);
 
-   		$roles = $this->_explode($this->getParam($params, 'roles'));
-   		$permissions = $this->_explode($this->getParam($params, 'permissions'));
+           $roles = $this->_explode($this->getParam($params, 'roles'));
+           $permissions = $this->_explode($this->getParam($params, 'permissions'));
 
-   		if (! $this->securityContext->isGranted($roles, $permissions)) {
+           if (! $this->securityContext->isGranted($roles, $permissions)) {
 
-   			$ex = new AuthenticationException(
-   					sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
-   							implode(',', $roles), implode(',', $permissions), $context
-   					)
-   			);
+               $ex = new AuthenticationException(
+                       sprintf("User not granted for roles '%s', permissions '%s' in context '%s'.",
+                               implode(',', $roles), implode(',', $permissions), $context
+                       )
+               );
 
-   			$loginTpl = $this->getParam($params, 'login_tpl');
+               $loginTpl = $this->getParam($params, 'login_tpl');
 
-   			if (null != $loginTpl) {
-   				$ex->setLoginTemplate($loginTpl);
-   			}
+               if (null != $loginTpl) {
+                   $ex->setLoginTemplate($loginTpl);
+               }
 
-   			throw $ex;
-   		}
+               throw $ex;
+           }
 
-   		return '';
+           return '';
      }
 
     /**

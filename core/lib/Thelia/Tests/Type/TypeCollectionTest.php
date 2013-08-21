@@ -63,10 +63,9 @@ class TypeTest extends \PHPUnit_Framework_TestCase
             new Type\FloatType()
         );
 
-
         $types = \PHPUnit_Framework_Assert::readAttribute($collection, 'types');
 
-        foreach($collection as $key => $type) {
+        foreach ($collection as $key => $type) {
             $this->assertEquals(
                 $type,
                 $types[$key]

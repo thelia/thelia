@@ -35,24 +35,24 @@ use Thelia\Core\Template\Smarty\SmartyPluginDescriptor;
  */
 class DataAccessFunctions extends AbstractSmartyPlugin
 {
-	private $securityContext;
-	protected $parserContext;
+    private $securityContext;
+    protected $parserContext;
 
-	public function __construct(SecurityContext $securityContext, ParserContext $parserContext)
-	{
-		$this->securityContext = $securityContext;
-	}
+    public function __construct(SecurityContext $securityContext, ParserContext $parserContext)
+    {
+        $this->securityContext = $securityContext;
+    }
 
     /**
      * Provides access to the current logged administrator attributes using the accessors.
      *
-     * @param  array $params
+     * @param  array   $params
      * @param  unknown $smarty
-     * @return string the value of the requested attribute
+     * @return string  the value of the requested attribute
      */
     public function adminDataAccess($params, &$smarty)
     {
-     	return $this->userDataAccess("Admin User", SecurityContext::CONTEXT_BACK_OFFICE, $params);
+         return $this->userDataAccess("Admin User", SecurityContext::CONTEXT_BACK_OFFICE, $params);
     }
 
      /**
@@ -64,38 +64,37 @@ class DataAccessFunctions extends AbstractSmartyPlugin
       */
      public function customerDataAccess($params, &$smarty)
      {
-     	return $this->userDataAccess("Customer User", SecurityContext::CONTEXT_FRONT_OFFICE, $params);
+         return $this->userDataAccess("Customer User", SecurityContext::CONTEXT_FRONT_OFFICE, $params);
      }
-
 
     /**
      * Provides access to user attributes using the accessors.
      *
-     * @param  array $params
-     * @param  unknown $smarty
-     * @return string the value of the requested attribute
+     * @param  array                    $params
+     * @param  unknown                  $smarty
+     * @return string                   the value of the requested attribute
      * @throws InvalidArgumentException if the object does not have the requested attribute.
      */
      protected function userDataAccess($objectLabel, $context, $params)
      {
-     	$attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
+         $attribute = $this->getNormalizedParam($params, array('attribute', 'attrib', 'attr'));
 
-     	if (! empty($attribute)) {
-     		$user = $this->securityContext->setContext($context)->getUser();
+         if (! empty($attribute)) {
+             $user = $this->securityContext->setContext($context)->getUser();
 
-     		if (null != $user) {
-     			$getter = sprintf("get%s", ucfirst($attribute));
+             if (null != $user) {
+                 $getter = sprintf("get%s", ucfirst($attribute));
 
-     			if (method_exists($user, $getter)) {
-     				return $user->$getter();
-     			}
+                 if (method_exists($user, $getter)) {
+                     return $user->$getter();
+                 }
 
-     			throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", $objectLabel, $attribute));
+                 throw new \InvalidArgumentException(sprintf("%s has no '%s' attribute", $objectLabel, $attribute));
 
-     		}
-     	}
+             }
+         }
 
-     	return '';
+         return '';
      }
     /**
      * Define the various smarty plugins hendled by this class

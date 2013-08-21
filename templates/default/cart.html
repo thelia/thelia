@@ -3,7 +3,7 @@
 <h1>{intl l='cart'}</h1>
 <ul>
 {loop name="cart" type="cart"}
-    <li>Item {$LOOP_COUNT}/{$LOOP_TOTAL} : #TITLE - quantity : #QUANTITY</li>
+    <li>Item {$LOOP_COUNT}/{$LOOP_TOTAL} : #ITEM_ID #TITLE - quantity : #QUANTITY</li>
 {/loop}
 </ul>
 

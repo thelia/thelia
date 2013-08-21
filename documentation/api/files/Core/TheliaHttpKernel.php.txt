@@ -131,17 +131,17 @@ class TheliaHttpKernel extends HttpKernel
     }
 
     /**
-     * @param Request $request
+     * @param  Request                 $request
      * @return null|\Thelia\Model\Lang
      */
     protected function detectLang(Request $request)
     {
         $lang = null;
         //first priority => lang parameter present in request (get or post)
-        if($request->query->has("lang")) {
+        if ($request->query->has("lang")) {
             $lang = Model\LangQuery::create()->findOneByCode($request->query->get("lang"));
 
-            if(is_null($lang)) {
+            if (is_null($lang)) {
                 return;
             }
 

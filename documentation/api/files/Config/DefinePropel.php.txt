@@ -26,9 +26,8 @@ namespace Thelia\Config;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-
-class DefinePropel {
-
+class DefinePropel
+{
     private $processorConfig;
 
     public function __construct(ConfigurationInterface $configuration, array $propelConf)
@@ -40,6 +39,7 @@ class DefinePropel {
     public function getConfig()
     {
         $connection = $this->processorConfig["connection"];
+
         return $conf = array(
             "dsn" => $connection["dsn"],
             "user" => $connection["user"],
@@ -48,3 +48,4 @@ class DefinePropel {
         );
     }
 }
+

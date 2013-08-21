@@ -22,9 +22,8 @@
 /*************************************************************************************/
 namespace Thelia\Controller\Front;
 
-
 use Thelia\Controller\BaseController;
 
-class BaseFrontController extends BaseController {
-
+class BaseFrontController extends BaseController
+{
 }

@@ -29,11 +29,12 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 class Translation extends AbstractSmartyPlugin
 {
-	protected $translator;
+    protected $translator;
 
-	public function __construct(TranslatorInterface $translator) {
-		$this->translator = $translator;
-	}
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
+    }
 
     /**
      * Process translate function
@@ -44,15 +45,15 @@ class Translation extends AbstractSmartyPlugin
      */
     public function translate($params, &$smarty)
     {
-    	// All parameters other than 'l' are supposed to be variables. Build an array of var => value pairs
-    	// and pass it to the translator
-    	$vars = array();
+        // All parameters other than 'l' are supposed to be variables. Build an array of var => value pairs
+        // and pass it to the translator
+        $vars = array();
 
-    	foreach($params as $name => $value) {
-    		if ($name != 'l') $vars["%$name"] = $value;
-    	}
+        foreach ($params as $name => $value) {
+            if ($name != 'l') $vars["%$name"] = $value;
+        }
 
-    	return $this->translator->trans($this->getParam($params, 'l'), $vars);
+        return $this->translator->trans($this->getParam($params, 'l'), $vars);
     }
 
     /**

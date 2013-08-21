@@ -99,10 +99,9 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
             )
         );
 
-
         $arguments = \PHPUnit_Framework_Assert::readAttribute($collection, 'arguments');
 
-        foreach($collection as $key => $argument) {
+        foreach ($collection as $key => $argument) {
             $this->assertEquals(
                 $argument,
                 $arguments[$key]

@@ -22,11 +22,10 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-use Propel\Runtime\ActiveQuery\Criteria;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\ExecutionContextInterface;
-use Thelia\Action\Exception\StockNotFoundException;
-use Thelia\Action\Exception\ProductNotFoundException;
+use Thelia\Form\Exception\StockNotFoundException;
+use Thelia\Form\Exception\ProductNotFoundException;
 use Thelia\Model\ProductSaleElementsQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Model\ProductQuery;

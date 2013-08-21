@@ -21,18 +21,18 @@
 /*                                                                                   */
 /*************************************************************************************/
 
-namespace Thelia\Admin\Controller;
+namespace Thelia\Controller\Admin;
 
-class AdminController extends BaseAdminController {
-
+class AdminController extends BaseAdminController
+{
     public function indexAction()
     {
-    	return $this->render("home");
+        return $this->render("home");
     }
 
     public function processAction()
     {
-    	echo "not yet coded !";
-    	exit();
+        echo "not yet coded !";
+        exit();
     }
 }

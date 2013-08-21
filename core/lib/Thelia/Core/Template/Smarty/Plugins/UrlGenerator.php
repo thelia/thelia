@@ -37,25 +37,24 @@ class UrlGenerator extends AbstractSmartyPlugin
         $this->request = $request;
     }
 
-	/**
+    /**
      * Process url generator function
      *
-     * @param  array $params
+     * @param  array   $params
      * @param  unknown $smarty
-     * @return string no text is returned.
+     * @return string  no text is returned.
      */
     public function generateUrlFunction($params, &$smarty)
     {
-    	// the path to process
-   		$path = $this->getParam($params, 'path');
+        // the path to process
+           $path = $this->getParam($params, 'path');
 
-   		$target = $this->getParam($params, 'target', null);
+           $target = $this->getParam($params, 'target', null);
 
-   		$url = URL::absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
+           $url = URL::absoluteUrl($path, $this->getArgsFromParam($params, array('path', 'target')));
 
-   		if ($target != null) $url .= '#'.$target;
-
-   		return $url;
+           if ($target != null) $url .= '#'.$target;
+           return $url;
      }
 
      /**
@@ -67,7 +66,7 @@ class UrlGenerator extends AbstractSmartyPlugin
       */
      public function generateFrontViewUrlFunction($params, &$smarty)
      {
-     	return $this->generateViewUrlFunction($params, false);
+         return $this->generateViewUrlFunction($params, false);
      }
 
      /**
@@ -79,22 +78,21 @@ class UrlGenerator extends AbstractSmartyPlugin
       */
      public function generateAdminViewUrlFunction($params, &$smarty)
      {
-     	return $this->generateViewUrlFunction($params, true);
+         return $this->generateViewUrlFunction($params, true);
      }
 
      protected function generateViewUrlFunction($params, $forAdmin)
      {
-     	// the view name (without .html)
-     	$view = $this->getParam($params,'view');
+         // the view name (without .html)
+         $view = $this->getParam($params,'view');
 
-      	// the related action (optionale)
-     	$action = $this->getParam($params, 'action');
+          // the related action (optionale)
+         $action = $this->getParam($params, 'action');
 
-     	$args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
+         $args = $this->getArgsFromParam($params, array('view', 'action', 'target'));
 
-     	if (! empty($action)) $args['action'] = $action;
-
-     	return $forAdmin ? URL::adminViewUrl($view, $args) : URL::viewUrl($view, $args);
+         if (! empty($action)) $args['action'] = $action;
+         return $forAdmin ? URL::adminViewUrl($view, $args) : URL::viewUrl($view, $args);
      }
 
      /**
@@ -103,18 +101,18 @@ class UrlGenerator extends AbstractSmartyPlugin
       * @param array $params Smarty function params
       * @return array the parameters array (either emply, of valued)
       */
-     private function getArgsFromParam($params, $exclude = array()) {
+     private function getArgsFromParam($params, $exclude = array())
+     {
+         $pairs = array();
 
-     	$pairs = array();
+           foreach ($params as $name => $value) {
 
-   		foreach($params as $name => $value) {
+               if (in_array($name, $exclude)) continue;
 
-   			if (in_array($name, $exclude)) continue;
+               $pairs[$name] = $value;
+           }
 
-   			$pairs[$name] = $value;
-   		}
-
-   		return $pairs;
+           return $pairs;
      }
 
     /**

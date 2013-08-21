@@ -25,13 +25,9 @@ namespace Thelia\Core\Template\Loop;
 
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
-use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-
-use Thelia\Type\TypeCollection;
-use Thelia\Type;
 
 /**
  *
@@ -53,7 +49,7 @@ class Order extends BaseLoop
      */
     public function exec(&$pagination)
     {
-    	// TODO : a coder !
+        // TODO : a coder !
         return new LoopResult();
     }
 }

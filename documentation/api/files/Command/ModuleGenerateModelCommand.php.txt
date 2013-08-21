@@ -23,18 +23,16 @@
 
 namespace Thelia\Command;
 
-
 use Propel\Generator\Command\ModelBuildCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
-class ModuleGenerateModelCommand extends BaseModuleGenerate {
-
+class ModuleGenerateModelCommand extends BaseModuleGenerate
+{
     protected function configure()
     {
         $this
@@ -124,7 +122,7 @@ class ModuleGenerateModelCommand extends BaseModuleGenerate {
             }
         }
 
-
     }
 
 }
+

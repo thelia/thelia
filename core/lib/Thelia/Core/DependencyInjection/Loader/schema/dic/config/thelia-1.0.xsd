@@ -16,6 +16,7 @@
             <xsd:element name="parameters" type="parameters"/>
             <xsd:element name="commands" type="commands"/>
             <xsd:element name="forms" type="forms" />
+            <xsd:element name="routing" type="routing" />
         </xsd:choice>
     </xsd:complexType>
 
@@ -53,6 +54,16 @@
             <xsd:enumeration value="exception" />
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:complexType name="routing">
+        <xsd:choice minOccurs="0" maxOccurs="unbounded">
+            <xsd:element name="file" type="file"/>
+        </xsd:choice>
+    </xsd:complexType>
+
+    <xsd:complexType name="file">
+        <xsd:attribute name="path" type="xsd:string" use="required" />
+    </xsd:complexType>
 
     <xsd:complexType name="loops">
         <xsd:choice minOccurs="0" maxOccurs="unbounded" >

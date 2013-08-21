@@ -23,7 +23,6 @@
 
 namespace Thelia\Core\Event\Internal;
 
-
 use Symfony\Component\EventDispatcher\Event;
 
 /**
@@ -32,6 +31,6 @@ use Symfony\Component\EventDispatcher\Event;
  * Class InternalEvent
  * @package Thelia\Core\Event
  */
-abstract class InternalEvent extends Event {
-
+abstract class InternalEvent extends Event
+{
 }

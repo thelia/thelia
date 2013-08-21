@@ -30,7 +30,6 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
-use Thelia\Log\Tlog;
 
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
@@ -95,7 +94,7 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
-		$id = $this->getId();
+        $id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
@@ -107,15 +106,13 @@ class Category extends BaseLoop
             $search->filterByParent($parent);
         }
 
-
-		$current = $this->getCurrent();
+        $current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("category_id"));
         } elseif ($current === false) {
             $search->filterById($this->request->get("category_id"), Criteria::NOT_IN);
         }
-
 
          $exclude = $this->getExclude();
 
@@ -124,11 +121,11 @@ class Category extends BaseLoop
         }
 
         if ($this->getVisible() != BooleanOrBothType::ANY)
-        	$search->filterByVisible($this->getVisible() ? 1 : 0);
+            $search->filterByVisible($this->getVisible() ? 1 : 0);
 
         $orders  = $this->getOrder();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
                     $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
@@ -171,27 +168,26 @@ class Category extends BaseLoop
 
             if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
 
-
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
-            	->set("ID", $category->getId())
-            	->set("TITLE",$category->getTitle())
-	            ->set("CHAPO", $category->getChapo())
-	            ->set("DESCRIPTION", $category->getDescription())
-	            ->set("POSTSCRIPTUM", $category->getPostscriptum())
-	            ->set("PARENT", $category->getParent())
-	            ->set("URL", $category->getUrl())
-	            ->set("PRODUCT_COUNT", $category->countChild())
-	            ->set("VISIBLE", $category->getVisible() ? "1" : "0")
-	            ->set("POSITION", $category->getPosition())
+                ->set("ID", $category->getId())
+                ->set("TITLE",$category->getTitle())
+                ->set("CHAPO", $category->getChapo())
+                ->set("DESCRIPTION", $category->getDescription())
+                ->set("POSTSCRIPTUM", $category->getPostscriptum())
+                ->set("PARENT", $category->getParent())
+                ->set("URL", $category->getUrl())
+                ->set("PRODUCT_COUNT", $category->countChild())
+                ->set("VISIBLE", $category->getVisible() ? "1" : "0")
+                ->set("POSITION", $category->getPosition())
 
-	            ->set("CREATE_DATE", $category->getCreatedAt())
-	            ->set("UPDATE_DATE", $category->getUpdatedAt())
-	            ->set("VERSION", $category->getVersion())
-	            ->set("VERSION_DATE", $category->getVersionCreatedAt())
-	            ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
-			;
+                ->set("CREATE_DATE", $category->getCreatedAt())
+                ->set("UPDATE_DATE", $category->getUpdatedAt())
+                ->set("VERSION", $category->getVersion())
+                ->set("VERSION_DATE", $category->getVersionCreatedAt())
+                ->set("VERSION_AUTHOR", $category->getVersionCreatedBy())
+            ;
 
             $loopResult->addRow($loopResultRow);
         }
@@ -199,3 +195,4 @@ class Category extends BaseLoop
         return $loopResult;
     }
 }
+

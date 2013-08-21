@@ -196,6 +196,7 @@ class Thelia extends Kernel
 
         $parameters["thelia.root_dir"] = THELIA_ROOT;
         $parameters["thelia.core_dir"] = THELIA_ROOT . "core/lib/Thelia";
+        $parameters["thelia.module_dir"] = THELIA_MODULE_DIR;
 
         return $parameters;
     }

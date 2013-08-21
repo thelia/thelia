@@ -22,15 +22,11 @@
 /*************************************************************************************/
 namespace Thelia\Form;
 
-
-use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Email;
 
-class CustomerLogin extends BaseForm {
-
+class CustomerLogin extends BaseForm
+{
     protected function buildForm()
     {
         $this->formBuilder
@@ -42,7 +38,7 @@ class CustomerLogin extends BaseForm {
             ))
             ->add("password", "password", array(
                 "constraints" => array(
-                	new NotBlank()
+                    new NotBlank()
                 )
             ))
             ->add("remember_me", "checkbox")

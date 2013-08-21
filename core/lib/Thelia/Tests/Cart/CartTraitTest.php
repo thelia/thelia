@@ -23,13 +23,10 @@
 namespace Thelia\Tests\Cart\CartTraitTest;
 
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
-use Thelia\Core\Event\DefaultActionEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Thelia\Core\HttpFoundation\Session\Session;
 use Thelia\Model\Cart;
 use Thelia\Model\Customer;
-use Thelia\Model\ProductQuery;
-use Thelia\Model\ProductSaleElementsQuery;
 
 /**
  * phpunit 3.8 needed for mcking a Trait and there is conflict with php version.
@@ -180,7 +177,6 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
 
         $request = $this->request;
 
-
         //create a fake customer just for test. If not persists test fails !
         $customer = new Customer();
         $customer->setFirstname("john");
@@ -218,7 +214,6 @@ class CartTraitTest extends \PHPUnit_Framework_TestCase
         $cartTrait = $this->cartTrait;
 
         $request = $this->request;
-
 
         //create a fake customer just for test. If not persists test fails !
         $customer = new Customer();
