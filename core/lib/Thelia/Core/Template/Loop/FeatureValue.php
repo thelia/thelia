@@ -35,6 +35,7 @@ use Thelia\Log\Tlog;
 
 use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\FeatureAvQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -132,7 +133,12 @@ class FeatureValue extends BaseLoop
 
             $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault());
 
-            $featureAvailability = $featureValue->getFeatureAv();
+            $featureAvailability = null;
+            if($featureValue->getFeatureAvId() !== null) {
+                $featureAvailability = FeatureAvQuery::create()
+                    ->joinWithI18n('fr_FR')
+                    ->findPk($featureValue->getFeatureAvId());
+            }
 
             $loopResultRow->set("TITLE", ($featureAvailability === null ? '' : $featureAvailability->getTitle()));
             $loopResultRow->set("CHAPO", ($featureAvailability === null ? '' : $featureAvailability->getChapo()));

@@ -41,7 +41,15 @@ try {
         ->find();
     $feature->delete();
 
+    $feature = Thelia\Model\FeatureI18nQuery::create()
+        ->find();
+    $feature->delete();
+
     $featureAv = Thelia\Model\FeatureAvQuery::create()
+        ->find();
+    $featureAv->delete();
+
+    $featureAv = Thelia\Model\FeatureAvI18nQuery::create()
         ->find();
     $featureAv->delete();
 
@@ -49,7 +57,15 @@ try {
         ->find();
     $attribute->delete();
 
+    $attribute = Thelia\Model\AttributeI18nQuery::create()
+        ->find();
+    $attribute->delete();
+
     $attributeAv = Thelia\Model\AttributeAvQuery::create()
+        ->find();
+    $attributeAv->delete();
+
+    $attributeAv = Thelia\Model\AttributeAvI18nQuery::create()
         ->find();
     $attributeAv->delete();
 
@@ -57,7 +73,15 @@ try {
         ->find();
     $category->delete();
 
+    $category = Thelia\Model\CategoryI18nQuery::create()
+        ->find();
+    $category->delete();
+
     $product = Thelia\Model\ProductQuery::create()
+        ->find();
+    $product->delete();
+
+    $product = Thelia\Model\ProductI18nQuery::create()
         ->find();
     $product->delete();
 
@@ -65,29 +89,19 @@ try {
         ->find();
     $customer->delete();
 
-    $customer = new Thelia\Model\Customer();
-    $customer->createOrUpdate(
-        1,
-        "thelia",
-        "thelia",
-        "5 rue rochon",
-        "",
-        "",
-        "0102030405",
-        "0601020304",
-        "63000",
-        "clermont-ferrand",
-        64,
-        "test@thelia.net",
-        "azerty"
-    );
-
-
     $folder = Thelia\Model\FolderQuery::create()
         ->find();
     $folder->delete();
 
+    $folder = Thelia\Model\FolderI18nQuery::create()
+        ->find();
+    $folder->delete();
+
     $content = Thelia\Model\ContentQuery::create()
+        ->find();
+    $content->delete();
+
+    $content = Thelia\Model\ContentI18nQuery::create()
         ->find();
     $content->delete();
 
@@ -105,15 +119,32 @@ try {
 
     $stmt = $con->prepare("SET foreign_key_checks = 1");
     $stmt->execute();
-    
+
+    //customer
+    $customer = new Thelia\Model\Customer();
+    $customer->createOrUpdate(
+        1,
+        "thelia",
+        "thelia",
+        "5 rue rochon",
+        "",
+        "",
+        "0102030405",
+        "0601020304",
+        "63000",
+        "clermont-ferrand",
+        64,
+        "test@thelia.net",
+        "azerty"
+    );
+
     //features and features_av
     $featureList = array();
     for($i=0; $i<4; $i++) {
         $feature = new Thelia\Model\Feature();
         $feature->setVisible(rand(1, 10)>7 ? 0 : 1);
         $feature->setPosition($i);
-        $feature->setTitle($faker->text(20));
-        $feature->setDescription($faker->text(50));
+        setI18n($faker, $feature);
 
         $feature->save();
         $featureId = $feature->getId();
@@ -123,8 +154,7 @@ try {
             $featureAv = new Thelia\Model\FeatureAv();
             $featureAv->setFeature($feature);
             $featureAv->setPosition($j);
-            $featureAv->setTitle($faker->text(20));
-            $featureAv->setDescription($faker->text(255));
+            setI18n($faker, $featureAv);
 
             $featureAv->save();
             $featureList[$featureId][] = $featureAv->getId();
@@ -136,8 +166,7 @@ try {
     for($i=0; $i<4; $i++) {
         $attribute = new Thelia\Model\Attribute();
         $attribute->setPosition($i);
-        $attribute->setTitle($faker->text(20));
-        $attribute->setDescription($faker->text(50));
+        setI18n($faker, $attribute);
 
         $attribute->save();
         $attributeId = $attribute->getId();
@@ -147,8 +176,7 @@ try {
             $attributeAv = new Thelia\Model\AttributeAv();
             $attributeAv->setAttribute($attribute);
             $attributeAv->setPosition($j);
-            $attributeAv->setTitle($faker->text(20));
-            $attributeAv->setDescription($faker->text(255));
+            setI18n($faker, $attributeAv);
 
             $attributeAv->save();
             $attributeList[$attributeId][] = $attributeAv->getId();
@@ -271,8 +299,7 @@ try {
         $folder->setParent(0);
         $folder->setVisible(rand(1, 10)>7 ? 0 : 1);
         $folder->setPosition($i);
-        $folder->setTitle($faker->text(20));
-        $folder->setDescription($faker->text(255));
+        setI18n($faker, $folder);
 
         $folder->save();
 
@@ -285,8 +312,7 @@ try {
             $subfolder->setParent($folder->getId());
             $subfolder->setVisible(rand(1, 10)>7 ? 0 : 1);
             $subfolder->setPosition($j);
-            $subfolder->setTitle($faker->text(20));
-            $subfolder->setDescription($faker->text(255));
+            setI18n($faker, $subfolder);
 
             $subfolder->save();
 
@@ -299,8 +325,7 @@ try {
                 $content->addFolder($subfolder);
                 $content->setVisible(rand(1, 10)>7 ? 0 : 1);
                 $content->setPosition($k);
-                $content->setTitle($faker->text(20));
-                $content->setDescription($faker->text(255));
+                setI18n($faker, $content);
 
                 $content->save();
 
@@ -324,8 +349,7 @@ function createProduct($faker, $category, $position, &$productIdList)
     $product->addCategory($category);
     $product->setVisible(rand(1, 10)>7 ? 0 : 1);
     $product->setPosition($position);
-    $product->setTitle($faker->text(20));
-    $product->setDescription($faker->text(255));
+    setI18n($faker, $product);
 
     $product->save();
     $productId = $product->getId();
@@ -344,8 +368,7 @@ function createCategory($faker, $parent, $position, &$categoryIdList)
     $category->setParent($parent);
     $category->setVisible(rand(1, 10)>7 ? 0 : 1);
     $category->setPosition($position);
-    $category->setTitle($faker->text(20));
-    $category->setDescription($faker->text(255));
+    setI18n($faker, $category);
 
     $category->save();
     $cateogoryId = $category->getId();
@@ -405,5 +428,20 @@ function generate_image($image, $position, $typeobj, $id) {
     if (! is_dir(dirname($image_file))) mkdir(dirname($image_file), 0777, true);
 
     $image->save($image_file);
+}
+
+function setI18n($faker, &$object)
+{
+    $localeList = array('fr_FR', 'en_EN');
+
+    $title = $faker->text(20);
+    $description = $faker->text(50);
+
+    foreach($localeList as $locale) {
+        $object->setLocale($locale);
+
+        $object->setTitle($locale . ' : ' . $title);
+        $object->setDescription($locale . ' : ' . $description);
+    }
 }
 

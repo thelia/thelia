@@ -156,10 +156,32 @@ class Category extends BaseLoop
          * @todo : verify here if we want results for row without translations.
          */
 
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
+        if(ConfigQuery::read("default_lang_without_translation", 1) == 0) {
+            /*
+             * don't use the following to be able to use the same getter than below
+             * $search->joinWithI18n( $this->request->getSession()->getLocale(), Criteria::INNER_JOIN );
+             */
+            $search->joinCategoryI18n('asked_locale_i18n', Criteria::INNER_JOIN)
+                ->addJoinCondition('asked_locale_i18n' ,'`asked_locale_i18n`.LOCALE = ?', 'en_EN', null, \PDO::PARAM_STR);
+
+            $search->withColumn('`asked_locale_i18n`.TITLE', 'i18n_TITLE');
+            $search->withColumn('`asked_locale_i18n`.CHAPO', 'i18n_CHAPO');
+            $search->withColumn('`asked_locale_i18n`.DESCRIPTION', 'i18n_DESCRIPTION');
+            $search->withColumn('`asked_locale_i18n`.POSTSCRIPTUM', 'i18n_POSTSCRIPTUM');
+        } else {
+            $search->joinCategoryI18n('default_locale_i18n')
+                ->addJoinCondition('default_locale_i18n' ,'`default_locale_i18n`.LOCALE = ?', 'fr_FR', null, \PDO::PARAM_STR);
+
+            $search->joinCategoryI18n('asked_locale_i18n')
+                ->addJoinCondition('asked_locale_i18n' ,'`asked_locale_i18n`.LOCALE = ?', 'en_EN', null, \PDO::PARAM_STR);
+
+            $search->where('NOT ISNULL(`asked_locale_i18n`.ID)')->_or()->where('NOT ISNULL(`default_locale_i18n`.ID)');
+
+            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.TITLE ELSE `asked_locale_i18n`.TITLE END', 'i18n_TITLE');
+            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.CHAPO ELSE `asked_locale_i18n`.CHAPO END', 'i18n_CHAPO');
+            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.DESCRIPTION ELSE `asked_locale_i18n`.DESCRIPTION END', 'i18n_DESCRIPTION');
+            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.POSTSCRIPTUM ELSE `asked_locale_i18n`.POSTSCRIPTUM END', 'i18n_POSTSCRIPTUM');
+        }
 
         $categories = $this->search($search, $pagination);
 
@@ -171,15 +193,16 @@ class Category extends BaseLoop
 
             if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
 
+            $x = $category->getTitle();
 
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
             	->set("ID", $category->getId())
-            	->set("TITLE",$category->getTitle())
-	            ->set("CHAPO", $category->getChapo())
-	            ->set("DESCRIPTION", $category->getDescription())
-	            ->set("POSTSCRIPTUM", $category->getPostscriptum())
+            	->set("TITLE",$category->getVirtualColumn('i18n_TITLE'))
+	            ->set("CHAPO", $category->getVirtualColumn('i18n_CHAPO'))
+	            ->set("DESCRIPTION", $category->getVirtualColumn('i18n_DESCRIPTION'))
+	            ->set("POSTSCRIPTUM", $category->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $category->getParent())
 	            ->set("URL", $category->getUrl())
 	            ->set("PRODUCT_COUNT", $category->countChild())
