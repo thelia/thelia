@@ -25,23 +25,23 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
-use Thelia\Core\Template\Loop\FeatureAvailable;
+use Thelia\Core\Template\Loop\Attribute;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class FeatureAvailableTest extends BaseLoopTestor
+class AttributeTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {
-        return 'Thelia\Core\Template\Loop\FeatureAvailable';
+        return 'Thelia\Core\Template\Loop\Attribute';
     }
 
     public function getTestedInstance()
     {
-        return new FeatureAvailable($this->request, $this->dispatcher, $this->securityContext);
+        return new Attribute($this->request, $this->dispatcher, $this->securityContext);
     }
 
     public function getMandatoryArguments()
