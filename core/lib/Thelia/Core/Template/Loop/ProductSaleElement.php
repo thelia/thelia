@@ -132,16 +132,6 @@ class ProductSaleElements extends BaseLoop
                 ->set("PRICE", $PSEValue->getVirtualColumn('price_PRICE'))
                 ->set("PROMO_PRICE", $PSEValue->getVirtualColumn('price_PROMO_PRICE'));
 
-            //$price = $PSEValue->getAttributeAv();
-
-            /*
-            $attributeAvailability = $PSEValue->getAttributeAv();
-
-            $loopResultRow->set("TITLE", ($attributeAvailability === null ? '' : $attributeAvailability->getTitle()));
-            $loopResultRow->set("CHAPO", ($attributeAvailability === null ? '' : $attributeAvailability->getChapo()));
-            $loopResultRow->set("DESCRIPTION", ($attributeAvailability === null ? '' : $attributeAvailability->getDescription()));
-            $loopResultRow->set("POSTSCRIPTUM", ($attributeAvailability === null ? '' : $attributeAvailability->getPostscriptum()));*/
-
             $loopResult->addRow($loopResultRow);
         }
 

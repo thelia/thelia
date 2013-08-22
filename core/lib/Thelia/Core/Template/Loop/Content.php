@@ -31,6 +31,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\FolderQuery;
 use Thelia\Model\Map\ContentTableMap;
 use Thelia\Model\ContentFolderQuery;
@@ -84,6 +86,9 @@ class Content extends BaseLoop
     public function exec(&$pagination)
     {
         $search = ContentQuery::create();
+
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $id = $this->getId();
 
@@ -153,10 +158,10 @@ class Content extends BaseLoop
         foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\ContentI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
                     if(null === $folder || count($folder) != 1)
@@ -199,17 +204,7 @@ class Content extends BaseLoop
             );
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
+        /* perform search */
         $search->groupBy(ContentTableMap::ID);
 
         $contents = $this->search($search, $pagination);
@@ -220,10 +215,10 @@ class Content extends BaseLoop
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow->set("ID", $content->getId())
-                ->set("TITLE",$content->getTitle())
-                ->set("CHAPO", $content->getChapo())
-                ->set("DESCRIPTION", $content->getDescription())
-                ->set("POSTSCRIPTUM", $content->getPostscriptum())
+                ->set("TITLE",$content->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $content->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $content->getPosition())
             ;
 

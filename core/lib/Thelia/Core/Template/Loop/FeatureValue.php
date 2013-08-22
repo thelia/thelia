@@ -33,9 +33,12 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
-use Thelia\Model\FeatureAvQuery;
+use Thelia\Model\Map\FeatureAvTableMap;
+use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -80,6 +83,16 @@ class FeatureValue extends BaseLoop
     {
         $search = FeatureProductQuery::create();
 
+        /* manage featureAv translations */
+        ModelCriteriaTools::getI18n(
+            $search,
+            ConfigQuery::read("default_lang_without_translation", 1),
+            $this->request->getSession()->getLocale(),
+            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            FeatureAvTableMap::TABLE_NAME,
+            'FEATURE_AV_ID'
+        );
+
         $feature = $this->getFeature();
 
         $search->filterByFeatureId($feature, Criteria::EQUAL);
@@ -109,16 +122,16 @@ class FeatureValue extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    //$search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case "alpha_reverse":
-                    //$search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case "manual":
-                    //$search->orderByPosition(Criteria::ASC);
+                    $search->orderByPosition(Criteria::ASC);
                     break;
                 case "manual_reverse":
-                    //$search->orderByPosition(Criteria::DESC);
+                    $search->orderByPosition(Criteria::DESC);
                     break;
             }
         }
@@ -131,19 +144,11 @@ class FeatureValue extends BaseLoop
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $featureValue->getId());
 
-            $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault());
-
-            $featureAvailability = null;
-            if($featureValue->getFeatureAvId() !== null) {
-                $featureAvailability = FeatureAvQuery::create()
-                    ->joinWithI18n('fr_FR')
-                    ->findPk($featureValue->getFeatureAvId());
-            }
-
-            $loopResultRow->set("TITLE", ($featureAvailability === null ? '' : $featureAvailability->getTitle()));
-            $loopResultRow->set("CHAPO", ($featureAvailability === null ? '' : $featureAvailability->getChapo()));
-            $loopResultRow->set("DESCRIPTION", ($featureAvailability === null ? '' : $featureAvailability->getDescription()));
-            $loopResultRow->set("POSTSCRIPTUM", ($featureAvailability === null ? '' : $featureAvailability->getPostscriptum()));
+            $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault())
+                ->set("TITLE",$featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
 
             $loopResult->addRow($loopResultRow);
         }

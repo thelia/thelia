@@ -31,6 +31,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\CountryQuery;
 use Thelia\Model\ConfigQuery;
 
@@ -68,6 +70,9 @@ class Country extends BaseLoop
     {
         $search = CountryQuery::create();
 
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+
         $id = $this->getId();
 
         if (null !== $id) {
@@ -94,31 +99,20 @@ class Country extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
+        $search->addAscendingOrderByColumn('i18n_TITLE');
 
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
-        $search->addAscendingOrderByColumn(\Thelia\Model\Map\CountryI18nTableMap::TITLE);
-
+        /* perform search */
         $countries = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
         foreach ($countries as $country) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $country->getId());
-            $loopResultRow->set("AREA", $country->getAreaId());
-            $loopResultRow->set("TITLE", $country->getTitle());
-            $loopResultRow->set("CHAPO", $country->getChapo());
-            $loopResultRow->set("DESCRIPTION", $country->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $country->getPostscriptum());
+            $loopResultRow->set("ID", $country->getId())
+                ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'));
             $loopResultRow->set("ISOCODE", $country->getIsocode());
             $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
             $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());

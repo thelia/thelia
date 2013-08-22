@@ -180,7 +180,7 @@ abstract class Folder implements ActiveRecordInterface
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_US';
+    protected $currentLocale = 'en_EN';
 
     /**
      * Current translation objects
@@ -407,7 +407,7 @@ abstract class Folder implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -3460,7 +3460,7 @@ abstract class Folder implements ActiveRecordInterface
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_US';
+        $this->currentLocale = 'en_EN';
         $this->currentTranslations = null;
 
         if ($this->collRewritings instanceof Collection) {
@@ -3526,7 +3526,7 @@ abstract class Folder implements ActiveRecordInterface
      *
      * @return    ChildFolder The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_US')
+    public function setLocale($locale = 'en_EN')
     {
         $this->currentLocale = $locale;
 
@@ -3550,7 +3550,7 @@ abstract class Folder implements ActiveRecordInterface
      * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildFolderI18n */
-    public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function getTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collFolderI18ns) {
@@ -3585,7 +3585,7 @@ abstract class Folder implements ActiveRecordInterface
      *
      * @return    ChildFolder The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function removeTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
             ChildFolderI18nQuery::create()

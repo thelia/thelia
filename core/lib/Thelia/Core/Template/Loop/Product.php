@@ -33,6 +33,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Model\Map\ProductPriceTableMap;
@@ -135,16 +137,8 @@ class Product extends BaseLoop
     {
         $search = ProductQuery::create();
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
         $isPSELeftJoinList = array();
@@ -460,10 +454,10 @@ class Product extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "min_price":
                     $search->addAscendingOrderByColumn('real_lowest_price', Criteria::ASC);
@@ -506,6 +500,7 @@ class Product extends BaseLoop
             }
         }
 
+        /* perform search */
         $products = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
@@ -515,10 +510,10 @@ class Product extends BaseLoop
 
             $loopResultRow->set("ID", $product->getId())
                 ->set("REF",$product->getRef())
-                ->set("TITLE",$product->getTitle())
-                ->set("CHAPO", $product->getChapo())
-                ->set("DESCRIPTION", $product->getDescription())
-                ->set("POSTSCRIPTUM", $product->getPostscriptum())
+                ->set("TITLE",$product->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
                 ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
                 ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))

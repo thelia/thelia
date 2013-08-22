@@ -33,7 +33,11 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\Base\AttributeCombinationQuery;
+use Thelia\Model\Map\AttributeAvTableMap;
+use Thelia\Model\Map\AttributeTableMap;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
@@ -58,9 +62,9 @@ class AttributeCombination extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('attribute_availability', 'attribute_availability_reverse', 'attribute', 'attribute_reverse'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse'))
                 ),
-                'attribute'
+                'alpha'
             )
         );
     }
@@ -74,6 +78,26 @@ class AttributeCombination extends BaseLoop
     {
         $search = AttributeCombinationQuery::create();
 
+        /* manage attribute translations */
+        ModelCriteriaTools::getI18n(
+            $search,
+            ConfigQuery::read("default_lang_without_translation", 1),
+            $this->request->getSession()->getLocale(),
+            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            AttributeTableMap::TABLE_NAME,
+            'ATTRIBUTE_ID'
+        );
+
+        /* manage attributeAv translations */
+        ModelCriteriaTools::getI18n(
+            $search,
+            ConfigQuery::read("default_lang_without_translation", 1),
+            $this->request->getSession()->getLocale(),
+            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            AttributeAvTableMap::TABLE_NAME,
+            'ATTRIBUTE_AV_ID'
+        );
+
         $productSaleElement = $this->getProduct_sale_element();
 
         $search->filterByProductSaleElementsId($productSaleElement, Criteria::EQUAL);
@@ -82,17 +106,11 @@ class AttributeCombination extends BaseLoop
 
         foreach($orders as $order) {
             switch ($order) {
-                case "attribute_availability":
-                    //$search->addAscendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
+                case "alpha":
+                    $search->addAscendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
-                case "attribute_availability_reverse":
-                    //$search->addDescendingOrderByColumn(\Thelia\Model\Map\AttributeI18nTableMap::TITLE);
-                    break;
-                case "attribute":
-                    //$search->orderByPosition(Criteria::ASC);
-                    break;
-                case "attribute_reverse":
-                    //$search->orderByPosition(Criteria::DESC);
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
             }
         }
@@ -104,18 +122,15 @@ class AttributeCombination extends BaseLoop
         foreach ($attributeCombinations as $attributeCombination) {
             $loopResultRow = new LoopResultRow();
 
-            $attribute = $attributeCombination->getAttribute();
-            $attributeAvailability = $attributeCombination->getAttributeAv();
-
             $loopResultRow
-                ->set("ATTRIBUTE_TITLE", $attribute->getTitle())
-                ->set("ATTRIBUTE_CHAPO", $attribute->getChapo())
-                ->set("ATTRIBUTE_DESCRIPTION", $attribute->getDescription())
-                ->set("ATTRIBUTE_POSTSCRIPTUM", $attribute->getPostscriptum())
-                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $attributeAvailability->getTitle())
-                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $attributeAvailability->getChapo())
-                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $attributeAvailability->getDescription())
-                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $attributeAvailability->getPostscriptum());
+                ->set("ATTRIBUTE_TITLE", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("ATTRIBUTE_CHAPO", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("ATTRIBUTE_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("ATTRIBUTE_POSTSCRIPTUM", $attributeCombination->getVirtualColumn(AttributeTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'))
+                ->set("ATTRIBUTE_AVAILABILITY_TITLE", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("ATTRIBUTE_AVAILABILITY_CHAPO", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("ATTRIBUTE_AVAILABILITY_DESCRIPTION", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("ATTRIBUTE_AVAILABILITY_POSTSCRIPTUM", $attributeCombination->getVirtualColumn(AttributeAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
 
             $loopResult->addRow($loopResultRow);
         }

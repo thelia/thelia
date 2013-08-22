@@ -33,6 +33,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\Base\AttributeAvQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
@@ -76,6 +78,9 @@ class AttributeAvailability extends BaseLoop
     {
         $search = AttributeAvQuery::create();
 
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+
         $id = $this->getId();
 
         if (null !== $id) {
@@ -99,10 +104,10 @@ class AttributeAvailability extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\AttributeAvI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\AttributeAvI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
@@ -113,28 +118,18 @@ class AttributeAvailability extends BaseLoop
             }
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
+        /* perform search */
         $attributesAv = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
         foreach ($attributesAv as $attributeAv) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $attributeAv->getId());
-            $loopResultRow->set("TITLE",$attributeAv->getTitle());
-            $loopResultRow->set("CHAPO", $attributeAv->getChapo());
-            $loopResultRow->set("DESCRIPTION", $attributeAv->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $attributeAv->getPostscriptum());
+            $loopResultRow->set("ID", $attributeAv->getId())
+                ->set("TITLE",$attributeAv->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $attributeAv->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $attributeAv->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $attributeAv->getVirtualColumn('i18n_POSTSCRIPTUM'));
 
             $loopResult->addRow($loopResultRow);
         }

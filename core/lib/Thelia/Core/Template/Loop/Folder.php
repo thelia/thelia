@@ -32,6 +32,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
@@ -77,6 +79,9 @@ class Folder extends BaseLoop
     {
         $search = FolderQuery::create();
 
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+
 		$id = $this->getId();
 
         if (!is_null($id)) {
@@ -114,10 +119,10 @@ class Folder extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual_reverse":
                     $search->orderByPosition(Criteria::DESC);
@@ -133,35 +138,29 @@ class Folder extends BaseLoop
             }
         }
 
-        /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
+        /* perform search */
         $folders = $this->search($search, $pagination);
 
+        /* @todo */
         $notEmpty  = $this->getNot_empty();
 
         $loopResult = new LoopResult();
 
         foreach ($folders as $folder) {
 
-            if ($notEmpty && $folder->countAllProducts() == 0) continue;
+            /*
+             * no cause pagination lost :
+             * if ($notEmpty && $folder->countAllProducts() == 0) continue;
+             */
 
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
             	->set("ID", $folder->getId())
-            	->set("TITLE",$folder->getTitle())
-	            ->set("CHAPO", $folder->getChapo())
-	            ->set("DESCRIPTION", $folder->getDescription())
-	            ->set("POSTSCRIPTUM", $folder->getPostscriptum())
+                ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $folder->getParent())
 	            ->set("CONTENT_COUNT", $folder->countChild())
 	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")

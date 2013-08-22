@@ -32,6 +32,8 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\CategoryQuery;
 use Thelia\Model\ConfigQuery;
 use Thelia\Type\TypeCollection;
@@ -95,6 +97,9 @@ class Category extends BaseLoop
     {
         $search = CategoryQuery::create();
 
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+
 		$id = $this->getId();
 
         if (!is_null($id)) {
@@ -131,10 +136,10 @@ class Category extends BaseLoop
         foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha_reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\CategoryI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual_reverse":
                     $search->orderByPosition(Criteria::DESC);
@@ -150,50 +155,20 @@ class Category extends BaseLoop
             }
         }
 
-        /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        if(ConfigQuery::read("default_lang_without_translation", 1) == 0) {
-            /*
-             * don't use the following to be able to use the same getter than below
-             * $search->joinWithI18n( $this->request->getSession()->getLocale(), Criteria::INNER_JOIN );
-             */
-            $search->joinCategoryI18n('asked_locale_i18n', Criteria::INNER_JOIN)
-                ->addJoinCondition('asked_locale_i18n' ,'`asked_locale_i18n`.LOCALE = ?', 'en_EN', null, \PDO::PARAM_STR);
-
-            $search->withColumn('`asked_locale_i18n`.TITLE', 'i18n_TITLE');
-            $search->withColumn('`asked_locale_i18n`.CHAPO', 'i18n_CHAPO');
-            $search->withColumn('`asked_locale_i18n`.DESCRIPTION', 'i18n_DESCRIPTION');
-            $search->withColumn('`asked_locale_i18n`.POSTSCRIPTUM', 'i18n_POSTSCRIPTUM');
-        } else {
-            $search->joinCategoryI18n('default_locale_i18n')
-                ->addJoinCondition('default_locale_i18n' ,'`default_locale_i18n`.LOCALE = ?', 'fr_FR', null, \PDO::PARAM_STR);
-
-            $search->joinCategoryI18n('asked_locale_i18n')
-                ->addJoinCondition('asked_locale_i18n' ,'`asked_locale_i18n`.LOCALE = ?', 'en_EN', null, \PDO::PARAM_STR);
-
-            $search->where('NOT ISNULL(`asked_locale_i18n`.ID)')->_or()->where('NOT ISNULL(`default_locale_i18n`.ID)');
-
-            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.TITLE ELSE `asked_locale_i18n`.TITLE END', 'i18n_TITLE');
-            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.CHAPO ELSE `asked_locale_i18n`.CHAPO END', 'i18n_CHAPO');
-            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.DESCRIPTION ELSE `asked_locale_i18n`.DESCRIPTION END', 'i18n_DESCRIPTION');
-            $search->withColumn('CASE WHEN ISNULL(`asked_locale_i18n`.ID) THEN `asked_locale_i18n`.POSTSCRIPTUM ELSE `asked_locale_i18n`.POSTSCRIPTUM END', 'i18n_POSTSCRIPTUM');
-        }
-
+        /* perform search */
         $categories = $this->search($search, $pagination);
 
+        /* @todo */
         $notEmpty  = $this->getNot_empty();
 
         $loopResult = new LoopResult();
 
         foreach ($categories as $category) {
 
-            if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
-
-            $x = $category->getTitle();
+            /*
+             * no cause pagination lost :
+             * if ($this->getNotEmpty() && $category->countAllProducts() == 0) continue;
+             */
 
             $loopResultRow = new LoopResultRow();
 
