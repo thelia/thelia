@@ -33,19 +33,19 @@ use Thelia\Core\Template\Loop\Argument\Argument;
 
 use Thelia\Model\Tools\ModelCriteriaTools;
 
-use Thelia\Model\CountryQuery;
+use Thelia\Model\CurrencyQuery;
 use Thelia\Model\ConfigQuery;
 
 /**
  *
- * Country loop
+ * Currency loop
  *
  *
- * Class Country
+ * Class Currency
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  */
-class Country extends BaseLoop
+class Currency extends BaseLoop
 {
     /**
      * @return ArgumentCollection
@@ -54,9 +54,8 @@ class Country extends BaseLoop
     {
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
-            Argument::createIntListTypeArgument('area'),
-            Argument::createBooleanTypeArgument('with_area'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createBooleanTypeArgument('default_only', false)
         );
     }
 
@@ -67,29 +66,15 @@ class Country extends BaseLoop
      */
     public function exec(&$pagination)
     {
-        $search = CountryQuery::create();
+        $search = CurrencyQuery::create();
 
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale(), array('NAME'));
 
         $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
-        }
-
-        $area = $this->getArea();
-
-        if (null !== $area) {
-            $search->filterByAreaId($area, Criteria::IN);
-        }
-
-        $withArea = $this->getWith_area();
-
-        if (true === $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNOTNULL);
-        } elseif (false == $withArea) {
-            $search->filterByAreaId(null, Criteria::ISNULL);
         }
 
         $exclude = $this->getExclude();
@@ -98,23 +83,26 @@ class Country extends BaseLoop
             $search->filterById($exclude, Criteria::NOT_IN);
         }
 
-        $search->addAscendingOrderByColumn('i18n_TITLE');
+        $default_only = $this->getDefaultOnly();
+
+        if ($default_only === true) {
+            $search->filterByByDefault(true);
+        }
+
+        $search->orderByPosition();
 
         /* perform search */
-        $countries = $this->search($search, $pagination);
+        $currencies = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
-        foreach ($countries as $country) {
+        foreach ($currencies as $currency) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $country->getId())
-                ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
-                ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
-                ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))
-                ->set("POSTSCRIPTUM", $country->getVirtualColumn('i18n_POSTSCRIPTUM'));
-            $loopResultRow->set("ISOCODE", $country->getIsocode());
-            $loopResultRow->set("ISOALPHA2", $country->getIsoalpha2());
-            $loopResultRow->set("ISOALPHA3", $country->getIsoalpha3());
+            $loopResultRow->set("ID", $currency->getId())
+                ->set("NAME",$currency->getVirtualColumn('i18n_NAME'))
+                ->set("ISOCODE", $currency->getCode())
+                ->set("RATE", $currency->getRate())
+                ->set("IS_DEFAULT", $currency->getByDefault());
 
             $loopResult->addRow($loopResultRow);
         }
