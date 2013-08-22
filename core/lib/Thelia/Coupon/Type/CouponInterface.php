@@ -109,4 +109,15 @@ interface CouponInterface
      * @return bool
      */
     public function isMatching();
+
+    /**
+     * Replace the existing Rules by those given in parameter
+     * If one Rule is badly implemented, no Rule will be added
+     *
+     * @param array $rules CouponRuleInterface to add
+     *
+     * @return $this
+     * @throws \Thelia\Exception\InvalidRuleException
+     */
+    public function setRules(array $rules);
 }

@@ -37,7 +37,7 @@ use Thelia\Coupon\Parameter\ComparableInterface;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class PriceParam implements ComparableInterface
+class PriceParam implements ComparableInterface, RuleParameterInterface
 {
     /** @var float Positive Float to compare with */
     protected $price = null;
@@ -113,4 +113,13 @@ class PriceParam implements ComparableInterface
         return $ret;
     }
 
+    /**
+     * Get Parameter value to test against
+     *
+     * @return float
+     */
+    public function getValue()
+    {
+        return $this->price;
+    }
 }

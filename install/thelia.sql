@@ -568,42 +568,6 @@ CREATE TABLE `content`
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
--- content_assoc
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `content_assoc`;
-
-CREATE TABLE `content_assoc`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `category_id` INTEGER,
-    `product_id` INTEGER,
-    `content_id` INTEGER,
-    `position` INTEGER,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `idx_content_assoc_category_id` (`category_id`),
-    INDEX `idx_content_assoc_product_id` (`product_id`),
-    INDEX `idx_content_assoc_content_id` (`content_id`),
-    CONSTRAINT `fk_content_assoc_category_id`
-        FOREIGN KEY (`category_id`)
-        REFERENCES `category` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_content_assoc_product_id`
-        FOREIGN KEY (`product_id`)
-        REFERENCES `product` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_content_assoc_content_id`
-        FOREIGN KEY (`content_id`)
-        REFERENCES `content` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
 -- product_image
 -- ---------------------------------------------------------------------
 
@@ -846,7 +810,7 @@ DROP TABLE IF EXISTS `accessory`;
 
 CREATE TABLE `accessory`
 (
-    `id` INTEGER NOT NULL,
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
     `product_id` INTEGER NOT NULL,
     `accessory` INTEGER NOT NULL,
     `position` INTEGER NOT NULL,
@@ -1121,16 +1085,26 @@ CREATE TABLE `coupon`
     `title` VARCHAR(255) NOT NULL,
     `short_description` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
-    `value` FLOAT NOT NULL,
+    `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
     `expiration_date` DATETIME NOT NULL,
-    `serialized_rules` TEXT NOT NULL,
+    `serialized_rules_type` TEXT NOT NULL,
+    `serialized_rules_content` TEXT NOT NULL,
+    `is_cumulative` TINYINT NOT NULL,
+    `is_removing_postage` TINYINT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `code_UNIQUE` (`code`)
+    UNIQUE INDEX `code_UNIQUE` (`code`),
+    INDEX `idx_is_enabled` (`is_enabled`),
+    INDEX `idx_is_used` (`is_used`),
+    INDEX `idx_type` (`type`),
+    INDEX `idx_amount` (`amount`),
+    INDEX `idx_expiration_date` (`expiration_date`),
+    INDEX `idx_is_cumulative` (`is_cumulative`),
+    INDEX `idx_is_removing_postage` (`is_removing_postage`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1437,6 +1411,64 @@ CREATE TABLE `folder_document`
     CONSTRAINT `fk_folder_document_folder_id`
         FOREIGN KEY (`folder_id`)
         REFERENCES `folder` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- product_associated_content
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `product_associated_content`;
+
+CREATE TABLE `product_associated_content`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `product_id` INTEGER NOT NULL,
+    `content_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_product_associated_content_product_id` (`product_id`),
+    INDEX `idx_product_associated_content_content_id` (`content_id`),
+    CONSTRAINT `fk_product_associated_content_product_id`
+        FOREIGN KEY (`product_id`)
+        REFERENCES `product` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_product_associated_content_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- category_associated_content
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `category_associated_content`;
+
+CREATE TABLE `category_associated_content`
+(
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `category_id` INTEGER NOT NULL,
+    `content_id` INTEGER NOT NULL,
+    `position` INTEGER NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    PRIMARY KEY (`id`),
+    INDEX `idx_category_associated_content_category_id` (`category_id`),
+    INDEX `idx_category_associated_content_content_id` (`content_id`),
+    CONSTRAINT `fk_category_associated_content_category_id`
+        FOREIGN KEY (`category_id`)
+        REFERENCES `category` (`id`)
+        ON UPDATE RESTRICT
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_category_associated_content_content_id`
+        FOREIGN KEY (`content_id`)
+        REFERENCES `content` (`id`)
         ON UPDATE RESTRICT
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
@@ -2147,11 +2179,14 @@ CREATE TABLE `coupon_version`
     `title` VARCHAR(255) NOT NULL,
     `short_description` TEXT NOT NULL,
     `description` LONGTEXT NOT NULL,
-    `value` FLOAT NOT NULL,
+    `amount` FLOAT NOT NULL,
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
     `expiration_date` DATETIME NOT NULL,
-    `serialized_rules` TEXT NOT NULL,
+    `serialized_rules_type` TEXT NOT NULL,
+    `serialized_rules_content` TEXT NOT NULL,
+    `is_cumulative` TINYINT NOT NULL,
+    `is_removing_postage` TINYINT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

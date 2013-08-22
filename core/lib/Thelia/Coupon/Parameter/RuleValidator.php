@@ -23,85 +23,55 @@
 
 namespace Thelia\Coupon\Parameter;
 
-use Thelia\Coupon\Parameter\ComparableInterface;
-
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Represent an Integer
+ * Allow to validate parameters
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class IntegerParam implements ComparableInterface, RuleParameterInterface
+class RuleValidator
 {
-    /** @var int Integer to compare with */
-    protected $integer = 0;
+    /** @var string Operator ex: Operators::INFERIOR */
+    protected $operator = null;
+
+    /** @var ComparableInterface Validator */
+    protected $param = null;
 
     /**
      * Constructor
      *
-     * @param int $integer Integer
+     * @param string              $operator Operator ex: Operators::INFERIOR
+     * @param ComparableInterface $param    Validator ex: PriceParam
      */
-    public function __construct($integer)
+    function __construct($operator, ComparableInterface $param)
     {
-        $this->integer = $integer;
+        $this->operator = $operator;
+        $this->param = $param;
     }
 
     /**
-     * Get integer
+     * Get Validator Operator
      *
-     * @return int
+     * @return string
      */
-    public function getInteger()
+    public function getOperator()
     {
-        return $this->integer;
-    }
-
-
-    /**
-     * Compare the current object to the passed $other.
-     *
-     * Returns 0 if they are semantically equal, 1 if the other object
-     * is less than the current one, or -1 if its more than the current one.
-     *
-     * This method should not check for identity using ===, only for semantically equality for example
-     * when two different DateTime instances point to the exact same Date + TZ.
-     *
-     * @param mixed $other Object
-     *
-     * @throws \InvalidArgumentException
-     * @return int
-     */
-    public function compareTo($other)
-    {
-        if (!is_integer($other)) {
-            throw new \InvalidArgumentException('IntegerParam can compare only int');
-        }
-
-        $ret = -1;
-        if ($this->integer == $other) {
-            $ret = 0;
-        } elseif ($this->integer > $other) {
-            $ret = 1;
-        } else {
-            $ret = -1;
-        }
-
-        return $ret;
+        return $this->operator;
     }
 
     /**
-     * Get Parameter value to test against
+     * Get Validator Param
      *
-     * @return int
+     * @return ComparableInterface
      */
-    public function getValue()
+    public function getParam()
     {
-        return $this->integer;
+        return $this->param;
     }
 
 }

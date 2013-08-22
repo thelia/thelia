@@ -17,9 +17,9 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\CategoryAssociatedContent as ChildCategoryAssociatedContent;
+use Thelia\Model\CategoryAssociatedContentQuery as ChildCategoryAssociatedContentQuery;
 use Thelia\Model\Content as ChildContent;
-use Thelia\Model\ContentAssoc as ChildContentAssoc;
-use Thelia\Model\ContentAssocQuery as ChildContentAssocQuery;
 use Thelia\Model\ContentDocument as ChildContentDocument;
 use Thelia\Model\ContentDocumentQuery as ChildContentDocumentQuery;
 use Thelia\Model\ContentFolder as ChildContentFolder;
@@ -33,6 +33,8 @@ use Thelia\Model\ContentVersion as ChildContentVersion;
 use Thelia\Model\ContentVersionQuery as ChildContentVersionQuery;
 use Thelia\Model\Folder as ChildFolder;
 use Thelia\Model\FolderQuery as ChildFolderQuery;
+use Thelia\Model\ProductAssociatedContent as ChildProductAssociatedContent;
+use Thelia\Model\ProductAssociatedContentQuery as ChildProductAssociatedContentQuery;
 use Thelia\Model\Rewriting as ChildRewriting;
 use Thelia\Model\RewritingQuery as ChildRewritingQuery;
 use Thelia\Model\Map\ContentTableMap;
@@ -122,12 +124,6 @@ abstract class Content implements ActiveRecordInterface
     protected $version_created_by;
 
     /**
-     * @var        ObjectCollection|ChildContentAssoc[] Collection to store aggregation of ChildContentAssoc objects.
-     */
-    protected $collContentAssocs;
-    protected $collContentAssocsPartial;
-
-    /**
      * @var        ObjectCollection|ChildRewriting[] Collection to store aggregation of ChildRewriting objects.
      */
     protected $collRewritings;
@@ -150,6 +146,18 @@ abstract class Content implements ActiveRecordInterface
      */
     protected $collContentDocuments;
     protected $collContentDocumentsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildProductAssociatedContent[] Collection to store aggregation of ChildProductAssociatedContent objects.
+     */
+    protected $collProductAssociatedContents;
+    protected $collProductAssociatedContentsPartial;
+
+    /**
+     * @var        ObjectCollection|ChildCategoryAssociatedContent[] Collection to store aggregation of ChildCategoryAssociatedContent objects.
+     */
+    protected $collCategoryAssociatedContents;
+    protected $collCategoryAssociatedContentsPartial;
 
     /**
      * @var        ObjectCollection|ChildContentI18n[] Collection to store aggregation of ChildContentI18n objects.
@@ -208,12 +216,6 @@ abstract class Content implements ActiveRecordInterface
      * An array of objects scheduled for deletion.
      * @var ObjectCollection
      */
-    protected $contentAssocsScheduledForDeletion = null;
-
-    /**
-     * An array of objects scheduled for deletion.
-     * @var ObjectCollection
-     */
     protected $rewritingsScheduledForDeletion = null;
 
     /**
@@ -233,6 +235,18 @@ abstract class Content implements ActiveRecordInterface
      * @var ObjectCollection
      */
     protected $contentDocumentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $productAssociatedContentsScheduledForDeletion = null;
+
+    /**
+     * An array of objects scheduled for deletion.
+     * @var ObjectCollection
+     */
+    protected $categoryAssociatedContentsScheduledForDeletion = null;
 
     /**
      * An array of objects scheduled for deletion.
@@ -938,8 +952,6 @@ abstract class Content implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->collContentAssocs = null;
-
             $this->collRewritings = null;
 
             $this->collContentFolders = null;
@@ -947,6 +959,10 @@ abstract class Content implements ActiveRecordInterface
             $this->collContentImages = null;
 
             $this->collContentDocuments = null;
+
+            $this->collProductAssociatedContents = null;
+
+            $this->collCategoryAssociatedContents = null;
 
             $this->collContentI18ns = null;
 
@@ -1125,23 +1141,6 @@ abstract class Content implements ActiveRecordInterface
                 }
             }
 
-            if ($this->contentAssocsScheduledForDeletion !== null) {
-                if (!$this->contentAssocsScheduledForDeletion->isEmpty()) {
-                    \Thelia\Model\ContentAssocQuery::create()
-                        ->filterByPrimaryKeys($this->contentAssocsScheduledForDeletion->getPrimaryKeys(false))
-                        ->delete($con);
-                    $this->contentAssocsScheduledForDeletion = null;
-                }
-            }
-
-                if ($this->collContentAssocs !== null) {
-            foreach ($this->collContentAssocs as $referrerFK) {
-                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
-                        $affectedRows += $referrerFK->save($con);
-                    }
-                }
-            }
-
             if ($this->rewritingsScheduledForDeletion !== null) {
                 if (!$this->rewritingsScheduledForDeletion->isEmpty()) {
                     \Thelia\Model\RewritingQuery::create()
@@ -1204,6 +1203,40 @@ abstract class Content implements ActiveRecordInterface
 
                 if ($this->collContentDocuments !== null) {
             foreach ($this->collContentDocuments as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->productAssociatedContentsScheduledForDeletion !== null) {
+                if (!$this->productAssociatedContentsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\ProductAssociatedContentQuery::create()
+                        ->filterByPrimaryKeys($this->productAssociatedContentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->productAssociatedContentsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collProductAssociatedContents !== null) {
+            foreach ($this->collProductAssociatedContents as $referrerFK) {
+                    if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
+                        $affectedRows += $referrerFK->save($con);
+                    }
+                }
+            }
+
+            if ($this->categoryAssociatedContentsScheduledForDeletion !== null) {
+                if (!$this->categoryAssociatedContentsScheduledForDeletion->isEmpty()) {
+                    \Thelia\Model\CategoryAssociatedContentQuery::create()
+                        ->filterByPrimaryKeys($this->categoryAssociatedContentsScheduledForDeletion->getPrimaryKeys(false))
+                        ->delete($con);
+                    $this->categoryAssociatedContentsScheduledForDeletion = null;
+                }
+            }
+
+                if ($this->collCategoryAssociatedContents !== null) {
+            foreach ($this->collCategoryAssociatedContents as $referrerFK) {
                     if (!$referrerFK->isDeleted() && ($referrerFK->isNew() || $referrerFK->isModified())) {
                         $affectedRows += $referrerFK->save($con);
                     }
@@ -1460,9 +1493,6 @@ abstract class Content implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->collContentAssocs) {
-                $result['ContentAssocs'] = $this->collContentAssocs->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
-            }
             if (null !== $this->collRewritings) {
                 $result['Rewritings'] = $this->collRewritings->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
@@ -1474,6 +1504,12 @@ abstract class Content implements ActiveRecordInterface
             }
             if (null !== $this->collContentDocuments) {
                 $result['ContentDocuments'] = $this->collContentDocuments->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collProductAssociatedContents) {
+                $result['ProductAssociatedContents'] = $this->collProductAssociatedContents->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
+            }
+            if (null !== $this->collCategoryAssociatedContents) {
+                $result['CategoryAssociatedContents'] = $this->collCategoryAssociatedContents->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
             }
             if (null !== $this->collContentI18ns) {
                 $result['ContentI18ns'] = $this->collContentI18ns->toArray(null, true, $keyType, $includeLazyLoadColumns, $alreadyDumpedObjects);
@@ -1666,12 +1702,6 @@ abstract class Content implements ActiveRecordInterface
             // the getter/setter methods for fkey referrer objects.
             $copyObj->setNew(false);
 
-            foreach ($this->getContentAssocs() as $relObj) {
-                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
-                    $copyObj->addContentAssoc($relObj->copy($deepCopy));
-                }
-            }
-
             foreach ($this->getRewritings() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addRewriting($relObj->copy($deepCopy));
@@ -1693,6 +1723,18 @@ abstract class Content implements ActiveRecordInterface
             foreach ($this->getContentDocuments() as $relObj) {
                 if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
                     $copyObj->addContentDocument($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getProductAssociatedContents() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addProductAssociatedContent($relObj->copy($deepCopy));
+                }
+            }
+
+            foreach ($this->getCategoryAssociatedContents() as $relObj) {
+                if ($relObj !== $this) {  // ensure that we don't try to copy a reference to ourselves
+                    $copyObj->addCategoryAssociatedContent($relObj->copy($deepCopy));
                 }
             }
 
@@ -1749,9 +1791,6 @@ abstract class Content implements ActiveRecordInterface
      */
     public function initRelation($relationName)
     {
-        if ('ContentAssoc' == $relationName) {
-            return $this->initContentAssocs();
-        }
         if ('Rewriting' == $relationName) {
             return $this->initRewritings();
         }
@@ -1764,280 +1803,18 @@ abstract class Content implements ActiveRecordInterface
         if ('ContentDocument' == $relationName) {
             return $this->initContentDocuments();
         }
+        if ('ProductAssociatedContent' == $relationName) {
+            return $this->initProductAssociatedContents();
+        }
+        if ('CategoryAssociatedContent' == $relationName) {
+            return $this->initCategoryAssociatedContents();
+        }
         if ('ContentI18n' == $relationName) {
             return $this->initContentI18ns();
         }
         if ('ContentVersion' == $relationName) {
             return $this->initContentVersions();
         }
-    }
-
-    /**
-     * Clears out the collContentAssocs collection
-     *
-     * This does not modify the database; however, it will remove any associated objects, causing
-     * them to be refetched by subsequent calls to accessor method.
-     *
-     * @return void
-     * @see        addContentAssocs()
-     */
-    public function clearContentAssocs()
-    {
-        $this->collContentAssocs = null; // important to set this to NULL since that means it is uninitialized
-    }
-
-    /**
-     * Reset is the collContentAssocs collection loaded partially.
-     */
-    public function resetPartialContentAssocs($v = true)
-    {
-        $this->collContentAssocsPartial = $v;
-    }
-
-    /**
-     * Initializes the collContentAssocs collection.
-     *
-     * By default this just sets the collContentAssocs collection to an empty array (like clearcollContentAssocs());
-     * however, you may wish to override this method in your stub class to provide setting appropriate
-     * to your application -- for example, setting the initial array to the values stored in database.
-     *
-     * @param      boolean $overrideExisting If set to true, the method call initializes
-     *                                        the collection even if it is not empty
-     *
-     * @return void
-     */
-    public function initContentAssocs($overrideExisting = true)
-    {
-        if (null !== $this->collContentAssocs && !$overrideExisting) {
-            return;
-        }
-        $this->collContentAssocs = new ObjectCollection();
-        $this->collContentAssocs->setModel('\Thelia\Model\ContentAssoc');
-    }
-
-    /**
-     * Gets an array of ChildContentAssoc objects which contain a foreign key that references this object.
-     *
-     * If the $criteria is not null, it is used to always fetch the results from the database.
-     * Otherwise the results are fetched from the database the first time, then cached.
-     * Next time the same method is called without $criteria, the cached collection is returned.
-     * If this ChildContent is new, it will return
-     * an empty collection or the current collection; the criteria is ignored on a new object.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @return Collection|ChildContentAssoc[] List of ChildContentAssoc objects
-     * @throws PropelException
-     */
-    public function getContentAssocs($criteria = null, ConnectionInterface $con = null)
-    {
-        $partial = $this->collContentAssocsPartial && !$this->isNew();
-        if (null === $this->collContentAssocs || null !== $criteria  || $partial) {
-            if ($this->isNew() && null === $this->collContentAssocs) {
-                // return empty collection
-                $this->initContentAssocs();
-            } else {
-                $collContentAssocs = ChildContentAssocQuery::create(null, $criteria)
-                    ->filterByContent($this)
-                    ->find($con);
-
-                if (null !== $criteria) {
-                    if (false !== $this->collContentAssocsPartial && count($collContentAssocs)) {
-                        $this->initContentAssocs(false);
-
-                        foreach ($collContentAssocs as $obj) {
-                            if (false == $this->collContentAssocs->contains($obj)) {
-                                $this->collContentAssocs->append($obj);
-                            }
-                        }
-
-                        $this->collContentAssocsPartial = true;
-                    }
-
-                    $collContentAssocs->getInternalIterator()->rewind();
-
-                    return $collContentAssocs;
-                }
-
-                if ($partial && $this->collContentAssocs) {
-                    foreach ($this->collContentAssocs as $obj) {
-                        if ($obj->isNew()) {
-                            $collContentAssocs[] = $obj;
-                        }
-                    }
-                }
-
-                $this->collContentAssocs = $collContentAssocs;
-                $this->collContentAssocsPartial = false;
-            }
-        }
-
-        return $this->collContentAssocs;
-    }
-
-    /**
-     * Sets a collection of ContentAssoc objects related by a one-to-many relationship
-     * to the current object.
-     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
-     * and new objects from the given Propel collection.
-     *
-     * @param      Collection $contentAssocs A Propel collection.
-     * @param      ConnectionInterface $con Optional connection object
-     * @return   ChildContent The current object (for fluent API support)
-     */
-    public function setContentAssocs(Collection $contentAssocs, ConnectionInterface $con = null)
-    {
-        $contentAssocsToDelete = $this->getContentAssocs(new Criteria(), $con)->diff($contentAssocs);
-
-
-        $this->contentAssocsScheduledForDeletion = $contentAssocsToDelete;
-
-        foreach ($contentAssocsToDelete as $contentAssocRemoved) {
-            $contentAssocRemoved->setContent(null);
-        }
-
-        $this->collContentAssocs = null;
-        foreach ($contentAssocs as $contentAssoc) {
-            $this->addContentAssoc($contentAssoc);
-        }
-
-        $this->collContentAssocs = $contentAssocs;
-        $this->collContentAssocsPartial = false;
-
-        return $this;
-    }
-
-    /**
-     * Returns the number of related ContentAssoc objects.
-     *
-     * @param      Criteria $criteria
-     * @param      boolean $distinct
-     * @param      ConnectionInterface $con
-     * @return int             Count of related ContentAssoc objects.
-     * @throws PropelException
-     */
-    public function countContentAssocs(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
-    {
-        $partial = $this->collContentAssocsPartial && !$this->isNew();
-        if (null === $this->collContentAssocs || null !== $criteria || $partial) {
-            if ($this->isNew() && null === $this->collContentAssocs) {
-                return 0;
-            }
-
-            if ($partial && !$criteria) {
-                return count($this->getContentAssocs());
-            }
-
-            $query = ChildContentAssocQuery::create(null, $criteria);
-            if ($distinct) {
-                $query->distinct();
-            }
-
-            return $query
-                ->filterByContent($this)
-                ->count($con);
-        }
-
-        return count($this->collContentAssocs);
-    }
-
-    /**
-     * Method called to associate a ChildContentAssoc object to this object
-     * through the ChildContentAssoc foreign key attribute.
-     *
-     * @param    ChildContentAssoc $l ChildContentAssoc
-     * @return   \Thelia\Model\Content The current object (for fluent API support)
-     */
-    public function addContentAssoc(ChildContentAssoc $l)
-    {
-        if ($this->collContentAssocs === null) {
-            $this->initContentAssocs();
-            $this->collContentAssocsPartial = true;
-        }
-
-        if (!in_array($l, $this->collContentAssocs->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
-            $this->doAddContentAssoc($l);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param ContentAssoc $contentAssoc The contentAssoc object to add.
-     */
-    protected function doAddContentAssoc($contentAssoc)
-    {
-        $this->collContentAssocs[]= $contentAssoc;
-        $contentAssoc->setContent($this);
-    }
-
-    /**
-     * @param  ContentAssoc $contentAssoc The contentAssoc object to remove.
-     * @return ChildContent The current object (for fluent API support)
-     */
-    public function removeContentAssoc($contentAssoc)
-    {
-        if ($this->getContentAssocs()->contains($contentAssoc)) {
-            $this->collContentAssocs->remove($this->collContentAssocs->search($contentAssoc));
-            if (null === $this->contentAssocsScheduledForDeletion) {
-                $this->contentAssocsScheduledForDeletion = clone $this->collContentAssocs;
-                $this->contentAssocsScheduledForDeletion->clear();
-            }
-            $this->contentAssocsScheduledForDeletion[]= $contentAssoc;
-            $contentAssoc->setContent(null);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Content is new, it will return
-     * an empty collection; or if this Content has previously
-     * been saved, it will retrieve related ContentAssocs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Content.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildContentAssoc[] List of ChildContentAssoc objects
-     */
-    public function getContentAssocsJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildContentAssocQuery::create(null, $criteria);
-        $query->joinWith('Category', $joinBehavior);
-
-        return $this->getContentAssocs($query, $con);
-    }
-
-
-    /**
-     * If this collection has already been initialized with
-     * an identical criteria, it returns the collection.
-     * Otherwise if this Content is new, it will return
-     * an empty collection; or if this Content has previously
-     * been saved, it will retrieve related ContentAssocs from storage.
-     *
-     * This method is protected by default in order to keep the public
-     * api reasonable.  You can provide public methods for those you
-     * actually need in Content.
-     *
-     * @param      Criteria $criteria optional Criteria object to narrow the query
-     * @param      ConnectionInterface $con optional connection object
-     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
-     * @return Collection|ChildContentAssoc[] List of ChildContentAssoc objects
-     */
-    public function getContentAssocsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
-    {
-        $query = ChildContentAssocQuery::create(null, $criteria);
-        $query->joinWith('Product', $joinBehavior);
-
-        return $this->getContentAssocs($query, $con);
     }
 
     /**
@@ -3016,6 +2793,492 @@ abstract class Content implements ActiveRecordInterface
     }
 
     /**
+     * Clears out the collProductAssociatedContents collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addProductAssociatedContents()
+     */
+    public function clearProductAssociatedContents()
+    {
+        $this->collProductAssociatedContents = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collProductAssociatedContents collection loaded partially.
+     */
+    public function resetPartialProductAssociatedContents($v = true)
+    {
+        $this->collProductAssociatedContentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collProductAssociatedContents collection.
+     *
+     * By default this just sets the collProductAssociatedContents collection to an empty array (like clearcollProductAssociatedContents());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initProductAssociatedContents($overrideExisting = true)
+    {
+        if (null !== $this->collProductAssociatedContents && !$overrideExisting) {
+            return;
+        }
+        $this->collProductAssociatedContents = new ObjectCollection();
+        $this->collProductAssociatedContents->setModel('\Thelia\Model\ProductAssociatedContent');
+    }
+
+    /**
+     * Gets an array of ChildProductAssociatedContent objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildContent is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildProductAssociatedContent[] List of ChildProductAssociatedContent objects
+     * @throws PropelException
+     */
+    public function getProductAssociatedContents($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductAssociatedContentsPartial && !$this->isNew();
+        if (null === $this->collProductAssociatedContents || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collProductAssociatedContents) {
+                // return empty collection
+                $this->initProductAssociatedContents();
+            } else {
+                $collProductAssociatedContents = ChildProductAssociatedContentQuery::create(null, $criteria)
+                    ->filterByContent($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collProductAssociatedContentsPartial && count($collProductAssociatedContents)) {
+                        $this->initProductAssociatedContents(false);
+
+                        foreach ($collProductAssociatedContents as $obj) {
+                            if (false == $this->collProductAssociatedContents->contains($obj)) {
+                                $this->collProductAssociatedContents->append($obj);
+                            }
+                        }
+
+                        $this->collProductAssociatedContentsPartial = true;
+                    }
+
+                    $collProductAssociatedContents->getInternalIterator()->rewind();
+
+                    return $collProductAssociatedContents;
+                }
+
+                if ($partial && $this->collProductAssociatedContents) {
+                    foreach ($this->collProductAssociatedContents as $obj) {
+                        if ($obj->isNew()) {
+                            $collProductAssociatedContents[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collProductAssociatedContents = $collProductAssociatedContents;
+                $this->collProductAssociatedContentsPartial = false;
+            }
+        }
+
+        return $this->collProductAssociatedContents;
+    }
+
+    /**
+     * Sets a collection of ProductAssociatedContent objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $productAssociatedContents A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildContent The current object (for fluent API support)
+     */
+    public function setProductAssociatedContents(Collection $productAssociatedContents, ConnectionInterface $con = null)
+    {
+        $productAssociatedContentsToDelete = $this->getProductAssociatedContents(new Criteria(), $con)->diff($productAssociatedContents);
+
+
+        $this->productAssociatedContentsScheduledForDeletion = $productAssociatedContentsToDelete;
+
+        foreach ($productAssociatedContentsToDelete as $productAssociatedContentRemoved) {
+            $productAssociatedContentRemoved->setContent(null);
+        }
+
+        $this->collProductAssociatedContents = null;
+        foreach ($productAssociatedContents as $productAssociatedContent) {
+            $this->addProductAssociatedContent($productAssociatedContent);
+        }
+
+        $this->collProductAssociatedContents = $productAssociatedContents;
+        $this->collProductAssociatedContentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related ProductAssociatedContent objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related ProductAssociatedContent objects.
+     * @throws PropelException
+     */
+    public function countProductAssociatedContents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collProductAssociatedContentsPartial && !$this->isNew();
+        if (null === $this->collProductAssociatedContents || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collProductAssociatedContents) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getProductAssociatedContents());
+            }
+
+            $query = ChildProductAssociatedContentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
+        }
+
+        return count($this->collProductAssociatedContents);
+    }
+
+    /**
+     * Method called to associate a ChildProductAssociatedContent object to this object
+     * through the ChildProductAssociatedContent foreign key attribute.
+     *
+     * @param    ChildProductAssociatedContent $l ChildProductAssociatedContent
+     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     */
+    public function addProductAssociatedContent(ChildProductAssociatedContent $l)
+    {
+        if ($this->collProductAssociatedContents === null) {
+            $this->initProductAssociatedContents();
+            $this->collProductAssociatedContentsPartial = true;
+        }
+
+        if (!in_array($l, $this->collProductAssociatedContents->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddProductAssociatedContent($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param ProductAssociatedContent $productAssociatedContent The productAssociatedContent object to add.
+     */
+    protected function doAddProductAssociatedContent($productAssociatedContent)
+    {
+        $this->collProductAssociatedContents[]= $productAssociatedContent;
+        $productAssociatedContent->setContent($this);
+    }
+
+    /**
+     * @param  ProductAssociatedContent $productAssociatedContent The productAssociatedContent object to remove.
+     * @return ChildContent The current object (for fluent API support)
+     */
+    public function removeProductAssociatedContent($productAssociatedContent)
+    {
+        if ($this->getProductAssociatedContents()->contains($productAssociatedContent)) {
+            $this->collProductAssociatedContents->remove($this->collProductAssociatedContents->search($productAssociatedContent));
+            if (null === $this->productAssociatedContentsScheduledForDeletion) {
+                $this->productAssociatedContentsScheduledForDeletion = clone $this->collProductAssociatedContents;
+                $this->productAssociatedContentsScheduledForDeletion->clear();
+            }
+            $this->productAssociatedContentsScheduledForDeletion[]= clone $productAssociatedContent;
+            $productAssociatedContent->setContent(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Content is new, it will return
+     * an empty collection; or if this Content has previously
+     * been saved, it will retrieve related ProductAssociatedContents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Content.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildProductAssociatedContent[] List of ChildProductAssociatedContent objects
+     */
+    public function getProductAssociatedContentsJoinProduct($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildProductAssociatedContentQuery::create(null, $criteria);
+        $query->joinWith('Product', $joinBehavior);
+
+        return $this->getProductAssociatedContents($query, $con);
+    }
+
+    /**
+     * Clears out the collCategoryAssociatedContents collection
+     *
+     * This does not modify the database; however, it will remove any associated objects, causing
+     * them to be refetched by subsequent calls to accessor method.
+     *
+     * @return void
+     * @see        addCategoryAssociatedContents()
+     */
+    public function clearCategoryAssociatedContents()
+    {
+        $this->collCategoryAssociatedContents = null; // important to set this to NULL since that means it is uninitialized
+    }
+
+    /**
+     * Reset is the collCategoryAssociatedContents collection loaded partially.
+     */
+    public function resetPartialCategoryAssociatedContents($v = true)
+    {
+        $this->collCategoryAssociatedContentsPartial = $v;
+    }
+
+    /**
+     * Initializes the collCategoryAssociatedContents collection.
+     *
+     * By default this just sets the collCategoryAssociatedContents collection to an empty array (like clearcollCategoryAssociatedContents());
+     * however, you may wish to override this method in your stub class to provide setting appropriate
+     * to your application -- for example, setting the initial array to the values stored in database.
+     *
+     * @param      boolean $overrideExisting If set to true, the method call initializes
+     *                                        the collection even if it is not empty
+     *
+     * @return void
+     */
+    public function initCategoryAssociatedContents($overrideExisting = true)
+    {
+        if (null !== $this->collCategoryAssociatedContents && !$overrideExisting) {
+            return;
+        }
+        $this->collCategoryAssociatedContents = new ObjectCollection();
+        $this->collCategoryAssociatedContents->setModel('\Thelia\Model\CategoryAssociatedContent');
+    }
+
+    /**
+     * Gets an array of ChildCategoryAssociatedContent objects which contain a foreign key that references this object.
+     *
+     * If the $criteria is not null, it is used to always fetch the results from the database.
+     * Otherwise the results are fetched from the database the first time, then cached.
+     * Next time the same method is called without $criteria, the cached collection is returned.
+     * If this ChildContent is new, it will return
+     * an empty collection or the current collection; the criteria is ignored on a new object.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @return Collection|ChildCategoryAssociatedContent[] List of ChildCategoryAssociatedContent objects
+     * @throws PropelException
+     */
+    public function getCategoryAssociatedContents($criteria = null, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCategoryAssociatedContentsPartial && !$this->isNew();
+        if (null === $this->collCategoryAssociatedContents || null !== $criteria  || $partial) {
+            if ($this->isNew() && null === $this->collCategoryAssociatedContents) {
+                // return empty collection
+                $this->initCategoryAssociatedContents();
+            } else {
+                $collCategoryAssociatedContents = ChildCategoryAssociatedContentQuery::create(null, $criteria)
+                    ->filterByContent($this)
+                    ->find($con);
+
+                if (null !== $criteria) {
+                    if (false !== $this->collCategoryAssociatedContentsPartial && count($collCategoryAssociatedContents)) {
+                        $this->initCategoryAssociatedContents(false);
+
+                        foreach ($collCategoryAssociatedContents as $obj) {
+                            if (false == $this->collCategoryAssociatedContents->contains($obj)) {
+                                $this->collCategoryAssociatedContents->append($obj);
+                            }
+                        }
+
+                        $this->collCategoryAssociatedContentsPartial = true;
+                    }
+
+                    $collCategoryAssociatedContents->getInternalIterator()->rewind();
+
+                    return $collCategoryAssociatedContents;
+                }
+
+                if ($partial && $this->collCategoryAssociatedContents) {
+                    foreach ($this->collCategoryAssociatedContents as $obj) {
+                        if ($obj->isNew()) {
+                            $collCategoryAssociatedContents[] = $obj;
+                        }
+                    }
+                }
+
+                $this->collCategoryAssociatedContents = $collCategoryAssociatedContents;
+                $this->collCategoryAssociatedContentsPartial = false;
+            }
+        }
+
+        return $this->collCategoryAssociatedContents;
+    }
+
+    /**
+     * Sets a collection of CategoryAssociatedContent objects related by a one-to-many relationship
+     * to the current object.
+     * It will also schedule objects for deletion based on a diff between old objects (aka persisted)
+     * and new objects from the given Propel collection.
+     *
+     * @param      Collection $categoryAssociatedContents A Propel collection.
+     * @param      ConnectionInterface $con Optional connection object
+     * @return   ChildContent The current object (for fluent API support)
+     */
+    public function setCategoryAssociatedContents(Collection $categoryAssociatedContents, ConnectionInterface $con = null)
+    {
+        $categoryAssociatedContentsToDelete = $this->getCategoryAssociatedContents(new Criteria(), $con)->diff($categoryAssociatedContents);
+
+
+        $this->categoryAssociatedContentsScheduledForDeletion = $categoryAssociatedContentsToDelete;
+
+        foreach ($categoryAssociatedContentsToDelete as $categoryAssociatedContentRemoved) {
+            $categoryAssociatedContentRemoved->setContent(null);
+        }
+
+        $this->collCategoryAssociatedContents = null;
+        foreach ($categoryAssociatedContents as $categoryAssociatedContent) {
+            $this->addCategoryAssociatedContent($categoryAssociatedContent);
+        }
+
+        $this->collCategoryAssociatedContents = $categoryAssociatedContents;
+        $this->collCategoryAssociatedContentsPartial = false;
+
+        return $this;
+    }
+
+    /**
+     * Returns the number of related CategoryAssociatedContent objects.
+     *
+     * @param      Criteria $criteria
+     * @param      boolean $distinct
+     * @param      ConnectionInterface $con
+     * @return int             Count of related CategoryAssociatedContent objects.
+     * @throws PropelException
+     */
+    public function countCategoryAssociatedContents(Criteria $criteria = null, $distinct = false, ConnectionInterface $con = null)
+    {
+        $partial = $this->collCategoryAssociatedContentsPartial && !$this->isNew();
+        if (null === $this->collCategoryAssociatedContents || null !== $criteria || $partial) {
+            if ($this->isNew() && null === $this->collCategoryAssociatedContents) {
+                return 0;
+            }
+
+            if ($partial && !$criteria) {
+                return count($this->getCategoryAssociatedContents());
+            }
+
+            $query = ChildCategoryAssociatedContentQuery::create(null, $criteria);
+            if ($distinct) {
+                $query->distinct();
+            }
+
+            return $query
+                ->filterByContent($this)
+                ->count($con);
+        }
+
+        return count($this->collCategoryAssociatedContents);
+    }
+
+    /**
+     * Method called to associate a ChildCategoryAssociatedContent object to this object
+     * through the ChildCategoryAssociatedContent foreign key attribute.
+     *
+     * @param    ChildCategoryAssociatedContent $l ChildCategoryAssociatedContent
+     * @return   \Thelia\Model\Content The current object (for fluent API support)
+     */
+    public function addCategoryAssociatedContent(ChildCategoryAssociatedContent $l)
+    {
+        if ($this->collCategoryAssociatedContents === null) {
+            $this->initCategoryAssociatedContents();
+            $this->collCategoryAssociatedContentsPartial = true;
+        }
+
+        if (!in_array($l, $this->collCategoryAssociatedContents->getArrayCopy(), true)) { // only add it if the **same** object is not already associated
+            $this->doAddCategoryAssociatedContent($l);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param CategoryAssociatedContent $categoryAssociatedContent The categoryAssociatedContent object to add.
+     */
+    protected function doAddCategoryAssociatedContent($categoryAssociatedContent)
+    {
+        $this->collCategoryAssociatedContents[]= $categoryAssociatedContent;
+        $categoryAssociatedContent->setContent($this);
+    }
+
+    /**
+     * @param  CategoryAssociatedContent $categoryAssociatedContent The categoryAssociatedContent object to remove.
+     * @return ChildContent The current object (for fluent API support)
+     */
+    public function removeCategoryAssociatedContent($categoryAssociatedContent)
+    {
+        if ($this->getCategoryAssociatedContents()->contains($categoryAssociatedContent)) {
+            $this->collCategoryAssociatedContents->remove($this->collCategoryAssociatedContents->search($categoryAssociatedContent));
+            if (null === $this->categoryAssociatedContentsScheduledForDeletion) {
+                $this->categoryAssociatedContentsScheduledForDeletion = clone $this->collCategoryAssociatedContents;
+                $this->categoryAssociatedContentsScheduledForDeletion->clear();
+            }
+            $this->categoryAssociatedContentsScheduledForDeletion[]= clone $categoryAssociatedContent;
+            $categoryAssociatedContent->setContent(null);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * If this collection has already been initialized with
+     * an identical criteria, it returns the collection.
+     * Otherwise if this Content is new, it will return
+     * an empty collection; or if this Content has previously
+     * been saved, it will retrieve related CategoryAssociatedContents from storage.
+     *
+     * This method is protected by default in order to keep the public
+     * api reasonable.  You can provide public methods for those you
+     * actually need in Content.
+     *
+     * @param      Criteria $criteria optional Criteria object to narrow the query
+     * @param      ConnectionInterface $con optional connection object
+     * @param      string $joinBehavior optional join type to use (defaults to Criteria::LEFT_JOIN)
+     * @return Collection|ChildCategoryAssociatedContent[] List of ChildCategoryAssociatedContent objects
+     */
+    public function getCategoryAssociatedContentsJoinCategory($criteria = null, $con = null, $joinBehavior = Criteria::LEFT_JOIN)
+    {
+        $query = ChildCategoryAssociatedContentQuery::create(null, $criteria);
+        $query->joinWith('Category', $joinBehavior);
+
+        return $this->getCategoryAssociatedContents($query, $con);
+    }
+
+    /**
      * Clears out the collContentI18ns collection
      *
      * This does not modify the database; however, it will remove any associated objects, causing
@@ -3677,11 +3940,6 @@ abstract class Content implements ActiveRecordInterface
     public function clearAllReferences($deep = false)
     {
         if ($deep) {
-            if ($this->collContentAssocs) {
-                foreach ($this->collContentAssocs as $o) {
-                    $o->clearAllReferences($deep);
-                }
-            }
             if ($this->collRewritings) {
                 foreach ($this->collRewritings as $o) {
                     $o->clearAllReferences($deep);
@@ -3699,6 +3957,16 @@ abstract class Content implements ActiveRecordInterface
             }
             if ($this->collContentDocuments) {
                 foreach ($this->collContentDocuments as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collProductAssociatedContents) {
+                foreach ($this->collProductAssociatedContents as $o) {
+                    $o->clearAllReferences($deep);
+                }
+            }
+            if ($this->collCategoryAssociatedContents) {
+                foreach ($this->collCategoryAssociatedContents as $o) {
                     $o->clearAllReferences($deep);
                 }
             }
@@ -3723,10 +3991,6 @@ abstract class Content implements ActiveRecordInterface
         $this->currentLocale = 'en_EN';
         $this->currentTranslations = null;
 
-        if ($this->collContentAssocs instanceof Collection) {
-            $this->collContentAssocs->clearIterator();
-        }
-        $this->collContentAssocs = null;
         if ($this->collRewritings instanceof Collection) {
             $this->collRewritings->clearIterator();
         }
@@ -3743,6 +4007,14 @@ abstract class Content implements ActiveRecordInterface
             $this->collContentDocuments->clearIterator();
         }
         $this->collContentDocuments = null;
+        if ($this->collProductAssociatedContents instanceof Collection) {
+            $this->collProductAssociatedContents->clearIterator();
+        }
+        $this->collProductAssociatedContents = null;
+        if ($this->collCategoryAssociatedContents instanceof Collection) {
+            $this->collCategoryAssociatedContents->clearIterator();
+        }
+        $this->collCategoryAssociatedContents = null;
         if ($this->collContentI18ns instanceof Collection) {
             $this->collContentI18ns->clearIterator();
         }

@@ -87,4 +87,14 @@ class RepeatedDateParam extends RepeatedParam
 
         return $ret;
     }
+
+    /**
+     * Get Parameter value to test against
+     *
+     * @return \DatePeriod
+     */
+    public function getValue()
+    {
+        return clone $this->datePeriod;
+    }
 }

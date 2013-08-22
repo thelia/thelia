@@ -38,7 +38,7 @@ use DateTime;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-abstract class RepeatedParam implements ComparableInterface
+abstract class RepeatedParam implements ComparableInterface, RuleParameterInterface
 {
     /** @var DateTime The start date of the period. */
     protected $from = null;
@@ -232,9 +232,19 @@ abstract class RepeatedParam implements ComparableInterface
     /**
      * Get date DatePeriod
      *
-     * @return DatePeriod
+     * @return \DatePeriod
      */
     public function getDatePeriod()
+    {
+        return clone $this->datePeriod;
+    }
+
+    /**
+     * Get Parameter value to test against
+     *
+     * @return \DatePeriod
+     */
+    public function getValue()
     {
         return clone $this->datePeriod;
     }

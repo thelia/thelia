@@ -36,7 +36,7 @@ use Thelia\Coupon\Parameter\ComparableInterface;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class DateParam implements ComparableInterface
+class DateParam implements ComparableInterface, RuleParameterInterface
 {
     /** @var \DateTime Date  */
     protected $dateTime = null;
@@ -92,5 +92,16 @@ class DateParam implements ComparableInterface
 
         return $ret;
     }
+
+    /**
+     * Get Parameter value to test against
+     *
+     * @return \Datetime
+     */
+    public function getValue()
+    {
+        return clone $this->dateTime;
+    }
+
 
 }

@@ -26,6 +26,8 @@ namespace Thelia\Coupon\Rule;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\Parameter\ComparableInterface;
+use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Exception\InvalidRuleException;
 use Thelia\Exception\InvalidRuleOperatorException;
 
 /**
@@ -59,19 +61,46 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      * Constructor
      * Ex:
      *     Param 1 :
-     *     $validators['price']['operator'] = Operators::INFERIOR
-     *                         ['value'] = new IntegerParam(10)
+     *     $priceValidator = new RuleValidator(
+     *         Operators::INFERIOR,
+     *         new IntegerParam(10)
+     *     )
+     *     $validators[AvailableForTotalAmount::PARAM1_PRICE] = $priceValidator
      *
      *     Param 2 :
-     *     $paramsToValidate['price'] = 9
+     *     $paramsToValidate[AvailableForTotalAmount::PARAM1_PRICE] = 9
      *
-     * @param array $validators Parameters validating $paramsToValidate against
+     * @param array $validators Array of RuleValidator
+     *                          validating $paramsToValidate against
      * @param array $validated  Parameters to be paramsToValidate
+     *
+     * @throws InvalidRuleException
      */
     public function __construct(array $validators, array $validated = null)
     {
-        $this->validators = $validators;
+        $this->setValidators($validators);
         $this->paramsToValidate = $validated;
+    }
+
+    /**
+     * Check validator relevancy and store them
+     *
+     * @param array $validators Array of RuleValidator
+     *                          validating $paramsToValidate against
+     *
+     * @return $this
+     * @throws InvalidRuleException
+     */
+    protected function setValidators(array $validators)
+    {
+        foreach ($validators as $validator) {
+            if (!$validator instanceof RuleValidator) {
+                throw new InvalidRuleException(get_class());
+            }
+        }
+        $this->validators = $validators;
+
+        return $this;
     }
 
     /**
@@ -85,11 +114,12 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
         $this->checkCheckoutInput();
 
         $isMatching = true;
+        /** @var $validator RuleValidator*/
         foreach ($this->validators as $param => $validator) {
             $a = $this->paramsToValidate[$param];
-            $operator = $validator[self::OPERATOR];
-            /** @var ComparableInterface $b */
-            $b = $validator[self::VALUE];
+            $operator = $validator->getOperator();
+            /** @var ComparableInterface, RuleParameterInterface $b */
+            $b = $validator->getParam();
 
             if (!Operators::isValidAccordingToOperator($a, $operator, $b)) {
                 $isMatching = false;
@@ -118,9 +148,11 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      */
     protected function checkBackOfficeInputsOperators()
     {
+        /** @var RuleValidator $param */
         foreach ($this->validators as $key => $param) {
-            if (!isset($param[self::OPERATOR])
-                ||!in_array($param[self::OPERATOR], $this->availableOperators)
+            $operator = $param->getOperator();
+            if (!isset($operator)
+                ||!in_array($operator, $this->availableOperators)
             ) {
                 throw new InvalidRuleOperatorException(get_class(), $key);
             }
@@ -137,7 +169,7 @@ abstract class CouponRuleAbstract implements CouponRuleInterface
      * @throws \Symfony\Component\Intl\Exception\NotImplementedException
      * @return $this
      */
-    protected function setValidators(CouponAdapterInterface $adapter)
+    protected function setValidatorsFromAdapter(CouponAdapterInterface $adapter)
     {
         throw new NotImplementedException(
             'CouponRuleInterface::setValidators needs to be implemented'

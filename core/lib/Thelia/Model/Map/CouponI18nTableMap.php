@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Accessory;
-use Thelia\Model\AccessoryQuery;
+use Thelia\Model\CouponI18n;
+use Thelia\Model\CouponI18nQuery;
 
 
 /**
- * This class defines the structure of the 'accessory' table.
+ * This class defines the structure of the 'coupon_i18n' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\AccessoryQuery;
  * (i.e. if it's a text column type).
  *
  */
-class AccessoryTableMap extends TableMap
+class CouponI18nTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.AccessoryTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.CouponI18nTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class AccessoryTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'accessory';
+    const TABLE_NAME = 'coupon_i18n';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Accessory';
+    const OM_CLASS = '\\Thelia\\Model\\CouponI18n';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Accessory';
+    const CLASS_DEFAULT = 'Thelia.Model.CouponI18n';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 6;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -67,37 +67,17 @@ class AccessoryTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 6;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'accessory.ID';
+    const ID = 'coupon_i18n.ID';
 
     /**
-     * the column name for the PRODUCT_ID field
+     * the column name for the LOCALE field
      */
-    const PRODUCT_ID = 'accessory.PRODUCT_ID';
-
-    /**
-     * the column name for the ACCESSORY field
-     */
-    const ACCESSORY = 'accessory.ACCESSORY';
-
-    /**
-     * the column name for the POSITION field
-     */
-    const POSITION = 'accessory.POSITION';
-
-    /**
-     * the column name for the CREATED_AT field
-     */
-    const CREATED_AT = 'accessory.CREATED_AT';
-
-    /**
-     * the column name for the UPDATED_AT field
-     */
-    const UPDATED_AT = 'accessory.UPDATED_AT';
+    const LOCALE = 'coupon_i18n.LOCALE';
 
     /**
      * The default string format for model objects of the related table
@@ -111,12 +91,12 @@ class AccessoryTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'ProductId', 'Accessory', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'productId', 'accessory', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(AccessoryTableMap::ID, AccessoryTableMap::PRODUCT_ID, AccessoryTableMap::ACCESSORY, AccessoryTableMap::POSITION, AccessoryTableMap::CREATED_AT, AccessoryTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'PRODUCT_ID', 'ACCESSORY', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'product_id', 'accessory', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', ),
+        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID, CouponI18nTableMap::LOCALE, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -126,12 +106,12 @@ class AccessoryTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'ProductId' => 1, 'Accessory' => 2, 'Position' => 3, 'CreatedAt' => 4, 'UpdatedAt' => 5, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'productId' => 1, 'accessory' => 2, 'position' => 3, 'createdAt' => 4, 'updatedAt' => 5, ),
-        self::TYPE_COLNAME       => array(AccessoryTableMap::ID => 0, AccessoryTableMap::PRODUCT_ID => 1, AccessoryTableMap::ACCESSORY => 2, AccessoryTableMap::POSITION => 3, AccessoryTableMap::CREATED_AT => 4, AccessoryTableMap::UPDATED_AT => 5, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'PRODUCT_ID' => 1, 'ACCESSORY' => 2, 'POSITION' => 3, 'CREATED_AT' => 4, 'UPDATED_AT' => 5, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'product_id' => 1, 'accessory' => 2, 'position' => 3, 'created_at' => 4, 'updated_at' => 5, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, ),
+        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID => 0, CouponI18nTableMap::LOCALE => 1, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -144,19 +124,14 @@ class AccessoryTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('accessory');
-        $this->setPhpName('Accessory');
-        $this->setClassName('\\Thelia\\Model\\Accessory');
+        $this->setName('coupon_i18n');
+        $this->setPhpName('CouponI18n');
+        $this->setClassName('\\Thelia\\Model\\CouponI18n');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
-        $this->setIsCrossRef(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', true, null, null);
-        $this->addForeignKey('ACCESSORY', 'Accessory', 'INTEGER', 'product', 'ID', true, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', true, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'coupon', 'ID', true, null, null);
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
     } // initialize()
 
     /**
@@ -164,22 +139,61 @@ class AccessoryTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('ProductRelatedByProductId', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('ProductRelatedByAccessory', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('accessory' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**
+     * Adds an object to the instance pool.
      *
-     * Gets the list of behaviors registered for this table
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
      *
-     * @return array Associative array (name => parameters) of behaviors
+     * @param \Thelia\Model\CouponI18n $obj A \Thelia\Model\CouponI18n object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public function getBehaviors()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-        );
-    } // getBehaviors()
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getLocale()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\CouponI18n object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\CouponI18n) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getLocale()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\CouponI18n object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -195,11 +209,11 @@ class AccessoryTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -217,11 +231,7 @@ class AccessoryTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -237,7 +247,7 @@ class AccessoryTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? AccessoryTableMap::CLASS_DEFAULT : AccessoryTableMap::OM_CLASS;
+        return $withPrefix ? CouponI18nTableMap::CLASS_DEFAULT : CouponI18nTableMap::OM_CLASS;
     }
 
     /**
@@ -251,21 +261,21 @@ class AccessoryTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Accessory object, last column rank)
+     * @return array (CouponI18n object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = AccessoryTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = AccessoryTableMap::getInstanceFromPool($key))) {
+        $key = CouponI18nTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = CouponI18nTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + AccessoryTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + CouponI18nTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = AccessoryTableMap::OM_CLASS;
+            $cls = CouponI18nTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            AccessoryTableMap::addInstanceToPool($obj, $key);
+            CouponI18nTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -288,8 +298,8 @@ class AccessoryTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = AccessoryTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = AccessoryTableMap::getInstanceFromPool($key))) {
+            $key = CouponI18nTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = CouponI18nTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -298,7 +308,7 @@ class AccessoryTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                AccessoryTableMap::addInstanceToPool($obj, $key);
+                CouponI18nTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -319,19 +329,11 @@ class AccessoryTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(AccessoryTableMap::ID);
-            $criteria->addSelectColumn(AccessoryTableMap::PRODUCT_ID);
-            $criteria->addSelectColumn(AccessoryTableMap::ACCESSORY);
-            $criteria->addSelectColumn(AccessoryTableMap::POSITION);
-            $criteria->addSelectColumn(AccessoryTableMap::CREATED_AT);
-            $criteria->addSelectColumn(AccessoryTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(CouponI18nTableMap::ID);
+            $criteria->addSelectColumn(CouponI18nTableMap::LOCALE);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.ACCESSORY');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.LOCALE');
         }
     }
 
@@ -344,7 +346,7 @@ class AccessoryTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(AccessoryTableMap::DATABASE_NAME)->getTable(AccessoryTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(CouponI18nTableMap::DATABASE_NAME)->getTable(CouponI18nTableMap::TABLE_NAME);
     }
 
     /**
@@ -352,16 +354,16 @@ class AccessoryTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(AccessoryTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(AccessoryTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new AccessoryTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CouponI18nTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CouponI18nTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CouponI18nTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Accessory or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CouponI18n or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Accessory object or primary key or array of primary keys
+     * @param mixed               $values Criteria or CouponI18n object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -372,25 +374,35 @@ class AccessoryTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AccessoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponI18nTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Accessory) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\CouponI18n) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(AccessoryTableMap::DATABASE_NAME);
-            $criteria->add(AccessoryTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(CouponI18nTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(CouponI18nTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(CouponI18nTableMap::LOCALE, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = AccessoryQuery::create()->mergeWith($criteria);
+        $query = CouponI18nQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { AccessoryTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { CouponI18nTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { AccessoryTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { CouponI18nTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -398,20 +410,20 @@ class AccessoryTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the accessory table.
+     * Deletes all rows from the coupon_i18n table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return AccessoryQuery::create()->doDeleteAll($con);
+        return CouponI18nQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Accessory or Criteria object.
+     * Performs an INSERT on the database, given a CouponI18n or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Accessory object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or CouponI18n object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -420,22 +432,18 @@ class AccessoryTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AccessoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponI18nTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Accessory object
-        }
-
-        if ($criteria->containsKey(AccessoryTableMap::ID) && $criteria->keyContainsValue(AccessoryTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.AccessoryTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from CouponI18n object
         }
 
 
         // Set the correct dbName
-        $query = AccessoryQuery::create()->mergeWith($criteria);
+        $query = CouponI18nQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -451,7 +459,7 @@ class AccessoryTableMap extends TableMap
         return $pk;
     }
 
-} // AccessoryTableMap
+} // CouponI18nTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-AccessoryTableMap::buildTableMap();
+CouponI18nTableMap::buildTableMap();

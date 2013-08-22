@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\Coupon;
-use Thelia\Model\CouponQuery;
+use Thelia\Model\CouponVersion;
+use Thelia\Model\CouponVersionQuery;
 
 
 /**
- * This class defines the structure of the 'coupon' table.
+ * This class defines the structure of the 'coupon_version' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\CouponQuery;
  * (i.e. if it's a text column type).
  *
  */
-class CouponTableMap extends TableMap
+class CouponVersionTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.CouponTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.CouponVersionTableMap';
 
     /**
      * The default database name for this class
@@ -42,17 +42,17 @@ class CouponTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'coupon';
+    const TABLE_NAME = 'coupon_version';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\Coupon';
+    const OM_CLASS = '\\Thelia\\Model\\CouponVersion';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.Coupon';
+    const CLASS_DEFAULT = 'Thelia.Model.CouponVersion';
 
     /**
      * The total number of columns
@@ -72,101 +72,92 @@ class CouponTableMap extends TableMap
     /**
      * the column name for the ID field
      */
-    const ID = 'coupon.ID';
+    const ID = 'coupon_version.ID';
 
     /**
      * the column name for the CODE field
      */
-    const CODE = 'coupon.CODE';
+    const CODE = 'coupon_version.CODE';
 
     /**
      * the column name for the TYPE field
      */
-    const TYPE = 'coupon.TYPE';
+    const TYPE = 'coupon_version.TYPE';
 
     /**
      * the column name for the TITLE field
      */
-    const TITLE = 'coupon.TITLE';
+    const TITLE = 'coupon_version.TITLE';
 
     /**
      * the column name for the SHORT_DESCRIPTION field
      */
-    const SHORT_DESCRIPTION = 'coupon.SHORT_DESCRIPTION';
+    const SHORT_DESCRIPTION = 'coupon_version.SHORT_DESCRIPTION';
 
     /**
      * the column name for the DESCRIPTION field
      */
-    const DESCRIPTION = 'coupon.DESCRIPTION';
+    const DESCRIPTION = 'coupon_version.DESCRIPTION';
 
     /**
      * the column name for the AMOUNT field
      */
-    const AMOUNT = 'coupon.AMOUNT';
+    const AMOUNT = 'coupon_version.AMOUNT';
 
     /**
      * the column name for the IS_USED field
      */
-    const IS_USED = 'coupon.IS_USED';
+    const IS_USED = 'coupon_version.IS_USED';
 
     /**
      * the column name for the IS_ENABLED field
      */
-    const IS_ENABLED = 'coupon.IS_ENABLED';
+    const IS_ENABLED = 'coupon_version.IS_ENABLED';
 
     /**
      * the column name for the EXPIRATION_DATE field
      */
-    const EXPIRATION_DATE = 'coupon.EXPIRATION_DATE';
+    const EXPIRATION_DATE = 'coupon_version.EXPIRATION_DATE';
 
     /**
      * the column name for the SERIALIZED_RULES_TYPE field
      */
-    const SERIALIZED_RULES_TYPE = 'coupon.SERIALIZED_RULES_TYPE';
+    const SERIALIZED_RULES_TYPE = 'coupon_version.SERIALIZED_RULES_TYPE';
 
     /**
      * the column name for the SERIALIZED_RULES_CONTENT field
      */
-    const SERIALIZED_RULES_CONTENT = 'coupon.SERIALIZED_RULES_CONTENT';
+    const SERIALIZED_RULES_CONTENT = 'coupon_version.SERIALIZED_RULES_CONTENT';
 
     /**
      * the column name for the IS_CUMULATIVE field
      */
-    const IS_CUMULATIVE = 'coupon.IS_CUMULATIVE';
+    const IS_CUMULATIVE = 'coupon_version.IS_CUMULATIVE';
 
     /**
      * the column name for the IS_REMOVING_POSTAGE field
      */
-    const IS_REMOVING_POSTAGE = 'coupon.IS_REMOVING_POSTAGE';
+    const IS_REMOVING_POSTAGE = 'coupon_version.IS_REMOVING_POSTAGE';
 
     /**
      * the column name for the CREATED_AT field
      */
-    const CREATED_AT = 'coupon.CREATED_AT';
+    const CREATED_AT = 'coupon_version.CREATED_AT';
 
     /**
      * the column name for the UPDATED_AT field
      */
-    const UPDATED_AT = 'coupon.UPDATED_AT';
+    const UPDATED_AT = 'coupon_version.UPDATED_AT';
 
     /**
      * the column name for the VERSION field
      */
-    const VERSION = 'coupon.VERSION';
+    const VERSION = 'coupon_version.VERSION';
 
     /**
      * The default string format for model objects of the related table
      */
     const DEFAULT_STRING_FORMAT = 'YAML';
-
-    // i18n behavior
-
-    /**
-     * The default locale to use for translations.
-     *
-     * @var string
-     */
-    const DEFAULT_LOCALE = 'en_EN';
 
     /**
      * holds an array of fieldnames
@@ -177,7 +168,7 @@ class CouponTableMap extends TableMap
     protected static $fieldNames = array (
         self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'Title', 'ShortDescription', 'Description', 'Amount', 'IsUsed', 'IsEnabled', 'ExpirationDate', 'SerializedRulesType', 'SerializedRulesContent', 'IsCumulative', 'IsRemovingPostage', 'CreatedAt', 'UpdatedAt', 'Version', ),
         self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'title', 'shortDescription', 'description', 'amount', 'isUsed', 'isEnabled', 'expirationDate', 'serializedRulesType', 'serializedRulesContent', 'isCumulative', 'isRemovingPostage', 'createdAt', 'updatedAt', 'version', ),
-        self::TYPE_COLNAME       => array(CouponTableMap::ID, CouponTableMap::CODE, CouponTableMap::TYPE, CouponTableMap::TITLE, CouponTableMap::SHORT_DESCRIPTION, CouponTableMap::DESCRIPTION, CouponTableMap::AMOUNT, CouponTableMap::IS_USED, CouponTableMap::IS_ENABLED, CouponTableMap::EXPIRATION_DATE, CouponTableMap::SERIALIZED_RULES_TYPE, CouponTableMap::SERIALIZED_RULES_CONTENT, CouponTableMap::IS_CUMULATIVE, CouponTableMap::IS_REMOVING_POSTAGE, CouponTableMap::CREATED_AT, CouponTableMap::UPDATED_AT, CouponTableMap::VERSION, ),
+        self::TYPE_COLNAME       => array(CouponVersionTableMap::ID, CouponVersionTableMap::CODE, CouponVersionTableMap::TYPE, CouponVersionTableMap::TITLE, CouponVersionTableMap::SHORT_DESCRIPTION, CouponVersionTableMap::DESCRIPTION, CouponVersionTableMap::AMOUNT, CouponVersionTableMap::IS_USED, CouponVersionTableMap::IS_ENABLED, CouponVersionTableMap::EXPIRATION_DATE, CouponVersionTableMap::SERIALIZED_RULES_TYPE, CouponVersionTableMap::SERIALIZED_RULES_CONTENT, CouponVersionTableMap::IS_CUMULATIVE, CouponVersionTableMap::IS_REMOVING_POSTAGE, CouponVersionTableMap::CREATED_AT, CouponVersionTableMap::UPDATED_AT, CouponVersionTableMap::VERSION, ),
         self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'TITLE', 'SHORT_DESCRIPTION', 'DESCRIPTION', 'AMOUNT', 'IS_USED', 'IS_ENABLED', 'EXPIRATION_DATE', 'SERIALIZED_RULES_TYPE', 'SERIALIZED_RULES_CONTENT', 'IS_CUMULATIVE', 'IS_REMOVING_POSTAGE', 'CREATED_AT', 'UPDATED_AT', 'VERSION', ),
         self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'title', 'short_description', 'description', 'amount', 'is_used', 'is_enabled', 'expiration_date', 'serialized_rules_type', 'serialized_rules_content', 'is_cumulative', 'is_removing_postage', 'created_at', 'updated_at', 'version', ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
@@ -192,7 +183,7 @@ class CouponTableMap extends TableMap
     protected static $fieldKeys = array (
         self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'Title' => 3, 'ShortDescription' => 4, 'Description' => 5, 'Amount' => 6, 'IsUsed' => 7, 'IsEnabled' => 8, 'ExpirationDate' => 9, 'SerializedRulesType' => 10, 'SerializedRulesContent' => 11, 'IsCumulative' => 12, 'IsRemovingPostage' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, 'Version' => 16, ),
         self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'title' => 3, 'shortDescription' => 4, 'description' => 5, 'amount' => 6, 'isUsed' => 7, 'isEnabled' => 8, 'expirationDate' => 9, 'serializedRulesType' => 10, 'serializedRulesContent' => 11, 'isCumulative' => 12, 'isRemovingPostage' => 13, 'createdAt' => 14, 'updatedAt' => 15, 'version' => 16, ),
-        self::TYPE_COLNAME       => array(CouponTableMap::ID => 0, CouponTableMap::CODE => 1, CouponTableMap::TYPE => 2, CouponTableMap::TITLE => 3, CouponTableMap::SHORT_DESCRIPTION => 4, CouponTableMap::DESCRIPTION => 5, CouponTableMap::AMOUNT => 6, CouponTableMap::IS_USED => 7, CouponTableMap::IS_ENABLED => 8, CouponTableMap::EXPIRATION_DATE => 9, CouponTableMap::SERIALIZED_RULES_TYPE => 10, CouponTableMap::SERIALIZED_RULES_CONTENT => 11, CouponTableMap::IS_CUMULATIVE => 12, CouponTableMap::IS_REMOVING_POSTAGE => 13, CouponTableMap::CREATED_AT => 14, CouponTableMap::UPDATED_AT => 15, CouponTableMap::VERSION => 16, ),
+        self::TYPE_COLNAME       => array(CouponVersionTableMap::ID => 0, CouponVersionTableMap::CODE => 1, CouponVersionTableMap::TYPE => 2, CouponVersionTableMap::TITLE => 3, CouponVersionTableMap::SHORT_DESCRIPTION => 4, CouponVersionTableMap::DESCRIPTION => 5, CouponVersionTableMap::AMOUNT => 6, CouponVersionTableMap::IS_USED => 7, CouponVersionTableMap::IS_ENABLED => 8, CouponVersionTableMap::EXPIRATION_DATE => 9, CouponVersionTableMap::SERIALIZED_RULES_TYPE => 10, CouponVersionTableMap::SERIALIZED_RULES_CONTENT => 11, CouponVersionTableMap::IS_CUMULATIVE => 12, CouponVersionTableMap::IS_REMOVING_POSTAGE => 13, CouponVersionTableMap::CREATED_AT => 14, CouponVersionTableMap::UPDATED_AT => 15, CouponVersionTableMap::VERSION => 16, ),
         self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'TITLE' => 3, 'SHORT_DESCRIPTION' => 4, 'DESCRIPTION' => 5, 'AMOUNT' => 6, 'IS_USED' => 7, 'IS_ENABLED' => 8, 'EXPIRATION_DATE' => 9, 'SERIALIZED_RULES_TYPE' => 10, 'SERIALIZED_RULES_CONTENT' => 11, 'IS_CUMULATIVE' => 12, 'IS_REMOVING_POSTAGE' => 13, 'CREATED_AT' => 14, 'UPDATED_AT' => 15, 'VERSION' => 16, ),
         self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'title' => 3, 'short_description' => 4, 'description' => 5, 'amount' => 6, 'is_used' => 7, 'is_enabled' => 8, 'expiration_date' => 9, 'serialized_rules_type' => 10, 'serialized_rules_content' => 11, 'is_cumulative' => 12, 'is_removing_postage' => 13, 'created_at' => 14, 'updated_at' => 15, 'version' => 16, ),
         self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
@@ -208,13 +199,13 @@ class CouponTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('coupon');
-        $this->setPhpName('Coupon');
-        $this->setClassName('\\Thelia\\Model\\Coupon');
+        $this->setName('coupon_version');
+        $this->setPhpName('CouponVersion');
+        $this->setClassName('\\Thelia\\Model\\CouponVersion');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
+        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'coupon', 'ID', true, null, null);
         $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
         $this->addColumn('TYPE', 'Type', 'VARCHAR', true, 255, null);
         $this->addColumn('TITLE', 'Title', 'VARCHAR', true, 255, null);
@@ -230,7 +221,7 @@ class CouponTableMap extends TableMap
         $this->addColumn('IS_REMOVING_POSTAGE', 'IsRemovingPostage', 'TINYINT', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('VERSION', 'Version', 'INTEGER', false, null, 0);
+        $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
     } // initialize()
 
     /**
@@ -238,35 +229,61 @@ class CouponTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('CouponOrder', '\\Thelia\\Model\\CouponOrder', RelationMap::ONE_TO_MANY, array('code' => 'code', ), null, null, 'CouponOrders');
-        $this->addRelation('CouponI18n', '\\Thelia\\Model\\CouponI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CouponI18ns');
-        $this->addRelation('CouponVersion', '\\Thelia\\Model\\CouponVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CouponVersions');
+        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**
+     * Adds an object to the instance pool.
      *
-     * Gets the list of behaviors registered for this table
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
      *
-     * @return array Associative array (name => parameters) of behaviors
+     * @param \Thelia\Model\CouponVersion $obj A \Thelia\Model\CouponVersion object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public function getBehaviors()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-            'i18n' => array('i18n_table' => '%TABLE%_i18n', 'i18n_phpname' => '%PHPNAME%I18n', 'i18n_columns' => '', 'locale_column' => 'locale', 'locale_length' => '5', 'default_locale' => '', 'locale_alias' => '', ),
-            'versionable' => array('version_column' => 'version', 'version_table' => '', 'log_created_at' => 'false', 'log_created_by' => 'false', 'log_comment' => 'false', 'version_created_at_column' => 'version_created_at', 'version_created_by_column' => 'version_created_by', 'version_comment_column' => 'version_comment', ),
-        );
-    } // getBehaviors()
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getVersion()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
     /**
-     * Method to invalidate the instance pool of all tables related to coupon     * by a foreign key with ON DELETE CASCADE
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\CouponVersion object or a primary key value.
      */
-    public static function clearRelatedInstancePool()
+    public static function removeInstanceFromPool($value)
     {
-        // Invalidate objects in ".$this->getClassNameFromBuilder($joinedTableTableMapBuilder)." instance pool,
-        // since one or more of them may be deleted by ON DELETE CASCADE/SETNULL rule.
-                CouponI18nTableMap::clearInstancePool();
-                CouponVersionTableMap::clearInstancePool();
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\CouponVersion) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getVersion()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\CouponVersion object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
             }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -282,11 +299,11 @@ class CouponTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 16 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 16 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -304,11 +321,7 @@ class CouponTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -324,7 +337,7 @@ class CouponTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? CouponTableMap::CLASS_DEFAULT : CouponTableMap::OM_CLASS;
+        return $withPrefix ? CouponVersionTableMap::CLASS_DEFAULT : CouponVersionTableMap::OM_CLASS;
     }
 
     /**
@@ -338,21 +351,21 @@ class CouponTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (Coupon object, last column rank)
+     * @return array (CouponVersion object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = CouponTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = CouponTableMap::getInstanceFromPool($key))) {
+        $key = CouponVersionTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = CouponVersionTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + CouponTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + CouponVersionTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = CouponTableMap::OM_CLASS;
+            $cls = CouponVersionTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            CouponTableMap::addInstanceToPool($obj, $key);
+            CouponVersionTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -375,8 +388,8 @@ class CouponTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = CouponTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = CouponTableMap::getInstanceFromPool($key))) {
+            $key = CouponVersionTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = CouponVersionTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -385,7 +398,7 @@ class CouponTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                CouponTableMap::addInstanceToPool($obj, $key);
+                CouponVersionTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -406,23 +419,23 @@ class CouponTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(CouponTableMap::ID);
-            $criteria->addSelectColumn(CouponTableMap::CODE);
-            $criteria->addSelectColumn(CouponTableMap::TYPE);
-            $criteria->addSelectColumn(CouponTableMap::TITLE);
-            $criteria->addSelectColumn(CouponTableMap::SHORT_DESCRIPTION);
-            $criteria->addSelectColumn(CouponTableMap::DESCRIPTION);
-            $criteria->addSelectColumn(CouponTableMap::AMOUNT);
-            $criteria->addSelectColumn(CouponTableMap::IS_USED);
-            $criteria->addSelectColumn(CouponTableMap::IS_ENABLED);
-            $criteria->addSelectColumn(CouponTableMap::EXPIRATION_DATE);
-            $criteria->addSelectColumn(CouponTableMap::SERIALIZED_RULES_TYPE);
-            $criteria->addSelectColumn(CouponTableMap::SERIALIZED_RULES_CONTENT);
-            $criteria->addSelectColumn(CouponTableMap::IS_CUMULATIVE);
-            $criteria->addSelectColumn(CouponTableMap::IS_REMOVING_POSTAGE);
-            $criteria->addSelectColumn(CouponTableMap::CREATED_AT);
-            $criteria->addSelectColumn(CouponTableMap::UPDATED_AT);
-            $criteria->addSelectColumn(CouponTableMap::VERSION);
+            $criteria->addSelectColumn(CouponVersionTableMap::ID);
+            $criteria->addSelectColumn(CouponVersionTableMap::CODE);
+            $criteria->addSelectColumn(CouponVersionTableMap::TYPE);
+            $criteria->addSelectColumn(CouponVersionTableMap::TITLE);
+            $criteria->addSelectColumn(CouponVersionTableMap::SHORT_DESCRIPTION);
+            $criteria->addSelectColumn(CouponVersionTableMap::DESCRIPTION);
+            $criteria->addSelectColumn(CouponVersionTableMap::AMOUNT);
+            $criteria->addSelectColumn(CouponVersionTableMap::IS_USED);
+            $criteria->addSelectColumn(CouponVersionTableMap::IS_ENABLED);
+            $criteria->addSelectColumn(CouponVersionTableMap::EXPIRATION_DATE);
+            $criteria->addSelectColumn(CouponVersionTableMap::SERIALIZED_RULES_TYPE);
+            $criteria->addSelectColumn(CouponVersionTableMap::SERIALIZED_RULES_CONTENT);
+            $criteria->addSelectColumn(CouponVersionTableMap::IS_CUMULATIVE);
+            $criteria->addSelectColumn(CouponVersionTableMap::IS_REMOVING_POSTAGE);
+            $criteria->addSelectColumn(CouponVersionTableMap::CREATED_AT);
+            $criteria->addSelectColumn(CouponVersionTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(CouponVersionTableMap::VERSION);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
             $criteria->addSelectColumn($alias . '.CODE');
@@ -453,7 +466,7 @@ class CouponTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(CouponTableMap::DATABASE_NAME)->getTable(CouponTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(CouponVersionTableMap::DATABASE_NAME)->getTable(CouponVersionTableMap::TABLE_NAME);
     }
 
     /**
@@ -461,16 +474,16 @@ class CouponTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CouponTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(CouponTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new CouponTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CouponVersionTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CouponVersionTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CouponVersionTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a Coupon or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CouponVersion or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or Coupon object or primary key or array of primary keys
+     * @param mixed               $values Criteria or CouponVersion object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -481,25 +494,35 @@ class CouponTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CouponTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponVersionTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\Coupon) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\CouponVersion) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(CouponTableMap::DATABASE_NAME);
-            $criteria->add(CouponTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(CouponVersionTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(CouponVersionTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(CouponVersionTableMap::VERSION, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = CouponQuery::create()->mergeWith($criteria);
+        $query = CouponVersionQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { CouponTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { CouponVersionTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { CouponTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { CouponVersionTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -507,20 +530,20 @@ class CouponTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the coupon table.
+     * Deletes all rows from the coupon_version table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return CouponQuery::create()->doDeleteAll($con);
+        return CouponVersionQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a Coupon or Criteria object.
+     * Performs an INSERT on the database, given a CouponVersion or Criteria object.
      *
-     * @param mixed               $criteria Criteria or Coupon object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or CouponVersion object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -529,22 +552,18 @@ class CouponTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(CouponTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponVersionTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from Coupon object
-        }
-
-        if ($criteria->containsKey(CouponTableMap::ID) && $criteria->keyContainsValue(CouponTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.CouponTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from CouponVersion object
         }
 
 
         // Set the correct dbName
-        $query = CouponQuery::create()->mergeWith($criteria);
+        $query = CouponVersionQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -560,7 +579,7 @@ class CouponTableMap extends TableMap
         return $pk;
     }
 
-} // CouponTableMap
+} // CouponVersionTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-CouponTableMap::buildTableMap();
+CouponVersionTableMap::buildTableMap();

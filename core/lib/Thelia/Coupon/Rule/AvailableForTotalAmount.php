@@ -26,6 +26,8 @@ namespace Thelia\Coupon\Rule;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\Parameter\PriceParam;
+use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Exception\InvalidRuleException;
 use Thelia\Exception\InvalidRuleOperatorException;
 use Thelia\Exception\InvalidRuleValueException;
 
@@ -53,20 +55,30 @@ class AvailableForTotalAmount extends CouponRuleAbstract
         Operators::SUPERIOR,
     );
 
-    /** @var PriceParam Price Validator */
+    /** @var RuleValidator Price Validator */
     protected $priceValidator = null;
 
     /**
      * Constructor
      *
-     * @param array $validators Parameters validating $paramsToValidate against
+     * @param array $validators Array of RuleValidator
+     *                          validating $paramsToValidate against
      * @param array $validated  Parameters to be paramsToValidate
+     *
+     * @throws \Thelia\Exception\InvalidRuleException
      */
     public function __construct(array $validators, array $validated = null)
     {
         parent::__construct($validators, $validated);
 
-        $this->priceValidator = $validators[self::PARAM1_PRICE][self::VALUE];
+        if (isset($validators[self::PARAM1_PRICE])
+            && $validators[self::PARAM1_PRICE] instanceof RuleValidator
+        ) {
+            $this->priceValidator = $validators[self::PARAM1_PRICE];
+        } else {
+            throw new InvalidRuleException(get_class());
+        }
+
     }
 
 
@@ -82,16 +94,23 @@ class AvailableForTotalAmount extends CouponRuleAbstract
         if (!isset($this->validators)
             || empty($this->validators)
             ||!isset($this->validators[self::PARAM1_PRICE])
-            ||!isset($this->validators[self::PARAM1_PRICE][self::VALUE])
-            ||!$this->validators[self::PARAM1_PRICE][self::VALUE] instanceof PriceParam
+            ||!isset($this->validators[self::PARAM1_PRICE])
         ) {
+            throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
+        }
+
+        /** @var RuleValidator $ruleValidator */
+        $ruleValidator = $this->validators[self::PARAM1_PRICE];
+        /** @var PriceParam $price */
+        $price = $ruleValidator->getParam();
+
+        if (!$price instanceof PriceParam) {
             throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
         }
 
         $this->checkBackOfficeInputsOperators();
 
-        /** @var PriceParam $price */
-        $price = $this->validators[self::PARAM1_PRICE][self::VALUE];
+
 
         return $this->isPriceValid($price->getPrice());
     }
@@ -128,7 +147,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
     {
         $priceValidator = $this->priceValidator;
         try {
-            $priceValidator->compareTo($price);
+            $priceValidator->getParam()->compareTo($price);
         } catch(\InvalidArgumentException $e) {
             throw new InvalidRuleValueException(get_class(), self::PARAM1_PRICE);
         }
@@ -145,7 +164,7 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      * @throws \Symfony\Component\Intl\Exception\NotImplementedException
      * @return $this
      */
-    protected function setValidators(CouponAdapterInterface $adapter)
+    protected function setValidatorsFromAdapter(CouponAdapterInterface $adapter)
     {
         $adapter->getRule($this);
     }
@@ -165,6 +184,17 @@ class AvailableForTotalAmount extends CouponRuleAbstract
         );
 
         return $this;
+    }
+
+    /**
+     * Return all validators
+     * Serialization purpose
+     *
+     * @return array
+     */
+    public function getValidators()
+    {
+        return $this->validators;
     }
 
 

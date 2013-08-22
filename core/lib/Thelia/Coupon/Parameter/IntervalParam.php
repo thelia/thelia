@@ -34,7 +34,7 @@ namespace Thelia\Coupon\Parameter;
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class IntervalParam implements ComparableInterface
+class IntervalParam implements ComparableInterface, RuleParameterInterface
 {
     /** @var \DatePeriod Date period  */
     protected $datePeriod = null;
@@ -104,5 +104,15 @@ class IntervalParam implements ComparableInterface
         }
 
         return $ret;
+    }
+
+    /**
+     * Get Parameter value to test against
+     *
+     * @return \DatePeriod
+     */
+    public function getValue()
+    {
+        return clone $this->datePeriod;
     }
 }

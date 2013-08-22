@@ -2,7 +2,6 @@
 
 namespace Thelia\Model\Base;
 
-use \DateTime;
 use \Exception;
 use \PDO;
 use Propel\Runtime\Propel;
@@ -15,19 +14,17 @@ use Propel\Runtime\Exception\BadMethodCallException;
 use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
-use Propel\Runtime\Util\PropelDateTime;
-use Thelia\Model\Accessory as ChildAccessory;
-use Thelia\Model\AccessoryQuery as ChildAccessoryQuery;
-use Thelia\Model\Product as ChildProduct;
-use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\Map\AccessoryTableMap;
+use Thelia\Model\Coupon as ChildCoupon;
+use Thelia\Model\CouponI18nQuery as ChildCouponI18nQuery;
+use Thelia\Model\CouponQuery as ChildCouponQuery;
+use Thelia\Model\Map\CouponI18nTableMap;
 
-abstract class Accessory implements ActiveRecordInterface
+abstract class CouponI18n implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\AccessoryTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\CouponI18nTableMap';
 
 
     /**
@@ -63,44 +60,16 @@ abstract class Accessory implements ActiveRecordInterface
     protected $id;
 
     /**
-     * The value for the product_id field.
-     * @var        int
-     */
-    protected $product_id;
-
-    /**
-     * The value for the accessory field.
-     * @var        int
-     */
-    protected $accessory;
-
-    /**
-     * The value for the position field.
-     * @var        int
-     */
-    protected $position;
-
-    /**
-     * The value for the created_at field.
+     * The value for the locale field.
+     * Note: this column has a database default value of: 'en_EN'
      * @var        string
      */
-    protected $created_at;
+    protected $locale;
 
     /**
-     * The value for the updated_at field.
-     * @var        string
+     * @var        Coupon
      */
-    protected $updated_at;
-
-    /**
-     * @var        Product
-     */
-    protected $aProductRelatedByProductId;
-
-    /**
-     * @var        Product
-     */
-    protected $aProductRelatedByAccessory;
+    protected $aCoupon;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -111,10 +80,23 @@ abstract class Accessory implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\Accessory object.
+     * Applies default values to this object.
+     * This method should be called from the object's constructor (or
+     * equivalent initialization method).
+     * @see __construct()
+     */
+    public function applyDefaultValues()
+    {
+        $this->locale = 'en_EN';
+    }
+
+    /**
+     * Initializes internal state of Thelia\Model\Base\CouponI18n object.
+     * @see applyDefaults()
      */
     public function __construct()
     {
+        $this->applyDefaultValues();
     }
 
     /**
@@ -206,9 +188,9 @@ abstract class Accessory implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>Accessory</code> instance.  If
-     * <code>obj</code> is an instance of <code>Accessory</code>, delegates to
-     * <code>equals(Accessory)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>CouponI18n</code> instance.  If
+     * <code>obj</code> is an instance of <code>CouponI18n</code>, delegates to
+     * <code>equals(CouponI18n)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -289,7 +271,7 @@ abstract class Accessory implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return Accessory The current object, for fluid interface
+     * @return CouponI18n The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -321,7 +303,7 @@ abstract class Accessory implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return Accessory The current object, for fluid interface
+     * @return CouponI18n The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -376,83 +358,21 @@ abstract class Accessory implements ActiveRecordInterface
     }
 
     /**
-     * Get the [product_id] column value.
+     * Get the [locale] column value.
      *
-     * @return   int
+     * @return   string
      */
-    public function getProductId()
+    public function getLocale()
     {
 
-        return $this->product_id;
-    }
-
-    /**
-     * Get the [accessory] column value.
-     *
-     * @return   int
-     */
-    public function getAccessory()
-    {
-
-        return $this->accessory;
-    }
-
-    /**
-     * Get the [position] column value.
-     *
-     * @return   int
-     */
-    public function getPosition()
-    {
-
-        return $this->position;
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [created_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getCreatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->created_at;
-        } else {
-            return $this->created_at !== null ? $this->created_at->format($format) : null;
-        }
-    }
-
-    /**
-     * Get the [optionally formatted] temporal [updated_at] column value.
-     *
-     *
-     * @param      string $format The date/time format string (either date()-style or strftime()-style).
-     *                            If format is NULL, then the raw \DateTime object will be returned.
-     *
-     * @return mixed Formatted date/time value as string or \DateTime object (if format is NULL), NULL if column is NULL, and 0 if column value is 0000-00-00 00:00:00
-     *
-     * @throws PropelException - if unable to parse/validate the date/time value.
-     */
-    public function getUpdatedAt($format = NULL)
-    {
-        if ($format === null) {
-            return $this->updated_at;
-        } else {
-            return $this->updated_at !== null ? $this->updated_at->format($format) : null;
-        }
+        return $this->locale;
     }
 
     /**
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\Accessory The current object (for fluent API support)
+     * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -462,7 +382,11 @@ abstract class Accessory implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = AccessoryTableMap::ID;
+            $this->modifiedColumns[] = CouponI18nTableMap::ID;
+        }
+
+        if ($this->aCoupon !== null && $this->aCoupon->getId() !== $v) {
+            $this->aCoupon = null;
         }
 
 
@@ -470,117 +394,25 @@ abstract class Accessory implements ActiveRecordInterface
     } // setId()
 
     /**
-     * Set the value of [product_id] column.
+     * Set the value of [locale] column.
      *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Accessory The current object (for fluent API support)
+     * @param      string $v new value
+     * @return   \Thelia\Model\CouponI18n The current object (for fluent API support)
      */
-    public function setProductId($v)
+    public function setLocale($v)
     {
         if ($v !== null) {
-            $v = (int) $v;
+            $v = (string) $v;
         }
 
-        if ($this->product_id !== $v) {
-            $this->product_id = $v;
-            $this->modifiedColumns[] = AccessoryTableMap::PRODUCT_ID;
-        }
-
-        if ($this->aProductRelatedByProductId !== null && $this->aProductRelatedByProductId->getId() !== $v) {
-            $this->aProductRelatedByProductId = null;
+        if ($this->locale !== $v) {
+            $this->locale = $v;
+            $this->modifiedColumns[] = CouponI18nTableMap::LOCALE;
         }
 
 
         return $this;
-    } // setProductId()
-
-    /**
-     * Set the value of [accessory] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Accessory The current object (for fluent API support)
-     */
-    public function setAccessory($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->accessory !== $v) {
-            $this->accessory = $v;
-            $this->modifiedColumns[] = AccessoryTableMap::ACCESSORY;
-        }
-
-        if ($this->aProductRelatedByAccessory !== null && $this->aProductRelatedByAccessory->getId() !== $v) {
-            $this->aProductRelatedByAccessory = null;
-        }
-
-
-        return $this;
-    } // setAccessory()
-
-    /**
-     * Set the value of [position] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\Accessory The current object (for fluent API support)
-     */
-    public function setPosition($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->position !== $v) {
-            $this->position = $v;
-            $this->modifiedColumns[] = AccessoryTableMap::POSITION;
-        }
-
-
-        return $this;
-    } // setPosition()
-
-    /**
-     * Sets the value of [created_at] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Accessory The current object (for fluent API support)
-     */
-    public function setCreatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->created_at !== null || $dt !== null) {
-            if ($dt !== $this->created_at) {
-                $this->created_at = $dt;
-                $this->modifiedColumns[] = AccessoryTableMap::CREATED_AT;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setCreatedAt()
-
-    /**
-     * Sets the value of [updated_at] column to a normalized version of the date/time value specified.
-     *
-     * @param      mixed $v string, integer (timestamp), or \DateTime value.
-     *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\Accessory The current object (for fluent API support)
-     */
-    public function setUpdatedAt($v)
-    {
-        $dt = PropelDateTime::newInstance($v, null, '\DateTime');
-        if ($this->updated_at !== null || $dt !== null) {
-            if ($dt !== $this->updated_at) {
-                $this->updated_at = $dt;
-                $this->modifiedColumns[] = AccessoryTableMap::UPDATED_AT;
-            }
-        } // if either are not null
-
-
-        return $this;
-    } // setUpdatedAt()
+    } // setLocale()
 
     /**
      * Indicates whether the columns in this object are only set to default values.
@@ -592,6 +424,10 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
+            if ($this->locale !== 'en_EN') {
+                return false;
+            }
+
         // otherwise, everything was equal, so return TRUE
         return true;
     } // hasOnlyDefaultValues()
@@ -619,29 +455,11 @@ abstract class Accessory implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : AccessoryTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CouponI18nTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : AccessoryTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->product_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : AccessoryTableMap::translateFieldName('Accessory', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->accessory = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : AccessoryTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->position = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : AccessoryTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : AccessoryTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
-            if ($col === '0000-00-00 00:00:00') {
-                $col = null;
-            }
-            $this->updated_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CouponI18nTableMap::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)];
+            $this->locale = (null !== $col) ? (string) $col : null;
             $this->resetModified();
 
             $this->setNew(false);
@@ -650,10 +468,10 @@ abstract class Accessory implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 6; // 6 = AccessoryTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 2; // 2 = CouponI18nTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\Accessory object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\CouponI18n object", 0, $e);
         }
     }
 
@@ -672,11 +490,8 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function ensureConsistency()
     {
-        if ($this->aProductRelatedByProductId !== null && $this->product_id !== $this->aProductRelatedByProductId->getId()) {
-            $this->aProductRelatedByProductId = null;
-        }
-        if ($this->aProductRelatedByAccessory !== null && $this->accessory !== $this->aProductRelatedByAccessory->getId()) {
-            $this->aProductRelatedByAccessory = null;
+        if ($this->aCoupon !== null && $this->id !== $this->aCoupon->getId()) {
+            $this->aCoupon = null;
         }
     } // ensureConsistency
 
@@ -701,13 +516,13 @@ abstract class Accessory implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(AccessoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CouponI18nTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildAccessoryQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildCouponI18nQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -717,8 +532,7 @@ abstract class Accessory implements ActiveRecordInterface
 
         if ($deep) {  // also de-associate any related objects?
 
-            $this->aProductRelatedByProductId = null;
-            $this->aProductRelatedByAccessory = null;
+            $this->aCoupon = null;
         } // if (deep)
     }
 
@@ -728,8 +542,8 @@ abstract class Accessory implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see Accessory::setDeleted()
-     * @see Accessory::isDeleted()
+     * @see CouponI18n::setDeleted()
+     * @see CouponI18n::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -738,12 +552,12 @@ abstract class Accessory implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AccessoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildAccessoryQuery::create()
+            $deleteQuery = ChildCouponI18nQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -780,7 +594,7 @@ abstract class Accessory implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(AccessoryTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponI18nTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -789,19 +603,8 @@ abstract class Accessory implements ActiveRecordInterface
             $ret = $this->preSave($con);
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
-                // timestampable behavior
-                if (!$this->isColumnModified(AccessoryTableMap::CREATED_AT)) {
-                    $this->setCreatedAt(time());
-                }
-                if (!$this->isColumnModified(AccessoryTableMap::UPDATED_AT)) {
-                    $this->setUpdatedAt(time());
-                }
             } else {
                 $ret = $ret && $this->preUpdate($con);
-                // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(AccessoryTableMap::UPDATED_AT)) {
-                    $this->setUpdatedAt(time());
-                }
             }
             if ($ret) {
                 $affectedRows = $this->doSave($con);
@@ -811,7 +614,7 @@ abstract class Accessory implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                AccessoryTableMap::addInstanceToPool($this);
+                CouponI18nTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -846,18 +649,11 @@ abstract class Accessory implements ActiveRecordInterface
             // method.  This object relates to these object(s) by a
             // foreign key reference.
 
-            if ($this->aProductRelatedByProductId !== null) {
-                if ($this->aProductRelatedByProductId->isModified() || $this->aProductRelatedByProductId->isNew()) {
-                    $affectedRows += $this->aProductRelatedByProductId->save($con);
+            if ($this->aCoupon !== null) {
+                if ($this->aCoupon->isModified() || $this->aCoupon->isNew()) {
+                    $affectedRows += $this->aCoupon->save($con);
                 }
-                $this->setProductRelatedByProductId($this->aProductRelatedByProductId);
-            }
-
-            if ($this->aProductRelatedByAccessory !== null) {
-                if ($this->aProductRelatedByAccessory->isModified() || $this->aProductRelatedByAccessory->isNew()) {
-                    $affectedRows += $this->aProductRelatedByAccessory->save($con);
-                }
-                $this->setProductRelatedByAccessory($this->aProductRelatedByAccessory);
+                $this->setCoupon($this->aCoupon);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -891,33 +687,17 @@ abstract class Accessory implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = AccessoryTableMap::ID;
-        if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . AccessoryTableMap::ID . ')');
-        }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(AccessoryTableMap::ID)) {
+        if ($this->isColumnModified(CouponI18nTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(AccessoryTableMap::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
-        }
-        if ($this->isColumnModified(AccessoryTableMap::ACCESSORY)) {
-            $modifiedColumns[':p' . $index++]  = 'ACCESSORY';
-        }
-        if ($this->isColumnModified(AccessoryTableMap::POSITION)) {
-            $modifiedColumns[':p' . $index++]  = 'POSITION';
-        }
-        if ($this->isColumnModified(AccessoryTableMap::CREATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
-        }
-        if ($this->isColumnModified(AccessoryTableMap::UPDATED_AT)) {
-            $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
+        if ($this->isColumnModified(CouponI18nTableMap::LOCALE)) {
+            $modifiedColumns[':p' . $index++]  = 'LOCALE';
         }
 
         $sql = sprintf(
-            'INSERT INTO accessory (%s) VALUES (%s)',
+            'INSERT INTO coupon_i18n (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -929,20 +709,8 @@ abstract class Accessory implements ActiveRecordInterface
                     case 'ID':
                         $stmt->bindValue($identifier, $this->id, PDO::PARAM_INT);
                         break;
-                    case 'PRODUCT_ID':
-                        $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
-                        break;
-                    case 'ACCESSORY':
-                        $stmt->bindValue($identifier, $this->accessory, PDO::PARAM_INT);
-                        break;
-                    case 'POSITION':
-                        $stmt->bindValue($identifier, $this->position, PDO::PARAM_INT);
-                        break;
-                    case 'CREATED_AT':
-                        $stmt->bindValue($identifier, $this->created_at ? $this->created_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
-                        break;
-                    case 'UPDATED_AT':
-                        $stmt->bindValue($identifier, $this->updated_at ? $this->updated_at->format("Y-m-d H:i:s") : null, PDO::PARAM_STR);
+                    case 'LOCALE':
+                        $stmt->bindValue($identifier, $this->locale, PDO::PARAM_STR);
                         break;
                 }
             }
@@ -951,13 +719,6 @@ abstract class Accessory implements ActiveRecordInterface
             Propel::log($e->getMessage(), Propel::LOG_ERR);
             throw new PropelException(sprintf('Unable to execute INSERT statement [%s]', $sql), 0, $e);
         }
-
-        try {
-            $pk = $con->lastInsertId();
-        } catch (Exception $e) {
-            throw new PropelException('Unable to get autoincrement id.', 0, $e);
-        }
-        $this->setId($pk);
 
         $this->setNew(false);
     }
@@ -990,7 +751,7 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = AccessoryTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CouponI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1010,19 +771,7 @@ abstract class Accessory implements ActiveRecordInterface
                 return $this->getId();
                 break;
             case 1:
-                return $this->getProductId();
-                break;
-            case 2:
-                return $this->getAccessory();
-                break;
-            case 3:
-                return $this->getPosition();
-                break;
-            case 4:
-                return $this->getCreatedAt();
-                break;
-            case 5:
-                return $this->getUpdatedAt();
+                return $this->getLocale();
                 break;
             default:
                 return null;
@@ -1047,18 +796,14 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['Accessory'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CouponI18n'][serialize($this->getPrimaryKey())])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['Accessory'][$this->getPrimaryKey()] = true;
-        $keys = AccessoryTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['CouponI18n'][serialize($this->getPrimaryKey())] = true;
+        $keys = CouponI18nTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
-            $keys[1] => $this->getProductId(),
-            $keys[2] => $this->getAccessory(),
-            $keys[3] => $this->getPosition(),
-            $keys[4] => $this->getCreatedAt(),
-            $keys[5] => $this->getUpdatedAt(),
+            $keys[1] => $this->getLocale(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1067,11 +812,8 @@ abstract class Accessory implements ActiveRecordInterface
         }
 
         if ($includeForeignObjects) {
-            if (null !== $this->aProductRelatedByProductId) {
-                $result['ProductRelatedByProductId'] = $this->aProductRelatedByProductId->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aProductRelatedByAccessory) {
-                $result['ProductRelatedByAccessory'] = $this->aProductRelatedByAccessory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            if (null !== $this->aCoupon) {
+                $result['Coupon'] = $this->aCoupon->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1091,7 +833,7 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = AccessoryTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CouponI18nTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1111,19 +853,7 @@ abstract class Accessory implements ActiveRecordInterface
                 $this->setId($value);
                 break;
             case 1:
-                $this->setProductId($value);
-                break;
-            case 2:
-                $this->setAccessory($value);
-                break;
-            case 3:
-                $this->setPosition($value);
-                break;
-            case 4:
-                $this->setCreatedAt($value);
-                break;
-            case 5:
-                $this->setUpdatedAt($value);
+                $this->setLocale($value);
                 break;
         } // switch()
     }
@@ -1147,14 +877,10 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = AccessoryTableMap::getFieldNames($keyType);
+        $keys = CouponI18nTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
-        if (array_key_exists($keys[1], $arr)) $this->setProductId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setAccessory($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
+        if (array_key_exists($keys[1], $arr)) $this->setLocale($arr[$keys[1]]);
     }
 
     /**
@@ -1164,14 +890,10 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(AccessoryTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CouponI18nTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(AccessoryTableMap::ID)) $criteria->add(AccessoryTableMap::ID, $this->id);
-        if ($this->isColumnModified(AccessoryTableMap::PRODUCT_ID)) $criteria->add(AccessoryTableMap::PRODUCT_ID, $this->product_id);
-        if ($this->isColumnModified(AccessoryTableMap::ACCESSORY)) $criteria->add(AccessoryTableMap::ACCESSORY, $this->accessory);
-        if ($this->isColumnModified(AccessoryTableMap::POSITION)) $criteria->add(AccessoryTableMap::POSITION, $this->position);
-        if ($this->isColumnModified(AccessoryTableMap::CREATED_AT)) $criteria->add(AccessoryTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(AccessoryTableMap::UPDATED_AT)) $criteria->add(AccessoryTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CouponI18nTableMap::ID)) $criteria->add(CouponI18nTableMap::ID, $this->id);
+        if ($this->isColumnModified(CouponI18nTableMap::LOCALE)) $criteria->add(CouponI18nTableMap::LOCALE, $this->locale);
 
         return $criteria;
     }
@@ -1186,30 +908,37 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(AccessoryTableMap::DATABASE_NAME);
-        $criteria->add(AccessoryTableMap::ID, $this->id);
+        $criteria = new Criteria(CouponI18nTableMap::DATABASE_NAME);
+        $criteria->add(CouponI18nTableMap::ID, $this->id);
+        $criteria->add(CouponI18nTableMap::LOCALE, $this->locale);
 
         return $criteria;
     }
 
     /**
-     * Returns the primary key for this object (row).
-     * @return   int
+     * Returns the composite primary key for this object.
+     * The array elements will be in same order as specified in XML.
+     * @return array
      */
     public function getPrimaryKey()
     {
-        return $this->getId();
+        $pks = array();
+        $pks[0] = $this->getId();
+        $pks[1] = $this->getLocale();
+
+        return $pks;
     }
 
     /**
-     * Generic method to set the primary key (id column).
+     * Set the [composite] primary key.
      *
-     * @param       int $key Primary key.
+     * @param      array $keys The elements of the composite key (order must match the order in XML file).
      * @return void
      */
-    public function setPrimaryKey($key)
+    public function setPrimaryKey($keys)
     {
-        $this->setId($key);
+        $this->setId($keys[0]);
+        $this->setLocale($keys[1]);
     }
 
     /**
@@ -1219,7 +948,7 @@ abstract class Accessory implements ActiveRecordInterface
     public function isPrimaryKeyNull()
     {
 
-        return null === $this->getId();
+        return (null === $this->getId()) && (null === $this->getLocale());
     }
 
     /**
@@ -1228,21 +957,17 @@ abstract class Accessory implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\Accessory (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\CouponI18n (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
      */
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
-        $copyObj->setProductId($this->getProductId());
-        $copyObj->setAccessory($this->getAccessory());
-        $copyObj->setPosition($this->getPosition());
-        $copyObj->setCreatedAt($this->getCreatedAt());
-        $copyObj->setUpdatedAt($this->getUpdatedAt());
+        $copyObj->setId($this->getId());
+        $copyObj->setLocale($this->getLocale());
         if ($makeNew) {
             $copyObj->setNew(true);
-            $copyObj->setId(NULL); // this is a auto-increment column, so set to default value
         }
     }
 
@@ -1255,7 +980,7 @@ abstract class Accessory implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\Accessory Clone of current object.
+     * @return                 \Thelia\Model\CouponI18n Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1269,26 +994,26 @@ abstract class Accessory implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildProduct object.
+     * Declares an association between this object and a ChildCoupon object.
      *
-     * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\Accessory The current object (for fluent API support)
+     * @param                  ChildCoupon $v
+     * @return                 \Thelia\Model\CouponI18n The current object (for fluent API support)
      * @throws PropelException
      */
-    public function setProductRelatedByProductId(ChildProduct $v = null)
+    public function setCoupon(ChildCoupon $v = null)
     {
         if ($v === null) {
-            $this->setProductId(NULL);
+            $this->setId(NULL);
         } else {
-            $this->setProductId($v->getId());
+            $this->setId($v->getId());
         }
 
-        $this->aProductRelatedByProductId = $v;
+        $this->aCoupon = $v;
 
         // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProduct object, it will not be re-added.
+        // If this object has already been added to the ChildCoupon object, it will not be re-added.
         if ($v !== null) {
-            $v->addAccessoryRelatedByProductId($this);
+            $v->addCouponI18n($this);
         }
 
 
@@ -1297,77 +1022,26 @@ abstract class Accessory implements ActiveRecordInterface
 
 
     /**
-     * Get the associated ChildProduct object
+     * Get the associated ChildCoupon object
      *
      * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProduct The associated ChildProduct object.
+     * @return                 ChildCoupon The associated ChildCoupon object.
      * @throws PropelException
      */
-    public function getProductRelatedByProductId(ConnectionInterface $con = null)
+    public function getCoupon(ConnectionInterface $con = null)
     {
-        if ($this->aProductRelatedByProductId === null && ($this->product_id !== null)) {
-            $this->aProductRelatedByProductId = ChildProductQuery::create()->findPk($this->product_id, $con);
+        if ($this->aCoupon === null && ($this->id !== null)) {
+            $this->aCoupon = ChildCouponQuery::create()->findPk($this->id, $con);
             /* The following can be used additionally to
                 guarantee the related object contains a reference
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aProductRelatedByProductId->addAccessoriesRelatedByProductId($this);
+                $this->aCoupon->addCouponI18ns($this);
              */
         }
 
-        return $this->aProductRelatedByProductId;
-    }
-
-    /**
-     * Declares an association between this object and a ChildProduct object.
-     *
-     * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\Accessory The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProductRelatedByAccessory(ChildProduct $v = null)
-    {
-        if ($v === null) {
-            $this->setAccessory(NULL);
-        } else {
-            $this->setAccessory($v->getId());
-        }
-
-        $this->aProductRelatedByAccessory = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProduct object, it will not be re-added.
-        if ($v !== null) {
-            $v->addAccessoryRelatedByAccessory($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildProduct object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProduct The associated ChildProduct object.
-     * @throws PropelException
-     */
-    public function getProductRelatedByAccessory(ConnectionInterface $con = null)
-    {
-        if ($this->aProductRelatedByAccessory === null && ($this->accessory !== null)) {
-            $this->aProductRelatedByAccessory = ChildProductQuery::create()->findPk($this->accessory, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aProductRelatedByAccessory->addAccessoriesRelatedByAccessory($this);
-             */
-        }
-
-        return $this->aProductRelatedByAccessory;
+        return $this->aCoupon;
     }
 
     /**
@@ -1376,13 +1050,10 @@ abstract class Accessory implements ActiveRecordInterface
     public function clear()
     {
         $this->id = null;
-        $this->product_id = null;
-        $this->accessory = null;
-        $this->position = null;
-        $this->created_at = null;
-        $this->updated_at = null;
+        $this->locale = null;
         $this->alreadyInSave = false;
         $this->clearAllReferences();
+        $this->applyDefaultValues();
         $this->resetModified();
         $this->setNew(true);
         $this->setDeleted(false);
@@ -1402,8 +1073,7 @@ abstract class Accessory implements ActiveRecordInterface
         if ($deep) {
         } // if ($deep)
 
-        $this->aProductRelatedByProductId = null;
-        $this->aProductRelatedByAccessory = null;
+        $this->aCoupon = null;
     }
 
     /**
@@ -1413,21 +1083,7 @@ abstract class Accessory implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(AccessoryTableMap::DEFAULT_STRING_FORMAT);
-    }
-
-    // timestampable behavior
-
-    /**
-     * Mark the current object so that the update date doesn't get updated during next save
-     *
-     * @return     ChildAccessory The current object (for fluent API support)
-     */
-    public function keepUpdateDateUnchanged()
-    {
-        $this->modifiedColumns[] = AccessoryTableMap::UPDATED_AT;
-
-        return $this;
+        return (string) $this->exportTo(CouponI18nTableMap::DEFAULT_STRING_FORMAT);
     }
 
     /**
