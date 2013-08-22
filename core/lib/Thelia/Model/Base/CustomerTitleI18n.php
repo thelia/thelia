@@ -61,7 +61,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
 
     /**
      * The value for the locale field.
-     * Note: this column has a database default value of: 'en_US'
+     * Note: this column has a database default value of: 'en_EN'
      * @var        string
      */
     protected $locale;
@@ -99,7 +99,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
      */
     public function applyDefaultValues()
     {
-        $this->locale = 'en_US';
+        $this->locale = 'en_EN';
     }
 
     /**
@@ -500,7 +500,7 @@ abstract class CustomerTitleI18n implements ActiveRecordInterface
      */
     public function hasOnlyDefaultValues()
     {
-            if ($this->locale !== 'en_US') {
+            if ($this->locale !== 'en_EN') {
                 return false;
             }
 

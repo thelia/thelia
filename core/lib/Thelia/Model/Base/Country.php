@@ -142,7 +142,7 @@ abstract class Country implements ActiveRecordInterface
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_US';
+    protected $currentLocale = 'en_EN';
 
     /**
      * Current translation objects
@@ -2323,7 +2323,7 @@ abstract class Country implements ActiveRecordInterface
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_US';
+        $this->currentLocale = 'en_EN';
         $this->currentTranslations = null;
 
         if ($this->collTaxRuleCountries instanceof Collection) {
@@ -2374,7 +2374,7 @@ abstract class Country implements ActiveRecordInterface
      *
      * @return    ChildCountry The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_US')
+    public function setLocale($locale = 'en_EN')
     {
         $this->currentLocale = $locale;
 
@@ -2398,7 +2398,7 @@ abstract class Country implements ActiveRecordInterface
      * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildCountryI18n */
-    public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function getTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collCountryI18ns) {
@@ -2433,7 +2433,7 @@ abstract class Country implements ActiveRecordInterface
      *
      * @return    ChildCountry The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function removeTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
             ChildCountryI18nQuery::create()

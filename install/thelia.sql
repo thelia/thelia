@@ -1117,40 +1117,20 @@ CREATE TABLE `coupon`
 (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `code` VARCHAR(45) NOT NULL,
-    `action` VARCHAR(255) NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `short_description` TEXT NOT NULL,
+    `description` LONGTEXT NOT NULL,
     `value` FLOAT NOT NULL,
-    `used` TINYINT,
-    `available_since` DATETIME,
-    `date_limit` DATETIME,
-    `activate` TINYINT,
+    `is_used` TINYINT NOT NULL,
+    `is_enabled` TINYINT NOT NULL,
+    `expiration_date` DATETIME NOT NULL,
+    `serialized_rules` TEXT NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0,
     PRIMARY KEY (`id`),
     UNIQUE INDEX `code_UNIQUE` (`code`)
-) ENGINE=InnoDB;
-
--- ---------------------------------------------------------------------
--- coupon_rule
--- ---------------------------------------------------------------------
-
-DROP TABLE IF EXISTS `coupon_rule`;
-
-CREATE TABLE `coupon_rule`
-(
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `coupon_id` INTEGER NOT NULL,
-    `controller` VARCHAR(255),
-    `operation` VARCHAR(255),
-    `value` FLOAT,
-    `created_at` DATETIME,
-    `updated_at` DATETIME,
-    PRIMARY KEY (`id`),
-    INDEX `idx_coupon_rule_coupon_id` (`coupon_id`),
-    CONSTRAINT `fk_coupon_rule_coupon_id`
-        FOREIGN KEY (`coupon_id`)
-        REFERENCES `coupon` (`id`)
-        ON UPDATE RESTRICT
-        ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1169,11 +1149,15 @@ CREATE TABLE `coupon_order`
     `updated_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `idx_coupon_order_order_id` (`order_id`),
+    INDEX `fk_coupon_order_coupon_idx` (`code`),
     CONSTRAINT `fk_coupon_order_order_id`
         FOREIGN KEY (`order_id`)
         REFERENCES `order` (`id`)
         ON UPDATE RESTRICT
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT `fk_coupon_order_coupon`
+        FOREIGN KEY (`code`)
+        REFERENCES `coupon` (`code`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -1466,7 +1450,7 @@ DROP TABLE IF EXISTS `category_i18n`;
 CREATE TABLE `category_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1487,7 +1471,7 @@ DROP TABLE IF EXISTS `product_i18n`;
 CREATE TABLE `product_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1508,7 +1492,7 @@ DROP TABLE IF EXISTS `country_i18n`;
 CREATE TABLE `country_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1529,7 +1513,7 @@ DROP TABLE IF EXISTS `tax_i18n`;
 CREATE TABLE `tax_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` TEXT,
     PRIMARY KEY (`id`,`locale`),
@@ -1548,7 +1532,7 @@ DROP TABLE IF EXISTS `tax_rule_i18n`;
 CREATE TABLE `tax_rule_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `tax_rule_i18n_FK_1`
         FOREIGN KEY (`id`)
@@ -1565,7 +1549,7 @@ DROP TABLE IF EXISTS `feature_i18n`;
 CREATE TABLE `feature_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1586,7 +1570,7 @@ DROP TABLE IF EXISTS `feature_av_i18n`;
 CREATE TABLE `feature_av_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1607,7 +1591,7 @@ DROP TABLE IF EXISTS `attribute_i18n`;
 CREATE TABLE `attribute_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1628,7 +1612,7 @@ DROP TABLE IF EXISTS `attribute_av_i18n`;
 CREATE TABLE `attribute_av_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1649,7 +1633,7 @@ DROP TABLE IF EXISTS `config_i18n`;
 CREATE TABLE `config_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1670,7 +1654,7 @@ DROP TABLE IF EXISTS `customer_title_i18n`;
 CREATE TABLE `customer_title_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `short` VARCHAR(10),
     `long` VARCHAR(45),
     PRIMARY KEY (`id`,`locale`),
@@ -1689,7 +1673,7 @@ DROP TABLE IF EXISTS `folder_i18n`;
 CREATE TABLE `folder_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1710,7 +1694,7 @@ DROP TABLE IF EXISTS `content_i18n`;
 CREATE TABLE `content_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1731,7 +1715,7 @@ DROP TABLE IF EXISTS `product_image_i18n`;
 CREATE TABLE `product_image_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1752,7 +1736,7 @@ DROP TABLE IF EXISTS `product_document_i18n`;
 CREATE TABLE `product_document_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1773,7 +1757,7 @@ DROP TABLE IF EXISTS `currency_i18n`;
 CREATE TABLE `currency_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `name` VARCHAR(45),
     PRIMARY KEY (`id`,`locale`),
     CONSTRAINT `currency_i18n_FK_1`
@@ -1791,7 +1775,7 @@ DROP TABLE IF EXISTS `order_status_i18n`;
 CREATE TABLE `order_status_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1812,7 +1796,7 @@ DROP TABLE IF EXISTS `module_i18n`;
 CREATE TABLE `module_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1833,7 +1817,7 @@ DROP TABLE IF EXISTS `group_i18n`;
 CREATE TABLE `group_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1854,7 +1838,7 @@ DROP TABLE IF EXISTS `resource_i18n`;
 CREATE TABLE `resource_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1875,7 +1859,7 @@ DROP TABLE IF EXISTS `message_i18n`;
 CREATE TABLE `message_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` TEXT,
     `description` LONGTEXT,
     `description_html` LONGTEXT,
@@ -1883,6 +1867,23 @@ CREATE TABLE `message_i18n`
     CONSTRAINT `message_i18n_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- coupon_i18n
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_i18n`;
+
+CREATE TABLE `coupon_i18n`
+(
+    `id` INTEGER NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
+    PRIMARY KEY (`id`,`locale`),
+    CONSTRAINT `coupon_i18n_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
@@ -1895,7 +1896,7 @@ DROP TABLE IF EXISTS `category_image_i18n`;
 CREATE TABLE `category_image_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1916,7 +1917,7 @@ DROP TABLE IF EXISTS `folder_image_i18n`;
 CREATE TABLE `folder_image_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1937,7 +1938,7 @@ DROP TABLE IF EXISTS `content_image_i18n`;
 CREATE TABLE `content_image_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1958,7 +1959,7 @@ DROP TABLE IF EXISTS `category_document_i18n`;
 CREATE TABLE `category_document_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -1979,7 +1980,7 @@ DROP TABLE IF EXISTS `content_document_i18n`;
 CREATE TABLE `content_document_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -2000,7 +2001,7 @@ DROP TABLE IF EXISTS `folder_document_i18n`;
 CREATE TABLE `folder_document_i18n`
 (
     `id` INTEGER NOT NULL,
-    `locale` VARCHAR(5) DEFAULT 'en_US' NOT NULL,
+    `locale` VARCHAR(5) DEFAULT 'en_EN' NOT NULL,
     `title` VARCHAR(255),
     `description` LONGTEXT,
     `chapo` TEXT,
@@ -2129,6 +2130,35 @@ CREATE TABLE `message_version`
     CONSTRAINT `message_version_FK_1`
         FOREIGN KEY (`id`)
         REFERENCES `message` (`id`)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- coupon_version
+-- ---------------------------------------------------------------------
+
+DROP TABLE IF EXISTS `coupon_version`;
+
+CREATE TABLE `coupon_version`
+(
+    `id` INTEGER NOT NULL,
+    `code` VARCHAR(45) NOT NULL,
+    `type` VARCHAR(255) NOT NULL,
+    `title` VARCHAR(255) NOT NULL,
+    `short_description` TEXT NOT NULL,
+    `description` LONGTEXT NOT NULL,
+    `value` FLOAT NOT NULL,
+    `is_used` TINYINT NOT NULL,
+    `is_enabled` TINYINT NOT NULL,
+    `expiration_date` DATETIME NOT NULL,
+    `serialized_rules` TEXT NOT NULL,
+    `created_at` DATETIME,
+    `updated_at` DATETIME,
+    `version` INTEGER DEFAULT 0 NOT NULL,
+    PRIMARY KEY (`id`,`version`),
+    CONSTRAINT `coupon_version_FK_1`
+        FOREIGN KEY (`id`)
+        REFERENCES `coupon` (`id`)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 

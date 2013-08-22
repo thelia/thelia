@@ -152,7 +152,7 @@ class CouponOrderTableMap extends TableMap
         // columns
         $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
         $this->addForeignKey('ORDER_ID', 'OrderId', 'INTEGER', 'order', 'ID', true, null, null);
-        $this->addColumn('CODE', 'Code', 'VARCHAR', true, 45, null);
+        $this->addForeignKey('CODE', 'Code', 'VARCHAR', 'coupon', 'CODE', true, 45, null);
         $this->addColumn('VALUE', 'Value', 'FLOAT', true, null, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
@@ -164,6 +164,7 @@ class CouponOrderTableMap extends TableMap
     public function buildRelations()
     {
         $this->addRelation('Order', '\\Thelia\\Model\\Order', RelationMap::MANY_TO_ONE, array('order_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_ONE, array('code' => 'code', ), null, null);
     } // buildRelations()
 
     /**
