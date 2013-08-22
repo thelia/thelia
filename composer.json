@@ -36,7 +36,8 @@
 
         "simplepie/simplepie": "dev-master",
 
-        "imagine/imagine": "dev-master"
+        "imagine/imagine": "dev-master",
+        "symfony/serializer": "2.2.*"
     },
     "require-dev" : {
         "phpunit/phpunit": "3.7.*",
