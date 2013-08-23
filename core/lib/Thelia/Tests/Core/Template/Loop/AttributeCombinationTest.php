@@ -46,6 +46,6 @@ class AttributeCombinationTest extends BaseLoopTestor
 
     public function getMandatoryArguments()
     {
-        return array('product_sale_element' => 1);
+        return array('product_sale_elements' => 1);
     }
 }
