@@ -63,7 +63,7 @@ class FeatureValue extends BaseLoop
             Argument::createIntTypeArgument('product', null, true),
             Argument::createIntListTypeArgument('feature_availability'),
             Argument::createBooleanTypeArgument('exclude_feature_availability', 0),
-            Argument::createBooleanTypeArgument('exclude_default_values', 0),
+            Argument::createBooleanTypeArgument('exclude_personal_values', 0),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -112,7 +112,7 @@ class FeatureValue extends BaseLoop
             $search->filterByFeatureAvId(null, Criteria::NULL);
         }
 
-        $excludeDefaultValues = $this->getExclude_default_values();
+        $excludeDefaultValues = $this->getExclude_personal_values();
         if($excludeDefaultValues == true) {
             $search->filterByByDefault(null, Criteria::NULL);
         }

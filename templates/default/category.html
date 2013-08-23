@@ -1,6 +1,6 @@
 <h1>Category page</h1>
 
-<div style="border: solid 8px; margin: 0px; padding: 0px; width: 30%; float: left">
+<div style="border: solid 8px; margin: 0px; padding: 0px; width: 45%; float: left">
 
 <h2>CATALOG</h2>
 
@@ -73,7 +73,7 @@
         {assign var=current_product value=#ID}
         {loop name="pse" type="product_sale_elements" product="#ID"}
             <div style="border: solid 2px darkorange; padding: 5px; margin: 5px;">
-                {loop name="combi" type="attribute_combination" product_sale_element="#ID"}
+                {loop name="combi" type="attribute_combination" product_sale_elements="#ID"}
                     #ATTRIBUTE_TITLE = #ATTRIBUTE_AVAILABILITY_TITLE<br />
                 {/loop}
                 <br />#WEIGHT g
@@ -161,7 +161,7 @@
             {assign var=current_product value=#ID}
             {loop name="pse" type="product_sale_elements" product="#ID"}
                 <div style="border: solid 2px darkorange; padding: 5px; margin: 5px;">
-                    {loop name="combi" type="attribute_combination" product_sale_element="#ID"}
+                    {loop name="combi" type="attribute_combination" product_sale_elements="#ID"}
                     #ATTRIBUTE_TITLE = #ATTRIBUTE_AVAILABILITY_TITLE<br />
                     {/loop}
                     <br />#WEIGHT g
@@ -187,7 +187,7 @@
 
 </div>
 
-<div style="border: solid 8px; margin: 0px; padding: 0px; width: 30%; float: left">
+<div style="border: solid 8px; margin: 0px; padding: 0px; width: 45%; float: left">
 
 <h2>ALL FEATURES AND THEIR AVAILABILITY</h2>
 
@@ -221,37 +221,4 @@
     {/loop}
 </ul>
 
-</div>
-
-<div style="border: solid 8px; margin: 0px; padding: 0px; width: 30%; float: left">
-
-    <h2>SANDBOX</h2>
-
-    {*loop name="product" type="product" order="promo,min_price" exclude_category="3" new="on" promo="off"}
-    <h3>PRODUCT : #REF / #TITLE</h3>
-    {/loop*}
-
-{*loop name="product" type="product" new="on" promo="off"}
-<h3>PRODUCT : #REF / #TITLE</h3>
-{/loop*}
-
-
-
-    {*loop name="product" type="product" order="ref" feature_availability="1: (1 | 2) , 2: 4, 3: 433"}
-    <h3>PRODUCT : #REF / #TITLE</h3>
-    price : #PRICE €<br />
-    promo price : #PROMO_PRICE €<br />
-    is promo : #PROMO<br />
-    is new : #NEW<br />
-    weight : #WEIGHT<br />
-    {/loop*}
-
-    {*loop name="product" type="product" order="ref" feature_values="1: foo"}
-    <h3>PRODUCT : #REF / #TITLE</h3>
-    price : #PRICE €<br />
-    promo price : #PROMO_PRICE €<br />
-    is promo : #PROMO<br />
-    is new : #NEW<br />
-    weight : #WEIGHT<br />
-    {/loop*}
 </div>

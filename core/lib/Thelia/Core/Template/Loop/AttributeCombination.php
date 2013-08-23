@@ -58,7 +58,7 @@ class AttributeCombination extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('product_sale_element', null, true),
+            Argument::createIntTypeArgument('product_sale_elements', null, true),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -98,9 +98,9 @@ class AttributeCombination extends BaseLoop
             'ATTRIBUTE_AV_ID'
         );
 
-        $productSaleElement = $this->getProduct_sale_element();
+        $productSaleElements = $this->getProduct_sale_elements();
 
-        $search->filterByProductSaleElementsId($productSaleElement, Criteria::EQUAL);
+        $search->filterByProductSaleElementsId($productSaleElements, Criteria::EQUAL);
 
         $orders  = $this->getOrder();
 

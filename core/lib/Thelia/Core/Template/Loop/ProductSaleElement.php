@@ -42,7 +42,7 @@ use Thelia\Type;
  *
  * Product Sale Elements loop
  *
- * @todo : manage currency
+ * @todo : manage currency and attribute_availability
  *
  * Class ProductSaleElements
  * @package Thelia\Core\Template\Loop
@@ -56,7 +56,7 @@ class ProductSaleElements extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntTypeArgument('devise'),
+            Argument::createIntTypeArgument('currency'),
             Argument::createIntTypeArgument('product', null, true),
             new Argument(
                 'attribute_availability',
@@ -106,7 +106,7 @@ class ProductSaleElements extends BaseLoop
             }
         }
 
-        $devise = $this->getDevise();
+        $currency = $this->getCurrency();
 
         $search->joinProductPrice('price', Criteria::INNER_JOIN);
             //->addJoinCondition('price', '');

@@ -67,7 +67,8 @@ class AssociatedContent extends Content
     /**
      * @param $pagination
      *
-     * @return \Thelia\Core\Template\Element\LoopResult
+     * @return LoopResult
+     * @throws \InvalidArgumentException
      */
     public function exec(&$pagination)
     {
