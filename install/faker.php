@@ -20,7 +20,15 @@ $currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne(
 try {
     $stmt = $con->prepare("SET foreign_key_checks = 0");
     $stmt->execute();
-    
+
+    $productAssociatedContent = Thelia\Model\ProductAssociatedContentQuery::create()
+        ->find();
+    $productAssociatedContent->delete();
+
+    $categoryAssociatedContent = Thelia\Model\CategoryAssociatedContentQuery::create()
+        ->find();
+    $categoryAssociatedContent->delete();
+
     $attributeCategory = Thelia\Model\AttributeCategoryQuery::create()
         ->find();
     $attributeCategory->delete();
@@ -183,14 +191,60 @@ try {
         }
     }
 
+    //folders and contents
+    $contentIdList = array();
+    for($i=0; $i<4; $i++) {
+        $folder = new Thelia\Model\Folder();
+        $folder->setParent(0);
+        $folder->setVisible(rand(1, 10)>7 ? 0 : 1);
+        $folder->setPosition($i);
+        setI18n($faker, $folder);
+
+        $folder->save();
+
+        $image = new FolderImage();
+        $image->setFolderId($folder->getId());
+        generate_image($image, 1, 'folder', $folder->getId());
+
+        for($j=1; $j<rand(0, 5); $j++) {
+            $subfolder = new Thelia\Model\Folder();
+            $subfolder->setParent($folder->getId());
+            $subfolder->setVisible(rand(1, 10)>7 ? 0 : 1);
+            $subfolder->setPosition($j);
+            setI18n($faker, $subfolder);
+
+            $subfolder->save();
+
+            $image = new FolderImage();
+            $image->setFolderId($subfolder->getId());
+            generate_image($image, 1, 'folder', $subfolder->getId());
+
+            for($k=0; $k<rand(0, 5); $k++) {
+                $content = new Thelia\Model\Content();
+                $content->addFolder($subfolder);
+                $content->setVisible(rand(1, 10)>7 ? 0 : 1);
+                $content->setPosition($k);
+                setI18n($faker, $content);
+
+                $content->save();
+                $contentId = $content->getId();
+                $contentIdList[] = $contentId;
+
+                $image = new ContentImage();
+                $image->setContentId($content->getId());
+                generate_image($image, 1, 'content', $contentId);
+            }
+        }
+    }
+
     //categories and products
     $productIdList = array();
     $categoryIdList = array();
     for($i=0; $i<4; $i++) {
-        $category = createCategory($faker, 0, $i, $categoryIdList);
+        $category = createCategory($faker, 0, $i, $categoryIdList, $contentIdList);
 
         for($j=1; $j<rand(0, 5); $j++) {
-            $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList);
+            $subcategory = createCategory($faker, $category->getId(), $j, $categoryIdList, $contentIdList);
 
             for($k=0; $k<rand(0, 5); $k++) {
                 createProduct($faker, $subcategory, $k, $productIdList);
@@ -235,6 +289,22 @@ try {
                 ->save();
         }
 
+        //add random associated content
+        $alreadyPicked = array();
+        for($i=1; $i<rand(0, 3); $i++) {
+            $productAssociatedContent = new Thelia\Model\ProductAssociatedContent();
+            do {
+                $pick = array_rand($contentIdList, 1);
+            } while(in_array($pick, $alreadyPicked));
+
+            $alreadyPicked[] = $pick;
+
+            $productAssociatedContent->setContentId($contentIdList[$pick])
+                ->setProductId($productId)
+                ->setPosition($i)
+                ->save();
+        }
+
         //associate PSE and stocks to products
         for($i=0; $i<rand(1,7); $i++) {
             $stock = new \Thelia\Model\ProductSaleElements();
@@ -270,11 +340,6 @@ try {
             }
         }
 
-
-        foreach($attributeList as $attributeId => $attributeAvId) {
-
-        }
-
         //associate features to products
         foreach($featureList as $featureId => $featureAvId) {
             $featureProduct = new Thelia\Model\FeatureProduct();
@@ -290,49 +355,6 @@ try {
             }
 
             $featureProduct->save();
-        }
-    }
-
-    //folders and contents
-    for($i=0; $i<4; $i++) {
-        $folder = new Thelia\Model\Folder();
-        $folder->setParent(0);
-        $folder->setVisible(rand(1, 10)>7 ? 0 : 1);
-        $folder->setPosition($i);
-        setI18n($faker, $folder);
-
-        $folder->save();
-
-        $image = new FolderImage();
-        $image->setFolderId($folder->getId());
-        generate_image($image, 1, 'folder', $folder->getId());
-
-        for($j=1; $j<rand(0, 5); $j++) {
-            $subfolder = new Thelia\Model\Folder();
-            $subfolder->setParent($folder->getId());
-            $subfolder->setVisible(rand(1, 10)>7 ? 0 : 1);
-            $subfolder->setPosition($j);
-            setI18n($faker, $subfolder);
-
-            $subfolder->save();
-
-            $image = new FolderImage();
-            $image->setFolderId($subfolder->getId());
-            generate_image($image, 1, 'folder', $subfolder->getId());
-
-            for($k=0; $k<rand(0, 5); $k++) {
-                $content = new Thelia\Model\Content();
-                $content->addFolder($subfolder);
-                $content->setVisible(rand(1, 10)>7 ? 0 : 1);
-                $content->setPosition($k);
-                setI18n($faker, $content);
-
-                $content->save();
-
-                $image = new ContentImage();
-                $image->setContentId($content->getId());
-                generate_image($image, 1, 'content', $content->getId());
-            }
         }
     }
 
@@ -362,7 +384,7 @@ function createProduct($faker, $category, $position, &$productIdList)
     return $product;
 }
 
-function createCategory($faker, $parent, $position, &$categoryIdList)
+function createCategory($faker, $parent, $position, &$categoryIdList, $contentIdList)
 {
     $category = new Thelia\Model\Category();
     $category->setParent($parent);
@@ -371,12 +393,28 @@ function createCategory($faker, $parent, $position, &$categoryIdList)
     setI18n($faker, $category);
 
     $category->save();
-    $cateogoryId = $category->getId();
-    $categoryIdList[] = $cateogoryId;
+    $categoryId = $category->getId();
+    $categoryIdList[] = $categoryId;
+
+    //add random associated content
+    $alreadyPicked = array();
+    for($i=1; $i<rand(0, 3); $i++) {
+        $categoryAssociatedContent = new Thelia\Model\CategoryAssociatedContent();
+        do {
+            $pick = array_rand($contentIdList, 1);
+        } while(in_array($pick, $alreadyPicked));
+
+        $alreadyPicked[] = $pick;
+
+        $categoryAssociatedContent->setContentId($contentIdList[$pick])
+            ->setCategoryId($categoryId)
+            ->setPosition($i)
+            ->save();
+    }
 
     $image = new CategoryImage();
-    $image->setCategoryId($cateogoryId);
-    generate_image($image, 1, 'category', $cateogoryId);
+    $image->setCategoryId($categoryId);
+    generate_image($image, 1, 'category', $categoryId);
     
     return $category;
 }

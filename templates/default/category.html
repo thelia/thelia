@@ -7,11 +7,25 @@
 {loop name="category0" type="category" parent="0" order="manual"}
 <div style="border: solid 4px blue; padding: 20px; margin: 10px;">
     <h2>CATEGORY : #TITLE (#LOOP_COUNT / #LOOP_TOTAL)</h2>
+
+    {ifloop rel="prod_ass_cont"}
+        <h5>Associated Content</h5>
+        <ul>
+            {loop name="prod_ass_cont" type="associated_content" category="#ID" order="associated_content"}
+            <li>#TITLE</li>
+            {/loop}
+        </ul>
+    {/ifloop}
+    {elseloop rel="prod_ass_cont"}
+        <h5>No associated content</h5>
+    {/elseloop}
+
     {loop name="product" type="product" category="#ID"}
     <div style="border: dashed 2px red; padding: 20px; margin: 10px;">
         <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
         <h4>#TITLE</h4>
         <p>#DESCRIPTION</p>
+
         {ifloop rel="acc"}
             <h5>Accessories</h5>
             <ul>
@@ -23,6 +37,19 @@
         {elseloop rel="acc"}
             <h5>No accessory</h5>
         {/elseloop}
+
+        {ifloop rel="prod_ass_cont"}
+            <h5>Associated Content</h5>
+            <ul>
+                {loop name="prod_ass_cont" type="associated_content" product="#ID" order="associated_content"}
+                <li>#TITLE</li>
+                {/loop}
+            </ul>
+        {/ifloop}
+        {elseloop rel="prod_ass_cont"}
+            <h5>No associated content</h5>
+        {/elseloop}
+
         {ifloop rel="ft"}
             <h5>Features</h5>
             <ul>
@@ -40,7 +67,7 @@
         {elseloop rel="ft"}
             <h5>No feature</h5>
         {/elseloop}
-        {ifloop rel="pse"}
+
         <h5>Product sale elements</h5>
 
         {assign var=current_product value=#ID}
@@ -62,20 +89,32 @@
                 </ul>
             </div>
         {/loop}
-        {/ifloop}
-        {elseloop rel="ft"}
-        <h5>No feature</h5>
-        {/elseloop}
+
     </div>
     {/loop}
     {loop name="catgory1" type="category" parent="#ID"}
     <div style="border: double 4px lightseagreen; padding: 20px; margin: 10px;">
         <h3>SUBCATEGORY : #TITLE  (#LOOP_COUNT / #LOOP_TOTAL)</h3>
+
+        {ifloop rel="prod_ass_cont"}
+            <h5>Associated Content</h5>
+            <ul>
+                {loop name="prod_ass_cont" type="associated_content" category="#ID" order="associated_content"}
+                <li>#TITLE</li>
+                {/loop}
+            </ul>
+        {/ifloop}
+        {elseloop rel="prod_ass_cont"}
+            <h5>No associated content</h5>
+        {/elseloop}
+
         {loop name="product" type="product" category="#ID"}
+
         <div style="border: solid 1px green; padding: 20px; margin: 10px;">
             <h3><a name="#REF">PRODUCT : #REF (#LOOP_COUNT / #LOOP_TOTAL)</a></h3>
             <h4>#TITLE</h4>
             <p>#DESCRIPTION</p>
+
             {ifloop rel="acc"}
             <h5>Accessories</h5>
             <ul>
@@ -87,6 +126,19 @@
             {elseloop rel="acc"}
             <h5>No accessory</h5>
             {/elseloop}
+
+            {ifloop rel="prod_ass_cont"}
+            <h5>Associated Content</h5>
+            <ul>
+                {loop name="prod_ass_cont" type="associated_content" product="#ID" order="associated_content"}
+                <li>#TITLE</li>
+                {/loop}
+            </ul>
+            {/ifloop}
+            {elseloop rel="prod_ass_cont"}
+            <h5>No associated content</h5>
+            {/elseloop}
+
             {ifloop rel="ft"}
             <h5>Features</h5>
             <ul>
@@ -103,6 +155,29 @@
             {elseloop rel="ft"}
             <h5>No feature</h5>
             {/elseloop}
+
+            <h5>Product sale elements</h5>
+
+            {assign var=current_product value=#ID}
+            {loop name="pse" type="product_sale_elements" product="#ID"}
+                <div style="border: solid 2px darkorange; padding: 5px; margin: 5px;">
+                    {loop name="combi" type="attribute_combination" product_sale_element="#ID"}
+                    #ATTRIBUTE_TITLE = #ATTRIBUTE_AVAILABILITY_TITLE<br />
+                    {/loop}
+                    <br />#WEIGHT g
+                    <br /><strong>{if #IS_PROMO == 1} #PROMO_PRICE € (instead of #PRICE) {else} #PRICE € {/if}</strong>
+                    <br /><br />
+                    Add
+                    <select>
+                        {for $will=1 to #QUANTITY}
+                        <option>{$will}</option>
+                        {/for}
+                    </select>
+                    to my cart
+                    </ul>
+                </div>
+            {/loop}
+
         </div>
         {/loop}
     </div>
