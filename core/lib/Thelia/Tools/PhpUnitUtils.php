@@ -21,41 +21,35 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Rule;
-
-use Thelia\Coupon\CouponAdapterInterface;
+namespace Thelia\Tools;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
+ * Helper for Unit Testing
+ *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForDate extends AvailableForPeriod
+class PhpUnitUtils
 {
-
     /**
-     * Check if backoffice inputs are relevant or not
+     * Allow to call a protected methods
      *
-     * @return bool
-     */
-    public function checkBackOfficeInput()
-    {
-        // TODO: Implement checkBackOfficeInput() method.
-    }
-
-    /**
-     * Check if Checkout inputs are relevant or not
+     * @param string $obj  Class name + namespace
+     * @param string $name Method name
+     * @param array  $args Method arguments
      *
-     * @return bool
+     * @return protected method result
      */
-    public function checkCheckoutInput()
+    public static function callMethod($obj, $name, array $args)
     {
-        // TODO: Implement checkCheckoutInput() method.
+        $class = new \ReflectionClass(get_class($obj));
+        $method = $class->getMethod($name);
+        $method->setAccessible(true);
+        return $method->invokeArgs($obj, $args);
     }
-
-
 }

@@ -21,41 +21,61 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Rule;
+namespace Thelia\Coupon;
 
-use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Coupon\Parameter\PriceParam;
+use Thelia\Coupon\Parameter\RuleValidator;
+use Thelia\Coupon\Rule\AvailableForTotalAmount;
+use Thelia\Coupon\Rule\Operators;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
+ * Unit Test CouponRuleCollection Class
+ *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForDate extends AvailableForPeriod
+class CouponRuleCollectionTest extends \PHPUnit_Framework_TestCase
 {
-
     /**
-     * Check if backoffice inputs are relevant or not
      *
-     * @return bool
      */
-    public function checkBackOfficeInput()
+    public function testRuleSerialisation()
     {
-        // TODO: Implement checkBackOfficeInput() method.
+        $rule1 = new AvailableForTotalAmount(
+            array(
+                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+                    Operators::SUPERIOR,
+                    new PriceParam(
+                        40.00,
+                        'EUR'
+                    )
+                )
+            )
+        );
+        $rule2 = new AvailableForTotalAmount(
+            array(
+                AvailableForTotalAmount::PARAM1_PRICE => new RuleValidator(
+                    Operators::INFERIOR,
+                    new PriceParam(
+                        400.00,
+                        'EUR'
+                    )
+                )
+            )
+        );
+        $rules = new CouponRuleCollection(array($rule1, $rule2));
+
+        $serializedRules = base64_encode(serialize($rules));
+        $unserializedRules = unserialize(base64_decode($serializedRules));
+
+        $expected = $rules;
+        $actual = $unserializedRules;
+
+        $this->assertEquals($expected, $actual);
     }
-
-    /**
-     * Check if Checkout inputs are relevant or not
-     *
-     * @return bool
-     */
-    public function checkCheckoutInput()
-    {
-        // TODO: Implement checkCheckoutInput() method.
-    }
-
-
 }

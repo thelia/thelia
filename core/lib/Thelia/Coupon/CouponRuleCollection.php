@@ -23,106 +23,66 @@
 
 namespace Thelia\Coupon;
 
-use InvalidArgumentException;
-use Thelia\Coupon\Parameter\IntegerParam;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Thelia\Coupon\Rule\CouponRuleInterface;
+use Thelia\Exception\InvalidRuleException;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Unit Test IntegerParam Class
+ * Manage a set of v
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class IntegerParamTest extends \PHPUnit_Framework_TestCase
+class CouponRuleCollection
 {
+    /** @var array Array of CouponRuleInterface */
+    protected $rules = array();
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
-     * This method is called before a test is executed.
+     * Constructor
+     *
+     * @param array $rules Array of CouponRuleInterface
+     *
+     * @throws \Thelia\Exception\InvalidRuleException
      */
-    protected function setUp()
+    function __construct(array $rules)
     {
+        foreach ($rules as $rule) {
+            if (!$rule instanceof CouponRuleInterface) {
+                throw new InvalidRuleException(get_class());
+            }
+        }
+        $this->rules = $rules;
     }
 
     /**
+     * Get Rules
      *
-     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
-     *
+     * @return array Array of CouponRuleInterface
      */
-    public function testInferiorInteger()
+    public function getRules()
     {
-        $intValidator = 42;
-        $intToValidate = 41;
-
-        $integerParam = new IntegerParam($intValidator);
-
-        $expected = 1;
-        $actual = $integerParam->compareTo($intToValidate);
-        $this->assertEquals($expected, $actual);
+        return $this->rules;
     }
 
     /**
+     * Add a CouponRuleInterface to the Collection
      *
-     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
+     * @param CouponRuleInterface $rule Rule
      *
+     * @return $this
      */
-    public function testEqualsInteger()
+    public function add(CouponRuleInterface $rule)
     {
-        $intValidator = 42;
-        $intToValidate = 42;
+        $this->rules[] = $rule;
 
-        $integerParam = new IntegerParam($intValidator);
-
-        $expected = 0;
-        $actual = $integerParam->compareTo($intToValidate);
-        $this->assertEquals($expected, $actual);
+        return $this;
     }
 
-    /**
-     *
-     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
-     *
-     */
-    public function testSuperiorInteger()
-    {
-        $intValidator = 42;
-        $intToValidate = 43;
-
-        $integerParam = new IntegerParam($intValidator);
-
-        $expected = -1;
-        $actual = $integerParam->compareTo($intToValidate);
-        $this->assertEquals($expected, $actual);
-    }
-
-    /**
-     * @covers Thelia\Coupon\Parameter\IntegerParam::compareTo
-     * @expectedException InvalidArgumentException
-     */
-    public function testInvalidArgumentException()
-    {
-        $intValidator = 42;
-        $intToValidate = '42';
-
-        $integerParam = new IntegerParam($intValidator);
-
-        $expected = 0;
-        $actual = $integerParam->compareTo($intToValidate);
-        $this->assertEquals($expected, $actual);
-    }
-
-
-
-    /**
-     * Tears down the fixture, for example, closes a network connection.
-     * This method is called after a test is executed.
-     */
-    protected function tearDown()
-    {
-    }
 
 }

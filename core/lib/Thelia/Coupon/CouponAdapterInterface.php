@@ -23,6 +23,9 @@
 
 namespace Thelia\Coupon;
 
+use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Model\Coupon;
+
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
@@ -92,5 +95,23 @@ interface CouponAdapterInterface
      * @return array Array of CouponInterface
      */
     public function getCurrentCoupons();
+
+    /**
+     * Find one Coupon in the database from its code
+     *
+     * @param string $code Coupon code
+     *
+     * @return Coupon
+     */
+    public function findOneCouponByCode($code);
+
+    /**
+     * Save a Coupon in the database
+     *
+     * @param CouponInterface $coupon Coupon
+     *
+     * @return $this
+     */
+    public function saveCoupon(CouponInterface $coupon);
 
 }

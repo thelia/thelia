@@ -26,6 +26,7 @@ namespace Thelia\Coupon\Type;
 use Symfony\Component\Intl\Exception\NotImplementedException;
 use Thelia\Coupon\CouponAdapterInterface;
 use Thelia\Coupon\Rule\CouponRuleInterface;
+use Thelia\Coupon\CouponRuleCollection;
 use Thelia\Coupon\RuleOrganizerInterface;
 use Thelia\Exception\InvalidRuleException;
 
@@ -48,7 +49,7 @@ abstract class CouponAbstract implements CouponInterface
     /** @var RuleOrganizerInterface  */
     protected $organizer = null;
 
-    /** @var array Array of CouponRuleInterface */
+    /** @var CouponRuleCollection Array of CouponRuleInterface */
     protected $rules = null;
 
     /** @var string Coupon code (ex: XMAS) */
@@ -63,6 +64,12 @@ abstract class CouponAbstract implements CouponInterface
     /** @var string Coupon description */
     protected $description = null;
 
+    /** @var bool if Coupon is enabled */
+    protected $isEnabled = false;
+
+    /** @var \DateTime Coupon expiration date */
+    protected $expirationDate = null;
+
     /** @var bool if Coupon is cumulative */
     protected $isCumulative = false;
 
@@ -71,6 +78,12 @@ abstract class CouponAbstract implements CouponInterface
 
     /** @var float Amount that will be removed from the Checkout (Coupon Effect)  */
     protected $amount = 0;
+
+    /** @var int Max time a Coupon can be used (-1 = unlimited) */
+    protected $maxUsage = -1;
+
+    /** @var bool if Coupon is available for Products already on special offers */
+    protected $isAvailableOnSpecialOffers = false;
 
     /**
      * Set Adapter containing all relevant data
@@ -176,13 +189,11 @@ abstract class CouponAbstract implements CouponInterface
     /**
      * Return condition to validate the Coupon or not
      *
-     * @return array An array of CouponRuleInterface
+     * @return CouponRuleCollection
      */
     public function getRules()
     {
-        $arrayObject = new \ArrayObject($this->rules);
-
-        return $arrayObject->getArrayCopy();
+        return clone $this->rules;
     }
 
     /**
@@ -195,7 +206,7 @@ abstract class CouponAbstract implements CouponInterface
      */
     public function addRule(CouponRuleInterface $rule)
     {
-        $this->rules[] = $rule;
+        $this->rules->add($rule);
 
         return $this;
     }
@@ -204,22 +215,14 @@ abstract class CouponAbstract implements CouponInterface
      * Replace the existing Rules by those given in parameter
      * If one Rule is badly implemented, no Rule will be added
      *
-     * @param array $rules CouponRuleInterface to add
+     * @param CouponRuleCollection $rules CouponRuleInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidRuleException
      */
-    public function setRules(array $rules)
+    public function setRules(CouponRuleCollection $rules)
     {
-        foreach ($rules as $rule) {
-            if (!$rule instanceof CouponRuleInterface) {
-                throw new InvalidRuleException(get_class());
-            }
-        }
-        $this->rules = array();
-        foreach ($rules as $rule) {
-            $this->addRule($rule);
-        }
+        $this->rules = $rules;
 
         return $this;
     }
@@ -236,7 +239,7 @@ abstract class CouponAbstract implements CouponInterface
         $isMatching = true;
 
         /** @var CouponRuleInterface $rule */
-        foreach ($this->rules as $rule) {
+        foreach ($this->rules->getRules() as $rule) {
             if (!$rule->isMatching()) {
                 $isMatching = false;
             }
@@ -244,6 +247,66 @@ abstract class CouponAbstract implements CouponInterface
 
         return $isMatching;
     }
+
+    /**
+     * Return Coupon expiration date
+     *
+     * @return \DateTime
+     */
+    public function getExpirationDate()
+    {
+        return clone $this->expirationDate;
+    }
+
+    /**
+     * Check if the Coupon can be used against a
+     * product already with a special offer price
+     *
+     * @return boolean
+     */
+    public function isAvailableOnSpecialOffers()
+    {
+        return $this->isAvailableOnSpecialOffers;
+    }
+
+
+    /**
+     * Check if Coupon has been disabled by admin
+     *
+     * @return boolean
+     */
+    public function isEnabled()
+    {
+        return $this->isEnabled;
+    }
+
+    /**
+     * Return how many time the Coupon can be used again
+     * Ex : -1 unlimited
+     *
+     * @return int
+     */
+    public function getMaxUsage()
+    {
+        return $this->maxUsage;
+    }
+
+    /**
+     * Check if the Coupon is already Expired
+     *
+     * @return bool
+     */
+    public function isExpired()
+    {
+        $ret = true;
+
+        if ($this->expirationDate < new \DateTime()) {
+            $ret = false;
+        }
+
+        return $ret;
+    }
+
 
 
 }

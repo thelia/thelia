@@ -32,7 +32,7 @@ use Thelia\Coupon\Parameter\RepeatedDateParam;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when a Rule receive an invalid Parameter
+ * Unit Test RepeatedDateParam Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>

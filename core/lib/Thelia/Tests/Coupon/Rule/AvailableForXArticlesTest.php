@@ -30,7 +30,7 @@ use Thelia\Coupon\Rule\AvailableForXArticles;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when a Rule receive an invalid Parameter
+ * Unit Test AvailableForXArticles Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>

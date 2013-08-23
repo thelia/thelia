@@ -57,7 +57,7 @@ class CouponVersionTableMap extends TableMap
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 17;
+    const NUM_COLUMNS = 18;
 
     /**
      * The number of lazy-loaded columns
@@ -67,7 +67,7 @@ class CouponVersionTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 17;
+    const NUM_HYDRATE_COLUMNS = 18;
 
     /**
      * the column name for the ID field
@@ -120,14 +120,9 @@ class CouponVersionTableMap extends TableMap
     const EXPIRATION_DATE = 'coupon_version.EXPIRATION_DATE';
 
     /**
-     * the column name for the SERIALIZED_RULES_TYPE field
+     * the column name for the SERIALIZED_RULES field
      */
-    const SERIALIZED_RULES_TYPE = 'coupon_version.SERIALIZED_RULES_TYPE';
-
-    /**
-     * the column name for the SERIALIZED_RULES_CONTENT field
-     */
-    const SERIALIZED_RULES_CONTENT = 'coupon_version.SERIALIZED_RULES_CONTENT';
+    const SERIALIZED_RULES = 'coupon_version.SERIALIZED_RULES';
 
     /**
      * the column name for the IS_CUMULATIVE field
@@ -138,6 +133,16 @@ class CouponVersionTableMap extends TableMap
      * the column name for the IS_REMOVING_POSTAGE field
      */
     const IS_REMOVING_POSTAGE = 'coupon_version.IS_REMOVING_POSTAGE';
+
+    /**
+     * the column name for the MAX_USAGE field
+     */
+    const MAX_USAGE = 'coupon_version.MAX_USAGE';
+
+    /**
+     * the column name for the IS_AVAILABLE_ON_SPECIAL_OFFERS field
+     */
+    const IS_AVAILABLE_ON_SPECIAL_OFFERS = 'coupon_version.IS_AVAILABLE_ON_SPECIAL_OFFERS';
 
     /**
      * the column name for the CREATED_AT field
@@ -166,12 +171,12 @@ class CouponVersionTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'Title', 'ShortDescription', 'Description', 'Amount', 'IsUsed', 'IsEnabled', 'ExpirationDate', 'SerializedRulesType', 'SerializedRulesContent', 'IsCumulative', 'IsRemovingPostage', 'CreatedAt', 'UpdatedAt', 'Version', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'title', 'shortDescription', 'description', 'amount', 'isUsed', 'isEnabled', 'expirationDate', 'serializedRulesType', 'serializedRulesContent', 'isCumulative', 'isRemovingPostage', 'createdAt', 'updatedAt', 'version', ),
-        self::TYPE_COLNAME       => array(CouponVersionTableMap::ID, CouponVersionTableMap::CODE, CouponVersionTableMap::TYPE, CouponVersionTableMap::TITLE, CouponVersionTableMap::SHORT_DESCRIPTION, CouponVersionTableMap::DESCRIPTION, CouponVersionTableMap::AMOUNT, CouponVersionTableMap::IS_USED, CouponVersionTableMap::IS_ENABLED, CouponVersionTableMap::EXPIRATION_DATE, CouponVersionTableMap::SERIALIZED_RULES_TYPE, CouponVersionTableMap::SERIALIZED_RULES_CONTENT, CouponVersionTableMap::IS_CUMULATIVE, CouponVersionTableMap::IS_REMOVING_POSTAGE, CouponVersionTableMap::CREATED_AT, CouponVersionTableMap::UPDATED_AT, CouponVersionTableMap::VERSION, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'TITLE', 'SHORT_DESCRIPTION', 'DESCRIPTION', 'AMOUNT', 'IS_USED', 'IS_ENABLED', 'EXPIRATION_DATE', 'SERIALIZED_RULES_TYPE', 'SERIALIZED_RULES_CONTENT', 'IS_CUMULATIVE', 'IS_REMOVING_POSTAGE', 'CREATED_AT', 'UPDATED_AT', 'VERSION', ),
-        self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'title', 'short_description', 'description', 'amount', 'is_used', 'is_enabled', 'expiration_date', 'serialized_rules_type', 'serialized_rules_content', 'is_cumulative', 'is_removing_postage', 'created_at', 'updated_at', 'version', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+        self::TYPE_PHPNAME       => array('Id', 'Code', 'Type', 'Title', 'ShortDescription', 'Description', 'Amount', 'IsUsed', 'IsEnabled', 'ExpirationDate', 'SerializedRules', 'IsCumulative', 'IsRemovingPostage', 'MaxUsage', 'IsAvailableOnSpecialOffers', 'CreatedAt', 'UpdatedAt', 'Version', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'code', 'type', 'title', 'shortDescription', 'description', 'amount', 'isUsed', 'isEnabled', 'expirationDate', 'serializedRules', 'isCumulative', 'isRemovingPostage', 'maxUsage', 'isAvailableOnSpecialOffers', 'createdAt', 'updatedAt', 'version', ),
+        self::TYPE_COLNAME       => array(CouponVersionTableMap::ID, CouponVersionTableMap::CODE, CouponVersionTableMap::TYPE, CouponVersionTableMap::TITLE, CouponVersionTableMap::SHORT_DESCRIPTION, CouponVersionTableMap::DESCRIPTION, CouponVersionTableMap::AMOUNT, CouponVersionTableMap::IS_USED, CouponVersionTableMap::IS_ENABLED, CouponVersionTableMap::EXPIRATION_DATE, CouponVersionTableMap::SERIALIZED_RULES, CouponVersionTableMap::IS_CUMULATIVE, CouponVersionTableMap::IS_REMOVING_POSTAGE, CouponVersionTableMap::MAX_USAGE, CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS, CouponVersionTableMap::CREATED_AT, CouponVersionTableMap::UPDATED_AT, CouponVersionTableMap::VERSION, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'CODE', 'TYPE', 'TITLE', 'SHORT_DESCRIPTION', 'DESCRIPTION', 'AMOUNT', 'IS_USED', 'IS_ENABLED', 'EXPIRATION_DATE', 'SERIALIZED_RULES', 'IS_CUMULATIVE', 'IS_REMOVING_POSTAGE', 'MAX_USAGE', 'IS_AVAILABLE_ON_SPECIAL_OFFERS', 'CREATED_AT', 'UPDATED_AT', 'VERSION', ),
+        self::TYPE_FIELDNAME     => array('id', 'code', 'type', 'title', 'short_description', 'description', 'amount', 'is_used', 'is_enabled', 'expiration_date', 'serialized_rules', 'is_cumulative', 'is_removing_postage', 'max_usage', 'is_available_on_special_offers', 'created_at', 'updated_at', 'version', ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
     );
 
     /**
@@ -181,12 +186,12 @@ class CouponVersionTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'Title' => 3, 'ShortDescription' => 4, 'Description' => 5, 'Amount' => 6, 'IsUsed' => 7, 'IsEnabled' => 8, 'ExpirationDate' => 9, 'SerializedRulesType' => 10, 'SerializedRulesContent' => 11, 'IsCumulative' => 12, 'IsRemovingPostage' => 13, 'CreatedAt' => 14, 'UpdatedAt' => 15, 'Version' => 16, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'title' => 3, 'shortDescription' => 4, 'description' => 5, 'amount' => 6, 'isUsed' => 7, 'isEnabled' => 8, 'expirationDate' => 9, 'serializedRulesType' => 10, 'serializedRulesContent' => 11, 'isCumulative' => 12, 'isRemovingPostage' => 13, 'createdAt' => 14, 'updatedAt' => 15, 'version' => 16, ),
-        self::TYPE_COLNAME       => array(CouponVersionTableMap::ID => 0, CouponVersionTableMap::CODE => 1, CouponVersionTableMap::TYPE => 2, CouponVersionTableMap::TITLE => 3, CouponVersionTableMap::SHORT_DESCRIPTION => 4, CouponVersionTableMap::DESCRIPTION => 5, CouponVersionTableMap::AMOUNT => 6, CouponVersionTableMap::IS_USED => 7, CouponVersionTableMap::IS_ENABLED => 8, CouponVersionTableMap::EXPIRATION_DATE => 9, CouponVersionTableMap::SERIALIZED_RULES_TYPE => 10, CouponVersionTableMap::SERIALIZED_RULES_CONTENT => 11, CouponVersionTableMap::IS_CUMULATIVE => 12, CouponVersionTableMap::IS_REMOVING_POSTAGE => 13, CouponVersionTableMap::CREATED_AT => 14, CouponVersionTableMap::UPDATED_AT => 15, CouponVersionTableMap::VERSION => 16, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'TITLE' => 3, 'SHORT_DESCRIPTION' => 4, 'DESCRIPTION' => 5, 'AMOUNT' => 6, 'IS_USED' => 7, 'IS_ENABLED' => 8, 'EXPIRATION_DATE' => 9, 'SERIALIZED_RULES_TYPE' => 10, 'SERIALIZED_RULES_CONTENT' => 11, 'IS_CUMULATIVE' => 12, 'IS_REMOVING_POSTAGE' => 13, 'CREATED_AT' => 14, 'UPDATED_AT' => 15, 'VERSION' => 16, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'title' => 3, 'short_description' => 4, 'description' => 5, 'amount' => 6, 'is_used' => 7, 'is_enabled' => 8, 'expiration_date' => 9, 'serialized_rules_type' => 10, 'serialized_rules_content' => 11, 'is_cumulative' => 12, 'is_removing_postage' => 13, 'created_at' => 14, 'updated_at' => 15, 'version' => 16, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Code' => 1, 'Type' => 2, 'Title' => 3, 'ShortDescription' => 4, 'Description' => 5, 'Amount' => 6, 'IsUsed' => 7, 'IsEnabled' => 8, 'ExpirationDate' => 9, 'SerializedRules' => 10, 'IsCumulative' => 11, 'IsRemovingPostage' => 12, 'MaxUsage' => 13, 'IsAvailableOnSpecialOffers' => 14, 'CreatedAt' => 15, 'UpdatedAt' => 16, 'Version' => 17, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'code' => 1, 'type' => 2, 'title' => 3, 'shortDescription' => 4, 'description' => 5, 'amount' => 6, 'isUsed' => 7, 'isEnabled' => 8, 'expirationDate' => 9, 'serializedRules' => 10, 'isCumulative' => 11, 'isRemovingPostage' => 12, 'maxUsage' => 13, 'isAvailableOnSpecialOffers' => 14, 'createdAt' => 15, 'updatedAt' => 16, 'version' => 17, ),
+        self::TYPE_COLNAME       => array(CouponVersionTableMap::ID => 0, CouponVersionTableMap::CODE => 1, CouponVersionTableMap::TYPE => 2, CouponVersionTableMap::TITLE => 3, CouponVersionTableMap::SHORT_DESCRIPTION => 4, CouponVersionTableMap::DESCRIPTION => 5, CouponVersionTableMap::AMOUNT => 6, CouponVersionTableMap::IS_USED => 7, CouponVersionTableMap::IS_ENABLED => 8, CouponVersionTableMap::EXPIRATION_DATE => 9, CouponVersionTableMap::SERIALIZED_RULES => 10, CouponVersionTableMap::IS_CUMULATIVE => 11, CouponVersionTableMap::IS_REMOVING_POSTAGE => 12, CouponVersionTableMap::MAX_USAGE => 13, CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS => 14, CouponVersionTableMap::CREATED_AT => 15, CouponVersionTableMap::UPDATED_AT => 16, CouponVersionTableMap::VERSION => 17, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CODE' => 1, 'TYPE' => 2, 'TITLE' => 3, 'SHORT_DESCRIPTION' => 4, 'DESCRIPTION' => 5, 'AMOUNT' => 6, 'IS_USED' => 7, 'IS_ENABLED' => 8, 'EXPIRATION_DATE' => 9, 'SERIALIZED_RULES' => 10, 'IS_CUMULATIVE' => 11, 'IS_REMOVING_POSTAGE' => 12, 'MAX_USAGE' => 13, 'IS_AVAILABLE_ON_SPECIAL_OFFERS' => 14, 'CREATED_AT' => 15, 'UPDATED_AT' => 16, 'VERSION' => 17, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'code' => 1, 'type' => 2, 'title' => 3, 'short_description' => 4, 'description' => 5, 'amount' => 6, 'is_used' => 7, 'is_enabled' => 8, 'expiration_date' => 9, 'serialized_rules' => 10, 'is_cumulative' => 11, 'is_removing_postage' => 12, 'max_usage' => 13, 'is_available_on_special_offers' => 14, 'created_at' => 15, 'updated_at' => 16, 'version' => 17, ),
+        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, )
     );
 
     /**
@@ -215,10 +220,11 @@ class CouponVersionTableMap extends TableMap
         $this->addColumn('IS_USED', 'IsUsed', 'TINYINT', true, null, null);
         $this->addColumn('IS_ENABLED', 'IsEnabled', 'TINYINT', true, null, null);
         $this->addColumn('EXPIRATION_DATE', 'ExpirationDate', 'TIMESTAMP', true, null, null);
-        $this->addColumn('SERIALIZED_RULES_TYPE', 'SerializedRulesType', 'LONGVARCHAR', true, null, null);
-        $this->addColumn('SERIALIZED_RULES_CONTENT', 'SerializedRulesContent', 'LONGVARCHAR', true, null, null);
+        $this->addColumn('SERIALIZED_RULES', 'SerializedRules', 'LONGVARCHAR', true, null, null);
         $this->addColumn('IS_CUMULATIVE', 'IsCumulative', 'TINYINT', true, null, null);
         $this->addColumn('IS_REMOVING_POSTAGE', 'IsRemovingPostage', 'TINYINT', true, null, null);
+        $this->addColumn('MAX_USAGE', 'MaxUsage', 'INTEGER', true, null, null);
+        $this->addColumn('IS_AVAILABLE_ON_SPECIAL_OFFERS', 'IsAvailableOnSpecialOffers', 'BOOLEAN', true, 1, null);
         $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
         $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
         $this->addPrimaryKey('VERSION', 'Version', 'INTEGER', true, null, 0);
@@ -299,11 +305,11 @@ class CouponVersionTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 16 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 17 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 16 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 17 + $offset : static::translateFieldName('Version', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -429,10 +435,11 @@ class CouponVersionTableMap extends TableMap
             $criteria->addSelectColumn(CouponVersionTableMap::IS_USED);
             $criteria->addSelectColumn(CouponVersionTableMap::IS_ENABLED);
             $criteria->addSelectColumn(CouponVersionTableMap::EXPIRATION_DATE);
-            $criteria->addSelectColumn(CouponVersionTableMap::SERIALIZED_RULES_TYPE);
-            $criteria->addSelectColumn(CouponVersionTableMap::SERIALIZED_RULES_CONTENT);
+            $criteria->addSelectColumn(CouponVersionTableMap::SERIALIZED_RULES);
             $criteria->addSelectColumn(CouponVersionTableMap::IS_CUMULATIVE);
             $criteria->addSelectColumn(CouponVersionTableMap::IS_REMOVING_POSTAGE);
+            $criteria->addSelectColumn(CouponVersionTableMap::MAX_USAGE);
+            $criteria->addSelectColumn(CouponVersionTableMap::IS_AVAILABLE_ON_SPECIAL_OFFERS);
             $criteria->addSelectColumn(CouponVersionTableMap::CREATED_AT);
             $criteria->addSelectColumn(CouponVersionTableMap::UPDATED_AT);
             $criteria->addSelectColumn(CouponVersionTableMap::VERSION);
@@ -447,10 +454,11 @@ class CouponVersionTableMap extends TableMap
             $criteria->addSelectColumn($alias . '.IS_USED');
             $criteria->addSelectColumn($alias . '.IS_ENABLED');
             $criteria->addSelectColumn($alias . '.EXPIRATION_DATE');
-            $criteria->addSelectColumn($alias . '.SERIALIZED_RULES_TYPE');
-            $criteria->addSelectColumn($alias . '.SERIALIZED_RULES_CONTENT');
+            $criteria->addSelectColumn($alias . '.SERIALIZED_RULES');
             $criteria->addSelectColumn($alias . '.IS_CUMULATIVE');
             $criteria->addSelectColumn($alias . '.IS_REMOVING_POSTAGE');
+            $criteria->addSelectColumn($alias . '.MAX_USAGE');
+            $criteria->addSelectColumn($alias . '.IS_AVAILABLE_ON_SPECIAL_OFFERS');
             $criteria->addSelectColumn($alias . '.CREATED_AT');
             $criteria->addSelectColumn($alias . '.UPDATED_AT');
             $criteria->addSelectColumn($alias . '.VERSION');

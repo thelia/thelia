@@ -21,41 +21,33 @@
 /*                                                                                */
 /**********************************************************************************/
 
-namespace Thelia\Coupon\Rule;
+namespace Thelia\Exception;
 
-use Thelia\Coupon\CouponAdapterInterface;
+use Thelia\Log\Tlog;
 
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
  * Time: 3:24 PM
  *
+ * Thrown when an Expired Coupon is tried
+ *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class AvailableForDate extends AvailableForPeriod
+class CouponExpiredException extends \Exception
 {
-
     /**
-     * Check if backoffice inputs are relevant or not
+     * CouponExpiredException thrown when a Coupon is expired
      *
-     * @return bool
+     * @param string $couponCode Coupon code
      */
-    public function checkBackOfficeInput()
+    public function __construct($couponCode)
     {
-        // TODO: Implement checkBackOfficeInput() method.
+        $message = 'Expired Coupon ' . $couponCode . 'attempt';
+        Tlog::getInstance()->addInfo($message);
+
+        parent::__construct($message);
     }
-
-    /**
-     * Check if Checkout inputs are relevant or not
-     *
-     * @return bool
-     */
-    public function checkCheckoutInput()
-    {
-        // TODO: Implement checkCheckoutInput() method.
-    }
-
-
 }

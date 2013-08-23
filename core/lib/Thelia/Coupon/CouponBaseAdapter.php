@@ -23,6 +23,10 @@
 
 namespace Thelia\Coupon;
 
+use Thelia\Coupon\Type\CouponInterface;
+use Thelia\Model\Coupon;
+use Thelia\Model\CouponQuery;
+
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
@@ -30,6 +34,7 @@ namespace Thelia\Coupon;
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
+ * @todo implements
  *
  */
 class CouponBaseAdapter implements CouponAdapterInterface
@@ -111,7 +116,7 @@ class CouponBaseAdapter implements CouponAdapterInterface
      */
     public function getCurrentCoupons()
     {
-        $couponFactory = new CouponFactory();
+        $couponFactory = new CouponFactory($this);
 
         // @todo Get from Session
         $couponCodes = array('XMAS', 'SPRINGBREAK');
@@ -122,6 +127,47 @@ class CouponBaseAdapter implements CouponAdapterInterface
         }
 
         return $coupons;
+    }
+
+    /**
+     * Find one Coupon in the database from its code
+     *
+     * @param string $code Coupon code
+     *
+     * @return Coupon
+     */
+    public function findOneCouponByCode($code)
+    {
+        $couponQuery = CouponQuery::create();
+
+        return $couponQuery->findOneByCode($code);
+    }
+
+    /**
+     * Save a Coupon in the database
+     *
+     * @param CouponInterface $coupon Coupon
+     *
+     * @return $this
+     */
+    public function saveCoupon(CouponInterface $coupon)
+    {
+//        $couponModel = new Coupon();
+//        $couponModel->setCode($coupon->getCode());
+//        $couponModel->setType(get_class($coupon));
+//        $couponModel->setTitle($coupon->getTitle());
+//        $couponModel->setShortDescription($coupon->getShortDescription());
+//        $couponModel->setDescription($coupon->getDescription());
+//        $couponModel->setAmount($coupon->getEffect());
+//        $couponModel->setIsUsed(0);
+//        $couponModel->setIsEnabled(1);
+//        $couponModel->set
+//        $couponModel->set
+//        $couponModel->set
+//        $couponModel->set
+//        $couponModel->set
+//        $couponModel->set
+//        $couponModel->set
     }
 
 

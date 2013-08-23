@@ -42,9 +42,9 @@ class InvalidRuleException extends \RuntimeException
      * InvalidRuleOperatorException thrown when a Rule is badly implemented
      *
      * @param string $className Class name
-     * @param string $parameter array key parameter
      */
-    public function __construct($className) {
+    public function __construct($className)
+    {
 
         $message = 'Invalid Rule given to ' . $className;
         Tlog::getInstance()->addError($message);

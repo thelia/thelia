@@ -44,7 +44,8 @@ class InvalidRuleOperatorException extends \RuntimeException
      * @param string $className Class name
      * @param string $parameter array key parameter
      */
-    public function __construct($className, $parameter) {
+    public function __construct($className, $parameter)
+    {
 
         $message = 'Invalid Operator for Rule ' . $className . ' on parameter ' . $parameter;
         Tlog::getInstance()->addError($message);

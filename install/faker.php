@@ -350,19 +350,9 @@ Sed facilisis pellentesque nisl, eu tincidunt erat scelerisque a. Nullam malesua
             )
         )
     );
-    $rules = array($rule1, $rule2);
+    $rules = new \Thelia\Coupon\CouponRuleCollection(array($rule1, $rule2));
 
-    $encoders = array(new XmlEncoder(), new JsonEncoder());
-    $normalizers = array(new GetSetMethodNormalizer());
-    $serializer = new Serializer($normalizers, $encoders);
-
-    $ruleTypes = array();
-    /** @var Thelia\Coupon\Rule\CouponRuleInterface $rule */
-    foreach ($rules as $rule) {
-        $ruleTypes[] = get_class($rule);
-    }
-    $coupon1->setSerializedRulesType($serializer->serialize($ruleTypes, 'json'));
-    $coupon1->setSerializedRulesContent($serializer->serialize($rules, 'json'));
+    $coupon1->setSerializedRules(base64_encode(serialize($rules)));
 
     $coupon1->setIsCumulative(1);
     $coupon1->setIsRemovingPostage(0);

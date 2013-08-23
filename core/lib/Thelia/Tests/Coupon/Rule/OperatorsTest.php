@@ -31,13 +31,13 @@ use Thelia\Coupon\Rule\Operators;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when a Rule receive an invalid Parameter
+ * Unit Test Operators Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>
  *
  */
-class OperatorTest extends \PHPUnit_Framework_TestCase
+class OperatorsTest extends \PHPUnit_Framework_TestCase
 {
 
     /**

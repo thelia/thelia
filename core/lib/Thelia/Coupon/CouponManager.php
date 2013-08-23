@@ -51,7 +51,7 @@ class CouponManager
      *
      * @param CouponAdapterInterface $adapter Provide necessary value from Thelia
      */
-    function __construct($adapter)
+    function __construct(CouponAdapterInterface $adapter)
     {
         $this->adapter = $adapter;
         $this->coupons = $this->adapter->getCurrentCoupons();
@@ -69,7 +69,7 @@ class CouponManager
         $discount = 0.00;
 
         if (count($this->coupons) > 0) {
-            $couponsKept = $this->sortCoupons();
+            $couponsKept = $this->sortCoupons($this->coupons);
             $isRemovingPostage = $this->isCouponRemovingPostage($couponsKept);
 
             if ($isRemovingPostage) {
@@ -111,17 +111,36 @@ class CouponManager
      * Sort Coupon to keep
      * Coupon not cumulative cancels previous
      *
+     * @param array $coupons CouponInterface to process
+     *
      * @return array Array of CouponInterface sorted
      */
-    protected function sortCoupons()
+    protected function sortCoupons(array $coupons)
     {
         $couponsKept = array();
 
         /** @var CouponInterface $coupon */
-        foreach ($this->coupons as $coupon) {
-            if (!$coupon->isCumulative()) {
-                $couponsKept = array();
-                $couponsKept[] = $coupon;
+        foreach ($coupons as $coupon) {
+            if (!$coupon->isExpired()) {
+                if ($coupon->isCumulative()) {
+                    if (isset($couponsKept[0])) {
+                        /** @var CouponInterface $previousCoupon */
+                        $previousCoupon = $couponsKept[0];
+                        if ($previousCoupon->isCumulative()) {
+                            // Add Coupon
+                            $couponsKept[] = $coupon;
+                        } else {
+                            // Reset Coupons, add last
+                            $couponsKept = array($coupon);
+                        }
+                    } else {
+                        // Reset Coupons, add last
+                        $couponsKept = array($coupon);
+                    }
+                } else {
+                    // Reset Coupons, add last
+                    $couponsKept = array($coupon);
+                }
             }
         }
 

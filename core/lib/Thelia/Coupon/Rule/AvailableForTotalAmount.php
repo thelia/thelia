@@ -166,7 +166,8 @@ class AvailableForTotalAmount extends CouponRuleAbstract
      */
     protected function setValidatorsFromAdapter(CouponAdapterInterface $adapter)
     {
-        $adapter->getRule($this);
+//        $adapter->getRule($this);
+        // @todo implement
     }
 
     /**

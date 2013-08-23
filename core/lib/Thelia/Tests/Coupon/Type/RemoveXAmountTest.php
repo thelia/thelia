@@ -33,7 +33,7 @@ use Thelia\Coupon\Type\RemoveXAmount;
  * Date: 8/19/13
  * Time: 3:24 PM
  *
- * Thrown when a Rule receive an invalid Parameter
+ * Unit Test RemoveXAmount Class
  *
  * @package Coupon
  * @author  Guillaume MOREL <gmorel@openstudio.fr>

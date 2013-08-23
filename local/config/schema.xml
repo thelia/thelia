@@ -799,10 +799,11 @@
         <column name="is_used" required="true" type="TINYINT" />
         <column name="is_enabled" required="true" type="TINYINT" />
         <column name="expiration_date" required="true" type="TIMESTAMP" />
-        <column name="serialized_rules_type" required="true" type="LONGVARCHAR" />
-        <column name="serialized_rules_content" required="true" type="LONGVARCHAR" />
+        <column name="serialized_rules" required="true" type="LONGVARCHAR" />
         <column name="is_cumulative" required="true" type="TINYINT" />
         <column name="is_removing_postage" required="true" type="TINYINT" />
+        <column name="max_usage" required="true" type="INTEGER" />
+        <column name="is_available_on_special_offers" required="true" type="BOOLEAN" />
         <unique name="code_UNIQUE">
             <unique-column name="code" />
         </unique>
@@ -826,6 +827,12 @@
         </index>
         <index name="idx_is_removing_postage">
             <index-column name="is_removing_postage" />
+        </index>
+        <index name="idx_max_usage">
+            <index-column name="max_usage" />
+        </index>
+        <index name="idx_is_available_on_special_offers">
+            <index-column name="is_available_on_special_offers" />
         </index>
         <behavior name="timestampable" />
         <behavior name="i18n" />

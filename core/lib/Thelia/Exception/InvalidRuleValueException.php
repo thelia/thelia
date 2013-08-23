@@ -44,7 +44,8 @@ class InvalidRuleValueException extends \RuntimeException
      * @param string $className Class name
      * @param string $parameter array key parameter
      */
-    public function __construct($className, $parameter) {
+    public function __construct($className, $parameter)
+    {
 
         $message = 'Invalid Parameter for Rule ' . $className . ' on parameter ' . $parameter;
         Tlog::getInstance()->addError($message);

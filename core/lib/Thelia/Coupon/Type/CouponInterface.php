@@ -23,6 +23,8 @@
 
 namespace Thelia\Coupon\Type;
 
+use Thelia\Coupon\CouponRuleCollection;
+
 /**
  * Created by JetBrains PhpStorm.
  * Date: 8/19/13
@@ -114,10 +116,48 @@ interface CouponInterface
      * Replace the existing Rules by those given in parameter
      * If one Rule is badly implemented, no Rule will be added
      *
-     * @param array $rules CouponRuleInterface to add
+     * @param CouponRuleCollection $rules CouponRuleInterface to add
      *
      * @return $this
      * @throws \Thelia\Exception\InvalidRuleException
      */
-    public function setRules(array $rules);
+    public function setRules(CouponRuleCollection $rules);
+
+    /**
+     * Return Coupon expiration date
+     *
+     * @return \DateTime
+     */
+    public function getExpirationDate();
+
+    /**
+     * Check if the Coupon can be used against a
+     * product already with a special offer price
+     *
+     * @return boolean
+     */
+    public function isAvailableOnSpecialOffers();
+
+
+    /**
+     * Check if Coupon has been disabled by admin
+     *
+     * @return boolean
+     */
+    public function isEnabled();
+
+    /**
+     * Return how many time the Coupon can be used again
+     * Ex : -1 unlimited
+     *
+     * @return int
+     */
+    public function getMaxUsage();
+
+    /**
+     * Check if the Coupon is already Expired
+     *
+     * @return bool
+     */
+    public function isExpired();
 }

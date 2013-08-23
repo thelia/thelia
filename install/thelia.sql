@@ -1089,10 +1089,11 @@ CREATE TABLE `coupon`
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
     `expiration_date` DATETIME NOT NULL,
-    `serialized_rules_type` TEXT NOT NULL,
-    `serialized_rules_content` TEXT NOT NULL,
+    `serialized_rules` TEXT NOT NULL,
     `is_cumulative` TINYINT NOT NULL,
     `is_removing_postage` TINYINT NOT NULL,
+    `max_usage` INTEGER NOT NULL,
+    `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0,
@@ -1104,7 +1105,9 @@ CREATE TABLE `coupon`
     INDEX `idx_amount` (`amount`),
     INDEX `idx_expiration_date` (`expiration_date`),
     INDEX `idx_is_cumulative` (`is_cumulative`),
-    INDEX `idx_is_removing_postage` (`is_removing_postage`)
+    INDEX `idx_is_removing_postage` (`is_removing_postage`),
+    INDEX `idx_max_usage` (`max_usage`),
+    INDEX `idx_is_available_on_special_offers` (`is_available_on_special_offers`)
 ) ENGINE=InnoDB;
 
 -- ---------------------------------------------------------------------
@@ -2183,10 +2186,11 @@ CREATE TABLE `coupon_version`
     `is_used` TINYINT NOT NULL,
     `is_enabled` TINYINT NOT NULL,
     `expiration_date` DATETIME NOT NULL,
-    `serialized_rules_type` TEXT NOT NULL,
-    `serialized_rules_content` TEXT NOT NULL,
+    `serialized_rules` TEXT NOT NULL,
     `is_cumulative` TINYINT NOT NULL,
     `is_removing_postage` TINYINT NOT NULL,
+    `max_usage` INTEGER NOT NULL,
+    `is_available_on_special_offers` TINYINT(1) NOT NULL,
     `created_at` DATETIME,
     `updated_at` DATETIME,
     `version` INTEGER DEFAULT 0 NOT NULL,

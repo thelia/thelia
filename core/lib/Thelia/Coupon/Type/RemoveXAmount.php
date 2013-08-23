@@ -41,15 +41,20 @@ class RemoveXAmount extends CouponAbstract
     /**
      * Constructor
      *
-     * @param string $code              Coupon code (ex: XMAS)
-     * @param string $title             Coupon title (ex: Coupon for XMAS)
-     * @param string $shortDescription  Coupon short description
-     * @param string $description       Coupon description
-     * @param float  $amount            Coupon amount to deduce
-     * @param bool   $isCumulative      if Coupon is cumulative
-     * @param bool   $isRemovingPostage if Coupon is removing postage
+     * @param string    $code                       Coupon code (ex: XMAS)
+     * @param string    $title                      Coupon title (ex: Coupon for XMAS)
+     * @param string    $shortDescription           Coupon short description
+     * @param string    $description                Coupon description
+     * @param float     $amount                     Coupon amount to deduce
+     * @param bool      $isCumulative               If Coupon is cumulative
+     * @param bool      $isRemovingPostage          If Coupon is removing postage
+     * @param bool      $isAvailableOnSpecialOffers If available on Product already
+     *                                              on special offer price
+     * @param bool      $isEnabled                  False if Coupon is disabled by admin
+     * @param int       $maxUsage                   How many usage left
+     * @param \Datetime $expirationDate             When the Code is expiring
      */
-    function __construct($code, $title, $shortDescription, $description, $amount, $isCumulative, $isRemovingPostage)
+    function __construct($code, $title, $shortDescription, $description, $amount, $isCumulative, $isRemovingPostage, $isAvailableOnSpecialOffers, $isEnabled, $maxUsage, \DateTime $expirationDate)
     {
         $this->code = $code;
         $this->title = $title;
@@ -60,6 +65,11 @@ class RemoveXAmount extends CouponAbstract
         $this->isRemovingPostage = $isRemovingPostage;
 
         $this->amount = $amount;
+
+        $this->isAvailableOnSpecialOffers = $isAvailableOnSpecialOffers;
+        $this->isEnabled = $isEnabled;
+        $this->maxUsage = $maxUsage;
+        $this->expirationDate = $expirationDate;
     }
 
 }

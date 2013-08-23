@@ -23,13 +23,12 @@
 
 namespace Thelia\Coupon;
 
+use Symfony\Component\Translation\Exception\NotFoundResourceException;
 use Thelia\Coupon\Type\CouponInterface;
 use Thelia\Coupon\Type\RemoveXAmount;
-use Thelia\Model\Base\CouponQuery;
+use Thelia\Exception\CouponExpiredException;
 use Thelia\Model\Coupon;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
 
 /**
  * Created by JetBrains PhpStorm.
@@ -44,18 +43,41 @@ use Symfony\Component\Serializer\Normalizer\GetSetMethodNormalizer;
  */
 class CouponFactory
 {
+    /** @var  CouponAdapterInterface Provide necessary value from Thelia*/
+    protected $adapter;
+
+    /**
+     * Constructor
+     *
+     * @param CouponAdapterInterface $adapter Provide necessary value from Thelia
+     */
+    function __construct(CouponAdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+    }
+
     /**
      * Build a CouponInterface from its database data
      *
      * @param string $couponCode Coupon code ex: XMAS
      *
+     * @throws \Thelia\Exception\CouponExpiredException
+     * @throws \Symfony\Component\Translation\Exception\NotFoundResourceException
      * @return CouponInterface ready to be processed
      */
     public function buildCouponFromCode($couponCode)
     {
+        /** @var Coupon $couponModel */
+        $couponModel = $this->adapter->findOneCouponByCode($couponCode);
+        if ($couponModel === null) {
+            throw new NotFoundResourceException(
+                'Coupon ' . $couponCode . ' not found in Database'
+            );
+        }
 
-        $couponQuery = CouponQuery::create();
-        $couponModel = $couponQuery->findByCode($couponCode);
+        if ($couponModel->getExpirationDate() < new \DateTime()) {
+            throw new CouponExpiredException($couponCode);
+        }
 
         return $this->buildCouponInterfacFromModel($couponModel);
     }
@@ -74,37 +96,22 @@ class CouponFactory
         $couponClass = $model->getType();
 
         /** @var CouponInterface $coupon*/
-        $coupon = new $$couponClass(
+        $coupon = new $couponClass(
             $model->getCode(),
             $model->getTitle(),
             $model->getShortDescription(),
             $model->getDescription(),
             $model->getAmount(),
             $isCumulative,
-            $isRemovingPostage
+            $isRemovingPostage,
+            $model->getIsAvailableOnSpecialOffers(),
+            $model->getIsEnabled(),
+            $model->getMaxUsage(),
+            $model->getExpirationDate()
         );
 
-        $normalizer = new GetSetMethodNormalizer();
-        $encoder = new JsonEncoder();
-
-        $serializer = new Serializer(array($normalizer), array($encoder));
-
-        $o = new \ArrayObject();
-        $unserializedRuleTypes = $o->unserialize(
-            $model->getSerializedRulesType()
-        );
-        $unserializedRuleContents = $o->unserialize(
-            $model->getSerializedRulesContent()
-        );
-
-        $rules = array();
-        foreach ($unserializedRuleTypes as $key => $unserializedRuleType) {
-            $rules[] = $serializer->deserialize(
-                $unserializedRuleContents[$key],
-                $unserializedRuleType,
-                'json'
-            );
-        }
+        /** @var CouponRuleCollection $rules */
+        $rules = unserialize(base64_decode($model->getSerializedRules()));
 
         $coupon->setRules($rules);
 
