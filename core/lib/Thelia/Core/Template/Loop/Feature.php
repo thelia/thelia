@@ -84,8 +84,12 @@ class Feature extends BaseLoop
     {
         $search = FeatureQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $id = $this->getId();
 
@@ -150,6 +154,7 @@ class Feature extends BaseLoop
         foreach ($features as $feature) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $feature->getId())
+                ->set("IS_TRANSLATED",$feature->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))

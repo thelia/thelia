@@ -79,7 +79,7 @@ class AttributeCombination extends BaseLoop
         $search = AttributeCombinationQuery::create();
 
         /* manage attribute translations */
-        ModelCriteriaTools::getI18n(
+        ModelCriteriaTools::getFrontEndI18n(
             $search,
             ConfigQuery::read("default_lang_without_translation", 1),
             $this->request->getSession()->getLocale(),
@@ -89,7 +89,7 @@ class AttributeCombination extends BaseLoop
         );
 
         /* manage attributeAv translations */
-        ModelCriteriaTools::getI18n(
+        ModelCriteriaTools::getFrontEndI18n(
             $search,
             ConfigQuery::read("default_lang_without_translation", 1),
             $this->request->getSession()->getLocale(),

@@ -67,8 +67,12 @@ class Title extends BaseLoop
     {
         $search = CustomerTitleQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale(), array('SHORT', 'LONG'));
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale(), array('SHORT', 'LONG'));
 
         $id = $this->getId();
 
@@ -86,6 +90,7 @@ class Title extends BaseLoop
         foreach ($titles as $title) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $title->getId())
+                ->set("IS_TRANSLATED",$title->getVirtualColumn('IS_TRANSLATED'))
                 ->set("DEFAULT", $title->getByDefault())
                 ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
                 ->set("LONG", $title->getVirtualColumn('i18n_LONG'));

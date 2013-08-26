@@ -70,8 +70,12 @@ class Country extends BaseLoop
     {
         $search = CountryQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
         $id = $this->getId();
 
@@ -109,6 +113,7 @@ class Country extends BaseLoop
         foreach ($countries as $country) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $country->getId())
+                ->set("IS_TRANSLATED",$country->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$country->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $country->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $country->getVirtualColumn('i18n_DESCRIPTION'))

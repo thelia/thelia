@@ -80,8 +80,12 @@ class Folder extends BaseLoop
     {
         $search = FolderQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
 
 		$id = $this->getId();
 
@@ -158,6 +162,7 @@ class Folder extends BaseLoop
 
             $loopResultRow
             	->set("ID", $folder->getId())
+                ->set("IS_TRANSLATED",$folder->getVirtualColumn('IS_TRANSLATED'))
                 ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
                 ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))

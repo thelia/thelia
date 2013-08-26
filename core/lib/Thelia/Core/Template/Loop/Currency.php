@@ -69,8 +69,12 @@ class Currency extends BaseLoop
     {
         $search = CurrencyQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale(), array('NAME'));
+        ModelCriteriaTools::getI18n($backendContext, $lang, $search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale(), array('NAME'));
 
         $id = $this->getId();
 
@@ -100,8 +104,10 @@ class Currency extends BaseLoop
         foreach ($currencies as $currency) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $currency->getId())
+                ->set("IS_TRANSLATED",$currency->getVirtualColumn('IS_TRANSLATED'))
                 ->set("NAME",$currency->getVirtualColumn('i18n_NAME'))
                 ->set("ISOCODE", $currency->getCode())
+                ->set("SYMBOL", $currency->getSymbol())
                 ->set("RATE", $currency->getRate())
                 ->set("IS_DEFAULT", $currency->getByDefault());
 
