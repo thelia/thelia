@@ -1,23 +1,14 @@
-{*loop name="product" type="product" new="on" promo="on" min_stock="20" attribute_non_strict_match="min_stock,promo"}
-<h3>PRODUCT : #REF / #TITLE (#ID)</h3>
-{/loop*}
+<h2>ALL ATTRIBUTES AND THEIR AVAILABILITY</h2>
 
-{*loop name="product" type="product" min_weight="1000" max_weight="6000" attribute_non_strict_match="*"}
-<h3>PRODUCT : #REF / #TITLE (#ID)</h3>
-{/loop*}
-
-{*loop name="product" type="product" min_price="100" max_price="300" min_stock="4" min_weight="6000" max_weight="7000" attribute_non_strict_match="*" promo="on"}
-<h3>PRODUCT : #REF / #TITLE (#ID)</h3>
-{/loop*}
-
-{*loop name="product" type="product" promo="0" min_stock="4" order="promo,min_price"}
-<h3>PRODUCT : #REF / #TITLE (#ID)</h3>
-{/loop*}
-
-{*loop name="product" type="product" order="promo,min_price"}
-<h3>PRODUCT : #REF / #TITLE (#ID) / NEW : #NEW / PROMO : #PROMO / best price : #BEST_PRICE</h3>
-{/loop*}
-
-{loop name="product" type="product"}
-<h3>PRODUCT : #REF / #TITLE</h3>
-{/loop}
+<ul>
+    {loop name="attr" type="attribute" order="manual"}
+    <li>
+        #TITLE
+        <ul>
+            {loop name="attrav" type="attribute_availability" order="manual" attribute="#ID"}
+            <li>#TITLE</li>
+            {/loop}
+        </ul>
+    </li>
+    {/loop}
+</ul>

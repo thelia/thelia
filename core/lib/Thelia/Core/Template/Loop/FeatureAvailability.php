@@ -57,6 +57,7 @@ class FeatureAvailability extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('feature'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(

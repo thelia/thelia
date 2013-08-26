@@ -59,6 +59,7 @@ class AttributeAvailability extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('attribute'),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(

@@ -77,6 +77,7 @@ class Category extends BaseLoop
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('not_empty', 0),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(

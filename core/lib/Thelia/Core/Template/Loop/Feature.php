@@ -64,6 +64,7 @@ class Feature extends BaseLoop
             Argument::createIntListTypeArgument('category'),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(

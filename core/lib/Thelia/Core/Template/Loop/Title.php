@@ -53,7 +53,8 @@ class Title extends BaseLoop
     protected function getArgDefinitions()
     {
         return new ArgumentCollection(
-            Argument::createIntListTypeArgument('id')
+            Argument::createIntListTypeArgument('id'),
+            Argument::createIntTypeArgument('lang')
         );
     }
 

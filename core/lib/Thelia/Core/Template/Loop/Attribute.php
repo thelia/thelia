@@ -33,6 +33,7 @@ use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 use Thelia\Log\Tlog;
 
+use Thelia\Model\Base\LangQuery;
 use Thelia\Model\Tools\ModelCriteriaTools;
 
 use Thelia\Model\Base\CategoryQuery;
@@ -66,6 +67,7 @@ class Attribute extends BaseLoop
             Argument::createIntListTypeArgument('category'),
             Argument::createBooleanOrBothTypeArgument('visible', 1),
             Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang'),
             new Argument(
                 'order',
                 new TypeCollection(
@@ -85,8 +87,18 @@ class Attribute extends BaseLoop
     {
         $search = AttributeQuery::create();
 
+        $backendContext = $this->getBackend_context();
+
+        $lang = $this->getLang();
+
+        $x = LangQuery::create()->findOneById($lang);
+
         /* manage translations */
-        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        if($backendContext) {
+            ModelCriteriaTools::getBackEndI18n($search, $lang === null ? $this->request->getSession()->getLocale() : $x);
+        } else {
+            ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+        }
 
         $id = $this->getId();
 

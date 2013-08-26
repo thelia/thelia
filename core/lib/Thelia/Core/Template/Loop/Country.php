@@ -56,7 +56,8 @@ class Country extends BaseLoop
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('area'),
             Argument::createBooleanTypeArgument('with_area'),
-            Argument::createIntListTypeArgument('exclude')
+            Argument::createIntListTypeArgument('exclude'),
+            Argument::createIntTypeArgument('lang')
         );
     }
 

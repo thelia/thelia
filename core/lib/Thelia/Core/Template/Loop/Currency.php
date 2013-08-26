@@ -55,7 +55,8 @@ class Currency extends BaseLoop
         return new ArgumentCollection(
             Argument::createIntListTypeArgument('id'),
             Argument::createIntListTypeArgument('exclude'),
-            Argument::createBooleanTypeArgument('default_only', false)
+            Argument::createBooleanTypeArgument('default_only', false),
+            Argument::createIntTypeArgument('lang')
         );
     }
 
