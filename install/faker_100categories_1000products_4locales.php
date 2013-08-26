@@ -1,0 +1,173 @@
+<?php
+use Thelia\Model\ProductImage;
+use Thelia\Model\CategoryImage;
+use Thelia\Model\FolderImage;
+use Thelia\Model\ContentImage;
+use Imagine\Image\Color;
+use Imagine\Image\Point;
+
+require __DIR__ . '/../core/bootstrap.php';
+
+$thelia = new Thelia\Core\Thelia("dev", true);
+
+$faker = Faker\Factory::create();
+
+$con = \Propel\Runtime\Propel::getConnection(Thelia\Model\Map\ProductTableMap::DATABASE_NAME);
+$con->beginTransaction();
+
+$currency = \Thelia\Model\CurrencyQuery::create()->filterByCode('EUR')->findOne();
+
+try {
+    $stmt = $con->prepare("SET foreign_key_checks = 0");
+    $stmt->execute();
+
+    $productAssociatedContent = Thelia\Model\ProductAssociatedContentQuery::create()
+        ->find();
+    $productAssociatedContent->delete();
+
+    $categoryAssociatedContent = Thelia\Model\CategoryAssociatedContentQuery::create()
+        ->find();
+    $categoryAssociatedContent->delete();
+
+    $attributeCategory = Thelia\Model\AttributeCategoryQuery::create()
+        ->find();
+    $attributeCategory->delete();
+
+    $featureCategory = Thelia\Model\FeatureCategoryQuery::create()
+        ->find();
+    $featureCategory->delete();
+
+    $featureProduct = Thelia\Model\FeatureProductQuery::create()
+        ->find();
+    $featureProduct->delete();
+
+    $attributeCombination = Thelia\Model\AttributeCombinationQuery::create()
+        ->find();
+    $attributeCombination->delete();
+
+    $feature = Thelia\Model\FeatureQuery::create()
+        ->find();
+    $feature->delete();
+
+    $feature = Thelia\Model\FeatureI18nQuery::create()
+        ->find();
+    $feature->delete();
+
+    $featureAv = Thelia\Model\FeatureAvQuery::create()
+        ->find();
+    $featureAv->delete();
+
+    $featureAv = Thelia\Model\FeatureAvI18nQuery::create()
+        ->find();
+    $featureAv->delete();
+
+    $attribute = Thelia\Model\AttributeQuery::create()
+        ->find();
+    $attribute->delete();
+
+    $attribute = Thelia\Model\AttributeI18nQuery::create()
+        ->find();
+    $attribute->delete();
+
+    $attributeAv = Thelia\Model\AttributeAvQuery::create()
+        ->find();
+    $attributeAv->delete();
+
+    $attributeAv = Thelia\Model\AttributeAvI18nQuery::create()
+        ->find();
+    $attributeAv->delete();
+
+    $category = Thelia\Model\CategoryQuery::create()
+        ->find();
+    $category->delete();
+
+    $category = Thelia\Model\CategoryI18nQuery::create()
+        ->find();
+    $category->delete();
+
+    $product = Thelia\Model\ProductQuery::create()
+        ->find();
+    $product->delete();
+
+    $product = Thelia\Model\ProductI18nQuery::create()
+        ->find();
+    $product->delete();
+
+    $customer = Thelia\Model\CustomerQuery::create()
+        ->find();
+    $customer->delete();
+
+    $folder = Thelia\Model\FolderQuery::create()
+        ->find();
+    $folder->delete();
+
+    $folder = Thelia\Model\FolderI18nQuery::create()
+        ->find();
+    $folder->delete();
+
+    $content = Thelia\Model\ContentQuery::create()
+        ->find();
+    $content->delete();
+
+    $content = Thelia\Model\ContentI18nQuery::create()
+        ->find();
+    $content->delete();
+
+    $accessory = Thelia\Model\AccessoryQuery::create()
+        ->find();
+    $accessory->delete();
+
+    $stock = \Thelia\Model\ProductSaleElementsQuery::create()
+        ->find();
+    $stock->delete();
+
+    $productPrice = \Thelia\Model\ProductPriceQuery::create()
+        ->find();
+    $productPrice->delete();
+
+    $stmt = $con->prepare("SET foreign_key_checks = 1");
+    $stmt->execute();
+
+    //categories and products
+    for($i=0; $i<100; $i++) {
+        $category = new Thelia\Model\Category();
+        $category->setParent(0);
+        $category->setVisible(1);
+        $category->setPosition($i);
+        setI18n($faker, $category);
+
+        $category->save();
+
+        for($j=0; $j<10; $j++) {
+            $product = new Thelia\Model\Product();
+            $product->setRef($category->getId() . '_' . $j . '_' . $faker->randomNumber(8));
+            $product->addCategory($category);
+            $product->setVisible(1);
+            $product->setPosition($j);
+            setI18n($faker, $product);
+
+            $product->save();
+        }
+    }
+
+    $con->commit();
+} catch (Exception $e) {
+    echo "error : ".$e->getMessage()."\n";
+    $con->rollBack();
+}
+
+function setI18n($faker, &$object)
+{
+    $localeList = array('fr_FR', 'en_EN', 'es_ES', 'it_IT');
+
+    $title = $faker->text(20);
+    $description = $faker->text(50);
+
+    foreach($localeList as $locale) {
+        $object->setLocale($locale);
+
+        $object->setTitle($locale . ' : ' . $title);
+        $object->setDescription($locale . ' : ' . $description);
+    }
+}
+
