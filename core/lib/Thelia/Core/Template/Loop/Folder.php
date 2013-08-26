@@ -168,6 +168,7 @@ class Folder extends BaseLoop
                 ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
 	            ->set("PARENT", $folder->getParent())
+                ->set("URL", $folder->getUrl())
 	            ->set("CONTENT_COUNT", $folder->countChild())
 	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
 	            ->set("POSITION", $folder->getPosition())

@@ -226,6 +226,7 @@ class Content extends BaseLoop
                 ->set("DESCRIPTION", $content->getVirtualColumn('i18n_DESCRIPTION'))
                 ->set("POSTSCRIPTUM", $content->getVirtualColumn('i18n_POSTSCRIPTUM'))
                 ->set("POSITION", $content->getPosition())
+                ->set("URL", $content->getUrl())
             ;
 
             $loopResult->addRow($loopResultRow);

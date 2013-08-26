@@ -14,6 +14,11 @@ class Folder extends BaseFolder
         return FolderQuery::countChild($this->getId());
     }
 
+    public function getUrl()
+    {
+
+    }
+
     /**
      *
      * count all products for current category and sub categories
