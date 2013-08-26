@@ -1,5 +1,4 @@
 <?php
-use Thelia\Core\Event\TheliaEvents;
 /*************************************************************************************/
 /*                                                                                   */
 /*      Thelia	                                                                     */
@@ -24,7 +23,6 @@ use Thelia\Core\Event\TheliaEvents;
 
 namespace Thelia\Command;
 
-
 use Thelia\Command\ContainerAwareCommand;
 use Thelia\Core\Event\TheliaEvents;
 
@@ -33,6 +31,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Thelia\Core\Event\ImageEvent;
 use Thelia\Core\HttpFoundation\Request;
 use Symfony\Component\Console\Input\InputArgument;
+use Thelia\Core\Event\TheliaEvents;
 
 
 class ClearImageCache extends ContainerAwareCommand
