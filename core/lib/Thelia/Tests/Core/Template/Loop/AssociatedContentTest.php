@@ -25,27 +25,27 @@ namespace Thelia\Tests\Core\Template\Loop;
 
 use Thelia\Tests\Core\Template\Element\BaseLoopTestor;
 
-use Thelia\Core\Template\Loop\FeatureAvailable;
+use Thelia\Core\Template\Loop\AssociatedContent;
 
 /**
  *
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
  *
  */
-class FeatureAvailableTest extends BaseLoopTestor
+class AssociatedContentTest extends BaseLoopTestor
 {
     public function getTestedClassName()
     {
-        return 'Thelia\Core\Template\Loop\FeatureAvailable';
+        return 'Thelia\Core\Template\Loop\AssociatedContent';
     }
 
     public function getTestedInstance()
     {
-        return new FeatureAvailable($this->request, $this->dispatcher, $this->securityContext);
+        return new AssociatedContent($this->request, $this->dispatcher, $this->securityContext);
     }
 
     public function getMandatoryArguments()
     {
-        return array();
+        return array('product' => 1);
     }
 }

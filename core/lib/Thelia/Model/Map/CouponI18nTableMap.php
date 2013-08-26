@@ -10,12 +10,12 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\RelationMap;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Map\TableMapTrait;
-use Thelia\Model\ContentAssoc;
-use Thelia\Model\ContentAssocQuery;
+use Thelia\Model\CouponI18n;
+use Thelia\Model\CouponI18nQuery;
 
 
 /**
- * This class defines the structure of the 'content_assoc' table.
+ * This class defines the structure of the 'coupon_i18n' table.
  *
  *
  *
@@ -25,14 +25,14 @@ use Thelia\Model\ContentAssocQuery;
  * (i.e. if it's a text column type).
  *
  */
-class ContentAssocTableMap extends TableMap
+class CouponI18nTableMap extends TableMap
 {
     use InstancePoolTrait;
     use TableMapTrait;
     /**
      * The (dot-path) name of this class
      */
-    const CLASS_NAME = 'Thelia.Model.Map.ContentAssocTableMap';
+    const CLASS_NAME = 'Thelia.Model.Map.CouponI18nTableMap';
 
     /**
      * The default database name for this class
@@ -42,22 +42,22 @@ class ContentAssocTableMap extends TableMap
     /**
      * The table name for this class
      */
-    const TABLE_NAME = 'content_assoc';
+    const TABLE_NAME = 'coupon_i18n';
 
     /**
      * The related Propel class for this table
      */
-    const OM_CLASS = '\\Thelia\\Model\\ContentAssoc';
+    const OM_CLASS = '\\Thelia\\Model\\CouponI18n';
 
     /**
      * A class that can be returned by this tableMap
      */
-    const CLASS_DEFAULT = 'Thelia.Model.ContentAssoc';
+    const CLASS_DEFAULT = 'Thelia.Model.CouponI18n';
 
     /**
      * The total number of columns
      */
-    const NUM_COLUMNS = 7;
+    const NUM_COLUMNS = 2;
 
     /**
      * The number of lazy-loaded columns
@@ -67,42 +67,17 @@ class ContentAssocTableMap extends TableMap
     /**
      * The number of columns to hydrate (NUM_COLUMNS - NUM_LAZY_LOAD_COLUMNS)
      */
-    const NUM_HYDRATE_COLUMNS = 7;
+    const NUM_HYDRATE_COLUMNS = 2;
 
     /**
      * the column name for the ID field
      */
-    const ID = 'content_assoc.ID';
+    const ID = 'coupon_i18n.ID';
 
     /**
-     * the column name for the CATEGORY_ID field
+     * the column name for the LOCALE field
      */
-    const CATEGORY_ID = 'content_assoc.CATEGORY_ID';
-
-    /**
-     * the column name for the PRODUCT_ID field
-     */
-    const PRODUCT_ID = 'content_assoc.PRODUCT_ID';
-
-    /**
-     * the column name for the CONTENT_ID field
-     */
-    const CONTENT_ID = 'content_assoc.CONTENT_ID';
-
-    /**
-     * the column name for the POSITION field
-     */
-    const POSITION = 'content_assoc.POSITION';
-
-    /**
-     * the column name for the CREATED_AT field
-     */
-    const CREATED_AT = 'content_assoc.CREATED_AT';
-
-    /**
-     * the column name for the UPDATED_AT field
-     */
-    const UPDATED_AT = 'content_assoc.UPDATED_AT';
+    const LOCALE = 'coupon_i18n.LOCALE';
 
     /**
      * The default string format for model objects of the related table
@@ -116,12 +91,12 @@ class ContentAssocTableMap extends TableMap
      * e.g. self::$fieldNames[self::TYPE_PHPNAME][0] = 'Id'
      */
     protected static $fieldNames = array (
-        self::TYPE_PHPNAME       => array('Id', 'CategoryId', 'ProductId', 'ContentId', 'Position', 'CreatedAt', 'UpdatedAt', ),
-        self::TYPE_STUDLYPHPNAME => array('id', 'categoryId', 'productId', 'contentId', 'position', 'createdAt', 'updatedAt', ),
-        self::TYPE_COLNAME       => array(ContentAssocTableMap::ID, ContentAssocTableMap::CATEGORY_ID, ContentAssocTableMap::PRODUCT_ID, ContentAssocTableMap::CONTENT_ID, ContentAssocTableMap::POSITION, ContentAssocTableMap::CREATED_AT, ContentAssocTableMap::UPDATED_AT, ),
-        self::TYPE_RAW_COLNAME   => array('ID', 'CATEGORY_ID', 'PRODUCT_ID', 'CONTENT_ID', 'POSITION', 'CREATED_AT', 'UPDATED_AT', ),
-        self::TYPE_FIELDNAME     => array('id', 'category_id', 'product_id', 'content_id', 'position', 'created_at', 'updated_at', ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id', 'Locale', ),
+        self::TYPE_STUDLYPHPNAME => array('id', 'locale', ),
+        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID, CouponI18nTableMap::LOCALE, ),
+        self::TYPE_RAW_COLNAME   => array('ID', 'LOCALE', ),
+        self::TYPE_FIELDNAME     => array('id', 'locale', ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -131,12 +106,12 @@ class ContentAssocTableMap extends TableMap
      * e.g. self::$fieldKeys[self::TYPE_PHPNAME]['Id'] = 0
      */
     protected static $fieldKeys = array (
-        self::TYPE_PHPNAME       => array('Id' => 0, 'CategoryId' => 1, 'ProductId' => 2, 'ContentId' => 3, 'Position' => 4, 'CreatedAt' => 5, 'UpdatedAt' => 6, ),
-        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'categoryId' => 1, 'productId' => 2, 'contentId' => 3, 'position' => 4, 'createdAt' => 5, 'updatedAt' => 6, ),
-        self::TYPE_COLNAME       => array(ContentAssocTableMap::ID => 0, ContentAssocTableMap::CATEGORY_ID => 1, ContentAssocTableMap::PRODUCT_ID => 2, ContentAssocTableMap::CONTENT_ID => 3, ContentAssocTableMap::POSITION => 4, ContentAssocTableMap::CREATED_AT => 5, ContentAssocTableMap::UPDATED_AT => 6, ),
-        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'CATEGORY_ID' => 1, 'PRODUCT_ID' => 2, 'CONTENT_ID' => 3, 'POSITION' => 4, 'CREATED_AT' => 5, 'UPDATED_AT' => 6, ),
-        self::TYPE_FIELDNAME     => array('id' => 0, 'category_id' => 1, 'product_id' => 2, 'content_id' => 3, 'position' => 4, 'created_at' => 5, 'updated_at' => 6, ),
-        self::TYPE_NUM           => array(0, 1, 2, 3, 4, 5, 6, )
+        self::TYPE_PHPNAME       => array('Id' => 0, 'Locale' => 1, ),
+        self::TYPE_STUDLYPHPNAME => array('id' => 0, 'locale' => 1, ),
+        self::TYPE_COLNAME       => array(CouponI18nTableMap::ID => 0, CouponI18nTableMap::LOCALE => 1, ),
+        self::TYPE_RAW_COLNAME   => array('ID' => 0, 'LOCALE' => 1, ),
+        self::TYPE_FIELDNAME     => array('id' => 0, 'locale' => 1, ),
+        self::TYPE_NUM           => array(0, 1, )
     );
 
     /**
@@ -149,19 +124,14 @@ class ContentAssocTableMap extends TableMap
     public function initialize()
     {
         // attributes
-        $this->setName('content_assoc');
-        $this->setPhpName('ContentAssoc');
-        $this->setClassName('\\Thelia\\Model\\ContentAssoc');
+        $this->setName('coupon_i18n');
+        $this->setPhpName('CouponI18n');
+        $this->setClassName('\\Thelia\\Model\\CouponI18n');
         $this->setPackage('Thelia.Model');
-        $this->setUseIdGenerator(true);
+        $this->setUseIdGenerator(false);
         // columns
-        $this->addPrimaryKey('ID', 'Id', 'INTEGER', true, null, null);
-        $this->addForeignKey('CATEGORY_ID', 'CategoryId', 'INTEGER', 'category', 'ID', false, null, null);
-        $this->addForeignKey('PRODUCT_ID', 'ProductId', 'INTEGER', 'product', 'ID', false, null, null);
-        $this->addForeignKey('CONTENT_ID', 'ContentId', 'INTEGER', 'content', 'ID', false, null, null);
-        $this->addColumn('POSITION', 'Position', 'INTEGER', false, null, null);
-        $this->addColumn('CREATED_AT', 'CreatedAt', 'TIMESTAMP', false, null, null);
-        $this->addColumn('UPDATED_AT', 'UpdatedAt', 'TIMESTAMP', false, null, null);
+        $this->addForeignPrimaryKey('ID', 'Id', 'INTEGER' , 'coupon', 'ID', true, null, null);
+        $this->addPrimaryKey('LOCALE', 'Locale', 'VARCHAR', true, 5, 'en_EN');
     } // initialize()
 
     /**
@@ -169,23 +139,61 @@ class ContentAssocTableMap extends TableMap
      */
     public function buildRelations()
     {
-        $this->addRelation('Category', '\\Thelia\\Model\\Category', RelationMap::MANY_TO_ONE, array('category_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_ONE, array('product_id' => 'id', ), 'CASCADE', 'RESTRICT');
-        $this->addRelation('Content', '\\Thelia\\Model\\Content', RelationMap::MANY_TO_ONE, array('content_id' => 'id', ), 'CASCADE', 'RESTRICT');
+        $this->addRelation('Coupon', '\\Thelia\\Model\\Coupon', RelationMap::MANY_TO_ONE, array('id' => 'id', ), 'CASCADE', null);
     } // buildRelations()
 
     /**
+     * Adds an object to the instance pool.
      *
-     * Gets the list of behaviors registered for this table
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database. In some cases you may need to explicitly add objects
+     * to the cache in order to ensure that the same objects are always returned by find*()
+     * and findPk*() calls.
      *
-     * @return array Associative array (name => parameters) of behaviors
+     * @param \Thelia\Model\CouponI18n $obj A \Thelia\Model\CouponI18n object.
+     * @param string $key             (optional) key to use for instance map (for performance boost if key was already calculated externally).
      */
-    public function getBehaviors()
+    public static function addInstanceToPool($obj, $key = null)
     {
-        return array(
-            'timestampable' => array('create_column' => 'created_at', 'update_column' => 'updated_at', ),
-        );
-    } // getBehaviors()
+        if (Propel::isInstancePoolingEnabled()) {
+            if (null === $key) {
+                $key = serialize(array((string) $obj->getId(), (string) $obj->getLocale()));
+            } // if key === null
+            self::$instances[$key] = $obj;
+        }
+    }
+
+    /**
+     * Removes an object from the instance pool.
+     *
+     * Propel keeps cached copies of objects in an instance pool when they are retrieved
+     * from the database.  In some cases -- especially when you override doDelete
+     * methods in your stub classes -- you may need to explicitly remove objects
+     * from the cache in order to prevent returning objects that no longer exist.
+     *
+     * @param mixed $value A \Thelia\Model\CouponI18n object or a primary key value.
+     */
+    public static function removeInstanceFromPool($value)
+    {
+        if (Propel::isInstancePoolingEnabled() && null !== $value) {
+            if (is_object($value) && $value instanceof \Thelia\Model\CouponI18n) {
+                $key = serialize(array((string) $value->getId(), (string) $value->getLocale()));
+
+            } elseif (is_array($value) && count($value) === 2) {
+                // assume we've been passed a primary key";
+                $key = serialize(array((string) $value[0], (string) $value[1]));
+            } elseif ($value instanceof Criteria) {
+                self::$instances = [];
+
+                return;
+            } else {
+                $e = new PropelException("Invalid value passed to removeInstanceFromPool().  Expected primary key or \Thelia\Model\CouponI18n object; got " . (is_object($value) ? get_class($value) . ' object.' : var_export($value, true)));
+                throw $e;
+            }
+
+            unset(self::$instances[$key]);
+        }
+    }
 
     /**
      * Retrieves a string version of the primary key from the DB resultset row that can be used to uniquely identify a row in this table.
@@ -201,11 +209,11 @@ class ContentAssocTableMap extends TableMap
     public static function getPrimaryKeyHashFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
         // If the PK cannot be derived from the row, return NULL.
-        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null) {
+        if ($row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)] === null && $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)] === null) {
             return null;
         }
 
-        return (string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+        return serialize(array((string) $row[TableMap::TYPE_NUM == $indexType ? 0 + $offset : static::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)], (string) $row[TableMap::TYPE_NUM == $indexType ? 1 + $offset : static::translateFieldName('Locale', TableMap::TYPE_PHPNAME, $indexType)]));
     }
 
     /**
@@ -223,11 +231,7 @@ class ContentAssocTableMap extends TableMap
     public static function getPrimaryKeyFromRow($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
 
-            return (int) $row[
-                            $indexType == TableMap::TYPE_NUM
-                            ? 0 + $offset
-                            : self::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)
-                        ];
+            return $pks;
     }
 
     /**
@@ -243,7 +247,7 @@ class ContentAssocTableMap extends TableMap
      */
     public static function getOMClass($withPrefix = true)
     {
-        return $withPrefix ? ContentAssocTableMap::CLASS_DEFAULT : ContentAssocTableMap::OM_CLASS;
+        return $withPrefix ? CouponI18nTableMap::CLASS_DEFAULT : CouponI18nTableMap::OM_CLASS;
     }
 
     /**
@@ -257,21 +261,21 @@ class ContentAssocTableMap extends TableMap
      *
      * @throws PropelException Any exceptions caught during processing will be
      *         rethrown wrapped into a PropelException.
-     * @return array (ContentAssoc object, last column rank)
+     * @return array (CouponI18n object, last column rank)
      */
     public static function populateObject($row, $offset = 0, $indexType = TableMap::TYPE_NUM)
     {
-        $key = ContentAssocTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
-        if (null !== ($obj = ContentAssocTableMap::getInstanceFromPool($key))) {
+        $key = CouponI18nTableMap::getPrimaryKeyHashFromRow($row, $offset, $indexType);
+        if (null !== ($obj = CouponI18nTableMap::getInstanceFromPool($key))) {
             // We no longer rehydrate the object, since this can cause data loss.
             // See http://www.propelorm.org/ticket/509
             // $obj->hydrate($row, $offset, true); // rehydrate
-            $col = $offset + ContentAssocTableMap::NUM_HYDRATE_COLUMNS;
+            $col = $offset + CouponI18nTableMap::NUM_HYDRATE_COLUMNS;
         } else {
-            $cls = ContentAssocTableMap::OM_CLASS;
+            $cls = CouponI18nTableMap::OM_CLASS;
             $obj = new $cls();
             $col = $obj->hydrate($row, $offset, false, $indexType);
-            ContentAssocTableMap::addInstanceToPool($obj, $key);
+            CouponI18nTableMap::addInstanceToPool($obj, $key);
         }
 
         return array($obj, $col);
@@ -294,8 +298,8 @@ class ContentAssocTableMap extends TableMap
         $cls = static::getOMClass(false);
         // populate the object(s)
         while ($row = $dataFetcher->fetch()) {
-            $key = ContentAssocTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
-            if (null !== ($obj = ContentAssocTableMap::getInstanceFromPool($key))) {
+            $key = CouponI18nTableMap::getPrimaryKeyHashFromRow($row, 0, $dataFetcher->getIndexType());
+            if (null !== ($obj = CouponI18nTableMap::getInstanceFromPool($key))) {
                 // We no longer rehydrate the object, since this can cause data loss.
                 // See http://www.propelorm.org/ticket/509
                 // $obj->hydrate($row, 0, true); // rehydrate
@@ -304,7 +308,7 @@ class ContentAssocTableMap extends TableMap
                 $obj = new $cls();
                 $obj->hydrate($row);
                 $results[] = $obj;
-                ContentAssocTableMap::addInstanceToPool($obj, $key);
+                CouponI18nTableMap::addInstanceToPool($obj, $key);
             } // if key exists
         }
 
@@ -325,21 +329,11 @@ class ContentAssocTableMap extends TableMap
     public static function addSelectColumns(Criteria $criteria, $alias = null)
     {
         if (null === $alias) {
-            $criteria->addSelectColumn(ContentAssocTableMap::ID);
-            $criteria->addSelectColumn(ContentAssocTableMap::CATEGORY_ID);
-            $criteria->addSelectColumn(ContentAssocTableMap::PRODUCT_ID);
-            $criteria->addSelectColumn(ContentAssocTableMap::CONTENT_ID);
-            $criteria->addSelectColumn(ContentAssocTableMap::POSITION);
-            $criteria->addSelectColumn(ContentAssocTableMap::CREATED_AT);
-            $criteria->addSelectColumn(ContentAssocTableMap::UPDATED_AT);
+            $criteria->addSelectColumn(CouponI18nTableMap::ID);
+            $criteria->addSelectColumn(CouponI18nTableMap::LOCALE);
         } else {
             $criteria->addSelectColumn($alias . '.ID');
-            $criteria->addSelectColumn($alias . '.CATEGORY_ID');
-            $criteria->addSelectColumn($alias . '.PRODUCT_ID');
-            $criteria->addSelectColumn($alias . '.CONTENT_ID');
-            $criteria->addSelectColumn($alias . '.POSITION');
-            $criteria->addSelectColumn($alias . '.CREATED_AT');
-            $criteria->addSelectColumn($alias . '.UPDATED_AT');
+            $criteria->addSelectColumn($alias . '.LOCALE');
         }
     }
 
@@ -352,7 +346,7 @@ class ContentAssocTableMap extends TableMap
      */
     public static function getTableMap()
     {
-        return Propel::getServiceContainer()->getDatabaseMap(ContentAssocTableMap::DATABASE_NAME)->getTable(ContentAssocTableMap::TABLE_NAME);
+        return Propel::getServiceContainer()->getDatabaseMap(CouponI18nTableMap::DATABASE_NAME)->getTable(CouponI18nTableMap::TABLE_NAME);
     }
 
     /**
@@ -360,16 +354,16 @@ class ContentAssocTableMap extends TableMap
      */
     public static function buildTableMap()
     {
-      $dbMap = Propel::getServiceContainer()->getDatabaseMap(ContentAssocTableMap::DATABASE_NAME);
-      if (!$dbMap->hasTable(ContentAssocTableMap::TABLE_NAME)) {
-        $dbMap->addTableObject(new ContentAssocTableMap());
+      $dbMap = Propel::getServiceContainer()->getDatabaseMap(CouponI18nTableMap::DATABASE_NAME);
+      if (!$dbMap->hasTable(CouponI18nTableMap::TABLE_NAME)) {
+        $dbMap->addTableObject(new CouponI18nTableMap());
       }
     }
 
     /**
-     * Performs a DELETE on the database, given a ContentAssoc or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a CouponI18n or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ContentAssoc object or primary key or array of primary keys
+     * @param mixed               $values Criteria or CouponI18n object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -380,25 +374,35 @@ class ContentAssocTableMap extends TableMap
      public static function doDelete($values, ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponI18nTableMap::DATABASE_NAME);
         }
 
         if ($values instanceof Criteria) {
             // rename for clarity
             $criteria = $values;
-        } elseif ($values instanceof \Thelia\Model\ContentAssoc) { // it's a model object
+        } elseif ($values instanceof \Thelia\Model\CouponI18n) { // it's a model object
             // create criteria based on pk values
             $criteria = $values->buildPkeyCriteria();
         } else { // it's a primary key, or an array of pks
-            $criteria = new Criteria(ContentAssocTableMap::DATABASE_NAME);
-            $criteria->add(ContentAssocTableMap::ID, (array) $values, Criteria::IN);
+            $criteria = new Criteria(CouponI18nTableMap::DATABASE_NAME);
+            // primary key is composite; we therefore, expect
+            // the primary key passed to be an array of pkey values
+            if (count($values) == count($values, COUNT_RECURSIVE)) {
+                // array is not multi-dimensional
+                $values = array($values);
+            }
+            foreach ($values as $value) {
+                $criterion = $criteria->getNewCriterion(CouponI18nTableMap::ID, $value[0]);
+                $criterion->addAnd($criteria->getNewCriterion(CouponI18nTableMap::LOCALE, $value[1]));
+                $criteria->addOr($criterion);
+            }
         }
 
-        $query = ContentAssocQuery::create()->mergeWith($criteria);
+        $query = CouponI18nQuery::create()->mergeWith($criteria);
 
-        if ($values instanceof Criteria) { ContentAssocTableMap::clearInstancePool();
+        if ($values instanceof Criteria) { CouponI18nTableMap::clearInstancePool();
         } elseif (!is_object($values)) { // it's a primary key, or an array of pks
-            foreach ((array) $values as $singleval) { ContentAssocTableMap::removeInstanceFromPool($singleval);
+            foreach ((array) $values as $singleval) { CouponI18nTableMap::removeInstanceFromPool($singleval);
             }
         }
 
@@ -406,20 +410,20 @@ class ContentAssocTableMap extends TableMap
     }
 
     /**
-     * Deletes all rows from the content_assoc table.
+     * Deletes all rows from the coupon_i18n table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
      */
     public static function doDeleteAll(ConnectionInterface $con = null)
     {
-        return ContentAssocQuery::create()->doDeleteAll($con);
+        return CouponI18nQuery::create()->doDeleteAll($con);
     }
 
     /**
-     * Performs an INSERT on the database, given a ContentAssoc or Criteria object.
+     * Performs an INSERT on the database, given a CouponI18n or Criteria object.
      *
-     * @param mixed               $criteria Criteria or ContentAssoc object containing data that is used to create the INSERT statement.
+     * @param mixed               $criteria Criteria or CouponI18n object containing data that is used to create the INSERT statement.
      * @param ConnectionInterface $con the ConnectionInterface connection to use
      * @return mixed           The new primary key.
      * @throws PropelException Any exceptions caught during processing will be
@@ -428,22 +432,18 @@ class ContentAssocTableMap extends TableMap
     public static function doInsert($criteria, ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CouponI18nTableMap::DATABASE_NAME);
         }
 
         if ($criteria instanceof Criteria) {
             $criteria = clone $criteria; // rename for clarity
         } else {
-            $criteria = $criteria->buildCriteria(); // build Criteria from ContentAssoc object
-        }
-
-        if ($criteria->containsKey(ContentAssocTableMap::ID) && $criteria->keyContainsValue(ContentAssocTableMap::ID) ) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key ('.ContentAssocTableMap::ID.')');
+            $criteria = $criteria->buildCriteria(); // build Criteria from CouponI18n object
         }
 
 
         // Set the correct dbName
-        $query = ContentAssocQuery::create()->mergeWith($criteria);
+        $query = CouponI18nQuery::create()->mergeWith($criteria);
 
         try {
             // use transaction because $criteria could contain info
@@ -459,7 +459,7 @@ class ContentAssocTableMap extends TableMap
         return $pk;
     }
 
-} // ContentAssocTableMap
+} // CouponI18nTableMap
 // This is the static code needed to register the TableMap for this table with the main Propel class.
 //
-ContentAssocTableMap::buildTableMap();
+CouponI18nTableMap::buildTableMap();

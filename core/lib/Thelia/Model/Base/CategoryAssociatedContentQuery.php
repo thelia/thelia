@@ -12,96 +12,88 @@ use Propel\Runtime\Collection\Collection;
 use Propel\Runtime\Collection\ObjectCollection;
 use Propel\Runtime\Connection\ConnectionInterface;
 use Propel\Runtime\Exception\PropelException;
-use Thelia\Model\ContentAssoc as ChildContentAssoc;
-use Thelia\Model\ContentAssocQuery as ChildContentAssocQuery;
-use Thelia\Model\Map\ContentAssocTableMap;
+use Thelia\Model\CategoryAssociatedContent as ChildCategoryAssociatedContent;
+use Thelia\Model\CategoryAssociatedContentQuery as ChildCategoryAssociatedContentQuery;
+use Thelia\Model\Map\CategoryAssociatedContentTableMap;
 
 /**
- * Base class that represents a query for the 'content_assoc' table.
+ * Base class that represents a query for the 'category_associated_content' table.
  *
  *
  *
- * @method     ChildContentAssocQuery orderById($order = Criteria::ASC) Order by the id column
- * @method     ChildContentAssocQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
- * @method     ChildContentAssocQuery orderByProductId($order = Criteria::ASC) Order by the product_id column
- * @method     ChildContentAssocQuery orderByContentId($order = Criteria::ASC) Order by the content_id column
- * @method     ChildContentAssocQuery orderByPosition($order = Criteria::ASC) Order by the position column
- * @method     ChildContentAssocQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
- * @method     ChildContentAssocQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
+ * @method     ChildCategoryAssociatedContentQuery orderById($order = Criteria::ASC) Order by the id column
+ * @method     ChildCategoryAssociatedContentQuery orderByCategoryId($order = Criteria::ASC) Order by the category_id column
+ * @method     ChildCategoryAssociatedContentQuery orderByContentId($order = Criteria::ASC) Order by the content_id column
+ * @method     ChildCategoryAssociatedContentQuery orderByPosition($order = Criteria::ASC) Order by the position column
+ * @method     ChildCategoryAssociatedContentQuery orderByCreatedAt($order = Criteria::ASC) Order by the created_at column
+ * @method     ChildCategoryAssociatedContentQuery orderByUpdatedAt($order = Criteria::ASC) Order by the updated_at column
  *
- * @method     ChildContentAssocQuery groupById() Group by the id column
- * @method     ChildContentAssocQuery groupByCategoryId() Group by the category_id column
- * @method     ChildContentAssocQuery groupByProductId() Group by the product_id column
- * @method     ChildContentAssocQuery groupByContentId() Group by the content_id column
- * @method     ChildContentAssocQuery groupByPosition() Group by the position column
- * @method     ChildContentAssocQuery groupByCreatedAt() Group by the created_at column
- * @method     ChildContentAssocQuery groupByUpdatedAt() Group by the updated_at column
+ * @method     ChildCategoryAssociatedContentQuery groupById() Group by the id column
+ * @method     ChildCategoryAssociatedContentQuery groupByCategoryId() Group by the category_id column
+ * @method     ChildCategoryAssociatedContentQuery groupByContentId() Group by the content_id column
+ * @method     ChildCategoryAssociatedContentQuery groupByPosition() Group by the position column
+ * @method     ChildCategoryAssociatedContentQuery groupByCreatedAt() Group by the created_at column
+ * @method     ChildCategoryAssociatedContentQuery groupByUpdatedAt() Group by the updated_at column
  *
- * @method     ChildContentAssocQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
- * @method     ChildContentAssocQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
- * @method     ChildContentAssocQuery innerJoin($relation) Adds a INNER JOIN clause to the query
+ * @method     ChildCategoryAssociatedContentQuery leftJoin($relation) Adds a LEFT JOIN clause to the query
+ * @method     ChildCategoryAssociatedContentQuery rightJoin($relation) Adds a RIGHT JOIN clause to the query
+ * @method     ChildCategoryAssociatedContentQuery innerJoin($relation) Adds a INNER JOIN clause to the query
  *
- * @method     ChildContentAssocQuery leftJoinCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Category relation
- * @method     ChildContentAssocQuery rightJoinCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Category relation
- * @method     ChildContentAssocQuery innerJoinCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Category relation
+ * @method     ChildCategoryAssociatedContentQuery leftJoinCategory($relationAlias = null) Adds a LEFT JOIN clause to the query using the Category relation
+ * @method     ChildCategoryAssociatedContentQuery rightJoinCategory($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Category relation
+ * @method     ChildCategoryAssociatedContentQuery innerJoinCategory($relationAlias = null) Adds a INNER JOIN clause to the query using the Category relation
  *
- * @method     ChildContentAssocQuery leftJoinProduct($relationAlias = null) Adds a LEFT JOIN clause to the query using the Product relation
- * @method     ChildContentAssocQuery rightJoinProduct($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Product relation
- * @method     ChildContentAssocQuery innerJoinProduct($relationAlias = null) Adds a INNER JOIN clause to the query using the Product relation
+ * @method     ChildCategoryAssociatedContentQuery leftJoinContent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Content relation
+ * @method     ChildCategoryAssociatedContentQuery rightJoinContent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Content relation
+ * @method     ChildCategoryAssociatedContentQuery innerJoinContent($relationAlias = null) Adds a INNER JOIN clause to the query using the Content relation
  *
- * @method     ChildContentAssocQuery leftJoinContent($relationAlias = null) Adds a LEFT JOIN clause to the query using the Content relation
- * @method     ChildContentAssocQuery rightJoinContent($relationAlias = null) Adds a RIGHT JOIN clause to the query using the Content relation
- * @method     ChildContentAssocQuery innerJoinContent($relationAlias = null) Adds a INNER JOIN clause to the query using the Content relation
+ * @method     ChildCategoryAssociatedContent findOne(ConnectionInterface $con = null) Return the first ChildCategoryAssociatedContent matching the query
+ * @method     ChildCategoryAssociatedContent findOneOrCreate(ConnectionInterface $con = null) Return the first ChildCategoryAssociatedContent matching the query, or a new ChildCategoryAssociatedContent object populated from the query conditions when no match is found
  *
- * @method     ChildContentAssoc findOne(ConnectionInterface $con = null) Return the first ChildContentAssoc matching the query
- * @method     ChildContentAssoc findOneOrCreate(ConnectionInterface $con = null) Return the first ChildContentAssoc matching the query, or a new ChildContentAssoc object populated from the query conditions when no match is found
+ * @method     ChildCategoryAssociatedContent findOneById(int $id) Return the first ChildCategoryAssociatedContent filtered by the id column
+ * @method     ChildCategoryAssociatedContent findOneByCategoryId(int $category_id) Return the first ChildCategoryAssociatedContent filtered by the category_id column
+ * @method     ChildCategoryAssociatedContent findOneByContentId(int $content_id) Return the first ChildCategoryAssociatedContent filtered by the content_id column
+ * @method     ChildCategoryAssociatedContent findOneByPosition(int $position) Return the first ChildCategoryAssociatedContent filtered by the position column
+ * @method     ChildCategoryAssociatedContent findOneByCreatedAt(string $created_at) Return the first ChildCategoryAssociatedContent filtered by the created_at column
+ * @method     ChildCategoryAssociatedContent findOneByUpdatedAt(string $updated_at) Return the first ChildCategoryAssociatedContent filtered by the updated_at column
  *
- * @method     ChildContentAssoc findOneById(int $id) Return the first ChildContentAssoc filtered by the id column
- * @method     ChildContentAssoc findOneByCategoryId(int $category_id) Return the first ChildContentAssoc filtered by the category_id column
- * @method     ChildContentAssoc findOneByProductId(int $product_id) Return the first ChildContentAssoc filtered by the product_id column
- * @method     ChildContentAssoc findOneByContentId(int $content_id) Return the first ChildContentAssoc filtered by the content_id column
- * @method     ChildContentAssoc findOneByPosition(int $position) Return the first ChildContentAssoc filtered by the position column
- * @method     ChildContentAssoc findOneByCreatedAt(string $created_at) Return the first ChildContentAssoc filtered by the created_at column
- * @method     ChildContentAssoc findOneByUpdatedAt(string $updated_at) Return the first ChildContentAssoc filtered by the updated_at column
- *
- * @method     array findById(int $id) Return ChildContentAssoc objects filtered by the id column
- * @method     array findByCategoryId(int $category_id) Return ChildContentAssoc objects filtered by the category_id column
- * @method     array findByProductId(int $product_id) Return ChildContentAssoc objects filtered by the product_id column
- * @method     array findByContentId(int $content_id) Return ChildContentAssoc objects filtered by the content_id column
- * @method     array findByPosition(int $position) Return ChildContentAssoc objects filtered by the position column
- * @method     array findByCreatedAt(string $created_at) Return ChildContentAssoc objects filtered by the created_at column
- * @method     array findByUpdatedAt(string $updated_at) Return ChildContentAssoc objects filtered by the updated_at column
+ * @method     array findById(int $id) Return ChildCategoryAssociatedContent objects filtered by the id column
+ * @method     array findByCategoryId(int $category_id) Return ChildCategoryAssociatedContent objects filtered by the category_id column
+ * @method     array findByContentId(int $content_id) Return ChildCategoryAssociatedContent objects filtered by the content_id column
+ * @method     array findByPosition(int $position) Return ChildCategoryAssociatedContent objects filtered by the position column
+ * @method     array findByCreatedAt(string $created_at) Return ChildCategoryAssociatedContent objects filtered by the created_at column
+ * @method     array findByUpdatedAt(string $updated_at) Return ChildCategoryAssociatedContent objects filtered by the updated_at column
  *
  */
-abstract class ContentAssocQuery extends ModelCriteria
+abstract class CategoryAssociatedContentQuery extends ModelCriteria
 {
 
     /**
-     * Initializes internal state of \Thelia\Model\Base\ContentAssocQuery object.
+     * Initializes internal state of \Thelia\Model\Base\CategoryAssociatedContentQuery object.
      *
      * @param     string $dbName The database name
      * @param     string $modelName The phpName of a model, e.g. 'Book'
      * @param     string $modelAlias The alias for the model in this query, e.g. 'b'
      */
-    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\ContentAssoc', $modelAlias = null)
+    public function __construct($dbName = 'thelia', $modelName = '\\Thelia\\Model\\CategoryAssociatedContent', $modelAlias = null)
     {
         parent::__construct($dbName, $modelName, $modelAlias);
     }
 
     /**
-     * Returns a new ChildContentAssocQuery object.
+     * Returns a new ChildCategoryAssociatedContentQuery object.
      *
      * @param     string $modelAlias The alias of a model in the query
      * @param     Criteria $criteria Optional Criteria to build the query from
      *
-     * @return ChildContentAssocQuery
+     * @return ChildCategoryAssociatedContentQuery
      */
     public static function create($modelAlias = null, $criteria = null)
     {
-        if ($criteria instanceof \Thelia\Model\ContentAssocQuery) {
+        if ($criteria instanceof \Thelia\Model\CategoryAssociatedContentQuery) {
             return $criteria;
         }
-        $query = new \Thelia\Model\ContentAssocQuery();
+        $query = new \Thelia\Model\CategoryAssociatedContentQuery();
         if (null !== $modelAlias) {
             $query->setModelAlias($modelAlias);
         }
@@ -124,19 +116,19 @@ abstract class ContentAssocQuery extends ModelCriteria
      * @param mixed $key Primary key to use for the query
      * @param ConnectionInterface $con an optional connection object
      *
-     * @return ChildContentAssoc|array|mixed the result, formatted by the current formatter
+     * @return ChildCategoryAssociatedContent|array|mixed the result, formatted by the current formatter
      */
     public function findPk($key, $con = null)
     {
         if ($key === null) {
             return null;
         }
-        if ((null !== ($obj = ContentAssocTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
+        if ((null !== ($obj = CategoryAssociatedContentTableMap::getInstanceFromPool((string) $key))) && !$this->formatter) {
             // the object is already in the instance pool
             return $obj;
         }
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CategoryAssociatedContentTableMap::DATABASE_NAME);
         }
         $this->basePreSelect($con);
         if ($this->formatter || $this->modelAlias || $this->with || $this->select
@@ -155,11 +147,11 @@ abstract class ContentAssocQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return   ChildContentAssoc A model object, or null if the key is not found
+     * @return   ChildCategoryAssociatedContent A model object, or null if the key is not found
      */
     protected function findPkSimple($key, $con)
     {
-        $sql = 'SELECT ID, CATEGORY_ID, PRODUCT_ID, CONTENT_ID, POSITION, CREATED_AT, UPDATED_AT FROM content_assoc WHERE ID = :p0';
+        $sql = 'SELECT ID, CATEGORY_ID, CONTENT_ID, POSITION, CREATED_AT, UPDATED_AT FROM category_associated_content WHERE ID = :p0';
         try {
             $stmt = $con->prepare($sql);
             $stmt->bindValue(':p0', $key, PDO::PARAM_INT);
@@ -170,9 +162,9 @@ abstract class ContentAssocQuery extends ModelCriteria
         }
         $obj = null;
         if ($row = $stmt->fetch(\PDO::FETCH_NUM)) {
-            $obj = new ChildContentAssoc();
+            $obj = new ChildCategoryAssociatedContent();
             $obj->hydrate($row);
-            ContentAssocTableMap::addInstanceToPool($obj, (string) $key);
+            CategoryAssociatedContentTableMap::addInstanceToPool($obj, (string) $key);
         }
         $stmt->closeCursor();
 
@@ -185,7 +177,7 @@ abstract class ContentAssocQuery extends ModelCriteria
      * @param     mixed $key Primary key to use for the query
      * @param     ConnectionInterface $con A connection object
      *
-     * @return ChildContentAssoc|array|mixed the result, formatted by the current formatter
+     * @return ChildCategoryAssociatedContent|array|mixed the result, formatted by the current formatter
      */
     protected function findPkComplex($key, $con)
     {
@@ -227,12 +219,12 @@ abstract class ContentAssocQuery extends ModelCriteria
      *
      * @param     mixed $key Primary key to use for the query
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByPrimaryKey($key)
     {
 
-        return $this->addUsingAlias(ContentAssocTableMap::ID, $key, Criteria::EQUAL);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::ID, $key, Criteria::EQUAL);
     }
 
     /**
@@ -240,12 +232,12 @@ abstract class ContentAssocQuery extends ModelCriteria
      *
      * @param     array $keys The list of primary key to use for the query
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByPrimaryKeys($keys)
     {
 
-        return $this->addUsingAlias(ContentAssocTableMap::ID, $keys, Criteria::IN);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::ID, $keys, Criteria::IN);
     }
 
     /**
@@ -264,18 +256,18 @@ abstract class ContentAssocQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterById($id = null, $comparison = null)
     {
         if (is_array($id)) {
             $useMinMax = false;
             if (isset($id['min'])) {
-                $this->addUsingAlias(ContentAssocTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::ID, $id['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($id['max'])) {
-                $this->addUsingAlias(ContentAssocTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::ID, $id['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -286,7 +278,7 @@ abstract class ContentAssocQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ContentAssocTableMap::ID, $id, $comparison);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::ID, $id, $comparison);
     }
 
     /**
@@ -307,18 +299,18 @@ abstract class ContentAssocQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByCategoryId($categoryId = null, $comparison = null)
     {
         if (is_array($categoryId)) {
             $useMinMax = false;
             if (isset($categoryId['min'])) {
-                $this->addUsingAlias(ContentAssocTableMap::CATEGORY_ID, $categoryId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::CATEGORY_ID, $categoryId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($categoryId['max'])) {
-                $this->addUsingAlias(ContentAssocTableMap::CATEGORY_ID, $categoryId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::CATEGORY_ID, $categoryId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -329,50 +321,7 @@ abstract class ContentAssocQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ContentAssocTableMap::CATEGORY_ID, $categoryId, $comparison);
-    }
-
-    /**
-     * Filter the query on the product_id column
-     *
-     * Example usage:
-     * <code>
-     * $query->filterByProductId(1234); // WHERE product_id = 1234
-     * $query->filterByProductId(array(12, 34)); // WHERE product_id IN (12, 34)
-     * $query->filterByProductId(array('min' => 12)); // WHERE product_id > 12
-     * </code>
-     *
-     * @see       filterByProduct()
-     *
-     * @param     mixed $productId The value to use as filter.
-     *              Use scalar values for equality.
-     *              Use array values for in_array() equivalent.
-     *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
-     * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildContentAssocQuery The current query, for fluid interface
-     */
-    public function filterByProductId($productId = null, $comparison = null)
-    {
-        if (is_array($productId)) {
-            $useMinMax = false;
-            if (isset($productId['min'])) {
-                $this->addUsingAlias(ContentAssocTableMap::PRODUCT_ID, $productId['min'], Criteria::GREATER_EQUAL);
-                $useMinMax = true;
-            }
-            if (isset($productId['max'])) {
-                $this->addUsingAlias(ContentAssocTableMap::PRODUCT_ID, $productId['max'], Criteria::LESS_EQUAL);
-                $useMinMax = true;
-            }
-            if ($useMinMax) {
-                return $this;
-            }
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-        }
-
-        return $this->addUsingAlias(ContentAssocTableMap::PRODUCT_ID, $productId, $comparison);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::CATEGORY_ID, $categoryId, $comparison);
     }
 
     /**
@@ -393,18 +342,18 @@ abstract class ContentAssocQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByContentId($contentId = null, $comparison = null)
     {
         if (is_array($contentId)) {
             $useMinMax = false;
             if (isset($contentId['min'])) {
-                $this->addUsingAlias(ContentAssocTableMap::CONTENT_ID, $contentId['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::CONTENT_ID, $contentId['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($contentId['max'])) {
-                $this->addUsingAlias(ContentAssocTableMap::CONTENT_ID, $contentId['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::CONTENT_ID, $contentId['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -415,7 +364,7 @@ abstract class ContentAssocQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ContentAssocTableMap::CONTENT_ID, $contentId, $comparison);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::CONTENT_ID, $contentId, $comparison);
     }
 
     /**
@@ -434,18 +383,18 @@ abstract class ContentAssocQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByPosition($position = null, $comparison = null)
     {
         if (is_array($position)) {
             $useMinMax = false;
             if (isset($position['min'])) {
-                $this->addUsingAlias(ContentAssocTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::POSITION, $position['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($position['max'])) {
-                $this->addUsingAlias(ContentAssocTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::POSITION, $position['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -456,7 +405,7 @@ abstract class ContentAssocQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ContentAssocTableMap::POSITION, $position, $comparison);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::POSITION, $position, $comparison);
     }
 
     /**
@@ -477,18 +426,18 @@ abstract class ContentAssocQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByCreatedAt($createdAt = null, $comparison = null)
     {
         if (is_array($createdAt)) {
             $useMinMax = false;
             if (isset($createdAt['min'])) {
-                $this->addUsingAlias(ContentAssocTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::CREATED_AT, $createdAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($createdAt['max'])) {
-                $this->addUsingAlias(ContentAssocTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::CREATED_AT, $createdAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -499,7 +448,7 @@ abstract class ContentAssocQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ContentAssocTableMap::CREATED_AT, $createdAt, $comparison);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::CREATED_AT, $createdAt, $comparison);
     }
 
     /**
@@ -520,18 +469,18 @@ abstract class ContentAssocQuery extends ModelCriteria
      *              Use associative array('min' => $minValue, 'max' => $maxValue) for intervals.
      * @param     string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByUpdatedAt($updatedAt = null, $comparison = null)
     {
         if (is_array($updatedAt)) {
             $useMinMax = false;
             if (isset($updatedAt['min'])) {
-                $this->addUsingAlias(ContentAssocTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::UPDATED_AT, $updatedAt['min'], Criteria::GREATER_EQUAL);
                 $useMinMax = true;
             }
             if (isset($updatedAt['max'])) {
-                $this->addUsingAlias(ContentAssocTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
+                $this->addUsingAlias(CategoryAssociatedContentTableMap::UPDATED_AT, $updatedAt['max'], Criteria::LESS_EQUAL);
                 $useMinMax = true;
             }
             if ($useMinMax) {
@@ -542,7 +491,7 @@ abstract class ContentAssocQuery extends ModelCriteria
             }
         }
 
-        return $this->addUsingAlias(ContentAssocTableMap::UPDATED_AT, $updatedAt, $comparison);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::UPDATED_AT, $updatedAt, $comparison);
     }
 
     /**
@@ -551,20 +500,20 @@ abstract class ContentAssocQuery extends ModelCriteria
      * @param \Thelia\Model\Category|ObjectCollection $category The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByCategory($category, $comparison = null)
     {
         if ($category instanceof \Thelia\Model\Category) {
             return $this
-                ->addUsingAlias(ContentAssocTableMap::CATEGORY_ID, $category->getId(), $comparison);
+                ->addUsingAlias(CategoryAssociatedContentTableMap::CATEGORY_ID, $category->getId(), $comparison);
         } elseif ($category instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ContentAssocTableMap::CATEGORY_ID, $category->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CategoryAssociatedContentTableMap::CATEGORY_ID, $category->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByCategory() only accepts arguments of type \Thelia\Model\Category or Collection');
         }
@@ -576,9 +525,9 @@ abstract class ContentAssocQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
-    public function joinCategory($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinCategory($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Category');
@@ -613,86 +562,11 @@ abstract class ContentAssocQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\CategoryQuery A secondary query class using the current class as primary query
      */
-    public function useCategoryQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useCategoryQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinCategory($relationAlias, $joinType)
             ->useQuery($relationAlias ? $relationAlias : 'Category', '\Thelia\Model\CategoryQuery');
-    }
-
-    /**
-     * Filter the query by a related \Thelia\Model\Product object
-     *
-     * @param \Thelia\Model\Product|ObjectCollection $product The related object(s) to use as filter
-     * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
-     *
-     * @return ChildContentAssocQuery The current query, for fluid interface
-     */
-    public function filterByProduct($product, $comparison = null)
-    {
-        if ($product instanceof \Thelia\Model\Product) {
-            return $this
-                ->addUsingAlias(ContentAssocTableMap::PRODUCT_ID, $product->getId(), $comparison);
-        } elseif ($product instanceof ObjectCollection) {
-            if (null === $comparison) {
-                $comparison = Criteria::IN;
-            }
-
-            return $this
-                ->addUsingAlias(ContentAssocTableMap::PRODUCT_ID, $product->toKeyValue('PrimaryKey', 'Id'), $comparison);
-        } else {
-            throw new PropelException('filterByProduct() only accepts arguments of type \Thelia\Model\Product or Collection');
-        }
-    }
-
-    /**
-     * Adds a JOIN clause to the query using the Product relation
-     *
-     * @param     string $relationAlias optional alias for the relation
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return ChildContentAssocQuery The current query, for fluid interface
-     */
-    public function joinProduct($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        $tableMap = $this->getTableMap();
-        $relationMap = $tableMap->getRelation('Product');
-
-        // create a ModelJoin object for this join
-        $join = new ModelJoin();
-        $join->setJoinType($joinType);
-        $join->setRelationMap($relationMap, $this->useAliasInSQL ? $this->getModelAlias() : null, $relationAlias);
-        if ($previousJoin = $this->getPreviousJoin()) {
-            $join->setPreviousJoin($previousJoin);
-        }
-
-        // add the ModelJoin to the current object
-        if ($relationAlias) {
-            $this->addAlias($relationAlias, $relationMap->getRightTable()->getName());
-            $this->addJoinObject($join, $relationAlias);
-        } else {
-            $this->addJoinObject($join, 'Product');
-        }
-
-        return $this;
-    }
-
-    /**
-     * Use the Product relation Product object
-     *
-     * @see useQuery()
-     *
-     * @param     string $relationAlias optional alias for the relation,
-     *                                   to be used as main alias in the secondary query
-     * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
-     *
-     * @return   \Thelia\Model\ProductQuery A secondary query class using the current class as primary query
-     */
-    public function useProductQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
-    {
-        return $this
-            ->joinProduct($relationAlias, $joinType)
-            ->useQuery($relationAlias ? $relationAlias : 'Product', '\Thelia\Model\ProductQuery');
     }
 
     /**
@@ -701,20 +575,20 @@ abstract class ContentAssocQuery extends ModelCriteria
      * @param \Thelia\Model\Content|ObjectCollection $content The related object(s) to use as filter
      * @param string $comparison Operator to use for the column comparison, defaults to Criteria::EQUAL
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function filterByContent($content, $comparison = null)
     {
         if ($content instanceof \Thelia\Model\Content) {
             return $this
-                ->addUsingAlias(ContentAssocTableMap::CONTENT_ID, $content->getId(), $comparison);
+                ->addUsingAlias(CategoryAssociatedContentTableMap::CONTENT_ID, $content->getId(), $comparison);
         } elseif ($content instanceof ObjectCollection) {
             if (null === $comparison) {
                 $comparison = Criteria::IN;
             }
 
             return $this
-                ->addUsingAlias(ContentAssocTableMap::CONTENT_ID, $content->toKeyValue('PrimaryKey', 'Id'), $comparison);
+                ->addUsingAlias(CategoryAssociatedContentTableMap::CONTENT_ID, $content->toKeyValue('PrimaryKey', 'Id'), $comparison);
         } else {
             throw new PropelException('filterByContent() only accepts arguments of type \Thelia\Model\Content or Collection');
         }
@@ -726,9 +600,9 @@ abstract class ContentAssocQuery extends ModelCriteria
      * @param     string $relationAlias optional alias for the relation
      * @param     string $joinType Accepted values are null, 'left join', 'right join', 'inner join'
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
-    public function joinContent($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function joinContent($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         $tableMap = $this->getTableMap();
         $relationMap = $tableMap->getRelation('Content');
@@ -763,7 +637,7 @@ abstract class ContentAssocQuery extends ModelCriteria
      *
      * @return   \Thelia\Model\ContentQuery A secondary query class using the current class as primary query
      */
-    public function useContentQuery($relationAlias = null, $joinType = Criteria::LEFT_JOIN)
+    public function useContentQuery($relationAlias = null, $joinType = Criteria::INNER_JOIN)
     {
         return $this
             ->joinContent($relationAlias, $joinType)
@@ -773,21 +647,21 @@ abstract class ContentAssocQuery extends ModelCriteria
     /**
      * Exclude object from result
      *
-     * @param   ChildContentAssoc $contentAssoc Object to remove from the list of results
+     * @param   ChildCategoryAssociatedContent $categoryAssociatedContent Object to remove from the list of results
      *
-     * @return ChildContentAssocQuery The current query, for fluid interface
+     * @return ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
-    public function prune($contentAssoc = null)
+    public function prune($categoryAssociatedContent = null)
     {
-        if ($contentAssoc) {
-            $this->addUsingAlias(ContentAssocTableMap::ID, $contentAssoc->getId(), Criteria::NOT_EQUAL);
+        if ($categoryAssociatedContent) {
+            $this->addUsingAlias(CategoryAssociatedContentTableMap::ID, $categoryAssociatedContent->getId(), Criteria::NOT_EQUAL);
         }
 
         return $this;
     }
 
     /**
-     * Deletes all rows from the content_assoc table.
+     * Deletes all rows from the category_associated_content table.
      *
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).
@@ -795,7 +669,7 @@ abstract class ContentAssocQuery extends ModelCriteria
     public function doDeleteAll(ConnectionInterface $con = null)
     {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CategoryAssociatedContentTableMap::DATABASE_NAME);
         }
         $affectedRows = 0; // initialize var to track total num of affected rows
         try {
@@ -806,8 +680,8 @@ abstract class ContentAssocQuery extends ModelCriteria
             // Because this db requires some delete cascade/set null emulation, we have to
             // clear the cached instance *after* the emulation has happened (since
             // instances get re-added by the select statement contained therein).
-            ContentAssocTableMap::clearInstancePool();
-            ContentAssocTableMap::clearRelatedInstancePool();
+            CategoryAssociatedContentTableMap::clearInstancePool();
+            CategoryAssociatedContentTableMap::clearRelatedInstancePool();
 
             $con->commit();
         } catch (PropelException $e) {
@@ -819,9 +693,9 @@ abstract class ContentAssocQuery extends ModelCriteria
     }
 
     /**
-     * Performs a DELETE on the database, given a ChildContentAssoc or Criteria object OR a primary key value.
+     * Performs a DELETE on the database, given a ChildCategoryAssociatedContent or Criteria object OR a primary key value.
      *
-     * @param mixed               $values Criteria or ChildContentAssoc object or primary key or array of primary keys
+     * @param mixed               $values Criteria or ChildCategoryAssociatedContent object or primary key or array of primary keys
      *              which is used to create the DELETE statement
      * @param ConnectionInterface $con the connection to use
      * @return int The number of affected rows (if supported by underlying database driver).  This includes CASCADE-related rows
@@ -832,13 +706,13 @@ abstract class ContentAssocQuery extends ModelCriteria
      public function delete(ConnectionInterface $con = null)
      {
         if (null === $con) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CategoryAssociatedContentTableMap::DATABASE_NAME);
         }
 
         $criteria = $this;
 
         // Set the correct dbName
-        $criteria->setDbName(ContentAssocTableMap::DATABASE_NAME);
+        $criteria->setDbName(CategoryAssociatedContentTableMap::DATABASE_NAME);
 
         $affectedRows = 0; // initialize var to track total num of affected rows
 
@@ -848,10 +722,10 @@ abstract class ContentAssocQuery extends ModelCriteria
             $con->beginTransaction();
 
 
-        ContentAssocTableMap::removeInstanceFromPool($criteria);
+        CategoryAssociatedContentTableMap::removeInstanceFromPool($criteria);
 
             $affectedRows += ModelCriteria::delete($con);
-            ContentAssocTableMap::clearRelatedInstancePool();
+            CategoryAssociatedContentTableMap::clearRelatedInstancePool();
             $con->commit();
 
             return $affectedRows;
@@ -868,11 +742,11 @@ abstract class ContentAssocQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of the latest update in days
      *
-     * @return     ChildContentAssocQuery The current query, for fluid interface
+     * @return     ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function recentlyUpdated($nbDays = 7)
     {
-        return $this->addUsingAlias(ContentAssocTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::UPDATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
@@ -880,51 +754,51 @@ abstract class ContentAssocQuery extends ModelCriteria
      *
      * @param      int $nbDays Maximum age of in days
      *
-     * @return     ChildContentAssocQuery The current query, for fluid interface
+     * @return     ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function recentlyCreated($nbDays = 7)
     {
-        return $this->addUsingAlias(ContentAssocTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
+        return $this->addUsingAlias(CategoryAssociatedContentTableMap::CREATED_AT, time() - $nbDays * 24 * 60 * 60, Criteria::GREATER_EQUAL);
     }
 
     /**
      * Order by update date desc
      *
-     * @return     ChildContentAssocQuery The current query, for fluid interface
+     * @return     ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function lastUpdatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ContentAssocTableMap::UPDATED_AT);
+        return $this->addDescendingOrderByColumn(CategoryAssociatedContentTableMap::UPDATED_AT);
     }
 
     /**
      * Order by update date asc
      *
-     * @return     ChildContentAssocQuery The current query, for fluid interface
+     * @return     ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function firstUpdatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ContentAssocTableMap::UPDATED_AT);
+        return $this->addAscendingOrderByColumn(CategoryAssociatedContentTableMap::UPDATED_AT);
     }
 
     /**
      * Order by create date desc
      *
-     * @return     ChildContentAssocQuery The current query, for fluid interface
+     * @return     ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function lastCreatedFirst()
     {
-        return $this->addDescendingOrderByColumn(ContentAssocTableMap::CREATED_AT);
+        return $this->addDescendingOrderByColumn(CategoryAssociatedContentTableMap::CREATED_AT);
     }
 
     /**
      * Order by create date asc
      *
-     * @return     ChildContentAssocQuery The current query, for fluid interface
+     * @return     ChildCategoryAssociatedContentQuery The current query, for fluid interface
      */
     public function firstCreatedFirst()
     {
-        return $this->addAscendingOrderByColumn(ContentAssocTableMap::CREATED_AT);
+        return $this->addAscendingOrderByColumn(CategoryAssociatedContentTableMap::CREATED_AT);
     }
 
-} // ContentAssocQuery
+} // CategoryAssociatedContentQuery

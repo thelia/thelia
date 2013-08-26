@@ -30,6 +30,9 @@ use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Log\Tlog;
+
+use Thelia\Model\Tools\ModelCriteriaTools;
 
 use Thelia\Model\FolderQuery;
 use Thelia\Model\ConfigQuery;
@@ -59,7 +62,7 @@ class Folder extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual-reverse', 'random'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse', 'random'))
                 ),
                 'manual'
             ),
@@ -76,7 +79,10 @@ class Folder extends BaseLoop
     {
         $search = FolderQuery::create();
 
-        $id = $this->getId();
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+
+		$id = $this->getId();
 
         if (!is_null($id)) {
             $search->filterById($id, Criteria::IN);
@@ -88,13 +94,15 @@ class Folder extends BaseLoop
             $search->filterByParent($parent);
         }
 
-        $current = $this->getCurrent();
+
+		$current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("folder_id"));
         } elseif ($current === false) {
             $search->filterById($this->request->get("folder_id"), Criteria::NOT_IN);
         }
+
 
          $exclude = $this->getExclude();
 
@@ -108,15 +116,15 @@ class Folder extends BaseLoop
 
         $orders  = $this->getOrder();
 
-        foreach ($orders as $order) {
+        foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
-                case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FolderI18nTableMap::TITLE);
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
-                case "manual-reverse":
+                case "manual_reverse":
                     $search->orderByPosition(Criteria::DESC);
                     break;
                 case "manual":
@@ -130,46 +138,40 @@ class Folder extends BaseLoop
             }
         }
 
-        /**
-         * \Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
+        /* perform search */
         $folders = $this->search($search, $pagination);
 
+        /* @todo */
         $notEmpty  = $this->getNot_empty();
 
         $loopResult = new LoopResult();
 
         foreach ($folders as $folder) {
 
-            if ($notEmpty && $folder->countAllProducts() == 0) continue;
+            /*
+             * no cause pagination lost :
+             * if ($notEmpty && $folder->countAllProducts() == 0) continue;
+             */
 
             $loopResultRow = new LoopResultRow();
 
             $loopResultRow
-                ->set("ID", $folder->getId())
-                ->set("TITLE",$folder->getTitle())
-                ->set("CHAPO", $folder->getChapo())
-                ->set("DESCRIPTION", $folder->getDescription())
-                ->set("POSTSCRIPTUM", $folder->getPostscriptum())
-                ->set("PARENT", $folder->getParent())
-                ->set("CONTENT_COUNT", $folder->countChild())
-                ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
-                ->set("POSITION", $folder->getPosition())
+            	->set("ID", $folder->getId())
+                ->set("TITLE",$folder->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $folder->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $folder->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $folder->getVirtualColumn('i18n_POSTSCRIPTUM'))
+	            ->set("PARENT", $folder->getParent())
+	            ->set("CONTENT_COUNT", $folder->countChild())
+	            ->set("VISIBLE", $folder->getVisible() ? "1" : "0")
+	            ->set("POSITION", $folder->getPosition())
 
-                ->set("CREATE_DATE", $folder->getCreatedAt())
-                ->set("UPDATE_DATE", $folder->getUpdatedAt())
-                ->set("VERSION", $folder->getVersion())
-                ->set("VERSION_DATE", $folder->getVersionCreatedAt())
-                ->set("VERSION_AUTHOR", $folder->getVersionCreatedBy())
-            ;
+	            ->set("CREATE_DATE", $folder->getCreatedAt())
+	            ->set("UPDATE_DATE", $folder->getUpdatedAt())
+	            ->set("VERSION", $folder->getVersion())
+	            ->set("VERSION_DATE", $folder->getVersionCreatedAt())
+	            ->set("VERSION_AUTHOR", $folder->getVersionCreatedBy())
+			;
 
             $loopResult->addRow($loopResultRow);
         }

@@ -24,14 +24,21 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Log\Tlog;
+
+use Thelia\Model\Tools\ModelCriteriaTools;
 
 use Thelia\Model\CategoryQuery;
+use Thelia\Model\Map\FeatureProductTableMap;
+use Thelia\Model\Map\ProductPriceTableMap;
+use Thelia\Model\Map\ProductSaleElementsTableMap;
 use Thelia\Model\Map\ProductTableMap;
 use Thelia\Model\ProductCategoryQuery;
 use Thelia\Model\ProductQuery;
@@ -48,6 +55,8 @@ use Thelia\Type\BooleanOrBothType;
  * Class Product
  * @package Thelia\Core\Template\Loop
  * @author Etienne Roudeix <eroudeix@openstudio.fr>
+ *
+ * @todo : manage currency in price filter
  */
 class Product extends BaseLoop
 {
@@ -65,13 +74,13 @@ class Product extends BaseLoop
                 )
             ),
             Argument::createIntListTypeArgument('category'),
-            //Argument::createBooleanTypeArgument('new'),
-            //Argument::createBooleanTypeArgument('promo'),
-            //Argument::createFloatTypeArgument('min_price'),
-            //Argument::createFloatTypeArgument('max_price'),
-            //Argument::createIntTypeArgument('min_stock'),
-            //Argument::createFloatTypeArgument('min_weight'),
-            //Argument::createFloatTypeArgument('max_weight'),
+            Argument::createBooleanTypeArgument('new'),
+            Argument::createBooleanTypeArgument('promo'),
+            Argument::createFloatTypeArgument('min_price'),
+            Argument::createFloatTypeArgument('max_price'),
+            Argument::createIntTypeArgument('min_stock'),
+            Argument::createFloatTypeArgument('min_weight'),
+            Argument::createFloatTypeArgument('max_weight'),
             Argument::createBooleanTypeArgument('current'),
             Argument::createBooleanTypeArgument('current_category'),
             Argument::createIntTypeArgument('depth', 1),
@@ -79,14 +88,14 @@ class Product extends BaseLoop
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', /*'min_price', 'max_price',*/ 'manual', 'manual_reverse', 'ref', /*'promo', 'new',*/ 'random', 'given_id'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'min_price', 'max_price', 'manual', 'manual_reverse', 'ref', 'promo', 'new', 'random', 'given_id'))
                 ),
                 'alpha'
             ),
             Argument::createIntListTypeArgument('exclude'),
             Argument::createIntListTypeArgument('exclude_category'),
             new Argument(
-                'feature_available',
+                'feature_availability',
                 new TypeCollection(
                     new Type\IntToCombinedIntsListType()
                 )
@@ -96,6 +105,24 @@ class Product extends BaseLoop
                 new TypeCollection(
                     new Type\IntToCombinedStringsListType()
                 )
+            ),
+            /*
+             * promo, new, quantity, weight or price may differ depending on the different attributes
+             * by default, product loop will look for at least 1 attribute which matches all the loop criteria : attribute_non_strict_match="none"
+             * you can also provide a list of non-strict attributes.
+             *      ie : attribute_non_strict_match="promo,new"
+             *      loop will return the product if he has at least an attribute in promo and at least an attribute as new ; even if it's not the same attribute.
+             * you can set all the attributes as non strict : attribute_non_strict_match="*"
+             *
+             * In order to allow such a process, we will have to make a LEFT JOIN foreach of the following case.
+            */
+            new Argument(
+                'attribute_non_strict_match',
+                new TypeCollection(
+                    new Type\EnumListType(array('min_stock', 'promo', 'new', 'min_weight', 'max_weight', 'min_price', 'max_price')),
+                    new Type\EnumType(array('*', 'none'))
+                ),
+                'none'
             )
         );
     }
@@ -110,7 +137,12 @@ class Product extends BaseLoop
     {
         $search = ProductQuery::create();
 
-        //$search->withColumn('CASE WHEN ' . ProductTableMap::PROMO . '=1 THEN ' . ProductTableMap::PRICE2 . ' ELSE ' . ProductTableMap::PRICE . ' END', 'real_price');
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+
+        $attributeNonStrictMatch = $this->getAttribute_non_strict_match();
+        $isPSELeftJoinList = array();
+        $isProductPriceLeftJoinList = array();
 
         $id = $this->getId();
 
@@ -124,15 +156,15 @@ class Product extends BaseLoop
             $search->filterByRef($ref, Criteria::IN);
         }
 
-          $category = $this->getCategory();
+        $category = $this->getCategory();
 
         if (!is_null($category)) {
             $categories = CategoryQuery::create()->filterById($category, Criteria::IN)->find();
 
             $depth = $this->getDepth();
 
-            if (null !== $depth) {
-                foreach (CategoryQuery::findAllChild($category, $depth) as $subCategory) {
+            if(null !== $depth) {
+                foreach(CategoryQuery::findAllChild($category, $depth) as $subCategory) {
                     $categories->prepend($subCategory);
                 }
             }
@@ -143,79 +175,174 @@ class Product extends BaseLoop
             );
         }
 
-        /*$new = $this->getNew();
+        $new = $this->getNew();
 
         if ($new === true) {
-            $search->filterByNewness(1, Criteria::EQUAL);
-        } elseif ($new === false) {
-            $search->filterByNewness(0, Criteria::EQUAL);
+            $isPSELeftJoinList[] = 'is_new';
+            $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
+                ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '1')
+                ->where('NOT ISNULL(`is_new`.ID)');
+        } else if($new === false) {
+            $isPSELeftJoinList[] = 'is_new';
+            $search->joinProductSaleElements('is_new', Criteria::LEFT_JOIN)
+                ->where('`is_new`.NEWNESS' . Criteria::EQUAL . '0')
+                ->where('NOT ISNULL(`is_new`.ID)');
         }
 
         $promo = $this->getPromo();
 
         if ($promo === true) {
-            $search->filterByPromo(1, Criteria::EQUAL);
-        } elseif ($promo === false) {
-            $search->filterByNewness(0, Criteria::EQUAL);
+            $isPSELeftJoinList[] = 'is_promo';
+            $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
+                ->where('`is_promo`.PROMO' . Criteria::EQUAL . '1')
+                ->where('NOT ISNULL(`is_promo`.ID)');
+        } else if($promo === false) {
+            $isPSELeftJoinList[] = 'is_promo';
+            $search->joinProductSaleElements('is_promo', Criteria::LEFT_JOIN)
+                ->where('`is_promo`.PROMO' . Criteria::EQUAL . '0')
+                ->where('NOT ISNULL(`is_promo`.ID)');
         }
 
         $min_stock = $this->getMin_stock();
 
         if (null != $min_stock) {
-            $search->filterByQuantity($min_stock, Criteria::GREATER_EQUAL);
+            $isPSELeftJoinList[] = 'is_min_stock';
+            $search->joinProductSaleElements('is_min_stock', Criteria::LEFT_JOIN)
+                ->where('`is_min_stock`.QUANTITY' . Criteria::GREATER_THAN . '?', $min_stock, \PDO::PARAM_INT)
+                ->where('NOT ISNULL(`is_min_stock`.ID)');
         }
 
-        $min_price = $this->getMin_price();*/
+        $min_weight = $this->getMin_weight();
 
-        //if (null !== $min_price) {
-            /**
-             * Following should work but does not :
-             *
-             *  $search->filterBy('real_price', $max_price, Criteria::GREATER_EQUAL);
-             */
-            /*$search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
-                    ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
-                    ->condition('min_price2', ProductTableMap::PRICE2 . Criteria::GREATER_EQUAL . '?', $min_price)
-                    ->condition('min_price', ProductTableMap::PRICE . Criteria::GREATER_EQUAL . '?', $min_price)
-                    ->combine(array('in_promo', 'min_price2'), Criteria::LOGICAL_AND, 'in_promo_min_price')
-                    ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
-                    ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
-        }
-
-        $max_price = $this->getMax_price();*/
-
-        //if (null !== $max_price) {
-            /**
-             * Following should work but does not :
-             *
-             *  $search->filterBy('real_price', $max_price, Criteria::LESS_EQUAL);
-             */
-            /*$search->condition('in_promo', ProductTableMap::PROMO . Criteria::EQUAL . '1')
-                    ->condition('not_in_promo', ProductTableMap::PROMO . Criteria::NOT_EQUAL . '1')
-                    ->condition('max_price2', ProductTableMap::PRICE2 . Criteria::LESS_EQUAL . '?', $max_price)
-                    ->condition('max_price', ProductTableMap::PRICE . Criteria::LESS_EQUAL . '?', $max_price)
-                    ->combine(array('in_promo', 'max_price2'), Criteria::LOGICAL_AND, 'in_promo_max_price')
-                    ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
-                    ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
-        }*/
-
-        /*$min_weight = $this->getMin_weight();
-
-        if (null !== $min_weight) {
-            $search->filterByWeight($min_weight, Criteria::GREATER_EQUAL);
+        if (null != $min_weight) {
+            $isPSELeftJoinList[] = 'is_min_weight';
+            $search->joinProductSaleElements('is_min_weight', Criteria::LEFT_JOIN)
+                ->where('`is_min_weight`.WEIGHT' . Criteria::GREATER_THAN . '?', $min_weight, \PDO::PARAM_STR)
+                ->where('NOT ISNULL(`is_min_weight`.ID)');
         }
 
         $max_weight = $this->getMax_weight();
 
-        if (null !== $max_weight) {
-            $search->filterByWeight($max_weight, Criteria::LESS_EQUAL);
-        }*/
+        if (null != $max_weight) {
+            $isPSELeftJoinList[] = 'is_max_weight';
+            $search->joinProductSaleElements('is_max_weight', Criteria::LEFT_JOIN)
+                ->where('`is_max_weight`.WEIGHT' . Criteria::LESS_THAN . '?', $max_weight, \PDO::PARAM_STR)
+                ->where('NOT ISNULL(`is_max_weight`.ID)');
+        }
+
+        $min_price = $this->getMin_price();
+
+        if(null !== $min_price) {
+            $isPSELeftJoinList[] = 'is_min_price';
+            $isProductPriceLeftJoinList['is_min_price'] = 'min_price_data';
+            $minPriceJoin = new Join();
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_min_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'min_price_data');
+            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->joinProductSaleElements('is_min_price', Criteria::LEFT_JOIN)
+                ->addJoinObject($minPriceJoin)
+                ->condition('in_promo', '`is_min_price`.promo'. Criteria::EQUAL .'1')
+                ->condition('not_in_promo', '`is_min_price`.promo'. Criteria::NOT_EQUAL .'1')
+                ->condition('min_promo_price', '`min_price_data`.promo_price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
+                ->condition('min_price', '`min_price_data`.price' . Criteria::GREATER_EQUAL . '?', $min_price, \PDO::PARAM_STR)
+                ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_min_price')
+                ->combine(array('not_in_promo', 'min_price'), Criteria::LOGICAL_AND, 'not_in_promo_min_price')
+                ->where(array('not_in_promo_min_price', 'in_promo_min_price'), Criteria::LOGICAL_OR);
+        }
+
+        $max_price = $this->getMax_price();
+
+        if(null !== $max_price) {
+            $isPSELeftJoinList[] = 'is_max_price';
+            $isProductPriceLeftJoinList['is_max_price'] = 'max_price_data';
+            $minPriceJoin = new Join();
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', 'is_max_price', ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'max_price_data');
+            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->joinProductSaleElements('is_max_price', Criteria::LEFT_JOIN)
+                ->addJoinObject($minPriceJoin)
+                ->condition('in_promo', '`is_max_price`.promo'. Criteria::EQUAL .'1')
+                ->condition('not_in_promo', '`is_max_price`.promo'. Criteria::NOT_EQUAL .'1')
+                ->condition('min_promo_price', '`max_price_data`.promo_price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
+                ->condition('max_price', '`max_price_data`.price' . Criteria::LESS_EQUAL . '?', $max_price, \PDO::PARAM_STR)
+                ->combine(array('in_promo', 'min_promo_price'), Criteria::LOGICAL_AND, 'in_promo_max_price')
+                ->combine(array('not_in_promo', 'max_price'), Criteria::LOGICAL_AND, 'not_in_promo_max_price')
+                ->where(array('not_in_promo_max_price', 'in_promo_max_price'), Criteria::LOGICAL_OR);
+        }
+
+        if( $attributeNonStrictMatch != '*' ) {
+            if($attributeNonStrictMatch == 'none') {
+                $actuallyUsedAttributeNonStrictMatchList = $isPSELeftJoinList;
+            } else {
+                $actuallyUsedAttributeNonStrictMatchList = array_values(array_intersect($isPSELeftJoinList, $attributeNonStrictMatch));
+            }
+
+            foreach($actuallyUsedAttributeNonStrictMatchList as $key => $actuallyUsedAttributeNonStrictMatch) {
+                if($key == 0)
+                    continue;
+                $search->where('`' . $actuallyUsedAttributeNonStrictMatch . '`.ID=' . '`' . $actuallyUsedAttributeNonStrictMatchList[$key-1] . '`.ID');
+            }
+        }
+
+        /*
+         * for ordering and outputs, the product will be :
+         * - new if at least one the criteria matching PSE is new
+         * - in promo if at least one the criteria matching PSE is in promo
+         */
+
+        if(count($isProductPriceLeftJoinList) == 0) {
+            if(count($isPSELeftJoinList) == 0) {
+                $joiningTable = "global";
+                $isPSELeftJoinList[] = $joiningTable;
+                $search->joinProductSaleElements('global', Criteria::LEFT_JOIN);
+            } else {
+                $joiningTable = $isPSELeftJoinList[0];
+            }
+
+            $isProductPriceLeftJoinList[$joiningTable] = 'global_price_data';
+
+            $minPriceJoin = new Join();
+            $minPriceJoin->addExplicitCondition(ProductSaleElementsTableMap::TABLE_NAME, 'ID', $joiningTable, ProductPriceTableMap::TABLE_NAME, 'PRODUCT_SALE_ELEMENTS_ID', 'global_price_data');
+            $minPriceJoin->setJoinType(Criteria::LEFT_JOIN);
+
+            $search->addJoinObject($minPriceJoin);
+        }
+
+        /*
+         * we need to test all promo field from our previous conditions. Indeed ie:
+         * product P0, attributes color : red
+         * P0red is in promo and is the only attribute combinaton availability.
+         * so the product might be consider as in promo (in outputs and ordering)
+         * We got the following loop to display in promo AND new product but we don't care it's the same attribute which is new and in promo :
+         * {loop type="product" promo="1" new="1" attribute_non_strict_match="promo,new"} {/loop}
+         * our request will so far returns 1 line
+         *
+         * is_promo.ID | is_promo.PROMO | is_promo.NEWNESS | is_new.ID | is_new.PROMO | is_new.NEWNESS
+         *      NULL            NULL              NULL        red_id         1               0
+         *
+         * So that we can say the product is in global promo only with is_promo.PROMO, we must acknowledge it with (is_promo.PROMO OR is_new.PROMO)
+         */
+        $booleanMatchedPromoList = array();
+        $booleanMatchedNewnessList = array();
+        foreach($isPSELeftJoinList as $isPSELeftJoin) {
+            $booleanMatchedPromoList[] = '`' . $isPSELeftJoin . '`.PROMO';
+            $booleanMatchedNewnessList[] = '`' . $isPSELeftJoin . '`.NEWNESS';
+        }
+        $booleanMatchedPriceList = array();
+        foreach($isProductPriceLeftJoinList as $pSE => $isProductPriceLeftJoin) {
+            $booleanMatchedPriceList[] = 'CASE WHEN `' . $pSE . '`.PROMO=1 THEN `' . $isProductPriceLeftJoin . '`.PROMO_PRICE ELSE `' . $isProductPriceLeftJoin . '`.PRICE END';
+        }
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedPromoList) . ')', 'main_product_is_promo');
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedNewnessList) . ')', 'main_product_is_new');
+        $search->withColumn('MAX(' . implode(' OR ', $booleanMatchedPriceList) . ')', 'real_highest_price');
+        $search->withColumn('MIN(' . implode(' OR ', $booleanMatchedPriceList) . ')', 'real_lowest_price');
+
 
         $current = $this->getCurrent();
 
         if ($current === true) {
             $search->filterById($this->request->get("product_id"));
-        } elseif ($current === false) {
+        } elseif($current === false) {
             $search->filterById($this->request->get("product_id"), Criteria::NOT_IN);
         }
 
@@ -232,7 +359,7 @@ class Product extends BaseLoop
                 )->find(),
                 Criteria::IN
             );
-        } elseif ($current_category === false) {
+        } elseif($current_category === false) {
             $search->filterByCategory(
                 CategoryQuery::create()->filterByProduct(
                     ProductCategoryQuery::create()->filterByProductId(
@@ -249,57 +376,6 @@ class Product extends BaseLoop
 
         if ($visible != BooleanOrBothType::ANY) $search->filterByVisible($visible ? 1 : 0);
 
-        $orders  = $this->getOrder();
-
-        foreach ($orders as $order) {
-            switch ($order) {
-                case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
-                    break;
-                case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\ProductI18nTableMap::TITLE);
-                    break;
-                /*case "min_price":
-                    $search->orderBy('real_price', Criteria::ASC);
-                    break;
-                case "max_price":
-                    $search->orderBy('real_price', Criteria::DESC);
-                    break;*/
-                case "manual":
-                    if(null === $category || count($category) != 1)
-                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
-                    $search->orderByPosition(Criteria::ASC);
-                    break;
-                case "manual_reverse":
-                    if(null === $category || count($category) != 1)
-                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
-                    $search->orderByPosition(Criteria::DESC);
-                    break;
-                case "ref":
-                    $search->orderByRef(Criteria::ASC);
-                    break;
-                /*case "promo":
-                    $search->orderByPromo(Criteria::DESC);
-                    break;
-                case "new":
-                    $search->orderByNewness(Criteria::DESC);
-                    break;*/
-                case "given_id":
-                    if(null === $id)
-                        throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
-                    foreach ($id as $singleId) {
-                        $givenIdMatched = 'given_id_matched_' . $singleId;
-                        $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
-                        $search->orderBy($givenIdMatched, Criteria::DESC);
-                    }
-                    break;
-                case "random":
-                    $search->clearOrderByColumns();
-                    $search->addAscendingOrderByColumn('RAND()');
-                    break(2);
-            }
-        }
-
         $exclude = $this->getExclude();
 
         if (!is_null($exclude)) {
@@ -315,11 +391,11 @@ class Product extends BaseLoop
             );
         }
 
-        $feature_available = $this->getFeature_available();
+        $feature_availability = $this->getFeature_availability();
 
-        if (null !== $feature_available) {
-            foreach ($feature_available as $feature => $feature_choice) {
-                foreach ($feature_choice['values'] as $feature_av) {
+        if(null !== $feature_availability) {
+            foreach($feature_availability as $feature => $feature_choice) {
+                foreach($feature_choice['values'] as $feature_av) {
                     $featureAlias = 'fa_' . $feature;
                     if($feature_av != '*')
                         $featureAlias .= '_' . $feature_av;
@@ -331,7 +407,7 @@ class Product extends BaseLoop
 
                 /* format for mysql */
                 $sqlWhereString = $feature_choice['expression'];
-                if ($sqlWhereString == '*') {
+                if($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fa_' . $feature . '`.ID)';
                 } else {
                     $sqlWhereString = preg_replace('#([0-9]+)#', 'NOT ISNULL(`fa_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
@@ -345,9 +421,9 @@ class Product extends BaseLoop
 
         $feature_values = $this->getFeature_values();
 
-        if (null !== $feature_values) {
-            foreach ($feature_values as $feature => $feature_choice) {
-                foreach ($feature_choice['values'] as $feature_value) {
+        if(null !== $feature_values) {
+            foreach($feature_values as $feature => $feature_choice) {
+                foreach($feature_choice['values'] as $feature_value) {
                     $featureAlias = 'fv_' . $feature;
                     if($feature_value != '*')
                         $featureAlias .= '_' . $feature_value;
@@ -359,7 +435,7 @@ class Product extends BaseLoop
 
                 /* format for mysql */
                 $sqlWhereString = $feature_choice['expression'];
-                if ($sqlWhereString == '*') {
+                if($sqlWhereString == '*') {
                     $sqlWhereString = 'NOT ISNULL(`fv_' . $feature . '`.ID)';
                 } else {
                     $sqlWhereString = preg_replace('#([a-zA-Z0-9_\-]+)#', 'NOT ISNULL(`fv_' . $feature . '_' . '\1`.ID)', $sqlWhereString);
@@ -371,19 +447,60 @@ class Product extends BaseLoop
             }
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
         $search->groupBy(ProductTableMap::ID);
 
+        $orders  = $this->getOrder();
+
+        foreach($orders as $order) {
+            switch ($order) {
+                case "alpha":
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
+                    break;
+                case "min_price":
+                    $search->addAscendingOrderByColumn('real_lowest_price', Criteria::ASC);
+                    break;
+                case "max_price":
+                    $search->addDescendingOrderByColumn('real_lowest_price');
+                    break;
+                case "manual":
+                    if(null === $category || count($category) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::ASC);
+                    break;
+                case "manual_reverse":
+                    if(null === $category || count($category) != 1)
+                        throw new \InvalidArgumentException('Manual order cannot be set without single category argument');
+                    $search->orderByPosition(Criteria::DESC);
+                    break;
+                case "ref":
+                    $search->orderByRef(Criteria::ASC);
+                    break;
+                case "promo":
+                    $search->addDescendingOrderByColumn('main_product_is_promo');
+                    break;
+                case "new":
+                    $search->addDescendingOrderByColumn('main_product_is_new');
+                    break;
+                case "given_id":
+                    if(null === $id)
+                        throw new \InvalidArgumentException('Given_id order cannot be set without `id` argument');
+                    foreach($id as $singleId) {
+                        $givenIdMatched = 'given_id_matched_' . $singleId;
+                        $search->withColumn(ProductTableMap::ID . "='$singleId'", $givenIdMatched);
+                        $search->orderBy($givenIdMatched, Criteria::DESC);
+                    }
+                    break;
+                case "random":
+                    $search->clearOrderByColumns();
+                    $search->addAscendingOrderByColumn('RAND()');
+                    break(2);
+            }
+        }
+
+        /* perform search */
         $products = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
@@ -393,15 +510,13 @@ class Product extends BaseLoop
 
             $loopResultRow->set("ID", $product->getId())
                 ->set("REF",$product->getRef())
-                ->set("TITLE",$product->getTitle())
-                ->set("CHAPO", $product->getChapo())
-                ->set("DESCRIPTION", $product->getDescription())
-                ->set("POSTSCRIPTUM", $product->getPostscriptum())
-                //->set("PRICE", $product->getPrice())
-                //->set("PROMO_PRICE", $product->getPrice2())
-                //->set("WEIGHT", $product->getWeight())
-                //->set("PROMO", $product->getPromo())
-                //->set("NEW", $product->getNewness())
+                ->set("TITLE",$product->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $product->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $product->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $product->getVirtualColumn('i18n_POSTSCRIPTUM'))
+                ->set("BEST_PRICE", $product->getVirtualColumn('real_lowest_price'))
+                ->set("IS_PROMO", $product->getVirtualColumn('main_product_is_promo'))
+                ->set("IS_NEW", $product->getVirtualColumn('main_product_is_new'))
                 ->set("POSITION", $product->getPosition())
             ;
 
@@ -410,5 +525,4 @@ class Product extends BaseLoop
 
         return $loopResult;
     }
-
 }

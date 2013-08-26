@@ -16,8 +16,10 @@ use Propel\Runtime\Exception\PropelException;
 use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
+use Thelia\Model\Coupon as ChildCoupon;
 use Thelia\Model\CouponOrder as ChildCouponOrder;
 use Thelia\Model\CouponOrderQuery as ChildCouponOrderQuery;
+use Thelia\Model\CouponQuery as ChildCouponQuery;
 use Thelia\Model\Order as ChildOrder;
 use Thelia\Model\OrderQuery as ChildOrderQuery;
 use Thelia\Model\Map\CouponOrderTableMap;
@@ -96,6 +98,11 @@ abstract class CouponOrder implements ActiveRecordInterface
      * @var        Order
      */
     protected $aOrder;
+
+    /**
+     * @var        Coupon
+     */
+    protected $aCoupon;
 
     /**
      * Flag to prevent endless save loop, if this object is referenced
@@ -261,7 +268,7 @@ abstract class CouponOrder implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -506,6 +513,10 @@ abstract class CouponOrder implements ActiveRecordInterface
             $this->modifiedColumns[] = CouponOrderTableMap::CODE;
         }
 
+        if ($this->aCoupon !== null && $this->aCoupon->getCode() !== $v) {
+            $this->aCoupon = null;
+        }
+
 
         return $this;
     } // setCode()
@@ -666,6 +677,9 @@ abstract class CouponOrder implements ActiveRecordInterface
         if ($this->aOrder !== null && $this->order_id !== $this->aOrder->getId()) {
             $this->aOrder = null;
         }
+        if ($this->aCoupon !== null && $this->code !== $this->aCoupon->getCode()) {
+            $this->aCoupon = null;
+        }
     } // ensureConsistency
 
     /**
@@ -706,6 +720,7 @@ abstract class CouponOrder implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aOrder = null;
+            $this->aCoupon = null;
         } // if (deep)
     }
 
@@ -838,6 +853,13 @@ abstract class CouponOrder implements ActiveRecordInterface
                     $affectedRows += $this->aOrder->save($con);
                 }
                 $this->setOrder($this->aOrder);
+            }
+
+            if ($this->aCoupon !== null) {
+                if ($this->aCoupon->isModified() || $this->aCoupon->isNew()) {
+                    $affectedRows += $this->aCoupon->save($con);
+                }
+                $this->setCoupon($this->aCoupon);
             }
 
             if ($this->isNew() || $this->isModified()) {
@@ -1049,6 +1071,9 @@ abstract class CouponOrder implements ActiveRecordInterface
         if ($includeForeignObjects) {
             if (null !== $this->aOrder) {
                 $result['Order'] = $this->aOrder->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
+            }
+            if (null !== $this->aCoupon) {
+                $result['Coupon'] = $this->aCoupon->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
         }
 
@@ -1297,6 +1322,59 @@ abstract class CouponOrder implements ActiveRecordInterface
     }
 
     /**
+     * Declares an association between this object and a ChildCoupon object.
+     *
+     * @param                  ChildCoupon $v
+     * @return                 \Thelia\Model\CouponOrder The current object (for fluent API support)
+     * @throws PropelException
+     */
+    public function setCoupon(ChildCoupon $v = null)
+    {
+        if ($v === null) {
+            $this->setCode(NULL);
+        } else {
+            $this->setCode($v->getCode());
+        }
+
+        $this->aCoupon = $v;
+
+        // Add binding for other direction of this n:n relationship.
+        // If this object has already been added to the ChildCoupon object, it will not be re-added.
+        if ($v !== null) {
+            $v->addCouponOrder($this);
+        }
+
+
+        return $this;
+    }
+
+
+    /**
+     * Get the associated ChildCoupon object
+     *
+     * @param      ConnectionInterface $con Optional Connection object.
+     * @return                 ChildCoupon The associated ChildCoupon object.
+     * @throws PropelException
+     */
+    public function getCoupon(ConnectionInterface $con = null)
+    {
+        if ($this->aCoupon === null && (($this->code !== "" && $this->code !== null))) {
+            $this->aCoupon = ChildCouponQuery::create()
+                ->filterByCouponOrder($this) // here
+                ->findOne($con);
+            /* The following can be used additionally to
+                guarantee the related object contains a reference
+                to this object.  This level of coupling may, however, be
+                undesirable since it could result in an only partially populated collection
+                in the referenced object.
+                $this->aCoupon->addCouponOrders($this);
+             */
+        }
+
+        return $this->aCoupon;
+    }
+
+    /**
      * Clears the current object and sets all attributes to their default values
      */
     public function clear()
@@ -1329,6 +1407,7 @@ abstract class CouponOrder implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aOrder = null;
+        $this->aCoupon = null;
     }
 
     /**

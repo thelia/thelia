@@ -124,7 +124,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_US';
+    protected $currentLocale = 'en_EN';
 
     /**
      * Current translation objects
@@ -319,7 +319,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -2106,7 +2106,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_US';
+        $this->currentLocale = 'en_EN';
         $this->currentTranslations = null;
 
         if ($this->collCustomers instanceof Collection) {
@@ -2156,7 +2156,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @return    ChildCustomerTitle The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_US')
+    public function setLocale($locale = 'en_EN')
     {
         $this->currentLocale = $locale;
 
@@ -2180,7 +2180,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildCustomerTitleI18n */
-    public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function getTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collCustomerTitleI18ns) {
@@ -2215,7 +2215,7 @@ abstract class CustomerTitle implements ActiveRecordInterface
      *
      * @return    ChildCustomerTitle The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function removeTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
             ChildCustomerTitleI18nQuery::create()

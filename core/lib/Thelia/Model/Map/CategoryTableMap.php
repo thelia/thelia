@@ -126,7 +126,7 @@ class CategoryTableMap extends TableMap
      *
      * @var string
      */
-    const DEFAULT_LOCALE = 'en_US';
+    const DEFAULT_LOCALE = 'en_EN';
 
     /**
      * holds an array of fieldnames
@@ -193,10 +193,10 @@ class CategoryTableMap extends TableMap
         $this->addRelation('ProductCategory', '\\Thelia\\Model\\ProductCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'ProductCategories');
         $this->addRelation('FeatureCategory', '\\Thelia\\Model\\FeatureCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'FeatureCategories');
         $this->addRelation('AttributeCategory', '\\Thelia\\Model\\AttributeCategory', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'AttributeCategories');
-        $this->addRelation('ContentAssoc', '\\Thelia\\Model\\ContentAssoc', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'ContentAssocs');
         $this->addRelation('Rewriting', '\\Thelia\\Model\\Rewriting', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'Rewritings');
         $this->addRelation('CategoryImage', '\\Thelia\\Model\\CategoryImage', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryImages');
         $this->addRelation('CategoryDocument', '\\Thelia\\Model\\CategoryDocument', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryDocuments');
+        $this->addRelation('CategoryAssociatedContent', '\\Thelia\\Model\\CategoryAssociatedContent', RelationMap::ONE_TO_MANY, array('id' => 'category_id', ), 'CASCADE', 'RESTRICT', 'CategoryAssociatedContents');
         $this->addRelation('CategoryI18n', '\\Thelia\\Model\\CategoryI18n', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryI18ns');
         $this->addRelation('CategoryVersion', '\\Thelia\\Model\\CategoryVersion', RelationMap::ONE_TO_MANY, array('id' => 'id', ), 'CASCADE', null, 'CategoryVersions');
         $this->addRelation('Product', '\\Thelia\\Model\\Product', RelationMap::MANY_TO_MANY, array(), 'CASCADE', 'RESTRICT', 'Products');
@@ -228,10 +228,10 @@ class CategoryTableMap extends TableMap
                 ProductCategoryTableMap::clearInstancePool();
                 FeatureCategoryTableMap::clearInstancePool();
                 AttributeCategoryTableMap::clearInstancePool();
-                ContentAssocTableMap::clearInstancePool();
                 RewritingTableMap::clearInstancePool();
                 CategoryImageTableMap::clearInstancePool();
                 CategoryDocumentTableMap::clearInstancePool();
+                CategoryAssociatedContentTableMap::clearInstancePool();
                 CategoryI18nTableMap::clearInstancePool();
                 CategoryVersionTableMap::clearInstancePool();
             }

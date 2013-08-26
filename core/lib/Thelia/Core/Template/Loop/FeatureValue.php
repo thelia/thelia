@@ -24,15 +24,21 @@
 namespace Thelia\Core\Template\Loop;
 
 use Propel\Runtime\ActiveQuery\Criteria;
+use Propel\Runtime\ActiveQuery\Join;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
 
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use Thelia\Log\Tlog;
+
+use Thelia\Model\Tools\ModelCriteriaTools;
 
 use Thelia\Model\Base\FeatureProductQuery;
 use Thelia\Model\ConfigQuery;
+use Thelia\Model\Map\FeatureAvTableMap;
+use Thelia\Model\Map\FeatureProductTableMap;
 use Thelia\Type\TypeCollection;
 use Thelia\Type;
 
@@ -55,13 +61,13 @@ class FeatureValue extends BaseLoop
         return new ArgumentCollection(
             Argument::createIntTypeArgument('feature', null, true),
             Argument::createIntTypeArgument('product', null, true),
-            Argument::createIntListTypeArgument('feature_available'),
-            Argument::createBooleanTypeArgument('exclude_feature_available', 0),
-            Argument::createBooleanTypeArgument('exclude_default_values', 0),
+            Argument::createIntListTypeArgument('feature_availability'),
+            Argument::createBooleanTypeArgument('exclude_feature_availability', 0),
+            Argument::createBooleanTypeArgument('exclude_personal_values', 0),
             new Argument(
                 'order',
                 new TypeCollection(
-                    new Type\EnumListType(array('alpha', 'alpha-reverse', 'manual', 'manual_reverse'))
+                    new Type\EnumListType(array('alpha', 'alpha_reverse', 'manual', 'manual_reverse'))
                 ),
                 'manual'
             )
@@ -77,6 +83,16 @@ class FeatureValue extends BaseLoop
     {
         $search = FeatureProductQuery::create();
 
+        /* manage featureAv translations */
+        ModelCriteriaTools::getI18n(
+            $search,
+            ConfigQuery::read("default_lang_without_translation", 1),
+            $this->request->getSession()->getLocale(),
+            array('TITLE', 'CHAPO', 'DESCRIPTION', 'POSTSCRIPTUM'),
+            FeatureAvTableMap::TABLE_NAME,
+            'FEATURE_AV_ID'
+        );
+
         $feature = $this->getFeature();
 
         $search->filterByFeatureId($feature, Criteria::EQUAL);
@@ -85,31 +101,31 @@ class FeatureValue extends BaseLoop
 
         $search->filterByProductId($product, Criteria::EQUAL);
 
-        $featureAvailable = $this->getFeature_available();
+        $featureAvailability = $this->getFeature_availability();
 
-        if (null !== $featureAvailable) {
-            $search->filterByFeatureAvId($featureAvailable, Criteria::IN);
+        if (null !== $featureAvailability) {
+            $search->filterByFeatureAvId($featureAvailability, Criteria::IN);
         }
 
-        $excludeFeatureAvailable = $this->getExclude_feature_available();
-        if ($excludeFeatureAvailable == true) {
+        $excludeFeatureAvailability = $this->getExclude_feature_availability();
+        if($excludeFeatureAvailability == true) {
             $search->filterByFeatureAvId(null, Criteria::NULL);
         }
 
-        $excludeDefaultValues = $this->getExclude_default_values();
-        if ($excludeDefaultValues == true) {
+        $excludeDefaultValues = $this->getExclude_personal_values();
+        if($excludeDefaultValues == true) {
             $search->filterByByDefault(null, Criteria::NULL);
         }
 
         $orders  = $this->getOrder();
 
-        foreach ($orders as $order) {
+        foreach($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
-                case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                case "alpha_reverse":
+                    $search->addDescendingOrderByColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE');
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
@@ -120,17 +136,6 @@ class FeatureValue extends BaseLoop
             }
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        /*$search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );*/
-
         $featureValues = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
@@ -138,10 +143,12 @@ class FeatureValue extends BaseLoop
         foreach ($featureValues as $featureValue) {
             $loopResultRow = new LoopResultRow();
             $loopResultRow->set("ID", $featureValue->getId());
-            /*$loopResultRow->set("TITLE",$featureValue->getTitle());
-            $loopResultRow->set("CHAPO", $featureValue->getChapo());
-            $loopResultRow->set("DESCRIPTION", $featureValue->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $featureValue->getPostscriptum());*/
+
+            $loopResultRow->set("PERSONAL_VALUE", $featureValue->getByDefault())
+                ->set("TITLE",$featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_TITLE'))
+                ->set("CHAPO", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_CHAPO'))
+                ->set("DESCRIPTION", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $featureValue->getVirtualColumn(FeatureAvTableMap::TABLE_NAME . '_i18n_POSTSCRIPTUM'));
 
             $loopResult->addRow($loopResultRow);
         }

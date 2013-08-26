@@ -120,7 +120,7 @@ abstract class ProductDocument implements ActiveRecordInterface
      * Current locale
      * @var        string
      */
-    protected $currentLocale = 'en_US';
+    protected $currentLocale = 'en_EN';
 
     /**
      * Current translation objects
@@ -290,7 +290,7 @@ abstract class ProductDocument implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -1640,7 +1640,7 @@ abstract class ProductDocument implements ActiveRecordInterface
         } // if ($deep)
 
         // i18n behavior
-        $this->currentLocale = 'en_US';
+        $this->currentLocale = 'en_EN';
         $this->currentTranslations = null;
 
         if ($this->collProductDocumentI18ns instanceof Collection) {
@@ -1683,7 +1683,7 @@ abstract class ProductDocument implements ActiveRecordInterface
      *
      * @return    ChildProductDocument The current object (for fluent API support)
      */
-    public function setLocale($locale = 'en_US')
+    public function setLocale($locale = 'en_EN')
     {
         $this->currentLocale = $locale;
 
@@ -1707,7 +1707,7 @@ abstract class ProductDocument implements ActiveRecordInterface
      * @param     ConnectionInterface $con an optional connection object
      *
      * @return ChildProductDocumentI18n */
-    public function getTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function getTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!isset($this->currentTranslations[$locale])) {
             if (null !== $this->collProductDocumentI18ns) {
@@ -1742,7 +1742,7 @@ abstract class ProductDocument implements ActiveRecordInterface
      *
      * @return    ChildProductDocument The current object (for fluent API support)
      */
-    public function removeTranslation($locale = 'en_US', ConnectionInterface $con = null)
+    public function removeTranslation($locale = 'en_EN', ConnectionInterface $con = null)
     {
         if (!$this->isNew()) {
             ChildProductDocumentI18nQuery::create()

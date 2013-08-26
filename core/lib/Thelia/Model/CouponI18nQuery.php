@@ -2,11 +2,11 @@
 
 namespace Thelia\Model;
 
-use Thelia\Model\Base\ContentAssocQuery as BaseContentAssocQuery;
+use Thelia\Model\Base\CouponI18nQuery as BaseCouponI18nQuery;
 
 
 /**
- * Skeleton subclass for performing query and update operations on the 'content_assoc' table.
+ * Skeleton subclass for performing query and update operations on the 'coupon_i18n' table.
  *
  *
  *
@@ -15,6 +15,6 @@ use Thelia\Model\Base\ContentAssocQuery as BaseContentAssocQuery;
  * long as it does not already exist in the output directory.
  *
  */
-class ContentAssocQuery extends BaseContentAssocQuery {
+class CouponI18nQuery extends BaseCouponI18nQuery {
 
-} // ContentAssocQuery
+} // CouponI18nQuery

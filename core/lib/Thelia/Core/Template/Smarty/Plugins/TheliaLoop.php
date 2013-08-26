@@ -61,7 +61,7 @@ class TheliaLoop extends AbstractSmartyPlugin
      */
     public static function getPagination($loopId)
     {
-        if (!empty(self::$pagination[$loopId])) {
+        if(!empty(self::$pagination[$loopId])) {
             return self::$pagination[$loopId];
         } else {
             return null;
@@ -75,8 +75,9 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $type = $this->getParam($params, 'type');
 
-        if (null == $type)
+    	if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in count arguments");
+        }
 
         $loop = $this->createLoopInstance($params);
 
@@ -101,13 +102,15 @@ class TheliaLoop extends AbstractSmartyPlugin
     {
         $name = $this->getParam($params, 'name');
 
-        if (null == $name)
+        if (null == $name) {
             throw new \InvalidArgumentException("Missing 'name' parameter in loop arguments");
+        }
 
         $type = $this->getParam($params, 'type');
 
-        if (null == $type)
+        if (null == $type) {
             throw new \InvalidArgumentException("Missing 'type' parameter in loop arguments");
+        }
 
         if ($content === null) {
             // Check if a loop with the same name exists in the current scope, and abort if it's the case.

@@ -31,6 +31,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\Base\CategoryQuery;
 use Thelia\Model\Base\ProductCategoryQuery;
 use Thelia\Model\Base\FeatureQuery;
@@ -81,6 +83,9 @@ class Feature extends BaseLoop
     {
         $search = FeatureQuery::create();
 
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale());
+
         $id = $this->getId();
 
         if (null !== $id) {
@@ -122,10 +127,10 @@ class Feature extends BaseLoop
         foreach ($orders as $order) {
             switch ($order) {
                 case "alpha":
-                    $search->addAscendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    $search->addAscendingOrderByColumn('i18n_TITLE');
                     break;
                 case "alpha-reverse":
-                    $search->addDescendingOrderByColumn(\Thelia\Model\Map\FeatureI18nTableMap::TITLE);
+                    $search->addDescendingOrderByColumn('i18n_TITLE');
                     break;
                 case "manual":
                     $search->orderByPosition(Criteria::ASC);
@@ -136,28 +141,18 @@ class Feature extends BaseLoop
             }
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
+        /* perform search */
         $features = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
         foreach ($features as $feature) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $feature->getId());
-            $loopResultRow->set("TITLE",$feature->getTitle());
-            $loopResultRow->set("CHAPO", $feature->getChapo());
-            $loopResultRow->set("DESCRIPTION", $feature->getDescription());
-            $loopResultRow->set("POSTSCRIPTUM", $feature->getPostscriptum());
+            $loopResultRow->set("ID", $feature->getId())
+                ->set("TITLE",$feature->getVirtualColumn('i18n_TITLE'))
+                ->set("CHAPO", $feature->getVirtualColumn('i18n_CHAPO'))
+                ->set("DESCRIPTION", $feature->getVirtualColumn('i18n_DESCRIPTION'))
+                ->set("POSTSCRIPTUM", $feature->getVirtualColumn('i18n_POSTSCRIPTUM'));
 
             $loopResult->addRow($loopResultRow);
         }

@@ -31,6 +31,8 @@ use Thelia\Core\Template\Element\LoopResultRow;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
 
+use Thelia\Model\Tools\ModelCriteriaTools;
+
 use Thelia\Model\CustomerTitleQuery;
 use Thelia\Model\ConfigQuery;
 
@@ -64,35 +66,28 @@ class Title extends BaseLoop
     {
         $search = CustomerTitleQuery::create();
 
+        /* manage translations */
+        ModelCriteriaTools::getI18n($search, ConfigQuery::read("default_lang_without_translation", 1), $this->request->getSession()->getLocale(), array('SHORT', 'LONG'));
+
         $id = $this->getId();
 
         if (null !== $id) {
             $search->filterById($id, Criteria::IN);
         }
 
-        /**
-         * Criteria::INNER_JOIN in second parameter for joinWithI18n  exclude query without translation.
-         *
-         * @todo : verify here if we want results for row without translations.
-         */
-
-        $search->joinWithI18n(
-            $this->request->getSession()->getLocale(),
-            (ConfigQuery::read("default_lang_without_translation", 1)) ? Criteria::LEFT_JOIN : Criteria::INNER_JOIN
-        );
-
         $search->orderByPosition();
 
+        /* perform search */
         $titles = $this->search($search, $pagination);
 
         $loopResult = new LoopResult();
 
         foreach ($titles as $title) {
             $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("ID", $title->getId());
-            $loopResultRow->set("DEFAULT", $title->getByDefault());
-            $loopResultRow->set("SHORT", $title->getShort());
-            $loopResultRow->set("LONG", $title->getLong());
+            $loopResultRow->set("ID", $title->getId())
+                ->set("DEFAULT", $title->getByDefault())
+                ->set("SHORT", $title->getVirtualColumn('i18n_SHORT'))
+                ->set("LONG", $title->getVirtualColumn('i18n_LONG'));
 
             $loopResult->addRow($loopResultRow);
         }

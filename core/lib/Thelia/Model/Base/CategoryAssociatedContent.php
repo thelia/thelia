@@ -17,21 +17,19 @@ use Propel\Runtime\Map\TableMap;
 use Propel\Runtime\Parser\AbstractParser;
 use Propel\Runtime\Util\PropelDateTime;
 use Thelia\Model\Category as ChildCategory;
+use Thelia\Model\CategoryAssociatedContent as ChildCategoryAssociatedContent;
+use Thelia\Model\CategoryAssociatedContentQuery as ChildCategoryAssociatedContentQuery;
 use Thelia\Model\CategoryQuery as ChildCategoryQuery;
 use Thelia\Model\Content as ChildContent;
-use Thelia\Model\ContentAssoc as ChildContentAssoc;
-use Thelia\Model\ContentAssocQuery as ChildContentAssocQuery;
 use Thelia\Model\ContentQuery as ChildContentQuery;
-use Thelia\Model\Product as ChildProduct;
-use Thelia\Model\ProductQuery as ChildProductQuery;
-use Thelia\Model\Map\ContentAssocTableMap;
+use Thelia\Model\Map\CategoryAssociatedContentTableMap;
 
-abstract class ContentAssoc implements ActiveRecordInterface
+abstract class CategoryAssociatedContent implements ActiveRecordInterface
 {
     /**
      * TableMap class name
      */
-    const TABLE_MAP = '\\Thelia\\Model\\Map\\ContentAssocTableMap';
+    const TABLE_MAP = '\\Thelia\\Model\\Map\\CategoryAssociatedContentTableMap';
 
 
     /**
@@ -73,12 +71,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
     protected $category_id;
 
     /**
-     * The value for the product_id field.
-     * @var        int
-     */
-    protected $product_id;
-
-    /**
      * The value for the content_id field.
      * @var        int
      */
@@ -108,11 +100,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
     protected $aCategory;
 
     /**
-     * @var        Product
-     */
-    protected $aProduct;
-
-    /**
      * @var        Content
      */
     protected $aContent;
@@ -126,7 +113,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
     protected $alreadyInSave = false;
 
     /**
-     * Initializes internal state of Thelia\Model\Base\ContentAssoc object.
+     * Initializes internal state of Thelia\Model\Base\CategoryAssociatedContent object.
      */
     public function __construct()
     {
@@ -221,9 +208,9 @@ abstract class ContentAssoc implements ActiveRecordInterface
     }
 
     /**
-     * Compares this with another <code>ContentAssoc</code> instance.  If
-     * <code>obj</code> is an instance of <code>ContentAssoc</code>, delegates to
-     * <code>equals(ContentAssoc)</code>.  Otherwise, returns <code>false</code>.
+     * Compares this with another <code>CategoryAssociatedContent</code> instance.  If
+     * <code>obj</code> is an instance of <code>CategoryAssociatedContent</code>, delegates to
+     * <code>equals(CategoryAssociatedContent)</code>.  Otherwise, returns <code>false</code>.
      *
      * @param      obj The object to compare to.
      * @return Whether equal to the object specified.
@@ -281,7 +268,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function hasVirtualColumn($name)
     {
-        return isset($this->virtualColumns[$name]);
+        return array_key_exists($name, $this->virtualColumns);
     }
 
     /**
@@ -304,7 +291,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * @param string $name  The virtual column name
      * @param mixed  $value The value to give to the virtual column
      *
-     * @return ContentAssoc The current object, for fluid interface
+     * @return CategoryAssociatedContent The current object, for fluid interface
      */
     public function setVirtualColumn($name, $value)
     {
@@ -336,7 +323,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      *                       or a format name ('XML', 'YAML', 'JSON', 'CSV')
      * @param string $data The source data to import from
      *
-     * @return ContentAssoc The current object, for fluid interface
+     * @return CategoryAssociatedContent The current object, for fluid interface
      */
     public function importFrom($parser, $data)
     {
@@ -399,17 +386,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
     {
 
         return $this->category_id;
-    }
-
-    /**
-     * Get the [product_id] column value.
-     *
-     * @return   int
-     */
-    public function getProductId()
-    {
-
-        return $this->product_id;
     }
 
     /**
@@ -478,7 +454,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * Set the value of [id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return   \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      */
     public function setId($v)
     {
@@ -488,7 +464,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
 
         if ($this->id !== $v) {
             $this->id = $v;
-            $this->modifiedColumns[] = ContentAssocTableMap::ID;
+            $this->modifiedColumns[] = CategoryAssociatedContentTableMap::ID;
         }
 
 
@@ -499,7 +475,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * Set the value of [category_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return   \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      */
     public function setCategoryId($v)
     {
@@ -509,7 +485,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
 
         if ($this->category_id !== $v) {
             $this->category_id = $v;
-            $this->modifiedColumns[] = ContentAssocTableMap::CATEGORY_ID;
+            $this->modifiedColumns[] = CategoryAssociatedContentTableMap::CATEGORY_ID;
         }
 
         if ($this->aCategory !== null && $this->aCategory->getId() !== $v) {
@@ -521,35 +497,10 @@ abstract class ContentAssoc implements ActiveRecordInterface
     } // setCategoryId()
 
     /**
-     * Set the value of [product_id] column.
-     *
-     * @param      int $v new value
-     * @return   \Thelia\Model\ContentAssoc The current object (for fluent API support)
-     */
-    public function setProductId($v)
-    {
-        if ($v !== null) {
-            $v = (int) $v;
-        }
-
-        if ($this->product_id !== $v) {
-            $this->product_id = $v;
-            $this->modifiedColumns[] = ContentAssocTableMap::PRODUCT_ID;
-        }
-
-        if ($this->aProduct !== null && $this->aProduct->getId() !== $v) {
-            $this->aProduct = null;
-        }
-
-
-        return $this;
-    } // setProductId()
-
-    /**
      * Set the value of [content_id] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return   \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      */
     public function setContentId($v)
     {
@@ -559,7 +510,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
 
         if ($this->content_id !== $v) {
             $this->content_id = $v;
-            $this->modifiedColumns[] = ContentAssocTableMap::CONTENT_ID;
+            $this->modifiedColumns[] = CategoryAssociatedContentTableMap::CONTENT_ID;
         }
 
         if ($this->aContent !== null && $this->aContent->getId() !== $v) {
@@ -574,7 +525,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * Set the value of [position] column.
      *
      * @param      int $v new value
-     * @return   \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return   \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      */
     public function setPosition($v)
     {
@@ -584,7 +535,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
 
         if ($this->position !== $v) {
             $this->position = $v;
-            $this->modifiedColumns[] = ContentAssocTableMap::POSITION;
+            $this->modifiedColumns[] = CategoryAssociatedContentTableMap::POSITION;
         }
 
 
@@ -596,7 +547,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return   \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      */
     public function setCreatedAt($v)
     {
@@ -604,7 +555,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
         if ($this->created_at !== null || $dt !== null) {
             if ($dt !== $this->created_at) {
                 $this->created_at = $dt;
-                $this->modifiedColumns[] = ContentAssocTableMap::CREATED_AT;
+                $this->modifiedColumns[] = CategoryAssociatedContentTableMap::CREATED_AT;
             }
         } // if either are not null
 
@@ -617,7 +568,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      *
      * @param      mixed $v string, integer (timestamp), or \DateTime value.
      *               Empty strings are treated as NULL.
-     * @return   \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return   \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      */
     public function setUpdatedAt($v)
     {
@@ -625,7 +576,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
         if ($this->updated_at !== null || $dt !== null) {
             if ($dt !== $this->updated_at) {
                 $this->updated_at = $dt;
-                $this->modifiedColumns[] = ContentAssocTableMap::UPDATED_AT;
+                $this->modifiedColumns[] = CategoryAssociatedContentTableMap::UPDATED_AT;
             }
         } // if either are not null
 
@@ -670,28 +621,25 @@ abstract class ContentAssoc implements ActiveRecordInterface
         try {
 
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : ContentAssocTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 0 + $startcol : CategoryAssociatedContentTableMap::translateFieldName('Id', TableMap::TYPE_PHPNAME, $indexType)];
             $this->id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : ContentAssocTableMap::translateFieldName('CategoryId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 1 + $startcol : CategoryAssociatedContentTableMap::translateFieldName('CategoryId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->category_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : ContentAssocTableMap::translateFieldName('ProductId', TableMap::TYPE_PHPNAME, $indexType)];
-            $this->product_id = (null !== $col) ? (int) $col : null;
-
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : ContentAssocTableMap::translateFieldName('ContentId', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 2 + $startcol : CategoryAssociatedContentTableMap::translateFieldName('ContentId', TableMap::TYPE_PHPNAME, $indexType)];
             $this->content_id = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : ContentAssocTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 3 + $startcol : CategoryAssociatedContentTableMap::translateFieldName('Position', TableMap::TYPE_PHPNAME, $indexType)];
             $this->position = (null !== $col) ? (int) $col : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : ContentAssocTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 4 + $startcol : CategoryAssociatedContentTableMap::translateFieldName('CreatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
             $this->created_at = (null !== $col) ? PropelDateTime::newInstance($col, null, '\DateTime') : null;
 
-            $col = $row[TableMap::TYPE_NUM == $indexType ? 6 + $startcol : ContentAssocTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
+            $col = $row[TableMap::TYPE_NUM == $indexType ? 5 + $startcol : CategoryAssociatedContentTableMap::translateFieldName('UpdatedAt', TableMap::TYPE_PHPNAME, $indexType)];
             if ($col === '0000-00-00 00:00:00') {
                 $col = null;
             }
@@ -704,10 +652,10 @@ abstract class ContentAssoc implements ActiveRecordInterface
                 $this->ensureConsistency();
             }
 
-            return $startcol + 7; // 7 = ContentAssocTableMap::NUM_HYDRATE_COLUMNS.
+            return $startcol + 6; // 6 = CategoryAssociatedContentTableMap::NUM_HYDRATE_COLUMNS.
 
         } catch (Exception $e) {
-            throw new PropelException("Error populating \Thelia\Model\ContentAssoc object", 0, $e);
+            throw new PropelException("Error populating \Thelia\Model\CategoryAssociatedContent object", 0, $e);
         }
     }
 
@@ -728,9 +676,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
     {
         if ($this->aCategory !== null && $this->category_id !== $this->aCategory->getId()) {
             $this->aCategory = null;
-        }
-        if ($this->aProduct !== null && $this->product_id !== $this->aProduct->getId()) {
-            $this->aProduct = null;
         }
         if ($this->aContent !== null && $this->content_id !== $this->aContent->getId()) {
             $this->aContent = null;
@@ -758,13 +703,13 @@ abstract class ContentAssoc implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getReadConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getReadConnection(CategoryAssociatedContentTableMap::DATABASE_NAME);
         }
 
         // We don't need to alter the object instance pool; we're just modifying this instance
         // already in the pool.
 
-        $dataFetcher = ChildContentAssocQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
+        $dataFetcher = ChildCategoryAssociatedContentQuery::create(null, $this->buildPkeyCriteria())->setFormatter(ModelCriteria::FORMAT_STATEMENT)->find($con);
         $row = $dataFetcher->fetch();
         $dataFetcher->close();
         if (!$row) {
@@ -775,7 +720,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
         if ($deep) {  // also de-associate any related objects?
 
             $this->aCategory = null;
-            $this->aProduct = null;
             $this->aContent = null;
         } // if (deep)
     }
@@ -786,8 +730,8 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * @param      ConnectionInterface $con
      * @return void
      * @throws PropelException
-     * @see ContentAssoc::setDeleted()
-     * @see ContentAssoc::isDeleted()
+     * @see CategoryAssociatedContent::setDeleted()
+     * @see CategoryAssociatedContent::isDeleted()
      */
     public function delete(ConnectionInterface $con = null)
     {
@@ -796,12 +740,12 @@ abstract class ContentAssoc implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CategoryAssociatedContentTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
         try {
-            $deleteQuery = ChildContentAssocQuery::create()
+            $deleteQuery = ChildCategoryAssociatedContentQuery::create()
                 ->filterByPrimaryKey($this->getPrimaryKey());
             $ret = $this->preDelete($con);
             if ($ret) {
@@ -838,7 +782,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
         }
 
         if ($con === null) {
-            $con = Propel::getServiceContainer()->getWriteConnection(ContentAssocTableMap::DATABASE_NAME);
+            $con = Propel::getServiceContainer()->getWriteConnection(CategoryAssociatedContentTableMap::DATABASE_NAME);
         }
 
         $con->beginTransaction();
@@ -848,16 +792,16 @@ abstract class ContentAssoc implements ActiveRecordInterface
             if ($isInsert) {
                 $ret = $ret && $this->preInsert($con);
                 // timestampable behavior
-                if (!$this->isColumnModified(ContentAssocTableMap::CREATED_AT)) {
+                if (!$this->isColumnModified(CategoryAssociatedContentTableMap::CREATED_AT)) {
                     $this->setCreatedAt(time());
                 }
-                if (!$this->isColumnModified(ContentAssocTableMap::UPDATED_AT)) {
+                if (!$this->isColumnModified(CategoryAssociatedContentTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             } else {
                 $ret = $ret && $this->preUpdate($con);
                 // timestampable behavior
-                if ($this->isModified() && !$this->isColumnModified(ContentAssocTableMap::UPDATED_AT)) {
+                if ($this->isModified() && !$this->isColumnModified(CategoryAssociatedContentTableMap::UPDATED_AT)) {
                     $this->setUpdatedAt(time());
                 }
             }
@@ -869,7 +813,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
                     $this->postUpdate($con);
                 }
                 $this->postSave($con);
-                ContentAssocTableMap::addInstanceToPool($this);
+                CategoryAssociatedContentTableMap::addInstanceToPool($this);
             } else {
                 $affectedRows = 0;
             }
@@ -911,13 +855,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
                 $this->setCategory($this->aCategory);
             }
 
-            if ($this->aProduct !== null) {
-                if ($this->aProduct->isModified() || $this->aProduct->isNew()) {
-                    $affectedRows += $this->aProduct->save($con);
-                }
-                $this->setProduct($this->aProduct);
-            }
-
             if ($this->aContent !== null) {
                 if ($this->aContent->isModified() || $this->aContent->isNew()) {
                     $affectedRows += $this->aContent->save($con);
@@ -956,36 +893,33 @@ abstract class ContentAssoc implements ActiveRecordInterface
         $modifiedColumns = array();
         $index = 0;
 
-        $this->modifiedColumns[] = ContentAssocTableMap::ID;
+        $this->modifiedColumns[] = CategoryAssociatedContentTableMap::ID;
         if (null !== $this->id) {
-            throw new PropelException('Cannot insert a value for auto-increment primary key (' . ContentAssocTableMap::ID . ')');
+            throw new PropelException('Cannot insert a value for auto-increment primary key (' . CategoryAssociatedContentTableMap::ID . ')');
         }
 
          // check the columns in natural order for more readable SQL queries
-        if ($this->isColumnModified(ContentAssocTableMap::ID)) {
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::ID)) {
             $modifiedColumns[':p' . $index++]  = 'ID';
         }
-        if ($this->isColumnModified(ContentAssocTableMap::CATEGORY_ID)) {
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::CATEGORY_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CATEGORY_ID';
         }
-        if ($this->isColumnModified(ContentAssocTableMap::PRODUCT_ID)) {
-            $modifiedColumns[':p' . $index++]  = 'PRODUCT_ID';
-        }
-        if ($this->isColumnModified(ContentAssocTableMap::CONTENT_ID)) {
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::CONTENT_ID)) {
             $modifiedColumns[':p' . $index++]  = 'CONTENT_ID';
         }
-        if ($this->isColumnModified(ContentAssocTableMap::POSITION)) {
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::POSITION)) {
             $modifiedColumns[':p' . $index++]  = 'POSITION';
         }
-        if ($this->isColumnModified(ContentAssocTableMap::CREATED_AT)) {
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::CREATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'CREATED_AT';
         }
-        if ($this->isColumnModified(ContentAssocTableMap::UPDATED_AT)) {
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::UPDATED_AT)) {
             $modifiedColumns[':p' . $index++]  = 'UPDATED_AT';
         }
 
         $sql = sprintf(
-            'INSERT INTO content_assoc (%s) VALUES (%s)',
+            'INSERT INTO category_associated_content (%s) VALUES (%s)',
             implode(', ', $modifiedColumns),
             implode(', ', array_keys($modifiedColumns))
         );
@@ -999,9 +933,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
                         break;
                     case 'CATEGORY_ID':
                         $stmt->bindValue($identifier, $this->category_id, PDO::PARAM_INT);
-                        break;
-                    case 'PRODUCT_ID':
-                        $stmt->bindValue($identifier, $this->product_id, PDO::PARAM_INT);
                         break;
                     case 'CONTENT_ID':
                         $stmt->bindValue($identifier, $this->content_id, PDO::PARAM_INT);
@@ -1061,7 +992,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function getByName($name, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ContentAssocTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CategoryAssociatedContentTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
         $field = $this->getByPosition($pos);
 
         return $field;
@@ -1084,18 +1015,15 @@ abstract class ContentAssoc implements ActiveRecordInterface
                 return $this->getCategoryId();
                 break;
             case 2:
-                return $this->getProductId();
-                break;
-            case 3:
                 return $this->getContentId();
                 break;
-            case 4:
+            case 3:
                 return $this->getPosition();
                 break;
-            case 5:
+            case 4:
                 return $this->getCreatedAt();
                 break;
-            case 6:
+            case 5:
                 return $this->getUpdatedAt();
                 break;
             default:
@@ -1121,19 +1049,18 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function toArray($keyType = TableMap::TYPE_PHPNAME, $includeLazyLoadColumns = true, $alreadyDumpedObjects = array(), $includeForeignObjects = false)
     {
-        if (isset($alreadyDumpedObjects['ContentAssoc'][$this->getPrimaryKey()])) {
+        if (isset($alreadyDumpedObjects['CategoryAssociatedContent'][$this->getPrimaryKey()])) {
             return '*RECURSION*';
         }
-        $alreadyDumpedObjects['ContentAssoc'][$this->getPrimaryKey()] = true;
-        $keys = ContentAssocTableMap::getFieldNames($keyType);
+        $alreadyDumpedObjects['CategoryAssociatedContent'][$this->getPrimaryKey()] = true;
+        $keys = CategoryAssociatedContentTableMap::getFieldNames($keyType);
         $result = array(
             $keys[0] => $this->getId(),
             $keys[1] => $this->getCategoryId(),
-            $keys[2] => $this->getProductId(),
-            $keys[3] => $this->getContentId(),
-            $keys[4] => $this->getPosition(),
-            $keys[5] => $this->getCreatedAt(),
-            $keys[6] => $this->getUpdatedAt(),
+            $keys[2] => $this->getContentId(),
+            $keys[3] => $this->getPosition(),
+            $keys[4] => $this->getCreatedAt(),
+            $keys[5] => $this->getUpdatedAt(),
         );
         $virtualColumns = $this->virtualColumns;
         foreach($virtualColumns as $key => $virtualColumn)
@@ -1144,9 +1071,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
         if ($includeForeignObjects) {
             if (null !== $this->aCategory) {
                 $result['Category'] = $this->aCategory->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
-            }
-            if (null !== $this->aProduct) {
-                $result['Product'] = $this->aProduct->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
             }
             if (null !== $this->aContent) {
                 $result['Content'] = $this->aContent->toArray($keyType, $includeLazyLoadColumns,  $alreadyDumpedObjects, true);
@@ -1169,7 +1093,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function setByName($name, $value, $type = TableMap::TYPE_PHPNAME)
     {
-        $pos = ContentAssocTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
+        $pos = CategoryAssociatedContentTableMap::translateFieldName($name, $type, TableMap::TYPE_NUM);
 
         return $this->setByPosition($pos, $value);
     }
@@ -1192,18 +1116,15 @@ abstract class ContentAssoc implements ActiveRecordInterface
                 $this->setCategoryId($value);
                 break;
             case 2:
-                $this->setProductId($value);
-                break;
-            case 3:
                 $this->setContentId($value);
                 break;
-            case 4:
+            case 3:
                 $this->setPosition($value);
                 break;
-            case 5:
+            case 4:
                 $this->setCreatedAt($value);
                 break;
-            case 6:
+            case 5:
                 $this->setUpdatedAt($value);
                 break;
         } // switch()
@@ -1228,15 +1149,14 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function fromArray($arr, $keyType = TableMap::TYPE_PHPNAME)
     {
-        $keys = ContentAssocTableMap::getFieldNames($keyType);
+        $keys = CategoryAssociatedContentTableMap::getFieldNames($keyType);
 
         if (array_key_exists($keys[0], $arr)) $this->setId($arr[$keys[0]]);
         if (array_key_exists($keys[1], $arr)) $this->setCategoryId($arr[$keys[1]]);
-        if (array_key_exists($keys[2], $arr)) $this->setProductId($arr[$keys[2]]);
-        if (array_key_exists($keys[3], $arr)) $this->setContentId($arr[$keys[3]]);
-        if (array_key_exists($keys[4], $arr)) $this->setPosition($arr[$keys[4]]);
-        if (array_key_exists($keys[5], $arr)) $this->setCreatedAt($arr[$keys[5]]);
-        if (array_key_exists($keys[6], $arr)) $this->setUpdatedAt($arr[$keys[6]]);
+        if (array_key_exists($keys[2], $arr)) $this->setContentId($arr[$keys[2]]);
+        if (array_key_exists($keys[3], $arr)) $this->setPosition($arr[$keys[3]]);
+        if (array_key_exists($keys[4], $arr)) $this->setCreatedAt($arr[$keys[4]]);
+        if (array_key_exists($keys[5], $arr)) $this->setUpdatedAt($arr[$keys[5]]);
     }
 
     /**
@@ -1246,15 +1166,14 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function buildCriteria()
     {
-        $criteria = new Criteria(ContentAssocTableMap::DATABASE_NAME);
+        $criteria = new Criteria(CategoryAssociatedContentTableMap::DATABASE_NAME);
 
-        if ($this->isColumnModified(ContentAssocTableMap::ID)) $criteria->add(ContentAssocTableMap::ID, $this->id);
-        if ($this->isColumnModified(ContentAssocTableMap::CATEGORY_ID)) $criteria->add(ContentAssocTableMap::CATEGORY_ID, $this->category_id);
-        if ($this->isColumnModified(ContentAssocTableMap::PRODUCT_ID)) $criteria->add(ContentAssocTableMap::PRODUCT_ID, $this->product_id);
-        if ($this->isColumnModified(ContentAssocTableMap::CONTENT_ID)) $criteria->add(ContentAssocTableMap::CONTENT_ID, $this->content_id);
-        if ($this->isColumnModified(ContentAssocTableMap::POSITION)) $criteria->add(ContentAssocTableMap::POSITION, $this->position);
-        if ($this->isColumnModified(ContentAssocTableMap::CREATED_AT)) $criteria->add(ContentAssocTableMap::CREATED_AT, $this->created_at);
-        if ($this->isColumnModified(ContentAssocTableMap::UPDATED_AT)) $criteria->add(ContentAssocTableMap::UPDATED_AT, $this->updated_at);
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::ID)) $criteria->add(CategoryAssociatedContentTableMap::ID, $this->id);
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::CATEGORY_ID)) $criteria->add(CategoryAssociatedContentTableMap::CATEGORY_ID, $this->category_id);
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::CONTENT_ID)) $criteria->add(CategoryAssociatedContentTableMap::CONTENT_ID, $this->content_id);
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::POSITION)) $criteria->add(CategoryAssociatedContentTableMap::POSITION, $this->position);
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::CREATED_AT)) $criteria->add(CategoryAssociatedContentTableMap::CREATED_AT, $this->created_at);
+        if ($this->isColumnModified(CategoryAssociatedContentTableMap::UPDATED_AT)) $criteria->add(CategoryAssociatedContentTableMap::UPDATED_AT, $this->updated_at);
 
         return $criteria;
     }
@@ -1269,8 +1188,8 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function buildPkeyCriteria()
     {
-        $criteria = new Criteria(ContentAssocTableMap::DATABASE_NAME);
-        $criteria->add(ContentAssocTableMap::ID, $this->id);
+        $criteria = new Criteria(CategoryAssociatedContentTableMap::DATABASE_NAME);
+        $criteria->add(CategoryAssociatedContentTableMap::ID, $this->id);
 
         return $criteria;
     }
@@ -1311,7 +1230,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * If desired, this method can also make copies of all associated (fkey referrers)
      * objects.
      *
-     * @param      object $copyObj An object of \Thelia\Model\ContentAssoc (or compatible) type.
+     * @param      object $copyObj An object of \Thelia\Model\CategoryAssociatedContent (or compatible) type.
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
      * @param      boolean $makeNew Whether to reset autoincrement PKs and make the object new.
      * @throws PropelException
@@ -1319,7 +1238,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
     public function copyInto($copyObj, $deepCopy = false, $makeNew = true)
     {
         $copyObj->setCategoryId($this->getCategoryId());
-        $copyObj->setProductId($this->getProductId());
         $copyObj->setContentId($this->getContentId());
         $copyObj->setPosition($this->getPosition());
         $copyObj->setCreatedAt($this->getCreatedAt());
@@ -1339,7 +1257,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * objects.
      *
      * @param      boolean $deepCopy Whether to also copy all rows that refer (by fkey) to the current row.
-     * @return                 \Thelia\Model\ContentAssoc Clone of current object.
+     * @return                 \Thelia\Model\CategoryAssociatedContent Clone of current object.
      * @throws PropelException
      */
     public function copy($deepCopy = false)
@@ -1356,7 +1274,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      * Declares an association between this object and a ChildCategory object.
      *
      * @param                  ChildCategory $v
-     * @return                 \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return                 \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      * @throws PropelException
      */
     public function setCategory(ChildCategory $v = null)
@@ -1372,7 +1290,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildCategory object, it will not be re-added.
         if ($v !== null) {
-            $v->addContentAssoc($this);
+            $v->addCategoryAssociatedContent($this);
         }
 
 
@@ -1396,7 +1314,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aCategory->addContentAssocs($this);
+                $this->aCategory->addCategoryAssociatedContents($this);
              */
         }
 
@@ -1404,61 +1322,10 @@ abstract class ContentAssoc implements ActiveRecordInterface
     }
 
     /**
-     * Declares an association between this object and a ChildProduct object.
-     *
-     * @param                  ChildProduct $v
-     * @return                 \Thelia\Model\ContentAssoc The current object (for fluent API support)
-     * @throws PropelException
-     */
-    public function setProduct(ChildProduct $v = null)
-    {
-        if ($v === null) {
-            $this->setProductId(NULL);
-        } else {
-            $this->setProductId($v->getId());
-        }
-
-        $this->aProduct = $v;
-
-        // Add binding for other direction of this n:n relationship.
-        // If this object has already been added to the ChildProduct object, it will not be re-added.
-        if ($v !== null) {
-            $v->addContentAssoc($this);
-        }
-
-
-        return $this;
-    }
-
-
-    /**
-     * Get the associated ChildProduct object
-     *
-     * @param      ConnectionInterface $con Optional Connection object.
-     * @return                 ChildProduct The associated ChildProduct object.
-     * @throws PropelException
-     */
-    public function getProduct(ConnectionInterface $con = null)
-    {
-        if ($this->aProduct === null && ($this->product_id !== null)) {
-            $this->aProduct = ChildProductQuery::create()->findPk($this->product_id, $con);
-            /* The following can be used additionally to
-                guarantee the related object contains a reference
-                to this object.  This level of coupling may, however, be
-                undesirable since it could result in an only partially populated collection
-                in the referenced object.
-                $this->aProduct->addContentAssocs($this);
-             */
-        }
-
-        return $this->aProduct;
-    }
-
-    /**
      * Declares an association between this object and a ChildContent object.
      *
      * @param                  ChildContent $v
-     * @return                 \Thelia\Model\ContentAssoc The current object (for fluent API support)
+     * @return                 \Thelia\Model\CategoryAssociatedContent The current object (for fluent API support)
      * @throws PropelException
      */
     public function setContent(ChildContent $v = null)
@@ -1474,7 +1341,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
         // Add binding for other direction of this n:n relationship.
         // If this object has already been added to the ChildContent object, it will not be re-added.
         if ($v !== null) {
-            $v->addContentAssoc($this);
+            $v->addCategoryAssociatedContent($this);
         }
 
 
@@ -1498,7 +1365,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
                 to this object.  This level of coupling may, however, be
                 undesirable since it could result in an only partially populated collection
                 in the referenced object.
-                $this->aContent->addContentAssocs($this);
+                $this->aContent->addCategoryAssociatedContents($this);
              */
         }
 
@@ -1512,7 +1379,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
     {
         $this->id = null;
         $this->category_id = null;
-        $this->product_id = null;
         $this->content_id = null;
         $this->position = null;
         $this->created_at = null;
@@ -1539,7 +1405,6 @@ abstract class ContentAssoc implements ActiveRecordInterface
         } // if ($deep)
 
         $this->aCategory = null;
-        $this->aProduct = null;
         $this->aContent = null;
     }
 
@@ -1550,7 +1415,7 @@ abstract class ContentAssoc implements ActiveRecordInterface
      */
     public function __toString()
     {
-        return (string) $this->exportTo(ContentAssocTableMap::DEFAULT_STRING_FORMAT);
+        return (string) $this->exportTo(CategoryAssociatedContentTableMap::DEFAULT_STRING_FORMAT);
     }
 
     // timestampable behavior
@@ -1558,11 +1423,11 @@ abstract class ContentAssoc implements ActiveRecordInterface
     /**
      * Mark the current object so that the update date doesn't get updated during next save
      *
-     * @return     ChildContentAssoc The current object (for fluent API support)
+     * @return     ChildCategoryAssociatedContent The current object (for fluent API support)
      */
     public function keepUpdateDateUnchanged()
     {
-        $this->modifiedColumns[] = ContentAssocTableMap::UPDATED_AT;
+        $this->modifiedColumns[] = CategoryAssociatedContentTableMap::UPDATED_AT;
 
         return $this;
     }
